@@ -1,12 +1,3 @@
-.PHONY: help
-help:
-	@echo "Please select a target!"
-
-.PHONY: format
-format:
-	@echo "[ $@	: \033[0;36mFormatting...\033[0m ]"
-	prettier -l --write src/**/*.js
-
 .PHONY: build
 build:
 	NODE_ENV=production $(MAKE) javascript
@@ -21,6 +12,11 @@ javascript: clean
 	@echo "[ $@	: \033[0;35mProcessing...\033[0m ]"
 	./node_modules/.bin/rollup -c --silent
 	@echo "[ $@	: \033[0;32mDone\033[0m ]"
+
+.PHONY: format
+format:
+	@echo "[ $@	: \033[0;36mFormatting...\033[0m ]"
+	prettier -l --write src/**/*.js
 
 .PHONY: test
 test:
