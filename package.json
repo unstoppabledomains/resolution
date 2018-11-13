@@ -26,5 +26,8 @@
   },
   "files": [
     "build"
-  ]
+  ],
+  "dependencies": {
+    "punycode": "^2.1.1"
+  }
 }

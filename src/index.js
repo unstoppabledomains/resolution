@@ -1,1 +1,3 @@
-export default 'Namicorn'
+import * as name from './name'
+
+export { name }
