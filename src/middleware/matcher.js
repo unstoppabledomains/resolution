@@ -1,4 +1,4 @@
-function matcherMiddleware(
+export default function matcherMiddleware(
   {
     name,
     filter: { mangle = false, normalize = true, strictLdhFilter = true },
@@ -13,5 +13,3 @@ function matcherMiddleware(
   if (regex.test(name)) return next()
   throw new Error('Invalid domain name')
 }
-
-export { matcherMiddleware, matcherMiddleware as default }

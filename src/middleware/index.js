@@ -1,3 +1,3 @@
-export { createEnsMiddleware } from './ens'
-export { createZnsMiddleware } from './zns'
-export { matcherMiddleware } from './matcher'
+export { default as createEnsMiddleware } from './ens'
+export { default as createZnsMiddleware } from './zns'
+export { default as matcherMiddleware } from './matcher'

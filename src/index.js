@@ -29,6 +29,11 @@ class Namicorn {
   manager = new Middleware().use(this.middleware.debugger)
   use = this.manager.use
 
+  constructor({ debug = false, disableMatcher = false }) {
+    if (debug) this.use(this.middleware.debugger)
+    if (!disableMatcher) this.use(this.middleware.matcher)
+  }
+
   resolve = (name, opts) => this.manager.invoke({ ...opts, self: this, name })
 }
 

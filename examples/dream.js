@@ -4,7 +4,7 @@ import Ensicorn from '@namicorn/ens'
 
 const namicorn = new Namicorn()
 
-namicorn.register(new Znsicorn({}))
+namicorn.register(new Znsicorn())
 namicorn.register(new Ensicorn())
 
 namicorn.resolve('nameyname')

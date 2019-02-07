@@ -22,14 +22,15 @@ import Namicorn from 'namicorn'
 const namicorn = new Namicorn()
 
 namicorn.use(
-  namicorn.middleware.debugger,
-  namicorn.middleware.matcher,
   namicorn.middleware.ens({ url: 'http:localhost:8545' }),
   namicorn.middleware.zns({ url: 'http:localhost:40013' }),
 )
 
 namicorn
-  .resolve(namicorn.util.normalize('🦄.zil'))
+  .resolve(namicorn.util.normalize('🦄.zil'), {
+    filter: { onlyLdh: true },
+    data: { ttl: true },
+  })
   .then(nameData => {
     console.log(nameData)
   })

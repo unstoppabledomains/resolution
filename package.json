@@ -27,8 +27,11 @@
     "build"
   ],
   "dependencies": {
+    "@zilliqa-js/zilliqa": "^0.4.2",
     "deep-equal": "^1.0.1",
-    "ethers": "^4.0.20",
-    "punycode": "^2.1.1"
+    "eth-ens-namehash": "^2.0.8",
+    "ethers": "^4.0.23",
+    "punycode": "^2.1.1",
+    "tslib": "^1.9.3"
   }
 }

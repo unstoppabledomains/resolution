@@ -1,15 +1,11 @@
 import Namicorn from '../src'
 
-const namicorn = new Namicorn()
+const namicorn = new Namicorn({
+  // debug: true,
+  disableMatcher: true,
+})
 
-namicorn.use(namicorn.middleware.debugger)
+namicorn.use(namicorn.middleware.ens())
+namicorn.use(namicorn.middleware.zns())
 
-namicorn
-  .resolve('hello', { filter: { strictLdhFilter: false } })
-  .then(console.log.bind(console, 'result'))
-  .catch(console.error.bind(console, 'error'))
-
-// export { name, createNamicorn }
-
-/*
- */
+namicorn.resolve('resolver.eth', { filter: { strictLdhFilter: false } })
