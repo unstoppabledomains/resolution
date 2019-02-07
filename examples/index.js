@@ -8,4 +8,4 @@ const namicorn = new Namicorn({
 namicorn.use(namicorn.middleware.ens())
 namicorn.use(namicorn.middleware.zns())
 
-namicorn.resolve('resolver.eth', { filter: { strictLdhFilter: false } })
+namicorn.resolve('supername.zil', { filter: { strictLdhFilter: false } })
