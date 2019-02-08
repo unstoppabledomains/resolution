@@ -6,7 +6,7 @@ import {
 } from './middleware'
 
 class Namicorn {
-  static create = () => new Namicorn()
+  static create = options => new Namicorn(options)
 
   debug = true
   middleware = {
@@ -30,7 +30,7 @@ class Namicorn {
   use = this.manager.use
 
   constructor({ debug = false, disableMatcher = false }) {
-    if (debug) this.use(this.middleware.debugger)
+    this.debug = debug
     if (!disableMatcher) this.use(this.middleware.matcher)
   }
 

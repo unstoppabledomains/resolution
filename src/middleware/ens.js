@@ -1,7 +1,11 @@
 import { Cache } from '../lib'
 import deepEqual from 'deep-equal'
 import { Contract, getDefaultProvider } from 'ethers'
-import { registryAddress, registryAbi, resolverAbi } from './ens-config'
+import {
+  registryAddress as defaultRegistryAddress,
+  registryAbi,
+  resolverAbi,
+} from './ens-config'
 import { hash } from 'eth-ens-namehash'
 
 async function getBasicInfo(registryContract, fields, hashed) {
@@ -51,7 +55,10 @@ async function getResolverInfo(resolverContract, basic, fields, hashed) {
   return { addr, content, resolvedName, pubKey, multihash }
 }
 
-export default ({ url = 'https://infura.io' } = {}) => {
+export default ({
+  url = 'https://infura.io',
+  registryAddress = defaultRegistryAddress,
+} = {}) => {
   const signer = getDefaultProvider()
   const registryContract = new Contract(registryAddress, registryAbi, signer)
   const resolverContract = new Contract(

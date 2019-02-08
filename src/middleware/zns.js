@@ -11,10 +11,10 @@ export default ({ url = 'https://dev-api.zilliqa.com' } = {}) => {
 
     const namehash = nameHash(name.replace(/(\.zil)$/, ''))
 
+    const znsState = await zilliqa.contracts.at(contractAddress).getState()
+
     try {
-      const [owner, prevOwner, resolver, ttl] = zilliqa.contracts
-        .at(contractAddress)
-        .getState()
+      const [owner, prevOwner, resolver, ttl] = znsState
         .find(v => v.vname === 'registry')
         .value.find(v => v.key === namehash).val.arguments
 
@@ -26,6 +26,8 @@ export default ({ url = 'https://dev-api.zilliqa.com' } = {}) => {
         resolver,
         ttl,
       }
-    } catch (error) {}
+    } catch (error) {
+      // console.error(error)
+    }
   }
 }

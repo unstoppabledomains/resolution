@@ -1,7 +1,7 @@
 import Namicorn from '../src'
 
 const namicorn = new Namicorn({
-  // debug: true,
+  debug: true,
   disableMatcher: true,
 })
 

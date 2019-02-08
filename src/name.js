@@ -1,24 +1,22 @@
 import punycode from 'punycode'
 
-export { isLdh, isZil, isEth, isTopLevel, normalize, mangle }
-
-function isLdh(value) {
+export function isLdh(value) {
   return /^(?:[a-z0-9-]+\.)*[a-z0-9-]+\.?$/.test(value)
 }
 
-function isZil(value) {
+export function isZil(value) {
   return /^(?:[a-z0-9-]+\.)+zil\.?$/.test(value)
 }
 
-function isEth(value) {
+export function isEth(value) {
   return /^(?:[a-z0-9-]+\.)+eth\.?$/.test(value)
 }
 
-function isTopLevel(value) {
+export function isTopLevel(value) {
   return /^[a-z0-9-]+\.{eth,zil}\.?$/.test(value)
 }
 
-function normalize(value) {
+export function normalize(value) {
   try {
     const encoded = punycode.toASCII(value).toLowerCase()
 
@@ -27,6 +25,17 @@ function normalize(value) {
     throw new Error("value isn't punycode compliant")
   }
   throw new Error("value isn't idna compliant")
+}
+
+export function isNormalized(value) {
+  try {
+    const encoded = punycode.toASCII(value).toLowerCase()
+
+    if (isLdh(encoded)) return encoded
+    return false
+  } catch (error) {
+    return false
+  }
 }
 
 function mangle() {}
