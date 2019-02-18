@@ -11,76 +11,68 @@ const babelRc = JSON.parse(fs.readFileSync('.babelrc'))
 
 babelRc.presets[0][1].modules = false
 
+const commonPlugins = [
+  json(),
+  babel({
+    ...babelRc,
+    runtimeHelpers: true,
+    babelrc: false,
+    // externalHelpers: true,
+  }),
+
+  nodeResolve({
+    preferBuiltins: true,
+  }),
+  commonjs({
+    namedExports: {
+      'node_modules/ethers/index.js': ['getDefaultProvider', 'Contract'],
+      'node_modules/@zilliqa-js/proto/dist/index.js': ['ZilliqaMessage'],
+      'node_modules/hash.js/lib/hash.js': ['sha256'],
+    },
+  }),
+]
+
+const devConfig = {
+  output: {
+    file: pkg.main,
+    format: 'cjs',
+    exports: 'named',
+  },
+
+  plugins: commonPlugins,
+}
+
+const cjsConfig = {
+  output: [
+    {
+      file: pkg.main,
+      format: 'cjs',
+      exports: 'named',
+      sourcemap: true,
+    },
+    {
+      file: pkg.module,
+      format: 'es',
+      exports: 'named',
+      sourcemap: true,
+    },
+  ],
+
+  plugins: commonPlugins,
+}
+
+const umdConfig = {
+  output: {
+    file: pkg.browser,
+    format: 'umd',
+    name: camelCase(pkg.name, { pascalCase: true }),
+    exports: 'named',
+    sourcemap: true,
+  },
+
+  plugins: commonPlugins.concat(terser()),
+}
+
 export default (process.env.NODE_ENV !== 'production'
-  ? {
-      input: 'src/index.js',
-
-      output: {
-        file: pkg.main,
-        format: 'cjs',
-        exports: 'named',
-      },
-
-      plugins: [
-        json(),
-        babel({
-          ...babelRc,
-          runtimeHelpers: true,
-          babelrc: false,
-        }),
-      ],
-    }
-  : [
-      {
-        input: 'src/index.js',
-
-        output: [
-          {
-            file: pkg.main,
-            format: 'cjs',
-            exports: 'named',
-            sourcemap: true,
-          },
-          {
-            file: pkg.module,
-            format: 'es',
-            exports: 'named',
-            sourcemap: true,
-          },
-        ],
-
-        plugins: [
-          json(),
-          babel({
-            ...babelRc,
-            runtimeHelpers: true,
-            babelrc: false,
-          }),
-        ],
-      },
-      {
-        input: 'src/index.js',
-
-        output: {
-          file: pkg.browser,
-          format: 'umd',
-          name: camelCase(pkg.name, { pascalCase: true }),
-          exports: 'named',
-          sourcemap: true,
-        },
-
-        plugins: [
-          json(),
-          babel({
-            ...babelRc,
-            runtimeHelpers: true,
-            babelrc: false,
-          }),
-
-          nodeResolve(),
-          commonjs(),
-
-          terser(),
-        ],
-      },
-    ])
+  ? devConfig
+  : [cjsConfig, umdConfig])

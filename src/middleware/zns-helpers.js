@@ -1,12 +1,11 @@
-import * as hash from 'hash.js'
+import { sha256 as sha } from 'hash.js'
 
 export const sha256 = (
   message,
   { hexPrefix = true, inputEnc, outputEnc = 'hex' } = {},
 ) =>
   (hexPrefix ? '0x' : '') +
-  hash
-    .sha256()
+  sha()
     .update(message, inputEnc)
     .digest(outputEnc)
 
@@ -30,4 +29,22 @@ export function wrapZilliqaRpcCall(promise) {
     else if (response.error) throw new Error(response.error.message)
     else return response.result
   })
+}
+
+let id = 0
+
+export function zilliqaRpcCall(url, method, ...params) {
+  return wrapZilliqaRpcCall(
+    fetch(url, {
+      method: 'POST',
+      body: JSON.stringify({
+        id: String(++id),
+        jsonrpc: '2.0',
+        method,
+        params,
+      }),
+    }).then(resp =>
+      resp.ok ? resp.json() : Promise.reject('failed to fetch'),
+    ),
+  )
 }

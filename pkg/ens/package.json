@@ -1,0 +1,26 @@
+{
+  "name": "namicorn",
+  "version": "0.0.2-1",
+  "main": "./build/index.js",
+  "module": "./build/index.es.js",
+  "jsnext:main": "./build/index.es.js",
+  "browser": "./build/index.browser.js",
+  "typings": "./index.d.ts",
+  "license": "MIT",
+  "files": [
+    "build"
+  ],
+  "devDependencies": {
+    "deep-equal": "^1.0.1",
+  },
+  "dependencies": {
+    "eth-ens-namehash": "^2.0.8",
+    "ethers": "^4.0.23",
+    "punycode": "^2.1.1"
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "build:prod": "NODE_ENV=production yarn build",
+    "prepublish": "exit; yarn build:prod"
+  }
+}

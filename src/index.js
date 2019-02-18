@@ -1,6 +1,6 @@
 import { Middleware } from './lib'
 import {
-  createEnsMiddleware,
+  // createEnsMiddleware,
   createZnsMiddleware,
   matcherMiddleware,
 } from './middleware'
@@ -21,7 +21,7 @@ class Namicorn {
           throw error
         },
       ),
-    ens: createEnsMiddleware,
+    // ens: createEnsMiddleware,
     zns: createZnsMiddleware,
     matcher: matcherMiddleware,
   }

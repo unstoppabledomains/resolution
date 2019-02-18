@@ -1,11 +1,11 @@
-import { Cache } from '../lib'
-import deepEqual from 'deep-equal'
+// import { Cache } from '../lib'
+// import deepEqual from 'deep-equal'
 import { Contract, getDefaultProvider } from 'ethers'
 import {
   registryAddress as defaultRegistryAddress,
   registryAbi,
   resolverAbi,
-} from './ens-config'
+} from './config'
 import { hash } from 'eth-ens-namehash'
 
 async function getBasicInfo(registryContract, fields, hashed) {
