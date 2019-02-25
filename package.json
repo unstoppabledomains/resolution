@@ -1,6 +1,6 @@
 {
   "name": "namicorn",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "./build/index.js",
   "module": "./build/index.es.js",
   "jsnext:main": "./build/index.es.js",
@@ -25,7 +25,8 @@
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-terser": "^3.0.0",
     "terser": "^3.8.2",
-    "tslib": "^1.9.3"
+    "tslib": "^1.9.3",
+    "webpack-cli": "^3.2.3"
   },
   "files": [
     "build"
@@ -34,13 +35,16 @@
     "deep-equal": "^1.0.1",
     "eth-ens-namehash": "^2.0.8",
     "ethers": "^4.0.23",
-    "punycode": "^2.1.1"
+    "punycode": "^2.1.1",
+    "rollup-plugin-alias": "^1.5.1",
+    "webpack": "^4.29.5"
   },
   "scripts": {
     "build": "rollup -c -i src/index.js",
     "build:prod": "NODE_ENV=production yarn build",
     "build:ens": "NODE_ENV=production rollup -c -i pkg/ens/src/index.js",
     "build:zns": "NODE_ENV=production rollup -c -i pkg/zns/src/index.js",
+    "prebuild:ens": "webpack --config webpack.elliptic.js",
     "prepublish": "exit; yarn build:prod"
   }
 }
