@@ -1,6 +1,6 @@
 {
   "name": "namicorn",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "main": "./build/index.js",
   "module": "./build/index.es.js",
   "jsnext:main": "./build/index.es.js",
@@ -37,6 +37,7 @@
     "ethers": "^4.0.23",
     "punycode": "^2.1.1",
     "rollup-plugin-alias": "^1.5.1",
+    "rollup-plugin-node-builtins": "^2.1.2",
     "webpack": "^4.29.5"
   },
   "scripts": {
