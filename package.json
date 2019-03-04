@@ -1,6 +1,6 @@
 {
   "name": "namicorn",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "main": "./build/index.js",
   "module": "./build/index.es.js",
   "jsnext:main": "./build/index.es.js",
@@ -33,6 +33,7 @@
     "index.d.ts"
   ],
   "dependencies": {
+    "babel-plugin-transform-runtime": "^6.23.0",
     "deep-equal": "^1.0.1",
     "eth-ens-namehash": "^2.0.8",
     "ethers": "^4.0.23",
