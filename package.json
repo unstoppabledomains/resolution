@@ -1,6 +1,6 @@
 {
   "name": "namicorn",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "main": "./build/index.js",
   "module": "./build/index.es.js",
   "jsnext:main": "./build/index.es.js",
@@ -29,7 +29,8 @@
     "webpack-cli": "^3.2.3"
   },
   "files": [
-    "build"
+    "build",
+    "index.d.ts"
   ],
   "dependencies": {
     "deep-equal": "^1.0.1",
