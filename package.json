@@ -1,6 +1,6 @@
 {
   "name": "namicorn",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "main": "./build/index.js",
   "module": "./build/index.es.js",
   "jsnext:main": "./build/index.es.js",
@@ -13,19 +13,23 @@
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.7.0",
     "babel-runtime": "^6.26.0",
     "camelcase": "^5.0.0",
     "isomorphic-fetch": "^2.2.1",
     "prettier": "^1.13.7",
     "rollup": "^1.1.2",
+    "rollup-plugin-alias": "^1.5.1",
     "rollup-plugin-babel": "^3.0.7",
     "rollup-plugin-commonjs": "^9.1.3",
     "rollup-plugin-json": "^3.1.0",
+    "rollup-plugin-node-builtins": "^2.1.2",
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-terser": "^3.0.0",
     "terser": "^3.8.2",
     "tslib": "^1.9.3",
+    "webpack": "^4.29.5",
     "webpack-cli": "^3.2.3"
   },
   "files": [
@@ -33,14 +37,8 @@
     "index.d.ts"
   ],
   "dependencies": {
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "deep-equal": "^1.0.1",
-    "eth-ens-namehash": "^2.0.8",
     "ethers": "^4.0.23",
-    "punycode": "^2.1.1",
-    "rollup-plugin-alias": "^1.5.1",
-    "rollup-plugin-node-builtins": "^2.1.2",
-    "webpack": "^4.29.5"
+    "punycode": "^2.1.1"
   },
   "scripts": {
     "build": "rollup -c -i src/index.js",
