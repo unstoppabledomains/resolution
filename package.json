@@ -1,6 +1,6 @@
 {
   "name": "namicorn",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "main": "./build/index.js",
   "module": "./build/index.es.js",
   "jsnext:main": "./build/index.es.js",
