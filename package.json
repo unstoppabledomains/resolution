@@ -1,51 +1,40 @@
 {
-  "name": "namicorn",
-  "version": "0.0.13",
-  "main": "./build/index.js",
-  "module": "./build/index.es.js",
-  "jsnext:main": "./build/index.es.js",
-  "browser": "./build/index.browser.js",
-  "typings": "./index.d.ts",
-  "license": "MIT",
+  "private": true,
+  "name": "workspace",
+  "version": "0.0.0",
   "devDependencies": {
-    "@zilliqa-js/zilliqa": "^0.4.2",
-    "babel-core": "^6.26.3",
-    "babel-plugin-external-helpers": "^6.22.0",
-    "babel-plugin-transform-class-properties": "^6.24.1",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-env": "^1.7.0",
-    "babel-runtime": "^6.26.0",
-    "camelcase": "^5.0.0",
+    "@babel/core": "^7.4.3",
+    "@babel/preset-env": "^7.4.3",
+    "@babel/preset-typescript": "^7.3.3",
+    "@types/jest": "^24.0.11",
+    "babel-jest": "^24.7.1",
+    "camelcase": "^5.2.0",
+    "chalk": "^2.4.2",
     "isomorphic-fetch": "^2.2.1",
-    "prettier": "^1.13.7",
-    "rollup": "^1.1.2",
-    "rollup-plugin-alias": "^1.5.1",
-    "rollup-plugin-babel": "^3.0.7",
-    "rollup-plugin-commonjs": "^9.1.3",
-    "rollup-plugin-json": "^3.1.0",
-    "rollup-plugin-node-builtins": "^2.1.2",
-    "rollup-plugin-node-resolve": "^3.3.0",
-    "rollup-plugin-terser": "^3.0.0",
-    "terser": "^3.8.2",
-    "tslib": "^1.9.3",
-    "webpack": "^4.29.5",
-    "webpack-cli": "^3.2.3"
+    "jest": "^24.5.0",
+    "lerna": "^3.13.1",
+    "prettier": "^1.16.4",
+    "rimraf": "^2.6.3",
+    "rollup": "^1.7.3",
+    "rollup-plugin-clean": "^1.0.0",
+    "rollup-plugin-commonjs": "^9.2.2",
+    "rollup-plugin-json": "^4.0.0",
+    "rollup-plugin-node-resolve": "^4.0.1",
+    "rollup-plugin-terser": "^4.0.4",
+    "rollup-plugin-typescript": "^1.0.1",
+    "rollup-plugin-typescript2": "^0.20.1",
+    "terser": "^3.17.0",
+    "ts-jest": "^24.0.1",
+    "typescript": "^3.3.4000"
   },
-  "files": [
-    "build",
-    "index.d.ts"
+  "workspaces": [
+    "packages/namicorn",
+    "packages/@namicorn/*"
   ],
-  "dependencies": {
-    "ethers": "^4.0.23",
-    "punycode": "^2.1.1"
-  },
   "scripts": {
-    "build": "rollup -c -i src/index.js",
-    "build:prod": "NODE_ENV=production yarn build",
-    "build:ens": "NODE_ENV=production rollup -c -i pkg/ens/src/index.js",
-    "build:zns": "NODE_ENV=production rollup -c -i pkg/zns/src/index.js",
-    "prebuild:ens": "webpack --config webpack.elliptic.js",
-    "prepublish": "exit; yarn build:prod"
+    "build-all": "./scripts/build-all",
+    "build-one": "./scripts/build-one",
+    "clean": "./scripts/clean",
+    "test": "jest"
   }
 }

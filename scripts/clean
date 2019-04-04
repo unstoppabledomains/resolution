@@ -1,0 +1,15 @@
+#!/usr/bin/env node
+
+const rimraf = require('rimraf')
+
+const packages = [
+  'namicorn',
+  '@namicorn/core',
+  '@namicorn/ens',
+  '@namicorn/rns',
+  '@namicorn/zns',
+]
+
+packages.map(packageName =>
+  rimraf.sync(__dirname + '/../packages/' + packageName + '/build'),
+)

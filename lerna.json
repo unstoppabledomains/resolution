@@ -1,0 +1,6 @@
+{
+  "packages": ["packages/namicorn", "packages/@namicorn/*"],
+  "version": "0.0.0",
+  "npmClient": "yarn",
+  "useWorkspaces": true
+}

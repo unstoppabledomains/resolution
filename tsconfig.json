@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    "paths": {
+      "*": ["*"]
+    },
+    "allowSyntheticDefaultImports": true,
+    "lib": ["dom", "es6"]
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "@namicorn/core",
+  "version": "0.0.0",
+  "main": "build/index.js",
+  "browser": "build/index.umd.js",
+  "module": "build/index.es.js",
+  "jsnext:main": "build/index.es.js",
+  "types": "build/index.d.ts",
+  "dependencies": {
+    "tslib": "^1.9.3"
+  }
+}

@@ -1,0 +1,36 @@
+#!/usr/bin/env node
+
+const makeCommonJSInputConfig = require('../config/makeCommonJSInputConfig')
+const makeCommonJSOutputConfig = require('../config/makeCommonJSOutputConfig')
+const makeUMDInputConfig = require('../config/makeUMDInputConfig')
+const makeUMDOutputConfig = require('../config/makeUMDOutputConfig')
+const { rollup } = require('rollup')
+const rimraf = require('rimraf')
+
+const packages = [
+  'namicorn',
+  '@namicorn/core',
+  '@namicorn/ens',
+  '@namicorn/rns',
+  '@namicorn/zns',
+]
+
+Promise.all(
+  packages.map(packageName => {
+    const packagePath = __dirname + '/../packages/' + packageName
+
+    rimraf.sync(packagePath + '/build')
+
+    return rollup(makeCommonJSInputConfig(packagePath)).then(bundle => {
+      const outputConfig = makeCommonJSOutputConfig(packagePath)
+      if (outputConfig.file) {
+        console.log('bundled cjs', packageName)
+        return bundle.write(outputConfig)
+      } else
+        console.warn(
+          'no output file specified in package.json for',
+          packageName,
+        )
+    })
+  }),
+).catch(console.error)

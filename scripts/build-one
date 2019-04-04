@@ -1,0 +1,13 @@
+#!/usr/bin/env node
+
+const makeCommonJSInputConfig = require('../config/makeCommonJSInputConfig')
+const makeCommonJSOutputConfig = require('../config/makeCommonJSOutputConfig')
+const makeUMDInputConfig = require('../config/makeUMDInputConfig')
+const makeUMDOutputConfig = require('../config/makeUMDOutputConfig')
+const { rollup } = require('rollup')
+
+const packagePath = __dirname + '/../packages/' + process.argv[2]
+
+rollup(makeCommonJSInputConfig(packagePath))
+  .then(bundle => bundle.write(makeCommonJSOutputConfig(packagePath)))
+  .catch(console.error)
