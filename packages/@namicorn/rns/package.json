@@ -7,11 +7,12 @@
   "module": "build/index.es.js",
   "jsnext:main": "build/index.es.js",
   "types": "build/index.d.ts",
+  "private": false,
   "files": [
     "build"
   ],
   "dependencies": {
     "@namicorn/ens": "^0.1.3"
   },
-  "gitHead": "e0bd2e2377926c4ac15638e74ee8526850e47a36"
+  "gitHead": "34952fb219280f0d73044f64efe2dd768fe5260b"
 }
