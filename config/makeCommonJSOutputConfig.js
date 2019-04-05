@@ -4,5 +4,6 @@ module.exports = absolutePackagePath => {
   return {
     file: absolutePackagePath + '/' + pkg.main,
     format: 'cjs',
+    exports: 'named',
   }
 }

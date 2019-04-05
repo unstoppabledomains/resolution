@@ -7,7 +7,7 @@ import resolver from './abiCodecs/resolver'
 import * as networks from './networks.json'
 import toCall from './toCall'
 
-type Src =
+export type Src =
   | string
   | URL
   | Provider
@@ -17,35 +17,34 @@ type Src =
       sendPayload?: Function
     }
 
-interface Context {
+export interface Context {
   name: string
   data: {
     [key: string]: any
   }
 }
 
-interface Result {
+export interface Result {
   [key: string]: any
 }
 
-function fnCall(call, to, fnCodec, ...args) {
+function fnCall(call, to, codec, ...args) {
   return call(
     {
       to,
-      data: fnCodec.enc(...args),
+      data: codec.enc(...args),
     },
     'latest',
-  ).then(resp => fnCodec.dec(resp))
+  ).then(resp => codec.dec(resp))
 }
 
-function mappedResolverFieldFnCall(send, to, fnCodec, node, keys) {
-  return Promise.all(
-    keys.map(key => fnCall(send, to, fnCodec, node, key)),
-  ).then(values =>
-    keys.reduce((a, v, i) => {
-      a[v] = values[i]
-      return a
-    }, {}),
+function mappedResolverFieldFnCall(send, to, codec, node, keys) {
+  return Promise.all(keys.map(key => fnCall(send, to, codec, node, key))).then(
+    values =>
+      keys.reduce((a, v, i) => {
+        a[v] = values[i]
+        return a
+      }, {}),
   )
 }
 
@@ -56,27 +55,30 @@ export default class ENS {
 
   src: Src
   UNSAFE_registryAddress: string
-  isENS: (name: string) => boolean
+  isValid: (name: string) => boolean
 
   constructor({
     src = 'https://localhost:8545',
     network = 'mainnet',
     UNSAFE_registryAddress = ENS.deriveRegistryAddressFromNetwork(network),
-    isENS = v => /^.*$/.test(v),
+    isValid = v => /^.*\.(eth|reverse.addr)$/.test(v),
   }: {
     src?: Src
     network?: keyof typeof networks
     UNSAFE_registryAddress?: string
-    isENS?: (name: string) => boolean
+    isValid?: (name: string) => boolean
   } = {}) {
     this.src = src
     this.UNSAFE_registryAddress = UNSAFE_registryAddress
-    this.isENS = isENS
+    this.isValid = isValid
   }
 
   middlewareFn = async (context: Context, next) => {
-    if (!this.isENS(context.name)) return next()
+    if (!this.isValid(context.name)) return next()
+    return this.resolve(context)
+  }
 
+  protected resolve = async (context: Context) => {
     const send = toCall(this.src)
 
     const node = utils.namehash(context.name)
@@ -104,6 +106,10 @@ export default class ENS {
         fnCall(send, this.UNSAFE_registryAddress, registry.fn.ttl, node),
     ])
 
+    if (resolverAddress === '0x0000000000000000000000000000000000000000') {
+      return { owner, ttl }
+    }
+
     const [
       addr,
       name,
@@ -113,59 +119,73 @@ export default class ENS {
       text,
       abi,
     ] = await Promise.all([
-      ctx.data.addr && fnCall(send, resolverAddress, resolver.fn.addr, node),
-      ctx.data.name && fnCall(send, resolverAddress, resolver.fn.name, node),
-      ctx.data.contenthash &&
-        fnCall(send, resolverAddress, resolver.fn.contenthash, node),
+      ctx.data.addr
+        ? fnCall(send, resolverAddress, resolver.fn.addr, node)
+        : undefined,
+      ctx.data.name
+        ? fnCall(send, resolverAddress, resolver.fn.name, node)
+        : undefined,
+      ctx.data.contenthash
+        ? fnCall(send, resolverAddress, resolver.fn.contenthash, node)
+        : undefined,
 
-      ctx.data.text &&
-        mappedResolverFieldFnCall(
-          send,
-          resolverAddress,
-          resolver.fn.text,
-          node,
-          ctx.data.text,
-        ),
-      ctx.data.abi &&
-        mappedResolverFieldFnCall(
-          send,
-          resolverAddress,
-          resolver.fn.abi,
-          node,
-          ctx.data.abi,
-        ),
+      ctx.data.text
+        ? mappedResolverFieldFnCall(
+            send,
+            resolverAddress,
+            resolver.fn.text,
+            node,
+            ctx.data.text,
+          )
+        : undefined,
+      ctx.data.abi
+        ? mappedResolverFieldFnCall(
+            send,
+            resolverAddress,
+            resolver.fn.abi,
+            node,
+            ctx.data.abi,
+          )
+        : undefined,
 
-      ctx.data.EXPERIMENTAL_pubkey &&
-        fnCall(send, resolverAddress, resolver.fn.pubkey, node),
+      ctx.data.EXPERIMENTAL_pubkey
+        ? fnCall(send, resolverAddress, resolver.fn.pubkey, node)
+        : undefined,
 
-      ctx.data.LEGACY_content &&
-        fnCall(send, resolverAddress, resolver.fn.content, node),
-      ctx.data.LEGACY_multihash &&
-        fnCall(send, resolverAddress, resolver.fn.multihash, node),
+      ctx.data.LEGACY_content
+        ? fnCall(send, resolverAddress, resolver.fn.content, node)
+        : undefined,
+      ctx.data.LEGACY_multihash
+        ? fnCall(send, resolverAddress, resolver.fn.multihash, node)
+        : undefined,
     ])
 
-    return {
+    const result: Result = {
       owner,
       ttl,
-      resolver: Boolean(resolverAddress) && {
-        address: resolverAddress,
-        addr,
-        name,
-        contenthash,
-        content,
-        multihash,
-        text,
-        abi,
-      },
+      resolver: Boolean(resolverAddress)
+        ? {
+            address: resolverAddress,
+            addr,
+            name,
+            contenthash,
+            content,
+            multihash,
+            text,
+            abi,
+          }
+        : undefined,
     }
-  }
 
-  resolve = (
-    name: string,
-    opts?: {
-      data?: {
-        [key: string]: any
-      }
-    },
-  ) => this.middlewareFn({ ...(opts || {}), name } as any, () => {}) as Result
+    Object.keys(result).forEach(
+      key => result[key] === undefined && delete result[key],
+    )
+    result.resolver &&
+      Object.keys(result.resolver).forEach(
+        key =>
+          result.resolver[key] === undefined && delete result.resolver[key],
+      )
+
+    return result
+  }
 }

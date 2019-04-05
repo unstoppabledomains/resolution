@@ -6,11 +6,13 @@
   "module": "build/index.es.js",
   "jsnext:main": "build/index.es.js",
   "types": "build/index.d.ts",
+  "files": [
+    "build"
+  ],
   "dependencies": {
     "@browseth/abi": "^2.1.0",
     "ethers": "^4.0.27",
     "tslib": "^1.9.3",
-    "web3-providers": "^1.0.0-beta.52",
-    "web3-providers-ws": "^1.0.0-beta.37"
+    "web3-providers": "^1.0.0-beta.52"
   }
 }

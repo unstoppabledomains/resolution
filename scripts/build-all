@@ -8,18 +8,16 @@ const { rollup } = require('rollup')
 const rimraf = require('rimraf')
 
 const packages = [
-  'namicorn',
   '@namicorn/core',
   '@namicorn/ens',
   '@namicorn/rns',
   '@namicorn/zns',
+  'namicorn',
 ]
 
 Promise.all(
   packages.map(packageName => {
     const packagePath = __dirname + '/../packages/' + packageName
-
-    rimraf.sync(packagePath + '/build')
 
     return rollup(makeCommonJSInputConfig(packagePath)).then(bundle => {
       const outputConfig = makeCommonJSOutputConfig(packagePath)

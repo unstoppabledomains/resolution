@@ -24,7 +24,6 @@ export default function toCall(src) {
   if (typeof src === 'string') {
     return toCall(new URL(src))
   } else if (src instanceof URL) {
-    console.log(src.protocol)
     switch (src.protocol) {
       case 'http:':
       case 'https:': {
