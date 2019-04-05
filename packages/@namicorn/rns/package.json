@@ -1,7 +1,7 @@
 {
   "name": "@namicorn/rns",
   "license": "MIT",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "main": "build/index.js",
   "browser": "build/index.umd.js",
   "module": "build/index.es.js",
@@ -12,7 +12,7 @@
     "build"
   ],
   "dependencies": {
-    "@namicorn/ens": "^0.1.3"
+    "@namicorn/ens": "^0.1.5"
   },
   "gitHead": "dc9cfeb001f8dd5649da8147962355e0dc534839"
 }
