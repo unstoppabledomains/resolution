@@ -1,5 +1,6 @@
 {
   "name": "@namicorn/core",
+  "license": "MIT",
   "version": "0.1.1",
   "main": "build/index.js",
   "browser": "build/index.umd.js",
@@ -11,5 +12,6 @@
   ],
   "dependencies": {
     "tslib": "^1.9.3"
-  }
+  },
+  "gitHead": "b653dd4254b7911daf7e2a91c1086f78860fdc63"
 }
