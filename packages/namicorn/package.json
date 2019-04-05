@@ -18,5 +18,8 @@
     "@namicorn/zns": "^0.1.5",
     "tslib": "^1.9.3"
   },
-  "gitHead": "dc9cfeb001f8dd5649da8147962355e0dc534839"
+  "publicConfig": {
+    "access": "public"
+  },
+  "gitHead": "b97a8585d3540a804053983c485db9da59b1186b"
 }
