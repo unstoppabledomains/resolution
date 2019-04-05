@@ -10,10 +10,10 @@
     "build"
   ],
   "dependencies": {
-    "tslib": "^1.9.3",
-    "@namicorn/ens": "0.1.0",
-    "@namicorn/zns": "0.1.0",
-    "@namicorn/rns": "0.1.0",
-    "@namicorn/core": "0.1.0"
+    "@namicorn/core": "^0.1.0",
+    "@namicorn/ens": "^0.1.0",
+    "@namicorn/rns": "^0.1.0",
+    "@namicorn/zns": "^0.1.0",
+    "tslib": "^1.9.3"
   }
 }
