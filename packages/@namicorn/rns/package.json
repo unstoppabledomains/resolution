@@ -1,6 +1,6 @@
 {
   "name": "@namicorn/rns",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "build/index.js",
   "browser": "build/index.umd.js",
   "module": "build/index.es.js",
@@ -10,6 +10,6 @@
     "build"
   ],
   "dependencies": {
-    "@namicorn/ens": "^0.1.0"
+    "@namicorn/ens": "^0.1.1"
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "namicorn",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "build/index.js",
   "browser": "build/index.umd.js",
   "module": "build/index.es.js",
@@ -10,10 +10,10 @@
     "build"
   ],
   "dependencies": {
-    "@namicorn/core": "^0.1.0",
-    "@namicorn/ens": "^0.1.0",
-    "@namicorn/rns": "^0.1.0",
-    "@namicorn/zns": "^0.1.0",
+    "@namicorn/core": "^0.1.1",
+    "@namicorn/ens": "^0.1.1",
+    "@namicorn/rns": "^0.1.1",
+    "@namicorn/zns": "^0.1.1",
     "tslib": "^1.9.3"
   }
 }
