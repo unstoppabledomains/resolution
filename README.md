@@ -7,3 +7,5 @@ Supported domain zones:
 * .rsk
 * .eth 
 * .crypto
+
+[Documentation](https://docs.unstoppabledomains.com/docs/namicorn/getting-started/)
