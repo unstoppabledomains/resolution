@@ -6,6 +6,6 @@ Supported domain zones:
 * .zil 
 * .rsk
 * .eth 
-* .crypto
+* .etcetera
 
 [Documentation](https://docs.unstoppabledomains.com/docs/namicorn/getting-started/)
