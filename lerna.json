@@ -1,8 +1,5 @@
 {
-  "packages": [
-    "packages/namicorn",
-    "packages/@namicorn/*"
-  ],
+  "packages": ["packages/namicorn", "packages/@namicorn/*"],
   "version": "0.1.7",
   "npmClient": "yarn",
   "useWorkspaces": true,

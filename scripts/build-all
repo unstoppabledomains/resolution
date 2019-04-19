@@ -7,28 +7,28 @@ const makeUMDOutputConfig = require('../config/makeUMDOutputConfig')
 const { rollup } = require('rollup')
 const rimraf = require('rimraf')
 
-const packages = [
-  '@namicorn/core',
-  '@namicorn/ens',
-  '@namicorn/rns',
-  '@namicorn/zns',
-  'namicorn',
-]
+function buildPkgs(pkgs) {
+  return Promise.all(
+    pkgs.map(packageName => {
+      const packagePath = __dirname + '/../packages/' + packageName
 
-Promise.all(
-  packages.map(packageName => {
-    const packagePath = __dirname + '/../packages/' + packageName
+      return rollup(makeCommonJSInputConfig(packagePath)).then(bundle => {
+        const outputConfig = makeCommonJSOutputConfig(packagePath)
+        if (outputConfig.file) {
+          console.log('bundled cjs', packageName)
+          return bundle.write(outputConfig)
+        } else
+          console.warn(
+            'no output file specified in package.json for',
+            packageName,
+          )
+      })
+    }),
+  )
+}
 
-    return rollup(makeCommonJSInputConfig(packagePath)).then(bundle => {
-      const outputConfig = makeCommonJSOutputConfig(packagePath)
-      if (outputConfig.file) {
-        console.log('bundled cjs', packageName)
-        return bundle.write(outputConfig)
-      } else
-        console.warn(
-          'no output file specified in package.json for',
-          packageName,
-        )
-    })
-  }),
-).catch(console.error)
+buildPkgs(['@namicorn/core'])
+  .then(() => buildPkgs(['@namicorn/ens', '@namicorn/zns']))
+  .then(() => buildPkgs(['@namicorn/rns']))
+  .then(() => buildPkgs(['namicorn']))
+  .catch(console.error)
