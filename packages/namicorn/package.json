@@ -1,7 +1,7 @@
 {
   "name": "namicorn",
   "license": "MIT",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "main": "build/index.js",
   "browser": "build/index.umd.js",
   "module": "build/index.es.js",
@@ -13,10 +13,10 @@
   ],
   "dependencies": {
     "@babel/runtime": "^7.4.3",
-    "@namicorn/core": "^0.1.9",
-    "@namicorn/ens": "^0.1.9",
-    "@namicorn/rns": "^0.1.9",
-    "@namicorn/zns": "^0.1.6",
+    "@namicorn/core": "^0.1.10",
+    "@namicorn/ens": "^0.1.10",
+    "@namicorn/rns": "^0.1.10",
+    "@namicorn/zns": "^0.1.10",
     "tslib": "^1.9.3"
   },
   "publicConfig": {
