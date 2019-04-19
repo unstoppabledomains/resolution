@@ -3,10 +3,10 @@ import Middleware from './Middlware'
 class Core {
   static create = options => new Core(options)
 
+  debug: boolean
   private manager = new Middleware()
   use = this.manager.use
 
-  debug: boolean
   constructor({ debug = false }: { debug?: boolean } = {}) {
     this.debug = debug
   }

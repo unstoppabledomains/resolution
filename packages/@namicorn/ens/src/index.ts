@@ -9,8 +9,8 @@ import toCall from './toCall'
 
 export type Src =
   | string
-  | URL
   | Provider
+  | URL
   | {
       send?: Function
       sendAsync?: Function
