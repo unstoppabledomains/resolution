@@ -3,6 +3,8 @@
   "name": "workspace",
   "version": "0.0.0",
   "devDependencies": {
+    "@babel/core": "^7.4.3",
+    "@babel/preset-env": "^7.4.3",
     "@types/jest": "^24.0.11",
     "camelcase": "^5.2.0",
     "isomorphic-fetch": "^2.2.1",
@@ -11,6 +13,7 @@
     "prettier": "^1.16.4",
     "rimraf": "^2.6.3",
     "rollup": "^1.7.3",
+    "rollup-plugin-babel": "^4.3.2",
     "rollup-plugin-commonjs": "^9.2.2",
     "rollup-plugin-json": "^4.0.0",
     "rollup-plugin-node-resolve": "^4.0.1",

@@ -2,6 +2,7 @@ const commonjs = require('rollup-plugin-commonjs')
 const json = require('rollup-plugin-json')
 const nodeResolve = require('rollup-plugin-node-resolve')
 const typescript = require('rollup-plugin-typescript2')
+const babel = require('rollup-plugin-babel')
 const namedExports = require('./namedExports.json')
 
 const onwarn = (warning, warn) => {
@@ -39,6 +40,12 @@ module.exports = absolutePackagePath => {
           },
           include: [absolutePackagePath + '/src/*'],
         },
+      }),
+      babel({
+        exclude: 'node_modules/**',
+        runtimeHelpers: true,
+        babelrc: false,
+        presets: [['@babel/preset-env', { modules: false }]],
       }),
     ],
   }
