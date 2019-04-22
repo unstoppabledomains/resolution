@@ -1,3 +1,4 @@
+import '@babel/polyfill'
 import Middleware from './Middlware'
 
 class Core {

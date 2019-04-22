@@ -37,16 +37,26 @@ module.exports = absolutePackagePath => {
             rootDir: absolutePackagePath + '/src',
             declaration: true,
             declarationDir: absolutePackagePath + '/build',
+            lib: ['es2015', 'dom'],
           },
           include: [absolutePackagePath + '/src/*'],
         },
       }),
-      babel({
-        exclude: 'node_modules/**',
-        runtimeHelpers: true,
-        babelrc: false,
-        presets: [['@babel/preset-env', { modules: false }]],
-      }),
+      // babel({
+      //   exclude: 'node_modules/**',
+      //   include: absolutePackagePath + '/**/*.ts',
+      //   extensions: ['js', 'ts'],
+      //   runtimeHelpers: true,
+      //   babelrc: false,
+      //   presets: [
+      //     // '@babel/preset-typescript',
+      //     ['@babel/preset-env', { modules: false, targets: { node: '8' } }],
+      //   ],
+      //   plugins: [
+      //     '@babel/plugin-transform-runtime',
+      //     '@babel/plugin-proposal-class-properties',
+      //   ],
+      // }),
     ],
   }
 }

@@ -1,3 +1,4 @@
+import '@babel/polyfill'
 import ENS, {Src} from '@namicorn/ens'
 import * as networks from './networks.json'
 

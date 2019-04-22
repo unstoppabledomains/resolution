@@ -1,3 +1,4 @@
+import '@babel/polyfill'
 import {utils} from 'ethers'
 import {Provider} from 'ethers/providers'
 import deed from './abiCodecs/deed'

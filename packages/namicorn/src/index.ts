@@ -1,3 +1,4 @@
+import '@babel/polyfill'
 import Core from '@namicorn/core'
 import ENS from '@namicorn/ens'
 import RNS from '@namicorn/rns'

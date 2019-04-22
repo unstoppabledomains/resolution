@@ -12,7 +12,7 @@
     "build"
   ],
   "dependencies": {
-    "@babel/runtime": "^7.4.3",
+    "@babel/polyfill": "^7.4.3",
     "@namicorn/core": "^0.1.10",
     "@namicorn/ens": "^0.1.10",
     "@namicorn/rns": "^0.1.10",

@@ -1,3 +1,4 @@
+import '@babel/polyfill'
 import {sha256 as sha} from 'hash.js'
 
 function sha256(
