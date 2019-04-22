@@ -1,7 +1,7 @@
 {
   "name": "@namicorn/rns",
   "license": "MIT",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "main": "build/index.js",
   "browser": "build/index.umd.js",
   "module": "build/index.es.js",
@@ -13,7 +13,7 @@
   ],
   "dependencies": {
     "@babel/polyfill": "^7.4.3",
-    "@namicorn/ens": "^0.1.10"
+    "@namicorn/ens": "^0.1.11"
   },
   "publicConfig": {
     "access": "public"
