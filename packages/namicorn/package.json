@@ -14,10 +14,9 @@
   "dependencies": {
     "@babel/polyfill": "^7.4.3",
     "@namicorn/core": "^0.1.11",
-    "@namicorn/ens": "^0.1.11",
-    "@namicorn/rns": "^0.1.11",
-    "@namicorn/zns": "^0.1.11",
-    "tslib": "^1.9.3"
+    "tslib": "^1.9.3",
+    "eth-ens-namehash": "^2.0.8",
+    "web3": "^1.0.0-beta.48"
   },
   "publicConfig": {
     "access": "public"
