@@ -2,6 +2,8 @@ import '@babel/polyfill'
 import Core from '@namicorn/core'
 import ENS from '@namicorn/ens'
 import Ens from './ens'
+import Zns from './zns'
+import Rns from './rns'
 import RNS from '@namicorn/rns'
 import ZNS from '@namicorn/zns'
 
@@ -27,6 +29,8 @@ class Namicorn {
   api: string;
   core: Core;
   ens: Ens;
+  rns: Rns; // ENS not a mistake
+  zns: Zns;
 
   constructor({blockchain = false, api = DEFAULT_URL}: { api?: Src, blockchain?: Blockchain } = {}) {
     this.api = api.toString();
@@ -47,11 +51,12 @@ class Namicorn {
   async resolveUsingBlockchain(domain) {
     if (!this.isValidDomain(domain)) return null;
     var method = null;
-    //if (domain.match(/\.zil$/)) {
-      //method = new Zns();
-    //} 
-    if (domain.match(/\.eth$/)) {
+    if (domain.match(/\.zil$/)) {
+      method = this.zns;
+    } else if (domain.match(/\.eth$/)) {
       method = this.ens;
+    } else if (domain.match(/\.rsk$/)) {
+      method = this.rns
     }
     var result = await method.resolve(domain) || UNCLAIMED_DOMAIN_RESPONSE
     return result;
@@ -73,6 +78,9 @@ class Namicorn {
       blockchain = {}
     }
     this.ens = new Ens(blockchain.ens)
+    this.zns = new Zns(blockchain.zns)
+    this.rns = new Rns(blockchain.rns)
+
     const core = new Core();
     if (blockchain.ens != false) {
       const ens = new ENS({ src: blockchain.ens });

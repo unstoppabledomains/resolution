@@ -15,6 +15,8 @@
     "@babel/polyfill": "^7.4.3",
     "@namicorn/core": "^0.1.11",
     "tslib": "^1.9.3",
+    "@zilliqa-js/util": "^0.5.0",
+    "@zilliqa-js/zilliqa": "^0.5.2",
     "eth-ens-namehash": "^2.0.8",
     "web3": "^1.0.0-beta.48"
   },
