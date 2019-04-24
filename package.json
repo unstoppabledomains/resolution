@@ -1,40 +1,46 @@
 {
-  "private": true,
-  "name": "workspace",
-  "version": "0.0.0",
-  "devDependencies": {
-    "@babel/core": "^7.4.3",
-    "@babel/plugin-proposal-class-properties": "^7.4.0",
-    "@babel/plugin-transform-runtime": "^7.4.3",
-    "@babel/preset-env": "^7.4.3",
-    "@babel/preset-typescript": "^7.3.3",
-    "@types/jest": "^24.0.11",
-    "camelcase": "^5.2.0",
-    "isomorphic-fetch": "^2.2.1",
-    "jest": "^24.5.0",
-    "lerna": "^3.13.1",
-    "prettier": "^1.16.4",
-    "rimraf": "^2.6.3",
-    "rollup": "^1.7.3",
-    "rollup-plugin-babel": "^4.3.2",
-    "rollup-plugin-commonjs": "^9.2.2",
-    "rollup-plugin-json": "^4.0.0",
-    "rollup-plugin-node-resolve": "^4.0.1",
-    "rollup-plugin-terser": "^4.0.4",
-    "rollup-plugin-typescript": "^1.0.1",
-    "rollup-plugin-typescript2": "^0.20.1",
-    "terser": "^3.17.0",
-    "ts-jest": "^24.0.1",
-    "typescript": "^3.3.4000"
-  },
-  "workspaces": [
-    "packages/namicorn",
-    "packages/@namicorn/*"
-  ],
+  "name": "namicorn",
+  "version": "0.2.0",
+  "description": "Crypto currency wallet domain name resolution library by Unstoppable Domains Inc.",
+  "main": "lib/namicorn",
+  "types": "lib/namicorn",
   "scripts": {
-    "build-all": "./scripts/build-all",
-    "build-one": "./scripts/build-one",
-    "clean": "./scripts/clean",
-    "test": "jest"
+    "test": "jest",
+    "start": "npm run build:live",
+    "build": "tsc -p .",
+    "format": "prettier --write -l **/*.{js,json,ts}",
+    "build:live": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/unstoppabledomains/namicorn.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/unstoppabledomains/namicorn/issues"
+  },
+  "homepage": "https://github.com/unstoppabledomains/namicorn#readme",
+  "devDependencies": {
+    "@types/jest": "^24.0.11",
+    "@types/node": "^11.13.7",
+    "jest": "^24.7.1",
+    "ts-jest": "^24.0.2",
+    "typescript": "^3.4.4",
+    "prettier": "^1.17.0"
+  },
+  "prettier": {
+    "trailingComma": "all",
+    "singleQuote": true,
+    "semi": false,
+    "bracketSpacing": false
+  },
+  "publicConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@zilliqa-js/zilliqa": "^0.5.3",
+    "eth-ens-namehash": "^2.0.8",
+    "web3": "^1.0.0-beta.52"
   }
 }

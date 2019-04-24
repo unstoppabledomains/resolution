@@ -1,4 +1,5 @@
-node_modules/
-build/
-
-.rpt2_cache/
+.rpt2_cache
+build
+lib
+node_modules
+tmp

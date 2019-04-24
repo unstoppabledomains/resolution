@@ -1,11 +1,14 @@
 {
   "compilerOptions": {
-    "resolveJsonModule": true,
+    "target": "es5",
     "moduleResolution": "node",
-    "paths": {
-      "*": ["*"]
-    },
+    "lib": ["es6", "dom"],
+    "outDir": "lib",
+    "rootDir": "src",
+    "strict": false,
+    "esModuleInterop": true,
+    "declaration": true,
     "allowSyntheticDefaultImports": true,
-    "lib": ["dom", "es6"]
+    "resolveJsonModule": true
   }
 }
