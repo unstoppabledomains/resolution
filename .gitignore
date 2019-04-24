@@ -1,4 +1,5 @@
 .rpt2_cache
+yarn-error.log
 build
 lib
 node_modules
