@@ -2,7 +2,6 @@ import Ens from './ens'
 import Zns from './zns'
 import Rns from './rns'
 
-//const fetch = require('isomorphic-fetch');
 import fetch from 'isomorphic-fetch'
 const DEFAULT_URL = 'https://unstoppable-domains-api.appspot.com/v1'
 const UNCLAIMED_DOMAIN_RESPONSE = {
