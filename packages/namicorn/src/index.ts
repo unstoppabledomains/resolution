@@ -1,11 +1,7 @@
 import '@babel/polyfill'
-import Core from '@namicorn/core'
-import ENS from '@namicorn/ens'
 import Ens from './ens'
 import Zns from './zns'
 import Rns from './rns'
-import RNS from '@namicorn/rns'
-import ZNS from '@namicorn/zns'
 
 const fetch = require('isomorphic-fetch');
 const DEFAULT_URL = 'https://unstoppable-domains-api.appspot.com/v1';
@@ -27,20 +23,21 @@ type Blockchain = boolean | {
 
 class Namicorn {
   api: string;
-  core: Core;
   ens: Ens;
   rns: Rns; // ENS not a mistake
   zns: Zns;
+  blockchain: boolean;
 
   constructor({blockchain = false, api = DEFAULT_URL}: { api?: Src, blockchain?: Blockchain } = {}) {
     this.api = api.toString();
+    this.blockchain = !!blockchain;
     if (blockchain) {
-      this.core = this.buildCore(blockchain)
+      this.buildCore(blockchain)
     }
   }
 
   async resolve(domain) {
-    if (this.core) {
+    if (this.blockchain) {
       return await this.resolveUsingBlockchain(domain)
     } else {
       const response = await fetch(`${this.api}/${domain}`);
@@ -80,25 +77,6 @@ class Namicorn {
     this.ens = new Ens(blockchain.ens)
     this.zns = new Zns(blockchain.zns)
     this.rns = new Rns(blockchain.rns)
-
-    const core = new Core();
-    if (blockchain.ens != false) {
-      const ens = new ENS({ src: blockchain.ens });
-      core.use(ens.middlewareFn);
-    }
-    if (blockchain.rns != false) {
-      const rns = new RNS({
-        src: blockchain.rns || 'https://public-node.rsk.co',
-      });
-      core.use(rns.middlewareFn);
-    }
-    if (blockchain.zns != false) {
-      const zns = new ZNS({
-        src: blockchain.zns || 'https://dev-api.zilliqa.com',
-      });
-      core.use(zns.middlewareFn);
-    }
-    return core;
   }
 }
 
