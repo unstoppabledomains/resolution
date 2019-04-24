@@ -1,9 +1,9 @@
 {
   "name": "namicorn",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Crypto currency wallet domain name resolution library by Unstoppable Domains Inc.",
-  "main": "lib/namicorn",
-  "types": "lib/namicorn",
+  "main": "./lib/namicorn.js",
+  "types": "./lib/namicorn.d.ts",
   "scripts": {
     "test": "jest",
     "start": "npm run build:live",
@@ -11,6 +11,9 @@
     "format": "prettier --write -l **/*.{js,json,ts}",
     "build:live": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts"
   },
+  "files": [
+    "lib"
+  ],
   "repository": {
     "type": "git",
     "url": "git://github.com/unstoppabledomains/namicorn.git"
