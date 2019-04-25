@@ -69,13 +69,12 @@ class Namicorn {
     return result
   }
 
-  async address(domain, currencyTicker) {
+  async address(domain: string, currencyTicker: string) {
     const data = await this.resolve(domain)
-    return data.addresses[currencyTicker.toUpperCase()]
+    return data.addresses[currencyTicker.toUpperCase()] || null
   }
 
   isValidDomain(domain: string) {
-    // Require dot in domain helps router to next() the request
     return (
       domain.indexOf('.') > 0 &&
       /^((?![0-9]+$)(?!.*-$)(?!-)[a-zA-Z0-9-]{1,63}\.)*(?![0-9]+$)(?!.*-$)(?!-)[a-zA-Z0-9-]{1,63}$/.test(

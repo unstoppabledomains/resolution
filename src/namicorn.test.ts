@@ -18,6 +18,12 @@ it('resolves zil name using blockchain', async () => {
   expect(result).toEqual('0xd96d39c91b3d0236437e800f874800b026dc5f14')
 })
 
+it('resolves non-existing zil name using blockchain', async () => {
+  const namicorn = new Namicorn({blockchain: true})
+  const result = await namicorn.address('this-does-not-exist-ever.zil', 'ZIL')
+  expect(result).toEqual(null)
+})
+
 xit('resolves rsk name using blockchain', async () => {
   const namicorn = new Namicorn({blockchain: true})
   const result = await namicorn.address('alice.rsk', 'ETH')

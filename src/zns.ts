@@ -23,9 +23,12 @@ export default class {
       return null
     }
 
-    const [owner, previous_owner, resolver, ttl] = (state as any)
-      .find(v => v.vname === 'registry')
-      .value.find(v => v.key === nodeHash).val.arguments
+    const record = (state as any).
+      find(v => v.vname === 'registry').
+      value.find(v => v.key === nodeHash)
+    if (!record)
+      return null
+    const [owner, previous_owner, resolver, ttl] = record.val.arguments
 
     return {
       addresses: {
