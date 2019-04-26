@@ -24,6 +24,12 @@ it('resolves non-existing zil name using blockchain', async () => {
   expect(result).toEqual(null)
 })
 
+it('provides empty response constant', async () => {
+  const response = Namicorn.UNCLAIMED_DOMAIN_RESPONSE
+  expect(response.addresses).toEqual({})
+  expect(response.meta.owner).toEqual(null)
+})
+
 xit('resolves rsk name using blockchain', async () => {
   const namicorn = new Namicorn({blockchain: true})
   const result = await namicorn.address('alice.rsk', 'ETH')

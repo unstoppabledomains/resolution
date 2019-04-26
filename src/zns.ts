@@ -23,6 +23,7 @@ export default class {
       return null
     }
 
+    // TODO: real ZNS contract implementation
     const record = (state as any).
       find(v => v.vname === 'registry').
       value.find(v => v.key === nodeHash)

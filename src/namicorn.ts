@@ -4,15 +4,6 @@ import Rns from './rns'
 
 import fetch from 'isomorphic-fetch'
 const DEFAULT_URL = 'https://unstoppable-domains-api.appspot.com/v1'
-const UNCLAIMED_DOMAIN_RESPONSE = {
-  addresses: {},
-  meta: {
-    owner: null, //available domain
-    ttl: 0,
-    previous_owner: null,
-  },
-}
-
 type Src = string | undefined
 
 type Blockchain =
@@ -24,6 +15,15 @@ type Blockchain =
     }
 
 class Namicorn {
+  static readonly UNCLAIMED_DOMAIN_RESPONSE = {
+    addresses: {},
+    meta: {
+      owner: null, //available domain
+      ttl: 0,
+      previous_owner: null,
+    },
+  }
+
   api: string
   ens: Ens | undefined
   rns: Rns | undefined
@@ -65,7 +65,7 @@ class Namicorn {
     } else if (domain.match(/\.rsk$/)) {
       method = this.rns
     }
-    var result = (await method.resolve(domain)) || UNCLAIMED_DOMAIN_RESPONSE
+    var result = (await method.resolve(domain)) || Namicorn.UNCLAIMED_DOMAIN_RESPONSE
     return result
   }
 
