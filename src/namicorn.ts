@@ -3,7 +3,7 @@ import Zns from './zns'
 import Rns from './rns'
 
 import fetch from 'isomorphic-fetch'
-const DEFAULT_URL = 'https://unstoppable-domains-api.appspot.com/v1'
+const DEFAULT_URL = 'https://unstoppabledomains.com/api/v1'
 type Src = string | undefined
 
 type Blockchain =
