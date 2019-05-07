@@ -65,8 +65,9 @@ class Namicorn {
     } else if (domain.match(/\.rsk$/)) {
       method = this.rns
     }
-    var result = (await method.resolve(domain)) || Namicorn.UNCLAIMED_DOMAIN_RESPONSE
-    return result
+
+    var result = method && (await method.resolve(domain))
+    return result || Namicorn.UNCLAIMED_DOMAIN_RESPONSE
   }
 
   async address(domain: string, currencyTicker: string) {

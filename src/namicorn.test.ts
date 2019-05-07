@@ -6,6 +6,7 @@ it('should work', async () => {
   expect(result).toEqual('0x89a8f5f337304EaA7caEd7AA1D88b791f3d8B51D')
 })
 
+
 it('resolves eth name using blockchain', async () => {
   const namicorn = new Namicorn({blockchain: true})
   const result = await namicorn.address('matthewgould.eth', 'ETH')
@@ -28,6 +29,12 @@ it('provides empty response constant', async () => {
   const response = Namicorn.UNCLAIMED_DOMAIN_RESPONSE
   expect(response.addresses).toEqual({})
   expect(response.meta.owner).toEqual(null)
+})
+
+it('resolves non-existing domain zone', async () => {
+  const namicorn = new Namicorn({blockchain: true})
+  const result = await namicorn.address('bogdangusiev.qq', 'ZIL')
+  expect(result).toEqual(null)
 })
 
 xit('resolves rsk name using blockchain', async () => {
