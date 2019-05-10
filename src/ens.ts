@@ -34,11 +34,10 @@ export default class {
   }
   async resolve(domain) {
     const nodeHash = hash(domain)
-    var [owner, ttl, resolver, previous_owner] = await Promise.all([
+    var [owner, ttl, resolver] = await Promise.all([
       this.ensContract.methods.owner(nodeHash).call(),
       this.ensContract.methods.ttl(nodeHash).call(),
       this.ensContract.methods.resolver(nodeHash).call(),
-      this.fetchPreviousOwner(domain),
     ])
     if (resolver == BLANK_ADDRESS) resolver = null
     if (owner == BLANK_ADDRESS) owner = null
@@ -51,7 +50,6 @@ export default class {
         owner,
         type: 'ens',
         ttl: Number(ttl),
-        previous_owner,
       },
     }
   }

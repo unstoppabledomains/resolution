@@ -29,7 +29,7 @@ export default class {
       value.find(v => v.key === nodeHash)
     if (!record)
       return null
-    const [owner, previous_owner, resolver, ttl] = record.val.arguments
+    const [owner, resolver, ttl] = record.val.arguments
 
     return {
       addresses: {
@@ -39,7 +39,6 @@ export default class {
         owner: owner || null,
         type: 'zns',
         ttl,
-        previous_owner: previous_owner || null,
       },
     }
   }

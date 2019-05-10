@@ -20,7 +20,6 @@ class Namicorn {
     meta: {
       owner: null, //available domain
       ttl: 0,
-      previous_owner: null,
     },
   }
 
