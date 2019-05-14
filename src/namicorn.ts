@@ -59,7 +59,7 @@ class Namicorn {
     var method = null
     if (domain.match(/\.zil$/)) {
       method = this.zns
-    } else if (domain.match(/\.eth$/)) {
+    } else if (domain.match(/\.eth$/) || domain.match(/\.xyz/)) {
       method = this.ens
     } else if (domain.match(/\.rsk$/)) {
       method = this.rns

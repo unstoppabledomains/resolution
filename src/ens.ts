@@ -9,7 +9,7 @@ const Web3 = require('web3')
 const BLANK_ADDRESS = '0x0000000000000000000000000000000000000000'
 const DEFAULT_SOURCE = 'wss://mainnet.infura.io/ws'
 
-export default class {
+export default class Ens {
   ensContract: any
   deedContract: any
   resolverContract: any
