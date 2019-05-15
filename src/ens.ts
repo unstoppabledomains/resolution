@@ -11,8 +11,6 @@ const DEFAULT_SOURCE = 'wss://mainnet.infura.io/ws';
 
 export default class Ens {
   ensContract: any;
-  deedContract: any;
-  resolverContract: any;
   registrarContract: any;
   web3: any;
 
@@ -25,13 +23,12 @@ export default class Ens {
       ensInterface,
       '0x314159265dD8dbb310642f98f50C066173C1259b',
     );
-    this.deedContract = new this.web3.eth.Contract(deedInterface);
-    this.resolverContract = new this.web3.eth.Contract(resolverInterface);
     this.registrarContract = new this.web3.eth.Contract(
       registrarInterface,
       '0x6090A6e47849629b7245Dfa1Ca21D94cd15878Ef',
     );
   }
+
   async resolve(domain) {
     const nodeHash = hash(domain);
     var [owner, ttl, resolver] = await Promise.all([
@@ -39,7 +36,6 @@ export default class Ens {
       this.ensContract.methods.ttl(nodeHash).call(),
       this.ensContract.methods.resolver(nodeHash).call(),
     ]);
-    if (resolver == BLANK_ADDRESS) resolver = null;
     if (owner == BLANK_ADDRESS) owner = null;
     const address = await this.fetchAddress(resolver, nodeHash);
     return {
@@ -54,12 +50,11 @@ export default class Ens {
     };
   }
   async fetchAddress(resolver, nodeHash) {
-    if (!resolver) {
+    if (!resolver || resolver == BLANK_ADDRESS) {
       return null;
     }
-    const currentResolverContract = this.resolverContract.clone();
-    currentResolverContract.options.address = resolver;
-    return await currentResolverContract.methods.addr(nodeHash).call();
+    const resolverContract = new this.web3.eth.Contract(resolverInterface, resolver);
+    return await resolverContract.methods.addr(nodeHash).call();
   }
 
   async fetchPreviousOwner(domain) {
@@ -77,10 +72,9 @@ export default class Ens {
       return null;
     }
 
-    const currentDeedContract = this.deedContract.clone();
-    currentDeedContract.options.address = deedAddress;
+    const deedContract = new this.web3.eth.Contract(deedInterface, deedAddress);
 
-    const previousOwner = currentDeedContract.methods.previousOwner().call();
+    const previousOwner = deedContract.methods.previousOwner().call();
     return previousOwner === BLANK_ADDRESS ? null : previousOwner;
   }
 }
