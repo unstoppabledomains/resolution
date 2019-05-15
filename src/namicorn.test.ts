@@ -15,7 +15,10 @@ it('resolves .eth name using blockchain', async () => {
 import Ens from './ens';
 it('reverses address to ENS domain', async () => {
   const ens = new Ens();
-  var result = await ens.reverse('0xb0E7a465D255aE83eb7F8a50504F3867B945164C', 'ETH');
+  var result = await ens.reverse(
+    '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
+    'ETH',
+  );
   expect(result).toEqual('adrian.argent.xyz');
   //var result = await ens.reverse('0x714ef33943d925731FBB89C99aF5780D888bD106', 'ETH');
   //expect(result).toEqual('matthewgould.eth');

@@ -29,20 +29,25 @@ export default class Ens {
     );
   }
 
-  async reverse(address: string, coin: string) {
-    if(coin != "ETH") {
-      throw new Error(`Ens doesn't support any coin other than ETH`)
+  async reverse(address: string, currencyTicker: string) {
+    if (currencyTicker != 'ETH') {
+      throw new Error(`Ens doesn't support any currency other than ETH`);
     }
-    if (address.startsWith("0x")) {
-      address = address.substr(2)
+    if (address.startsWith('0x')) {
+      address = address.substr(2);
     }
-    const reverseAddress = address + ".addr.reverse"
+    const reverseAddress = address + '.addr.reverse';
     const nodeHash = hash(reverseAddress);
-    const resolverAddress = await this.ensContract.methods.resolver(nodeHash).call()
+    const resolverAddress = await this.ensContract.methods
+      .resolver(nodeHash)
+      .call();
     if (resolverAddress == BLANK_ADDRESS) {
-      return null
+      return null;
     }
-    const resolverContract = new this.web3.eth.Contract(resolverInterface, resolverAddress)
+    const resolverContract = new this.web3.eth.Contract(
+      resolverInterface,
+      resolverAddress,
+    );
     return await resolverContract.methods.name(nodeHash).call();
   }
 
@@ -70,7 +75,10 @@ export default class Ens {
     if (!resolver || resolver == BLANK_ADDRESS) {
       return null;
     }
-    const resolverContract = new this.web3.eth.Contract(resolverInterface, resolver);
+    const resolverContract = new this.web3.eth.Contract(
+      resolverInterface,
+      resolver,
+    );
     return await resolverContract.methods.addr(nodeHash).call();
   }
 
