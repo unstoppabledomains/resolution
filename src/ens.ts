@@ -29,6 +29,23 @@ export default class Ens {
     );
   }
 
+  async reverse(address: string, coin: string) {
+    if(coin != "ETH") {
+      throw new Error(`Ens doesn't support any coin other than ETH`)
+    }
+    if (address.startsWith("0x")) {
+      address = address.substr(2)
+    }
+    const reverseAddress = address + ".addr.reverse"
+    const nodeHash = hash(reverseAddress);
+    const resolverAddress = await this.ensContract.methods.resolver(nodeHash).call()
+    if (resolverAddress == BLANK_ADDRESS) {
+      return null
+    }
+    const resolverContract = new this.web3.eth.Contract(resolverInterface, resolverAddress)
+    return await resolverContract.methods.name(nodeHash).call();
+  }
+
   async resolve(domain) {
     const nodeHash = hash(domain);
     var [owner, ttl, resolver] = await Promise.all([
