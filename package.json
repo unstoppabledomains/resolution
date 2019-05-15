@@ -8,7 +8,7 @@
     "test": "jest",
     "start": "npm run build:live",
     "build": "tsc -p .",
-    "format": "prettier --write -l **/*.{js,json,ts}",
+    "format": "prettier --semi --write -l **/*.{js,json,ts}",
     "build:live": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts"
   },
   "files": [
