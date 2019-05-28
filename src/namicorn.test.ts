@@ -20,8 +20,8 @@ it('reverses address to ENS domain', async () => {
     'ETH',
   );
   expect(result).toEqual('adrian.argent.xyz');
-  //var result = await ens.reverse('0x714ef33943d925731FBB89C99aF5780D888bD106', 'ETH');
-  //expect(result).toEqual('matthewgould.eth');
+  var result = await ens.reverse('0x112234455c3a32fd11230c42e7bccd4a84e02010', 'ETH');
+  expect(result).toEqual(null);
 });
 
 it('resolves .xyz name using ENS blockchain', async () => {
