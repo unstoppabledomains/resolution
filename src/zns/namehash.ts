@@ -1,8 +1,12 @@
 import sha3 from './sha3'
 
-export default (name = '') =>
-  '0x' +
-  ['0000000000000000000000000000000000000000000000000000000000000000']
+export default (name = '', parent = null) => {
+  parent = parent || '0000000000000000000000000000000000000000000000000000000000000000'
+  if (parent.match(/^0x/)) {
+    parent = parent.substr(2)
+  }
+  return '0x' +
+  [parent]
     .concat(
       name
         .split('.')
@@ -13,3 +17,4 @@ export default (name = '') =>
     .reduce((a, labelHash) =>
       sha3(a + labelHash, {hexPrefix: false, inputEnc: 'hex'}),
     )
+}
