@@ -1,10 +1,11 @@
 import {Zilliqa} from '@zilliqa-js/zilliqa';
 import {Contract} from '@zilliqa-js/contract';
+import {toChecksumAddress} from '@zilliqa-js/crypto'
 import namehash from './zns/namehash';
 import _ from 'lodash';
 
 const DEFAULT_SOURCE = 'https://api.zilliqa.com/';
-const registryAddress = '9611c53BE6d1b32058b2747bdeCECed7e1216793'.toLowerCase();
+const registryAddress = 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz'
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 export default class {
@@ -29,10 +30,10 @@ export default class {
     if (resolverAddress == NULL_ADDRESS) {
       return {};
     }
-    if (resolverAddress.match(/^0x/)) {
-      resolverAddress = resolverAddress.substring(2)
-    }
-    const resolver = this.zilliqa.contracts.at(resolverAddress);
+    //if (resolverAddress.match(/^0x/)) {
+      //resolverAddress = resolverAddress.substring(2)
+    //}
+    const resolver = this.zilliqa.contracts.at(toChecksumAddress(resolverAddress));
     const resolverRecords = await this.getContractField(resolver, 'records') as Array<{key, val}> || [];
     const result = {};
     resolverRecords.forEach(record => {

@@ -42,7 +42,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@zilliqa-js/zilliqa": "^0.5.3",
+    "@zilliqa-js/zilliqa": "^0.7.2",
     "eth-ens-namehash": "^2.0.8",
     "lodash": "^4.17.11",
     "node-fetch": "^2.2.1",
