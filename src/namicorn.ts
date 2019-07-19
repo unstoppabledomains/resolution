@@ -1,8 +1,9 @@
+import fetch from 'node-fetch';
+
 import Ens from './ens';
 import Zns from './zns';
 import Rns from './rns';
 
-import fetch from 'isomorphic-fetch';
 const DEFAULT_URL = 'https://unstoppabledomains.com/api/v1';
 type Src = string | undefined;
 
@@ -24,9 +25,9 @@ class Namicorn {
   };
 
   api: string;
-  ens: Ens | undefined;
-  rns: Rns | undefined;
-  zns: Zns | undefined;
+  ens: Ens;
+  rns: Rns;
+  zns: Zns;
   blockchain: boolean;
 
   constructor({

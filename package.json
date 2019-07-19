@@ -44,7 +44,8 @@
   "dependencies": {
     "@zilliqa-js/zilliqa": "^0.5.3",
     "eth-ens-namehash": "^2.0.8",
-    "isomorphic-fetch": "^2.2.1",
+    "node-fetch": "^2.2.1",
+    "lodash": "^4.17.11",
     "web3": "^1.0.0-beta.52"
   }
 }
