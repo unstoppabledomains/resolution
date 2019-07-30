@@ -1,8 +1,8 @@
-import {default as ensInterface} from './ens/contract/ens';
-import {default as registrarInterface} from './ens/contract/registrar';
-import {default as deedInterface} from './ens/contract/deed';
-import {default as resolverInterface} from './ens/contract/resolver';
-import {hash} from 'eth-ens-namehash';
+import { default as ensInterface } from './ens/contract/ens';
+import { default as registrarInterface } from './ens/contract/registrar';
+import { default as deedInterface } from './ens/contract/deed';
+import { default as resolverInterface } from './ens/contract/resolver';
+import { hash } from 'eth-ens-namehash';
 
 const Web3 = require('web3');
 

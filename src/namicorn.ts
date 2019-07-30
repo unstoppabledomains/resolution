@@ -33,7 +33,7 @@ class Namicorn {
   constructor({
     blockchain = false,
     api = DEFAULT_URL,
-  }: {api?: Src; blockchain?: Blockchain} = {}) {
+  }: { api?: Src; blockchain?: Blockchain } = {}) {
     this.api = api.toString();
     this.blockchain = !!blockchain;
     if (blockchain) {
@@ -50,7 +50,9 @@ class Namicorn {
     if (this.blockchain) {
       return await this.resolveUsingBlockchain(domain);
     } else {
-      const response = await fetch(`${this.api}/${domain}`);
+      const response = !window
+        ? await fetch(`${this.api}/${domain}`)
+        : await window.fetch(`${this.api}/${domain}`);
       return response.json();
     }
   }
@@ -91,4 +93,4 @@ class Namicorn {
   buildCore(blockchain) {}
 }
 
-export {Namicorn, Namicorn as default};
+export { Namicorn, Namicorn as default };

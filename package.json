@@ -28,6 +28,7 @@
     "@types/jest": "^24.0.11",
     "@types/node": "^11.13.7",
     "jest": "^24.7.1",
+    "nock": "^10.0.6",
     "prettier": "^1.17.0",
     "ts-jest": "^24.0.2",
     "typescript": "^3.4.4"
@@ -35,8 +36,8 @@
   "prettier": {
     "trailingComma": "all",
     "singleQuote": true,
-    "semi": false,
-    "bracketSpacing": false
+    "semi": true,
+    "bracketSpacing": true
   },
   "publicConfig": {
     "access": "public"
