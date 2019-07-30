@@ -28,7 +28,7 @@ class Namicorn {
   rns: Rns
   zns: Zns
   blockchain: boolean
-  isNode: boolean
+  isBrowser: boolean
 
   constructor({
     blockchain = false,
@@ -43,8 +43,8 @@ class Namicorn {
       this.ens = new Ens(blockchain.ens)
       this.zns = new Zns(blockchain.zns)
       this.rns = new Rns(blockchain.rns)
-      this.isNode = Function(
-        'try {return this===global;}catch(e){return false;}',
+      this.isBrowser = Function(
+        'try {return this===window;}catch(e){return false;}',
       )()
     }
   }
@@ -53,9 +53,9 @@ class Namicorn {
     if (this.blockchain) {
       return await this.resolveUsingBlockchain(domain)
     } else {
-      const response = this.isNode
-        ? await fetch(`${this.api}/${domain}`)
-        : await window.fetch(`${this.api}/${domain}`)
+      const response = this.isBrowser
+        ? await window.fetch(`${this.api}/${domain}`)
+        : await fetch(`${this.api}/${domain}`)
       return response.json()
     }
   }
