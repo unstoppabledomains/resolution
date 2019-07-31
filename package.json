@@ -35,8 +35,8 @@
   "prettier": {
     "trailingComma": "all",
     "singleQuote": true,
-    "semi": false,
-    "bracketSpacing": false
+    "semi": true,
+    "bracketSpacing": true
   },
   "publicConfig": {
     "access": "public"
