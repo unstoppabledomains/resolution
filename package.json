@@ -1,6 +1,6 @@
 {
   "name": "namicorn",
-  "version": "0.2.17",
+  "version": "0.2.22",
   "description": "Crypto currency wallet domain name resolution library by Unstoppable Domains Inc.",
   "main": "./lib/namicorn.js",
   "types": "./lib/namicorn.d.ts",
@@ -27,6 +27,7 @@
   "devDependencies": {
     "@types/jest": "^24.0.11",
     "@types/node": "^11.13.7",
+    "@types/node-fetch": "^2.5.0",
     "jest": "^24.7.1",
     "prettier": "^1.17.0",
     "ts-jest": "^24.0.2",
@@ -45,7 +46,7 @@
     "@zilliqa-js/zilliqa": "^0.7.2",
     "eth-ens-namehash": "^2.0.8",
     "lodash": "^4.17.15",
-    "node-fetch": "^2.2.1",
+    "node-fetch": "^2.6.0",
     "web3": "^1.0.0-beta.52"
   }
 }
