@@ -1,12 +1,12 @@
-import {Zilliqa} from '@zilliqa-js/zilliqa';
-import {Contract} from '@zilliqa-js/contract';
-import {toChecksumAddress} from '@zilliqa-js/crypto'
+import { Zilliqa } from '@zilliqa-js/zilliqa';
+import { Contract } from '@zilliqa-js/contract';
+import { toChecksumAddress } from '@zilliqa-js/crypto';
 import namehash from './zns/namehash';
 import _ from 'lodash';
 
 const DEFAULT_SOURCE = 'https://api.zilliqa.com/';
-const registryAddress = 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz'
-const NULL_ADDRESS = '0x0000000000000000000000000000000000000000'
+const registryAddress = 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz';
+const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 export default class {
   registry: Contract;
@@ -31,17 +31,22 @@ export default class {
       return {};
     }
     //if (resolverAddress.match(/^0x/)) {
-      //resolverAddress = resolverAddress.substring(2)
+    //resolverAddress = resolverAddress.substring(2)
     //}
-    const resolver = this.zilliqa.contracts.at(toChecksumAddress(resolverAddress));
-    const resolverRecords = await this.getContractField(resolver, 'records') as Array<{key, val}> || [];
+    const resolver = this.zilliqa.contracts.at(
+      toChecksumAddress(resolverAddress),
+    );
+    const resolverRecords =
+      ((await this.getContractField(resolver, 'records')) as Array<{
+        key;
+        val;
+      }>) || [];
     const result = {};
     resolverRecords.forEach(record => {
-      _.set(result, record.key, record.val)
-    })
+      _.set(result, record.key, record.val);
+    });
     return result;
   }
-
 
   async resolve(domain) {
     const state = await this.registry.getState();
@@ -50,13 +55,21 @@ export default class {
       return null;
     }
 
-    const registryRecords = await this.getContractField(this.registry, 'records')
+    const registryRecords = await this.getContractField(
+      this.registry,
+      'records',
+    );
     if (!registryRecords) return null;
-    const registryRecord = registryRecords.find(r => r.key == nodeHash)
+    const registryRecord = registryRecords.find(r => r.key == nodeHash);
     if (!registryRecord) return null;
-    const [ownerAddress, resolverAddress] = registryRecord.val.arguments as [string, string];
-    const resolution = await this.getResolverRecordsStructure(resolverAddress) as {crypto?: Array<{address?}>, ttl?};
-    const addresses = _.mapValues(resolution.crypto, 'address')
+    const [ownerAddress, resolverAddress] = registryRecord.val.arguments as [
+      string,
+      string
+    ];
+    const resolution = (await this.getResolverRecordsStructure(
+      resolverAddress,
+    )) as { crypto?: Array<{ address? }>; ttl? };
+    const addresses = _.mapValues(resolution.crypto, 'address');
 
     return {
       addresses,

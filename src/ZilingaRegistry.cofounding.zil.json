@@ -1,0 +1,13 @@
+[
+  {
+    "key": "0x1cc365ffd60bb50538e01d24c1f1e26c887c36f26a0de250660b8a1465c60667",
+    "val": {
+      "argtypes": [],
+      "arguments": [
+        "0x267ca17e8b3bbf49c52a4c3b473cdebcbaf9025e",
+        "0xb17c35e557a8c13a730696c92d716a58421e36ca"
+      ],
+      "constructor": "Record"
+    }
+  }
+]

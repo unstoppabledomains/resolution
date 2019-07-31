@@ -12,21 +12,6 @@ function getMockData({ _ownerAddress }: { _ownerAddress: String }): [] {
   return result;
 }
 
-function setTimeCheck({
-  _scopes,
-  _mstime,
-}: {
-  _scopes: any[];
-  _mstime: number;
-}) {
-  setTimeout(() => {
-    // Will throw an assertion error if meanwhile a "GET http://google.com" was
-    // not performed.
-    console.log('scope is done!');
-    _scopes.forEach(scope => scope.done());
-  }, _mstime);
-}
-
 it('should work', async () => {
   const DEFAULT_URL = 'https://unstoppabledomains.com/api/v1';
   const API_VALID_RESPONSE = {
@@ -45,7 +30,6 @@ it('should work', async () => {
     .get('/cofounding.zil')
     .reply(200, API_VALID_RESPONSE);
 
-  setTimeCheck({ _scopes: [scope], _mstime: 1000 });
   const namicorn = new Namicorn();
   const result = await namicorn.address('cofounding.zil', 'eth');
   expect(result).toEqual('0xaa91734f90795e80751c96e682a321bb3c1a4186');
@@ -87,38 +71,19 @@ it('should work', async () => {
 // });
 
 it('resolves .zil name using blockchain', async () => {
-  const mockResult = getMockData({
-    _ownerAddress: '0x267ca17e8b3bbf49c52a4c3b473cdebcbaf9025e',
-  });
-  // first distinguish api call happens every time
-  const firstBigCall = nock('https://api.zilliqa.com/')
-    .post({
-      id: 1,
-      jsonrpc: '2.0',
-      method: 'GetSmartContractState',
-      params: ['9611c53be6d1b32058b2747bdececed7e1216793'],
-    })
-    .reply(200, {
-      id: 1,
-      jsonrpc: '2.0',
-      result: [
-        {
-          type: 'List (ByStr20)',
-          value: [
-            '0xa11de7664f55f5bdf8544a9ac711691d01378b4c',
-            '0x76c858a5ea4552e78523cbcaacb58977fbf50b93',
-            '0x6261f4df0eabab544d2fb14a1016c0575d13fff3',
-            '0x021801104f9672bda71424d0bc8b1546b287adc2',
-            '0xdfa89866ae86632b36361d53b76c1373448c28fa',
-          ],
-          vname: 'admins',
-        },
-        ...mockResult,
-      ],
-    });
+  const mockData = require('./ZilingaRegistry.cofounding.zil.json');
+  const scope = nock('api.zilliqa.com/')
+    .post(
+      JSON.stringify({
+        id: 1,
+        jsonrpc: '2.0',
+        method: 'GetSmartContractState',
+        params: ['9611c53be6d1b32058b2747bdececed7e1216793'],
+      }),
+    )
+    .reply(200, mockData);
 
-  // second distinguis api call happens every time
-  const secondBigCall = nock('https://api.zilliqa.com')
+  const secondScope = nock('api.zillinqa.com')
     .post({
       id: 1,
       jsonrpc: '2.0',
@@ -148,7 +113,9 @@ it('resolves .zil name using blockchain', async () => {
     });
 
   const namicorn = new Namicorn({ blockchain: true });
+  //   setTimeCheck({ _scopes: [scope, secondScope], _mstime: 1500 });
   const result = await namicorn.resolve('cofounding.zil');
+  console.log('result === ', result);
   expect(result.addresses.ETH).toEqual(
     '0xaa91734f90795e80751c96e682a321bb3c1a4186',
   );
