@@ -72,6 +72,7 @@ class Namicorn {
 
   async resolveUsingBlockchain(domain: string) {
     if (!this.isValidDomain(domain)) return null;
+
     var method = null;
     if (domain.match(/\.zil$/)) {
       method = this.zns;
@@ -84,7 +85,6 @@ class Namicorn {
     } else if (domain.match(/\.rsk$/)) {
       method = this.rns;
     }
-
     var result = method && (await method.resolve(domain));
     return result || Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
   }

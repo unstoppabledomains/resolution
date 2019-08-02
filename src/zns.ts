@@ -23,21 +23,13 @@ export default class {
 
   async getContractField(contract: Contract, field: string): Promise<any> {
     const state = await contract.getState();
-    const searchResult = state && state.find(v => v.vname === field).value;
-    console.log('STATE OF A CONTRACT FIEEEELDDDDDDD');
-    console.log('this is state.find ');
-    console.log(searchResult);
-    console.log('---------------');
-    return searchResult;
+    return state && state.find(v => v.vname === field).value;
   }
 
   async getResolverRecordsStructure(resolverAddress: string) {
     if (resolverAddress == NULL_ADDRESS) {
       return {};
     }
-    //if (resolverAddress.match(/^0x/)) {
-    //resolverAddress = resolverAddress.substring(2)
-    //}
     const resolver = this.zilliqa.contracts.at(
       toChecksumAddress(resolverAddress),
     );
@@ -59,6 +51,7 @@ export default class {
       this.registry,
       'records',
     );
+
     if (!registryRecords) return null;
     const registryRecord = registryRecords.find(r => r.key == nodeHash);
     if (!registryRecord) return null;
