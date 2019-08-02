@@ -23,7 +23,12 @@ export default class {
 
   async getContractField(contract: Contract, field: string): Promise<any> {
     const state = await contract.getState();
-    return state && state.find(v => v.vname === field).value;
+    const searchResult = state && state.find(v => v.vname === field).value;
+    console.log('STATE OF A CONTRACT FIEEEELDDDDDDD');
+    console.log('this is state.find ');
+    console.log(searchResult);
+    console.log('---------------');
+    return searchResult;
   }
 
   async getResolverRecordsStructure(resolverAddress: string) {
@@ -49,12 +54,7 @@ export default class {
   }
 
   async resolve(domain) {
-    const state = await this.registry.getState();
     const nodeHash = namehash(domain);
-    if (!state) {
-      return null;
-    }
-
     const registryRecords = await this.getContractField(
       this.registry,
       'records',

@@ -1,9 +1,10 @@
-import Namicorn from './namicorn';
 import nock from 'nock';
+import Namicorn from './namicorn';
 
 import bData from './blockchain.respond.json';
 import _ from 'lodash';
 import util from 'util';
+import fetch from 'node-fetch';
 
 function getMockData({ _ownerAddress }: { _ownerAddress: String }): [] {
   const result = _.filter(bData.result[1].value, {
@@ -12,7 +13,20 @@ function getMockData({ _ownerAddress }: { _ownerAddress: String }): [] {
   return result;
 }
 
+function setTimeCheck({
+  _scopes,
+  _mstime,
+}: {
+  _scopes: any[];
+  _mstime: number;
+}) {
+  setTimeout(() => {
+    _scopes.forEach(scope => scope.done());
+  }, _mstime);
+}
+
 it('should work', async () => {
+  nock.cleanAll();
   const DEFAULT_URL = 'https://unstoppabledomains.com/api/v1';
   const API_VALID_RESPONSE = {
     addresses: {
@@ -27,6 +41,7 @@ it('should work', async () => {
   };
 
   const scope = nock(DEFAULT_URL)
+    .log(console.log)
     .get('/cofounding.zil')
     .reply(200, API_VALID_RESPONSE);
 
@@ -71,51 +86,31 @@ it('should work', async () => {
 // });
 
 it('resolves .zil name using blockchain', async () => {
+  nock.cleanAll();
   const mockData = require('./ZilingaRegistry.cofounding.zil.json');
-  const scope = nock('api.zilliqa.com/')
-    .post(
-      JSON.stringify({
-        id: 1,
-        jsonrpc: '2.0',
-        method: 'GetSmartContractState',
-        params: ['9611c53be6d1b32058b2747bdececed7e1216793'],
-      }),
-    )
+  const mockDataSecond =
+    '{"id":1,"jsonrpc":"2.0","result":[{"type":"Map (String) (String)","value":[{"key":"crypto.ETH.address","val":"0xaa91734f90795e80751c96e682a321bb3c1a4186"},{"key":"crypto.BTC.address","val":"1NZKHwpfqprxzcaijcjf71CZr27D8osagR"}],"vname":"records"},{"type":"Uint128","value":"0","vname":"_balance"}]}';
+
+  //   const fullMockData = require('../ZilingaRegistry.all.json');
+  const scopeBody =
+    '{"id":1,"jsonrpc":"2.0","method":"GetSmartContractState","params":["9611c53be6d1b32058b2747bdececed7e1216793"]}';
+  const secondScopeBody =
+    '{"id":1,"jsonrpc":"2.0","method":"GetSmartContractState","params":["b17c35e557a8c13a730696c92d716a58421e36ca"]}';
+
+  const scope = nock('https://api.zilliqa.com')
+    .log(console.log)
+    .post('/', scopeBody)
     .reply(200, mockData);
 
-  const secondScope = nock('api.zillinqa.com')
-    .post({
-      id: 1,
-      jsonrpc: '2.0',
-      method: 'GetSmartContractState',
-      params: ['b17c35e557a8c13a730696c92d716a58421e36ca'],
-    })
-    .reply(200, {
-      id: 1,
-      jsonrpc: '2.0',
-      result: [
-        {
-          type: 'Map (String) (String)',
-          value: [
-            {
-              key: 'crypto.ETH.address',
-              val: '0xaa91734f90795e80751c96e682a321bb3c1a4186',
-            },
-            {
-              key: 'crypto.BTC.address',
-              val: '1NZKHwpfqprxzcaijcjf71CZr27D8osagR',
-            },
-          ],
-          vname: 'records',
-        },
-        { type: 'Uint128', value: '0', vname: '_balance' },
-      ],
-    });
+  const secondScope = nock('https://api.zilliqa.com')
+    .log(console.log)
+    .post('/', secondScopeBody)
+    .reply(200, mockDataSecond);
 
   const namicorn = new Namicorn({ blockchain: true });
-  //   setTimeCheck({ _scopes: [scope, secondScope], _mstime: 1500 });
   const result = await namicorn.resolve('cofounding.zil');
-  console.log('result === ', result);
+  //   console.log(result);
+  //   setTimeCheck({ _scopes: [scope], _mstime: 8000 });
   expect(result.addresses.ETH).toEqual(
     '0xaa91734f90795e80751c96e682a321bb3c1a4186',
   );
@@ -124,13 +119,8 @@ it('resolves .zil name using blockchain', async () => {
   );
   expect(result.meta.type).toEqual('zns');
   expect(result.meta.ttl).toEqual(0);
+  //   scope.persist(false);
 });
-
-// it('resolves non-existing .zil name using blockchain', async () => {
-//   const namicorn = new Namicorn({ blockchain: true });
-//   const result = await namicorn.address('this-does-not-exist-ever.zil', 'ZIL');
-//   expect(result).toEqual(null);
-// });
 
 // it('provides empty response constant', async () => {
 //   const response = Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
