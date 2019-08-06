@@ -3,14 +3,12 @@ import Namicorn from './namicorn';
 import _ from 'lodash';
 import mockData from './testData/mockData.json';
 
-nock.cleanAll();
 const DEFAULT_URL = 'https://unstoppabledomains.com/api/v1';
 const MAINNET_URL = 'https://mainnet.infura.io';
 const ZILLIGA_URL = 'https://api.zilliqa.com';
 
 const mockAPICalls = (topLevel, method, testName, url = MAINNET_URL) => {
   nock.cleanAll();
-  console.log(`url = ${url}`);
   const {
     [method]: { REQUESTS, RESPONSES },
   } = mockData[topLevel][testName];
