@@ -1,54 +1,54 @@
 {
-    "name": "namicorn",
-    "version": "0.2.22",
-    "description": "Crypto currency wallet domain name resolution library by Unstoppable Domains Inc.",
-    "main": "./lib/namicorn.js",
-    "types": "./lib/namicorn.d.ts",
-    "scripts": {
-        "test": "jest",
-        "start": "npm run build:live",
-        "build": "tsc -p .",
-        "format": "prettier --semi --write -l **/*.{js,json,ts}",
-        "build:live": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts"
-    },
-    "files": [
-        "lib"
-    ],
-    "repository": {
-        "type": "git",
-        "url": "git://github.com/unstoppabledomains/namicorn.git"
-    },
-    "author": "",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/unstoppabledomains/namicorn/issues"
-    },
-    "homepage": "https://github.com/unstoppabledomains/namicorn#readme",
-    "devDependencies": {
-        "@types/jest": "^24.0.11",
-        "@types/node": "^11.13.7",
-        "@types/node-fetch": "^2.5.0",
-        "jest": "^24.7.1",
-        "nock": "^10.0.6",
-        "prettier": "^1.17.0",
-        "ts-jest": "^24.0.2",
-        "typescript": "^3.4.4"
-    },
-    "prettier": {
-        "trailingComma": "all",
-        "singleQuote": true,
-        "semi": true,
-        "tabWidth": 2,
-        "bracketSpacing": true
-    },
-    "publicConfig": {
-        "access": "public"
-    },
-    "dependencies": {
-        "@zilliqa-js/zilliqa": "^0.7.2",
-        "eth-ens-namehash": "^2.0.8",
-        "lodash": "^4.17.15",
-        "node-fetch": "^2.6.0",
-        "web3": "^1.0.0-beta.52"
-    }
+	"name": "namicorn",
+	"version": "0.2.22",
+	"description": "Crypto currency wallet domain name resolution library by Unstoppable Domains Inc.",
+	"main": "./lib/namicorn.js",
+	"types": "./lib/namicorn.d.ts",
+	"scripts": {
+		"test": "jest",
+		"start": "npm run build:live",
+		"build": "tsc -p .",
+		"format": "prettier --semi --write -l **/*.{js,json,ts}",
+		"build:live": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts"
+	},
+	"files": [
+		"lib"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/unstoppabledomains/namicorn.git"
+	},
+	"author": "",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/unstoppabledomains/namicorn/issues"
+	},
+	"homepage": "https://github.com/unstoppabledomains/namicorn#readme",
+	"devDependencies": {
+		"@types/jest": "^24.0.11",
+		"@types/node": "^11.13.7",
+		"@types/node-fetch": "^2.5.0",
+		"jest": "^24.7.1",
+		"nock": "^10.0.6",
+		"prettier": "^1.17.0",
+		"ts-jest": "^24.0.2",
+		"typescript": "^3.4.4"
+	},
+	"prettier": {
+		"trailingComma": "all",
+		"singleQuote": true,
+		"semi": true,
+		"tabWidth": 2,
+		"bracketSpacing": true
+	},
+	"publicConfig": {
+		"access": "public"
+	},
+	"dependencies": {
+		"@zilliqa-js/zilliqa": "^0.7.2",
+		"eth-ens-namehash": "^2.0.8",
+		"lodash": "^4.17.15",
+		"node-fetch": "^2.6.0",
+		"web3": "^1.0.0-beta.52"
+	}
 }
