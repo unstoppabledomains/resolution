@@ -1,8 +1,8 @@
-import {default as ensInterface} from './ens/contract/ens';
-import {default as registrarInterface} from './ens/contract/registrar';
-import {default as deedInterface} from './ens/contract/deed';
-import {default as resolverInterface} from './ens/contract/resolver';
-import {hash} from 'eth-ens-namehash';
+import { default as ensInterface } from './ens/contract/ens';
+import { default as registrarInterface } from './ens/contract/registrar';
+import { default as deedInterface } from './ens/contract/deed';
+import { default as resolverInterface } from './ens/contract/resolver';
+import { hash } from 'eth-ens-namehash';
 
 const Web3 = require('web3');
 
@@ -29,6 +29,25 @@ export default class Ens {
     );
   }
 
+  /* Test functions bellow */
+
+  _resolverCallToName(resolverContract, nodeHash) {
+    return resolverContract.methods.name(nodeHash).call();
+  }
+
+  _getResolver(nodeHash) {
+    return this.ensContract.methods.resolver(nodeHash).call();
+  }
+
+  async _getResolutionInfo(nodeHash) {
+    return await Promise.all([
+      this.ensContract.methods.owner(nodeHash).call(),
+      this.ensContract.methods.ttl(nodeHash).call(),
+      this.ensContract.methods.resolver(nodeHash).call(),
+    ]);
+  }
+  /*===========================*/
+
   async reverse(address: string, currencyTicker: string) {
     if (currencyTicker != 'ETH') {
       throw new Error(`Ens doesn't support any currency other than ETH`);
@@ -38,9 +57,7 @@ export default class Ens {
     }
     const reverseAddress = address + '.addr.reverse';
     const nodeHash = hash(reverseAddress);
-    const resolverAddress = await this.ensContract.methods
-      .resolver(nodeHash)
-      .call();
+    const resolverAddress = await this._getResolver(nodeHash);
     if (resolverAddress == BLANK_ADDRESS) {
       return null;
     }
@@ -48,16 +65,13 @@ export default class Ens {
       resolverInterface,
       resolverAddress,
     );
-    return await resolverContract.methods.name(nodeHash).call();
+
+    return await this._resolverCallToName(resolverContract, nodeHash);
   }
 
   async resolve(domain) {
     const nodeHash = hash(domain);
-    var [owner, ttl, resolver] = await Promise.all([
-      this.ensContract.methods.owner(nodeHash).call(),
-      this.ensContract.methods.ttl(nodeHash).call(),
-      this.ensContract.methods.resolver(nodeHash).call(),
-    ]);
+    var [owner, ttl, resolver] = await this._getResolutionInfo(nodeHash);
     if (owner == BLANK_ADDRESS) owner = null;
     const address = await this.fetchAddress(resolver, nodeHash);
     return {
@@ -71,6 +85,7 @@ export default class Ens {
       },
     };
   }
+
   async fetchAddress(resolver, nodeHash) {
     if (!resolver || resolver == BLANK_ADDRESS) {
       return null;
@@ -79,7 +94,9 @@ export default class Ens {
       resolverInterface,
       resolver,
     );
-    return await resolverContract.methods.addr(nodeHash).call();
+    //put it as a separate method to stub.
+    const address = await resolverContract.methods.addr(nodeHash).call();
+    return address;
   }
 
   async fetchPreviousOwner(domain) {

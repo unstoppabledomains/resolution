@@ -84,7 +84,6 @@ class Namicorn {
     } else if (domain.match(/\.rsk$/)) {
       method = this.rns;
     }
-
     var result = method && (await method.resolve(domain));
     return result || Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
   }
@@ -92,6 +91,10 @@ class Namicorn {
   async address(domain: string, currencyTicker: string) {
     const data = await this.resolve(domain);
     return data.addresses[currencyTicker.toUpperCase()] || null;
+  }
+
+  async reverse(address: string, currencyTicker: string) {
+    return await this.ens.reverse(address, currencyTicker);
   }
 
   isValidDomain(domain: string) {
