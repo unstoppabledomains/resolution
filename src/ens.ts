@@ -2,7 +2,10 @@ import { default as ensInterface } from './ens/contract/ens';
 import { default as registrarInterface } from './ens/contract/registrar';
 import { default as deedInterface } from './ens/contract/deed';
 import { default as resolverInterface } from './ens/contract/resolver';
-import { hash } from 'eth-ens-namehash';
+
+const Hash = require('eth-ens-namehash') as {
+  hash(arg: string): string;
+};
 
 const Web3 = require('web3');
 
@@ -61,7 +64,7 @@ export default class Ens {
       address = address.substr(2);
     }
     const reverseAddress = address + '.addr.reverse';
-    const nodeHash: string = hash(reverseAddress);
+    const nodeHash: string = Hash.hash(reverseAddress);
     const resolverAddress = await this._getResolver(nodeHash);
     if (resolverAddress == BLANK_ADDRESS) {
       return null;
@@ -75,7 +78,7 @@ export default class Ens {
   }
 
   async resolve(domain: string) {
-    const nodeHash = hash(domain);
+    const nodeHash = Hash.hash(domain);
     var [owner, ttl, resolver] = await this._getResolutionInfo(nodeHash);
     if (owner == BLANK_ADDRESS) owner = null;
     const address = await this.fetchAddress(resolver, nodeHash);

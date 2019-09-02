@@ -1,6 +1,10 @@
 import sha3 from './sha3'
 
-export default (name = '', { parent = '0'.repeat(64), prefix = true } = {}) => {
+export default (
+	name: string = '',
+	{ parent = '0'.repeat(64), prefix = true }:
+		{ parent?: string, prefix?: boolean } = {}
+): string => {
 	if (parent.match(/^0x/)) {
 		parent = parent.substr(2)
 	}
