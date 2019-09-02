@@ -1,14 +1,14 @@
-import {sha256 as sha} from 'hash.js'
+import { sha256 as sha } from 'hash.js'
 
 export default (
-  message,
-  {
-    hexPrefix = true,
-    inputEnc = null,
-    outputEnc = 'hex',
-  }: {hexPrefix?: boolean; inputEnc?: 'hex'; outputEnc?: 'hex'} = {},
+	message: any,
+	{
+		hexPrefix = true,
+		inputEnc = undefined,
+		outputEnc = 'hex',
+	}: { hexPrefix?: boolean; inputEnc?: 'hex' | undefined; outputEnc?: 'hex' } = {},
 ) =>
-  (hexPrefix ? '0x' : '') +
-  sha()
-    .update(message, inputEnc)
-    .digest(outputEnc)
+	(hexPrefix ? '0x' : '') +
+	sha()
+		.update(message, inputEnc)
+		.digest(outputEnc)

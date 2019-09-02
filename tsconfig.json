@@ -1,14 +1,19 @@
 {
-  "compilerOptions": {
-    "target": "es5",
-    "moduleResolution": "node",
-    "lib": ["es6", "dom"],
-    "outDir": "lib",
-    "rootDir": "src",
-    "strict": false,
-    "esModuleInterop": true,
-    "declaration": true,
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true
-  }
+	"compilerOptions": {
+		"target": "es5",
+		"moduleResolution": "node",
+		"lib": [
+			"es6",
+			"dom"
+		],
+		"outDir": "lib",
+		"rootDir": "src",
+		"strict": false,
+		"esModuleInterop": true,
+		"declaration": true,
+		"allowSyntheticDefaultImports": true,
+		"resolveJsonModule": true,
+		"noImplicitAny": true,
+		"strictNullChecks": true
+	}
 }

@@ -46,6 +46,7 @@
 		"access": "public"
 	},
 	"dependencies": {
+		"@types/nock": "^10.0.3",
 		"@zilliqa-js/zilliqa": "^0.7.2",
 		"eth-ens-namehash": "^2.0.8",
 		"lodash": "^4.17.15",
