@@ -30,6 +30,8 @@ export default class {
   }
 
   async getContractField(contract: Contract, field: string): Promise<any> {
+    //let response = await this.zilliqa.provider.send("GetSmartContractSubState", contract.address, field);
+    //return (response.result || {})[field];
     const state = await contract.getState();
     return state && state[field];
   }
@@ -43,18 +45,14 @@ export default class {
     const resolver = this.zilliqa.contracts.at(
       toChecksumAddress(resolverAddress),
     );
-    const resolverRecords = (await this.getContractField(
+    const resolverRecords = await this.getContractField(
       resolver,
       'records',
-    )) as any;
-    const result = {};
-    Object.keys(resolverRecords).forEach(recordKey => {
-      _.set(result, recordKey, resolverRecords[recordKey]);
-    });
-    // resolverRecords.forEach(record => {
-    // 	_.set(result, record.key, record.val);
-    // });
-    return result;
+    ) as {[key: string]: string};
+    return _.transform(resolverRecords,
+      (result, value, key) =>  _.set(result, key, value),
+      {},
+    );
   }
 
   async resolve(domain: string): Promise<Resolution | null> {
