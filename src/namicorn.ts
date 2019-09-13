@@ -3,7 +3,7 @@ import Ens from './ens';
 import Zns from './zns';
 import Rns from './rns';
 
-const DEFAULT_URL = 'https://unstoppabledomains.com/api/v1';
+const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
 type Src = string | undefined;
 
 type Blockchain =
@@ -45,7 +45,7 @@ class Namicorn {
 
   constructor({
     blockchain = false,
-    api = DEFAULT_URL,
+    api = DefaultUrl,
   }: { api?: Src; blockchain?: Blockchain } = {}) {
     this.api = api.toString();
     this.blockchain = !!blockchain;
@@ -70,7 +70,25 @@ class Namicorn {
     }
   }
 
-  async resolveUsingBlockchain(domain: string) {
+  async address(domain: string, currencyTicker: string) {
+    const data = await this.resolve(domain);
+    return data.addresses[currencyTicker.toUpperCase()] || null;
+  }
+
+  async reverse(address: string, currencyTicker: string) {
+    return await this.ens.reverse(address, currencyTicker);
+  }
+
+  private isValidDomain(domain: string) {
+    return (
+      domain.indexOf('.') > 0 &&
+      /^((?![0-9]+$)(?!.*-$)(?!-)[a-zA-Z0-9-]{1,63}\.)*(?![0-9]+$)(?!.*-$)(?!-)[a-zA-Z0-9-]{1,63}$/.test(
+        domain,
+      )
+    );
+  }
+
+  private async resolveUsingBlockchain(domain: string) {
     if (!this.isValidDomain(domain)) return null;
     var method = null;
     if (domain.match(/\.zil$/)) {
@@ -87,25 +105,6 @@ class Namicorn {
     var result = method && (await method.resolve(domain));
     return result || Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
   }
-
-  async address(domain: string, currencyTicker: string) {
-    const data = await this.resolve(domain);
-    return data.addresses[currencyTicker.toUpperCase()] || null;
-  }
-
-  async reverse(address: string, currencyTicker: string) {
-    return await this.ens.reverse(address, currencyTicker);
-  }
-
-  isValidDomain(domain: string) {
-    return (
-      domain.indexOf('.') > 0 &&
-      /^((?![0-9]+$)(?!.*-$)(?!-)[a-zA-Z0-9-]{1,63}\.)*(?![0-9]+$)(?!.*-$)(?!-)[a-zA-Z0-9-]{1,63}$/.test(
-        domain,
-      )
-    );
-  }
-  buildCore(blockchain) {}
 }
 
 export { Namicorn, Namicorn as default };

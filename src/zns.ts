@@ -5,30 +5,24 @@ import namehash from './zns/namehash';
 import _ from 'lodash';
 import { fstat } from 'fs';
 
-const DEFAULT_SOURCE = 'https://api.zilliqa.com/';
+const DefaultSource = 'https://api.zilliqa.com/';
 const registryAddress = 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz';
-const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
+const NullAddress = '0x0000000000000000000000000000000000000000';
 
-type ResolverRecord = { key: string; val: string };
-type ResolverRecordsStructure = {
+type Resolution = {
   crypto?: { [key: string]: { address: string } };
   ttl?: string;
   [key: string]: any;
 };
 
-type ZNSResolve = {
-  crypto?: { [key: string]: { address: string } };
-  ttl?: string;
-  [key: string]: any;
-};
 
 export default class {
   registry: Contract;
   zilliqa: Zilliqa;
 
-  constructor(source: string | boolean = DEFAULT_SOURCE) {
+  constructor(source: string | boolean = DefaultSource) {
     if (source == true) {
-      source = DEFAULT_SOURCE;
+      source = DefaultSource;
     }
     source = source.toString();
     this.zilliqa = new Zilliqa(source);
@@ -37,15 +31,13 @@ export default class {
 
   async getContractField(contract: Contract, field: string): Promise<any> {
     const state = await contract.getState();
-    const fs = require('fs');
-    fs.writeFileSync(`./${field}.json`, JSON.stringify(state));
-    return state && state[field as any];
+    return state && state[field];
   }
 
   async getResolverRecordsStructure(
     resolverAddress: string,
-  ): Promise<ResolverRecordsStructure> {
-    if (resolverAddress == NULL_ADDRESS) {
+  ): Promise<Resolution> {
+    if (resolverAddress == NullAddress) {
       return {};
     }
     const resolver = this.zilliqa.contracts.at(
@@ -65,7 +57,7 @@ export default class {
     return result;
   }
 
-  async resolve(domain: string | undefined): Promise<ZNSResolve | null> {
+  async resolve(domain: string): Promise<Resolution | null> {
     const nodeHash = namehash(domain);
     const registryRecords = await this.getContractField(
       this.registry,
