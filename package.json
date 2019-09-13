@@ -5,6 +5,9 @@
 	"main": "./lib/namicorn.js",
 	"types": "./lib/namicorn.d.ts",
 	"scripts": {
+		"release": "yarn build && yarn test && yarn publish --patch",
+		"release:minor": "yarn build && yarn test && yarn publish --minor",
+		"release:major": "yarn build && yarn test && yarn publish --major",
 		"test": "jest",
 		"start": "npm run build:live",
 		"build": "tsc -p .",
