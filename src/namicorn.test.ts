@@ -6,7 +6,7 @@ import Ens from './ens';
 
 const DEFAULT_URL = 'https://unstoppabledomains.com/api/v1';
 const MAINNET_URL = 'https://mainnet.infura.io';
-const ZILLIGA_URL = 'https://api.zilliqa.com';
+const ZILLIQA_URL = 'https://api.zilliqa.com';
 
 const mockAPICalls = (
   topLevel: string,
@@ -171,8 +171,8 @@ it('resolves .luxe name using ENS blockchain null', async () => {
 
 it('resolves .zil name using blockchain', async () => {
   const testName = 'resolves .zil name using blockchain';
-  // mockAPICalls('ZIL', testName, ZILLIGA_URL);
-  const namicorn = new Namicorn({ blockchain: { zns: ZILLIGA_URL } });
+  mockAPICalls('ZIL', testName, ZILLIQA_URL);
+  const namicorn = new Namicorn({ blockchain: { zns: ZILLIQA_URL } });
   const result = await namicorn.resolve('cofounding.zil');
   expect(result).toBeDefined();
   expect(result && result.addresses.ETH).toEqual(
