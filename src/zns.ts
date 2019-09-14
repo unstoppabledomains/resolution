@@ -3,7 +3,6 @@ import { Contract } from '@zilliqa-js/contract';
 import { toChecksumAddress } from '@zilliqa-js/crypto';
 import namehash from './zns/namehash';
 import _ from 'lodash';
-import { fstat } from 'fs';
 
 const DefaultSource = 'https://api.zilliqa.com/';
 const registryAddress = 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz';
@@ -14,7 +13,6 @@ type Resolution = {
   ttl?: string;
   [key: string]: any;
 };
-
 
 export default class {
   registry: Contract;
@@ -45,12 +43,13 @@ export default class {
     const resolver = this.zilliqa.contracts.at(
       toChecksumAddress(resolverAddress),
     );
-    const resolverRecords = await this.getContractField(
+    const resolverRecords = (await this.getContractField(
       resolver,
       'records',
-    ) as {[key: string]: string};
-    return _.transform(resolverRecords,
-      (result, value, key) =>  _.set(result, key, value),
+    )) as { [key: string]: string };
+    return _.transform(
+      resolverRecords,
+      (result, value, key) => _.set(result, key, value),
       {},
     );
   }
