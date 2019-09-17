@@ -28,10 +28,10 @@ export default class {
   }
 
   async getContractField(contract: Contract, field: string): Promise<any> {
-    //let response = await this.zilliqa.provider.send("GetSmartContractSubState", contract.address, field);
-    //return (response.result || {})[field];
-    const state = await contract.getState();
-    return state && state[field];
+    let response = await this.zilliqa.provider.send("GetSmartContractSubState", contract.address.replace("0x", "").toLowerCase(), field, []);
+    return (response.result || {})[field];
+    //const state = await contract.getState();
+    //return state && state[field];
   }
 
   async getResolverRecordsStructure(
