@@ -318,7 +318,7 @@
           "id":1,
           "jsonrpc":"2.0",
           "method":"GetSmartContractSubState",
-          "params":["9611c53be6d1b32058b2747bdececed7e1216793","records",[]]
+          "params":["9611c53be6d1b32058b2747bdececed7e1216793","records",["\"0x1cc365ffd60bb50538e01d24c1f1e26c887c36f26a0de250660b8a1465c60667\""]]
         },
         "RESPONSE": {
           "id": 1,

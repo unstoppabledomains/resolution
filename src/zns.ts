@@ -27,11 +27,18 @@ export default class {
     this.registry = this.zilliqa.contracts.at(registryAddress);
   }
 
-  async getContractField(contract: Contract, field: string): Promise<any> {
-    let response = await this.zilliqa.provider.send("GetSmartContractSubState", contract.address.replace("0x", "").toLowerCase(), field, []);
+  async getContractField(contract: Contract, field: string, keys: string[] = []): Promise<any> {
+    let response = await this.zilliqa.provider.send(
+      "GetSmartContractSubState",
+      contract.address.replace("0x", "").toLowerCase(),
+      field,
+      keys.map(k => JSON.stringify(k))
+    );
     return (response.result || {})[field];
-    //const state = await contract.getState();
-    //return state && state[field];
+  }
+
+  async getContractMapValue(contract: Contract, field: string, key: string): Promise<any>  {
+    return (await this.getContractField(contract, field, [key]))[key];
   }
 
   async getResolverRecordsStructure(
@@ -55,14 +62,12 @@ export default class {
   }
 
   async resolve(domain: string): Promise<Resolution | null> {
-    const nodeHash = namehash(domain);
-    const registryRecords = await this.getContractField(
+    const registryRecord = await this.getContractMapValue(
       this.registry,
       'records',
+      namehash(domain),
     );
 
-    if (!registryRecords) return null;
-    const registryRecord = registryRecords[nodeHash];
     if (!registryRecord) return null;
     const [ownerAddress, resolverAddress] = registryRecord.arguments as [
       string,
