@@ -6,17 +6,17 @@ import { hash } from 'eth-ens-namehash';
 
 const Web3 = require('web3');
 
-const BLANK_ADDRESS = '0x0000000000000000000000000000000000000000';
-const DEFAULT_SOURCE = 'wss://mainnet.infura.io/ws';
+const NullAddress = '0x0000000000000000000000000000000000000000';
+const DefaultSource = 'wss://mainnet.infura.io/ws';
 
 export default class Ens {
   ensContract: any;
   registrarContract: any;
   web3: any;
 
-  constructor(source: string | boolean = DEFAULT_SOURCE) {
+  constructor(source: string | boolean = DefaultSource) {
     if (source == true) {
-      source = DEFAULT_SOURCE;
+      source = DefaultSource;
     }
     this.web3 = new Web3(source);
     this.ensContract = new this.web3.eth.Contract(
@@ -58,7 +58,7 @@ export default class Ens {
     const reverseAddress = address + '.addr.reverse';
     const nodeHash = hash(reverseAddress);
     const resolverAddress = await this._getResolver(nodeHash);
-    if (resolverAddress == BLANK_ADDRESS) {
+    if (resolverAddress == NullAddress) {
       return null;
     }
     const resolverContract = new this.web3.eth.Contract(
@@ -72,7 +72,7 @@ export default class Ens {
   async resolve(domain) {
     const nodeHash = hash(domain);
     var [owner, ttl, resolver] = await this._getResolutionInfo(nodeHash);
-    if (owner == BLANK_ADDRESS) owner = null;
+    if (owner == NullAddress) owner = null;
     const address = await this.fetchAddress(resolver, nodeHash);
     return {
       addresses: {
@@ -87,7 +87,7 @@ export default class Ens {
   }
 
   async fetchAddress(resolver, nodeHash) {
-    if (!resolver || resolver == BLANK_ADDRESS) {
+    if (!resolver || resolver == NullAddress) {
       return null;
     }
     const resolverContract = new this.web3.eth.Contract(
@@ -110,13 +110,13 @@ export default class Ens {
       highestBid,
     ] = await this.registrarContract.methods.entries(labelHash).call();
 
-    if (deedAddress === BLANK_ADDRESS) {
+    if (deedAddress === NullAddress) {
       return null;
     }
 
     const deedContract = new this.web3.eth.Contract(deedInterface, deedAddress);
 
     const previousOwner = deedContract.methods.previousOwner().call();
-    return previousOwner === BLANK_ADDRESS ? null : previousOwner;
+    return previousOwner === NullAddress ? null : previousOwner;
   }
 }
