@@ -36,7 +36,7 @@
 		"nock": "^10.0.6",
 		"prettier": "^1.17.0",
 		"ts-jest": "^24.0.2",
-		"typescript": "^3.4.4"
+		"typescript": "^3.6.3"
 	},
 	"prettier": {
 		"trailingComma": "all",
@@ -53,6 +53,7 @@
 		"eth-ens-namehash": "^2.0.8",
 		"lodash": "^4.17.15",
 		"node-fetch": "^2.6.0",
-		"web3": "^1.0.0-beta.52"
+		"tslib": "^1.10.0",
+		"web3": "^1.2.1"
 	}
 }
