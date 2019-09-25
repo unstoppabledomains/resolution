@@ -76,17 +76,14 @@ class Namicorn {
     return await this.ens.reverse(address, currencyTicker);
   }
 
-  isSupportedDomain(domain: string): Ens | Zns | false {
-    if (this.ens.isSupportedDomain(domain))
-      return this.ens;
-    if (this.zns.isSupportedDomain(domain))
-      return this.zns;
-    return false;
+  isSupportedDomain(domain: string): boolean {
+    return this.zns.isSupportedDomain(domain) || this.ens.isSupportedDomain(domain)
   }
 
   private async resolveUsingBlockchain(domain: string) {
-    const method = this.isSupportedDomain(domain);
-    if (!method) return null;
+    const supported = this.isSupportedDomain(domain);
+    if (!supported) return null;
+    const method = (/^.{1,}\.(eth|luxe|xyz|test)$/.test(domain)) ? this.ens : this.zns;
     var result = method && (await method.resolve(domain));
     return result || Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
   }
