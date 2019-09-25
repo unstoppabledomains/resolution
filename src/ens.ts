@@ -119,4 +119,8 @@ export default class Ens {
     const previousOwner = deedContract.methods.previousOwner().call();
     return previousOwner === NullAddress ? null : previousOwner;
   }
+  
+  isSupportedDomain(domain: string): boolean {
+    return domain.indexOf('.') > 0 && /^.{1,}\.(eth|luxe|xyz|test)$/.test(domain);
+  }
 }

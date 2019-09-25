@@ -84,4 +84,8 @@ export default class {
       },
     };
   }
+
+  isSupportedDomain(domain: string): boolean {
+    return domain.indexOf('.') > 0 && /^.{1,}\.(zil)$/.test(domain);
+  }
 }

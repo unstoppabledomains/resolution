@@ -11,7 +11,6 @@ type Blockchain =
   | {
       ens?: Src;
       zns?: Src;
-      rns?: Src;
     };
 
 // Node env has special properties stored in process which are not inside the browser env.
@@ -38,7 +37,6 @@ class Namicorn {
 
   api: string;
   ens: Ens;
-  rns: Rns;
   zns: Zns;
   blockchain: boolean;
   isBrowser: boolean;
@@ -55,7 +53,6 @@ class Namicorn {
       }
       this.ens = new Ens(blockchain.ens);
       this.zns = new Zns(blockchain.zns);
-      this.rns = new Rns(blockchain.rns);
     }
   }
 
@@ -72,36 +69,24 @@ class Namicorn {
 
   async address(domain: string, currencyTicker: string) {
     const data = await this.resolve(domain);
-    return data.addresses[currencyTicker.toUpperCase()] || null;
+    return data && data.addresses[currencyTicker.toUpperCase()] || null;
   }
 
   async reverse(address: string, currencyTicker: string) {
     return await this.ens.reverse(address, currencyTicker);
   }
 
-  private isValidDomain(domain: string) {
-    return (
-      domain.indexOf('.') > 0 &&
-      /^((?![0-9]+$)(?!.*-$)(?!-)[a-zA-Z0-9-]{1,63}\.)*(?![0-9]+$)(?!.*-$)(?!-)[a-zA-Z0-9-]{1,63}$/.test(
-        domain,
-      )
-    );
+  isSupportedDomain(domain: string): Ens | Zns | false {
+    if (this.ens.isSupportedDomain(domain))
+      return this.ens;
+    if (this.zns.isSupportedDomain(domain))
+      return this.zns;
+    return false;
   }
 
   private async resolveUsingBlockchain(domain: string) {
-    if (!this.isValidDomain(domain)) return null;
-    var method = null;
-    if (domain.match(/\.zil$/)) {
-      method = this.zns;
-    } else if (
-      domain.match(/\.eth$/) ||
-      domain.match(/\.xyz/) ||
-      domain.match(/\.luxe/)
-    ) {
-      method = this.ens;
-    } else if (domain.match(/\.rsk$/)) {
-      method = this.rns;
-    }
+    const method = this.isSupportedDomain(domain);
+    if (!method) return null;
     var result = method && (await method.resolve(domain));
     return result || Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
   }
