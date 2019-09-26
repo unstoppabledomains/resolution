@@ -1,7 +1,6 @@
 import fetch from 'node-fetch';
 import Ens from './ens';
 import Zns from './zns';
-import Rns from './rns';
 
 const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
 type Src = string | undefined;
@@ -42,7 +41,7 @@ class Namicorn {
   isBrowser: boolean;
 
   constructor({
-    blockchain = false,
+    blockchain = true,
     api = DefaultUrl,
   }: { api?: Src; blockchain?: Blockchain } = {}) {
     this.api = api.toString();
@@ -81,9 +80,9 @@ class Namicorn {
   }
 
   private async resolveUsingBlockchain(domain: string) {
-    const supported = this.isSupportedDomain(domain);
-    if (!supported) return null;
-    const method = (/^.{1,}\.(eth|luxe|xyz|test)$/.test(domain)) ? this.ens : this.zns;
+    const methods = [this.ens, this.zns];
+    const method = methods.find((method) => method.isSupportedDomain(domain));
+    if (!method) return null;
     var result = method && (await method.resolve(domain));
     return result || Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
   }
