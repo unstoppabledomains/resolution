@@ -1,6 +1,6 @@
 import { Zilliqa } from '@zilliqa-js/zilliqa';
 import { Contract } from '@zilliqa-js/contract';
-import { toChecksumAddress } from '@zilliqa-js/crypto';
+import { toChecksumAddress, toBech32Address } from '@zilliqa-js/crypto';
 import namehash from './zns/namehash';
 import _ from 'lodash';
 
@@ -37,7 +37,7 @@ export default class {
     return (response.result || {})[field];
   }
 
-  async getContractMapValue(contract: Contract, field: string, key: string): Promise<any>  {
+  async getContractMapValue(contract: Contract, field: string, key: string): Promise<any> {
     return (await this.getContractField(contract, field, [key]))[key];
   }
 
@@ -69,12 +69,23 @@ export default class {
     );
 
     if (!registryRecord) return null;
-    const [ownerAddress, resolverAddress] = registryRecord.arguments as [
+    let [ownerAddress, resolverAddress] = registryRecord.arguments as [
       string,
       string
     ];
     const resolution = await this.getResolverRecordsStructure(resolverAddress);
     const addresses = _.mapValues(resolution.crypto, 'address');
+    // at the moment ownerAddress is publicKey which starts with 0x 
+    if (ownerAddress.startsWith('0x')) {
+
+      // If it is uncompressed i have to compress it 
+      if (/^(0x)?(04)?[a-f0-9]{128}$/i.test(ownerAddress)) {
+        // How can i compress it? 
+      }
+      // at this point I should have compressed public key
+      // if it is compressed i should transform it into zil format
+      ownerAddress = `${toBech32Address(ownerAddress)}`;
+    }
     return {
       addresses,
       meta: {

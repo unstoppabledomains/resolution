@@ -117,7 +117,6 @@ it('resolves .xyz name using ENS blockchain', async () => {
   expect(result).toEqual('0xb0E7a465D255aE83eb7F8a50504F3867B945164C');
 });
 
-// john.luxe is valid domain but we have limitation for 7 characters only for some reason. skip this test until further
 it('resolves .luxe name using ENS blockchain', async () => {
   const namicorn = new Namicorn({
     blockchain: { ens: MAINNET_URL },
@@ -180,7 +179,7 @@ it('resolves .zil name using blockchain', async () => {
     '0xaa91734f90795e80751c96e682a321bb3c1a4186',
   );
   expect(result && result.meta.owner).toEqual(
-    '0x267ca17e8b3bbf49c52a4c3b473cdebcbaf9025e',
+    'zil1ye72zl5t8wl5n3f2fsa5w0x7hja0jqj7mhct23',
   );
   expect(result && result.meta.type).toEqual('zns');
   expect(result && result.meta.ttl).toEqual(0);
