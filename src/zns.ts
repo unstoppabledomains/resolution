@@ -27,18 +27,27 @@ export default class {
     this.registry = this.zilliqa.contracts.at(registryAddress);
   }
 
-  async getContractField(contract: Contract, field: string, keys: string[] = []): Promise<any> {
+  async getContractField(
+    contract: Contract,
+    field: string,
+    keys: string[] = [],
+  ): Promise<any> {
     let response = await this.zilliqa.provider.send(
-      "GetSmartContractSubState",
-      contract.address.replace("0x", "").toLowerCase(),
+      'GetSmartContractSubState',
+      contract.address.replace('0x', '').toLowerCase(),
       field,
-      keys.map(k => JSON.stringify(k))
+      keys.map(k => JSON.stringify(k)),
     );
     return (response.result || {})[field];
   }
 
-  async getContractMapValue(contract: Contract, field: string, key: string): Promise<any>  {
-    return (await this.getContractField(contract, field, [key]))[key];
+  async getContractMapValue(
+    contract: Contract,
+    field: string,
+    key: string,
+  ): Promise<any> {
+    const record = await this.getContractField(contract, field, [key]);
+    return (record && record[key]) || null;
   }
 
   async getResolverRecordsStructure(
