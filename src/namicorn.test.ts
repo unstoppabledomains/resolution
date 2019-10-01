@@ -43,7 +43,7 @@ beforeEach(() => {
 it('resolving .zil from unstoppable API', async () => {
   const testName = 'should work';
   mockAPICalls('UD_API', testName, DEFAULT_URL);
-  const namicorn = new Namicorn({blockchain: false});
+  const namicorn = new Namicorn({ blockchain: false });
   const result = await namicorn.address('cofounding.zil', 'eth');
   expect(result).toEqual('0xaa91734f90795e80751c96e682a321bb3c1a4186');
 });
@@ -198,13 +198,12 @@ it('resolves non-existing domain zone', async () => {
   expect(result).toEqual(null);
 });
 
-
 it('should work 2', async () => {
-  const namicorn = new Namicorn({blockchain: true});
+  const namicorn = new Namicorn({ blockchain: true });
   const result = await namicorn.resolve('test.zil');
   expect(result.addresses).toEqual({});
   expect(result.meta.owner).toEqual(null);
-})
+});
 
 xit('resolves rsk name using blockchain', async () => {
   const namicorn = new Namicorn({ blockchain: true });
