@@ -198,6 +198,14 @@ it('resolves non-existing domain zone', async () => {
   expect(result).toEqual(null);
 });
 
+
+it('should work 2', async () => {
+  const namicorn = new Namicorn({blockchain: true});
+  const result = await namicorn.resolve('test.zil');
+  expect(result.addresses).toEqual({});
+  expect(result.meta.owner).toEqual(null);
+})
+
 xit('resolves rsk name using blockchain', async () => {
   const namicorn = new Namicorn({ blockchain: true });
   const result = await namicorn.address('alice.rsk', 'ETH');

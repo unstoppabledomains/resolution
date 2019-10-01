@@ -38,7 +38,8 @@ export default class {
   }
 
   async getContractMapValue(contract: Contract, field: string, key: string): Promise<any>  {
-    return (await this.getContractField(contract, field, [key]))[key];
+    const record = await this.getContractField(contract, field, [key]);
+    return (record && (record)[key]) || null;
   }
 
   async getResolverRecordsStructure(
