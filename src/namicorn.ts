@@ -83,7 +83,6 @@ class Namicorn {
     const methods = [this.ens, this.zns];
     const method = methods.find((method) => method.isSupportedDomain(domain));
     if (!method) return null;
-    console.log('I found method!');
     var result = method && (await method.resolve(domain));
     return result || Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
   }
