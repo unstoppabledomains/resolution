@@ -1,10 +1,10 @@
-import * as _ from 'lodash'
+import * as _ from 'lodash';
 import { default as ensInterface } from './ens/contract/ens';
 import { default as registrarInterface } from './ens/contract/registrar';
 import { default as deedInterface } from './ens/contract/deed';
 import { default as resolverInterface } from './ens/contract/resolver';
 import { hash } from 'eth-ens-namehash';
-import { EnsSourceDefinition } from './types'
+import { EnsSourceDefinition } from './types';
 
 const Web3 = require('web3');
 
@@ -13,14 +13,14 @@ const DefaultUrl = 'https://mainnet.infura.io/ws';
 
 const NetworkIdMap = {
   1: 'mainnet.infura.io',
-}
+};
 
 const RegistryMap = {
   // Mainnet
   '1': '0x314159265dd8dbb310642f98f50c066173c1259b',
   // Ropsten
   '3': '0x112234455c3a32fd11230c42e7bccd4a84e02010',
-}
+};
 
 export default class Ens {
   private ensContract: any;
@@ -30,14 +30,14 @@ export default class Ens {
   private registryAddress: string;
 
   constructor(source: string | boolean | EnsSourceDefinition = true) {
-    source = this.normalizeSource(source)
+    source = this.normalizeSource(source);
     this.web3 = new Web3(source.url);
     this.network = source.network;
     if (!this.network) {
-      throw new Error("Unspecified network in Namicorn ENS configuration")
+      throw new Error('Unspecified network in Namicorn ENS configuration');
     }
 
-    this.registryAddress = RegistryMap[this.network]
+    this.registryAddress = RegistryMap[this.network];
     if (this.registryAddress) {
       this.ensContract = new this.web3.eth.Contract(
         ensInterface,
@@ -52,15 +52,16 @@ export default class Ens {
   }
 
   isSupportedDomain(domain: string): boolean {
-    return this.registryAddress &&
+    return (
+      this.registryAddress &&
       domain.indexOf('.') > 0 &&
-      /^.{1,}\.(eth|luxe|xyz|test)$/.test(domain);
+      /^.{1,}\.(eth|luxe|xyz|test)$/.test(domain)
+    );
   }
 
   isSupportedNetwork(network: number): boolean {
-    if (network)
-      return RegistryMap[network] != null;
-    
+    if (network) return RegistryMap[network] != null;
+
     return this.registryAddress != null;
   }
 
@@ -158,16 +159,21 @@ export default class Ens {
     return previousOwner === NullAddress ? null : previousOwner;
   }
 
-  private normalizeSource(source: string | boolean | EnsSourceDefinition): EnsSourceDefinition {
-    switch(typeof(source)) {
-      case("boolean"): {
+  private normalizeSource(
+    source: string | boolean | EnsSourceDefinition,
+  ): EnsSourceDefinition {
+    switch (typeof source) {
+      case 'boolean': {
         return { url: DefaultUrl, network: this.networkFromUrl(DefaultUrl) };
       }
-      case("string"): {
-        return { url: source as string, network: this.networkFromUrl(source as string) };
+      case 'string': {
+        return {
+          url: source as string,
+          network: this.networkFromUrl(source as string),
+        };
       }
-      case("object"): {
-        source = _.clone(source) as EnsSourceDefinition
+      case 'object': {
+        source = _.clone(source) as EnsSourceDefinition;
         if (source.network && !source.url) {
           source.url = NetworkIdMap[source.network.toString()];
         }
@@ -180,9 +186,6 @@ export default class Ens {
   }
 
   private networkFromUrl(url: string): number {
-    return parseInt(_.findKey(
-      NetworkIdMap,
-      host => url.indexOf(host) >= 0,
-    ))
+    return parseInt(_.findKey(NetworkIdMap, host => url.indexOf(host) >= 0));
   }
 }

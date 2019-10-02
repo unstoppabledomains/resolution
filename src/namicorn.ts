@@ -1,10 +1,9 @@
 import fetch from 'node-fetch';
 import Ens from './ens';
 import Zns from './zns';
-import { Blockchain } from './types'
+import { Blockchain } from './types';
 
 const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
-
 
 // Node env has special properties stored in process which are not inside the browser env.
 // Multiple checks is to avoid hitting the undefined while going deeper.
@@ -41,7 +40,7 @@ class Namicorn {
     this.blockchain = !!blockchain;
     if (blockchain) {
       if (blockchain == true) {
-        blockchain = {ens: true, zns: true};
+        blockchain = { ens: true, zns: true };
       }
       this.ens = new Ens(blockchain.ens);
       this.zns = new Zns(blockchain.zns);
