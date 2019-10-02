@@ -57,6 +57,10 @@ export default class Ens {
       /^.{1,}\.(eth|luxe|xyz|test)$/.test(domain);
   }
 
+  isSupportedNetwork(): boolean {
+    return this.registryAddress != null;
+  }
+
   async reverse(address: string, currencyTicker: string) {
     if (currencyTicker != 'ETH') {
       throw new Error(`Ens doesn't support any currency other than ETH`);
