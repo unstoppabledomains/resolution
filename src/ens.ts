@@ -57,7 +57,10 @@ export default class Ens {
       /^.{1,}\.(eth|luxe|xyz|test)$/.test(domain);
   }
 
-  isSupportedNetwork(): boolean {
+  isSupportedNetwork(network: number): boolean {
+    if (network)
+      return RegistryMap[network] != null;
+    
     return this.registryAddress != null;
   }
 
