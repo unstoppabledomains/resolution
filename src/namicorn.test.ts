@@ -13,6 +13,9 @@ const mockAPICalls = (
   testName: string,
   url = MAINNET_URL,
 ) => {
+  if (process.env.LIVE) {
+    return;
+  }
   const mcdt = mockData as any;
   const tplvl = mcdt[topLevel] as any;
   const mockCall = tplvl[testName] as [any];
