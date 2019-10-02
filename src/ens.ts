@@ -7,18 +7,24 @@ import { hash } from 'eth-ens-namehash';
 const Web3 = require('web3');
 
 const NullAddress = '0x0000000000000000000000000000000000000000';
-const DefaultSource = 'wss://mainnet.infura.io/ws';
+const DefaultSource = 'https://mainnet.infura.io/ws';
+
+interface SourceDefinition {
+  url: string,
+  network?: number,
+}
 
 export default class Ens {
-  ensContract: any;
-  registrarContract: any;
-  web3: any;
+  private ensContract: any;
+  private registrarContract: any;
+  private web3: any;
 
-  constructor(source: string | boolean = DefaultSource) {
-    if (source == true) {
+  constructor(source: string | boolean = true) {
+    if (typeof(source) === "boolean") {
       source = DefaultSource;
     }
     this.web3 = new Web3(source);
+
     this.ensContract = new this.web3.eth.Contract(
       ensInterface,
       '0x314159265dD8dbb310642f98f50C066173C1259b',
@@ -73,7 +79,7 @@ export default class Ens {
     const nodeHash = hash(domain);
     var [owner, ttl, resolver] = await this._getResolutionInfo(nodeHash);
     if (owner == NullAddress) owner = null;
-    const address = await this.fetchAddress(resolver, nodeHash);
+    const address = await this._fetchAddress(resolver, nodeHash);
     return {
       addresses: {
         ETH: address,
@@ -86,7 +92,7 @@ export default class Ens {
     };
   }
 
-  async fetchAddress(resolver, nodeHash) {
+  async _fetchAddress(resolver, nodeHash) {
     if (!resolver || resolver == NullAddress) {
       return null;
     }
@@ -119,7 +125,7 @@ export default class Ens {
     const previousOwner = deedContract.methods.previousOwner().call();
     return previousOwner === NullAddress ? null : previousOwner;
   }
-  
+
   isSupportedDomain(domain: string): boolean {
     return domain.indexOf('.') > 0 && /^.{1,}\.(eth|luxe|xyz|test)$/.test(domain);
   }

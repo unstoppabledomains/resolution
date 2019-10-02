@@ -106,7 +106,7 @@ it('resolves .xyz name using ENS blockchain', async () => {
     );
 
   const secondSpy = jest
-    .spyOn(namicorn.ens, 'fetchAddress')
+    .spyOn(namicorn.ens, '_fetchAddress')
     .mockImplementation(() =>
       Promise.resolve('0xb0E7a465D255aE83eb7F8a50504F3867B945164C'),
     );
@@ -134,7 +134,7 @@ it('resolves .luxe name using ENS blockchain', async () => {
     );
 
   const secondSpy = jest
-    .spyOn(namicorn.ens, 'fetchAddress')
+    .spyOn(namicorn.ens, '_fetchAddress')
     .mockImplementation(() =>
       Promise.resolve('0xf3dE750A73C11a6a2863761E930BF5fE979d5663'),
     );
@@ -161,7 +161,7 @@ it('resolves .luxe name using ENS blockchain null', async () => {
     );
 
   const secondSpy = jest
-    .spyOn(namicorn.ens, 'fetchAddress')
+    .spyOn(namicorn.ens, '_fetchAddress')
     .mockImplementation(() => Promise.resolve(null));
 
   const result = await namicorn.address('something.luxe', 'ETH');
