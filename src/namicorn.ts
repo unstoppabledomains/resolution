@@ -27,10 +27,10 @@ class Namicorn {
     },
   };
 
-  api: string;
-  ens: Ens;
-  zns: Zns;
-  blockchain: boolean;
+  readonly api: string;
+  readonly ens?: Ens;
+  readonly zns?: Zns;
+  readonly blockchain: boolean;
 
   constructor({
     blockchain = true,
@@ -40,10 +40,20 @@ class Namicorn {
     this.blockchain = !!blockchain;
     if (blockchain) {
       if (blockchain == true) {
-        blockchain = { ens: true, zns: true };
+        blockchain = {};
       }
-      this.ens = new Ens(blockchain.ens);
-      this.zns = new Zns(blockchain.zns);
+      if (blockchain.ens === undefined) {
+        blockchain.ens = true
+      }
+      if (blockchain.zns === undefined) {
+        blockchain.zns = true
+      }
+      if (blockchain.ens) {
+        this.ens = new Ens(blockchain.ens);
+      }
+      if (blockchain.zns) {
+        this.zns = new Zns(blockchain.zns);
+      }
     }
   }
 
@@ -69,13 +79,13 @@ class Namicorn {
 
   isSupportedDomain(domain: string): boolean {
     return (
-      this.zns.isSupportedDomain(domain) || this.ens.isSupportedDomain(domain)
+      (this.zns && this.zns.isSupportedDomain(domain)) || (this.ens && this.ens.isSupportedDomain(domain))
     );
   }
 
   private async resolveUsingBlockchain(domain: string) {
     const methods = [this.ens, this.zns];
-    const method = methods.find(method => method.isSupportedDomain(domain));
+    const method = methods.find(method => method && method.isSupportedDomain(domain));
     if (!method) return null;
     var result = method && (await method.resolve(domain));
     return result || Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
