@@ -58,14 +58,14 @@ describe("ZNS", () => {
     const namicorn = new Namicorn({ blockchain: { zns: ZilliqaUrl } });
     const result = await namicorn.resolve('cofounding.zil');
     expect(result).toBeDefined();
-    expect(result && result.addresses.ETH).toEqual(
+    expect(result.addresses.ETH).toEqual(
       '0xaa91734f90795e80751c96e682a321bb3c1a4186',
     );
-    expect(result && result.meta.owner).toEqual(
+    expect(result.meta.owner).toEqual(
       '0x267ca17e8b3bbf49c52a4c3b473cdebcbaf9025e',
     );
-    expect(result && result.meta.type).toEqual('zns');
-    expect(result && result.meta.ttl).toEqual(0);
+    expect(result.meta.type).toEqual('zns');
+    expect(result.meta.ttl).toEqual(0);
   });
 
   it('resolves unclaimed domain using blockchain', async () => {
