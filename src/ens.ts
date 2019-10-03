@@ -9,7 +9,7 @@ import { EnsSourceDefinition } from './types';
 const Web3 = require('web3');
 
 const NullAddress = '0x0000000000000000000000000000000000000000';
-const DefaultUrl = 'https://mainnet.infura.io/ws';
+const DefaultUrl = 'https://mainnet.infura.io';
 
 const NetworkIdMap = {
   1: 'mainnet',
@@ -39,6 +39,9 @@ export default class Ens {
     this.network = source.network;
     if (!this.network) {
       throw new Error('Unspecified network in Namicorn ENS configuration');
+    }
+    if (!source.url) {
+      throw new Error('Unspecified url in Namicorn ENS configuration');
     }
 
     this.registryAddress = RegistryMap[this.network];
@@ -178,7 +181,7 @@ export default class Ens {
           source.network = parseInt(_.invert(NetworkIdMap)[source.network])
         }
         if (source.network && !source.url) {
-          source.url = NetworkIdMap[source.network.toString()];
+          source.url = `https://${NetworkIdMap[source.network.toString()]}.infura.io`;
         }
         if (source.url && !source.network) {
           source.network = this.networkFromUrl(source.url);
@@ -189,6 +192,6 @@ export default class Ens {
   }
 
   private networkFromUrl(url: string): number {
-    return parseInt(_.findKey(NetworkIdMap, host => url.indexOf(host) >= 0));
+    return parseInt(_.findKey(NetworkIdMap, name => url.indexOf(name) >= 0));
   }
 }
