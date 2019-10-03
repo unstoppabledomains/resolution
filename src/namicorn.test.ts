@@ -43,14 +43,40 @@ beforeEach(() => {
   jest.restoreAllMocks();
 });
 
-it('resolving .zil from unstoppable API', async () => {
-  const testName = 'should work';
-  mockAPICalls('UD_API', testName, DEFAULT_URL);
-  const namicorn = new Namicorn({ blockchain: false });
-  const result = await namicorn.address('cofounding.zil', 'eth');
-  expect(result).toEqual('0xaa91734f90795e80751c96e682a321bb3c1a4186');
-});
+describe("ZNS", () => {
+  it('resolving from unstoppable API', async () => {
+    const testName = 'should work';
+    mockAPICalls('UD_API', testName, DEFAULT_URL);
+    const namicorn = new Namicorn({ blockchain: false });
+    const result = await namicorn.address('cofounding.zil', 'eth');
+    expect(result).toEqual('0xaa91734f90795e80751c96e682a321bb3c1a4186');
+  });
 
+  it('resolves .zil name using blockchain', async () => {
+    const testName = 'resolves .zil name using blockchain';
+    mockAPICalls('ZIL', testName, ZILLIQA_URL);
+    const namicorn = new Namicorn({ blockchain: { zns: ZILLIQA_URL } });
+    const result = await namicorn.resolve('cofounding.zil');
+    expect(result).toBeDefined();
+    expect(result && result.addresses.ETH).toEqual(
+      '0xaa91734f90795e80751c96e682a321bb3c1a4186',
+    );
+    expect(result && result.meta.owner).toEqual(
+      '0x267ca17e8b3bbf49c52a4c3b473cdebcbaf9025e',
+    );
+    expect(result && result.meta.type).toEqual('zns');
+    expect(result && result.meta.ttl).toEqual(0);
+  });
+
+  it('resolves unclaimed domain using blockchain', async () => {
+    const namicorn = new Namicorn({ blockchain: true });
+    const result = await namicorn.resolve('test.zil');
+    expect(result.addresses).toEqual({});
+    expect(result.meta.owner).toEqual(null);
+  });
+})
+
+describe("ENS", () => {
 it('resolves .eth name using blockchain', async () => {
   const testName = 'resolves .eth name using blockchain';
   mockAPICalls('ENS', testName, MAINNET_URL);
@@ -172,22 +198,7 @@ it('resolves .luxe name using ENS blockchain null', async () => {
   expect(secondSpy).toBeCalled();
   expect(result).toEqual(null);
 });
-
-it('resolves .zil name using blockchain', async () => {
-  const testName = 'resolves .zil name using blockchain';
-  mockAPICalls('ZIL', testName, ZILLIQA_URL);
-  const namicorn = new Namicorn({ blockchain: { zns: ZILLIQA_URL } });
-  const result = await namicorn.resolve('cofounding.zil');
-  expect(result).toBeDefined();
-  expect(result && result.addresses.ETH).toEqual(
-    '0xaa91734f90795e80751c96e682a321bb3c1a4186',
-  );
-  expect(result && result.meta.owner).toEqual(
-    '0x267ca17e8b3bbf49c52a4c3b473cdebcbaf9025e',
-  );
-  expect(result && result.meta.type).toEqual('zns');
-  expect(result && result.meta.ttl).toEqual(0);
-});
+})
 
 it('provides empty response constant', async () => {
   const response = Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
@@ -201,15 +212,3 @@ it('resolves non-existing domain zone', async () => {
   expect(result).toEqual(null);
 });
 
-it('should work 2', async () => {
-  const namicorn = new Namicorn({ blockchain: true });
-  const result = await namicorn.resolve('test.zil');
-  expect(result.addresses).toEqual({});
-  expect(result.meta.owner).toEqual(null);
-});
-
-xit('resolves rsk name using blockchain', async () => {
-  const namicorn = new Namicorn({ blockchain: true });
-  const result = await namicorn.address('alice.rsk', 'ETH');
-  expect(result).toEqual('0xd96d39c91b3d0236437e800f874800b026dc5f14');
-});

@@ -27,10 +27,10 @@ class Namicorn {
     },
   };
 
-  api: string;
-  ens: Ens;
-  zns: Zns;
-  blockchain: boolean;
+  readonly api: string;
+  readonly ens: Ens;
+  readonly zns: Zns;
+  readonly blockchain: boolean;
 
   constructor({
     blockchain = true,
