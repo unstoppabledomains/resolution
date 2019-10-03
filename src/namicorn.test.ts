@@ -83,13 +83,13 @@ describe("ZNS", () => {
 describe("ENS", () => {
   it('allows ens network specified as string', async () => {
     const testName = 'resolves .eth name using blockchain';
-    mockAPICalls('ENS', testName, MainnetUrl);
+    //mockAPICalls('ENS', testName, MainnetUrl);
 
     const namicorn = new Namicorn({
       blockchain: { ens: { network: 'mainnet'} },
     });
-    var result = await namicorn.address('matthewgould.eth', 'ETH');
-    expect(result).toEqual('0x714ef33943d925731FBB89C99aF5780D888bD106');
+    expect(namicorn.ens.url).toEqual('https://mainnet.infura.io')
+    expect(namicorn.ens.network).toEqual('mainnet')
   });
 
   it('resolves .eth name using blockchain', async () => {
@@ -99,6 +99,8 @@ describe("ENS", () => {
     const namicorn = new Namicorn({
       blockchain: { ens: true },
     });
+    expect(namicorn.ens.url).toEqual('https://mainnet.infura.io')
+    expect(namicorn.ens.network).toEqual('mainnet')
     var result = await namicorn.address('matthewgould.eth', 'ETH');
     expect(result).toEqual('0x714ef33943d925731FBB89C99aF5780D888bD106');
   });
