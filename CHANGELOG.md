@@ -1,3 +1,7 @@
+## Unreleased
+
+* Add return type for Ens#resolve
+
 ## 0.2.35
 
 * Make Ens#network and Ens#url public properties

@@ -4,7 +4,7 @@ import { default as registrarInterface } from './ens/contract/registrar';
 import { default as deedInterface } from './ens/contract/deed';
 import { default as resolverInterface } from './ens/contract/resolver';
 import { hash } from 'eth-ens-namehash';
-import { EnsSourceDefinition } from './types';
+import { EnsSourceDefinition, ResolutionResult } from './types';
 
 const Web3 = require('web3');
 
@@ -90,7 +90,7 @@ export default class Ens {
     return await this._resolverCallToName(resolverContract, nodeHash);
   }
 
-  async resolve(domain) {
+  async resolve(domain: string): Promise<ResolutionResult> {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork()) {
       return null;
     }
