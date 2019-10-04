@@ -1,4 +1,4 @@
-## Unreleased
+## 0.2.35
 
 * Make Ens#network and Ens#url public properties
 * Change default ENS source protocol from wss (websocket) to https
