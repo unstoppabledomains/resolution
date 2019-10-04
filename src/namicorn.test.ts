@@ -218,18 +218,14 @@ describe("ENS", () => {
   it('checks if the network is supported(true)', async () => {
     const ens = new Ens({network: 1});
     const answer = ens.isSupportedNetwork();
-    console.log('answer  true = ', answer);
     expect(answer).toBe(true);
   })
   it('checks if the network is supported(false)', async () => {
     const ens = new Ens({network: 5});
     const answer = ens.isSupportedNetwork();
-    console.log('answer = ', answer);
     const testnew = new Namicorn({blockchain:{ens: {network: 1 }}});
-    console.log('testnew = ', testnew.ens.isSupportedNetwork());
     expect(answer).toBe(false);
   })
-
 })
 
 it('provides empty response constant', async () => {
@@ -243,4 +239,11 @@ it('resolves non-existing domain zone', async () => {
   const result = await namicorn.address('bogdangusiev.qq', 'ZIL');
   expect(result).toEqual(null);
 });
+
+it('checks the isSupportedDomainInNetwork', async ()=> {
+  const namicorn = new Namicorn();
+  const result = namicorn.isSupportedDomainInNetwork('brad.zil');
+  expect(result).toBe(true);
+})
+
 

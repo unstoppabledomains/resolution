@@ -1,6 +1,9 @@
-## Unreleased
+## 0.2.36
 
 * Add return type for Ens#resolve
+* Add isSupportedDomainInNetwork in namicorn
+* Add isSupportedNetwork for ZNS 
+
 
 ## 0.2.35
 

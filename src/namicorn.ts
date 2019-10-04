@@ -83,6 +83,12 @@ class Namicorn {
     );
   }
 
+  isSupportedDomainInNetwork(domain: string): boolean {
+    const methods = [this.ens, this.zns];
+    const method = methods.find(method => method && method.isSupportedDomain(domain));
+    return method && method.isSupportedNetwork();
+  }
+
   private async resolveUsingBlockchain(domain: string) {
     const methods = [this.ens, this.zns];
     const method = methods.find(method => method && method.isSupportedDomain(domain));
