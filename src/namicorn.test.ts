@@ -163,7 +163,6 @@ describe("ENS", () => {
     expect(result).toEqual('0xb0E7a465D255aE83eb7F8a50504F3867B945164C');
   });
 
-  // john.luxe is valid domain but we have limitation for 7 characters only for some reason. skip this test until further
   it('resolves .luxe name using ENS blockchain', async () => {
     const namicorn = new Namicorn({
       blockchain: { ens: MainnetUrl },
@@ -215,6 +214,22 @@ describe("ENS", () => {
     expect(secondSpy).toBeCalled();
     expect(result).toEqual(null);
   });
+
+  it('checks if the network is supported(true)', async () => {
+    const ens = new Ens({network: 1});
+    const answer = ens.isSupportedNetwork();
+    console.log('answer  true = ', answer);
+    expect(answer).toBe(true);
+  })
+  it('checks if the network is supported(false)', async () => {
+    const ens = new Ens({network: 5});
+    const answer = ens.isSupportedNetwork();
+    console.log('answer = ', answer);
+    const testnew = new Namicorn({blockchain:{ens: {network: 1 }}});
+    console.log('testnew = ', testnew.ens.isSupportedNetwork());
+    expect(answer).toBe(false);
+  })
+
 })
 
 it('provides empty response constant', async () => {
