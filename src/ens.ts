@@ -69,7 +69,7 @@ export default class Ens {
     return this.registryAddress != null;
   }
 
-  async reverse(address: string, currencyTicker: string) {
+  async reverse(address: string, currencyTicker: string): Promise<string> {
     if (currencyTicker != 'ETH') {
       throw new Error(`Ens doesn't support any currency other than ETH`);
     }
@@ -90,7 +90,7 @@ export default class Ens {
     return await this._resolverCallToName(resolverContract, nodeHash);
   }
 
-  async resolve(domain: string): Promise<ResolutionResult> {
+  async resolve(domain: string): Promise<ResolutionResult | null> {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork()) {
       return null;
     }
