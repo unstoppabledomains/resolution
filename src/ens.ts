@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 import { default as ensInterface } from './ens/contract/ens';
 import { default as registrarInterface } from './ens/contract/registrar';
 import { default as deedInterface } from './ens/contract/deed';
@@ -18,29 +18,30 @@ const NetworkIdMap = {
   42: 'rinkeby',
   5: 'goerli',
 };
+const NetworkNameMap = _(NetworkIdMap).invert().mapValues((v, k) => parseInt(v)).value()
 
 const RegistryMap = {
-  // Mainnet
-  '1': '0x314159265dd8dbb310642f98f50c066173c1259b',
-  // Ropsten
-  '3': '0x112234455c3a32fd11230c42e7bccd4a84e02010',
+  'mainnet': '0x314159265dd8dbb310642f98f50c066173c1259b',
+  'ropsten': '0x112234455c3a32fd11230c42e7bccd4a84e02010',
 };
 
 export default class Ens {
+  readonly network: string;
+  readonly url: string;
   private ensContract: any;
   private registrarContract: any;
   private web3: any;
-  private network: string | number;
   private registryAddress: string;
 
   constructor(source: string | boolean | EnsSourceDefinition = true) {
     source = this.normalizeSource(source);
     this.web3 = new Web3(source.url);
-    this.network = source.network;
+    this.network = <string>source.network;
+    this.url = source.url
     if (!this.network) {
       throw new Error('Unspecified network in Namicorn ENS configuration');
     }
-    if (!source.url) {
+    if (!this.url) {
       throw new Error('Unspecified url in Namicorn ENS configuration');
     }
 
@@ -177,11 +178,11 @@ export default class Ens {
       }
       case 'object': {
         source = _.clone(source) as EnsSourceDefinition;
-        if (typeof(source.network) == "string") {
-          source.network = parseInt(_.invert(NetworkIdMap)[source.network])
+        if (typeof(source.network) == "number") {
+          source.network = NetworkIdMap[source.network];
         }
         if (source.network && !source.url) {
-          source.url = `https://${NetworkIdMap[source.network.toString()]}.infura.io`;
+          source.url = `https://${source.network}.infura.io`;
         }
         if (source.url && !source.network) {
           source.network = this.networkFromUrl(source.url);
@@ -191,7 +192,7 @@ export default class Ens {
     }
   }
 
-  private networkFromUrl(url: string): number {
-    return parseInt(_.findKey(NetworkIdMap, name => url.indexOf(name) >= 0));
+  private networkFromUrl(url: string): string {
+    return _.find(NetworkIdMap, (name) => url.indexOf(name) >= 0);
   }
 }

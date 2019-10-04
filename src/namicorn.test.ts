@@ -4,14 +4,14 @@ import _ from 'lodash';
 import mockData from './testData/mockData.json';
 import Ens from './ens';
 
-const DEFAULT_URL = 'https://unstoppabledomains.com/api/v1';
-const MAINNET_URL = 'https://mainnet.infura.io';
-const ZILLIQA_URL = 'https://api.zilliqa.com';
+const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
+const MainnetUrl = 'https://mainnet.infura.io';
+const ZilliqaUrl = 'https://api.zilliqa.com';
 
 const mockAPICalls = (
   topLevel: string,
   testName: string,
-  url = MAINNET_URL,
+  url = MainnetUrl,
 ) => {
   if (process.env.LIVE) {
     return;
@@ -46,7 +46,7 @@ beforeEach(() => {
 describe("ZNS", () => {
   it('resolving from unstoppable API', async () => {
     const testName = 'should work';
-    mockAPICalls('UD_API', testName, DEFAULT_URL);
+    mockAPICalls('UD_API', testName, DefaultUrl);
     const namicorn = new Namicorn({ blockchain: false });
     const result = await namicorn.address('cofounding.zil', 'eth');
     expect(result).toEqual('0xaa91734f90795e80751c96e682a321bb3c1a4186');
@@ -54,18 +54,18 @@ describe("ZNS", () => {
 
   it('resolves .zil name using blockchain', async () => {
     const testName = 'resolves .zil name using blockchain';
-    mockAPICalls('ZIL', testName, ZILLIQA_URL);
-    const namicorn = new Namicorn({ blockchain: { zns: ZILLIQA_URL } });
+    mockAPICalls('ZIL', testName, ZilliqaUrl);
+    const namicorn = new Namicorn({ blockchain: { zns: ZilliqaUrl } });
     const result = await namicorn.resolve('cofounding.zil');
     expect(result).toBeDefined();
-    expect(result && result.addresses.ETH).toEqual(
+    expect(result.addresses.ETH).toEqual(
       '0xaa91734f90795e80751c96e682a321bb3c1a4186',
     );
-    expect(result && result.meta.owner).toEqual(
+    expect(result.meta.owner).toEqual(
       '0x267ca17e8b3bbf49c52a4c3b473cdebcbaf9025e',
     );
-    expect(result && result.meta.type).toEqual('zns');
-    expect(result && result.meta.ttl).toEqual(0);
+    expect(result.meta.type).toEqual('zns');
+    expect(result.meta.ttl).toEqual(0);
   });
 
   it('resolves unclaimed domain using blockchain', async () => {
@@ -74,33 +74,39 @@ describe("ZNS", () => {
     expect(result.addresses).toEqual({});
     expect(result.meta.owner).toEqual(null);
   });
+  it("doesn't support zil domain when zns is disabled", () => {
+    let namicorn = new Namicorn({blockchain: {zns: false}});
+    expect(namicorn.isSupportedDomain("hello.zil")).toBeFalsy()
+  })
 })
 
 describe("ENS", () => {
   it('allows ens network specified as string', async () => {
     const testName = 'resolves .eth name using blockchain';
-    mockAPICalls('ENS', testName, MAINNET_URL);
+    //mockAPICalls('ENS', testName, MainnetUrl);
 
     const namicorn = new Namicorn({
       blockchain: { ens: { network: 'mainnet'} },
     });
-    var result = await namicorn.address('matthewgould.eth', 'ETH');
-    expect(result).toEqual('0x714ef33943d925731FBB89C99aF5780D888bD106');
+    expect(namicorn.ens.url).toEqual('https://mainnet.infura.io')
+    expect(namicorn.ens.network).toEqual('mainnet')
   });
 
   it('resolves .eth name using blockchain', async () => {
     const testName = 'resolves .eth name using blockchain';
-    mockAPICalls('ENS', testName, MAINNET_URL);
+    mockAPICalls('ENS', testName, MainnetUrl);
 
     const namicorn = new Namicorn({
-      blockchain: { ens: MAINNET_URL },
+      blockchain: { ens: true },
     });
+    expect(namicorn.ens.url).toEqual('https://mainnet.infura.io')
+    expect(namicorn.ens.network).toEqual('mainnet')
     var result = await namicorn.address('matthewgould.eth', 'ETH');
     expect(result).toEqual('0x714ef33943d925731FBB89C99aF5780D888bD106');
   });
 
   it('reverses address to ENS domain', async () => {
-    const ens = new Ens(MAINNET_URL);
+    const ens = new Ens(MainnetUrl);
     const eye = jest
       .spyOn(ens, '_resolverCallToName')
       .mockImplementation(() => 'adrian.argent.xyz');
@@ -117,7 +123,7 @@ describe("ENS", () => {
   });
 
   it('reverses address to ENS domain null', async () => {
-    const ens = new Ens(MAINNET_URL);
+    const ens = new Ens(MainnetUrl);
     const spy = jest
       .spyOn(ens, '_getResolver')
       .mockImplementation(() => '0x0000000000000000000000000000000000000000');
@@ -132,7 +138,7 @@ describe("ENS", () => {
 
   it('resolves .xyz name using ENS blockchain', async () => {
     const namicorn = new Namicorn({
-      blockchain: { ens: MAINNET_URL },
+      blockchain: { ens: MainnetUrl },
     });
 
     const spy = jest
@@ -160,7 +166,7 @@ describe("ENS", () => {
   // john.luxe is valid domain but we have limitation for 7 characters only for some reason. skip this test until further
   it('resolves .luxe name using ENS blockchain', async () => {
     const namicorn = new Namicorn({
-      blockchain: { ens: MAINNET_URL },
+      blockchain: { ens: MainnetUrl },
     });
 
     const spy = jest
@@ -187,7 +193,7 @@ describe("ENS", () => {
 
   it('resolves .luxe name using ENS blockchain null', async () => {
     const namicorn = new Namicorn({
-      blockchain: { ens: MAINNET_URL },
+      blockchain: { ens: MainnetUrl },
     });
 
     const spy = jest
