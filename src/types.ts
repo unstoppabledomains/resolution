@@ -4,7 +4,7 @@ export type ResolutionResult = {
   [key: string]: any;
 };
 
-export interface EnsSourceDefinition {
+export interface SourceDefinition {
   url?: string;
   network?: string | number;
 }
@@ -12,6 +12,6 @@ export interface EnsSourceDefinition {
 export type Blockchain =
   | boolean
   | {
-      ens?: string | boolean | EnsSourceDefinition;
-      zns?: boolean | string;
+      ens?: string | boolean | SourceDefinition;
+      zns?: string | boolean | SourceDefinition;
     };
