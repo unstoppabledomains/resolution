@@ -3,7 +3,7 @@ import { Contract } from '@zilliqa-js/contract';
 import { toChecksumAddress, toBech32Address } from '@zilliqa-js/crypto';
 import namehash from './zns/namehash';
 import _ from 'lodash';
-import {ResolutionResult} from './types'
+import { ResolutionResult } from './types';
 
 const DefaultSource = 'https://api.zilliqa.com/';
 const registryAddress = 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz';
@@ -79,16 +79,8 @@ export default class {
     ];
     const resolution = await this.getResolverRecordsStructure(resolverAddress);
     const addresses = _.mapValues(resolution.crypto, 'address');
-    // at the moment ownerAddress is publicKey which starts with 0x 
     if (ownerAddress.startsWith('0x')) {
-
-      // If it is uncompressed i have to compress it 
-      if (/^(0x)?(04)?[a-f0-9]{128}$/i.test(ownerAddress)) {
-        // How can i compress it? 
-      }
-      // at this point I should have compressed public key
-      // if it is compressed i should transform it into zil format
-      ownerAddress = `${toBech32Address(ownerAddress)}`;
+      ownerAddress = toBech32Address(ownerAddress);
     }
     return {
       addresses,
@@ -104,5 +96,7 @@ export default class {
     return domain.indexOf('.') > 0 && /^.{1,}\.(zil)$/.test(domain);
   }
 
-  isSupportedNetwork(): boolean { return true }
+  isSupportedNetwork(): boolean {
+    return true;
+  }
 }

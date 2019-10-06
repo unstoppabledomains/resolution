@@ -8,11 +8,7 @@ const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
 const MainnetUrl = 'https://mainnet.infura.io';
 const ZilliqaUrl = 'https://api.zilliqa.com';
 
-const mockAPICalls = (
-  topLevel: string,
-  testName: string,
-  url = MainnetUrl,
-) => {
+const mockAPICalls = (topLevel: string, testName: string, url = MainnetUrl) => {
   if (process.env.LIVE) {
     return;
   }
@@ -24,13 +20,13 @@ const mockAPICalls = (
     switch (METHOD) {
       case 'POST': {
         nock(url)
-        // .log(console.log)
+          // .log(console.log)
           .post('/', JSON.stringify(REQUEST))
           .reply(200, JSON.stringify(RESPONSE));
       }
       default: {
         nock(url)
-        // .log(console.log)
+          // .log(console.log)
           .get(REQUEST as string)
           .reply(200, RESPONSE);
       }
@@ -43,7 +39,7 @@ beforeEach(() => {
   jest.restoreAllMocks();
 });
 
-describe("ZNS", () => {
+describe('ZNS', () => {
   it('resolving from unstoppable API', async () => {
     const testName = 'should work';
     mockAPICalls('UD_API', testName, DefaultUrl);
@@ -62,7 +58,7 @@ describe("ZNS", () => {
       '0xaa91734f90795e80751c96e682a321bb3c1a4186',
     );
     expect(result.meta.owner).toEqual(
-      '0x267ca17e8b3bbf49c52a4c3b473cdebcbaf9025e',
+      'zil1ye72zl5t8wl5n3f2fsa5w0x7hja0jqj7mhct23',
     );
     expect(result.meta.type).toEqual('zns');
     expect(result.meta.ttl).toEqual(0);
@@ -75,21 +71,21 @@ describe("ZNS", () => {
     expect(result.meta.owner).toEqual(null);
   });
   it("doesn't support zil domain when zns is disabled", () => {
-    let namicorn = new Namicorn({blockchain: {zns: false}});
-    expect(namicorn.isSupportedDomain("hello.zil")).toBeFalsy()
-  })
-})
+    let namicorn = new Namicorn({ blockchain: { zns: false } });
+    expect(namicorn.isSupportedDomain('hello.zil')).toBeFalsy();
+  });
+});
 
-describe("ENS", () => {
+describe('ENS', () => {
   it('allows ens network specified as string', async () => {
     const testName = 'resolves .eth name using blockchain';
     //mockAPICalls('ENS', testName, MainnetUrl);
 
     const namicorn = new Namicorn({
-      blockchain: { ens: { network: 'mainnet'} },
+      blockchain: { ens: { network: 'mainnet' } },
     });
-    expect(namicorn.ens.url).toEqual('https://mainnet.infura.io')
-    expect(namicorn.ens.network).toEqual('mainnet')
+    expect(namicorn.ens.url).toEqual('https://mainnet.infura.io');
+    expect(namicorn.ens.network).toEqual('mainnet');
   });
 
   it('resolves .eth name using blockchain', async () => {
@@ -99,8 +95,8 @@ describe("ENS", () => {
     const namicorn = new Namicorn({
       blockchain: { ens: true },
     });
-    expect(namicorn.ens.url).toEqual('https://mainnet.infura.io')
-    expect(namicorn.ens.network).toEqual('mainnet')
+    expect(namicorn.ens.url).toEqual('https://mainnet.infura.io');
+    expect(namicorn.ens.network).toEqual('mainnet');
     var result = await namicorn.address('matthewgould.eth', 'ETH');
     expect(result).toEqual('0x714ef33943d925731FBB89C99aF5780D888bD106');
   });
@@ -216,17 +212,17 @@ describe("ENS", () => {
   });
 
   it('checks if the network is supported(true)', async () => {
-    const ens = new Ens({network: 1});
+    const ens = new Ens({ network: 1 });
     const answer = ens.isSupportedNetwork();
     expect(answer).toBe(true);
-  })
+  });
   it('checks if the network is supported(false)', async () => {
-    const ens = new Ens({network: 5});
+    const ens = new Ens({ network: 5 });
     const answer = ens.isSupportedNetwork();
-    const testnew = new Namicorn({blockchain:{ens: {network: 1 }}});
+    const testnew = new Namicorn({ blockchain: { ens: { network: 1 } } });
     expect(answer).toBe(false);
-  })
-})
+  });
+});
 
 it('provides empty response constant', async () => {
   const response = Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
@@ -240,10 +236,8 @@ it('resolves non-existing domain zone', async () => {
   expect(result).toEqual(null);
 });
 
-it('checks the isSupportedDomainInNetwork', async ()=> {
+it('checks the isSupportedDomainInNetwork', async () => {
   const namicorn = new Namicorn();
   const result = namicorn.isSupportedDomainInNetwork('brad.zil');
   expect(result).toBe(true);
-})
-
-
+});
