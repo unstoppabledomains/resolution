@@ -1,54 +1,75 @@
+import _ from 'lodash';
 import { default as ensInterface } from './ens/contract/ens';
 import { default as registrarInterface } from './ens/contract/registrar';
 import { default as deedInterface } from './ens/contract/deed';
 import { default as resolverInterface } from './ens/contract/resolver';
 import { hash } from 'eth-ens-namehash';
+import { EnsSourceDefinition, ResolutionResult } from './types';
 
 const Web3 = require('web3');
 
 const NullAddress = '0x0000000000000000000000000000000000000000';
-const DefaultSource = 'wss://mainnet.infura.io/ws';
+const DefaultUrl = 'https://mainnet.infura.io';
+
+const NetworkIdMap = {
+  1: 'mainnet',
+  3: 'ropsten',
+  4: 'kovan',
+  42: 'rinkeby',
+  5: 'goerli',
+};
+const NetworkNameMap = _(NetworkIdMap).invert().mapValues((v, k) => parseInt(v)).value()
+
+const RegistryMap = {
+  'mainnet': '0x314159265dd8dbb310642f98f50c066173c1259b',
+  'ropsten': '0x112234455c3a32fd11230c42e7bccd4a84e02010',
+};
 
 export default class Ens {
-  ensContract: any;
-  registrarContract: any;
-  web3: any;
+  readonly network: string;
+  readonly url: string;
+  private ensContract: any;
+  private registrarContract: any;
+  private web3: any;
+  private registryAddress: string;
 
-  constructor(source: string | boolean = DefaultSource) {
-    if (source == true) {
-      source = DefaultSource;
+  constructor(source: string | boolean | EnsSourceDefinition = true) {
+    source = this.normalizeSource(source);
+    this.web3 = new Web3(source.url);
+    this.network = <string>source.network;
+    this.url = source.url
+    if (!this.network) {
+      throw new Error('Unspecified network in Namicorn ENS configuration');
     }
-    this.web3 = new Web3(source);
-    this.ensContract = new this.web3.eth.Contract(
-      ensInterface,
-      '0x314159265dD8dbb310642f98f50C066173C1259b',
+    if (!this.url) {
+      throw new Error('Unspecified url in Namicorn ENS configuration');
+    }
+
+    this.registryAddress = RegistryMap[this.network];
+    if (this.registryAddress) {
+      this.ensContract = new this.web3.eth.Contract(
+        ensInterface,
+        this.registryAddress,
+      );
+      this.registrarContract = new this.web3.eth.Contract(
+        registrarInterface,
+        //TODO: make an address dependent on network id
+        '0x6090A6e47849629b7245Dfa1Ca21D94cd15878Ef',
+      );
+    }
+  }
+
+  isSupportedDomain(domain: string): boolean {
+    return (
+      domain.indexOf('.') > 0 && /^.{1,}\.(eth|luxe|xyz|test)$/.test(domain)
     );
-    this.registrarContract = new this.web3.eth.Contract(
-      registrarInterface,
-      '0x6090A6e47849629b7245Dfa1Ca21D94cd15878Ef',
-    );
   }
 
-  /* Test functions bellow */
-
-  _resolverCallToName(resolverContract, nodeHash) {
-    return resolverContract.methods.name(nodeHash).call();
+  isSupportedNetwork(): boolean {
+    return this.registryAddress != null;
   }
 
-  _getResolver(nodeHash) {
-    return this.ensContract.methods.resolver(nodeHash).call();
-  }
-
-  async _getResolutionInfo(nodeHash) {
-    return await Promise.all([
-      this.ensContract.methods.owner(nodeHash).call(),
-      this.ensContract.methods.ttl(nodeHash).call(),
-      this.ensContract.methods.resolver(nodeHash).call(),
-    ]);
-  }
-  /*===========================*/
-
-  async reverse(address: string, currencyTicker: string) {
+  async reverse(address: string, currencyTicker: string): Promise<string> {
     if (currencyTicker != 'ETH') {
       throw new Error(`Ens doesn't support any currency other than ETH`);
     }
@@ -69,11 +90,14 @@ export default class Ens {
     return await this._resolverCallToName(resolverContract, nodeHash);
   }
 
-  async resolve(domain) {
+  async resolve(domain: string): Promise<ResolutionResult | null> {
+    if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork()) {
+      return null;
+    }
     const nodeHash = hash(domain);
     var [owner, ttl, resolver] = await this._getResolutionInfo(nodeHash);
     if (owner == NullAddress) owner = null;
-    const address = await this.fetchAddress(resolver, nodeHash);
+    const address = await this._fetchAddress(resolver, nodeHash);
     return {
       addresses: {
         ETH: address,
@@ -86,7 +110,25 @@ export default class Ens {
     };
   }
 
-  async fetchAddress(resolver, nodeHash) {
+  /* Test functions bellow */
+
+  _resolverCallToName(resolverContract, nodeHash) {
+    return resolverContract.methods.name(nodeHash).call();
+  }
+
+  _getResolver(nodeHash) {
+    return this.ensContract.methods.resolver(nodeHash).call();
+  }
+
+  async _getResolutionInfo(nodeHash) {
+    return await Promise.all([
+      this.ensContract.methods.owner(nodeHash).call(),
+      this.ensContract.methods.ttl(nodeHash).call(),
+      this.ensContract.methods.resolver(nodeHash).call(),
+    ]);
+  }
+
+  async _fetchAddress(resolver, nodeHash) {
     if (!resolver || resolver == NullAddress) {
       return null;
     }
@@ -98,8 +140,9 @@ export default class Ens {
     const address = await resolverContract.methods.addr(nodeHash).call();
     return address;
   }
+  /*===========================*/
 
-  async fetchPreviousOwner(domain) {
+  private async fetchPreviousOwner(domain) {
     var labelHash = this.web3.utils.sha3(domain.split('.')[0]);
 
     const [
@@ -119,8 +162,37 @@ export default class Ens {
     const previousOwner = deedContract.methods.previousOwner().call();
     return previousOwner === NullAddress ? null : previousOwner;
   }
-  
-  isSupportedDomain(domain: string): boolean {
-    return domain.indexOf('.') > 0 && /^.{1,}\.(eth|luxe|xyz|test)$/.test(domain);
+
+  private normalizeSource(
+    source: string | boolean | EnsSourceDefinition,
+  ): EnsSourceDefinition {
+    switch (typeof source) {
+      case 'boolean': {
+        return { url: DefaultUrl, network: this.networkFromUrl(DefaultUrl) };
+      }
+      case 'string': {
+        return {
+          url: source as string,
+          network: this.networkFromUrl(source as string),
+        };
+      }
+      case 'object': {
+        source = _.clone(source) as EnsSourceDefinition;
+        if (typeof(source.network) == "number") {
+          source.network = NetworkIdMap[source.network];
+        }
+        if (source.network && !source.url) {
+          source.url = `https://${source.network}.infura.io`;
+        }
+        if (source.url && !source.network) {
+          source.network = this.networkFromUrl(source.url);
+        }
+        return source;
+      }
+    }
+  }
+
+  private networkFromUrl(url: string): string {
+    return _.find(NetworkIdMap, (name) => url.indexOf(name) >= 0);
   }
 }
