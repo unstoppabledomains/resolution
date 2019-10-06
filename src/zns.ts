@@ -3,7 +3,7 @@ import { Contract } from '@zilliqa-js/contract';
 import { toChecksumAddress } from '@zilliqa-js/crypto';
 import namehash from './zns/namehash';
 import _ from 'lodash';
-import {ResolutionResult, SourceDefinition} from './types'
+import { ResolutionResult, SourceDefinition } from './types';
 
 const DefaultSource = 'https://api.zilliqa.com/';
 const NullAddress = '0x0000000000000000000000000000000000000000';
@@ -17,7 +17,7 @@ const NetworkIdMap = {
 };
 
 const RegistryMap = {
-  'mainnet': 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
+  mainnet: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
 };
 
 export default class {
@@ -41,7 +41,6 @@ export default class {
     this.registryAddress = RegistryMap[this.network];
     if (this.registryAddress)
       this.registry = this.zilliqa.contracts.at(this.registryAddress);
-
   }
 
   async getContractField(
@@ -90,7 +89,7 @@ export default class {
   async resolve(domain: string): Promise<ResolutionResult | null> {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork())
       return null;
-    
+
     const registryRecord = await this.getContractMapValue(
       this.registry,
       'records',
@@ -118,22 +117,26 @@ export default class {
     return domain.indexOf('.') > 0 && /^.{1,}\.(zil)$/.test(domain);
   }
 
-  isSupportedNetwork(): boolean { return this.registryAddress != null; }
+  isSupportedNetwork(): boolean {
+    return this.registryAddress != null;
+  }
 
-  private normalizeSource(source: string | boolean | SourceDefinition) : SourceDefinition {
-    switch(typeof source) {
+  private normalizeSource(
+    source: string | boolean | SourceDefinition,
+  ): SourceDefinition {
+    switch (typeof source) {
       case 'boolean': {
-        return {url: DefaultSource, network: 'mainnet'}
+        return { url: DefaultSource, network: 'mainnet' };
       }
       case 'string': {
         return {
           url: source as string,
-          network: 'mainnet'
-        }
+          network: 'mainnet',
+        };
       }
       case 'object': {
         source = _.clone(source) as SourceDefinition;
-        if (typeof(source.network) == 'number') {
+        if (typeof source.network == 'number') {
           source.network = NetworkIdMap[source.network];
         }
         if (source.network && !source.url) {
@@ -146,5 +149,4 @@ export default class {
       }
     }
   }
-
 }

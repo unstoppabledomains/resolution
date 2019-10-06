@@ -18,11 +18,14 @@ const NetworkIdMap = {
   42: 'rinkeby',
   5: 'goerli',
 };
-const NetworkNameMap = _(NetworkIdMap).invert().mapValues((v, k) => parseInt(v)).value()
+const NetworkNameMap = _(NetworkIdMap)
+  .invert()
+  .mapValues((v, k) => parseInt(v))
+  .value();
 
 const RegistryMap = {
-  'mainnet': '0x314159265dd8dbb310642f98f50c066173c1259b',
-  'ropsten': '0x112234455c3a32fd11230c42e7bccd4a84e02010',
+  mainnet: '0x314159265dd8dbb310642f98f50c066173c1259b',
+  ropsten: '0x112234455c3a32fd11230c42e7bccd4a84e02010',
 };
 
 export default class Ens {
@@ -37,7 +40,7 @@ export default class Ens {
     source = this.normalizeSource(source);
     this.web3 = new Web3(source.url);
     this.network = <string>source.network;
-    this.url = source.url
+    this.url = source.url;
     if (!this.network) {
       throw new Error('Unspecified network in Namicorn ENS configuration');
     }
@@ -178,7 +181,7 @@ export default class Ens {
       }
       case 'object': {
         source = _.clone(source) as SourceDefinition;
-        if (typeof(source.network) == "number") {
+        if (typeof source.network == 'number') {
           source.network = NetworkIdMap[source.network];
         }
         if (source.network && !source.url) {
@@ -193,6 +196,6 @@ export default class Ens {
   }
 
   private networkFromUrl(url: string): string {
-    return _.find(NetworkIdMap, (name) => url.indexOf(name) >= 0);
+    return _.find(NetworkIdMap, name => url.indexOf(name) >= 0);
   }
 }
