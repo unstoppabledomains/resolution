@@ -181,7 +181,7 @@ export default class Ens {
       }
       case 'object': {
         source = _.clone(source) as SourceDefinition;
-        if (typeof(source.network) == "number") {
+        if (typeof source.network == 'number') {
           source.network = NetworkIdMap[source.network];
         }
         if (source.network && !source.url) {
