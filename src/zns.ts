@@ -3,23 +3,45 @@ import { Contract } from '@zilliqa-js/contract';
 import { toChecksumAddress } from '@zilliqa-js/crypto';
 import namehash from './zns/namehash';
 import _ from 'lodash';
-import {ResolutionResult} from './types'
+import {ResolutionResult, SourceDefinition} from './types'
 
 const DefaultSource = 'https://api.zilliqa.com/';
-const registryAddress = 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz';
 const NullAddress = '0x0000000000000000000000000000000000000000';
 
+const NetworkIdMap = {
+  1: 'mainnet',
+  3: 'ropsten',
+  4: 'kovan',
+  42: 'rinkeby',
+  5: 'goerli',
+};
+
+const RegistryMap = {
+  'mainnet': 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
+};
+
 export default class {
+  readonly network: string;
+  readonly url: string;
+  private registryAddress: string;
   registry: Contract;
   zilliqa: Zilliqa;
 
-  constructor(source: string | boolean = DefaultSource) {
-    if (source == true) {
-      source = DefaultSource;
+  constructor(source: string | boolean | SourceDefinition = true) {
+    source = this.normalizeSource(source);
+    this.network = <string>source.network;
+    this.url = source.url;
+    this.zilliqa = new Zilliqa(this.url);
+    if (!this.network) {
+      throw new Error('Unspecified network in Namicorn ENS configuration');
     }
-    source = source.toString();
-    this.zilliqa = new Zilliqa(source);
-    this.registry = this.zilliqa.contracts.at(registryAddress);
+    if (!this.url) {
+      throw new Error('Unspecified url in Namicorn ENS configuration');
+    }
+    this.registryAddress = RegistryMap[this.network];
+    if (this.registryAddress)
+      this.registry = this.zilliqa.contracts.at(this.registryAddress);
+
   }
 
   async getContractField(
@@ -66,6 +88,9 @@ export default class {
   }
 
   async resolve(domain: string): Promise<ResolutionResult | null> {
+    if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork())
+      return null;
+    
     const registryRecord = await this.getContractMapValue(
       this.registry,
       'records',
@@ -93,5 +118,33 @@ export default class {
     return domain.indexOf('.') > 0 && /^.{1,}\.(zil)$/.test(domain);
   }
 
-  isSupportedNetwork(): boolean { return true }
+  isSupportedNetwork(): boolean { return this.registryAddress != null; }
+
+  private normalizeSource(source: string | boolean | SourceDefinition) : SourceDefinition {
+    switch(typeof source) {
+      case 'boolean': {
+        return {url: DefaultSource, network: 'mainnet'}
+      }
+      case 'string': {
+        return {
+          url: source as string,
+          network: 'mainnet'
+        }
+      }
+      case 'object': {
+        source = _.clone(source) as SourceDefinition;
+        if (typeof(source.network) == 'number') {
+          source.network = NetworkIdMap[source.network];
+        }
+        if (source.network && !source.url) {
+          source.url = DefaultSource;
+        }
+        if (source.url && !source.network) {
+          source.network = 'mainnet';
+        }
+        return source;
+      }
+    }
+  }
+
 }

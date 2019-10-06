@@ -4,7 +4,7 @@ import { default as registrarInterface } from './ens/contract/registrar';
 import { default as deedInterface } from './ens/contract/deed';
 import { default as resolverInterface } from './ens/contract/resolver';
 import { hash } from 'eth-ens-namehash';
-import { EnsSourceDefinition, ResolutionResult } from './types';
+import { SourceDefinition, ResolutionResult } from './types';
 
 const Web3 = require('web3');
 
@@ -33,7 +33,7 @@ export default class Ens {
   private web3: any;
   private registryAddress: string;
 
-  constructor(source: string | boolean | EnsSourceDefinition = true) {
+  constructor(source: string | boolean | SourceDefinition = true) {
     source = this.normalizeSource(source);
     this.web3 = new Web3(source.url);
     this.network = <string>source.network;
@@ -164,8 +164,8 @@ export default class Ens {
   }
 
   private normalizeSource(
-    source: string | boolean | EnsSourceDefinition,
-  ): EnsSourceDefinition {
+    source: string | boolean | SourceDefinition,
+  ): SourceDefinition {
     switch (typeof source) {
       case 'boolean': {
         return { url: DefaultUrl, network: this.networkFromUrl(DefaultUrl) };
@@ -177,7 +177,7 @@ export default class Ens {
         };
       }
       case 'object': {
-        source = _.clone(source) as EnsSourceDefinition;
+        source = _.clone(source) as SourceDefinition;
         if (typeof(source.network) == "number") {
           source.network = NetworkIdMap[source.network];
         }
