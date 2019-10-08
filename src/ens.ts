@@ -35,6 +35,7 @@ export default class Ens {
     if (!this.url) {
       throw new Error('Unspecified url in Namicorn ENS configuration');
     }
+    this.registryAddress = validator.getRegistryAddress();
     if (this.registryAddress) {
       this.ensContract = new this.web3.eth.Contract(
         ensInterface,
