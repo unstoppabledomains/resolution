@@ -19,8 +19,8 @@ const defaults = [
     defaultNetwork: 'zilliqa',
     networkIdMap: {
       1: 'zilliqa',
-      3: 'dev',
-      42: 'local',
+      333: 'dev',
+      0: 'local',
     },
     registryMap: {
       zilliqa: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
