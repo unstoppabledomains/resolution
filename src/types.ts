@@ -9,6 +9,22 @@ export interface SourceDefinition {
   network?: string | number;
 }
 
+export type NetworkIdMap = {
+  [key: number]: string;
+};
+
+export type DefaultSource = {
+  url: string;
+  networkIdMap: NetworkIdMap;
+  registryMap: NetworkIdMap;
+  defaultNetwork: string;
+};
+
+export enum NameService {
+  zns = 0,
+  ens = 1,
+}
+
 export type Blockchain =
   | boolean
   | {

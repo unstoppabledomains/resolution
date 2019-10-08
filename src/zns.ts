@@ -3,21 +3,18 @@ import { Contract } from '@zilliqa-js/contract';
 import { toChecksumAddress } from '@zilliqa-js/crypto';
 import namehash from './zns/namehash';
 import _ from 'lodash';
-import { ResolutionResult, SourceDefinition } from './types';
+import { ResolutionResult, SourceDefinition, NameService } from './types';
+import BlockchainSourceValidator from './network';
 
 const DefaultSource = 'https://api.zilliqa.com/';
 const NullAddress = '0x0000000000000000000000000000000000000000';
 
 const NetworkIdMap = {
   1: 'mainnet',
-  3: 'ropsten',
-  4: 'kovan',
-  42: 'rinkeby',
-  5: 'goerli',
 };
 
 const RegistryMap = {
-  mainnet: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
+  zilliqa: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
 };
 
 export default class {
@@ -28,17 +25,18 @@ export default class {
   zilliqa: Zilliqa;
 
   constructor(source: string | boolean | SourceDefinition = true) {
-    source = this.normalizeSource(source);
+    const validator = new BlockchainSourceValidator(NameService.zns);
+    source = validator.normalizeSource(source);
     this.network = <string>source.network;
     this.url = source.url;
     this.zilliqa = new Zilliqa(this.url);
     if (!this.network) {
-      throw new Error('Unspecified network in Namicorn ENS configuration');
+      throw new Error('Unspecified network in Namicorn ZNS configuration');
     }
     if (!this.url) {
-      throw new Error('Unspecified url in Namicorn ENS configuration');
+      throw new Error('Unspecified url in Namicorn ZNS configuration');
     }
-    this.registryAddress = RegistryMap[this.network];
+    this.registryAddress = validator.getRegistryAddress();
     if (this.registryAddress)
       this.registry = this.zilliqa.contracts.at(this.registryAddress);
   }

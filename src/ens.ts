@@ -4,24 +4,11 @@ import { default as registrarInterface } from './ens/contract/registrar';
 import { default as deedInterface } from './ens/contract/deed';
 import { default as resolverInterface } from './ens/contract/resolver';
 import { hash } from 'eth-ens-namehash';
-import { SourceDefinition, ResolutionResult } from './types';
-
+import { SourceDefinition, ResolutionResult, NameService } from './types';
+import BlockchainSourceValidator from './network';
 const Web3 = require('web3');
 
 const NullAddress = '0x0000000000000000000000000000000000000000';
-const DefaultUrl = 'https://mainnet.infura.io';
-
-const NetworkIdMap = {
-  1: 'mainnet',
-  3: 'ropsten',
-  4: 'kovan',
-  42: 'rinkeby',
-  5: 'goerli',
-};
-const NetworkNameMap = _(NetworkIdMap)
-  .invert()
-  .mapValues((v, k) => parseInt(v))
-  .value();
 
 const RegistryMap = {
   mainnet: '0x314159265dd8dbb310642f98f50c066173c1259b',
@@ -37,7 +24,8 @@ export default class Ens {
   private registryAddress: string;
 
   constructor(source: string | boolean | SourceDefinition = true) {
-    source = this.normalizeSource(source);
+    const validator = new BlockchainSourceValidator(NameService.ens);
+    source = validator.normalizeSource(source);
     this.web3 = new Web3(source.url);
     this.network = <string>source.network;
     this.url = source.url;
@@ -47,8 +35,6 @@ export default class Ens {
     if (!this.url) {
       throw new Error('Unspecified url in Namicorn ENS configuration');
     }
-
-    this.registryAddress = RegistryMap[this.network];
     if (this.registryAddress) {
       this.ensContract = new this.web3.eth.Contract(
         ensInterface,
@@ -164,38 +150,5 @@ export default class Ens {
 
     const previousOwner = deedContract.methods.previousOwner().call();
     return previousOwner === NullAddress ? null : previousOwner;
-  }
-
-  private normalizeSource(
-    source: string | boolean | SourceDefinition,
-  ): SourceDefinition {
-    switch (typeof source) {
-      case 'boolean': {
-        return { url: DefaultUrl, network: this.networkFromUrl(DefaultUrl) };
-      }
-      case 'string': {
-        return {
-          url: source as string,
-          network: this.networkFromUrl(source as string),
-        };
-      }
-      case 'object': {
-        source = _.clone(source) as SourceDefinition;
-        if (typeof source.network == 'number') {
-          source.network = NetworkIdMap[source.network];
-        }
-        if (source.network && !source.url) {
-          source.url = `https://${source.network}.infura.io`;
-        }
-        if (source.url && !source.network) {
-          source.network = this.networkFromUrl(source.url);
-        }
-        return source;
-      }
-    }
-  }
-
-  private networkFromUrl(url: string): string {
-    return _.find(NetworkIdMap, name => url.indexOf(name) >= 0);
   }
 }
