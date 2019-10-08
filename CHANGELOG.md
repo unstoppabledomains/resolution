@@ -1,3 +1,7 @@
+## Unreleased
+
+* Transform owner old zil address format to a new zil format
+
 ## 0.2.36
 
 * Add return type for Ens#resolve

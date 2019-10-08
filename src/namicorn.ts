@@ -43,10 +43,10 @@ class Namicorn {
         blockchain = {};
       }
       if (blockchain.ens === undefined) {
-        blockchain.ens = true
+        blockchain.ens = true;
       }
       if (blockchain.zns === undefined) {
-        blockchain.zns = true
+        blockchain.zns = true;
       }
       if (blockchain.ens) {
         this.ens = new Ens(blockchain.ens);
@@ -79,19 +79,24 @@ class Namicorn {
 
   isSupportedDomain(domain: string): boolean {
     return (
-      (this.zns && this.zns.isSupportedDomain(domain)) || (this.ens && this.ens.isSupportedDomain(domain))
+      (this.zns && this.zns.isSupportedDomain(domain)) ||
+      (this.ens && this.ens.isSupportedDomain(domain))
     );
   }
 
   isSupportedDomainInNetwork(domain: string): boolean {
     const methods = [this.ens, this.zns];
-    const method = methods.find(method => method && method.isSupportedDomain(domain));
+    const method = methods.find(
+      method => method && method.isSupportedDomain(domain),
+    );
     return method && method.isSupportedNetwork();
   }
 
   private async resolveUsingBlockchain(domain: string) {
     const methods = [this.ens, this.zns];
-    const method = methods.find(method => method && method.isSupportedDomain(domain));
+    const method = methods.find(
+      method => method && method.isSupportedDomain(domain),
+    );
     if (!method) return null;
     var result = method && (await method.resolve(domain));
     return result || Namicorn.UNCLAIMED_DOMAIN_RESPONSE;

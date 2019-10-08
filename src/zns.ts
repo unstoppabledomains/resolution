@@ -1,9 +1,9 @@
 import { Zilliqa } from '@zilliqa-js/zilliqa';
 import { Contract } from '@zilliqa-js/contract';
-import { toChecksumAddress } from '@zilliqa-js/crypto';
+import { toChecksumAddress, toBech32Address } from '@zilliqa-js/crypto';
 import namehash from './zns/namehash';
 import _ from 'lodash';
-import {ResolutionResult} from './types'
+import { ResolutionResult } from './types';
 
 const DefaultSource = 'https://api.zilliqa.com/';
 const registryAddress = 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz';
@@ -73,12 +73,15 @@ export default class {
     );
 
     if (!registryRecord) return null;
-    const [ownerAddress, resolverAddress] = registryRecord.arguments as [
+    let [ownerAddress, resolverAddress] = registryRecord.arguments as [
       string,
       string
     ];
     const resolution = await this.getResolverRecordsStructure(resolverAddress);
     const addresses = _.mapValues(resolution.crypto, 'address');
+    if (ownerAddress.startsWith('0x')) {
+      ownerAddress = toBech32Address(ownerAddress);
+    }
     return {
       addresses,
       meta: {
@@ -93,5 +96,7 @@ export default class {
     return domain.indexOf('.') > 0 && /^.{1,}\.(zil)$/.test(domain);
   }
 
-  isSupportedNetwork(): boolean { return true }
+  isSupportedNetwork(): boolean {
+    return true;
+  }
 }
