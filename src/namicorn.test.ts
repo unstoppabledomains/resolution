@@ -71,9 +71,21 @@ describe('ZNS', () => {
     expect(result.meta.owner).toEqual(null);
   });
   it("doesn't support zil domain when zns is disabled", () => {
-    let namicorn = new Namicorn({ blockchain: { zns: false } });
+    const namicorn = new Namicorn({ blockchain: { zns: false } });
     expect(namicorn.isSupportedDomain('hello.zil')).toBeFalsy();
   });
+});
+
+describe('NamingService', () => {
+  it('checks normalizeSource from boolean', async () => {
+    const namicorn = new Namicorn({ blockchain: { ens: true, zns: true } });
+    expect(namicorn.ens.network).toBe('mainnet');
+    expect(namicorn.ens.url).toBe('https://mainnet.infura.io');
+    expect(namicorn.zns.network).toBe('mainnet');
+    expect(namicorn.zns.url).toBe('https://api.zilliqa.com');
+  });
+
+  //TODO: Write more tests to cover all the options. 3!
 });
 
 describe('ENS', () => {

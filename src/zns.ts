@@ -5,19 +5,28 @@ import namehash from './zns/namehash';
 import _ from 'lodash';
 import { ResolutionResult, SourceDefinition, NameService } from './types';
 import BlockchainSourceValidator from './network';
+import NamingService from './namingService';
 
-const DefaultSource = 'https://api.zilliqa.com/';
+const DefaultSource = 'https://api.zilliqa.com';
 const NullAddress = '0x0000000000000000000000000000000000000000';
 
 const NetworkIdMap = {
   1: 'mainnet',
+  333: 'testnet',
+  111: 'localnet',
 };
 
 const RegistryMap = {
-  zilliqa: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
+  mainnet: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
 };
 
-export default class {
+const UrlMap = {
+  mainnet: 'https://api.zilliqa.com/',
+  testnet: 'https://dev-api.zilliqa.com/',
+  localnet: 'http://localhost:4201/',
+};
+
+export default class ZNS extends NamingService {
   readonly network: string;
   readonly url: string;
   private registryAddress: string;
@@ -25,8 +34,8 @@ export default class {
   zilliqa: Zilliqa;
 
   constructor(source: string | boolean | SourceDefinition = true) {
-    const validator = new BlockchainSourceValidator(NameService.zns);
-    source = validator.normalizeSource(source);
+    super();
+    source = this.normalizeSource(source);
     this.network = <string>source.network;
     this.url = source.url;
     this.zilliqa = new Zilliqa(this.url);
@@ -36,7 +45,7 @@ export default class {
     if (!this.url) {
       throw new Error('Unspecified url in Namicorn ZNS configuration');
     }
-    this.registryAddress = validator.getRegistryAddress();
+    this.registryAddress = RegistryMap[this.network];
     if (this.registryAddress)
       this.registry = this.zilliqa.contracts.at(this.registryAddress);
   }
@@ -119,7 +128,7 @@ export default class {
     return this.registryAddress != null;
   }
 
-  private normalizeSource(
+  normalizeSourceDefinition(
     source: string | boolean | SourceDefinition,
   ): SourceDefinition {
     switch (typeof source) {
@@ -127,9 +136,14 @@ export default class {
         return { url: DefaultSource, network: 'mainnet' };
       }
       case 'string': {
+        let network;
+        if (source.indexOf('api.zilliqa.com') >= 0) network = 'mainnet';
+        if (source.indexOf('dev-api.zilliqa.com') >= 0) network = 'testnet';
+        if (source.indexOf('localhost') >= 0) network = 'localnet';
+
         return {
           url: source as string,
-          network: 'mainnet',
+          network,
         };
       }
       case 'object': {
@@ -138,13 +152,19 @@ export default class {
           source.network = NetworkIdMap[source.network];
         }
         if (source.network && !source.url) {
-          source.url = DefaultSource;
+          source.url = UrlMap[source.network];
         }
         if (source.url && !source.network) {
-          source.network = 'mainnet';
+          source.network = this.getNetworkFromUrl(source.url);
         }
         return source;
       }
     }
+  }
+
+  private getNetworkFromUrl(url: string): string {
+    if (url.indexOf('api.zilliqa.com') >= 0) return 'mainnet';
+    if (url.indexOf('dev-api.zilliqa.com') >= 0) return 'testnet';
+    return 'localnet';
   }
 }
