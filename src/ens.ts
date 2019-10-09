@@ -5,7 +5,6 @@ import { default as deedInterface } from './ens/contract/deed';
 import { default as resolverInterface } from './ens/contract/resolver';
 import { hash } from 'eth-ens-namehash';
 import { SourceDefinition, ResolutionResult, NameService } from './types';
-import BlockchainSourceValidator from './network';
 import NamingService from './namingService';
 const Web3 = require('web3');
 
