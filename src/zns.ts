@@ -162,8 +162,6 @@ export default class ZNS extends NamingService {
     return this.registryAddress != null;
   }
 
-  
-
   private getNetworkFromUrl(url: string): string {
     if (url.indexOf('api.zilliqa.com') >= 0) return 'mainnet';
     if (url.indexOf('dev-api.zilliqa.com') >= 0) return 'testnet';
