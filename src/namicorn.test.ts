@@ -80,21 +80,23 @@ describe('ZNS', () => {
     const namicorn = new Namicorn({ blockchain: { zns: true } });
     expect(namicorn.zns.network).toBe('mainnet');
     expect(namicorn.zns.url).toBe('https://api.zilliqa.com/');
-  });  
-  
+  });
+
   it('checks normalizeSource zns (boolean - false)', async () => {
     try {
       new Namicorn({ blockchain: { zns: false } });
-    } catch(err) {
-      expect(err).toBeDefined(); 
+    } catch (err) {
+      expect(err).toBeDefined();
     }
   });
 
   it('checks normalizeSource zns (string)', async () => {
-    const namicorn = new Namicorn({ blockchain: { zns: 'https://api.zilliqa.com' } });
+    const namicorn = new Namicorn({
+      blockchain: { zns: 'https://api.zilliqa.com' },
+    });
     expect(namicorn.zns.network).toBe('mainnet');
     expect(namicorn.zns.url).toBe('https://api.zilliqa.com/');
-  });  
+  });
 
   it('checks normalizeSource zns wrong string', async () => {
     try {
@@ -102,41 +104,49 @@ describe('ZNS', () => {
     } catch (err) {
       expect(err).toBeDefined();
     }
-  });  
+  });
 
   it('checks normalizeSource zns (object) #1', async () => {
-    const namicorn = new Namicorn({ blockchain: { zns: {url: 'https://api.zilliqa.com'} } });
+    const namicorn = new Namicorn({
+      blockchain: { zns: { url: 'https://api.zilliqa.com' } },
+    });
     expect(namicorn.zns.network).toBe('mainnet');
     expect(namicorn.zns.url).toBe('https://api.zilliqa.com/');
   });
-  
+
   it('checks normalizeSource zns (object) #2', async () => {
-    const namicorn = new Namicorn({ blockchain: { zns: {network: 333} } });
+    const namicorn = new Namicorn({ blockchain: { zns: { network: 333 } } });
     expect(namicorn.zns.network).toBe('testnet');
     expect(namicorn.zns.url).toBe('https://dev-api.zilliqa.com/');
   });
 
   it('checks normalizeSource zns (object) #3', async () => {
-    const namicorn = new Namicorn({ blockchain: { zns: {url: 'https://api.zilliqa.com/'} } });
+    const namicorn = new Namicorn({
+      blockchain: { zns: { url: 'https://api.zilliqa.com/' } },
+    });
     expect(namicorn.zns.network).toBe('mainnet');
     expect(namicorn.zns.url).toBe('https://api.zilliqa.com/');
   });
 
   it('checks normalizeSource zns (object) #4', async () => {
-    const namicorn = new Namicorn({ blockchain: { zns: {url: 'https://api.zilliqa.com/', network: 1} } });
+    const namicorn = new Namicorn({
+      blockchain: { zns: { url: 'https://api.zilliqa.com/', network: 1 } },
+    });
     expect(namicorn.zns.network).toBe('mainnet');
     expect(namicorn.zns.url).toBe('https://api.zilliqa.com/');
   });
-  
+
   it('checks normalizeSource zns (object) #5', async () => {
-    const namicorn = new Namicorn({ blockchain: { zns: {url: 'https://api.zilliqa.com/', network: 333} } });
+    const namicorn = new Namicorn({
+      blockchain: { zns: { url: 'https://api.zilliqa.com/', network: 333 } },
+    });
     expect(namicorn.zns.network).toBe('testnet');
     expect(namicorn.zns.url).toBe('https://api.zilliqa.com/');
-  }); 
+  });
 
   it('checks normalizeSource zns (object) #6', async () => {
     try {
-      new Namicorn({ blockchain: { zns: {network: 42} } });
+      new Namicorn({ blockchain: { zns: { network: 42 } } });
     } catch (err) {
       expect(err).toBeDefined();
     }
@@ -144,27 +154,28 @@ describe('ZNS', () => {
 
   it('checks normalizeSource zns (object) #7', async () => {
     try {
-      new Namicorn({ blockchain: { zns: {network: 'invalid'} } });
+      new Namicorn({ blockchain: { zns: { network: 'invalid' } } });
     } catch (err) {
       expect(err).toBeDefined();
     }
-  });  
+  });
 
   it('checks normalizeSource zns (object) #8', async () => {
-    const namicorn = new Namicorn({ blockchain: { zns: {network: 'mainnet'} } });
+    const namicorn = new Namicorn({
+      blockchain: { zns: { network: 'mainnet' } },
+    });
     expect(namicorn.zns.network).toBe('mainnet');
     expect(namicorn.zns.url).toBe('https://api.zilliqa.com/');
-  });  
+  });
 
   it('checks normalizeSource zns (object) #9', async () => {
-    const namicorn = new Namicorn({ blockchain: { zns: {network: 'testnet'} } });
+    const namicorn = new Namicorn({
+      blockchain: { zns: { network: 'testnet' } },
+    });
     expect(namicorn.zns.network).toBe('testnet');
     expect(namicorn.zns.url).toBe('https://dev-api.zilliqa.com/');
-  });  
-  
-  
+  });
 });
-
 
 describe('ENS', () => {
   it('allows ens network specified as string', async () => {
@@ -306,7 +317,7 @@ describe('ENS', () => {
     const answer = ens.isSupportedNetwork();
     expect(answer).toBe(true);
   });
-  
+
   it('checks if the network is supported(false)', async () => {
     const ens = new Ens({ network: 5 });
     const answer = ens.isSupportedNetwork();
@@ -318,43 +329,49 @@ describe('ENS', () => {
     const namicorn = new Namicorn({ blockchain: { ens: true } });
     expect(namicorn.ens.network).toBe('mainnet');
     expect(namicorn.ens.url).toBe('https://mainnet.infura.io/');
-  });  
-  
+  });
+
   it('checks normalizeSource ens (boolean - false)', async () => {
     try {
       new Namicorn({ blockchain: { ens: false } });
-    } catch(err) {
+    } catch (err) {
       expect(err).toBeDefined();
     }
-  });  
+  });
 
   it('checks normalizeSource ens (object) #1', async () => {
-    const namicorn = new Namicorn({ blockchain: { ens: {url: 'https://mainnet.infura.io'} } });
+    const namicorn = new Namicorn({
+      blockchain: { ens: { url: 'https://mainnet.infura.io' } },
+    });
     expect(namicorn.ens.network).toBe('mainnet');
     expect(namicorn.ens.url).toBe('https://mainnet.infura.io/');
   });
-  
+
   it('checks normalizeSource ens (object) #2', async () => {
-    const namicorn = new Namicorn({ blockchain: { ens: {network: 3} } });
+    const namicorn = new Namicorn({ blockchain: { ens: { network: 3 } } });
     expect(namicorn.ens.network).toBe('ropsten');
     expect(namicorn.ens.url).toBe('https://ropsten.infura.io/');
   });
 
   it('checks normalizeSource ens (object) #3', async () => {
-    const namicorn = new Namicorn({ blockchain: { ens: {url: 'https://rinkeby.infura.io/'} } });
+    const namicorn = new Namicorn({
+      blockchain: { ens: { url: 'https://rinkeby.infura.io/' } },
+    });
     expect(namicorn.ens.network).toBe('rinkeby');
     expect(namicorn.ens.url).toBe('https://rinkeby.infura.io/');
   });
 
   it('checks normalizeSource ens (object) #4', async () => {
-    const namicorn = new Namicorn({ blockchain: { ens: {url: 'https://goerli.infura.io/', network: 5} } });
+    const namicorn = new Namicorn({
+      blockchain: { ens: { url: 'https://goerli.infura.io/', network: 5 } },
+    });
     expect(namicorn.ens.network).toBe('goerli');
     expect(namicorn.ens.url).toBe('https://goerli.infura.io/');
   });
 
   it('checks normalizeSource ens (object) #6', async () => {
     try {
-      new Namicorn({ blockchain: { ens: {network: 7543} } });
+      new Namicorn({ blockchain: { ens: { network: 7543 } } });
     } catch (err) {
       expect(err).toBeDefined();
     }
@@ -362,27 +379,30 @@ describe('ENS', () => {
 
   it('checks normalizeSource ens (object) #7', async () => {
     try {
-      new Namicorn({ blockchain: { ens: {network: 'invalid'} } });
+      new Namicorn({ blockchain: { ens: { network: 'invalid' } } });
     } catch (err) {
       expect(err).toBeDefined();
     }
-  });  
+  });
 
   it('checks normalizeSource ens (object) #8', async () => {
-    const namicorn = new Namicorn({ blockchain: { ens: {network: 'mainnet'} } });
+    const namicorn = new Namicorn({
+      blockchain: { ens: { network: 'mainnet' } },
+    });
     expect(namicorn.ens.network).toBe('mainnet');
     expect(namicorn.ens.url).toBe('https://mainnet.infura.io/');
-  });  
+  });
 
   it('checks normalizeSource ens (object) #9', async () => {
-    const namicorn = new Namicorn({ blockchain: { ens: {network: 'kovan'} } });
+    const namicorn = new Namicorn({
+      blockchain: { ens: { network: 'kovan' } },
+    });
     expect(namicorn.ens.network).toBe('kovan');
     expect(namicorn.ens.url).toBe('https://kovan.infura.io/');
-  });  
-
+  });
 });
 
- it('provides empty response constant', async () => {
+it('provides empty response constant', async () => {
   const response = Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
   expect(response.addresses).toEqual({});
   expect(response.meta.owner).toEqual(null);

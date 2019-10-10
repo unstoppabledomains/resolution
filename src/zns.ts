@@ -26,10 +26,11 @@ const UrlMap = {
 };
 
 const UrlNetworkMap = (url: string) => {
- const invert =  _(UrlMap).invert().value();
- return url.endsWith('/') ? invert[url] : invert[url + '/'];
-}
-
+  const invert = _(UrlMap)
+    .invert()
+    .value();
+  return url.endsWith('/') ? invert[url] : invert[url + '/'];
+};
 
 export default class ZNS extends NamingService {
   readonly network: string;
@@ -47,8 +48,10 @@ export default class ZNS extends NamingService {
         return { url: DefaultSource, network: 'mainnet' };
       }
       case 'string': {
-        const formatedSource = !source.endsWith('/') ? source + '/' : source  as string;
-        
+        const formatedSource = !source.endsWith('/')
+          ? source + '/'
+          : (source as string);
+
         return {
           url: formatedSource,
           network: UrlNetworkMap(source),
