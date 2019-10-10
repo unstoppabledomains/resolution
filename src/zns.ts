@@ -3,10 +3,10 @@ import { Contract } from '@zilliqa-js/contract';
 import { toChecksumAddress } from '@zilliqa-js/crypto';
 import namehash from './zns/namehash';
 import _ from 'lodash';
-import { ResolutionResult, SourceDefinition, NameService } from './types';
+import { ResolutionResult, SourceDefinition } from './types';
 import NamingService from './namingService';
 
-const DefaultSource = 'https://api.zilliqa.com';
+const DefaultSource = 'https://api.zilliqa.com/';
 const NullAddress = '0x0000000000000000000000000000000000000000';
 
 const NetworkIdMap = {
@@ -25,6 +25,12 @@ const UrlMap = {
   localnet: 'http://localhost:4201/',
 };
 
+const UrlNetworkMap = (url: string) => {
+ const invert =  _(UrlMap).invert().value();
+ return url.endsWith('/') ? invert[url] : invert[url + '/'];
+}
+
+
 export default class ZNS extends NamingService {
   readonly network: string;
   readonly url: string;
@@ -33,7 +39,7 @@ export default class ZNS extends NamingService {
   zilliqa: Zilliqa;
 
   // NamingService.normalizeSourceDefinition
-  normalizeSourceDefinition(
+  protected normalizeSourceDefinition(
     source: string | boolean | SourceDefinition,
   ): SourceDefinition {
     switch (typeof source) {
@@ -41,14 +47,11 @@ export default class ZNS extends NamingService {
         return { url: DefaultSource, network: 'mainnet' };
       }
       case 'string': {
-        let network;
-        if (source.indexOf('api.zilliqa.com') >= 0) network = 'mainnet';
-        if (source.indexOf('dev-api.zilliqa.com') >= 0) network = 'testnet';
-        if (source.indexOf('localhost') >= 0) network = 'localnet';
-
+        const formatedSource = !source.endsWith('/') ? source + '/' : source  as string;
+        
         return {
-          url: source as string,
-          network,
+          url: formatedSource,
+          network: UrlNetworkMap(source),
         };
       }
       case 'object': {
@@ -60,7 +63,8 @@ export default class ZNS extends NamingService {
           source.url = UrlMap[source.network];
         }
         if (source.url && !source.network) {
-          source.network = this.getNetworkFromUrl(source.url);
+          source.url = source.url.endsWith('/') ? source.url : source.url + '/';
+          source.network = UrlNetworkMap(source.url);
         }
         return source;
       }
@@ -160,11 +164,5 @@ export default class ZNS extends NamingService {
 
   isSupportedNetwork(): boolean {
     return this.registryAddress != null;
-  }
-
-  private getNetworkFromUrl(url: string): string {
-    if (url.indexOf('api.zilliqa.com') >= 0) return 'mainnet';
-    if (url.indexOf('dev-api.zilliqa.com') >= 0) return 'testnet';
-    return 'localnet';
   }
 }

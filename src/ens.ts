@@ -4,12 +4,12 @@ import { default as registrarInterface } from './ens/contract/registrar';
 import { default as deedInterface } from './ens/contract/deed';
 import { default as resolverInterface } from './ens/contract/resolver';
 import { hash } from 'eth-ens-namehash';
-import { SourceDefinition, ResolutionResult, NameService } from './types';
+import { SourceDefinition, ResolutionResult } from './types';
 import NamingService from './namingService';
 const Web3 = require('web3');
 
 const NullAddress = '0x0000000000000000000000000000000000000000';
-const DefaultUrl = 'https://mainnet.infura.io';
+const DefaultUrl = 'https://mainnet.infura.io/';
 
 const NetworkIdMap = {
   1: 'mainnet',
@@ -37,7 +37,7 @@ export default class Ens extends NamingService {
   private registryAddress: string;
 
   // NamingService.normalizeSourceDefinition
-  normalizeSourceDefinition(
+  protected normalizeSourceDefinition(
     source: string | boolean | SourceDefinition,
   ): SourceDefinition {
     switch (typeof source) {
@@ -56,11 +56,12 @@ export default class Ens extends NamingService {
           source.network = NetworkIdMap[source.network];
         }
         if (source.network && !source.url) {
-          source.url = `https://${source.network}.infura.io`;
+          source.url = `https://${source.network}.infura.io/`;
         }
         if (source.url && !source.network) {
           source.network = this.networkFromUrl(source.url);
         }
+        source.url = source.url.endsWith('/') ? source.url : source.url + '/';
         return source;
       }
     }
