@@ -20,11 +20,6 @@ export type DefaultSource = {
   defaultNetwork: string;
 };
 
-export enum NameService {
-  zns = 0,
-  ens = 1,
-}
-
 export type Blockchain =
   | boolean
   | {

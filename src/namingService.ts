@@ -1,7 +1,7 @@
 import { SourceDefinition } from './types';
 
 export default abstract class NamingService {
-  abstract normalizeSourceDefinition(
+  protected abstract normalizeSourceDefinition(
     source: boolean | string | SourceDefinition,
   );
 
