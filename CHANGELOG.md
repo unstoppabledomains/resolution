@@ -1,5 +1,8 @@
 ## Unreleased
 
+## 0.2.37
+
+* Support node 12
 * Transform owner old zil address format to a new zil format
 
 ## 0.2.36
