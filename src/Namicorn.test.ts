@@ -92,11 +92,9 @@ describe('ZNS', () => {
   });
 
   it('checks normalizeSource zns wrong string', async () => {
-    try {
+    expect(() => {
       new Namicorn({ blockchain: { zns: 'https://wrongurl.com' } });
-    } catch (err) {
-      expect(err).toBeDefined();
-    }
+    }).toThrowError()
   });
 
   it('checks normalizeSource zns (object) #1', async () => {
@@ -138,19 +136,15 @@ describe('ZNS', () => {
   });
 
   it('checks normalizeSource zns (object) #6', async () => {
-    try {
+    expect(() => {
       new Namicorn({ blockchain: { zns: { network: 42 } } });
-    } catch (err) {
-      expect(err).toBeDefined();
-    }
+    }).toThrowError()
   });
 
   it('checks normalizeSource zns (object) #7', async () => {
-    try {
+    expect(() => {
       new Namicorn({ blockchain: { zns: { network: 'invalid' } } });
-    } catch (err) {
-      expect(err).toBeDefined();
-    }
+    }).toThrowError()
   });
 
   it('checks normalizeSource zns (object) #8', async () => {
@@ -360,19 +354,15 @@ describe('ENS', () => {
   });
 
   it('checks normalizeSource ens (object) #6', async () => {
-    try {
+    expect(() => {
       new Namicorn({ blockchain: { ens: { network: 7543 } } });
-    } catch (err) {
-      expect(err).toBeDefined();
-    }
+    }).toThrowError()
   });
 
   it('checks normalizeSource ens (object) #7', async () => {
-    try {
+    expect(() => {
       new Namicorn({ blockchain: { ens: { network: 'invalid' } } });
-    } catch (err) {
-      expect(err).toBeDefined();
-    }
+    }).toThrowError()
   });
 
   it('checks normalizeSource ens (object) #8', async () => {

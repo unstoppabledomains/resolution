@@ -163,7 +163,7 @@ export default class Ens extends NamingService {
         if (typeof source.network == 'number') {
           source.network = NetworkIdMap[source.network];
         }
-        if (source.network && !source.url) {
+        if (NetworkNameMap[source.network] && !source.url) {
           source.url = `https://${source.network}.infura.io/`;
         }
         if (source.url && !source.network) {
