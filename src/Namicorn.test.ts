@@ -73,6 +73,7 @@ describe('ZNS', () => {
 
   it("doesn't support zil domain when zns is disabled", () => {
     const namicorn = new Namicorn({ blockchain: { zns: false } });
+    expect(namicorn.zns).toBeUndefined();
     expect(namicorn.isSupportedDomain('hello.zil')).toBeFalsy();
   });
 
@@ -80,14 +81,6 @@ describe('ZNS', () => {
     const namicorn = new Namicorn({ blockchain: { zns: true } });
     expect(namicorn.zns.network).toBe('mainnet');
     expect(namicorn.zns.url).toBe('https://api.zilliqa.com/');
-  });
-
-  it('checks normalizeSource zns (boolean - false)', async () => {
-    try {
-      new Namicorn({ blockchain: { zns: false } });
-    } catch (err) {
-      expect(err).toBeDefined();
-    }
   });
 
   it('checks normalizeSource zns (string)', async () => {
@@ -321,7 +314,6 @@ describe('ENS', () => {
   it('checks if the network is supported(false)', async () => {
     const ens = new Ens({ network: 5 });
     const answer = ens.isSupportedNetwork();
-    const testnew = new Namicorn({ blockchain: { ens: { network: 1 } } });
     expect(answer).toBe(false);
   });
 
@@ -332,11 +324,9 @@ describe('ENS', () => {
   });
 
   it('checks normalizeSource ens (boolean - false)', async () => {
-    try {
-      new Namicorn({ blockchain: { ens: false } });
-    } catch (err) {
-      expect(err).toBeDefined();
-    }
+    const namicorn = new Namicorn({ blockchain: { ens: false } });
+    expect(namicorn.isSupportedDomain('hello.eth')).toBeFalsy()
+    expect(namicorn.ens).toBeUndefined()
   });
 
   it('checks normalizeSource ens (object) #1', async () => {
