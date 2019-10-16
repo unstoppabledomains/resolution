@@ -6,7 +6,7 @@ import _ from 'lodash';
 import { ResolutionResult, SourceDefinition } from './types';
 import NamingService from './namingService';
 
-const DefaultSource = 'https://api.zilliqa.com/';
+const DefaultSource = 'https://api.zilliqa.com';
 const NullAddress = '0x0000000000000000000000000000000000000000';
 
 const NetworkIdMap = {
@@ -20,27 +20,26 @@ const RegistryMap = {
 };
 
 const UrlMap = {
-  mainnet: 'https://api.zilliqa.com/',
-  testnet: 'https://dev-api.zilliqa.com/',
-  localnet: 'http://localhost:4201/',
+  mainnet: 'https://api.zilliqa.com',
+  testnet: 'https://dev-api.zilliqa.com',
+  localnet: 'http://localhost:4201',
 };
 
 const UrlNetworkMap = (url: string) => {
   const invert = _(UrlMap)
     .invert()
     .value();
-  return url.endsWith('/') ? invert[url] : invert[url + '/'];
+  return invert[url]
 };
 
 export default class ZNS extends NamingService {
   readonly network: string;
   readonly url: string;
-  private registryAddress: string;
+  readonly registryAddress: string;
   registry: Contract;
   zilliqa: Zilliqa;
 
-  // NamingService.normalizeSourceDefinition
-  protected normalizeSourceDefinition(
+  protected normalizeSource(
     source: string | boolean | SourceDefinition,
   ): SourceDefinition {
     switch (typeof source) {
@@ -48,12 +47,8 @@ export default class ZNS extends NamingService {
         return { url: DefaultSource, network: 'mainnet' };
       }
       case 'string': {
-        const formatedSource = !source.endsWith('/')
-          ? source + '/'
-          : (source as string);
-
         return {
-          url: formatedSource,
+          url: source,
           network: UrlNetworkMap(source),
         };
       }
@@ -66,8 +61,11 @@ export default class ZNS extends NamingService {
           source.url = UrlMap[source.network];
         }
         if (source.url && !source.network) {
-          source.url = source.url.endsWith('/') ? source.url : source.url + '/';
           source.network = UrlNetworkMap(source.url);
+        }
+        if (!source.url && !source.network && source.registry) {
+          source.url = DefaultSource;
+          source.network = 'mainnet';
         }
         return source;
       }
@@ -86,9 +84,11 @@ export default class ZNS extends NamingService {
     if (!this.url) {
       throw new Error('Unspecified url in Namicorn ZNS configuration');
     }
-    this.registryAddress = RegistryMap[this.network];
+    this.registryAddress = source.registry ? source.registry :  RegistryMap[this.network];
     if (this.registryAddress)
       this.registry = this.zilliqa.contracts.at(this.registryAddress);
+    if (!this.registry)
+      throw new Error(`No registry for address: ${this.registryAddress} `);
   }
 
   async getContractField(

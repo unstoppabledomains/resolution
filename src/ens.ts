@@ -9,7 +9,7 @@ import NamingService from './namingService';
 const Web3 = require('web3');
 
 const NullAddress = '0x0000000000000000000000000000000000000000';
-const DefaultUrl = 'https://mainnet.infura.io/';
+const DefaultUrl = 'https://mainnet.infura.io';
 
 const NetworkIdMap = {
   1: 'mainnet',
@@ -31,13 +31,12 @@ const RegistryMap = {
 export default class Ens extends NamingService {
   readonly network: string;
   readonly url: string;
+  readonly registryAddress: string;
   private ensContract: any;
   private registrarContract: any;
   private web3: any;
-  private registryAddress: string;
 
-  // NamingService.normalizeSourceDefinition
-  protected normalizeSourceDefinition(
+  protected normalizeSource(
     source: string | boolean | SourceDefinition,
   ): SourceDefinition {
     switch (typeof source) {
@@ -52,16 +51,19 @@ export default class Ens extends NamingService {
       }
       case 'object': {
         source = _.clone(source) as SourceDefinition;
+        if (!source.network && !source.url) {
+          source.network = 'mainnet';
+          source.url = 'https://mainnet.infura.io';
+        }
         if (typeof source.network == 'number') {
           source.network = NetworkIdMap[source.network];
         }
         if (source.network && !source.url) {
-          source.url = `https://${source.network}.infura.io/`;
+          source.url = `https://${source.network}.infura.io`;
         }
         if (source.url && !source.network) {
           source.network = this.networkFromUrl(source.url);
         }
-        source.url = source.url.endsWith('/') ? source.url : source.url + '/';
         return source;
       }
     }
@@ -79,7 +81,7 @@ export default class Ens extends NamingService {
     if (!this.url) {
       throw new Error('Unspecified url in Namicorn ENS configuration');
     }
-    this.registryAddress = RegistryMap[this.network];
+    this.registryAddress = source.registry ? source.registry : RegistryMap[this.network];
     if (this.registryAddress) {
       this.ensContract = new this.web3.eth.Contract(
         ensInterface,
