@@ -81,7 +81,9 @@ export default class Ens extends NamingService {
     if (!this.url) {
       throw new Error('Unspecified url in Namicorn ENS configuration');
     }
-    this.registryAddress = source.registry ? source.registry : RegistryMap[this.network];
+    this.registryAddress = source.registry
+      ? source.registry
+      : RegistryMap[this.network];
     if (this.registryAddress) {
       this.ensContract = new this.web3.eth.Contract(
         ensInterface,

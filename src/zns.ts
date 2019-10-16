@@ -29,7 +29,7 @@ const UrlNetworkMap = (url: string) => {
   const invert = _(UrlMap)
     .invert()
     .value();
-  return invert[url]
+  return invert[url];
 };
 
 export default class ZNS extends NamingService {
@@ -84,7 +84,9 @@ export default class ZNS extends NamingService {
     if (!this.url) {
       throw new Error('Unspecified url in Namicorn ZNS configuration');
     }
-    this.registryAddress = source.registry ? source.registry :  RegistryMap[this.network];
+    this.registryAddress = source.registry
+      ? source.registry
+      : RegistryMap[this.network];
     if (this.registryAddress)
       this.registry = this.zilliqa.contracts.at(this.registryAddress);
     if (!this.registry)
