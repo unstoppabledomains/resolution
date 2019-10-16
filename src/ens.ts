@@ -197,6 +197,35 @@ export default class Ens extends NamingService {
     return previousOwner === NullAddress ? null : previousOwner;
   }
 
+  private normalizeSource(
+    source: string | boolean | SourceDefinition,
+  ): SourceDefinition {
+    switch (typeof source) {
+      case 'boolean': {
+        return { url: DefaultUrl, network: this.networkFromUrl(DefaultUrl) };
+      }
+      case 'string': {
+        return {
+          url: source as string,
+          network: this.networkFromUrl(source as string),
+        };
+      }
+      case 'object': {
+        source = _.clone(source) as SourceDefinition;
+        if (typeof source.network == 'number') {
+          source.network = NetworkIdMap[source.network];
+        }
+        if (source.network && !source.url) {
+          source.url = `https://${source.network}.infura.io`;
+        }
+        if (source.url && !source.network) {
+          source.network = this.networkFromUrl(source.url);
+        }
+        return source;
+      }
+    }
+  }
+
   private networkFromUrl(url: string): string {
     return _.find(NetworkIdMap, name => url.indexOf(name) >= 0);
   }

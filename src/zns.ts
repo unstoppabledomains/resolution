@@ -1,6 +1,6 @@
 import { Zilliqa } from '@zilliqa-js/zilliqa';
 import { Contract } from '@zilliqa-js/contract';
-import { toChecksumAddress } from '@zilliqa-js/crypto';
+import { toChecksumAddress, toBech32Address } from '@zilliqa-js/crypto';
 import namehash from './zns/namehash';
 import _ from 'lodash';
 import { ResolutionResult, SourceDefinition } from './types';
@@ -145,12 +145,15 @@ export default class ZNS extends NamingService {
     );
 
     if (!registryRecord) return null;
-    const [ownerAddress, resolverAddress] = registryRecord.arguments as [
+    let [ownerAddress, resolverAddress] = registryRecord.arguments as [
       string,
       string
     ];
     const resolution = await this.getResolverRecordsStructure(resolverAddress);
     const addresses = _.mapValues(resolution.crypto, 'address');
+    if (ownerAddress.startsWith('0x')) {
+      ownerAddress = toBech32Address(ownerAddress);
+    }
     return {
       addresses,
       meta: {

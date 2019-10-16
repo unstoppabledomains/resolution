@@ -1,3 +1,14 @@
+## Unreleased
+
+## 0.2.38
+
+* Updated zilliqa library to 0.8.1
+
+## 0.2.37
+
+* Support node 12
+* Transform owner old zil address format to a new zil format
+
 ## 0.2.36
 
 * Add return type for Ens#resolve
