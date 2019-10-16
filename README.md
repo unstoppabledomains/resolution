@@ -7,4 +7,4 @@ Supported domain zones:
 * .eth 
 * .etcetera
 
-[Documentation](https://docs.unstoppabledomains.com/docs/namicorn/getting-started/)
+[Documentation](https://docs.unstoppabledomains.com/#tag/namicorn)
