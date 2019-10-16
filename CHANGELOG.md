@@ -1,5 +1,7 @@
 ## Unreleased
 
+* Zns network and url options support
+
 ## 0.2.38
 
 * Updated zilliqa library to 0.8.1
