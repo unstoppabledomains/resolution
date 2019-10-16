@@ -61,13 +61,10 @@ export default class Zns extends NamingService {
     field: string,
     keys: string[] = [],
   ): Promise<any> {
-    let response = await this.zilliqa.provider.send(
-      'GetSmartContractSubState',
-      contract.address.replace('0x', '').toLowerCase(),
-      field,
-      keys.map(k => JSON.stringify(k)),
-    );
-    return (response.result || {})[field];
+    let result = await contract.getSubState(
+      field, keys.map(k => JSON.stringify(k))
+    ) || {}
+    return result[field];
   }
 
   async getContractMapValue(
