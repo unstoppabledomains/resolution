@@ -50,7 +50,7 @@
 		"access": "public"
 	},
 	"dependencies": {
-		"@zilliqa-js/zilliqa": "0.8.1-alpha.0",
+		"@zilliqa-js/zilliqa": "^0.8.1",
 		"eth-ens-namehash": "^2.0.8",
 		"lodash": "^4.17.15",
 		"node-fetch": "^2.6.0",

@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.2.38
+
+* Updated zilliqa library to 0.8.1
+
 ## 0.2.37
 
 * Support node 12
