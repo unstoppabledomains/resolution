@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
-import Ens from './ens';
-import Zns from './zns';
+import Ens from './Ens';
+import Zns from './Zns';
 import { Blockchain } from './types';
 
 const DefaultUrl = 'https://unstoppabledomains.com/api/v1';

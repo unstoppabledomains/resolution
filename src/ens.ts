@@ -5,7 +5,7 @@ import { default as deedInterface } from './ens/contract/deed';
 import { default as resolverInterface } from './ens/contract/resolver';
 import { hash } from 'eth-ens-namehash';
 import { SourceDefinition, ResolutionResult } from './types';
-import NamingService from './namingService';
+import NamingService from './NamingService';
 const Web3 = require('web3');
 
 const NullAddress = '0x0000000000000000000000000000000000000000';
@@ -35,37 +35,6 @@ export default class Ens extends NamingService {
   private registrarContract: any;
   private web3: any;
   private registryAddress: string;
-
-  // NamingService.normalizeSourceDefinition
-  protected normalizeSourceDefinition(
-    source: string | boolean | SourceDefinition,
-  ): SourceDefinition {
-    switch (typeof source) {
-      case 'boolean': {
-        return { url: DefaultUrl, network: this.networkFromUrl(DefaultUrl) };
-      }
-      case 'string': {
-        return {
-          url: source as string,
-          network: this.networkFromUrl(source as string),
-        };
-      }
-      case 'object': {
-        source = _.clone(source) as SourceDefinition;
-        if (typeof source.network == 'number') {
-          source.network = NetworkIdMap[source.network];
-        }
-        if (source.network && !source.url) {
-          source.url = `https://${source.network}.infura.io/`;
-        }
-        if (source.url && !source.network) {
-          source.network = this.networkFromUrl(source.url);
-        }
-        source.url = source.url.endsWith('/') ? source.url : source.url + '/';
-        return source;
-      }
-    }
-  }
 
   constructor(source: string | boolean | SourceDefinition = true) {
     super();
@@ -176,6 +145,36 @@ export default class Ens extends NamingService {
   }
   /*===========================*/
 
+  protected normalizeSource(
+    source: string | boolean | SourceDefinition,
+  ): SourceDefinition {
+    switch (typeof source) {
+      case 'boolean': {
+        return { url: DefaultUrl, network: this.networkFromUrl(DefaultUrl) };
+      }
+      case 'string': {
+        return {
+          url: source as string,
+          network: this.networkFromUrl(source as string),
+        };
+      }
+      case 'object': {
+        source = _.clone(source) as SourceDefinition;
+        if (typeof source.network == 'number') {
+          source.network = NetworkIdMap[source.network];
+        }
+        if (source.network && !source.url) {
+          source.url = `https://${source.network}.infura.io/`;
+        }
+        if (source.url && !source.network) {
+          source.network = this.networkFromUrl(source.url);
+        }
+        source.url = source.url.endsWith('/') ? source.url : source.url + '/';
+        return source;
+      }
+    }
+  }
+
   private async fetchPreviousOwner(domain) {
     var labelHash = this.web3.utils.sha3(domain.split('.')[0]);
 
@@ -195,35 +194,6 @@ export default class Ens extends NamingService {
 
     const previousOwner = deedContract.methods.previousOwner().call();
     return previousOwner === NullAddress ? null : previousOwner;
-  }
-
-  private normalizeSource(
-    source: string | boolean | SourceDefinition,
-  ): SourceDefinition {
-    switch (typeof source) {
-      case 'boolean': {
-        return { url: DefaultUrl, network: this.networkFromUrl(DefaultUrl) };
-      }
-      case 'string': {
-        return {
-          url: source as string,
-          network: this.networkFromUrl(source as string),
-        };
-      }
-      case 'object': {
-        source = _.clone(source) as SourceDefinition;
-        if (typeof source.network == 'number') {
-          source.network = NetworkIdMap[source.network];
-        }
-        if (source.network && !source.url) {
-          source.url = `https://${source.network}.infura.io`;
-        }
-        if (source.url && !source.network) {
-          source.network = this.networkFromUrl(source.url);
-        }
-        return source;
-      }
-    }
   }
 
   private networkFromUrl(url: string): string {

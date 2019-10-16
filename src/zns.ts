@@ -4,7 +4,7 @@ import { toChecksumAddress, toBech32Address } from '@zilliqa-js/crypto';
 import namehash from './zns/namehash';
 import _ from 'lodash';
 import { ResolutionResult, SourceDefinition } from './types';
-import NamingService from './namingService';
+import NamingService from './NamingService';
 
 const DefaultSource = 'https://api.zilliqa.com/';
 const NullAddress = '0x0000000000000000000000000000000000000000';
@@ -32,47 +32,12 @@ const UrlNetworkMap = (url: string) => {
   return url.endsWith('/') ? invert[url] : invert[url + '/'];
 };
 
-export default class ZNS extends NamingService {
+export default class Zns extends NamingService {
   readonly network: string;
   readonly url: string;
   private registryAddress: string;
   registry: Contract;
   zilliqa: Zilliqa;
-
-  // NamingService.normalizeSourceDefinition
-  protected normalizeSourceDefinition(
-    source: string | boolean | SourceDefinition,
-  ): SourceDefinition {
-    switch (typeof source) {
-      case 'boolean': {
-        return { url: DefaultSource, network: 'mainnet' };
-      }
-      case 'string': {
-        const formatedSource = !source.endsWith('/')
-          ? source + '/'
-          : (source as string);
-
-        return {
-          url: formatedSource,
-          network: UrlNetworkMap(source),
-        };
-      }
-      case 'object': {
-        source = _.clone(source) as SourceDefinition;
-        if (typeof source.network == 'number') {
-          source.network = NetworkIdMap[source.network];
-        }
-        if (source.network && !source.url) {
-          source.url = UrlMap[source.network];
-        }
-        if (source.url && !source.network) {
-          source.url = source.url.endsWith('/') ? source.url : source.url + '/';
-          source.network = UrlNetworkMap(source.url);
-        }
-        return source;
-      }
-    }
-  }
 
   constructor(source: string | boolean | SourceDefinition = true) {
     super();
@@ -171,4 +136,38 @@ export default class ZNS extends NamingService {
   isSupportedNetwork(): boolean {
     return this.registryAddress != null;
   }
+  protected normalizeSource(
+    source: string | boolean | SourceDefinition,
+  ): SourceDefinition {
+    switch (typeof source) {
+      case 'boolean': {
+        return { url: DefaultSource, network: 'mainnet' };
+      }
+      case 'string': {
+        const formatedSource = !source.endsWith('/')
+          ? source + '/'
+          : (source as string);
+
+        return {
+          url: formatedSource,
+          network: UrlNetworkMap(source),
+        };
+      }
+      case 'object': {
+        source = _.clone(source) as SourceDefinition;
+        if (typeof source.network == 'number') {
+          source.network = NetworkIdMap[source.network];
+        }
+        if (source.network && !source.url) {
+          source.url = UrlMap[source.network];
+        }
+        if (source.url && !source.network) {
+          source.url = source.url.endsWith('/') ? source.url : source.url + '/';
+          source.network = UrlNetworkMap(source.url);
+        }
+        return source;
+      }
+    }
+  }
+
 }
