@@ -51,12 +51,12 @@ export default class Ens extends NamingService {
       }
       case 'object': {
         source = _.clone(source) as SourceDefinition;
-        if (!source.network && !source.url) {
-          source.network = 'mainnet';
-          source.url = 'https://mainnet.infura.io';
-        }
         if (typeof source.network == 'number') {
           source.network = NetworkIdMap[source.network];
+        }
+        if (source.registry) {
+          source.network = source.network ? source.network : 'mainnet';
+          source.url = source.url ? source.url : DefaultUrl;
         }
         if (source.network && !source.url) {
           source.url = `https://${source.network}.infura.io`;
@@ -179,27 +179,6 @@ export default class Ens extends NamingService {
     return address;
   }
   /*===========================*/
-
-  private async fetchPreviousOwner(domain) {
-    var labelHash = this.web3.utils.sha3(domain.split('.')[0]);
-
-    const [
-      mode,
-      deedAddress,
-      registrationDateSeconds,
-      value,
-      highestBid,
-    ] = await this.registrarContract.methods.entries(labelHash).call();
-
-    if (deedAddress === NullAddress) {
-      return null;
-    }
-
-    const deedContract = new this.web3.eth.Contract(deedInterface, deedAddress);
-
-    const previousOwner = deedContract.methods.previousOwner().call();
-    return previousOwner === NullAddress ? null : previousOwner;
-  }
 
   private networkFromUrl(url: string): string {
     return _.find(NetworkIdMap, name => url.indexOf(name) >= 0);
