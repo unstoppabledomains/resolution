@@ -8,6 +8,11 @@ const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
 const MainnetUrl = 'https://mainnet.infura.io';
 const ZilliqaUrl = 'https://api.zilliqa.com';
 
+const EnsRegexUrlPattern = new RegExp(/(https:\/\/)(\w+)(.infura.io)\/?/);
+const ZnsRegexUrlPattern = new RegExp(
+  /(https:\/\/)((dev-)?\w+)(.zilliqa.com)\/?/,
+);
+
 const mockAPICalls = (topLevel: string, testName: string, url = MainnetUrl) => {
   if (process.env.LIVE) {
     return;
@@ -80,7 +85,13 @@ describe('ZNS', () => {
   it('checks normalizeSource zns (boolean)', async () => {
     const namicorn = new Namicorn({ blockchain: { zns: true } });
     expect(namicorn.zns.network).toBe('mainnet');
-    expect(namicorn.zns.url).toBe('https://api.zilliqa.com/');
+    expect(namicorn.zns.url).toMatch(ZnsRegexUrlPattern);
+  });
+
+  it('checks normalizeSource zns (boolean - false)', async () => {
+    const namicorn = new Namicorn({ blockchain: { zns: false } });
+    new Namicorn({ blockchain: { zns: false } });
+    expect(namicorn.zns).toBeUndefined();
   });
 
   it('checks normalizeSource zns (string)', async () => {
@@ -88,13 +99,13 @@ describe('ZNS', () => {
       blockchain: { zns: 'https://api.zilliqa.com' },
     });
     expect(namicorn.zns.network).toBe('mainnet');
-    expect(namicorn.zns.url).toBe('https://api.zilliqa.com/');
+    expect(namicorn.zns.url).toMatch(ZnsRegexUrlPattern);
   });
 
   it('checks normalizeSource zns wrong string', async () => {
-    expect(() => {
-      new Namicorn({ blockchain: { zns: 'https://wrongurl.com' } });
-    }).toThrowError()
+    expect(
+      () => new Namicorn({ blockchain: { zns: 'https://wrongurl.com' } }),
+    ).toThrow();
   });
 
   it('checks normalizeSource zns (object) #1', async () => {
@@ -102,49 +113,52 @@ describe('ZNS', () => {
       blockchain: { zns: { url: 'https://api.zilliqa.com' } },
     });
     expect(namicorn.zns.network).toBe('mainnet');
-    expect(namicorn.zns.url).toBe('https://api.zilliqa.com/');
+    expect(namicorn.zns.url).toMatch(ZnsRegexUrlPattern);
   });
 
   it('checks normalizeSource zns (object) #2', async () => {
     const namicorn = new Namicorn({ blockchain: { zns: { network: 333 } } });
+    expect(namicorn.zns.url).toMatch(ZnsRegexUrlPattern);
     expect(namicorn.zns.network).toBe('testnet');
-    expect(namicorn.zns.url).toBe('https://dev-api.zilliqa.com/');
+    expect(namicorn.zns.registryAddress).toBeUndefined();
   });
 
   it('checks normalizeSource zns (object) #3', async () => {
     const namicorn = new Namicorn({
-      blockchain: { zns: { url: 'https://api.zilliqa.com/' } },
+      blockchain: { zns: { url: 'https://api.zilliqa.com' } },
     });
     expect(namicorn.zns.network).toBe('mainnet');
-    expect(namicorn.zns.url).toBe('https://api.zilliqa.com/');
+    expect(namicorn.zns.url).toMatch(ZnsRegexUrlPattern);
   });
 
   it('checks normalizeSource zns (object) #4', async () => {
     const namicorn = new Namicorn({
-      blockchain: { zns: { url: 'https://api.zilliqa.com/', network: 1 } },
+      blockchain: { zns: { url: 'https://api.zilliqa.com', network: 1 } },
     });
     expect(namicorn.zns.network).toBe('mainnet');
-    expect(namicorn.zns.url).toBe('https://api.zilliqa.com/');
+    expect(namicorn.zns.url).toMatch(ZnsRegexUrlPattern);
   });
 
   it('checks normalizeSource zns (object) #5', async () => {
     const namicorn = new Namicorn({
-      blockchain: { zns: { url: 'https://api.zilliqa.com/', network: 333 } },
+      blockchain: { zns: { url: 'https://api.zilliqa.com', network: 333 } },
     });
+
+    expect(namicorn.zns.url).toMatch(ZnsRegexUrlPattern);
     expect(namicorn.zns.network).toBe('testnet');
-    expect(namicorn.zns.url).toBe('https://api.zilliqa.com/');
+    expect(namicorn.zns.registryAddress).toBeUndefined();
   });
 
   it('checks normalizeSource zns (object) #6', async () => {
-    expect(() => {
-      new Namicorn({ blockchain: { zns: { network: 42 } } });
-    }).toThrowError()
+    expect(
+      () => new Namicorn({ blockchain: { zns: { network: 42 } } }),
+    ).toThrow();
   });
 
   it('checks normalizeSource zns (object) #7', async () => {
-    expect(() => {
-      new Namicorn({ blockchain: { zns: { network: 'invalid' } } });
-    }).toThrowError()
+    expect(
+      () => new Namicorn({ blockchain: { zns: { network: 'invalid' } } }),
+    ).toThrow();
   });
 
   it('checks normalizeSource zns (object) #8', async () => {
@@ -152,15 +166,44 @@ describe('ZNS', () => {
       blockchain: { zns: { network: 'mainnet' } },
     });
     expect(namicorn.zns.network).toBe('mainnet');
-    expect(namicorn.zns.url).toBe('https://api.zilliqa.com/');
+    expect(namicorn.zns.url).toMatch(ZnsRegexUrlPattern);
   });
 
   it('checks normalizeSource zns (object) #9', async () => {
     const namicorn = new Namicorn({
       blockchain: { zns: { network: 'testnet' } },
     });
+
     expect(namicorn.zns.network).toBe('testnet');
-    expect(namicorn.zns.url).toBe('https://dev-api.zilliqa.com/');
+    expect(namicorn.zns.url).toMatch(ZnsRegexUrlPattern);
+    expect(namicorn.zns.registryAddress).toBeUndefined();
+  });
+
+  it('checks normalizeSource zns (object) #10', async () => {
+    const namicorn = new Namicorn({
+      blockchain: {
+        zns: { registry: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz' },
+      },
+    });
+    expect(namicorn.zns.network).toBe('mainnet');
+    expect(namicorn.zns.registryAddress).toBe(
+      'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
+    );
+    expect(namicorn.zns.url).toMatch(ZnsRegexUrlPattern);
+  });
+
+  it('checks normalizeSource zns (object) #11', async () => {
+    const namicorn = new Namicorn({
+      blockchain: {
+        zns: { registry: '0xabcffff1231586348194fcabbeff1231240234fc' },
+      },
+    });
+
+    expect(namicorn.zns.network).toBe('mainnet');
+    expect(namicorn.zns.url).toMatch(ZnsRegexUrlPattern);
+    expect(namicorn.zns.registryAddress).toBe(
+      '0xabcffff1231586348194fcabbeff1231240234fc',
+    );
   });
 });
 
@@ -172,7 +215,7 @@ describe('ENS', () => {
     const namicorn = new Namicorn({
       blockchain: { ens: { network: 'mainnet' } },
     });
-    expect(namicorn.ens.url).toEqual('https://mainnet.infura.io/');
+    expect(namicorn.ens.url).toMatch(EnsRegexUrlPattern);
     expect(namicorn.ens.network).toEqual('mainnet');
   });
 
@@ -183,7 +226,7 @@ describe('ENS', () => {
     const namicorn = new Namicorn({
       blockchain: { ens: true },
     });
-    expect(namicorn.ens.url).toEqual('https://mainnet.infura.io/');
+    expect(namicorn.ens.url).toMatch(EnsRegexUrlPattern);
     expect(namicorn.ens.network).toEqual('mainnet');
     var result = await namicorn.address('matthewgould.eth', 'ETH');
     expect(result).toEqual('0x714ef33943d925731FBB89C99aF5780D888bD106');
@@ -314,13 +357,14 @@ describe('ENS', () => {
   it('checks normalizeSource ens (boolean)', async () => {
     const namicorn = new Namicorn({ blockchain: { ens: true } });
     expect(namicorn.ens.network).toBe('mainnet');
-    expect(namicorn.ens.url).toBe('https://mainnet.infura.io/');
+    expect(namicorn.ens.url).toMatch(EnsRegexUrlPattern);
   });
 
   it('checks normalizeSource ens (boolean - false)', async () => {
-    const namicorn = new Namicorn({ blockchain: { ens: false } });
-    expect(namicorn.isSupportedDomain('hello.eth')).toBeFalsy()
-    expect(namicorn.ens).toBeUndefined()
+    const ens = new Ens({ network: 5 });
+    expect(ens.network).toBe('goerli');
+    expect(ens.url).toBe('https://goerli.infura.io');
+    expect(ens.isSupportedNetwork()).toBeFalsy();
   });
 
   it('checks normalizeSource ens (object) #1', async () => {
@@ -328,41 +372,45 @@ describe('ENS', () => {
       blockchain: { ens: { url: 'https://mainnet.infura.io' } },
     });
     expect(namicorn.ens.network).toBe('mainnet');
-    expect(namicorn.ens.url).toBe('https://mainnet.infura.io/');
+    expect(namicorn.ens.url).toMatch(EnsRegexUrlPattern);
   });
 
   it('checks normalizeSource ens (object) #2', async () => {
     const namicorn = new Namicorn({ blockchain: { ens: { network: 3 } } });
     expect(namicorn.ens.network).toBe('ropsten');
-    expect(namicorn.ens.url).toBe('https://ropsten.infura.io/');
+    expect(namicorn.ens.url).toMatch(EnsRegexUrlPattern);
   });
 
   it('checks normalizeSource ens (object) #3', async () => {
     const namicorn = new Namicorn({
-      blockchain: { ens: { url: 'https://rinkeby.infura.io/' } },
+      blockchain: { ens: { url: 'https://rinkeby.infura.io' } },
     });
     expect(namicorn.ens.network).toBe('rinkeby');
-    expect(namicorn.ens.url).toBe('https://rinkeby.infura.io/');
+    expect(namicorn.ens.url).toMatch(EnsRegexUrlPattern);
   });
 
   it('checks normalizeSource ens (object) #4', async () => {
     const namicorn = new Namicorn({
-      blockchain: { ens: { url: 'https://goerli.infura.io/', network: 5 } },
+      blockchain: { ens: { url: 'https://goerli.infura.io', network: 5 } },
     });
     expect(namicorn.ens.network).toBe('goerli');
-    expect(namicorn.ens.url).toBe('https://goerli.infura.io/');
+    expect(namicorn.ens.url).toMatch(EnsRegexUrlPattern);
   });
 
   it('checks normalizeSource ens (object) #6', async () => {
-    expect(() => {
+    try {
       new Namicorn({ blockchain: { ens: { network: 7543 } } });
-    }).toThrowError()
+    } catch (err) {
+      expect(err).toBeDefined();
+    }
   });
 
   it('checks normalizeSource ens (object) #7', async () => {
-    expect(() => {
+    try {
       new Namicorn({ blockchain: { ens: { network: 'invalid' } } });
-    }).toThrowError()
+    } catch (err) {
+      expect(err).toBeDefined();
+    }
   });
 
   it('checks normalizeSource ens (object) #8', async () => {
@@ -370,7 +418,7 @@ describe('ENS', () => {
       blockchain: { ens: { network: 'mainnet' } },
     });
     expect(namicorn.ens.network).toBe('mainnet');
-    expect(namicorn.ens.url).toBe('https://mainnet.infura.io/');
+    expect(namicorn.ens.url).toMatch(EnsRegexUrlPattern);
   });
 
   it('checks normalizeSource ens (object) #9', async () => {
@@ -378,7 +426,50 @@ describe('ENS', () => {
       blockchain: { ens: { network: 'kovan' } },
     });
     expect(namicorn.ens.network).toBe('kovan');
-    expect(namicorn.ens.url).toBe('https://kovan.infura.io/');
+    expect(namicorn.ens.url).toMatch(EnsRegexUrlPattern);
+  });
+
+  it('checks normalizeSource ens (object) #10', async () => {
+    const namicorn = new Namicorn({
+      blockchain: {
+        ens: { registry: '0x314159265dd8dbb310642f98f50c066173c1259b' },
+      },
+    });
+    expect(namicorn.ens.network).toBe('mainnet');
+    expect(namicorn.ens.url).toMatch(EnsRegexUrlPattern);
+    expect(namicorn.ens.registryAddress).toBe(
+      '0x314159265dd8dbb310642f98f50c066173c1259b',
+    );
+  });
+
+  it('checks normalizeSource ens (object) #11', async () => {
+    const namicorn = new Namicorn({
+      blockchain: {
+        ens: {
+          network: 'ropsten',
+          registry: '0x112234455c3a32fd11230c42e7bccd4a84e02010',
+        },
+      },
+    });
+    expect(namicorn.ens.network).toBe('ropsten');
+    expect(namicorn.ens.url).toMatch(EnsRegexUrlPattern);
+    expect(namicorn.ens.registryAddress).toBe(
+      '0x112234455c3a32fd11230c42e7bccd4a84e02010',
+    );
+  });
+
+  it('checks normalizeSource ens (object) #12', async () => {
+    const namicorn = new Namicorn({
+      blockchain: {
+        ens: { registry: '0xabcffff1231586348194fcabbeff1231240234fc' },
+      },
+    });
+
+    expect(namicorn.ens.network).toBe('mainnet');
+    expect(namicorn.ens.url).toMatch(EnsRegexUrlPattern);
+    expect(namicorn.ens.registryAddress).toBe(
+      '0xabcffff1231586348194fcabbeff1231240234fc',
+    );
   });
 });
 

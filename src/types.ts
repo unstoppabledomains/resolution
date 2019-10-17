@@ -7,6 +7,7 @@ export type ResolutionResult = {
 export interface SourceDefinition {
   url?: string;
   network?: string | number;
+  registry?: string;
 }
 
 export type NetworkIdMap = {
