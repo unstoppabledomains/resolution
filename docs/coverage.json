@@ -1,0 +1,21 @@
+{
+  "coverage": "0%",
+  "expectCount": 2,
+  "actualCount": 0,
+  "files": {
+    "src/ens/web3.ts": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        3
+      ]
+    },
+    "src/zns/namehash.ts": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        3
+      ]
+    }
+  }
+}
