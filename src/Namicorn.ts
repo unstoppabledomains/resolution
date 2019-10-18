@@ -6,7 +6,7 @@ import { Blockchain } from './types';
 const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
 
 // Node env has special properties stored in process which are not inside the browser env.
-// Multiple checks is to avoid hitting the undefined while going deeper.
+// Multiple checks is to avoid hitting the undefined while going deeper. 
 const isNode = () => {
   if (typeof process === 'object') {
     if (typeof process.versions === 'object') {
