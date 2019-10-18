@@ -15,7 +15,8 @@ jobs:
       # - image: circleci/mongo:3.4.4
 
     steps:
-      - checkout
+      - checkout:
+          name: Checking out the code
       # Download and cache dependencies
       - restore_cache:
           name: Restore Yarn Package Cache
