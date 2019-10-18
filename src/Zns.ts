@@ -54,8 +54,10 @@ export default class Zns extends NamingService {
     this.registryAddress = source.registry
       ? source.registry
       : RegistryMap[this.network];
-    if (this.registryAddress)
+    if (this.registryAddress) {
+      this.registryAddress = this.registryAddress.startsWith('0x') ? toBech32Address(this.registryAddress) : this.registryAddress; 
       this.registry = this.zilliqa.contracts.at(this.registryAddress);
+    }
   }
 
   async getContractField(

@@ -197,7 +197,7 @@ describe('ZNS', () => {
     expect(namicorn.zns.network).toBe('mainnet');
     expect(namicorn.zns.url).toBe('https://api.zilliqa.com');
     expect(namicorn.zns.registryAddress).toBe(
-      '0xabcffff1231586348194fcabbeff1231240234fc',
+      'zil1408llufrzkrrfqv5lj4malcjxyjqyd8urd7xz6',
     );
   });
 });
