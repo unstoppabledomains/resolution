@@ -35,9 +35,9 @@ const UrlNetworkMap = (url: string) => {
 export default class Zns extends NamingService {
   readonly network: string;
   readonly url: string;
-  readonly registryAddress: string;
-  registry: Contract;
-  zilliqa: Zilliqa;
+  readonly registryAddress?: string;
+  private registry?: Contract;
+  private zilliqa: Zilliqa;
 
   constructor(source: string | boolean | SourceDefinition = true) {
     super();
@@ -135,6 +135,7 @@ export default class Zns extends NamingService {
   isSupportedNetwork(): boolean {
     return this.registryAddress != null;
   }
+  
   protected normalizeSource(
     source: string | boolean | SourceDefinition,
   ): SourceDefinition {

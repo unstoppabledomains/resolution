@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import { default as ensInterface } from './ens/contract/ens';
 import { default as registrarInterface } from './ens/contract/registrar';
-import { default as deedInterface } from './ens/contract/deed';
 import { default as resolverInterface } from './ens/contract/resolver';
 import { hash } from 'eth-ens-namehash';
 import { SourceDefinition, ResolutionResult } from './types';
@@ -31,43 +30,10 @@ const RegistryMap = {
 export default class Ens extends NamingService {
   readonly network: string;
   readonly url: string;
-  readonly registryAddress: string;
+  readonly registryAddress?: string;
   private ensContract: any;
   private registrarContract: any;
   private web3: any;
-
-  protected normalizeSource(
-    source: string | boolean | SourceDefinition,
-  ): SourceDefinition {
-    switch (typeof source) {
-      case 'boolean': {
-        return { url: DefaultUrl, network: this.networkFromUrl(DefaultUrl) };
-      }
-      case 'string': {
-        return {
-          url: source as string,
-          network: this.networkFromUrl(source as string),
-        };
-      }
-      case 'object': {
-        source = _.clone(source) as SourceDefinition;
-        if (typeof source.network == 'number') {
-          source.network = NetworkIdMap[source.network];
-        }
-        if (source.registry) {
-          source.network = source.network ? source.network : 'mainnet';
-          source.url = source.url ? source.url : DefaultUrl;
-        }
-        if (source.network && !source.url) {
-          source.url = `https://${source.network}.infura.io`;
-        }
-        if (source.url && !source.network) {
-          source.network = this.networkFromUrl(source.url);
-        }
-        return source;
-      }
-    }
-  }
 
   constructor(source: string | boolean | SourceDefinition = true) {
     super();
@@ -179,6 +145,42 @@ export default class Ens extends NamingService {
     return address;
   }
   /*===========================*/
+
+  protected normalizeSource(
+    source: string | boolean | SourceDefinition,
+  ): SourceDefinition {
+    switch (typeof source) {
+      case 'boolean': {
+        return { url: DefaultUrl, network: this.networkFromUrl(DefaultUrl) };
+      }
+      case 'string': {
+        return {
+          url: source as string,
+          network: this.networkFromUrl(source as string),
+        };
+      }
+      case 'object': {
+        source = _.clone(source) as SourceDefinition;
+        if (typeof source.network == 'number') {
+          source.network = NetworkIdMap[source.network];
+        }
+        if (source.registry) {
+          source.network = source.network ? source.network : 'mainnet';
+          source.url = source.url ? source.url : `https://${source.network}.infura.io`;
+        }
+        if (source.network && !source.url) {
+          if (NetworkNameMap.hasOwnProperty(source.network))
+            source.url = `https://${source.network}.infura.io`;
+          else
+            throw new Error('Invalid network or unspecified url');
+        }
+        if (source.url && !source.network) {
+          source.network = this.networkFromUrl(source.url);
+        }
+        return source;
+      }
+    }
+  }
 
   private networkFromUrl(url: string): string {
     return _.find(NetworkIdMap, name => url.indexOf(name) >= 0);
