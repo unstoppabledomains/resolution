@@ -1,6 +1,7 @@
 ## Unreleased
 
 * Zns network and url options support
+* Ens and Zns support custom contracts registryAddress
 
 ## 0.2.38
 

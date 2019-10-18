@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import { default as ensInterface } from './ens/contract/ens';
 import { default as registrarInterface } from './ens/contract/registrar';
-import { default as deedInterface } from './ens/contract/deed';
 import { default as resolverInterface } from './ens/contract/resolver';
 import { hash } from 'eth-ens-namehash';
 import { SourceDefinition, ResolutionResult } from './types';
@@ -9,7 +8,7 @@ import NamingService from './NamingService';
 const Web3 = require('web3');
 
 const NullAddress = '0x0000000000000000000000000000000000000000';
-const DefaultUrl = 'https://mainnet.infura.io/';
+const DefaultUrl = 'https://mainnet.infura.io';
 
 const NetworkIdMap = {
   1: 'mainnet',
@@ -31,10 +30,10 @@ const RegistryMap = {
 export default class Ens extends NamingService {
   readonly network: string;
   readonly url: string;
+  readonly registryAddress?: string;
   private ensContract: any;
   private registrarContract: any;
   private web3: any;
-  private registryAddress: string;
 
   constructor(source: string | boolean | SourceDefinition = true) {
     super();
@@ -48,7 +47,9 @@ export default class Ens extends NamingService {
     if (!this.url) {
       throw new Error('Unspecified url in Namicorn ENS configuration');
     }
-    this.registryAddress = RegistryMap[this.network];
+    this.registryAddress = source.registry
+      ? source.registry
+      : RegistryMap[this.network];
     if (this.registryAddress) {
       this.ensContract = new this.web3.eth.Contract(
         ensInterface,
@@ -163,37 +164,23 @@ export default class Ens extends NamingService {
         if (typeof source.network == 'number') {
           source.network = NetworkIdMap[source.network];
         }
-        if (NetworkNameMap[source.network] && !source.url) {
-          source.url = `https://${source.network}.infura.io/`;
+        if (source.registry) {
+          source.network = source.network ? source.network : 'mainnet';
+          source.url = source.url
+            ? source.url
+            : `https://${source.network}.infura.io`;
+        }
+        if (source.network && !source.url) {
+          if (NetworkNameMap.hasOwnProperty(source.network))
+            source.url = `https://${source.network}.infura.io`;
+          else throw new Error('Invalid network or unspecified url');
         }
         if (source.url && !source.network) {
           source.network = this.networkFromUrl(source.url);
         }
-        source.url = source.url.endsWith('/') ? source.url : source.url + '/';
         return source;
       }
     }
-  }
-
-  private async fetchPreviousOwner(domain) {
-    var labelHash = this.web3.utils.sha3(domain.split('.')[0]);
-
-    const [
-      mode,
-      deedAddress,
-      registrationDateSeconds,
-      value,
-      highestBid,
-    ] = await this.registrarContract.methods.entries(labelHash).call();
-
-    if (deedAddress === NullAddress) {
-      return null;
-    }
-
-    const deedContract = new this.web3.eth.Contract(deedInterface, deedAddress);
-
-    const previousOwner = deedContract.methods.previousOwner().call();
-    return previousOwner === NullAddress ? null : previousOwner;
   }
 
   private networkFromUrl(url: string): string {
