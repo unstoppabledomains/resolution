@@ -169,7 +169,6 @@ export default class Ens extends NamingService {
         if (source.url && !source.network) {
           source.network = this.networkFromUrl(source.url);
         }
-        source.url = source.url.endsWith('/') ? source.url : source.url + '/';
         return source;
       }
     }
