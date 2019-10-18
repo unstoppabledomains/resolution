@@ -2,12 +2,21 @@
 #
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
 #
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build-node10
+      - build-node11
+      - build-node12
+      
 version: 2
 jobs:
-  build:
+  build-node10: &common-build
     docker:
       # specify the version you desire here
-      - image: circleci/node:10.16
+      - image: circleci/node:10
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -15,6 +24,10 @@ jobs:
       # - image: circleci/mongo:3.4.4
 
     steps:
+      - run:
+          name: 'Node version 10'
+          command: node --version
+      
       - checkout:
           name: Checking out the code
       # Download and cache dependencies
@@ -35,3 +48,22 @@ jobs:
 
       # run tests!
       - run: yarn test
+    
+  build-node11: 
+    <<: *common-build
+    docker:
+      - image: circleci/node:11
+    steps:
+      - run:
+          name: 'Node version 11'
+          command: node --version
+
+  build-node12:
+    <<: *common-build
+    docker:
+      - image: circleci/node:12
+    steps:
+      - run:
+          name: 'Node version 12'
+          command: node --version
+
