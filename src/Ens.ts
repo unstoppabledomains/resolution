@@ -166,13 +166,14 @@ export default class Ens extends NamingService {
         }
         if (source.registry) {
           source.network = source.network ? source.network : 'mainnet';
-          source.url = source.url ? source.url : `https://${source.network}.infura.io`;
+          source.url = source.url
+            ? source.url
+            : `https://${source.network}.infura.io`;
         }
         if (source.network && !source.url) {
           if (NetworkNameMap.hasOwnProperty(source.network))
             source.url = `https://${source.network}.infura.io`;
-          else
-            throw new Error('Invalid network or unspecified url');
+          else throw new Error('Invalid network or unspecified url');
         }
         if (source.url && !source.network) {
           source.network = this.networkFromUrl(source.url);

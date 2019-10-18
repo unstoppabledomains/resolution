@@ -135,7 +135,7 @@ export default class Zns extends NamingService {
   isSupportedNetwork(): boolean {
     return this.registryAddress != null;
   }
-  
+
   protected normalizeSource(
     source: string | boolean | SourceDefinition,
   ): SourceDefinition {
