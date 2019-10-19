@@ -68,7 +68,7 @@ export default class Zns extends NamingService {
     keys: string[] = [],
   ): Promise<any> {
     let result =
-      (await contract.getSubState(field, keys.map(k => JSON.stringify(k)))) ||
+      (await contract.getSubState(field, keys)) ||
       {};
     return result[field];
   }

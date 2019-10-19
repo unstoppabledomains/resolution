@@ -50,7 +50,7 @@ describe('ZNS', () => {
 
   it('resolves .zil name using blockchain', async () => {
     const testName = 'resolves .zil name using blockchain';
-    mockAPICalls('ZIL', testName, ZilliqaUrl);
+    // mockAPICalls('ZIL', testName, ZilliqaUrl);
     const namicorn = new Namicorn({ blockchain: { zns: ZilliqaUrl } });
     const result = await namicorn.resolve('cofounding.zil');
     expect(result).toBeDefined();
@@ -70,6 +70,19 @@ describe('ZNS', () => {
     expect(result.addresses).toEqual({});
     expect(result.meta.owner).toEqual(null);
   });
+
+  it('resolves domain using blockchain #2', async () => {
+    const namicorn = new Namicorn({ blockchain: true });
+    const result = await namicorn.resolve('test-manage-one.zil');
+    expect(result.addresses).toEqual({ BURST: 'BURST-R7KK-SBSY-FENX-AWYMW' });
+    expect(result.meta).toEqual(
+      {
+        owner: 'zil1zzpjwyp2nu29pcv3sh04qxq9x5l45vke0hrwec',
+        type: 'zns',
+        ttl: 0
+      }
+    );
+  })
 
   it("doesn't support zil domain when zns is disabled", () => {
     const namicorn = new Namicorn({ blockchain: { zns: false } });
