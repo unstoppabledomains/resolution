@@ -40,23 +40,64 @@ jobs:
       # run tests!
       - run: yarn test
     
-  build-node11: 
-    <<: *common-build
+  build-node11:
     docker:
       - image: circleci/node:11
     steps:
       - run:
           name: 'Node version 11'
           command: node --version
+      
+      - checkout:
+          name: Checking out the code
+      # Download and cache dependencies
+      - restore_cache:
+          name: Restore Yarn Package Cache
+          keys:
+            - yarn-packages-{{ checksum "yarn.lock" }}
+
+      - run:
+          name: Install Dependencies
+          command: yarn install --frozen-lockfile
+
+      - save_cache:
+          name: Save Yarn Package Cache
+          key: yarn-packages-{{ checksum "yarn.lock" }}
+          paths:
+            - ~/.cache/yarn
+
+      # run tests!
+      - run: yarn test
+    
 
   build-node12:
-    <<: *common-build
     docker:
       - image: circleci/node:12
     steps:
       - run:
           name: 'Node version 12'
           command: node --version
+      - checkout:
+          name: Checking out the code
+      # Download and cache dependencies
+      - restore_cache:
+          name: Restore Yarn Package Cache
+          keys:
+            - yarn-packages-{{ checksum "yarn.lock" }}
+
+      - run:
+          name: Install Dependencies
+          command: yarn install --frozen-lockfile
+
+      - save_cache:
+          name: Save Yarn Package Cache
+          key: yarn-packages-{{ checksum "yarn.lock" }}
+          paths:
+            - ~/.cache/yarn
+
+      # run tests!
+      - run: yarn test
+    
 
 workflows:
   version: 2
