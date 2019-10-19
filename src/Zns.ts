@@ -72,7 +72,7 @@ export default class Zns extends NamingService {
       {};
     return result[field];
   }
-
+  
   async getContractMapValue(
     contract: Contract,
     field: string,
