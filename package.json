@@ -12,7 +12,8 @@
 		"start": "npm run build:live",
 		"build": "tsc -p .",
 		"format": "prettier --semi --write -l **/*.{js,json,ts}",
-		"build:live": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts"
+		"build:live": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
+		"docs": "yarn run typedoc"
 	},
 	"files": [
 		"lib"
