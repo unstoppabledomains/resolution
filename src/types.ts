@@ -8,6 +8,7 @@
 export interface SourceDefinition {
   url?: string;
   network?: string | number;
+  registry?: string;
 }
 
 /**
