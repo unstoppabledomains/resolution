@@ -4,7 +4,7 @@ import { default as registrarInterface } from './ens/contract/registrar';
 import { default as deedInterface } from './ens/contract/deed';
 import { default as resolverInterface } from './ens/contract/resolver';
 import { hash } from 'eth-ens-namehash';
-import { SourceDefinition, ResolutionResult } from './types';
+import { SourceDefinition, NamicornResolution } from './types';
 import NamingService from './NamingService';
 const Web3 = require('web3');
 
@@ -27,7 +27,9 @@ const RegistryMap = {
   mainnet: '0x314159265dd8dbb310642f98f50c066173c1259b',
   ropsten: '0x112234455c3a32fd11230c42e7bccd4a84e02010',
 };
-
+/**
+ * Class to support connection with Etherium naming service
+ */
 export default class Ens extends NamingService {
   readonly network: string;
   readonly url: string;
@@ -35,6 +37,14 @@ export default class Ens extends NamingService {
   private registrarContract: any;
   private web3: any;
   private registryAddress: string;
+
+
+  /**
+   * Source object describing the network naming service operates on
+   * @param {string | boolean | SourceDefinition} source 
+   * @throws Unspecified network
+   * @throws Unspecified url
+   */
 
   constructor(source: string | boolean | SourceDefinition = true) {
     super();
@@ -93,7 +103,7 @@ export default class Ens extends NamingService {
     return await this._resolverCallToName(resolverContract, nodeHash);
   }
 
-  async resolve(domain: string): Promise<ResolutionResult | null> {
+  async resolve(domain: string): Promise<NamicornResolution | null> {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork()) {
       return null;
     }
@@ -107,7 +117,7 @@ export default class Ens extends NamingService {
       },
       meta: {
         owner,
-        type: 'ens',
+        type: 'ens' ,
         ttl: Number(ttl),
       },
     };

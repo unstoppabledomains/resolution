@@ -1,55 +1,46 @@
-import fetch from 'node-fetch';
 import Ens from './Ens';
 import Zns from './Zns';
-import { Blockchain } from './types';
+import { Blockchain, NamicornResolution } from './types';
 
 const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
 
-// Node env has special properties stored in process which are not inside the browser env.
-// Multiple checks is to avoid hitting the undefined while going deeper.
-const isNode = () => {
-  if (typeof process === 'object') {
-    if (typeof process.versions === 'object') {
-      if (typeof process.versions.node !== 'undefined') {
-        return true;
-      }
-    }
-  }
-  return false;
-};
-
 /**
- * Blockchain domain resolution library Namicorn.
+ * Blockchain domain resolution library - Namicorn.
  *
  * @example 
+ * ```
  * let namicorn = new Namicorn({blockchain: {ens: {url: 'https://mainnet.infura.io', network: 'mainnet'}}});
  * let domain = brad.zil
  * let resolution = namicorn.address(domain);
+ * ```
  */
 class Namicorn {
-  static readonly UNCLAIMED_DOMAIN_RESPONSE = {
+  static readonly UNCLAIMED_DOMAIN_RESPONSE: NamicornResolution = {
     addresses: {},
     meta: {
       owner: null, //available domain
+      type: '',
       ttl: 0,
     },
   };
 
-  readonly api: string;
+  readonly blockchain: Blockchain | boolean;
+/**
+ * @ignore
+ */
   readonly ens?: Ens;
+/**
+ * @ignore
+ */
   readonly zns?: Zns;
-  readonly blockchain: boolean;
 
 /**
  * Namicorn constructor
- * @param blockchain - main configuration object
- * @param api - main blockchain url
+ * @property {Blockchain} blockchain - main configuration object
  */
   constructor({
     blockchain = true,
-    api = DefaultUrl,
-  }: { api?: string; blockchain?: Blockchain } = {}) {
-    this.api = api.toString();
+  }: { blockchain?: Blockchain } = {}) {
     this.blockchain = !!blockchain;
     if (blockchain) {
       if (blockchain == true) {
@@ -71,22 +62,13 @@ class Namicorn {
   }
 
 /**
- * Resolves given domain
+ * Resolves the given domain
  * @async
  * @param {string} domain - domain name to be resolved 
- * @return {Promise<Object>} NamicornResolution
- *   @property {NamicornResolution.addresses} addresses - resolution addresses for various currency addresses attached to the domain
- *   @property {NamicornResolution.meta} meta - meta information about the owner of the domain
+ * @returns {Promise<NamicornResolution>} - Returns a promise that resolves in an object 
  */
-  async resolve(domain: string) {
-    if (this.blockchain) {
+  async resolve(domain: string): Promise<NamicornResolution> {
       return await this.resolveUsingBlockchain(domain);
-    } else {
-      const response = isNode()
-        ? await fetch(`${this.api}/${domain}`)
-        : await window.fetch(`${this.api}/${domain}`);
-      return response.json();
-    }
   }
 
 /**
@@ -94,7 +76,7 @@ class Namicorn {
  * @async
  * @param {string} domain - domain name to be resolved
  * @param {string} currencyTicker - currency ticker like BTC, ETH, ZIL
- * @return {Promise<string>} address for specified currencyTicker or null
+ * @returns {Promise<string>} - A promise that resolves in an address or null
  */
   async address(domain: string, currencyTicker: string): Promise<string> {
     const data = await this.resolve(domain);
@@ -105,8 +87,8 @@ class Namicorn {
  * This method is only for ens at the moment. Reverse the ens address to a ens registered domain name
  * @async
  * @param {string} address - address you wish to reverse
- * @param {string} currencyTicker 
- * @return {Promise<string>} - domain name attached to this address
+ * @param {string} currencyTicker - currency ticker like BTC, ETH, ZIL 
+ * @returns {Promise<string>} - domain name attached to this address
  */
   async reverse(address: string, currencyTicker: string): Promise<string> {
     return await this.ens.reverse(address, currencyTicker);
@@ -115,7 +97,7 @@ class Namicorn {
 /**
  * Checks if the domain is in valid format
  * @param {string} domain - domain name to be checked
- * @return {boolean} 
+ * @returns {boolean} 
  */
   isSupportedDomain(domain: string): boolean {
     return (
@@ -127,7 +109,7 @@ class Namicorn {
 /**
  * Checks if the domain is supported by the specified network as well as if it is in valid format
  * @param {string} domain - domain name to be checked
- * @return {boolean} 
+ * @returns {boolean} 
  */
   isSupportedDomainInNetwork(domain: string): boolean {
     const methods = [this.ens, this.zns];
@@ -144,7 +126,7 @@ class Namicorn {
  * @param {string} domain - domain name to be resolved
  * @return {Promise<NamicornResolution>}
  */
-  private async resolveUsingBlockchain(domain: string) {
+  private async resolveUsingBlockchain(domain: string): Promise<NamicornResolution>{
     const methods = [this.ens, this.zns];
     const method = methods.find(
       method => method && method.isSupportedDomain(domain),

@@ -1,9 +1,3 @@
-export type ResolutionResult = {
-  crypto?: { [key: string]: { address: string } };
-  ttl?: string;
-  [key: string]: any;
-};
-
 /**
  * SourceDefinition object
  * @typedef {Object} SourceDefinition
@@ -28,20 +22,14 @@ export type NamicornResolution = {
       [key: string]: string
     },
     meta: {
-      owner: string, //available domain
+      owner: string,
+      type: string //available domain
       ttl: number,
     },
   }
 
 export type NetworkIdMap = {
   [key: number]: string;
-};
-
-export type DefaultSource = {
-  url: string;
-  networkIdMap: NetworkIdMap;
-  registryMap: NetworkIdMap;
-  defaultNetwork: string;
 };
 
 export type Blockchain =

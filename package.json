@@ -12,8 +12,7 @@
 		"start": "npm run build:live",
 		"build": "tsc -p .",
 		"format": "prettier --semi --write -l **/*.{js,json,ts}",
-		"build:live": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
-		"docs": "./node_modules/.bin/esdoc -c .esdoc.json"
+		"build:live": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts"
 	},
 	"files": [
 		"lib"
@@ -36,10 +35,12 @@
 		"@types/web3": "^1.0.20",
 		"esdoc": "^1.1.0",
 		"esdoc-standard-plugin": "^1.0.0",
+		"esdoc-typescript-plugin": "^1.0.1",
 		"jest": "^24.9.0",
 		"nock": "^10.0.6",
 		"prettier": "^1.17.0",
 		"ts-jest": "^24.0.2",
+		"typedoc": "^0.15.0",
 		"typescript": "^3.6.3"
 	},
 	"prettier": {

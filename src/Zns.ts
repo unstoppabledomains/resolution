@@ -3,7 +3,7 @@ import { Contract } from '@zilliqa-js/contract';
 import { toChecksumAddress, toBech32Address } from '@zilliqa-js/crypto';
 import namehash from './zns/namehash';
 import _ from 'lodash';
-import { ResolutionResult, SourceDefinition } from './types';
+import { NamicornResolution, SourceDefinition } from './types';
 import NamingService from './NamingService';
 
 const DefaultSource = 'https://api.zilliqa.com/';
@@ -78,9 +78,9 @@ export default class Zns extends NamingService {
 
   async getResolverRecordsStructure(
     resolverAddress: string,
-  ): Promise<ResolutionResult> {
+  ): Promise<any>  {
     if (resolverAddress == NullAddress) {
-      return {};
+      return {} as NamicornResolution;
     }
     const resolver = this.zilliqa.contracts.at(
       toChecksumAddress(resolverAddress),
@@ -93,10 +93,10 @@ export default class Zns extends NamingService {
       resolverRecords,
       (result, value, key) => _.set(result, key, value),
       {},
-    );
+    ) as NamicornResolution;
   }
 
-  async resolve(domain: string): Promise<ResolutionResult | null> {
+  async resolve(domain: string): Promise<NamicornResolution | null> {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork())
       return null;
 
