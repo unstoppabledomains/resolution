@@ -26,11 +26,6 @@ const isNode = () => {
  * let domain = brad.zil
  * let resolution = namicorn.address(domain);
  */
-
-/**
- * Generate documentation.
- * @param {SourceDefinition} source - blockchain source configuration
- */
 class Namicorn {
   static readonly UNCLAIMED_DOMAIN_RESPONSE = {
     addresses: {},
@@ -45,7 +40,11 @@ class Namicorn {
   readonly zns?: Zns;
   readonly blockchain: boolean;
 
-
+/**
+ * Namicorn constructor
+ * @param blockchain - main configuration object
+ * @param api - main blockchain url
+ */
   constructor({
     blockchain = true,
     api = DefaultUrl,
@@ -72,10 +71,12 @@ class Namicorn {
   }
 
 /**
+ * Resolves given domain
+ * @async
  * @param {string} domain - domain name to be resolved 
- * @return {Object} NamicornResolution
- *  @property {Object} addresses - resolution addresses for various currency addresses attached to the domain
- * @property {Object} meta - meta information about the owner of the domain 
+ * @return {Promise<Object>} NamicornResolution
+ *   @property {NamicornResolution.addresses} addresses - resolution addresses for various currency addresses attached to the domain
+ *   @property {NamicornResolution.meta} meta - meta information about the owner of the domain
  */
   async resolve(domain: string) {
     if (this.blockchain) {
@@ -89,24 +90,25 @@ class Namicorn {
   }
 
 /**
+ * Resolves give domain name to a specific currency address if exists
  * @async
  * @param {string} domain - domain name to be resolved
  * @param {string} currencyTicker - currency ticker like BTC, ETH, ZIL
- * @return {string} address for specified currencyTicker or null
+ * @return {Promise<string>} address for specified currencyTicker or null
  */
-  async address(domain: string, currencyTicker: string) {
+  async address(domain: string, currencyTicker: string): Promise<string> {
     const data = await this.resolve(domain);
     return (data && data.addresses[currencyTicker.toUpperCase()]) || null;
   }
 
 /**
- * This method is only for ens at the moment
+ * This method is only for ens at the moment. Reverse the ens address to a ens registered domain name
  * @async
  * @param {string} address - address you wish to reverse
- * @param currencyTicker 
- * @return {string} - domain name attached to this address
+ * @param {string} currencyTicker 
+ * @return {Promise<string>} - domain name attached to this address
  */
-  async reverse(address: string, currencyTicker: string) {
+  async reverse(address: string, currencyTicker: string): Promise<string> {
     return await this.ens.reverse(address, currencyTicker);
   }
 
