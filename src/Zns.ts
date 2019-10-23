@@ -32,6 +32,9 @@ const UrlNetworkMap = (url: string) => {
   return invert[url];
 };
 
+/**
+ * Class to support connection with Zilliqa naming service
+*/
 export default class Zns extends NamingService {
   readonly network: string;
   readonly url: string;
@@ -39,6 +42,13 @@ export default class Zns extends NamingService {
   private registry?: Contract;
   private zilliqa: Zilliqa;
 
+
+/**
+ * Source object describing the network naming service operates on
+ * @param {string | boolean | SourceDefinition} source 
+ * @throws Unspecified network
+ * @throws Unspecified url
+*/
   constructor(source: string | boolean | SourceDefinition = true) {
     super();
     source = this.normalizeSource(source);
@@ -62,6 +72,12 @@ export default class Zns extends NamingService {
     }
   }
 
+/**
+ * Gets a contract field
+ * @param {Contract} contract - contract
+ * @param {string} field - field name
+ * @param {string[]} keys - used to get deeper levels of a field
+*/
   async getContractField(
     contract: Contract,
     field: string,
@@ -72,7 +88,12 @@ export default class Zns extends NamingService {
       {};
     return result[field];
   }
-  
+/**
+ * Wrapper around getContractField
+ * @param {Contract} contract - contract
+ * @param {string} field - field name
+ * @param {string} key - used to get deeper level of a field
+ */
   async getContractMapValue(
     contract: Contract,
     field: string,
@@ -102,6 +123,12 @@ export default class Zns extends NamingService {
     ) as NamicornResolution;
   }
 
+/**
+ * Resolves the given domain
+ * @async
+ * @param {string} domain - domain name to be resolved 
+ * @returns {Promise<NamicornResolution | null>} - Returns a promise that resolves in an object 
+*/
   async resolve(domain: string): Promise<NamicornResolution | null> {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork())
       return null;
@@ -132,14 +159,28 @@ export default class Zns extends NamingService {
     };
   }
 
+/**
+ * Checks if the domain is in valid format
+ * @param {string} domain - domain name to be checked
+ * @returns {boolean} 
+*/
   isSupportedDomain(domain: string): boolean {
     return domain.indexOf('.') > 0 && /^.{1,}\.(zil)$/.test(domain);
   }
 
+/**
+ * Checks if the current network is supported
+ * @return {boolean}
+*/ 
   isSupportedNetwork(): boolean {
     return this.registryAddress != null;
   }
 
+/**
+ * Normalizes the source object based on type
+ * @param { string | boolean | SourceDefinition } source 
+ * @returns {SourceDefinition}
+*/
   protected normalizeSource(
     source: string | boolean | SourceDefinition,
   ): SourceDefinition {
