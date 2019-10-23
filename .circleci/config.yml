@@ -4,7 +4,7 @@
 #      
 version: 2
 jobs:
-  build-node10: &common-build
+  build-node10:
     docker:
       # specify the version you desire here
       - image: circleci/node:10
@@ -72,7 +72,7 @@ jobs:
 
   build-node12:
     docker:
-      - image: circleci/node:12
+      - image: circleci/node:12.12.0
     steps:
       - run:
           name: 'Node version 12'
