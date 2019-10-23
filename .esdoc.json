@@ -1,8 +1,0 @@
-{
-  "source": "./src",
-  "destination": "./docs",
-  "includes": ["\\.ts$"],
-  "plugins": [
-    {"name": "esdoc-standard-plugin"}
-  ]
-}
