@@ -62,46 +62,6 @@ export default class Zns extends NamingService {
     }
   }
 
-  async getContractField(
-    contract: Contract,
-    field: string,
-    keys: string[] = [],
-  ): Promise<any> {
-    let result =
-      (await contract.getSubState(field, keys)) ||
-      {};
-    return result[field];
-  }
-  
-  async getContractMapValue(
-    contract: Contract,
-    field: string,
-    key: string,
-  ): Promise<any> {
-    const record = await this.getContractField(contract, field, [key]);
-    return (record && record[key]) || null;
-  }
-
-  async getResolverRecordsStructure(
-    resolverAddress: string,
-  ): Promise<ResolutionResult> {
-    if (resolverAddress == NullAddress) {
-      return {};
-    }
-    const resolver = this.zilliqa.contracts.at(
-      toChecksumAddress(resolverAddress),
-    );
-    const resolverRecords = (await this.getContractField(
-      resolver,
-      'records',
-    )) as { [key: string]: string };
-    return _.transform(
-      resolverRecords,
-      (result, value, key) => _.set(result, key, value),
-      {},
-    );
-  }
-
   async resolve(domain: string): Promise<ResolutionResult | null> {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork())
       return null;
@@ -171,5 +131,45 @@ export default class Zns extends NamingService {
         return source;
       }
     }
+  }
+
+  private async getContractField(
+    contract: Contract,
+    field: string,
+    keys: string[] = [],
+  ): Promise<any> {
+    let result =
+      (await contract.getSubState(field, keys)) ||
+      {};
+    return result[field];
+  }
+
+  private async getContractMapValue(
+    contract: Contract,
+    field: string,
+    key: string,
+  ): Promise<any> {
+    const record = await this.getContractField(contract, field, [key]);
+    return (record && record[key]) || null;
+  }
+
+  private async getResolverRecordsStructure(
+    resolverAddress: string,
+  ): Promise<ResolutionResult> {
+    if (resolverAddress == NullAddress) {
+      return {};
+    }
+    const resolver = this.zilliqa.contracts.at(
+      toChecksumAddress(resolverAddress),
+    );
+    const resolverRecords = (await this.getContractField(
+      resolver,
+      'records',
+    )) as { [key: string]: string };
+    return _.transform(
+      resolverRecords,
+      (result, value, key) => _.set(result, key, value),
+      {},
+    );
   }
 }
