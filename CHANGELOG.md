@@ -2,6 +2,7 @@
 
 * Zns network and url options support
 * Ens and Zns support custom contracts registryAddress
+* Adjust for breaking change at GetSmartContractSubState Zilliqa RPC call
 
 ## 0.2.38
 
