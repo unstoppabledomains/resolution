@@ -1,22 +1,8 @@
-import fetch from 'node-fetch';
 import Ens from './Ens';
 import Zns from './Zns';
 import { Blockchain } from './types';
 
 const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
-
-// Node env has special properties stored in process which are not inside the browser env.
-// Multiple checks is to avoid hitting the undefined while going deeper.
-const isNode = () => {
-  if (typeof process === 'object') {
-    if (typeof process.versions === 'object') {
-      if (typeof process.versions.node !== 'undefined') {
-        return true;
-      }
-    }
-  }
-  return false;
-};
 
 class Namicorn {
   static readonly UNCLAIMED_DOMAIN_RESPONSE = {
@@ -34,9 +20,7 @@ class Namicorn {
 
   constructor({
     blockchain = true,
-    api = DefaultUrl,
-  }: { api?: string; blockchain?: Blockchain } = {}) {
-    this.api = api.toString();
+  }: {blockchain?: Blockchain } = {}) {
     this.blockchain = !!blockchain;
     if (blockchain) {
       if (blockchain == true) {
@@ -58,14 +42,7 @@ class Namicorn {
   }
 
   async resolve(domain: string) {
-    if (this.blockchain) {
       return await this.resolveUsingBlockchain(domain);
-    } else {
-      const response = isNode()
-        ? await fetch(`${this.api}/${domain}`)
-        : await window.fetch(`${this.api}/${domain}`);
-      return response.json();
-    }
   }
 
   async address(domain: string, currencyTicker: string) {
