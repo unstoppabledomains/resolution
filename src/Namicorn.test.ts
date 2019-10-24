@@ -50,7 +50,7 @@ describe('ZNS', () => {
 
   it('resolves .zil name using blockchain', async () => {
     const testName = 'resolves .zil name using blockchain';
-    // mockAPICalls('ZIL', testName, ZilliqaUrl);
+    mockAPICalls('ZIL', testName, ZilliqaUrl);
     const namicorn = new Namicorn({ blockchain: { zns: ZilliqaUrl } });
     const result = await namicorn.resolve('cofounding.zil');
     expect(result).toBeDefined();
