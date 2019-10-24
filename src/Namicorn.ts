@@ -1,8 +1,22 @@
+import fetch from 'node-fetch';
 import Ens from './Ens';
 import Zns from './Zns';
 import { Blockchain, NamicornResolution } from './types';
 
 const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
+
+// Node env has special properties stored in process which are not inside the browser env.
+// Multiple checks is to avoid hitting the undefined while going deeper.
+const isNode = () => {
+  if (typeof process === 'object') {
+    if (typeof process.versions === 'object') {
+      if (typeof process.versions.node !== 'undefined') {
+        return true;
+      }
+    }
+  }
+  return false;
+};
 
 /**
  * Blockchain domain resolution library - Namicorn.
@@ -24,6 +38,7 @@ class Namicorn {
     },
   };
 
+  readonly api: string;
   readonly blockchain: Blockchain | boolean;
 /**
  * @ignore
@@ -40,7 +55,9 @@ class Namicorn {
  */
   constructor({
     blockchain = true,
-  }: { blockchain?: Blockchain } = {}) {
+    api = DefaultUrl,
+  }: { api?: string; blockchain?: Blockchain } = {}) {
+    this.api = api.toString();
     this.blockchain = !!blockchain;
     if (blockchain) {
       if (blockchain == true) {
@@ -68,7 +85,14 @@ class Namicorn {
  * @returns {Promise<NamicornResolution>} - Returns a promise that resolves in an object 
  */
   async resolve(domain: string): Promise<NamicornResolution> {
+    if (this.blockchain) {
       return await this.resolveUsingBlockchain(domain);
+    } else {
+      const response = isNode()
+        ? await fetch(`${this.api}/${domain}`)
+        : await window.fetch(`${this.api}/${domain}`);
+      return response.json();
+    }
   }
 
 /**

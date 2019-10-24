@@ -34,6 +34,7 @@ export default class Ens extends NamingService {
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
+  private registrarContract: any;
   private ensContract: any;
   private web3: any;
 
@@ -63,6 +64,11 @@ export default class Ens extends NamingService {
       this.ensContract = new this.web3.eth.Contract(
         ensInterface,
         this.registryAddress,
+      );
+      this.registrarContract = new this.web3.eth.Contract(
+        registrarInterface,
+        //TODO: make an address dependent on network id
+        '0x6090A6e47849629b7245Dfa1Ca21D94cd15878Ef',
       );
     }
   }
