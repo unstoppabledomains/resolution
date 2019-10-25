@@ -65,9 +65,9 @@ export default class Zns extends NamingService {
   async resolve(domain: string): Promise<ResolutionResult | null> {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork())
       return null;
-    const recordAddress = await this.getRecordsAddresses(domain);
-    if (!recordAddress) return null;
-    const [ownerAddress, resolverAddress] = recordAddress;
+    const recordAddresses = await this.getRecordsAddresses(domain);
+    if (!recordAddresses) return null;
+    const [ownerAddress, resolverAddress] = recordAddresses;
     const resolution = await this.getResolverRecordsStructure(resolverAddress);
     const addresses = _.mapValues(resolution.crypto, 'address');
     return {
@@ -80,10 +80,22 @@ export default class Zns extends NamingService {
     };
   }
 
-  async resolution(domain:string) : Promise<Object> {
+  async resolution(domain:string) : Promise<any | null> {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork())
       return null;
-    
+    const recordAddresses = await this.getRecordsAddresses(domain);
+    if (!recordAddresses) return null; 
+    const [ownerAddress, resolverAddress] = recordAddresses;
+    const resolution = await this.getResolverRecordsStructure(resolverAddress);
+    return {
+      resolution: _.omit(resolution, ['crypto']),
+      addresses: _.mapValues(resolution.crypto, 'address'),
+      meta: {
+        owner: ownerAddress || null,
+        type: 'zns',
+        ttl: parseInt(resolution.ttl as string) || 0
+      }
+    };
   }
 
   isSupportedDomain(domain: string): boolean {

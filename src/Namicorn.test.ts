@@ -228,15 +228,27 @@ describe('ENS', () => {
   });
 
   it('resolves .eth name using blockchain', async () => {
-    const testName = 'resolves .eth name using blockchain';
-    mockAPICalls('ENS', testName, MainnetUrl);
-
     const namicorn = new Namicorn({
       blockchain: { ens: true },
     });
     expect(namicorn.ens.url).toBe('https://mainnet.infura.io');
     expect(namicorn.ens.network).toEqual('mainnet');
+
+    const eye = jest
+      .spyOn(namicorn.ens, '_getResolutionInfo')
+      .mockImplementation(() => Promise.resolve([
+        '0x714ef33943d925731FBB89C99aF5780D888bD106',
+        '0',
+        '0x5FfC014343cd971B7eb70732021E26C35B744cc4'
+      ]));
+
+      const secondEye = jest
+        .spyOn(namicorn.ens, '_fetchAddress')
+        .mockImplementation(() => Promise.resolve('0x714ef33943d925731FBB89C99aF5780D888bD106'));
+
     var result = await namicorn.address('matthewgould.eth', 'ETH');
+    expect(eye).toHaveBeenCalled();
+    expect(secondEye).toHaveBeenCalled();
     expect(result).toEqual('0x714ef33943d925731FBB89C99aF5780D888bD106');
   });
 
