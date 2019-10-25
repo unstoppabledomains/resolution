@@ -80,22 +80,18 @@ export default class Zns extends NamingService {
     };
   }
 
-  async resolution(domain:string) : Promise<any | null> {
+  /**
+   * Resolves a domain
+   * @param domain - domain name to be resolved
+   * @returns - Everything what is stored on specified domain
+   */
+  async resolution(domain: string): Promise<any | null> {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork())
       return null;
     const recordAddresses = await this.getRecordsAddresses(domain);
-    if (!recordAddresses) return null; 
-    const [ownerAddress, resolverAddress] = recordAddresses;
-    const resolution = await this.getResolverRecordsStructure(resolverAddress);
-    return {
-      resolution: _.omit(resolution, ['crypto']),
-      addresses: _.mapValues(resolution.crypto, 'address'),
-      meta: {
-        owner: ownerAddress || null,
-        type: 'zns',
-        ttl: parseInt(resolution.ttl as string) || 0
-      }
-    };
+    if (!recordAddresses) return null;
+    const [_, resolverAddress] = recordAddresses;
+    return await this.getResolverRecordsStructure(resolverAddress);
   }
 
   isSupportedDomain(domain: string): boolean {
@@ -106,7 +102,7 @@ export default class Zns extends NamingService {
     return this.registryAddress != null;
   }
 
-  async getRecordsAddresses(domain: string) : Promise<[string, string] | null> {
+  async getRecordsAddresses(domain: string): Promise<[string, string] | null> {
     const registryRecord = await this.getContractMapValue(
       this.registry,
       'records',
@@ -181,9 +177,7 @@ export default class Zns extends NamingService {
     field: string,
     keys: string[] = [],
   ): Promise<any> {
-    let result =
-      (await contract.getSubState(field, keys)) ||
-      {};
+    let result = (await contract.getSubState(field, keys)) || {};
     return result[field];
   }
 

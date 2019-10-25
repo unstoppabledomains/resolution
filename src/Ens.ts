@@ -145,10 +145,6 @@ export default class Ens extends NamingService {
     return address;
   }
 
-  async resolution(domain:string) : Promise<any | null> {
-   return Promise.resolve(null);
-  }
-
   /*===========================*/
 
   protected normalizeSource(
