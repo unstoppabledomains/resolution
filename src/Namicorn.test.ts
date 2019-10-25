@@ -216,14 +216,14 @@ describe('ZNS', () => {
     const namicorn = new Namicorn();
 
     const eye = jest
-      .spyOn(namicorn.zns, 'getRecordsAddresses')
+      .spyOn(namicorn.zns, '_getRecordsAddresses')
       .mockResolvedValue([
         'zil194qcjskuuxh6qtg8xw3qqrr3kdc6dtq8ct6j9s',
         '0xdac22230adfe4601f00631eae92df6d77f054891',
       ]);
 
     const secondEye = jest
-      .spyOn(namicorn.zns, 'getResolverRecordsStructure')
+      .spyOn(namicorn.zns, '_getResolverRecordsStructure')
       .mockResolvedValue({
         crypto: {
           BCH: { address: 'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6' },
@@ -260,14 +260,14 @@ describe('ZNS', () => {
   it('should resolve with resolution key setuped SECOND', async () => {
     const namicorn = new Namicorn();
     const eye = jest
-      .spyOn(namicorn.zns, 'getRecordsAddresses')
+      .spyOn(namicorn.zns, '_getRecordsAddresses')
       .mockResolvedValue([
         'zil1f6vyj5hgvll3xtx5kuxd8ucn66x9zxmkp34agy',
         '0xa9b1d3647e4deb9ce4e601c2c9e0a2fdf2d7415a',
       ]);
 
     const secondEye = jest
-      .spyOn(namicorn.zns, 'getResolverRecordsStructure')
+      .spyOn(namicorn.zns, '_getResolverRecordsStructure')
       .mockResolvedValue({
         ipfs: {
           html: {

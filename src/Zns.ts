@@ -65,10 +65,10 @@ export default class Zns extends NamingService {
   async resolve(domain: string): Promise<ResolutionResult | null> {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork())
       return null;
-    const recordAddresses = await this.getRecordsAddresses(domain);
+    const recordAddresses = await this._getRecordsAddresses(domain);
     if (!recordAddresses) return null;
     const [ownerAddress, resolverAddress] = recordAddresses;
-    const resolution = await this.getResolverRecordsStructure(resolverAddress);
+    const resolution = await this._getResolverRecordsStructure(resolverAddress);
     const addresses = _.mapValues(resolution.crypto, 'address');
     return {
       addresses,
@@ -85,13 +85,13 @@ export default class Zns extends NamingService {
    * @param domain - domain name to be resolved
    * @returns - Everything what is stored on specified domain
    */
-  async resolution(domain: string): Promise<any | null> {
+  async resolution(domain: string): Promise<Object | {}> {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork())
       return null;
-    const recordAddresses = await this.getRecordsAddresses(domain);
+    const recordAddresses = await this._getRecordsAddresses(domain);
     if (!recordAddresses) return null;
     const [_, resolverAddress] = recordAddresses;
-    return await this.getResolverRecordsStructure(resolverAddress);
+    return await this._getResolverRecordsStructure(resolverAddress);
   }
 
   isSupportedDomain(domain: string): boolean {
@@ -102,7 +102,11 @@ export default class Zns extends NamingService {
     return this.registryAddress != null;
   }
 
-  async getRecordsAddresses(domain: string): Promise<[string, string] | null> {
+  /**
+   * @ignore
+   * @param domain - domain name
+   */
+  async _getRecordsAddresses(domain: string): Promise<[string, string] | null> {
     const registryRecord = await this.getContractMapValue(
       this.registry,
       'records',
@@ -119,7 +123,7 @@ export default class Zns extends NamingService {
     return [ownerAddress, resolverAddress];
   }
 
-  async getResolverRecordsStructure(
+  async _getResolverRecordsStructure(
     resolverAddress: string,
   ): Promise<ResolutionResult> {
     if (resolverAddress == NullAddress) {
