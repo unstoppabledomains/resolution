@@ -145,6 +145,7 @@ class Namicorn {
 
 /**
  * resolves the domain using blockchain call
+ * @ignore
  * @private
  * @async
  * @param {string} domain - domain name to be resolved

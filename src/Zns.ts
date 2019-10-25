@@ -6,25 +6,39 @@ import _ from 'lodash';
 import { NamicornResolution, SourceDefinition } from './types';
 import NamingService from './NamingService';
 
+/**
+ * @ignore
+ */
 const DefaultSource = 'https://api.zilliqa.com';
+/**
+ * @ignore
+ */
 const NullAddress = '0x0000000000000000000000000000000000000000';
-
+/**
+ * @ignore
+ */
 const NetworkIdMap = {
   1: 'mainnet',
   333: 'testnet',
   111: 'localnet',
 };
-
+/**
+ * @ignore
+ */
 const RegistryMap = {
   mainnet: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
 };
-
+/**
+ * @ignore
+ */
 const UrlMap = {
   mainnet: 'https://api.zilliqa.com',
   testnet: 'https://dev-api.zilliqa.com',
   localnet: 'http://localhost:4201',
 };
-
+/**
+ * @ignore
+ */
 const UrlNetworkMap = (url: string) => {
   const invert = _(UrlMap)
     .invert()
@@ -34,12 +48,24 @@ const UrlNetworkMap = (url: string) => {
 
 /**
  * Class to support connection with Zilliqa naming service
+ * @param {string} network - network string such as 
+ * - mainnet
+ * - ropsten
+ * @param {string} url - main api url such as 
+ * - https://mainnet.infura.io
+ * @param {string} registryAddress - address for a registry contract
 */
 export default class Zns extends NamingService {
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
+  /**
+ * @ignore
+ */
   private registry?: Contract;
+  /**
+ * @ignore
+ */
   private zilliqa: Zilliqa;
 
 
@@ -102,6 +128,12 @@ export default class Zns extends NamingService {
     const record = await this.getContractField(contract, field, [key]);
     return (record && record[key]) || null;
   }
+
+/**
+ * @ignore
+ * @param {string} resolverAddress - resolver Address
+ * @returns {NamicornResolution}
+ */
 
   async getResolverRecordsStructure(
     resolverAddress: string,
@@ -178,6 +210,7 @@ export default class Zns extends NamingService {
 
 /**
  * Normalizes the source object based on type
+ * @ignore
  * @param { string | boolean | SourceDefinition } source 
  * @returns {SourceDefinition}
 */
