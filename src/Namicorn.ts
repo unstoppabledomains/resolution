@@ -77,6 +77,13 @@ class Namicorn {
     return await this.ens.reverse(address, currencyTicker);
   }
 
+  async resolution(domain: string): Promise<Object | null> {
+    const method = this.getNamingMethod(domain);
+    if (!method) return null;
+    const result = await method.resolution(domain); 
+    return result || null;
+  }
+
   isSupportedDomain(domain: string): boolean {
     return (
       (this.zns && this.zns.isSupportedDomain(domain)) ||
@@ -103,7 +110,7 @@ class Namicorn {
   private async resolveUsingBlockchain(domain: string) {
     const method = this.getNamingMethod(domain);
     if (!method) return null;
-    var result = method && (await method.resolve(domain));
+    const result = await method.resolve(domain);
     return result || Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
   }
 }
