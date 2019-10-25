@@ -213,6 +213,105 @@ describe('ZNS', () => {
       'zil1408llufrzkrrfqv5lj4malcjxyjqyd8urd7xz6',
     );
   });
+
+  it('should resolve with resolution key setuped', async () => {
+    const namicorn = new Namicorn();
+
+    const eye = jest
+      .spyOn(namicorn.zns, 'getRecordsAddresses')
+      .mockResolvedValue([ 'zil194qcjskuuxh6qtg8xw3qqrr3kdc6dtq8ct6j9s',
+      '0xdac22230adfe4601f00631eae92df6d77f054891' ]);
+
+    const secondEye = jest
+      .spyOn(namicorn.zns, 'getResolverRecordsStructure')
+      .mockResolvedValue({ crypto:
+        { BCH: { address: 'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6' },
+          BTC: { address: '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB' },
+          ETH: { address: '0x45b31e01AA6f42F0549aD482BE81635ED3149abb' },
+          LTC: { address: 'LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL' },
+          ZIL: { address: 'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj' } },
+       ipfs:
+        { html: { value: 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK' },
+          redirect_domain: { value: 'www.unstoppabledomains.com' } } });
+
+    const result = await namicorn.resolution('brad.zil');
+
+    expect(eye).toHaveBeenCalled();
+    expect(secondEye).toHaveBeenCalled();
+    expect(result).toEqual({
+      resolution: {
+        ipfs:
+        {
+          html: { value: 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK' },
+          redirect_domain: { value: 'www.unstoppabledomains.com' }
+        }
+      },
+      addresses:
+      {
+        BCH: 'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6',
+        BTC: '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB',
+        ETH: '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
+        LTC: 'LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL',
+        ZIL: 'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj'
+      },
+      meta:
+      {
+        owner: 'zil194qcjskuuxh6qtg8xw3qqrr3kdc6dtq8ct6j9s',
+        type: 'zns',
+        ttl: 0
+      }
+    })
+  });
+  
+  it('should resolve with resolution key setuped SECOND', async () => {
+    const namicorn = new Namicorn();
+    const eye = jest
+      .spyOn(namicorn.zns, 'getRecordsAddresses')
+      .mockResolvedValue( [ 'zil1f6vyj5hgvll3xtx5kuxd8ucn66x9zxmkp34agy',
+      '0xa9b1d3647e4deb9ce4e601c2c9e0a2fdf2d7415a' ]);
+
+    const secondEye = jest
+      .spyOn(namicorn.zns, 'getResolverRecordsStructure')
+      .mockResolvedValue({ ipfs:
+        { html:
+           { hash: 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
+             value: 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK' },
+          redirect_domain: { value: 'www.unstoppabledomains.com' } },
+       whois:
+        { email: { value: 'matt+test@unstoppabledomains.com' },
+          for_sale: { value: 'true' } } });
+
+
+
+    const result = await namicorn.resolution('ergergergerg.zil');
+    expect(eye).toHaveBeenCalled();
+    expect(secondEye).toHaveBeenCalled();
+    expect(result).toEqual({
+      resolution: {
+        ipfs:
+        {
+          html:
+          {
+            hash: 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
+            value: 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK'
+          },
+          redirect_domain: { value: 'www.unstoppabledomains.com' }
+        },
+        whois:
+        {
+          email: { value: 'matt+test@unstoppabledomains.com' },
+          for_sale: { value: 'true' }
+        }
+      },
+      addresses: {},
+      meta:
+      {
+        owner: 'zil1f6vyj5hgvll3xtx5kuxd8ucn66x9zxmkp34agy',
+        type: 'zns',
+        ttl: 0
+      }
+    });
+  })
 });
 
 describe('ENS', () => {
@@ -242,9 +341,9 @@ describe('ENS', () => {
         '0x5FfC014343cd971B7eb70732021E26C35B744cc4'
       ]));
 
-      const secondEye = jest
-        .spyOn(namicorn.ens, '_fetchAddress')
-        .mockImplementation(() => Promise.resolve('0x714ef33943d925731FBB89C99aF5780D888bD106'));
+    const secondEye = jest
+      .spyOn(namicorn.ens, '_fetchAddress')
+      .mockImplementation(() => Promise.resolve('0x714ef33943d925731FBB89C99aF5780D888bD106'));
 
     var result = await namicorn.address('matthewgould.eth', 'ETH');
     expect(eye).toHaveBeenCalled();
@@ -502,6 +601,13 @@ describe('ENS', () => {
     expect(namicorn.ens.url).toBe('https://custom.notinfura.io');
     expect(namicorn.ens.registryAddress).toBeUndefined();
   });
+
+  it('should return null since ens does not support full resolution', async () => {
+    const namicorn = new Namicorn();
+    const invalid = await namicorn.resolution('matthewgould.eth');
+    expect(invalid).toBe(null);
+  })
+
 });
 
 it('provides empty response constant', async () => {

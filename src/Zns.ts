@@ -106,13 +106,12 @@ export default class Zns extends NamingService {
     return this.registryAddress != null;
   }
 
-  private async getRecordsAddresses(domain: string) : Promise<[string, string] | null> {
+  async getRecordsAddresses(domain: string) : Promise<[string, string] | null> {
     const registryRecord = await this.getContractMapValue(
       this.registry,
       'records',
       namehash(domain),
     );
-
     if (!registryRecord) return null;
     let [ownerAddress, resolverAddress] = registryRecord.arguments as [
       string,
@@ -124,6 +123,25 @@ export default class Zns extends NamingService {
     return [ownerAddress, resolverAddress];
   }
 
+  async getResolverRecordsStructure(
+    resolverAddress: string,
+  ): Promise<ResolutionResult> {
+    if (resolverAddress == NullAddress) {
+      return {};
+    }
+    const resolver = this.zilliqa.contracts.at(
+      toChecksumAddress(resolverAddress),
+    );
+    const resolverRecords = (await this.getContractField(
+      resolver,
+      'records',
+    )) as { [key: string]: string };
+    return _.transform(
+      resolverRecords,
+      (result, value, key) => _.set(result, key, value),
+      {},
+    );
+  }
 
   protected normalizeSource(
     source: string | boolean | SourceDefinition,
@@ -176,25 +194,5 @@ export default class Zns extends NamingService {
   ): Promise<any> {
     const record = await this.getContractField(contract, field, [key]);
     return (record && record[key]) || null;
-  }
-
-  private async getResolverRecordsStructure(
-    resolverAddress: string,
-  ): Promise<ResolutionResult> {
-    if (resolverAddress == NullAddress) {
-      return {};
-    }
-    const resolver = this.zilliqa.contracts.at(
-      toChecksumAddress(resolverAddress),
-    );
-    const resolverRecords = (await this.getContractField(
-      resolver,
-      'records',
-    )) as { [key: string]: string };
-    return _.transform(
-      resolverRecords,
-      (result, value, key) => _.set(result, key, value),
-      {},
-    );
   }
 }
