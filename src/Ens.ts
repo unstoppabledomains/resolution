@@ -114,6 +114,9 @@ export default class Ens extends NamingService {
     };
   }
 
+  namehash(domain:string): string {
+    return hash(domain);
+  }
   /* Test functions bellow */
 
   _resolverCallToName(resolverContract, nodeHash) {

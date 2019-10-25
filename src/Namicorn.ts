@@ -92,6 +92,13 @@ class Namicorn {
     return method && method.isSupportedNetwork();
   }
 
+  namehash(domain: string): string {
+    const method = this.getNamingMethod(domain);
+    if (!method) return null;
+    const result = method.namehash(domain);
+    return result;
+  }
+  
   private getNamingMethod(domain: string) {
     const methods = [this.ens, this.zns];
     const method = methods.find(
@@ -103,7 +110,7 @@ class Namicorn {
   private async resolveUsingBlockchain(domain: string) {
     const method = this.getNamingMethod(domain);
     if (!method) return null;
-    var result = method && (await method.resolve(domain));
+    const result = await method.resolve(domain);
     return result || Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
   }
 }

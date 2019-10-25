@@ -106,6 +106,10 @@ export default class Zns extends NamingService {
     return this.registryAddress != null;
   }
 
+  namehash(domain: string): string {
+    return namehash(domain);
+  }
+  
   private async getRecordsAddresses(domain: string) : Promise<[string, string] | null> {
     const registryRecord = await this.getContractMapValue(
       this.registry,

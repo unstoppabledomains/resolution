@@ -39,6 +39,22 @@ beforeEach(() => {
   jest.restoreAllMocks();
 });
 
+describe('Namicorn', () => {
+  it('tests namehash (zns side) function', async () => {
+    const namicorn = new Namicorn();
+    const namehash = namicorn.namehash('brad.zil');
+    expect(namehash).toBe('0x5fc604da00f502da70bfbc618088c0ce468ec9d18d05540935ae4118e8f50787');
+  })
+  
+  it('tests namehash (ens side) function', async () => {
+    const namicorn = new Namicorn();
+    const namehash = namicorn.namehash('matthewgould.eth');
+    expect(namehash).toBe('0x2b53e3f567989ee41b897998d89eb4d8cf0715fb2cfb41a64939a532c09e495e');
+  })
+
+
+});
+
 describe('ZNS', () => {
   it('resolving from unstoppable API', async () => {
     const testName = 'should work';
