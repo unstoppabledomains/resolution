@@ -65,7 +65,36 @@ export default class Zns extends NamingService {
   async resolve(domain: string): Promise<ResolutionResult | null> {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork())
       return null;
+    const recordAddress = await this.getRecordsAddresses(domain);
+    if (!recordAddress) return null;
+    const [ownerAddress, resolverAddress] = recordAddress;
+    const resolution = await this.getResolverRecordsStructure(resolverAddress);
+    const addresses = _.mapValues(resolution.crypto, 'address');
+    return {
+      addresses,
+      meta: {
+        owner: ownerAddress || null,
+        type: 'zns',
+        ttl: parseInt(resolution.ttl as string) || 0,
+      },
+    };
+  }
 
+  async resolution(domain:string) : Promise<Object> {
+    if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork())
+      return null;
+    
+  }
+
+  isSupportedDomain(domain: string): boolean {
+    return domain.indexOf('.') > 0 && /^.{1,}\.(zil)$/.test(domain);
+  }
+
+  isSupportedNetwork(): boolean {
+    return this.registryAddress != null;
+  }
+
+  private async getRecordsAddresses(domain: string) : Promise<[string, string] | null> {
     const registryRecord = await this.getContractMapValue(
       this.registry,
       'records',
@@ -77,28 +106,12 @@ export default class Zns extends NamingService {
       string,
       string
     ];
-    const resolution = await this.getResolverRecordsStructure(resolverAddress);
-    const addresses = _.mapValues(resolution.crypto, 'address');
     if (ownerAddress.startsWith('0x')) {
       ownerAddress = toBech32Address(ownerAddress);
     }
-    return {
-      addresses,
-      meta: {
-        owner: ownerAddress || null,
-        type: 'zns',
-        ttl: parseInt(resolution.ttl as string) || 0,
-      },
-    };
+    return [ownerAddress, resolverAddress];
   }
 
-  isSupportedDomain(domain: string): boolean {
-    return domain.indexOf('.') > 0 && /^.{1,}\.(zil)$/.test(domain);
-  }
-
-  isSupportedNetwork(): boolean {
-    return this.registryAddress != null;
-  }
 
   protected normalizeSource(
     source: string | boolean | SourceDefinition,
