@@ -3,7 +3,7 @@ import { Contract } from '@zilliqa-js/contract';
 import { toChecksumAddress, toBech32Address } from '@zilliqa-js/crypto';
 import namehash from './zns/namehash';
 import _ from 'lodash';
-import { ResolutionResult, SourceDefinition } from './types';
+import { SourceDefinition, NamicornResolution } from './types';
 import NamingService from './NamingService';
 
 const DefaultSource = 'https://api.zilliqa.com';
@@ -62,26 +62,14 @@ export default class Zns extends NamingService {
     }
   }
 
-  async resolve(domain: string): Promise<ResolutionResult | null> {
+  async resolve(domain: string): Promise<NamicornResolution | null> {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork())
       return null;
-
-    const registryRecord = await this.getContractMapValue(
-      this.registry,
-      'records',
-      namehash(domain),
-    );
-
-    if (!registryRecord) return null;
-    let [ownerAddress, resolverAddress] = registryRecord.arguments as [
-      string,
-      string
-    ];
-    const resolution = await this.getResolverRecordsStructure(resolverAddress);
+    const recordAddresses = await this._getRecordsAddresses(domain);
+    if (!recordAddresses) return null;
+    const [ownerAddress, resolverAddress] = recordAddresses;
+    const resolution = await this._getResolverRecordsStructure(resolverAddress);
     const addresses = _.mapValues(resolution.crypto, 'address');
-    if (ownerAddress.startsWith('0x')) {
-      ownerAddress = toBech32Address(ownerAddress);
-    }
     return {
       addresses,
       meta: {
@@ -92,12 +80,71 @@ export default class Zns extends NamingService {
     };
   }
 
+  /**
+   * Resolves a domain
+   * @param domain - domain name to be resolved
+   * @returns - Everything what is stored on specified domain
+   */
+  async resolution(domain: string): Promise<Object | {}> {
+    if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork())
+      return {};
+    const recordAddresses = await this._getRecordsAddresses(domain);
+    if (!recordAddresses) return {};
+    const [_, resolverAddress] = recordAddresses;
+    return await this._getResolverRecordsStructure(resolverAddress);
+  }
+
   isSupportedDomain(domain: string): boolean {
     return domain.indexOf('.') > 0 && /^.{1,}\.(zil)$/.test(domain);
   }
 
   isSupportedNetwork(): boolean {
     return this.registryAddress != null;
+  }
+
+  /**
+   * @ignore
+   * @param domain - domain name
+   */
+  async _getRecordsAddresses(domain: string): Promise<[string, string] | null> {
+    const registryRecord = await this.getContractMapValue(
+      this.registry,
+      'records',
+      namehash(domain),
+    );
+    if (!registryRecord) return null;
+    let [ownerAddress, resolverAddress] = registryRecord.arguments as [
+      string,
+      string
+    ];
+    if (ownerAddress.startsWith('0x')) {
+      ownerAddress = toBech32Address(ownerAddress);
+    }
+    return [ownerAddress, resolverAddress];
+  }
+
+  /**
+   * @ignore
+   * @param resolverAddress 
+   */
+  async _getResolverRecordsStructure(
+    resolverAddress: string,
+  ): Promise<NamicornResolution | any> {
+    if (resolverAddress == NullAddress) {
+      return {};
+    }
+    const resolver = this.zilliqa.contracts.at(
+      toChecksumAddress(resolverAddress),
+    );
+    const resolverRecords = (await this.getContractField(
+      resolver,
+      'records',
+    )) as { [key: string]: string };
+    return _.transform(
+      resolverRecords,
+      (result, value, key) => _.set(result, key, value),
+      {},
+    );
   }
 
   protected normalizeSource(
@@ -138,9 +185,7 @@ export default class Zns extends NamingService {
     field: string,
     keys: string[] = [],
   ): Promise<any> {
-    let result =
-      (await contract.getSubState(field, keys)) ||
-      {};
+    let result = (await contract.getSubState(field, keys)) || {};
     return result[field];
   }
 
@@ -151,25 +196,5 @@ export default class Zns extends NamingService {
   ): Promise<any> {
     const record = await this.getContractField(contract, field, [key]);
     return (record && record[key]) || null;
-  }
-
-  private async getResolverRecordsStructure(
-    resolverAddress: string,
-  ): Promise<ResolutionResult> {
-    if (resolverAddress == NullAddress) {
-      return {};
-    }
-    const resolver = this.zilliqa.contracts.at(
-      toChecksumAddress(resolverAddress),
-    );
-    const resolverRecords = (await this.getContractField(
-      resolver,
-      'records',
-    )) as { [key: string]: string };
-    return _.transform(
-      resolverRecords,
-      (result, value, key) => _.set(result, key, value),
-      {},
-    );
   }
 }

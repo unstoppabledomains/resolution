@@ -1,18 +1,19 @@
 {
 	"name": "namicorn",
-	"version": "0.2.40",
+	"version": "0.2.41",
 	"description": "Crypto currency wallet domain name resolution library by Unstoppable Domains Inc.",
 	"main": "./lib/namicorn.js",
 	"types": "./lib/namicorn.d.ts",
 	"scripts": {
-		"release": "yarn build && yarn test && yarn publish --patch",
-		"release:minor": "yarn build && yarn test && yarn publish --minor",
-		"release:major": "yarn build && yarn test && yarn publish --major",
+		"release": "yarn build && yarn test &&  yarn docs && yarn publish --patch",
+		"release:minor": "yarn build && yarn test && yarn docs && yarn publish --minor",
+		"release:major": "yarn build && yarn test && yarn docs && yarn publish --major ",
 		"test": "jest",
 		"start": "npm run build:live",
 		"build": "tsc -p .",
 		"format": "prettier --semi --write -l **/*.{js,json,ts}",
-		"build:live": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts"
+		"build:live": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
+		"docs": "yarn run typedoc"
 	},
 	"files": [
 		"lib"
@@ -37,6 +38,7 @@
 		"nock": "^10.0.6",
 		"prettier": "^1.17.0",
 		"ts-jest": "^24.0.2",
+		"typedoc": "^0.15.0",
 		"typescript": "^3.6.3"
 	},
 	"prettier": {

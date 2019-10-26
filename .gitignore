@@ -5,3 +5,5 @@ build
 lib
 node_modules
 tmp
+docs
+docs/index.html

@@ -75,14 +75,12 @@ describe('ZNS', () => {
     const namicorn = new Namicorn({ blockchain: true });
     const result = await namicorn.resolve('test-manage-one.zil');
     expect(result.addresses).toEqual({ BURST: 'BURST-R7KK-SBSY-FENX-AWYMW' });
-    expect(result.meta).toEqual(
-      {
-        owner: 'zil1zzpjwyp2nu29pcv3sh04qxq9x5l45vke0hrwec',
-        type: 'zns',
-        ttl: 0
-      }
-    );
-  })
+    expect(result.meta).toEqual({
+      owner: 'zil1zzpjwyp2nu29pcv3sh04qxq9x5l45vke0hrwec',
+      type: 'zns',
+      ttl: 0,
+    });
+  });
 
   it("doesn't support zil domain when zns is disabled", () => {
     const namicorn = new Namicorn({ blockchain: { zns: false } });
@@ -213,6 +211,124 @@ describe('ZNS', () => {
       'zil1408llufrzkrrfqv5lj4malcjxyjqyd8urd7xz6',
     );
   });
+
+  it('should resolve with resolution key setuped', async () => {
+    const namicorn = new Namicorn();
+
+    const eye = jest
+      .spyOn(namicorn.zns, '_getRecordsAddresses')
+      .mockResolvedValue([
+        'zil194qcjskuuxh6qtg8xw3qqrr3kdc6dtq8ct6j9s',
+        '0xdac22230adfe4601f00631eae92df6d77f054891',
+      ]);
+
+    const secondEye = jest
+      .spyOn(namicorn.zns, '_getResolverRecordsStructure')
+      .mockResolvedValue({
+        crypto: {
+          BCH: { address: 'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6' },
+          BTC: { address: '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB' },
+          ETH: { address: '0x45b31e01AA6f42F0549aD482BE81635ED3149abb' },
+          LTC: { address: 'LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL' },
+          ZIL: { address: 'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj' },
+        },
+        ipfs: {
+          html: { value: 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK' },
+          redirect_domain: { value: 'www.unstoppabledomains.com' },
+        },
+      });
+
+    const result = await namicorn.zns.resolution('brad.zil');
+
+    expect(eye).toHaveBeenCalled();
+    expect(secondEye).toHaveBeenCalled();
+    expect(result).toEqual({
+      crypto: {
+        BCH: { address: 'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6' },
+        BTC: { address: '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB' },
+        ETH: { address: '0x45b31e01AA6f42F0549aD482BE81635ED3149abb' },
+        LTC: { address: 'LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL' },
+        ZIL: { address: 'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj' },
+      },
+      ipfs: {
+        html: { value: 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK' },
+        redirect_domain: { value: 'www.unstoppabledomains.com' },
+      },
+    });
+  });
+
+  it('should resolve with resolution key setuped #2', async () => {
+    const namicorn = new Namicorn();
+    const eye = jest
+      .spyOn(namicorn.zns, '_getRecordsAddresses')
+      .mockResolvedValue([
+        'zil1f6vyj5hgvll3xtx5kuxd8ucn66x9zxmkp34agy',
+        '0xa9b1d3647e4deb9ce4e601c2c9e0a2fdf2d7415a',
+      ]);
+
+    const secondEye = jest
+      .spyOn(namicorn.zns, '_getResolverRecordsStructure')
+      .mockResolvedValue({
+        ipfs: {
+          html: {
+            hash: 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
+            value: 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
+          },
+          redirect_domain: { value: 'www.unstoppabledomains.com' },
+        },
+        whois: {
+          email: { value: 'matt+test@unstoppabledomains.com' },
+          for_sale: { value: 'true' },
+        },
+      });
+
+    const result = await namicorn.zns.resolution('ergergergerg.zil');
+    expect(eye).toHaveBeenCalled();
+    expect(secondEye).toHaveBeenCalled();
+    expect(result).toEqual({
+      ipfs: {
+        html: {
+          hash: 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
+          value: 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
+        },
+        redirect_domain: { value: 'www.unstoppabledomains.com' },
+      },
+      whois: {
+        email: { value: 'matt+test@unstoppabledomains.com' },
+        for_sale: { value: 'true' },
+      },
+    });
+  });
+
+  it('should resolve with resolution key setuped #3', async () => {
+    const namicorn = new Namicorn();
+    const zns = namicorn.zns;
+
+    expect(zns).toBeDefined();
+    const result = await zns.resolution('invalid.domain');
+    expect(result).toEqual({});
+  })
+
+  it('should resolve with resolution key setuped #4', async () => {
+    const namicorn = new Namicorn();
+    const zns = namicorn.zns;
+    expect(zns).toBeDefined();
+    const result = await zns.resolution('mcafee2020.zil');
+    expect(result).toEqual({
+      crypto:
+      {
+        BTC: { address: '17LV6fxL8b1pJomn5zoDR3ZCnbt88ehGBf' },
+        ETH: { address: '0x0ed6180ef7c638064b9b17ff53ba76ec7077dd95' },
+        LTC: { address: 'MTbeoMfWqEZaaZVG1yE1ENoxVGNmMAxoEj' }
+      },
+      whois:
+      {
+        email: { value: 'jordanb_970@hotmail.com' },
+        for_sale: { value: 'true' }
+      }
+    });
+  })
+
 });
 
 describe('ENS', () => {
@@ -228,15 +344,31 @@ describe('ENS', () => {
   });
 
   it('resolves .eth name using blockchain', async () => {
-    const testName = 'resolves .eth name using blockchain';
-    mockAPICalls('ENS', testName, MainnetUrl);
-
     const namicorn = new Namicorn({
       blockchain: { ens: true },
     });
     expect(namicorn.ens.url).toBe('https://mainnet.infura.io');
     expect(namicorn.ens.network).toEqual('mainnet');
+
+    const eye = jest
+      .spyOn(namicorn.ens, '_getResolutionInfo')
+      .mockImplementation(() =>
+        Promise.resolve([
+          '0x714ef33943d925731FBB89C99aF5780D888bD106',
+          '0',
+          '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
+        ]),
+      );
+
+    const secondEye = jest
+      .spyOn(namicorn.ens, '_fetchAddress')
+      .mockImplementation(() =>
+        Promise.resolve('0x714ef33943d925731FBB89C99aF5780D888bD106'),
+      );
+
     var result = await namicorn.address('matthewgould.eth', 'ETH');
+    expect(eye).toHaveBeenCalled();
+    expect(secondEye).toHaveBeenCalled();
     expect(result).toEqual('0x714ef33943d925731FBB89C99aF5780D888bD106');
   });
 
