@@ -111,7 +111,7 @@ describe('ZNS', () => {
   it('checks normalizeSource zns wrong string', async () => {
     expect(
       () => new Namicorn({ blockchain: { zns: 'https://wrongurl.com' } }),
-    ).toThrow();
+    ).toThrowError('Unspecified network in Namicorn ZNS configuration');
   });
 
   it('checks normalizeSource zns (object) #1', async () => {
@@ -158,13 +158,13 @@ describe('ZNS', () => {
   it('checks normalizeSource zns (object) #6', async () => {
     expect(
       () => new Namicorn({ blockchain: { zns: { network: 42 } } }),
-    ).toThrow();
+    ).toThrowError('Unspecified network in Namicorn ZNS configuration');
   });
 
   it('checks normalizeSource zns (object) #7', async () => {
     expect(
       () => new Namicorn({ blockchain: { zns: { network: 'invalid' } } }),
-    ).toThrow();
+    ).toThrowError('Unspecified url in Namicorn ZNS configuration');
   });
 
   it('checks normalizeSource zns (object) #8', async () => {
@@ -544,13 +544,14 @@ describe('ENS', () => {
   it('checks normalizeSource ens (object) #6', async () => {
     expect(
       () => new Namicorn({ blockchain: { ens: { network: 7543 } } }),
-    ).toThrow();
+    ).toThrowError('Unspecified network in Namicorn ENS configuration');
+
   });
 
   it('checks normalizeSource ens (object) #7', async () => {
     expect(
       () => new Namicorn({ blockchain: { ens: { network: 'invalid' } } }),
-    ).toThrow();
+    ).toThrowError('Unspecified url in Namicorn ENS configuration');
   });
 
   it('checks normalizeSource ens (object) #8', async () => {

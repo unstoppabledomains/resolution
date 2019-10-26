@@ -20,7 +20,7 @@ const HandlersByCode: {[key: string]: ResolutionErrorHandler} = {
  * @param domain - Domain name that was being used
  * @param method
  */
-class ResolutionError extends Error {
+export default class ResolutionError extends Error {
  
   readonly code: ResolutionErrorCode;
   readonly domain?: string;
@@ -28,7 +28,7 @@ class ResolutionError extends Error {
 
   constructor(code: ResolutionErrorCode, method?: string, domain?: string,) {
     const resolutionErrorHandler: ResolutionErrorHandler = HandlersByCode[code];
-    super(resolutionErrorHandler(domain, method));
+    super(resolutionErrorHandler(method, domain));
     this.code = code;
     this.domain = domain;
     this.method = method;
