@@ -123,6 +123,10 @@ export default class Zns extends NamingService {
     return [ownerAddress, resolverAddress];
   }
 
+  /**
+   * @ignore
+   * @param resolverAddress 
+   */
   async _getResolverRecordsStructure(
     resolverAddress: string,
   ): Promise<NamicornResolution | any> {
