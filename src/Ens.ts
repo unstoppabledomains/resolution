@@ -144,6 +144,7 @@ export default class Ens extends NamingService {
     const address = await resolverContract.methods.addr(nodeHash).call();
     return address;
   }
+
   /*===========================*/
 
   protected normalizeSource(
