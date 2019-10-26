@@ -87,9 +87,9 @@ export default class Zns extends NamingService {
    */
   async resolution(domain: string): Promise<Object | {}> {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork())
-      return null;
+      return {};
     const recordAddresses = await this._getRecordsAddresses(domain);
-    if (!recordAddresses) return null;
+    if (!recordAddresses) return {};
     const [_, resolverAddress] = recordAddresses;
     return await this._getResolverRecordsStructure(resolverAddress);
   }

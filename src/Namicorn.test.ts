@@ -257,7 +257,7 @@ describe('ZNS', () => {
     });
   });
 
-  it('should resolve with resolution key setuped SECOND', async () => {
+  it('should resolve with resolution key setuped #2', async () => {
     const namicorn = new Namicorn();
     const eye = jest
       .spyOn(namicorn.zns, '_getRecordsAddresses')
@@ -299,6 +299,36 @@ describe('ZNS', () => {
       },
     });
   });
+
+  it('should resolve with resolution key setuped #3', async () => {
+    const namicorn = new Namicorn();
+    const zns = namicorn.zns;
+
+    expect(zns).toBeDefined();
+    const result = await zns.resolution('invalid.domain');
+    expect(result).toEqual({});
+  })
+
+  it('should resolve with resolution key setuped #4', async () => {
+    const namicorn = new Namicorn();
+    const zns = namicorn.zns;
+    expect(zns).toBeDefined();
+    const result = await zns.resolution('mcafee2020.zil');
+    expect(result).toEqual({
+      crypto:
+      {
+        BTC: { address: '17LV6fxL8b1pJomn5zoDR3ZCnbt88ehGBf' },
+        ETH: { address: '0x0ed6180ef7c638064b9b17ff53ba76ec7077dd95' },
+        LTC: { address: 'MTbeoMfWqEZaaZVG1yE1ENoxVGNmMAxoEj' }
+      },
+      whois:
+      {
+        email: { value: 'jordanb_970@hotmail.com' },
+        for_sale: { value: 'true' }
+      }
+    });
+  })
+
 });
 
 describe('ENS', () => {
