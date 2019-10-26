@@ -42,10 +42,10 @@ export default class Ens extends NamingService {
     this.network = <string>source.network;
     this.url = source.url;
     if (!this.network) {
-      throw new Error('Unspecified network in Namicorn ENS configuration');
+      throw new ResolutionError('UNSPECIFIED_NETWORK', 'ENS')
     }
     if (!this.url) {
-      throw new Error('Unspecified url in Namicorn ENS configuration');
+      throw new ResolutionError('UNSPECIFIED_URL', 'ENS');
     }
     this.registryAddress = source.registry
       ? source.registry
@@ -170,10 +170,8 @@ export default class Ens extends NamingService {
             ? source.url
             : `https://${source.network}.infura.io`;
         }
-        if (source.network && !source.url) {
-          if (NetworkNameMap.hasOwnProperty(source.network))
+        if (source.network && !source.url && NetworkNameMap.hasOwnProperty(source.network)) {
             source.url = `https://${source.network}.infura.io`;
-          else throw new Error('Invalid network or unspecified url');
         }
         if (source.url && !source.network) {
           source.network = this.networkFromUrl(source.url);
