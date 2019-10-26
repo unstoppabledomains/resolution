@@ -1,17 +1,18 @@
 /** Alias for Resolution Error code */
 type ResolutionErrorCode = string;
 /** Alias for Resolution error handler function */
-type ResolutionErrorHandler = (domain?: string, method?: string) => string;
+// type ResolutionErrorHandler = (domain?: string, method?: string) => string;
+type ResolutionErrorHandler = (error: {domain?: string, method?: string}) => string;
 
 /** 
  * @ignore 
  * Internal Mapping object from ResolutionErrorCode to a ResolutionErrorHandler 
 */
 const HandlersByCode: {[key: string]: ResolutionErrorHandler} = {
-  'UNREGISTERED_DOMAIN': (domain: string) => `Domain ${domain} is not registered`,
+  'UNREGISTERED_DOMAIN': (error: {domain: string}) => `Domain ${error.domain} is not registered`,
   'UNSPECIFIED_RESOLVER': () => 'Resolver address is incorrect',
-  'UNSPECIFIED_NETWORK': (method: string) => `Unspecified network in Namicorn ${method} configuration`,
-  'UNSPECIFIED_URL': (method: string) => `Unspecified url in Namicorn ${method} configuration`,
+  'UNSPECIFIED_NETWORK': (error: {method: string}) => `Unspecified network in Namicorn ${error.method} configuration`,
+  'UNSPECIFIED_URL': (error: {method: string}) => `Unspecified url in Namicorn ${error.method} configuration`,
 }
 
 /**
@@ -28,7 +29,7 @@ export default class ResolutionError extends Error {
 
   constructor(code: ResolutionErrorCode, method?: string, domain?: string,) {
     const resolutionErrorHandler: ResolutionErrorHandler = HandlersByCode[code];
-    super(resolutionErrorHandler(method, domain));
+    super(resolutionErrorHandler({domain, method}));
     this.code = code;
     this.domain = domain;
     this.method = method;
