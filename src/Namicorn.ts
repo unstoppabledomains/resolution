@@ -152,14 +152,25 @@ class Namicorn {
  * @return {Promise<NamicornResolution>}
  */
   private async resolveUsingBlockchain(domain: string): Promise<NamicornResolution>{
+    const method = this.getNamingMethod(domain);
+    if (!method) return null;
+    const result = await method.resolve(domain);
+    return result || Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
+  }
+
+  /**
+   * @ignore
+   * Used internally to get the right method (ens or zns)
+   * @param domain - domain name
+   */
+  private getNamingMethod(domain: string) {
     const methods = [this.ens, this.zns];
     const method = methods.find(
       method => method && method.isSupportedDomain(domain),
     );
-    if (!method) return null;
-    var result = method && (await method.resolve(domain));
-    return result || Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
+    return method || null;
   }
+
 }
 
 export { Namicorn, Namicorn as default };

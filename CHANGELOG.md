@@ -1,7 +1,13 @@
 ## Unreleased
 
+* Make Zns#getContractField #getContractMapValue and #getResolverRecordsStructure private methods
+* Added Zns#resolution method which returns everything what is stored on zilliqa for specific domain
+
+## 0.2.39 - 0.2.40
+
 * Zns network and url options support
 * Ens and Zns support custom contracts registryAddress
+* Adjust for breaking change at GetSmartContractSubState Zilliqa RPC call
 
 ## 0.2.38
 

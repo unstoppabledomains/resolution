@@ -3,42 +3,28 @@ import { Contract } from '@zilliqa-js/contract';
 import { toChecksumAddress, toBech32Address } from '@zilliqa-js/crypto';
 import namehash from './zns/namehash';
 import _ from 'lodash';
-import { NamicornResolution, SourceDefinition } from './types';
+import { SourceDefinition, NamicornResolution } from './types';
 import NamingService from './NamingService';
 
-/**
- * @ignore
- */
 const DefaultSource = 'https://api.zilliqa.com';
-/**
- * @ignore
- */
 const NullAddress = '0x0000000000000000000000000000000000000000';
-/**
- * @ignore
- */
+
 const NetworkIdMap = {
   1: 'mainnet',
   333: 'testnet',
   111: 'localnet',
 };
-/**
- * @ignore
- */
+
 const RegistryMap = {
   mainnet: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
 };
-/**
- * @ignore
- */
+
 const UrlMap = {
   mainnet: 'https://api.zilliqa.com',
   testnet: 'https://dev-api.zilliqa.com',
   localnet: 'http://localhost:4201',
 };
-/**
- * @ignore
- */
+
 const UrlNetworkMap = (url: string) => {
   const invert = _(UrlMap)
     .invert()
@@ -46,35 +32,13 @@ const UrlNetworkMap = (url: string) => {
   return invert[url];
 };
 
-/**
- * Class to support connection with Zilliqa naming service
- * @param {string} network - network string such as 
- * - mainnet
- * - ropsten
- * @param {string} url - main api url such as 
- * - https://mainnet.infura.io
- * @param {string} registryAddress - address for a registry contract
-*/
 export default class Zns extends NamingService {
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
-  /**
- * @ignore
- */
   private registry?: Contract;
-  /**
- * @ignore
- */
   private zilliqa: Zilliqa;
 
-
-/**
- * Source object describing the network naming service operates on
- * @param {string | boolean | SourceDefinition} source 
- * @throws Unspecified network
- * @throws Unspecified url
-*/
   constructor(source: string | boolean | SourceDefinition = true) {
     super();
     source = this.normalizeSource(source);
@@ -98,48 +62,72 @@ export default class Zns extends NamingService {
     }
   }
 
-/**
- * Gets a contract field
- * @param {Contract} contract - contract
- * @param {string} field - field name
- * @param {string[]} keys - used to get deeper levels of a field
-*/
-  async getContractField(
-    contract: Contract,
-    field: string,
-    keys: string[] = [],
-  ): Promise<any> {
-    let result =
-      (await contract.getSubState(field, keys)) ||
-      {};
-    return result[field];
-  }
-/**
- * Wrapper around getContractField
- * @param {Contract} contract - contract
- * @param {string} field - field name
- * @param {string} key - used to get deeper level of a field
- */
-  async getContractMapValue(
-    contract: Contract,
-    field: string,
-    key: string,
-  ): Promise<any> {
-    const record = await this.getContractField(contract, field, [key]);
-    return (record && record[key]) || null;
+  async resolve(domain: string): Promise<NamicornResolution | null> {
+    if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork())
+      return null;
+    const recordAddresses = await this._getRecordsAddresses(domain);
+    if (!recordAddresses) return null;
+    const [ownerAddress, resolverAddress] = recordAddresses;
+    const resolution = await this._getResolverRecordsStructure(resolverAddress);
+    const addresses = _.mapValues(resolution.crypto, 'address');
+    return {
+      addresses,
+      meta: {
+        owner: ownerAddress || null,
+        type: 'zns',
+        ttl: parseInt(resolution.ttl as string) || 0,
+      },
+    };
   }
 
-/**
- * @ignore
- * @param {string} resolverAddress - resolver Address
- * @returns {NamicornResolution}
- */
+  /**
+   * Resolves a domain
+   * @param domain - domain name to be resolved
+   * @returns - Everything what is stored on specified domain
+   */
+  async resolution(domain: string): Promise<Object | {}> {
+    if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork())
+      return {};
+    const recordAddresses = await this._getRecordsAddresses(domain);
+    if (!recordAddresses) return {};
+    const [_, resolverAddress] = recordAddresses;
+    return await this._getResolverRecordsStructure(resolverAddress);
+  }
 
-  async getResolverRecordsStructure(
+  isSupportedDomain(domain: string): boolean {
+    return domain.indexOf('.') > 0 && /^.{1,}\.(zil)$/.test(domain);
+  }
+
+  isSupportedNetwork(): boolean {
+    return this.registryAddress != null;
+  }
+
+  /**
+   * @ignore
+   * @param domain - domain name
+   */
+  async _getRecordsAddresses(domain: string): Promise<[string, string] | null> {
+    const registryRecord = await this.getContractMapValue(
+      this.registry,
+      'records',
+      namehash(domain),
+    );
+    if (!registryRecord) return null;
+    let [ownerAddress, resolverAddress] = registryRecord.arguments as [
+      string,
+      string
+    ];
+    if (ownerAddress.startsWith('0x')) {
+      ownerAddress = toBech32Address(ownerAddress);
+    }
+    return [ownerAddress, resolverAddress];
+  }
+
+  async _getResolverRecordsStructure(
     resolverAddress: string,
-  ): Promise<any>  {
+  ): Promise<NamicornResolution | any> {
     if (resolverAddress == NullAddress) {
-      return {} as NamicornResolution;
+      return {};
     }
     const resolver = this.zilliqa.contracts.at(
       toChecksumAddress(resolverAddress),
@@ -152,68 +140,9 @@ export default class Zns extends NamingService {
       resolverRecords,
       (result, value, key) => _.set(result, key, value),
       {},
-    ) as NamicornResolution;
-  }
-
-/**
- * Resolves the given domain
- * @async
- * @param {string} domain - domain name to be resolved 
- * @returns {Promise<NamicornResolution | null>} - Returns a promise that resolves in an object 
-*/
-  async resolve(domain: string): Promise<NamicornResolution | null> {
-    if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork())
-      return null;
-
-    const registryRecord = await this.getContractMapValue(
-      this.registry,
-      'records',
-      namehash(domain),
     );
-
-    if (!registryRecord) return null;
-    let [ownerAddress, resolverAddress] = registryRecord.arguments as [
-      string,
-      string
-    ];
-    const resolution = await this.getResolverRecordsStructure(resolverAddress);
-    const addresses = _.mapValues(resolution.crypto, 'address');
-    if (ownerAddress.startsWith('0x')) {
-      ownerAddress = toBech32Address(ownerAddress);
-    }
-    return {
-      addresses,
-      meta: {
-        owner: ownerAddress || null,
-        type: 'zns',
-        ttl: parseInt(resolution.ttl as string) || 0,
-      },
-    };
   }
 
-/**
- * Checks if the domain is in valid format
- * @param {string} domain - domain name to be checked
- * @returns {boolean} 
-*/
-  isSupportedDomain(domain: string): boolean {
-    return domain.indexOf('.') > 0 && /^.{1,}\.(zil)$/.test(domain);
-  }
-
-/**
- * Checks if the current network is supported
- * @return {boolean}
-*/ 
-  isSupportedNetwork(): boolean {
-    return this.registryAddress != null;
-  }
-
-/**
- * Normalizes the source object based on type
- * @ignore
- * @param { string | boolean | SourceDefinition } source 
- * @returns {SourceDefinition}
-*/
   protected normalizeSource(
     source: string | boolean | SourceDefinition,
   ): SourceDefinition {
@@ -245,5 +174,23 @@ export default class Zns extends NamingService {
         return source;
       }
     }
+  }
+
+  private async getContractField(
+    contract: Contract,
+    field: string,
+    keys: string[] = [],
+  ): Promise<any> {
+    let result = (await contract.getSubState(field, keys)) || {};
+    return result[field];
+  }
+
+  private async getContractMapValue(
+    contract: Contract,
+    field: string,
+    key: string,
+  ): Promise<any> {
+    const record = await this.getContractField(contract, field, [key]);
+    return (record && record[key]) || null;
   }
 }

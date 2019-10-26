@@ -231,6 +231,8 @@ export default class Ens extends NamingService {
     return address;
   }
 
+  /*===========================*/
+
   /**
    * Normalizes the source object based on type
    * @ignore
