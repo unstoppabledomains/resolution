@@ -1,6 +1,6 @@
-## Unreleased
+## 0.2.41
 
-* Make Zns#getContractField #getContractMapValue and #getResolverRecordsStructure private methods
+* Make Zns#getContractField #getContractMapValue and #getResolverRecordsStructure pseudo-private methods by adding _ in front of the names
 * Added Zns#resolution method which returns everything what is stored on zilliqa for specific domain
 
 ## 0.2.39 - 0.2.40
