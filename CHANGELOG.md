@@ -1,3 +1,8 @@
+## Unreleased
+* Added documentation to Namicorn, ENS and ZNS files
+* Connected typedoc to the project
+* Specified scripts for automating generation of docs
+
 ## 0.2.41
 
 * Make Zns#getContractField #getContractMapValue and #getResolverRecordsStructure pseudo-private methods by adding _ in front of the names
