@@ -15,6 +15,7 @@ const HandlersByCode: {[key: string]: ResolutionErrorHandler} = {
   'NOT_REGISTERED_CURRENCY': (error: {domain: string, currencyTicker: string}) => `${error.domain} has no ${error.currencyTicker} attached to it`,
   'UNSPECIFIED_NETWORK': (error: {method: string}) => `Unspecified network in Namicorn ${error.method} configuration`,
   'UNSPECIFIED_URL': (error: {method: string}) => `Unspecified url in Namicorn ${error.method} configuration`,
+  'BLOCKCHAIN_DOWN': (error: {method: string}) => `${error.method} blockchain is down at the moment`
 }
 
 /**

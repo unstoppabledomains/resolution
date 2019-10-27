@@ -186,8 +186,12 @@ export default class Zns extends NamingService {
     field: string,
     keys: string[] = [],
   ): Promise<any> {
-    let result = (await contract.getSubState(field, keys)) || {};
-    return result[field];
+    try {
+      let result = (await contract.getSubState(field, keys)) || {};
+      return result[field];
+    }catch(err) {
+      if (err.name == 'FetchError') throw new ResolutionError('BLOCKCHAIN_DOWN', {method: 'ZNS'});
+    }
   }
 
   private async getContractMapValue(
