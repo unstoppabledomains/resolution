@@ -37,7 +37,7 @@ const NetworkNameMap = _(NetworkIdMap)
 
 /**
  * @ignore
-*/
+ */
 const RegistryMap = {
   mainnet: '0x314159265dd8dbb310642f98f50c066173c1259b',
   ropsten: '0x112234455c3a32fd11230c42e7bccd4a84e02010',
@@ -45,34 +45,33 @@ const RegistryMap = {
 
 /**
  * Class to support connection with Etherium naming service
- * @param {string} network - network string such as 
+ * @param {string} network - network string such as
  * - mainnet
  * - ropsten
- * @param {string} url - main api url such as 
+ * @param {string} url - main api url such as
  * - https://mainnet.infura.io
  * @param {string} registryAddress - address for a registry contract
-*/
+ */
 export default class Ens extends NamingService {
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
   /**
- * @ignore
- */
+   * @ignore
+   */
   private registrarContract: any;
   /**
- * @ignore
- */
+   * @ignore
+   */
   private ensContract: any;
   /**
- * @ignore
- */
+   * @ignore
+   */
   private web3: any;
-
 
   /**
    * Source object describing the network naming service operates on
-   * @param {string | boolean | SourceDefinition} source 
+   * @param {string | boolean | SourceDefinition} source
    * @throws Unspecified network
    * @throws Unspecified url
    */
@@ -105,10 +104,10 @@ export default class Ens extends NamingService {
   }
 
   /**
-  * Checks if the domain is in valid format
-  * @param {string} domain - domain name to be checked
-  * @returns {boolean} 
-  */
+   * Checks if the domain is in valid format
+   * @param {string} domain - domain name to be checked
+   * @returns {boolean}
+   */
   isSupportedDomain(domain: string): boolean {
     return (
       domain.indexOf('.') > 0 && /^.{1,}\.(eth|luxe|xyz|test)$/.test(domain)
@@ -127,7 +126,7 @@ export default class Ens extends NamingService {
    * Reverse the ens address to a ens registered domain name
    * @async
    * @param {string} address - address you wish to reverse
-   * @param {string} currencyTicker - currency ticker like BTC, ETH, ZIL 
+   * @param {string} currencyTicker - currency ticker like BTC, ETH, ZIL
    * @returns {Promise<string>} - domain name attached to this address
    */
   async reverse(address: string, currencyTicker: string): Promise<string> {
@@ -154,8 +153,8 @@ export default class Ens extends NamingService {
   /**
    * Resolves the given domain
    * @async
-   * @param {string} domain - domain name to be resolved 
-   * @returns {Promise<NamicornResolution>} - Returns a promise that resolves in an object 
+   * @param {string} domain - domain name to be resolved
+   * @returns {Promise<NamicornResolution>} - Returns a promise that resolves in an object
    */
   async resolve(domain: string): Promise<NamicornResolution | null> {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork()) {
@@ -177,7 +176,7 @@ export default class Ens extends NamingService {
     };
   }
 
-  namehash(domain:string): string {
+  namehash(domain: string): string {
     return hash(domain);
   }
   /* Test functions bellow */
@@ -185,9 +184,9 @@ export default class Ens extends NamingService {
   /**
    * @ignore
    * This was done to make automated tests more configurable
-   * @param resolverContract 
-   * @param nodeHash 
-  */
+   * @param resolverContract
+   * @param nodeHash
+   */
   _resolverCallToName(resolverContract, nodeHash) {
     return resolverContract.methods.name(nodeHash).call();
   }
@@ -195,8 +194,8 @@ export default class Ens extends NamingService {
   /**
    * @ignore
    * This was done to make automated tests more configurable
-   * @param nodeHash 
-  */
+   * @param nodeHash
+   */
   _getResolver(nodeHash) {
     return this.ensContract.methods.resolver(nodeHash).call();
   }
@@ -204,8 +203,8 @@ export default class Ens extends NamingService {
   /**
    * @ignore
    * This was done to make automated tests more configurable
-   * @param nodeHash 
-  */
+   * @param nodeHash
+   */
   async _getResolutionInfo(nodeHash) {
     return await Promise.all([
       this.ensContract.methods.owner(nodeHash).call(),
@@ -239,7 +238,7 @@ export default class Ens extends NamingService {
   /**
    * Normalizes the source object based on type
    * @ignore
-   * @param { string | boolean | SourceDefinition } source 
+   * @param { string | boolean | SourceDefinition } source
    * @returns {SourceDefinition}
    */
   protected normalizeSource(
@@ -284,7 +283,7 @@ export default class Ens extends NamingService {
    * @ignore
    * @param url - main api url for blockchain
    * @returns {string} - network such as:
-   *  - mainnet 
+   *  - mainnet
    *  - testnet
    */
   private networkFromUrl(url: string): string {

@@ -43,16 +43,18 @@ describe('Namicorn', () => {
   it('tests namehash (zns side) function', async () => {
     const namicorn = new Namicorn();
     const namehash = namicorn.namehash('brad.zil');
-    expect(namehash).toBe('0x5fc604da00f502da70bfbc618088c0ce468ec9d18d05540935ae4118e8f50787');
-  })
-  
+    expect(namehash).toBe(
+      '0x5fc604da00f502da70bfbc618088c0ce468ec9d18d05540935ae4118e8f50787',
+    );
+  });
+
   it('tests namehash (ens side) function', async () => {
     const namicorn = new Namicorn();
     const namehash = namicorn.namehash('matthewgould.eth');
-    expect(namehash).toBe('0x2b53e3f567989ee41b897998d89eb4d8cf0715fb2cfb41a64939a532c09e495e');
-  })
-
-
+    expect(namehash).toBe(
+      '0x2b53e3f567989ee41b897998d89eb4d8cf0715fb2cfb41a64939a532c09e495e',
+    );
+  });
 });
 
 describe('ZNS', () => {
@@ -323,7 +325,7 @@ describe('ZNS', () => {
     expect(zns).toBeDefined();
     const result = await zns.resolution('invalid.domain');
     expect(result).toEqual({});
-  })
+  });
 
   it('should resolve with resolution key setuped #4', async () => {
     const namicorn = new Namicorn();
@@ -331,20 +333,17 @@ describe('ZNS', () => {
     expect(zns).toBeDefined();
     const result = await zns.resolution('mcafee2020.zil');
     expect(result).toEqual({
-      crypto:
-      {
+      crypto: {
         BTC: { address: '17LV6fxL8b1pJomn5zoDR3ZCnbt88ehGBf' },
         ETH: { address: '0x0ed6180ef7c638064b9b17ff53ba76ec7077dd95' },
-        LTC: { address: 'MTbeoMfWqEZaaZVG1yE1ENoxVGNmMAxoEj' }
+        LTC: { address: 'MTbeoMfWqEZaaZVG1yE1ENoxVGNmMAxoEj' },
       },
-      whois:
-      {
+      whois: {
         email: { value: 'jordanb_970@hotmail.com' },
-        for_sale: { value: 'true' }
-      }
+        for_sale: { value: 'true' },
+      },
     });
-  })
-
+  });
 });
 
 describe('ENS', () => {
@@ -368,15 +367,19 @@ describe('ENS', () => {
 
     const eye = jest
       .spyOn(namicorn.ens, '_getResolutionInfo')
-      .mockImplementation(() => Promise.resolve([
-        '0x714ef33943d925731FBB89C99aF5780D888bD106',
-        '0',
-        '0x5FfC014343cd971B7eb70732021E26C35B744cc4'
-      ]));
+      .mockImplementation(() =>
+        Promise.resolve([
+          '0x714ef33943d925731FBB89C99aF5780D888bD106',
+          '0',
+          '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
+        ]),
+      );
 
-      const secondEye = jest
-        .spyOn(namicorn.ens, '_fetchAddress')
-        .mockImplementation(() => Promise.resolve('0x714ef33943d925731FBB89C99aF5780D888bD106'));
+    const secondEye = jest
+      .spyOn(namicorn.ens, '_fetchAddress')
+      .mockImplementation(() =>
+        Promise.resolve('0x714ef33943d925731FBB89C99aF5780D888bD106'),
+      );
 
     var result = await namicorn.address('matthewgould.eth', 'ETH');
     expect(eye).toHaveBeenCalled();

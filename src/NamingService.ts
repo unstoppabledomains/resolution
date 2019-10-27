@@ -1,7 +1,7 @@
 import { SourceDefinition } from './types';
 
 /**
- * Abstract class for different Naming Service supports like 
+ * Abstract class for different Naming Service supports like
  * - ENS
  * - ZNS
  */
