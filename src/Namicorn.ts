@@ -2,6 +2,7 @@ import fetch from 'node-fetch';
 import Ens from './Ens';
 import Zns from './Zns';
 import { Blockchain, NamicornResolution } from './types';
+import ResolutionError from './ResolutionError';
 
 const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
 
@@ -40,19 +41,19 @@ class Namicorn {
 
   readonly api: string;
   readonly blockchain: Blockchain | boolean;
-/**
- * @ignore
- */
+  /**
+   * @ignore
+   */
   readonly ens?: Ens;
-/**
- * @ignore
- */
+  /**
+   * @ignore
+   */
   readonly zns?: Zns;
 
-/**
- * Namicorn constructor
- * @property {Blockchain} blockchain - main configuration object
- */
+  /**
+   * Namicorn constructor
+   * @property {Blockchain} blockchain - main configuration object
+   */
   constructor({
     blockchain = true,
     api = DefaultUrl,
@@ -78,51 +79,81 @@ class Namicorn {
     }
   }
 
-/**
- * Resolves the given domain
- * @async
- * @param {string} domain - domain name to be resolved 
- * @returns {Promise<NamicornResolution>} - Returns a promise that resolves in an object 
- */
+  /**
+   * Resolves the given domain
+   * @async
+   * @param {string} domain - domain name to be resolved 
+   * @returns {Promise<NamicornResolution>} - Returns a promise that resolves in an object 
+   */
   async resolve(domain: string): Promise<NamicornResolution> {
-    if (this.blockchain) {
-      return await this.resolveUsingBlockchain(domain);
-    } else {
-      const response = isNode()
-        ? await fetch(`${this.api}/${domain}`)
-        : await window.fetch(`${this.api}/${domain}`);
-      return response.json();
+    try {
+      if (this.blockchain) {
+        return await this.resolveUsingBlockchain(domain);
+      } else {
+        const response = isNode()
+          ? await fetch(`${this.api}/${domain}`)
+          : await window.fetch(`${this.api}/${domain}`);
+        return response.json();
+      }
+    } catch (err) {
+      if (err.name == 'ResolutionError') { return null } else throw (err);
     }
   }
 
-/**
- * Resolves give domain name to a specific currency address if exists
- * @async
- * @param {string} domain - domain name to be resolved
- * @param {string} currencyTicker - currency ticker like BTC, ETH, ZIL
- * @returns {Promise<string>} - A promise that resolves in an address or null
- */
-  async address(domain: string, currencyTicker: string): Promise<string> {
-    const data = await this.resolve(domain);
-    return (data && data.addresses[currencyTicker.toUpperCase()]) || null;
+  /**
+   * Resolves give domain name to a specific currency address if exists
+   * @async
+   * @param {string} domain - domain name to be resolved
+   * @param {string} currencyTicker - currency ticker like BTC, ETH, ZIL
+   * @returns {Promise<string>} - A promise that resolves in an address or null
+   */
+  async address(domain: string, currencyTicker: string): Promise<string | null> {
+    try {
+      return await this.addressOrThrow(domain, currencyTicker)
+    }
+    catch (error) {
+      if (error.name == 'ResolutionError') { return null } else { throw error };
+    }
   }
 
-/**
- * This method is only for ens at the moment. Reverse the ens address to a ens registered domain name
- * @async
- * @param {string} address - address you wish to reverse
- * @param {string} currencyTicker - currency ticker like BTC, ETH, ZIL 
- * @returns {Promise<string>} - domain name attached to this address
- */
+  /**
+   * Resolves given domain to a specific currency address or throws
+   * @param domain - domain name
+   * @param currencyTicker - currency ticker such as
+   *  - ZIL
+   *  - BTC
+   *  - ETH
+   * @throws UNREGISTERED_DOMAIN
+   * @throws NOT_REGISTERED_CURRENCY 
+   */
+  async addressOrThrow(domain: string, currencyTicker: string): Promise<string> {
+    try {
+      var data = await this.resolve(domain);
+    } catch (err) {
+      if (err.name == 'ResolutionError') { return null } else { throw err };
+    }
+    if (data && !data.meta.owner) throw new ResolutionError('UNREGISTERED_DOMAIN', { domain });
+    if (data && !data.addresses[currencyTicker.toUpperCase()]) throw new ResolutionError('NOT_REGISTERED_CURRENCY', { domain, currencyTicker });
+    return (data && data.addresses[currencyTicker.toUpperCase()] || null);
+
+  }
+
+  /**
+   * This method is only for ens at the moment. Reverse the ens address to a ens registered domain name
+   * @async
+   * @param {string} address - address you wish to reverse
+   * @param {string} currencyTicker - currency ticker like BTC, ETH, ZIL 
+   * @returns {Promise<string>} - domain name attached to this address
+   */
   async reverse(address: string, currencyTicker: string): Promise<string> {
     return await this.ens.reverse(address, currencyTicker);
   }
 
-/**
- * Checks if the domain is in valid format
- * @param {string} domain - domain name to be checked
- * @returns {boolean} 
- */
+  /**
+   * Checks if the domain is in valid format
+   * @param {string} domain - domain name to be checked
+   * @returns {boolean} 
+   */
   isSupportedDomain(domain: string): boolean {
     return (
       (this.zns && this.zns.isSupportedDomain(domain)) ||
@@ -130,11 +161,11 @@ class Namicorn {
     );
   }
 
-/**
- * Checks if the domain is supported by the specified network as well as if it is in valid format
- * @param {string} domain - domain name to be checked
- * @returns {boolean} 
- */
+  /**
+   * Checks if the domain is supported by the specified network as well as if it is in valid format
+   * @param {string} domain - domain name to be checked
+   * @returns {boolean} 
+   */
   isSupportedDomainInNetwork(domain: string): boolean {
     const methods = [this.ens, this.zns];
     const method = methods.find(
@@ -143,17 +174,17 @@ class Namicorn {
     return method && method.isSupportedNetwork();
   }
 
-/**
- * resolves the domain using blockchain call
- * @ignore
- * @private
- * @async
- * @param {string} domain - domain name to be resolved
- * @return {Promise<NamicornResolution>}
- */
-  private async resolveUsingBlockchain(domain: string): Promise<NamicornResolution>{
+  /**
+   * resolves the domain using blockchain call
+   * @ignore
+   * @private
+   * @async
+   * @param {string} domain - domain name to be resolved
+   * @return {Promise<NamicornResolution>}
+   */
+  private async resolveUsingBlockchain(domain: string): Promise<NamicornResolution> {
     const method = this.getNamingMethod(domain);
-    if (!method) return null;
+    if (!method) throw new ResolutionError('UNSUPPORTED_DOMAIN', { domain });
     const result = await method.resolve(domain);
     return result || Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
   }

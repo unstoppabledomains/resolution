@@ -2,8 +2,8 @@
 type ResolutionErrorCode = string;
 /** Alias for Resolution error handler function */
 // type ResolutionErrorHandler = (domain?: string, method?: string) => string;
-type ResolutionErrorHandler = (error: {domain?: string, method?: string}) => string;
-
+type ResolutionErrorHandler = (error: ResolutionErrorOptions) => string;
+type ResolutionErrorOptions = {method?: string, domain?: string, currencyTicker?: string};
 /** 
  * @ignore 
  * Internal Mapping object from ResolutionErrorCode to a ResolutionErrorHandler 
@@ -11,6 +11,8 @@ type ResolutionErrorHandler = (error: {domain?: string, method?: string}) => str
 const HandlersByCode: {[key: string]: ResolutionErrorHandler} = {
   'UNREGISTERED_DOMAIN': (error: {domain: string}) => `Domain ${error.domain} is not registered`,
   'UNSPECIFIED_RESOLVER': () => 'Resolver address is incorrect',
+  'UNSUPPORTED_DOMAIN': (error: {domain: string}) => `Domain ${error.domain} is not supported`,
+  'NOT_REGISTERED_CURRENCY': (error: {domain: string, currencyTicker: string}) => `${error.domain} has no ${error.currencyTicker} attached to it`,
   'UNSPECIFIED_NETWORK': (error: {method: string}) => `Unspecified network in Namicorn ${error.method} configuration`,
   'UNSPECIFIED_URL': (error: {method: string}) => `Unspecified url in Namicorn ${error.method} configuration`,
 }
@@ -26,12 +28,16 @@ export default class ResolutionError extends Error {
   readonly code: ResolutionErrorCode;
   readonly domain?: string;
   readonly method?: string;
+  readonly currencyTicker?: string;
 
-  constructor(code: ResolutionErrorCode, method?: string, domain?: string,) {
+  constructor(code: ResolutionErrorCode, options: ResolutionErrorOptions) {
     const resolutionErrorHandler: ResolutionErrorHandler = HandlersByCode[code];
-    super(resolutionErrorHandler({domain, method}));
+    const {domain, method, currencyTicker} = options;
+    super(resolutionErrorHandler({domain, method, currencyTicker}));
     this.code = code;
     this.domain = domain;
     this.method = method;
+    this.currencyTicker = currencyTicker;
+    this.name = 'ResolutionError';
   } 
 }

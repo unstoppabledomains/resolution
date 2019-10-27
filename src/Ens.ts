@@ -84,10 +84,10 @@ export default class Ens extends NamingService {
     this.network = <string>source.network;
     this.url = source.url;
     if (!this.network) {
-      throw new ResolutionError('UNSPECIFIED_NETWORK', 'ENS')
+      throw new ResolutionError('UNSPECIFIED_NETWORK', {method: 'ENS'})
     }
     if (!this.url) {
-      throw new ResolutionError('UNSPECIFIED_URL', 'ENS');
+      throw new ResolutionError('UNSPECIFIED_URL', {method: 'ENS'});
     }
     this.registryAddress = source.registry
       ? source.registry
@@ -160,7 +160,7 @@ export default class Ens extends NamingService {
    */
   async resolve(domain: string): Promise<NamicornResolution | null> {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork()) {
-      return null;
+      throw new ResolutionError('UNSUPPORTED_DOMAIN', {domain});
     }
     const nodeHash = hash(domain);
     var [owner, ttl, resolver] = await this._getResolutionInfo(nodeHash);

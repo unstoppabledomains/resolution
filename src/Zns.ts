@@ -47,10 +47,10 @@ export default class Zns extends NamingService {
     this.url = source.url;
     this.zilliqa = new Zilliqa(this.url);
     if (!this.network) {
-      throw new ResolutionError('UNSPECIFIED_NETWORK', 'ZNS')
+      throw new ResolutionError('UNSPECIFIED_NETWORK', {method: 'ZNS'})
     }
     if (!this.url) {
-      throw new ResolutionError('UNSPECIFIED_URL', 'ZNS');
+      throw new ResolutionError('UNSPECIFIED_URL', {method: 'ZNS'});
     }
     this.registryAddress = source.registry
       ? source.registry
@@ -65,7 +65,7 @@ export default class Zns extends NamingService {
 
   async resolve(domain: string): Promise<NamicornResolution | null> {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork())
-      return null;
+      throw new ResolutionError('UNSUPPORTED_DOMAIN', {domain});
     const recordAddresses = await this._getRecordsAddresses(domain);
     if (!recordAddresses) return null;
     const [ownerAddress, resolverAddress] = recordAddresses;
