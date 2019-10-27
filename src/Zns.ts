@@ -47,10 +47,10 @@ export default class Zns extends NamingService {
     this.url = source.url;
     this.zilliqa = new Zilliqa(this.url);
     if (!this.network) {
-      throw new ResolutionError('UNSPECIFIED_NETWORK', {method: 'ZNS'})
+      throw new ResolutionError('UNSPECIFIED_NETWORK', { method: 'ZNS' });
     }
     if (!this.url) {
-      throw new ResolutionError('UNSPECIFIED_URL', {method: 'ZNS'});
+      throw new ResolutionError('UNSPECIFIED_URL', { method: 'ZNS' });
     }
     this.registryAddress = source.registry
       ? source.registry
@@ -65,7 +65,7 @@ export default class Zns extends NamingService {
 
   async resolve(domain: string): Promise<NamicornResolution | null> {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork())
-      throw new ResolutionError('UNSUPPORTED_DOMAIN', {domain});
+      throw new ResolutionError('UNSUPPORTED_DOMAIN', { domain });
     const recordAddresses = await this._getRecordsAddresses(domain);
     if (!recordAddresses) return null;
     const [ownerAddress, resolverAddress] = recordAddresses;
@@ -116,7 +116,7 @@ export default class Zns extends NamingService {
     if (!registryRecord) return null;
     let [ownerAddress, resolverAddress] = registryRecord.arguments as [
       string,
-      string
+      string,
     ];
     if (ownerAddress.startsWith('0x')) {
       ownerAddress = toBech32Address(ownerAddress);
@@ -126,7 +126,7 @@ export default class Zns extends NamingService {
 
   /**
    * @ignore
-   * @param resolverAddress 
+   * @param resolverAddress
    */
   async _getResolverRecordsStructure(
     resolverAddress: string,
@@ -189,8 +189,9 @@ export default class Zns extends NamingService {
     try {
       let result = (await contract.getSubState(field, keys)) || {};
       return result[field];
-    }catch(err) {
-      if (err.name == 'FetchError') throw new ResolutionError('BLOCKCHAIN_DOWN', {method: 'ZNS'});
+    } catch (err) {
+      if (err.name == 'FetchError')
+        throw new ResolutionError('BLOCKCHAIN_DOWN', { method: 'ZNS' });
     }
   }
 
