@@ -3,7 +3,7 @@ import { Contract } from '@zilliqa-js/contract';
 import { toChecksumAddress, toBech32Address } from '@zilliqa-js/crypto';
 import namehash from './zns/namehash';
 import _ from 'lodash';
-import { ResolutionResult, SourceDefinition } from './types';
+import { SourceDefinition, NamicornResolution } from './types';
 import NamingService from './NamingService';
 
 const DefaultSource = 'https://api.zilliqa.com';
@@ -62,13 +62,13 @@ export default class Zns extends NamingService {
     }
   }
 
-  async resolve(domain: string): Promise<ResolutionResult | null> {
+  async resolve(domain: string): Promise<NamicornResolution | null> {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork())
       return null;
-    const recordAddresses = await this.getRecordsAddresses(domain);
+    const recordAddresses = await this._getRecordsAddresses(domain);
     if (!recordAddresses) return null;
     const [ownerAddress, resolverAddress] = recordAddresses;
-    const resolution = await this.getResolverRecordsStructure(resolverAddress);
+    const resolution = await this._getResolverRecordsStructure(resolverAddress);
     const addresses = _.mapValues(resolution.crypto, 'address');
     return {
       addresses,
@@ -80,22 +80,18 @@ export default class Zns extends NamingService {
     };
   }
 
-  async resolution(domain:string) : Promise<any | null> {
+  /**
+   * Resolves a domain
+   * @param domain - domain name to be resolved
+   * @returns - Everything what is stored on specified domain
+   */
+  async resolution(domain: string): Promise<Object | {}> {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork())
-      return null;
-    const recordAddresses = await this.getRecordsAddresses(domain);
-    if (!recordAddresses) return null; 
-    const [ownerAddress, resolverAddress] = recordAddresses;
-    const resolution = await this.getResolverRecordsStructure(resolverAddress);
-    return {
-      resolution: _.omit(resolution, ['crypto']),
-      addresses: _.mapValues(resolution.crypto, 'address'),
-      meta: {
-        owner: ownerAddress || null,
-        type: 'zns',
-        ttl: parseInt(resolution.ttl as string) || 0
-      }
-    };
+      return {};
+    const recordAddresses = await this._getRecordsAddresses(domain);
+    if (!recordAddresses) return {};
+    const [_, resolverAddress] = recordAddresses;
+    return await this._getResolverRecordsStructure(resolverAddress);
   }
 
   isSupportedDomain(domain: string): boolean {
@@ -110,7 +106,11 @@ export default class Zns extends NamingService {
     return namehash(domain);
   }
   
-  private async getRecordsAddresses(domain: string) : Promise<[string, string] | null> {
+  /**
+   * @ignore
+   * @param domain - domain name
+   */
+  async _getRecordsAddresses(domain: string): Promise<[string, string] | null> {
     const registryRecord = await this.getContractMapValue(
       this.registry,
       'records',
@@ -128,6 +128,29 @@ export default class Zns extends NamingService {
     return [ownerAddress, resolverAddress];
   }
 
+  /**
+   * @ignore
+   * @param resolverAddress 
+   */
+  async _getResolverRecordsStructure(
+    resolverAddress: string,
+  ): Promise<NamicornResolution | any> {
+    if (resolverAddress == NullAddress) {
+      return {};
+    }
+    const resolver = this.zilliqa.contracts.at(
+      toChecksumAddress(resolverAddress),
+    );
+    const resolverRecords = (await this.getContractField(
+      resolver,
+      'records',
+    )) as { [key: string]: string };
+    return _.transform(
+      resolverRecords,
+      (result, value, key) => _.set(result, key, value),
+      {},
+    );
+  }
 
   protected normalizeSource(
     source: string | boolean | SourceDefinition,
@@ -167,9 +190,7 @@ export default class Zns extends NamingService {
     field: string,
     keys: string[] = [],
   ): Promise<any> {
-    let result =
-      (await contract.getSubState(field, keys)) ||
-      {};
+    let result = (await contract.getSubState(field, keys)) || {};
     return result[field];
   }
 
@@ -180,25 +201,5 @@ export default class Zns extends NamingService {
   ): Promise<any> {
     const record = await this.getContractField(contract, field, [key]);
     return (record && record[key]) || null;
-  }
-
-  private async getResolverRecordsStructure(
-    resolverAddress: string,
-  ): Promise<ResolutionResult> {
-    if (resolverAddress == NullAddress) {
-      return {};
-    }
-    const resolver = this.zilliqa.contracts.at(
-      toChecksumAddress(resolverAddress),
-    );
-    const resolverRecords = (await this.getContractField(
-      resolver,
-      'records',
-    )) as { [key: string]: string };
-    return _.transform(
-      resolverRecords,
-      (result, value, key) => _.set(result, key, value),
-      {},
-    );
   }
 }

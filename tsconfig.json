@@ -11,5 +11,10 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true
-  }
+  },
+  "typedocOptions": {
+    "mode": "file",
+    "module": "commonjs",
+    "out": "../docs"
+}
 }
