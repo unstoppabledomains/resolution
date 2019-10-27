@@ -92,6 +92,11 @@ class Namicorn {
     return method && method.isSupportedNetwork();
   }
 
+  /**
+   * Returns a corresponding namehash depends on the naming service 
+   * @param domain - domain name
+   * @returns namehash from internal naming service
+   */
   namehash(domain: string): string {
     const method = this.getNamingMethod(domain);
     if (!method) return null;
