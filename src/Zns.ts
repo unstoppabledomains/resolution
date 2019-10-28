@@ -63,8 +63,6 @@ export default class Zns extends NamingService {
   }
 
   async resolve(domain: string): Promise<NamicornResolution | null> {
-    if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork())
-      return null;
     const recordAddresses = await this._getRecordsAddresses(domain);
     if (!recordAddresses) return null;
     const [ownerAddress, resolverAddress] = recordAddresses;
@@ -86,11 +84,8 @@ export default class Zns extends NamingService {
    * @returns - Everything what is stored on specified domain
    */
   async resolution(domain: string): Promise<Object | {}> {
-    if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork())
-      return {};
-    const recordAddresses = await this._getRecordsAddresses(domain);
-    if (!recordAddresses) return {};
-    const [_, resolverAddress] = recordAddresses;
+    const resolverAddress = await this.resolverAddress(domain);
+    if (!resolverAddress) return {};
     return await this._getResolverRecordsStructure(resolverAddress);
   }
 
@@ -103,13 +98,15 @@ export default class Zns extends NamingService {
   }
 
   /** @ignore */
-  async _getRecordsAddresses(domain: string): Promise<[string, string] | null> {
+  async _getRecordsAddresses(domain: string): Promise<[string, string] | undefined> {
+    if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork())
+      return undefined;
     const registryRecord = await this.getContractMapValue(
       this.registry,
       'records',
       namehash(domain),
     );
-    if (!registryRecord) return null;
+    if (!registryRecord) return undefined;
     let [ownerAddress, resolverAddress] = registryRecord.arguments as [
       string,
       string
@@ -173,6 +170,12 @@ export default class Zns extends NamingService {
       }
     }
   }
+
+  /** @ignore */
+  private async resolverAddress(domain: string): Promise<string | undefined> {
+    return (await this._getRecordsAddresses(domain) || [])[1];
+  }
+
 /** @ignore */
   private async getContractField(
     contract: Contract,
