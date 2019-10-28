@@ -102,7 +102,7 @@ class Namicorn {
  * @param {string} domain - domain name to be resolved 
  * @returns {Promise<NamicornResolution>} - Returns a promise that resolves in an object 
  */
-  async resolve(domain: string) {
+  async resolve(domain: string): Promise<NamicornResolution> {
     if (this.blockchain) {
       return await this.resolveUsingBlockchain(domain);
     } else {
