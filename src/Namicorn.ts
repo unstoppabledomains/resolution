@@ -21,7 +21,7 @@ const isNode = () => {
 /**
  * Blockchain domain resolution library - Namicorn.
  *
- * @example 
+ * @example
  * ```
  * let namicorn = new Namicorn({blockchain: {ens: {url: 'https://mainnet.infura.io', network: 'mainnet'}}});
  * let domain = brad.zil
@@ -40,19 +40,19 @@ class Namicorn {
 
   readonly api: string;
   readonly blockchain: Blockchain | boolean;
-/**
- * @ignore
- */
+  /**
+   * @ignore
+   */
   readonly ens?: Ens;
-/**
- * @ignore
- */
+  /**
+   * @ignore
+   */
   readonly zns?: Zns;
 
-/**
- * Namicorn constructor
- * @property {Blockchain} blockchain - main configuration object
- */
+  /**
+   * Namicorn constructor
+   * @property {Blockchain} blockchain - main configuration object
+   */
   constructor({
     blockchain = true,
     api = DefaultUrl,
@@ -78,12 +78,12 @@ class Namicorn {
     }
   }
 
-/**
- * Resolves the given domain
- * @async
- * @param domain - domain name to be resolved 
- * @returns - Returns a promise that resolves in an object 
- */
+  /**
+   * Resolves the given domain
+   * @async
+   * @param domain - domain name to be resolved
+   * @returns - Returns a promise that resolves in an object
+   */
   async resolve(domain: string): Promise<NamicornResolution> {
     if (this.blockchain) {
       return await this.resolveUsingBlockchain(domain);
@@ -95,34 +95,34 @@ class Namicorn {
     }
   }
 
-/**
- * Resolves give domain name to a specific currency address if exists
- * @async
- * @param domain - domain name to be resolved
- * @param currencyTicker - currency ticker like BTC, ETH, ZIL
- * @returns - A promise that resolves in an address or null
- */
+  /**
+   * Resolves give domain name to a specific currency address if exists
+   * @async
+   * @param domain - domain name to be resolved
+   * @param currencyTicker - currency ticker like BTC, ETH, ZIL
+   * @returns - A promise that resolves in an address or null
+   */
   async address(domain: string, currencyTicker: string): Promise<string> {
     const data = await this.resolve(domain);
     return (data && data.addresses[currencyTicker.toUpperCase()]) || null;
   }
 
-/**
- * This method is only for ens at the moment. Reverse the ens address to a ens registered domain name
- * @async
- * @param address - address you wish to reverse
- * @param currencyTicker - currency ticker like BTC, ETH, ZIL 
- * @returns - domain name attached to this address
- */
+  /**
+   * This method is only for ens at the moment. Reverse the ens address to a ens registered domain name
+   * @async
+   * @param address - address you wish to reverse
+   * @param currencyTicker - currency ticker like BTC, ETH, ZIL
+   * @returns - domain name attached to this address
+   */
   async reverse(address: string, currencyTicker: string): Promise<string> {
     return await this.ens.reverse(address, currencyTicker);
   }
 
-/**
- * Checks if the domain is in valid format
- * @param domain - domain name to be checked
- * @returns 
- */
+  /**
+   * Checks if the domain is in valid format
+   * @param domain - domain name to be checked
+   * @returns
+   */
   isSupportedDomain(domain: string): boolean {
     return (
       (this.zns && this.zns.isSupportedDomain(domain)) ||
@@ -130,11 +130,11 @@ class Namicorn {
     );
   }
 
-/**
- * Checks if the domain is supported by the specified network as well as if it is in valid format
- * @param domain - domain name to be checked
- * @returns 
- */
+  /**
+   * Checks if the domain is supported by the specified network as well as if it is in valid format
+   * @param domain - domain name to be checked
+   * @returns
+   */
   isSupportedDomainInNetwork(domain: string): boolean {
     const methods = [this.ens, this.zns];
     const method = methods.find(
@@ -143,14 +143,9 @@ class Namicorn {
     return method && method.isSupportedNetwork();
   }
 
-/**
- * resolves the domain using blockchain call
- * @ignore
- * @private
- * @async
- * @param domain - domain name to be resolved
- * @return
- */
+  /**
+   * @ignore
+   */
   private async resolveUsingBlockchain(domain: string): Promise<NamicornResolution>{
     const method = this.getNamingMethod(domain);
     if (!method) return null;
@@ -160,8 +155,6 @@ class Namicorn {
 
   /**
    * @ignore
-   * Used internally to get the right method (ens or zns)
-   * @param domain - domain name
    */
   private getNamingMethod(domain: string) {
     const methods = [this.ens, this.zns];
@@ -170,7 +163,6 @@ class Namicorn {
     );
     return method || null;
   }
-
 }
 
 export { Namicorn, Namicorn as default };

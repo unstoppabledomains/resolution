@@ -117,7 +117,7 @@ export default class Zns extends NamingService {
     return [ownerAddress, resolverAddress];
   }
 
- /** @ignore */
+  /** @ignore */
   async _getResolverRecordsStructure(
     resolverAddress: string,
   ): Promise<NamicornResolution | any> {
@@ -137,7 +137,8 @@ export default class Zns extends NamingService {
       {},
     );
   }
-/** @ignore */
+
+  /** @ignore */
   protected normalizeSource(
     source: string | boolean | SourceDefinition,
   ): SourceDefinition {
@@ -176,7 +177,7 @@ export default class Zns extends NamingService {
     return (await this._getRecordsAddresses(domain) || [])[1];
   }
 
-/** @ignore */
+  /** @ignore */
   private async getContractField(
     contract: Contract,
     field: string,
@@ -185,7 +186,8 @@ export default class Zns extends NamingService {
     let result = (await contract.getSubState(field, keys)) || {};
     return result[field];
   }
-/** @ignore */
+
+  /** @ignore */
   private async getContractMapValue(
     contract: Contract,
     field: string,
