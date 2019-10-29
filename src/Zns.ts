@@ -42,7 +42,7 @@ export default class Zns extends NamingService {
   constructor(source: string | boolean | SourceDefinition = true) {
     super();
     source = this.normalizeSource(source);
-    this.network = <string>source.network;
+    this.network = source.network as string;
     this.url = source.url;
     this.zilliqa = new Zilliqa(this.url);
     if (!this.network) {
