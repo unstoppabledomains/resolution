@@ -5,7 +5,7 @@ import { default as resolverInterface } from './ens/contract/resolver';
 import { hash } from 'eth-ens-namehash';
 import { SourceDefinition, NamicornResolution } from './types';
 import NamingService from './NamingService';
-import ResolutionError from './ResolutionError';
+import { ResolutionError } from './index';
 /**
  * @ignore
  */

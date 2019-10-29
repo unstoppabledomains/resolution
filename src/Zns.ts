@@ -5,7 +5,7 @@ import namehash from './zns/namehash';
 import _ from 'lodash';
 import { SourceDefinition, NamicornResolution } from './types';
 import NamingService from './NamingService';
-import ResolutionError from './ResolutionError';
+import { ResolutionError } from './index';
 
 const DefaultSource = 'https://api.zilliqa.com';
 const NullAddress = '0x0000000000000000000000000000000000000000';
