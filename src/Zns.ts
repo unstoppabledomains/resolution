@@ -84,9 +84,16 @@ export default class Zns extends NamingService {
    * @returns - Everything what is stored on specified domain
    */
   async resolution(domain: string): Promise<ZnsResolution> {
-    const resolverAddress = await this.resolverAddress(domain);
-    if (!resolverAddress) return {};
-    return await this._getResolverRecordsStructure(resolverAddress);
+    return await this.structureResolverRecords(await this.records(domain));
+  }
+
+  /**
+   * Resolver Records
+   * @param domain - domain name to be resolved
+   * @returns - ZNS resolver records in an plain key-value format
+   */
+  async records(domain: string): Promise<Dictionary<string>> {
+    return await this._getResolverRecords(await this.resolverAddress(domain))
   }
 
   isSupportedDomain(domain: string): boolean {
@@ -118,20 +125,24 @@ export default class Zns extends NamingService {
   }
 
   /** @ignore */
-  async _getResolverRecordsStructure(
+  async _getResolverRecords(
     resolverAddress: string,
   ): Promise<ZnsResolution> {
-    if (resolverAddress == NullAddress) {
+    if (!resolverAddress || resolverAddress == NullAddress) {
       return {};
     }
     const resolver = this.zilliqa.contracts.at(
       toChecksumAddress(resolverAddress),
     );
-    const records = (await this.getContractField(
+    return (await this.getContractField(
       resolver,
       'records',
     ) || {}) as Dictionary<string>;
-    return this.structureResolverRecords(records);
+  }
+
+  /** @ignore */
+  async _getResolverRecordsStructure(resolverAddress: string): Promise<ZnsResolution> {
+    return this.structureResolverRecords(await this._getResolverRecords(resolverAddress));
   }
 
   /** @ignore */

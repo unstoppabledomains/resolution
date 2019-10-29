@@ -223,19 +223,15 @@ describe('ZNS', () => {
       ]);
 
     const secondEye = jest
-      .spyOn(namicorn.zns, '_getResolverRecordsStructure')
+      .spyOn(namicorn.zns, '_getResolverRecords')
       .mockResolvedValue({
-        crypto: {
-          BCH: { address: 'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6' },
-          BTC: { address: '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB' },
-          ETH: { address: '0x45b31e01AA6f42F0549aD482BE81635ED3149abb' },
-          LTC: { address: 'LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL' },
-          ZIL: { address: 'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj' },
-        },
-        ipfs: {
-          html: { value: 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK' },
-          redirect_domain: { value: 'www.unstoppabledomains.com' },
-        },
+        "crypto.BCH.address": 'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6',
+        "crypto.BTC.address": '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB',
+        "crypto.ETH.address": '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
+        "crypto.LTC.address": 'LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL',
+        "crypto.ZIL.address": 'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
+        "ipfs.html.value": 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
+        "ipfs.redirect_domain.value": 'www.unstoppabledomains.com',
       });
 
     const result = await namicorn.zns.resolution('brad.zil');
@@ -267,19 +263,13 @@ describe('ZNS', () => {
       ]);
 
     const secondEye = jest
-      .spyOn(namicorn.zns, '_getResolverRecordsStructure')
+      .spyOn(namicorn.zns, '_getResolverRecords')
       .mockResolvedValue({
-        ipfs: {
-          html: {
-            hash: 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
-            value: 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
-          },
-          redirect_domain: { value: 'www.unstoppabledomains.com' },
-        },
-        whois: {
-          email: { value: 'matt+test@unstoppabledomains.com' },
-          for_sale: { value: 'true' },
-        },
+        "ipfs.html.hash": 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
+        "ipfs.html.value": 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
+        "ipfs.redirect_domain.value": 'www.unstoppabledomains.com',
+        "whois.email.value": 'matt+test@unstoppabledomains.com' ,
+        "whois.for_sale.value": 'true' ,
       });
 
     const result = await namicorn.zns.resolution('ergergergerg.zil');
