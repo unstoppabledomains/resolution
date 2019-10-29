@@ -1,4 +1,4 @@
-export type Dictionary<T> = {[k: string]: T}
+export type Dictionary<T> = { [k: string]: T };
 
 /**
  * SourceDefinition object
@@ -19,15 +19,15 @@ export interface SourceDefinition {
  * @property {Object} meta - meta information about the owner of the domain
  */
 export type NamicornResolution = {
-    addresses: {
-      [key: string]: string
-    },
-    meta: {
-      owner: string,
-      type: string //available domain
-      ttl: number,
-    },
-  }
+  addresses: {
+    [key: string]: string;
+  };
+  meta: {
+    owner: string;
+    type: string; //available domain
+    ttl: number;
+  };
+};
 
 export type NetworkIdMap = {
   [key: number]: string;
@@ -45,7 +45,7 @@ export type Blockchain =
  * @typedef {object} ZnsResolution
  */
 export type ZnsResolution = {
-  crypto?: Dictionary<{address?: string, [key: string]: any}>,
-  ttl?: string,
-  [key: string]: any
-}
+  crypto?: Dictionary<{ address?: string; [key: string]: any }>;
+  ttl?: string;
+  [key: string]: any;
+};

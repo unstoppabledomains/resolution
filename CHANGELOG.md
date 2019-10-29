@@ -1,6 +1,7 @@
 ## Unreleased
 * Added documentation to Namicorn, ENS and ZNS files
 * Connected typedoc to the project
+* Added user-agent to fetch calls for https://unstoppabledomains.com/
 * Specified scripts for automating generation of docs
 
 ## 0.2.41

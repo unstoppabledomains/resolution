@@ -39,20 +39,15 @@ const RegistryMap = {
  * @param url - main api url such as
  * - https://mainnet.infura.io
  * @param registryAddress - address for a registry contract
-*/
+ */
 export default class Ens extends NamingService {
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
-  /**
-   * @ignore
-   */
+  /** @ignore */
   private ensContract: any;
-  /**
-   * @ignore
-   */
+  /**  @ignore */
   private web3: any;
-
 
   /**
    * Source object describing the network naming service operates on
@@ -163,7 +158,7 @@ export default class Ens extends NamingService {
    * This was done to make automated tests more configurable
    * @param resolverContract
    * @param nodeHash
-  */
+   */
   _resolverCallToName(resolverContract, nodeHash) {
     return resolverContract.methods.name(nodeHash).call();
   }
@@ -172,7 +167,7 @@ export default class Ens extends NamingService {
    * @ignore
    * This was done to make automated tests more configurable
    * @param nodeHash
-  */
+   */
   _getResolver(nodeHash) {
     return this.ensContract.methods.resolver(nodeHash).call();
   }
@@ -181,7 +176,7 @@ export default class Ens extends NamingService {
    * @ignore
    * This was done to make automated tests more configurable
    * @param nodeHash
-  */
+   */
   async _getResolutionInfo(nodeHash) {
     return await Promise.all([
       this.ensContract.methods.owner(nodeHash).call(),
