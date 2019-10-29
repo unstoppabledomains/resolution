@@ -83,10 +83,10 @@ export default class Ens extends NamingService {
     this.network = <string>source.network;
     this.url = source.url;
     if (!this.network) {
-      throw new ResolutionError('UNSPECIFIED_NETWORK', { method: 'ENS' });
+      throw new Error('Unspecified network in Namicorn ENS configuration');
     }
     if (!this.url) {
-      throw new ResolutionError('UNSPECIFIED_URL', { method: 'ENS' });
+      throw new Error('Unspecified url in Namicorn ENS configuration');
     }
     this.registryAddress = source.registry
       ? source.registry

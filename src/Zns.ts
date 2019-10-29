@@ -47,10 +47,10 @@ export default class Zns extends NamingService {
     this.url = source.url;
     this.zilliqa = new Zilliqa(this.url);
     if (!this.network) {
-      throw new ResolutionError('UNSPECIFIED_NETWORK', { method: 'ZNS' });
+      throw new Error('Unspecified network in Namicorn ZNS configuration');
     }
     if (!this.url) {
-      throw new ResolutionError('UNSPECIFIED_URL', { method: 'ZNS' });
+      throw new Error('Unspecified url in Namicorn ZNS configuration');
     }
     this.registryAddress = source.registry
       ? source.registry

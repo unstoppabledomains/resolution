@@ -13,20 +13,20 @@ type ResolutionErrorOptions = {
  * Internal Mapping object from ResolutionErrorCode to a ResolutionErrorHandler
  */
 const HandlersByCode: { [key: string]: ResolutionErrorHandler } = {
-  UNREGISTERED_DOMAIN: (error: { domain: string }) =>
+  "UNREGISTERED_DOMAIN": (error: { domain: string }) =>
     `Domain ${error.domain} is not registered`,
-  UNSPECIFIED_RESOLVER: () => 'Resolver address is incorrect',
-  UNSUPPORTED_DOMAIN: (error: { domain: string }) =>
+  "UNSPECIFIED_RESOLVER": () => 'Resolver address is not specified',
+  "UNSUPPORTED_DOMAIN": (error: { domain: string }) =>
     `Domain ${error.domain} is not supported`,
-  NOT_REGISTERED_CURRENCY: (error: {
+  "NOT_REGISTERED_CURRENCY": (error: {
     domain: string;
     currencyTicker: string;
   }) => `${error.domain} has no ${error.currencyTicker} attached to it`,
-  UNSPECIFIED_NETWORK: (error: { method: string }) =>
+  "UNSPECIFIED_NETWORK": (error: { method: string }) =>
     `Unspecified network in Namicorn ${error.method} configuration`,
-  UNSPECIFIED_URL: (error: { method: string }) =>
+  "UNSPECIFIED_URL": (error: { method: string }) =>
     `Unspecified url in Namicorn ${error.method} configuration`,
-  BLOCKCHAIN_DOWN: (error: { method: string }) =>
+  "BLOCKCHAIN_DOWN": (error: { method: string }) =>
     `${error.method} blockchain is down at the moment`,
 };
 

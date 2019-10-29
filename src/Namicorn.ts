@@ -96,9 +96,7 @@ class Namicorn {
         return response.json();
       }
     } catch (err) {
-      if (err.name == 'ResolutionError') {
-        return null;
-      } else throw err;
+      throw err;
     }
   }
 
