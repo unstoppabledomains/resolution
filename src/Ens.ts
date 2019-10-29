@@ -47,10 +47,6 @@ export default class Ens extends NamingService {
   /**
    * @ignore
    */
-  private registrarContract: any;
-  /**
-   * @ignore
-   */
   private ensContract: any;
   /**
    * @ignore
@@ -83,11 +79,6 @@ export default class Ens extends NamingService {
       this.ensContract = new this.web3.eth.Contract(
         ensInterface,
         this.registryAddress,
-      );
-      this.registrarContract = new this.web3.eth.Contract(
-        registrarInterface,
-        //TODO: make an address dependent on network id
-        '0x6090A6e47849629b7245Dfa1Ca21D94cd15878Ef',
       );
     }
   }

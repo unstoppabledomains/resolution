@@ -324,8 +324,6 @@ describe('ZNS', () => {
 describe('ENS', () => {
   it('allows ens network specified as string', async () => {
     const testName = 'resolves .eth name using blockchain';
-    //mockAPICalls('ENS', testName, MainnetUrl);
-
     const namicorn = new Namicorn({
       blockchain: { ens: { network: 'mainnet' } },
     });
