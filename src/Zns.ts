@@ -3,7 +3,7 @@ import { Contract } from '@zilliqa-js/contract';
 import { toChecksumAddress, toBech32Address } from '@zilliqa-js/crypto';
 import namehash from './zns/namehash';
 import _ from 'lodash';
-import { SourceDefinition, NamicornResolution } from './types';
+import { SourceDefinition, NamicornResolution, Dictionary, ZnsResolution } from './types';
 import NamingService from './NamingService';
 
 const DefaultSource = 'https://api.zilliqa.com';
@@ -67,7 +67,7 @@ export default class Zns extends NamingService {
     if (!recordAddresses) return null;
     const [ownerAddress, resolverAddress] = recordAddresses;
     const resolution = await this._getResolverRecordsStructure(resolverAddress);
-    const addresses = _.mapValues(resolution.crypto, 'address');
+    const addresses = _.mapValues(resolution.crypto || {}, 'address');
     return {
       addresses,
       meta: {
@@ -83,7 +83,7 @@ export default class Zns extends NamingService {
    * @param domain - domain name to be resolved
    * @returns - Everything what is stored on specified domain
    */
-  async resolution(domain: string): Promise<Object | {}> {
+  async resolution(domain: string): Promise<ZnsResolution> {
     const resolverAddress = await this.resolverAddress(domain);
     if (!resolverAddress) return {};
     return await this._getResolverRecordsStructure(resolverAddress);
@@ -120,22 +120,18 @@ export default class Zns extends NamingService {
   /** @ignore */
   async _getResolverRecordsStructure(
     resolverAddress: string,
-  ): Promise<NamicornResolution | any> {
+  ): Promise<ZnsResolution> {
     if (resolverAddress == NullAddress) {
       return {};
     }
     const resolver = this.zilliqa.contracts.at(
       toChecksumAddress(resolverAddress),
     );
-    const resolverRecords = (await this.getContractField(
+    const records = (await this.getContractField(
       resolver,
       'records',
-    )) as { [key: string]: string };
-    return _.transform(
-      resolverRecords,
-      (result, value, key) => _.set(result, key, value),
-      {},
-    );
+    ) || {}) as Dictionary<string>;
+    return this.structureResolverRecords(records);
   }
 
   /** @ignore */
@@ -170,6 +166,15 @@ export default class Zns extends NamingService {
         return source;
       }
     }
+  }
+
+  /** @ignore */
+  private structureResolverRecords(records: Dictionary<string>): object {
+    return _.transform(
+      records,
+      (result, value, key) => _.set(result, key, value),
+      {},
+    );
   }
 
   /** @ignore */
