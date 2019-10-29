@@ -66,7 +66,8 @@ export default class Zns extends NamingService {
     const recordAddresses = await this._getRecordsAddresses(domain);
     if (!recordAddresses) return null;
     const [ownerAddress, resolverAddress] = recordAddresses;
-    const resolution = await this._getResolverRecordsStructure(resolverAddress);
+    const resolution = this.structureResolverRecords(await this._getResolverRecords(resolverAddress));
+
     const addresses = _.mapValues(resolution.crypto || {}, 'address');
     return {
       addresses,
@@ -141,11 +142,6 @@ export default class Zns extends NamingService {
   }
 
   /** @ignore */
-  async _getResolverRecordsStructure(resolverAddress: string): Promise<ZnsResolution> {
-    return this.structureResolverRecords(await this._getResolverRecords(resolverAddress));
-  }
-
-  /** @ignore */
   protected normalizeSource(
     source: string | boolean | SourceDefinition,
   ): SourceDefinition {
@@ -180,7 +176,7 @@ export default class Zns extends NamingService {
   }
 
   /** @ignore */
-  private structureResolverRecords(records: Dictionary<string>): object {
+  private structureResolverRecords(records: Dictionary<string>): ZnsResolution {
     return _.transform(
       records,
       (result, value, key) => _.set(result, key, value),
