@@ -159,7 +159,7 @@ export default class Ens extends NamingService {
    */
   async resolve(domain: string): Promise<NamicornResolution | null> {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork()) {
-      throw new ResolutionError('UNSUPPORTED_DOMAIN', { domain });
+      throw new ResolutionError('UnsupportedDomain', { domain });
     }
     const nodeHash = hash(domain);
     var [owner, ttl, resolver] = await this._getResolutionInfo(nodeHash);

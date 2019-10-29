@@ -65,7 +65,7 @@ export default class Zns extends NamingService {
 
   async resolve(domain: string): Promise<NamicornResolution | null> {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork())
-      throw new ResolutionError('UNSUPPORTED_DOMAIN', { domain });
+      throw new ResolutionError('UnsupportedDomain', { domain });
     const recordAddresses = await this._getRecordsAddresses(domain);
     if (!recordAddresses) return null;
     const [ownerAddress, resolverAddress] = recordAddresses;
@@ -191,7 +191,7 @@ export default class Zns extends NamingService {
       return result[field];
     } catch (err) {
       if (err.name == 'FetchError')
-        throw new ResolutionError('BLOCKCHAIN_DOWN', { method: 'ZNS' });
+        throw new ResolutionError('BlockchainDown', { method: 'ZNS' });
     }
   }
 

@@ -146,9 +146,9 @@ class Namicorn {
       }
     }
     if (data && !data.meta.owner)
-      throw new ResolutionError('UNREGISTERED_DOMAIN', { domain });
+      throw new ResolutionError('UnregisteredDomain', { domain });
     if (data && !data.addresses[currencyTicker.toUpperCase()])
-      throw new ResolutionError('NOT_REGISTERED_CURRENCY', {
+      throw new ResolutionError('NotRegisteredCurrency', {
         domain,
         currencyTicker,
       });
@@ -203,7 +203,7 @@ class Namicorn {
     domain: string,
   ): Promise<NamicornResolution> {
     const method = this.getNamingMethod(domain);
-    if (!method) throw new ResolutionError('UNSUPPORTED_DOMAIN', { domain });
+    if (!method) throw new ResolutionError('UnsupportedDomain', { domain });
     const result = await method.resolve(domain);
     return result || Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
   }
