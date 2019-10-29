@@ -115,7 +115,7 @@ export default class Zns extends NamingService {
     if (!registryRecord) return null;
     let [ownerAddress, resolverAddress] = registryRecord.arguments as [
       string,
-      string
+      string,
     ];
     if (ownerAddress.startsWith('0x')) {
       ownerAddress = toBech32Address(ownerAddress);
@@ -125,7 +125,7 @@ export default class Zns extends NamingService {
 
   /**
    * @ignore
-   * @param resolverAddress 
+   * @param resolverAddress
    */
   async _getResolverRecordsStructure(
     resolverAddress: string,

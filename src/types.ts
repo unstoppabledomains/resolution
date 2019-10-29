@@ -15,19 +15,19 @@ export interface SourceDefinition {
  * NamicornResulution
  * @typedef {Object} NamicornResolution
  * @property {Object} addresses - resolution addresses for various currency addresses attached to the domain
- * @property {Object} meta - meta information about the owner of the domain 
+ * @property {Object} meta - meta information about the owner of the domain
  */
 
 export type NamicornResolution = {
-    addresses: {
-      [key: string]: string
-    },
-    meta: {
-      owner: string,
-      type: string //available domain
-      ttl: number,
-    },
-  }
+  addresses: {
+    [key: string]: string;
+  };
+  meta: {
+    owner: string;
+    type: string; //available domain
+    ttl: number;
+  };
+};
 
 export type NetworkIdMap = {
   [key: number]: string;
