@@ -164,7 +164,9 @@ class Namicorn {
   /**
    * @ignore
    */
-  private async resolveUsingBlockchain(domain: string): Promise<NamicornResolution>{
+  private async resolveUsingBlockchain(
+    domain: string,
+  ): Promise<NamicornResolution> {
     const method = this.getNamingMethod(domain);
     if (!method) return null;
     const result = await method.resolve(domain);

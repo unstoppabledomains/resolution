@@ -1,4 +1,4 @@
-export type Dictionary<T> = {[k: string]: T}
+export type Dictionary<T> = { [k: string]: T };
 
 /**
  * SourceDefinition object
@@ -45,7 +45,7 @@ export type Blockchain =
  * @typedef {object} ZnsResolution
  */
 export type ZnsResolution = {
-  crypto?: Dictionary<{address?: string, [key: string]: any}>,
-  ttl?: string,
-  [key: string]: any
-}
+  crypto?: Dictionary<{ address?: string; [key: string]: any }>;
+  ttl?: string;
+  [key: string]: any;
+};
