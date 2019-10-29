@@ -114,7 +114,7 @@ class Namicorn {
     try {
       return await this.addressOrThrow(domain, currencyTicker);
     } catch (error) {
-      if (error.name == 'ResolutionError') {
+      if (error instanceof ResolutionError) {
         return null;
       } else {
         throw error;
@@ -139,7 +139,7 @@ class Namicorn {
     try {
       var data = await this.resolve(domain);
     } catch (err) {
-      if (err.name == 'ResolutionError') {
+      if (err instanceof ResolutionError) {
         return null;
       } else {
         throw err;

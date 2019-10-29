@@ -50,5 +50,6 @@ export default class ResolutionError extends Error {
     this.method = method;
     this.currencyTicker = currencyTicker;
     this.name = 'ResolutionError';
+    Object.setPrototypeOf(this, ResolutionError.prototype);
   }
 }
