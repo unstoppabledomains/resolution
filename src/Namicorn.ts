@@ -22,7 +22,7 @@ const isNode = () => {
 };
 
 /** @ignore */
-const Myfetch = isNode() ? nodeFetch : window.fetch;
+const myfetch = isNode() ? nodeFetch : window.fetch;
 
 /** @ignore Used internaly to set the right user-agent for fetch */
 const DefaultUserAgent = isNode() ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)' : navigator.userAgent;
@@ -106,7 +106,7 @@ class Namicorn {
     if (this.blockchain) {
       return await this.resolveUsingBlockchain(domain);
     } else {
-      const response = await Myfetch(`${this.api}/${domain}`, { method: 'GET', headers: headers});
+      const response = await myfetch(`${this.api}/${domain}`, { method: 'GET', headers: headers});
       return response.json();
     }
   }
