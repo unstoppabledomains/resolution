@@ -2,7 +2,7 @@ import nock from 'nock';
 import Namicorn from '.';
 import _ from 'lodash';
 import mockData from './testData/mockData.json';
-import Ens from './Ens';
+import Ens from './ens';
 
 const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
 const MainnetUrl = 'https://mainnet.infura.io';

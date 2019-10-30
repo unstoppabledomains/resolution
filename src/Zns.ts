@@ -9,8 +9,8 @@ import {
   Dictionary,
   ZnsResolution,
 } from './types';
-import NamingService from './NamingService';
 import { ResolutionError } from './index';
+import NamingService from './namingService';
 
 const DefaultSource = 'https://api.zilliqa.com';
 const NullAddress = '0x0000000000000000000000000000000000000000';
