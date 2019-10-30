@@ -470,7 +470,9 @@ describe('ENS', () => {
     const namicorn = new Namicorn({
       blockchain: { ens: MainnetUrl },
     });
-    expect(namicorn.addressOrThrow('something.luxe', 'ETH')).rejects.toThrow(ResolutionError);
+    expect(namicorn.addressOrThrow('something.luxe', 'ETH')).rejects.toThrow(
+      ResolutionError,
+    );
   });
 
   it('checks if the network is supported(true)', async () => {
