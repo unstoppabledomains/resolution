@@ -9,7 +9,10 @@ import {
   Dictionary,
   ZnsResolution,
 } from './types';
+<<<<<<< HEAD
 import { ResolutionError } from './index';
+=======
+>>>>>>> 2e92423007e2579049dcf12aeaf82c6da7707373
 import NamingService from './namingService';
 
 const DefaultSource = 'https://api.zilliqa.com';
@@ -201,6 +204,7 @@ export default class Zns extends NamingService {
     field: string,
     keys: string[] = [],
   ): Promise<any> {
+<<<<<<< HEAD
     try {
       let result = (await contract.getSubState(field, keys)) || {};
       return result[field];
@@ -210,6 +214,10 @@ export default class Zns extends NamingService {
       else
         throw err;
     }
+=======
+    let result = (await contract.getSubState(field, keys)) || {};
+    return result[field];
+>>>>>>> 2e92423007e2579049dcf12aeaf82c6da7707373
   }
 
   /** @ignore */
