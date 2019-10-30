@@ -143,22 +143,13 @@ class Namicorn {
    *  - ZIL
    *  - BTC
    *  - ETH
-   * @throws UNREGISTERED_DOMAIN
-   * @throws NOT_REGISTERED_CURRENCY
+   * @throws ResolutionError
    */
   async addressOrThrow(
     domain: string,
     currencyTicker: string,
   ): Promise<string> {
-    try {
-      var data = await this.resolve(domain);
-    } catch (err) {
-      if (err instanceof ResolutionError) {
-        return null;
-      } else {
-        throw err;
-      }
-    }
+    var data = await this.resolve(domain);
     if (data && !data.meta.owner)
       throw new ResolutionError('UnregisteredDomain', { domain });
     if (data && !data.addresses[currencyTicker.toUpperCase()])

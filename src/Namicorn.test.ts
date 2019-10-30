@@ -1,5 +1,5 @@
 import nock from 'nock';
-import Namicorn from '.';
+import Namicorn, { ResolutionError } from '.';
 import _ from 'lodash';
 import mockData from './testData/mockData.json';
 import Ens from './ens';
@@ -320,7 +320,6 @@ describe('ZNS', () => {
 
 describe('ENS', () => {
   it('allows ens network specified as string', async () => {
-    const testName = 'resolves .eth name using blockchain';
     const namicorn = new Namicorn({
       blockchain: { ens: { network: 'mainnet' } },
     });
@@ -437,7 +436,7 @@ describe('ENS', () => {
       );
 
     const result = await namicorn.address('john.luxe', 'ETH');
-    // expect(spy).toBeCalled();
+    expect(spy).toBeCalled();
     expect(secondSpy).toBeCalled();
     expect(result).toEqual('0xf3dE750A73C11a6a2863761E930BF5fE979d5663');
   });
@@ -609,20 +608,43 @@ describe('ENS', () => {
   });
 });
 
-it('provides empty response constant', async () => {
-  const response = Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
-  expect(response.addresses).toEqual({});
-  expect(response.meta.owner).toEqual(null);
-});
+describe('Namicorn', () => {
+  it('checks Namicorn#addressOrThrow error #1', async () => {
+    const namicorn = new Namicorn();
+    expect(
+      namicorn.addressOrThrow('sdncdoncvdinvcsdncs.zil', 'ZIL'),
+    ).rejects.toThrow(ResolutionError);
+  });
 
-it('resolves non-existing domain zone', async () => {
-  const namicorn = new Namicorn({ blockchain: true });
-  const result = await namicorn.address('bogdangusiev.qq', 'ZIL');
-  expect(result).toEqual(null);
-});
+  it('checks Namicorn#addressOrThrow error #2', async () => {
+    const namicorn = new Namicorn();
+    expect(
+      namicorn.addressOrThrow('brad.zil', 'INVALID_CURRENCY_SYMBOL'),
+    ).rejects.toThrow(ResolutionError);
+  });
 
-it('checks the isSupportedDomainInNetwork', async () => {
-  const namicorn = new Namicorn();
-  const result = namicorn.isSupportedDomainInNetwork('brad.zil');
-  expect(result).toBe(true);
+  it('resolves non-existing domain zone with throw', async () => {
+    const namicorn = new Namicorn({ blockchain: true });
+    expect(namicorn.addressOrThrow('bogdangusiev.qq', 'ZIL')).rejects.toThrow(
+      ResolutionError,
+    );
+  });
+
+  it('resolves non-existing domain zone via safe address', async () => {
+    const namicorn = new Namicorn({ blockchain: true });
+    const result = await namicorn.address('bogdangusiev.qq', 'ZIL');
+    expect(result).toEqual(null);
+  });
+
+  it('provides empty response constant', async () => {
+    const response = Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
+    expect(response.addresses).toEqual({});
+    expect(response.meta.owner).toEqual(null);
+  });
+
+  it('checks the isSupportedDomainInNetwork', async () => {
+    const namicorn = new Namicorn();
+    const result = namicorn.isSupportedDomainInNetwork('brad.zil');
+    expect(result).toBe(true);
+  });
 });

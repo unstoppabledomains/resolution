@@ -17,10 +17,8 @@ const HandlersByCode = {
   UnspecifiedResolver: () => 'Resolver address is not specified',
   UnsupportedDomain: (params: { domain: string }) =>
     `Domain ${params.domain} is not supported`,
-  UnregisteredCurrency: (params: {
-    domain: string;
-    currencyTicker: string;
-  }) => `${params.domain} has no ${params.currencyTicker} attached to it`,
+  UnregisteredCurrency: (params: { domain: string; currencyTicker: string }) =>
+    `${params.domain} has no ${params.currencyTicker} attached to it`,
   BlockchainDown: (params: { method: string }) =>
     `${params.method} blockchain is down at the moment`,
 };
@@ -30,6 +28,11 @@ const HandlersByCode = {
  * @param code - Error Code
  * @param domain - Domain name that was being used
  * @param method
+ * @throws UnregisteredDomain - when domain is not registered
+ * @throws UnspecifiedResolver - when resolver is not specified
+ * @throws UnsupportedDomain - when domain is not supported by current namicorn instance
+ * @throws UnregisteredCurrency - when domain doesn't have any address of specified currency
+ * @throws BlockchainDown - when blockchain is down
  */
 export default class ResolutionError extends Error {
   readonly code: ErrorCode;
@@ -38,7 +41,7 @@ export default class ResolutionError extends Error {
   readonly currencyTicker?: string;
 
   constructor(code: ErrorCode, options: ResolutionErrorOptions) {
-    const resolutionErrorHandler = HandlersByCode[code];
+    const resolutionErrorHandler: ResolutionErrorHandler = HandlersByCode[code];
     const { domain, method, currencyTicker } = options;
     super(resolutionErrorHandler({ domain, method, currencyTicker }));
     this.code = code;
