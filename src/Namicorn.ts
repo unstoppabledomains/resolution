@@ -1,6 +1,6 @@
 import nodeFetch from 'node-fetch';
-import Ens from './Ens';
-import Zns from './Zns';
+import Ens from './ens';
+import Zns from './zns';
 import { Blockchain, NamicornResolution } from './types';
 
 const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
