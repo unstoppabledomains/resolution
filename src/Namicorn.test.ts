@@ -441,7 +441,7 @@ describe('ENS', () => {
     expect(result).toEqual('0xf3dE750A73C11a6a2863761E930BF5fE979d5663');
   });
 
-  it('resolves .luxe name using ENS blockchain null', async () => {
+  it('resolves .luxe name using ENS blockchain with safe null return', async () => {
     const namicorn = new Namicorn({
       blockchain: { ens: MainnetUrl },
     });
@@ -464,6 +464,13 @@ describe('ENS', () => {
     expect(spy).toBeCalled();
     expect(secondSpy).toBeCalled();
     expect(result).toEqual(null);
+  });
+
+  it('resolves .luxe name using ENS blockchain with thrown error', async () => {
+    const namicorn = new Namicorn({
+      blockchain: { ens: MainnetUrl },
+    });
+    expect(namicorn.addressOrThrow('something.luxe', 'ETH')).rejects.toThrow(ResolutionError);
   });
 
   it('checks if the network is supported(true)', async () => {
