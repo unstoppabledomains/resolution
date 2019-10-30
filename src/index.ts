@@ -1,2 +1,3 @@
 import Namicorn from './namicorn';
-export { Namicorn, Namicorn as default };
+import ResolutionError from './resolutionError';
+export { Namicorn, Namicorn as default, ResolutionError };

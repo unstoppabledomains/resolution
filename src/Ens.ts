@@ -5,21 +5,14 @@ import { default as resolverInterface } from './ens/contract/resolver';
 import { hash } from 'eth-ens-namehash';
 import { SourceDefinition, NamicornResolution } from './types';
 import NamingService from './namingService';
-/**
- * @ignore
- */
+import { ResolutionError } from './index';
+/** @ignore */
 const Web3 = require('web3');
-/**
- * @ignore
- */
+/** @ignore */
 const NullAddress = '0x0000000000000000000000000000000000000000';
-/**
- * @ignore
- */
+/** @ignore */
 const DefaultUrl = 'https://mainnet.infura.io';
-/**
- * @ignore
- */
+/** @ignore */
 const NetworkIdMap = {
   1: 'mainnet',
   3: 'ropsten',
@@ -27,17 +20,13 @@ const NetworkIdMap = {
   42: 'rinkeby',
   5: 'goerli',
 };
-/**
- * @ignore
- */
+/** @ignore */
 const NetworkNameMap = _(NetworkIdMap)
   .invert()
   .mapValues((v, k) => parseInt(v))
   .value();
 
-/**
- * @ignore
- */
+/** @ignore */
 const RegistryMap = {
   mainnet: '0x314159265dd8dbb310642f98f50c066173c1259b',
   ropsten: '0x112234455c3a32fd11230c42e7bccd4a84e02010',
@@ -45,35 +34,28 @@ const RegistryMap = {
 
 /**
  * Class to support connection with Etherium naming service
- * @param {string} network - network string such as
+ * @param network - network string such as
  * - mainnet
  * - ropsten
- * @param {string} url - main api url such as
+ * @param url - main api url such as
  * - https://mainnet.infura.io
- * @param {string} registryAddress - address for a registry contract
+ * @param registryAddress - address for a registry contract
  */
 export default class Ens extends NamingService {
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
-  /**
-   * @ignore
-   */
-  private registrarContract: any;
-  /**
-   * @ignore
-   */
+  /** @ignore */
   private ensContract: any;
-  /**
-   * @ignore
-   */
+  /**  @ignore */
   private web3: any;
+  /** @ignore */
+  private registrarContract: any
 
   /**
    * Source object describing the network naming service operates on
-   * @param {string | boolean | SourceDefinition} source
-   * @throws Unspecified network
-   * @throws Unspecified url
+   * @param source - if specified as a string will be used as main url, if omited then defaults are used
+   * @throws ConfigurationError - when either network or url is setup incorrectly
    */
   constructor(source: string | boolean | SourceDefinition = true) {
     super();
@@ -105,8 +87,8 @@ export default class Ens extends NamingService {
 
   /**
    * Checks if the domain is in valid format
-   * @param {string} domain - domain name to be checked
-   * @returns {boolean}
+   * @param domain - domain name to be checked
+   * @returns
    */
   isSupportedDomain(domain: string): boolean {
     return (
@@ -116,7 +98,7 @@ export default class Ens extends NamingService {
 
   /**
    * Checks if the current network is supported
-   * @return {boolean}
+   * @returns
    */
   isSupportedNetwork(): boolean {
     return this.registryAddress != null;
@@ -125,9 +107,9 @@ export default class Ens extends NamingService {
   /**
    * Reverse the ens address to a ens registered domain name
    * @async
-   * @param {string} address - address you wish to reverse
-   * @param {string} currencyTicker - currency ticker like BTC, ETH, ZIL
-   * @returns {Promise<string>} - domain name attached to this address
+   * @param address - address you wish to reverse
+   * @param currencyTicker - currency ticker like BTC, ETH, ZIL
+   * @returns - domain name attached to this address
    */
   async reverse(address: string, currencyTicker: string): Promise<string> {
     if (currencyTicker != 'ETH') {
@@ -153,8 +135,8 @@ export default class Ens extends NamingService {
   /**
    * Resolves the given domain
    * @async
-   * @param {string} domain - domain name to be resolved
-   * @returns {Promise<NamicornResolution>} - Returns a promise that resolves in an object
+   * @param domain - domain name to be resolved
+   * @returns- Returns a promise that resolves in an object
    */
   async resolve(domain: string): Promise<NamicornResolution | null> {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork()) {
@@ -176,6 +158,10 @@ export default class Ens extends NamingService {
     };
   }
 
+  /**
+   * returns ens namehash of a domain
+   * @param domain - domain to be hashed
+   */
   namehash(domain: string): string {
     return hash(domain);
   }
@@ -238,8 +224,8 @@ export default class Ens extends NamingService {
   /**
    * Normalizes the source object based on type
    * @ignore
-   * @param { string | boolean | SourceDefinition } source
-   * @returns {SourceDefinition}
+   * @param source
+   * @returns
    */
   protected normalizeSource(
     source: string | boolean | SourceDefinition,
@@ -265,10 +251,12 @@ export default class Ens extends NamingService {
             ? source.url
             : `https://${source.network}.infura.io`;
         }
-        if (source.network && !source.url) {
-          if (NetworkNameMap.hasOwnProperty(source.network))
-            source.url = `https://${source.network}.infura.io`;
-          else throw new Error('Invalid network or unspecified url');
+        if (
+          source.network &&
+          !source.url &&
+          NetworkNameMap.hasOwnProperty(source.network)
+        ) {
+          source.url = `https://${source.network}.infura.io`;
         }
         if (source.url && !source.network) {
           source.network = this.networkFromUrl(source.url);
@@ -282,7 +270,7 @@ export default class Ens extends NamingService {
    * Look up for network from url provided
    * @ignore
    * @param url - main api url for blockchain
-   * @returns {string} - network such as:
+   * @returns - network such as:
    *  - mainnet
    *  - testnet
    */

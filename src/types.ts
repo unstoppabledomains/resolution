@@ -1,10 +1,11 @@
+export type Dictionary<T> = { [k: string]: T };
+
 /**
  * SourceDefinition object
  * @typedef {Object} SourceDefinition
  * @property {string} [url] - main blockchain api url
  * @property {string | number} [network] - blockchain network
  */
-
 export interface SourceDefinition {
   url?: string;
   network?: string | number;
@@ -17,7 +18,6 @@ export interface SourceDefinition {
  * @property {Object} addresses - resolution addresses for various currency addresses attached to the domain
  * @property {Object} meta - meta information about the owner of the domain
  */
-
 export type NamicornResolution = {
   addresses: {
     [key: string]: string;
@@ -29,13 +29,30 @@ export type NamicornResolution = {
   };
 };
 
+/**
+ * @ignore
+ * Used internally to map network number to a string
+ */
 export type NetworkIdMap = {
   [key: number]: string;
 };
 
+/**
+ * Main configurational object for Namicorn instance
+ */
 export type Blockchain =
   | boolean
   | {
       ens?: string | boolean | SourceDefinition;
       zns?: string | boolean | SourceDefinition;
     };
+
+/**
+ * Default structure of ZnsResolution records
+ * @typedef {object} ZnsResolution
+ */
+export type ZnsResolution = {
+  crypto?: Dictionary<{ address?: string; [key: string]: any }>;
+  ttl?: string;
+  [key: string]: any;
+};
