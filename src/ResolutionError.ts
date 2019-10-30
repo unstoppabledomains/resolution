@@ -11,22 +11,18 @@ type ResolutionErrorOptions = {
  * @ignore
  * Internal Mapping object from ResolutionErrorCode to a ResolutionErrorHandler
  */
-const HandlersByCode: { [key: string]: ResolutionErrorHandler } = {
-  UnregisteredDomain: (error: { domain: string }) =>
-    `Domain ${error.domain} is not registered`,
+const HandlersByCode = {
+  UnregisteredDomain: (params: { domain: string }) =>
+    `Domain ${params.domain} is not registered`,
   UnspecifiedResolver: () => 'Resolver address is not specified',
-  UnsupportedDomain: (error: { domain: string }) =>
-    `Domain ${error.domain} is not supported`,
-  NotRegisteredCurrency: (error: {
+  UnsupportedDomain: (params: { domain: string }) =>
+    `Domain ${params.domain} is not supported`,
+  UnregisteredCurrency: (params: {
     domain: string;
     currencyTicker: string;
-  }) => `${error.domain} has no ${error.currencyTicker} attached to it`,
-  UnspecifiedNetwork: (error: { method: string }) =>
-    `Unspecified network in Namicorn ${error.method} configuration`,
-  UnspecifiedUrl: (error: { method: string }) =>
-    `Unspecified url in Namicorn ${error.method} configuration`,
-  BlockchainDown: (error: { method: string }) =>
-    `${error.method} blockchain is down at the moment`,
+  }) => `${params.domain} has no ${params.currencyTicker} attached to it`,
+  BlockchainDown: (params: { method: string }) =>
+    `${params.method} blockchain is down at the moment`,
 };
 
 /**
@@ -42,7 +38,7 @@ export default class ResolutionError extends Error {
   readonly currencyTicker?: string;
 
   constructor(code: ErrorCode, options: ResolutionErrorOptions) {
-    const resolutionErrorHandler: ResolutionErrorHandler = HandlersByCode[code];
+    const resolutionErrorHandler = HandlersByCode[code];
     const { domain, method, currencyTicker } = options;
     super(resolutionErrorHandler({ domain, method, currencyTicker }));
     this.code = code;

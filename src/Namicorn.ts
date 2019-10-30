@@ -148,7 +148,7 @@ class Namicorn {
     if (data && !data.meta.owner)
       throw new ResolutionError('UnregisteredDomain', { domain });
     if (data && !data.addresses[currencyTicker.toUpperCase()])
-      throw new ResolutionError('NotRegisteredCurrency', {
+      throw new ResolutionError('UnregisteredCurrency', {
         domain,
         currencyTicker,
       });
