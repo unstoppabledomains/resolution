@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+import nodeFetch from 'node-fetch';
 import Ens from './Ens';
 import Zns from './Zns';
 import { Blockchain, NamicornResolution } from './types';
@@ -6,8 +6,11 @@ import ResolutionError from './ResolutionError';
 
 const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
 
-// Node env has special properties stored in process which are not inside the browser env.
-// Multiple checks is to avoid hitting the undefined while going deeper.
+/**
+ * @ignore
+ * Node env has special properties stored in process which are not inside the browser env.
+ * Multiple checks is to avoid hitting the undefined while going deeper.
+ */
 const isNode = () => {
   if (typeof process === 'object') {
     if (typeof process.versions === 'object') {
@@ -18,6 +21,20 @@ const isNode = () => {
   }
   return false;
 };
+
+/** @ignore */
+const myFetch = isNode() ? nodeFetch : window.fetch;
+
+/** @ignore Used internaly to set the right user-agent for fetch */
+const DefaultUserAgent = isNode()
+  ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'
+  : navigator.userAgent;
+/** @ignore */
+const version = require('../package.json').version;
+/** @ignore */
+const CustomUserAgent = `${DefaultUserAgent} namicorn/${version}`;
+/** @ignore */
+const headers = { 'X-user-agent': CustomUserAgent };
 
 /**
  * Blockchain domain resolution library - Namicorn.
@@ -86,17 +103,11 @@ class Namicorn {
    * @returns {Promise<NamicornResolution>} - Returns a promise that resolves in an object
    */
   async resolve(domain: string): Promise<NamicornResolution> {
-    try {
-      if (this.blockchain) {
-        return await this.resolveUsingBlockchain(domain);
-      } else {
-        const response = isNode()
-          ? await fetch(`${this.api}/${domain}`)
-          : await window.fetch(`${this.api}/${domain}`);
-        return response.json();
-      }
-    } catch (err) {
-      throw err;
+    if (this.blockchain) {
+      return await this.resolveUsingBlockchain(domain);
+    } else {
+      const response = await myFetch(`${this.api}/${domain}`)
+      return response.json();
     }
   }
 
@@ -105,7 +116,7 @@ class Namicorn {
    * @async
    * @param {string} domain - domain name to be resolved
    * @param {string} currencyTicker - currency ticker like BTC, ETH, ZIL
-   * @returns {Promise<string>} - A promise that resolves in an address or null
+   * @returns {Promise<string | null>} - A promise that resolves in an address or null
    */
   async address(
     domain: string,
@@ -192,12 +203,7 @@ class Namicorn {
   }
 
   /**
-   * resolves the domain using blockchain call
    * @ignore
-   * @private
-   * @async
-   * @param {string} domain - domain name to be resolved
-   * @return {Promise<NamicornResolution>}
    */
   private async resolveUsingBlockchain(
     domain: string,
@@ -210,8 +216,6 @@ class Namicorn {
 
   /**
    * @ignore
-   * Used internally to get the right method (ens or zns)
-   * @param domain - domain name
    */
   private getNamingMethod(domain: string) {
     const methods = [this.ens, this.zns];

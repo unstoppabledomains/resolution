@@ -6,21 +6,13 @@ import { hash } from 'eth-ens-namehash';
 import { SourceDefinition, NamicornResolution } from './types';
 import NamingService from './NamingService';
 import { ResolutionError } from './index';
-/**
- * @ignore
- */
+/** @ignore */
 const Web3 = require('web3');
-/**
- * @ignore
- */
+/** @ignore */
 const NullAddress = '0x0000000000000000000000000000000000000000';
-/**
- * @ignore
- */
+/** @ignore */
 const DefaultUrl = 'https://mainnet.infura.io';
-/**
- * @ignore
- */
+/** @ignore */
 const NetworkIdMap = {
   1: 'mainnet',
   3: 'ropsten',
@@ -28,17 +20,13 @@ const NetworkIdMap = {
   42: 'rinkeby',
   5: 'goerli',
 };
-/**
- * @ignore
- */
+/** @ignore */
 const NetworkNameMap = _(NetworkIdMap)
   .invert()
   .mapValues((v, k) => parseInt(v))
   .value();
 
-/**
- * @ignore
- */
+/** @ignore */
 const RegistryMap = {
   mainnet: '0x314159265dd8dbb310642f98f50c066173c1259b',
   ropsten: '0x112234455c3a32fd11230c42e7bccd4a84e02010',
@@ -57,22 +45,14 @@ export default class Ens extends NamingService {
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
-  /**
-   * @ignore
-   */
-  private registrarContract: any;
-  /**
-   * @ignore
-   */
+  /** @ignore */
   private ensContract: any;
-  /**
-   * @ignore
-   */
+  /**  @ignore */
   private web3: any;
 
   /**
    * Source object describing the network naming service operates on
-   * @param {string | boolean | SourceDefinition} source
+   * @param {string | boolean | SourceDefinition} source - if specified as a string will be used as main url, if omited then defaults are used
    * @throws Unspecified network
    * @throws Unspecified url
    */
@@ -96,11 +76,6 @@ export default class Ens extends NamingService {
         ensInterface,
         this.registryAddress,
       );
-      this.registrarContract = new this.web3.eth.Contract(
-        registrarInterface,
-        //TODO: make an address dependent on network id
-        '0x6090A6e47849629b7245Dfa1Ca21D94cd15878Ef',
-      );
     }
   }
 
@@ -117,7 +92,7 @@ export default class Ens extends NamingService {
 
   /**
    * Checks if the current network is supported
-   * @return {boolean}
+   * @returns
    */
   isSupportedNetwork(): boolean {
     return this.registryAddress != null;

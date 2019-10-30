@@ -1,62 +1,62 @@
 {
-	"name": "namicorn",
-	"version": "0.2.41",
-	"description": "Crypto currency wallet domain name resolution library by Unstoppable Domains Inc.",
-	"main": "./lib/namicorn.js",
-	"types": "./lib/namicorn.d.ts",
-	"scripts": {
-		"release": "yarn build && yarn test &&  yarn docs && yarn publish --patch",
-		"release:minor": "yarn build && yarn test && yarn docs && yarn publish --minor",
-		"release:major": "yarn build && yarn test && yarn docs && yarn publish --major ",
-		"test": "jest",
-		"start": "npm run build:live",
-		"build": "tsc -p .",
-		"format": "prettier --semi --write -l **/*.{js,json,ts}",
-		"build:live": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
-		"docs": "yarn run typedoc"
-	},
-	"files": [
-		"lib"
-	],
-	"repository": {
-		"type": "git",
-		"url": "git://github.com/unstoppabledomains/namicorn.git"
-	},
-	"author": "",
-	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/unstoppabledomains/namicorn/issues"
-	},
-	"homepage": "https://github.com/unstoppabledomains/namicorn#readme",
-	"devDependencies": {
-		"@types/jest": "^24.0.11",
-		"@types/lodash": "^4.14.138",
-		"@types/node": "^11.13.7",
-		"@types/node-fetch": "^2.5.0",
-		"@types/web3": "^1.0.20",
-		"jest": "^24.9.0",
-		"nock": "^10.0.6",
-		"prettier": "^1.17.0",
-		"ts-jest": "^24.0.2",
-		"typedoc": "^0.15.0",
-		"typescript": "^3.6.3"
-	},
-	"prettier": {
-		"trailingComma": "all",
-		"singleQuote": true,
-		"semi": true,
-		"tabWidth": 2,
-		"bracketSpacing": true
-	},
-	"publicConfig": {
-		"access": "public"
-	},
-	"dependencies": {
-		"@zilliqa-js/zilliqa": "^0.8.1",
-		"eth-ens-namehash": "^2.0.8",
-		"lodash": "^4.17.15",
-		"node-fetch": "^2.6.0",
-		"tslib": "^1.10.0",
-		"web3": "^1.2.1"
-	}
+  "name": "namicorn",
+  "version": "0.2.41",
+  "description": "Crypto currency wallet domain name resolution library by Unstoppable Domains Inc.",
+  "main": "./lib/namicorn.js",
+  "types": "./lib/namicorn.d.ts",
+  "scripts": {
+    "release": "yarn build && yarn test &&  yarn docs && yarn publish --patch",
+    "release:minor": "yarn build && yarn test && yarn docs && yarn publish --minor",
+    "release:major": "yarn build && yarn test && yarn docs && yarn publish --major ",
+    "test": "jest",
+    "start": "npm run build:live",
+    "build": "tsc -p .",
+    "format": "prettier --semi --write -l **/*.{js,json,ts}",
+    "build:live": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
+    "docs": "yarn run typedoc"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/unstoppabledomains/namicorn.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/unstoppabledomains/namicorn/issues"
+  },
+  "homepage": "https://github.com/unstoppabledomains/namicorn#readme",
+  "devDependencies": {
+    "@types/jest": "^24.0.11",
+    "@types/lodash": "^4.14.138",
+    "@types/node": "^11.13.7",
+    "@types/node-fetch": "^2.5.0",
+    "@types/web3": "^1.0.20",
+    "jest": "^24.9.0",
+    "nock": "^10.0.6",
+    "prettier": "^1.17.0",
+    "ts-jest": "^24.0.2",
+    "typedoc": "^0.15.0",
+    "typescript": "^3.6.3"
+  },
+  "prettier": {
+    "trailingComma": "all",
+    "singleQuote": true,
+    "semi": true,
+    "tabWidth": 2,
+    "bracketSpacing": true
+  },
+  "publicConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@zilliqa-js/zilliqa": "^0.8.1",
+    "eth-ens-namehash": "^2.0.8",
+    "lodash": "^4.17.15",
+    "node-fetch": "^2.6.0",
+    "tslib": "^1.10.0",
+    "web3": "^1.2.1"
+  }
 }
