@@ -1,4 +1,4 @@
-## Unreleased
+## 0.2.42
 * Added documentation to Namicorn, ENS and ZNS files
 * Connected typedoc to the project
 * Added user-agent to fetch calls for https://unstoppabledomains.com/
