@@ -5,6 +5,7 @@ import { default as resolverInterface } from './ens/contract/resolver';
 import { hash } from 'eth-ens-namehash';
 import { SourceDefinition, NamicornResolution } from './types';
 import NamingService from './namingService';
+import { ResolutionError } from './index';
 /** @ignore */
 const Web3 = require('web3');
 /** @ignore */
@@ -237,10 +238,12 @@ export default class Ens extends NamingService {
             ? source.url
             : `https://${source.network}.infura.io`;
         }
-        if (source.network && !source.url) {
-          if (NetworkNameMap.hasOwnProperty(source.network))
-            source.url = `https://${source.network}.infura.io`;
-          else throw new Error('Invalid network or unspecified url');
+        if (
+          source.network &&
+          !source.url &&
+          NetworkNameMap.hasOwnProperty(source.network)
+        ) {
+          source.url = `https://${source.network}.infura.io`;
         }
         if (source.url && !source.network) {
           source.network = this.networkFromUrl(source.url);

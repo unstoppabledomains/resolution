@@ -29,10 +29,17 @@ export type NamicornResolution = {
   };
 };
 
+/**
+ * @ignore
+ * Used internally to map network number to a string
+ */
 export type NetworkIdMap = {
   [key: number]: string;
 };
 
+/**
+ * Main configurational object for Namicorn instance
+ */
 export type Blockchain =
   | boolean
   | {

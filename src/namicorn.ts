@@ -2,6 +2,7 @@ import nodeFetch from 'node-fetch';
 import Ens from './ens';
 import Zns from './zns';
 import { Blockchain, NamicornResolution } from './types';
+import ResolutionError from './resolutionError';
 
 const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
 
@@ -22,7 +23,7 @@ const isNode = () => {
 };
 
 /** @ignore */
-const myfetch = isNode() ? nodeFetch : window.fetch;
+const myFetch = isNode() ? nodeFetch : window.fetch;
 
 /** @ignore Used internaly to set the right user-agent for fetch */
 const DefaultUserAgent = isNode()
@@ -105,7 +106,7 @@ class Namicorn {
     if (this.blockchain) {
       return await this.resolveUsingBlockchain(domain);
     } else {
-      const response = await myfetch(`${this.api}/${domain}`, {
+      const response = await myFetch(`${this.api}/${domain}`, {
         method: 'GET',
         headers: headers,
       });
@@ -120,8 +121,42 @@ class Namicorn {
    * @param currencyTicker - currency ticker like BTC, ETH, ZIL
    * @returns - A promise that resolves in an address or null
    */
-  async address(domain: string, currencyTicker: string): Promise<string> {
-    const data = await this.resolve(domain);
+  async address(
+    domain: string,
+    currencyTicker: string,
+  ): Promise<string | null> {
+    try {
+      return await this.addressOrThrow(domain, currencyTicker);
+    } catch (error) {
+      if (error instanceof ResolutionError) {
+        return null;
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  /**
+   * Resolves given domain to a specific currency address or throws
+   * @param domain - domain name
+   * @param currencyTicker - currency ticker such as
+   *  - ZIL
+   *  - BTC
+   *  - ETH
+   * @throws ResolutionError
+   */
+  async addressOrThrow(
+    domain: string,
+    currencyTicker: string,
+  ): Promise<string> {
+    var data = await this.resolve(domain);
+    if (data && !data.meta.owner)
+      throw new ResolutionError('UnregisteredDomain', { domain });
+    if (data && !data.addresses[currencyTicker.toUpperCase()])
+      throw new ResolutionError('UnregisteredCurrency', {
+        domain,
+        currencyTicker,
+      });
     return (data && data.addresses[currencyTicker.toUpperCase()]) || null;
   }
 
@@ -165,7 +200,7 @@ class Namicorn {
     domain: string,
   ): Promise<NamicornResolution> {
     const method = this.getNamingMethod(domain);
-    if (!method) return null;
+    if (!method) throw new ResolutionError('UnsupportedDomain', { domain });
     const result = await method.resolve(domain);
     return result || Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
   }

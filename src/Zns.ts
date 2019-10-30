@@ -9,6 +9,7 @@ import {
   Dictionary,
   ZnsResolution,
 } from './types';
+import { ResolutionError } from './index';
 import NamingService from './namingService';
 
 const DefaultSource = 'https://api.zilliqa.com';
@@ -200,8 +201,14 @@ export default class Zns extends NamingService {
     field: string,
     keys: string[] = [],
   ): Promise<any> {
-    let result = (await contract.getSubState(field, keys)) || {};
-    return result[field];
+    try {
+      let result = (await contract.getSubState(field, keys)) || {};
+      return result[field];
+    } catch (err) {
+      if (err.name == 'FetchError')
+        throw new ResolutionError('BlockchainDown', { method: 'ZNS' });
+      else throw err;
+    }
   }
 
   /** @ignore */
