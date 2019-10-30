@@ -16,5 +16,5 @@
     "mode": "file",
     "module": "commonjs",
     "out": "../docs"
-}
+  }
 }

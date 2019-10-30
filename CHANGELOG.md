@@ -1,6 +1,13 @@
 ## Unreleased
+* Created resolutionError class for custom errors
+* Connected namicorn to throw resolution errors where needed
+* Namicorn#addressOrThrow -> new method that throws all kind of errors
+* Namicorn#address -> now utilizing Namicorn#addressOrThrow and when resolution error is catched null returned for compatability
+
+## 0.2.42
 * Added documentation to Namicorn, ENS and ZNS files
 * Connected typedoc to the project
+* Added user-agent to fetch calls for https://unstoppabledomains.com/
 * Specified scripts for automating generation of docs
 
 ## 0.2.41
