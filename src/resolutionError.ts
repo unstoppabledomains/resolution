@@ -2,6 +2,7 @@
 type ErrorCode = keyof typeof HandlersByCode;
 /** Alias for Resolution error handler function */
 type ResolutionErrorHandler = (error: ResolutionErrorOptions) => string;
+/** Explains Resolution Error options */
 type ResolutionErrorOptions = {
   method?: string;
   domain?: string;
