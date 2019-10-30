@@ -93,7 +93,7 @@ export default class Zns extends NamingService {
    * @returns - Everything what is stored on specified domain
    */
   async resolution(domain: string): Promise<ZnsResolution> {
-    return await this.structureResolverRecords(await this.records(domain));
+    return this.structureResolverRecords(await this.records(domain));
   }
 
   /**

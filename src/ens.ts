@@ -5,9 +5,8 @@ import { default as resolverInterface } from './ens/contract/resolver';
 import { hash } from 'eth-ens-namehash';
 import { SourceDefinition, NamicornResolution } from './types';
 import NamingService from './namingService';
-import { ResolutionError } from './index';
-/** @ignore */
-const Web3 = require('web3');
+import Web3 from 'web3';
+
 /** @ignore */
 const NullAddress = '0x0000000000000000000000000000000000000000';
 /** @ignore */
@@ -49,8 +48,6 @@ export default class Ens extends NamingService {
   private ensContract: any;
   /**  @ignore */
   private web3: any;
-  /** @ignore */
-  private registrarContract: any
 
   /**
    * Source object describing the network naming service operates on
@@ -76,11 +73,6 @@ export default class Ens extends NamingService {
       this.ensContract = new this.web3.eth.Contract(
         ensInterface,
         this.registryAddress,
-      );
-      this.registrarContract = new this.web3.eth.Contract(
-        registrarInterface,
-        //TODO: make an address dependent on network id
-        '0x6090A6e47849629b7245Dfa1Ca21D94cd15878Ef',
       );
     }
   }
