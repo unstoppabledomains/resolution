@@ -195,10 +195,7 @@ class Namicorn {
    * @returns {boolean}
    */
   isSupportedDomainInNetwork(domain: string): boolean {
-    const methods = [this.ens, this.zns];
-    const method = methods.find(
-      method => method && method.isSupportedDomain(domain),
-    );
+    const method = this.getNamingMethod(domain);
     return method && method.isSupportedNetwork();
   }
 
@@ -217,12 +214,12 @@ class Namicorn {
   /**
    * @ignore
    */
-  private getNamingMethod(domain: string) {
+  private getNamingMethod(domain: string): Ens | Zns | undefined {
     const methods = [this.ens, this.zns];
     const method = methods.find(
       method => method && method.isSupportedDomain(domain),
     );
-    return method || null;
+    return method;
   }
 }
 
