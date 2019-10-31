@@ -5,6 +5,7 @@ import { default as resolverInterface } from './ens/contract/resolver';
 import { hash } from 'eth-ens-namehash';
 import { SourceDefinition, NamicornResolution, NullAddress} from './types';
 import NamingService from './namingService';
+import { ResolutionError } from './index';
 import Web3 from 'web3';
 
 /** @ignore */
@@ -164,7 +165,7 @@ export default class Ens extends NamingService {
    * @param nodeHash
    */
   private resolverCallToName(resolverContract, nodeHash) {
-    return resolverContract.methods.name(nodeHash).call();
+    return this.callMethod(resolverContract.methods.name(nodeHash));
   }
 
   /**
@@ -173,7 +174,7 @@ export default class Ens extends NamingService {
    * @param nodeHash
    */
   private getResolver(nodeHash) {
-    return this.ensContract.methods.resolver(nodeHash).call();
+    return this.callMethod(this.ensContract.methods.resolver(nodeHash));
   }
 
   /**
@@ -183,9 +184,9 @@ export default class Ens extends NamingService {
    */
   private async getResolutionInfo(nodeHash) {
     return await Promise.all([
-      this.ensContract.methods.owner(nodeHash).call(),
-      this.ensContract.methods.ttl(nodeHash).call(),
-      this.ensContract.methods.resolver(nodeHash).call(),
+      this.callMethod(this.ensContract.methods.owner(nodeHash)),
+      this.callMethod(this.ensContract.methods.ttl(nodeHash)),
+      this.callMethod(this.ensContract.methods.resolver(nodeHash)),
     ]);
   }
 
@@ -203,8 +204,7 @@ export default class Ens extends NamingService {
       resolver,
     );
     //put it as a separate method to stub.
-    const address = await resolverContract.methods.addr(nodeHash).call();
-    return address;
+    return await this.callMethod(resolverContract.methods.addr(nodeHash));
   }
 
   /**
@@ -262,5 +262,17 @@ export default class Ens extends NamingService {
    */
   private networkFromUrl(url: string): string {
     return _.find(NetworkIdMap, name => url.indexOf(name) >= 0);
+  }
+
+  private async callMethod(method: {call: () => Promise<any>}): Promise<any> {
+    try {
+      return await method.call()
+    } catch(error) {
+      const {message}: {message: string} = error;
+      if (message.match(/Invalid JSON RPC response/)) {
+        throw new ResolutionError('NamingServiceDown', {method: 'ENS'})
+      }
+      throw error;
+    }
   }
 }
