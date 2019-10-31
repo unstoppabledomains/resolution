@@ -137,13 +137,13 @@ class Namicorn {
   }
 
   /**
-   * Resolves given domain to a specific currency address or throws
+   * Resolves given domain to a specific currency address or throws an error
    * @param domain - domain name
    * @param currencyTicker - currency ticker such as
    *  - ZIL
    *  - BTC
    *  - ETH
-   * @throws ResolutionError
+   * @throws ResolutionError if address is not found
    */
   async addressOrThrow(
     domain: string,
