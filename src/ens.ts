@@ -110,7 +110,7 @@ export default class Ens extends NamingService {
     }
     const reverseAddress = address + '.addr.reverse';
     const nodeHash = hash(reverseAddress);
-    const resolverAddress = await this._getResolver(nodeHash);
+    const resolverAddress = await this.getResolver(nodeHash);
     if (resolverAddress == NullAddress) {
       return null;
     }
@@ -119,7 +119,7 @@ export default class Ens extends NamingService {
       resolverAddress,
     );
 
-    return await this._resolverCallToName(resolverContract, nodeHash);
+    return await this.resolverCallToName(resolverContract, nodeHash);
   }
 
   /**
@@ -133,9 +133,9 @@ export default class Ens extends NamingService {
       return null;
     }
     const nodeHash = hash(domain);
-    var [owner, ttl, resolver] = await this._getResolutionInfo(nodeHash);
+    var [owner, ttl, resolver] = await this.getResolutionInfo(nodeHash);
     if (owner == NullAddress) owner = null;
-    const address = await this._fetchAddress(resolver, nodeHash);
+    const address = await this.fetchAddress(resolver, nodeHash);
     return {
       addresses: {
         ETH: address,
@@ -156,7 +156,6 @@ export default class Ens extends NamingService {
   namehash(domain: string): string {
     return hash(domain);
   }
-  /* Test functions bellow */
 
   /**
    * @ignore
@@ -164,7 +163,7 @@ export default class Ens extends NamingService {
    * @param resolverContract
    * @param nodeHash
    */
-  _resolverCallToName(resolverContract, nodeHash) {
+  private resolverCallToName(resolverContract, nodeHash) {
     return resolverContract.methods.name(nodeHash).call();
   }
 
@@ -173,7 +172,7 @@ export default class Ens extends NamingService {
    * This was done to make automated tests more configurable
    * @param nodeHash
    */
-  _getResolver(nodeHash) {
+  private getResolver(nodeHash) {
     return this.ensContract.methods.resolver(nodeHash).call();
   }
 
@@ -182,7 +181,7 @@ export default class Ens extends NamingService {
    * This was done to make automated tests more configurable
    * @param nodeHash
    */
-  async _getResolutionInfo(nodeHash) {
+  private async getResolutionInfo(nodeHash) {
     return await Promise.all([
       this.ensContract.methods.owner(nodeHash).call(),
       this.ensContract.methods.ttl(nodeHash).call(),
@@ -190,14 +189,12 @@ export default class Ens extends NamingService {
     ]);
   }
 
-  /*===========================*/
-
   /**
    * @ignore
    * @param resolver - Resolver address
    * @param nodeHash - namehash of a domain name
    */
-  async _fetchAddress(resolver, nodeHash) {
+  private async fetchAddress(resolver, nodeHash) {
     if (!resolver || resolver == NullAddress) {
       return null;
     }
@@ -209,8 +206,6 @@ export default class Ens extends NamingService {
     const address = await resolverContract.methods.addr(nodeHash).call();
     return address;
   }
-
-  /*===========================*/
 
   /**
    * Normalizes the source object based on type

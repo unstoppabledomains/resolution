@@ -106,11 +106,16 @@ class Namicorn {
     if (this.blockchain) {
       return await this.resolveUsingBlockchain(domain);
     } else {
-      const response = await myFetch(`${this.api}/${domain}`, {
-        method: 'GET',
-        headers: headers,
-      });
-      return response.json();
+      try {
+        const response = await myFetch(`${this.api}/${domain}`, {
+          method: 'GET',
+          headers: headers,
+        });
+        return response.json();
+      } catch(error) {
+        if (error.name !== 'FetchError') throw error;
+        throw new ResolutionError("NamingServiceDown", {method: 'UD'})
+      }
     }
   }
 

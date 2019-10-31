@@ -233,14 +233,14 @@ describe('ZNS', () => {
     const namicorn = new Namicorn();
 
     const eye = jest
-      .spyOn(namicorn.zns, '_getRecordsAddresses')
+      .spyOn(namicorn.zns as any, 'getRecordsAddresses')
       .mockResolvedValue([
         'zil194qcjskuuxh6qtg8xw3qqrr3kdc6dtq8ct6j9s',
         '0xdac22230adfe4601f00631eae92df6d77f054891',
       ]);
 
     const secondEye = jest
-      .spyOn(namicorn.zns, '_getResolverRecords')
+      .spyOn(namicorn.zns as any, 'getResolverRecords')
       .mockResolvedValue({
         'crypto.BCH.address': 'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6',
         'crypto.BTC.address': '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB',
@@ -273,14 +273,14 @@ describe('ZNS', () => {
   it('should resolve with resolution key setuped #2', async () => {
     const namicorn = new Namicorn();
     const eye = jest
-      .spyOn(namicorn.zns, '_getRecordsAddresses')
+      .spyOn(namicorn.zns as any, 'getRecordsAddresses')
       .mockResolvedValue([
         'zil1f6vyj5hgvll3xtx5kuxd8ucn66x9zxmkp34agy',
         '0xa9b1d3647e4deb9ce4e601c2c9e0a2fdf2d7415a',
       ]);
 
     const secondEye = jest
-      .spyOn(namicorn.zns, '_getResolverRecords')
+      .spyOn(namicorn.zns as any, 'getResolverRecords')
       .mockResolvedValue({
         'ipfs.html.hash': 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
         'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
@@ -352,7 +352,7 @@ describe('ENS', () => {
     expect(namicorn.ens.network).toEqual('mainnet');
 
     const eye = jest
-      .spyOn(namicorn.ens, '_getResolutionInfo')
+      .spyOn(namicorn.ens as any, 'getResolutionInfo')
       .mockImplementation(() =>
         Promise.resolve([
           '0x714ef33943d925731FBB89C99aF5780D888bD106',
@@ -362,7 +362,7 @@ describe('ENS', () => {
       );
 
     const secondEye = jest
-      .spyOn(namicorn.ens, '_fetchAddress')
+      .spyOn(namicorn.ens as any, 'fetchAddress')
       .mockImplementation(() =>
         Promise.resolve('0x714ef33943d925731FBB89C99aF5780D888bD106'),
       );
@@ -376,10 +376,10 @@ describe('ENS', () => {
   it('reverses address to ENS domain', async () => {
     const ens = new Ens(MainnetUrl);
     const eye = jest
-      .spyOn(ens, '_resolverCallToName')
+      .spyOn(ens as any, 'resolverCallToName')
       .mockImplementation(() => 'adrian.argent.xyz');
     const secondEye = jest
-      .spyOn(ens, '_getResolver')
+      .spyOn(ens as any, 'getResolver')
       .mockImplementation(() => '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890');
     const result = await ens.reverse(
       '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
@@ -393,7 +393,7 @@ describe('ENS', () => {
   it('reverses address to ENS domain null', async () => {
     const ens = new Ens(MainnetUrl);
     const spy = jest
-      .spyOn(ens, '_getResolver')
+      .spyOn(ens as any, 'getResolver')
       .mockImplementation(() => '0x0000000000000000000000000000000000000000');
     const result = await ens.reverse(
       '0x112234455c3a32fd11230c42e7bccd4a84e02010',
@@ -410,7 +410,7 @@ describe('ENS', () => {
     });
 
     const spy = jest
-      .spyOn(namicorn.ens, '_getResolutionInfo')
+      .spyOn(namicorn.ens as any, 'getResolutionInfo')
       .mockImplementation(() =>
         Promise.resolve([
           '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
@@ -420,7 +420,7 @@ describe('ENS', () => {
       );
 
     const secondSpy = jest
-      .spyOn(namicorn.ens, '_fetchAddress')
+      .spyOn(namicorn.ens as any, 'fetchAddress')
       .mockImplementation(() =>
         Promise.resolve('0xb0E7a465D255aE83eb7F8a50504F3867B945164C'),
       );
@@ -437,7 +437,7 @@ describe('ENS', () => {
     });
 
     const spy = jest
-      .spyOn(namicorn.ens, '_getResolutionInfo')
+      .spyOn(namicorn.ens as any, 'getResolutionInfo')
       .mockImplementation(() =>
         Promise.resolve([
           '0xf3dE750A73C11a6a2863761E930BF5fE979d5663',
@@ -447,7 +447,7 @@ describe('ENS', () => {
       );
 
     const secondSpy = jest
-      .spyOn(namicorn.ens, '_fetchAddress')
+      .spyOn(namicorn.ens as any, 'fetchAddress')
       .mockImplementation(() =>
         Promise.resolve('0xf3dE750A73C11a6a2863761E930BF5fE979d5663'),
       );
@@ -464,7 +464,7 @@ describe('ENS', () => {
     });
 
     const spy = jest
-      .spyOn(namicorn.ens, '_getResolutionInfo')
+      .spyOn(namicorn.ens as any, 'getResolutionInfo')
       .mockImplementation(() =>
         Promise.resolve([
           '0x0000000000000000000000000000000000000000',
@@ -474,7 +474,7 @@ describe('ENS', () => {
       );
 
     const secondSpy = jest
-      .spyOn(namicorn.ens, '_fetchAddress')
+      .spyOn(namicorn.ens as any, 'fetchAddress')
       .mockImplementation(() => Promise.resolve(null));
 
     const result = await namicorn.address('something.luxe', 'ETH');

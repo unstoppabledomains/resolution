@@ -69,11 +69,11 @@ export default class Zns extends NamingService {
   }
 
   async resolve(domain: string): Promise<NamicornResolution | null> {
-    const recordAddresses = await this._getRecordsAddresses(domain);
+    const recordAddresses = await this.getRecordsAddresses(domain);
     if (!recordAddresses) return null;
     const [ownerAddress, resolverAddress] = recordAddresses;
     const resolution = this.structureResolverRecords(
-      await this._getResolverRecords(resolverAddress),
+      await this.getResolverRecords(resolverAddress),
     );
 
     const addresses = _.mapValues(resolution.crypto || {}, 'address');
@@ -102,7 +102,7 @@ export default class Zns extends NamingService {
    * @returns - ZNS resolver records in an plain key-value format
    */
   async records(domain: string): Promise<Dictionary<string>> {
-    return await this._getResolverRecords(await this.resolverAddress(domain));
+    return await this.getResolverRecords(await this.resolverAddress(domain));
   }
 
   /**
@@ -129,12 +129,8 @@ export default class Zns extends NamingService {
     return namehash(domain);
   }
 
-  /**
-   * @ignore
-   * @param domain - domain name
-   */
   /** @ignore */
-  async _getRecordsAddresses(
+  private async getRecordsAddresses(
     domain: string,
   ): Promise<[string, string] | undefined> {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork())
@@ -156,7 +152,7 @@ export default class Zns extends NamingService {
   }
 
   /** @ignore */
-  async _getResolverRecords(resolverAddress: string): Promise<ZnsResolution> {
+  private async getResolverRecords(resolverAddress: string): Promise<ZnsResolution> {
     if (!resolverAddress || resolverAddress == NullAddress) {
       return {};
     }
@@ -212,7 +208,7 @@ export default class Zns extends NamingService {
 
   /** @ignore */
   private async resolverAddress(domain: string): Promise<string | undefined> {
-    return ((await this._getRecordsAddresses(domain)) || [])[1];
+    return ((await this.getRecordsAddresses(domain)) || [])[1];
   }
 
   /** @ignore */
