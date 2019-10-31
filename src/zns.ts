@@ -93,7 +93,7 @@ export default class Zns extends NamingService {
    * @returns - Everything what is stored on specified domain
    */
   async resolution(domain: string): Promise<ZnsResolution> {
-    return await this.structureResolverRecords(await this.records(domain));
+    return this.structureResolverRecords(await this.records(domain));
   }
 
   /**
@@ -105,14 +105,34 @@ export default class Zns extends NamingService {
     return await this._getResolverRecords(await this.resolverAddress(domain));
   }
 
+  /**
+   * Checks if domain is supported by zns
+   * @param domain
+   */
   isSupportedDomain(domain: string): boolean {
     return domain.indexOf('.') > 0 && /^.{1,}\.(zil)$/.test(domain);
   }
 
+  /**
+   * Checks if zns is supported by current namicorn instance
+   */
   isSupportedNetwork(): boolean {
     return this.registryAddress != null;
   }
 
+  /**
+   * Produces ZNS namehash of a domain
+   * @param domain - domain name to be hashed
+   * @returns ZNS namehash
+   */
+  namehash(domain: string): string {
+    return namehash(domain);
+  }
+
+  /**
+   * @ignore
+   * @param domain - domain name
+   */
   /** @ignore */
   async _getRecordsAddresses(
     domain: string,

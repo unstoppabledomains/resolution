@@ -5,9 +5,8 @@ import { default as resolverInterface } from './ens/contract/resolver';
 import { hash } from 'eth-ens-namehash';
 import { SourceDefinition, NamicornResolution } from './types';
 import NamingService from './namingService';
-import { ResolutionError } from './index';
-/** @ignore */
-const Web3 = require('web3');
+import Web3 from 'web3';
+
 /** @ignore */
 const NullAddress = '0x0000000000000000000000000000000000000000';
 /** @ignore */
@@ -53,8 +52,7 @@ export default class Ens extends NamingService {
   /**
    * Source object describing the network naming service operates on
    * @param source - if specified as a string will be used as main url, if omited then defaults are used
-   * @throws Unspecified network
-   * @throws Unspecified url
+   * @throws ConfigurationError - when either network or url is setup incorrectly
    */
   constructor(source: string | boolean | SourceDefinition = true) {
     super();
@@ -152,6 +150,14 @@ export default class Ens extends NamingService {
     };
   }
 
+  /**
+   * Produces ENS namehash
+   * @param domain - domain to be hashed
+   * @return ENS namehash of a domain
+   */
+  namehash(domain: string): string {
+    return hash(domain);
+  }
   /* Test functions bellow */
 
   /**

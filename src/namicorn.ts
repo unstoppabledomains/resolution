@@ -172,6 +172,18 @@ class Namicorn {
   }
 
   /**
+   * Produce a namehash from supported naming service
+   * @param domain - domain name to be hashed
+   * @returns - namehash either for ENS or ZNS
+   */
+  namehash(domain: string): string {
+    const method = this.getNamingMethod(domain);
+    if (!method) throw new ResolutionError('UnsupportedDomain', { domain });
+    const result = method.namehash(domain);
+    return result;
+  }
+
+  /**
    * Checks if the domain is in valid format
    * @param domain - domain name to be checked
    * @returns
@@ -207,8 +219,10 @@ class Namicorn {
 
   /**
    * @ignore
+   * Used internally to get the right method (ens or zns)
+   * @param domain - domain name
    */
-  private getNamingMethod(domain: string): Ens | Zns | undefined {
+  private getNamingMethod(domain: string) {
     const methods = [this.ens, this.zns];
     const method = methods.find(
       method => method && method.isSupportedDomain(domain),

@@ -3,6 +3,7 @@
 * Connected namicorn to throw resolution errors where needed
 * Namicorn#addressOrThrow -> new method that throws all kind of errors
 * Namicorn#address -> now utilizing Namicorn#addressOrThrow and when resolution error is catched null returned for compatability
+* Namicorn#namehash -> new method for namehashing the domain via different naming service namehash
 
 ## 0.2.42
 * Added documentation to Namicorn, ENS and ZNS files

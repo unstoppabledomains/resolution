@@ -656,4 +656,11 @@ describe('Namicorn', () => {
     const result = namicorn.isSupportedDomainInNetwork('brad.zil');
     expect(result).toBe(true);
   });
+
+  it('checks namehash for unsupported domain', async () => {
+    const namicorn = new Namicorn();
+    expect(() => namicorn.namehash('something.hello.com')).toThrow(
+      ResolutionError,
+    );
+  });
 });
