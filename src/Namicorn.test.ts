@@ -1,5 +1,5 @@
 import nock from 'nock';
-import Namicorn from '.';
+import Namicorn, { ResolutionError } from '.';
 import _ from 'lodash';
 import mockData from './testData/mockData.json';
 import Ens from './ens';
@@ -111,7 +111,7 @@ describe('ZNS', () => {
   it('checks normalizeSource zns wrong string', async () => {
     expect(
       () => new Namicorn({ blockchain: { zns: 'https://wrongurl.com' } }),
-    ).toThrow();
+    ).toThrowError('Unspecified network in Namicorn ZNS configuration');
   });
 
   it('checks normalizeSource zns (object) #1', async () => {
@@ -158,13 +158,13 @@ describe('ZNS', () => {
   it('checks normalizeSource zns (object) #6', async () => {
     expect(
       () => new Namicorn({ blockchain: { zns: { network: 42 } } }),
-    ).toThrow();
+    ).toThrowError('Unspecified network in Namicorn ZNS configuration');
   });
 
   it('checks normalizeSource zns (object) #7', async () => {
     expect(
       () => new Namicorn({ blockchain: { zns: { network: 'invalid' } } }),
-    ).toThrow();
+    ).toThrowError('Unspecified url in Namicorn ZNS configuration');
   });
 
   it('checks normalizeSource zns (object) #8', async () => {
@@ -225,17 +225,13 @@ describe('ZNS', () => {
     const secondEye = jest
       .spyOn(namicorn.zns, '_getResolverRecords')
       .mockResolvedValue({
-        crypto: {
-          BCH: { address: 'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6' },
-          BTC: { address: '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB' },
-          ETH: { address: '0x45b31e01AA6f42F0549aD482BE81635ED3149abb' },
-          LTC: { address: 'LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL' },
-          ZIL: { address: 'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj' },
-        },
-        ipfs: {
-          html: { value: 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK' },
-          redirect_domain: { value: 'www.unstoppabledomains.com' },
-        },
+        'crypto.BCH.address': 'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6',
+        'crypto.BTC.address': '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB',
+        'crypto.ETH.address': '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
+        'crypto.LTC.address': 'LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL',
+        'crypto.ZIL.address': 'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
+        'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
+        'ipfs.redirect_domain.value': 'www.unstoppabledomains.com',
       });
 
     const result = await namicorn.zns.resolution('brad.zil');
@@ -269,17 +265,11 @@ describe('ZNS', () => {
     const secondEye = jest
       .spyOn(namicorn.zns, '_getResolverRecords')
       .mockResolvedValue({
-        ipfs: {
-          html: {
-            hash: 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
-            value: 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
-          },
-          redirect_domain: { value: 'www.unstoppabledomains.com' },
-        },
-        whois: {
-          email: { value: 'matt+test@unstoppabledomains.com' },
-          for_sale: { value: 'true' },
-        },
+        'ipfs.html.hash': 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
+        'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
+        'ipfs.redirect_domain.value': 'www.unstoppabledomains.com',
+        'whois.email.value': 'matt+test@unstoppabledomains.com',
+        'whois.for_sale.value': 'true',
       });
 
     const result = await namicorn.zns.resolution('ergergergerg.zil');
@@ -330,9 +320,6 @@ describe('ZNS', () => {
 
 describe('ENS', () => {
   it('allows ens network specified as string', async () => {
-    const testName = 'resolves .eth name using blockchain';
-    //mockAPICalls('ENS', testName, MainnetUrl);
-
     const namicorn = new Namicorn({
       blockchain: { ens: { network: 'mainnet' } },
     });
@@ -454,7 +441,7 @@ describe('ENS', () => {
     expect(result).toEqual('0xf3dE750A73C11a6a2863761E930BF5fE979d5663');
   });
 
-  it('resolves .luxe name using ENS blockchain null', async () => {
+  it('resolves .luxe name using ENS blockchain with safe null return', async () => {
     const namicorn = new Namicorn({
       blockchain: { ens: MainnetUrl },
     });
@@ -477,6 +464,15 @@ describe('ENS', () => {
     expect(spy).toBeCalled();
     expect(secondSpy).toBeCalled();
     expect(result).toEqual(null);
+  });
+
+  it('resolves .luxe name using ENS blockchain with thrown error', async () => {
+    const namicorn = new Namicorn({
+      blockchain: { ens: MainnetUrl },
+    });
+    expect(namicorn.addressOrThrow('something.luxe', 'ETH')).rejects.toThrow(
+      ResolutionError,
+    );
   });
 
   it('checks if the network is supported(true)', async () => {
@@ -541,13 +537,13 @@ describe('ENS', () => {
   it('checks normalizeSource ens (object) #6', async () => {
     expect(
       () => new Namicorn({ blockchain: { ens: { network: 7543 } } }),
-    ).toThrow();
+    ).toThrowError('Unspecified network in Namicorn ENS configuration');
   });
 
   it('checks normalizeSource ens (object) #7', async () => {
     expect(
       () => new Namicorn({ blockchain: { ens: { network: 'invalid' } } }),
-    ).toThrow();
+    ).toThrowError('Unspecified url in Namicorn ENS configuration');
   });
 
   it('checks normalizeSource ens (object) #8', async () => {
@@ -621,20 +617,48 @@ describe('ENS', () => {
   });
 });
 
-it('provides empty response constant', async () => {
-  const response = Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
-  expect(response.addresses).toEqual({});
-  expect(response.meta.owner).toEqual(null);
-});
+describe('Namicorn', () => {
+  it('checks Namicorn#addressOrThrow error #1', async () => {
+    const namicorn = new Namicorn();
+    expect(
+      namicorn.addressOrThrow('sdncdoncvdinvcsdncs.zil', 'ZIL'),
+    ).rejects.toThrow(ResolutionError);
+  });
 
-it('resolves non-existing domain zone', async () => {
-  const namicorn = new Namicorn({ blockchain: true });
-  const result = await namicorn.address('bogdangusiev.qq', 'ZIL');
-  expect(result).toEqual(null);
-});
+  it('checks Namicorn#addressOrThrow error #2', async () => {
+    const namicorn = new Namicorn();
+    expect(
+      namicorn.addressOrThrow('brad.zil', 'INVALID_CURRENCY_SYMBOL'),
+    ).rejects.toThrow(ResolutionError);
+  });
 
-it('checks the isSupportedDomainInNetwork', async () => {
-  const namicorn = new Namicorn();
-  const result = namicorn.isSupportedDomainInNetwork('brad.zil');
-  expect(result).toBe(true);
+  it('resolves non-existing domain zone with throw', async () => {
+    const namicorn = new Namicorn({ blockchain: true });
+    expect(namicorn.addressOrThrow('bogdangusiev.qq', 'ZIL')).rejects.toThrow(
+      ResolutionError,
+    );
+  });
+
+  it('resolves non-existing domain zone via safe address', async () => {
+    const namicorn = new Namicorn({ blockchain: true });
+    const result = await namicorn.address('bogdangusiev.qq', 'ZIL');
+    expect(result).toEqual(null);
+  });
+
+  it('provides empty response constant', async () => {
+    const response = Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
+    expect(response.addresses).toEqual({});
+    expect(response.meta.owner).toEqual(null);
+  });
+
+  it('checks the isSupportedDomainInNetwork', async () => {
+    const namicorn = new Namicorn();
+    const result = namicorn.isSupportedDomainInNetwork('brad.zil');
+    expect(result).toBe(true);
+  });
+
+  it('checks namehash for unsupported domain', async () => {
+    const namicorn = new Namicorn();
+    expect(() => namicorn.namehash('something.hello.com')).toThrow(ResolutionError);
+  })
 });
