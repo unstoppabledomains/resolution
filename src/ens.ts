@@ -4,7 +4,7 @@ import { default as registrarInterface } from './ens/contract/registrar';
 import { default as resolverInterface } from './ens/contract/resolver';
 import { hash } from 'eth-ens-namehash';
 import { SourceDefinition, NamicornResolution } from './types';
-import NamingService from './namingService';
+import NamingService from './NamingService';
 import Web3 from 'web3';
 
 /** @ignore */

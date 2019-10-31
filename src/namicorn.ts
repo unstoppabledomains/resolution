@@ -1,8 +1,8 @@
 import nodeFetch from 'node-fetch';
 import Ens from './ens';
-import Zns from './zns';
+import Zns from './Zns';
 import { Blockchain, NamicornResolution } from './types';
-import ResolutionError from './resolutionError';
+import ResolutionError from './ResolutionError';
 
 const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
 
