@@ -34,6 +34,23 @@ const mockAPICalls = (topLevel: string, testName: string, url = MainnetUrl) => {
   });
 };
 
+const expectResolutionErrorCode = async (callback: Promise<any> | Function, code: string) => {
+  try {
+    if (callback instanceof Promise) {
+      await callback;
+    } else {
+      callback();
+    }
+  } catch (error) {
+    if (error instanceof ResolutionError) {
+      return expect(error.code).toEqual(code);
+    } else {
+      throw error;
+    }
+  }
+  expect(true).toBeFalsy();
+}
+
 beforeEach(() => {
   nock.cleanAll();
   jest.restoreAllMocks();
@@ -470,8 +487,8 @@ describe('ENS', () => {
     const namicorn = new Namicorn({
       blockchain: { ens: MainnetUrl },
     });
-    expect(namicorn.addressOrThrow('something.luxe', 'ETH')).rejects.toThrow(
-      ResolutionError,
+    await expectResolutionErrorCode(
+      namicorn.addressOrThrow('something.luxe', 'ETH'), 'UnregisteredDomain',
     );
   });
 
@@ -620,22 +637,25 @@ describe('ENS', () => {
 describe('Namicorn', () => {
   it('checks Namicorn#addressOrThrow error #1', async () => {
     const namicorn = new Namicorn();
-    expect(
+    await expectResolutionErrorCode(
       namicorn.addressOrThrow('sdncdoncvdinvcsdncs.zil', 'ZIL'),
-    ).rejects.toThrow(ResolutionError);
+      "UnregisteredDomain",
+    );
   });
 
   it('checks Namicorn#addressOrThrow error #2', async () => {
     const namicorn = new Namicorn();
-    expect(
+    await expectResolutionErrorCode(
       namicorn.addressOrThrow('brad.zil', 'INVALID_CURRENCY_SYMBOL'),
-    ).rejects.toThrow(ResolutionError);
+      "UnspecifiedCurrency",
+    );
   });
 
   it('resolves non-existing domain zone with throw', async () => {
     const namicorn = new Namicorn({ blockchain: true });
-    expect(namicorn.addressOrThrow('bogdangusiev.qq', 'ZIL')).rejects.toThrow(
-      ResolutionError,
+    await expectResolutionErrorCode(
+      namicorn.addressOrThrow('bogdangusiev.qq', 'ZIL'),
+      "UnsupportedDomain",
     );
   });
 
@@ -659,8 +679,9 @@ describe('Namicorn', () => {
 
   it('checks namehash for unsupported domain', async () => {
     const namicorn = new Namicorn();
-    expect(() => namicorn.namehash('something.hello.com')).toThrow(
-      ResolutionError,
+    await expectResolutionErrorCode(
+      () => namicorn.namehash('something.hello.com'),
+      "UnsupportedDomain",
     );
   });
 });

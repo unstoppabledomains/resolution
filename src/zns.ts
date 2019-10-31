@@ -8,12 +8,12 @@ import {
   NamicornResolution,
   Dictionary,
   ZnsResolution,
+  NullAddress,
 } from './types';
 import { ResolutionError } from './index';
 import NamingService from './namingService';
 
 const DefaultSource = 'https://api.zilliqa.com';
-const NullAddress = '0x0000000000000000000000000000000000000000';
 
 const NetworkIdMap = {
   1: 'mainnet',

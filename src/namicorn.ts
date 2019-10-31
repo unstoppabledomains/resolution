@@ -1,7 +1,7 @@
 import nodeFetch from 'node-fetch';
 import Ens from './ens';
 import Zns from './zns';
-import { Blockchain, NamicornResolution } from './types';
+import { Blockchain, NamicornResolution, NullAddress } from './types';
 import ResolutionError from './resolutionError';
 
 const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
@@ -150,14 +150,15 @@ class Namicorn {
     currencyTicker: string,
   ): Promise<string> {
     var data = await this.resolve(domain);
-    if (data && !data.meta.owner)
+    if (!data.meta.owner || data.meta.owner === NullAddress)
       throw new ResolutionError('UnregisteredDomain', { domain });
-    if (data && !data.addresses[currencyTicker.toUpperCase()])
-      throw new ResolutionError('UnregisteredCurrency', {
+    const address = data.addresses[currencyTicker.toUpperCase()];
+    if (!address)
+      throw new ResolutionError('UnspecifiedCurrency', {
         domain,
         currencyTicker,
       });
-    return (data && data.addresses[currencyTicker.toUpperCase()]) || null;
+    return address;
   }
 
   /**

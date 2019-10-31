@@ -3,12 +3,10 @@ import { default as ensInterface } from './ens/contract/ens';
 import { default as registrarInterface } from './ens/contract/registrar';
 import { default as resolverInterface } from './ens/contract/resolver';
 import { hash } from 'eth-ens-namehash';
-import { SourceDefinition, NamicornResolution } from './types';
+import { SourceDefinition, NamicornResolution, NullAddress} from './types';
 import NamingService from './namingService';
 import Web3 from 'web3';
 
-/** @ignore */
-const NullAddress = '0x0000000000000000000000000000000000000000';
 /** @ignore */
 const DefaultUrl = 'https://mainnet.infura.io';
 /** @ignore */
