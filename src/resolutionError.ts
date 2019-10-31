@@ -19,16 +19,16 @@ const HandlersByCode = {
   UnsupportedDomain: (params: { domain: string }) =>
     `Domain ${params.domain} is not supported`,
   UnspecifiedCurrency: (params: { domain: string; currencyTicker: string }) =>
-    `${params.domain} has no ${params.currencyTicker} attached to it`,
-  BlockchainDown: (params: { method: string }) =>
-    `${params.method} blockchain is down at the moment`,
+    `Domain ${params.domain} has no ${params.currencyTicker} attached to it`,
+  NamingServiceDown: (params: { method: string }) =>
+    `${params.method} naming service is down at the moment`,
 };
 
 /**
  * Resolution Error class is designed to control every error being thrown by Namicorn
  * @param code - Error Code
  * - UnsupportedDomain - domain is not supported by current namicorn instance
- * - BlockchainDown - blockchain API is down
+ * - NamingServiceDown - blockchain API is down
  * - UnregisteredDomain - domain is not owned by any address
  * - UnspecifiedResolver - domain has no resolver specified
  * - UnspecifiedCurrency - domain resolver doesn't have any address of specified currency

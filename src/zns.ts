@@ -226,7 +226,7 @@ export default class Zns extends NamingService {
       return result[field];
     } catch (err) {
       if (err.name == 'FetchError')
-        throw new ResolutionError('BlockchainDown', { method: 'ZNS' });
+        throw new ResolutionError('NamingServiceDown', { method: 'ZNS' });
       else throw err;
     }
   }
