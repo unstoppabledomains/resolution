@@ -178,7 +178,7 @@ class Namicorn {
    */
   namehash(domain: string): string {
     const method = this.getNamingMethod(domain);
-    if (!method) throw new ResolutionError('UnsupportedDomain', {domain});
+    if (!method) throw new ResolutionError('UnsupportedDomain', { domain });
     const result = method.namehash(domain);
     return result;
   }

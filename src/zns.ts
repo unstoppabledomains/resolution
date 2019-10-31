@@ -107,7 +107,7 @@ export default class Zns extends NamingService {
 
   /**
    * Checks if domain is supported by zns
-   * @param domain 
+   * @param domain
    */
   isSupportedDomain(domain: string): boolean {
     return domain.indexOf('.') > 0 && /^.{1,}\.(zil)$/.test(domain);
