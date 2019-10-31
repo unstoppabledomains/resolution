@@ -151,8 +151,9 @@ export default class Ens extends NamingService {
   }
 
   /**
-   * returns ens namehash of a domain
+   * Produces ENS namehash
    * @param domain - domain to be hashed
+   * @return ENS namehash of a domain
    */
   namehash(domain: string): string {
     return hash(domain);
