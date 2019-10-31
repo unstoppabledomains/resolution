@@ -190,10 +190,7 @@ class Namicorn {
    * @returns
    */
   isSupportedDomain(domain: string): boolean {
-    return (
-      (this.zns && this.zns.isSupportedDomain(domain)) ||
-      (this.ens && this.ens.isSupportedDomain(domain))
-    );
+    return !!this.getNamingMethod(domain)
   }
 
   /**
