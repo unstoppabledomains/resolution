@@ -264,6 +264,12 @@ export default class Ens extends NamingService {
     return _.find(NetworkIdMap, name => url.indexOf(name) >= 0);
   }
 
+  /**
+   *  @ignore
+   * Internal wrapper for ens method. Used to throw an error when ens is down
+   *  @param method - Method to be called
+   *  @throws ResolutionError -> When blockchain is down
+   */
   private async callMethod(method: {call: () => Promise<any>}): Promise<any> {
     try {
       return await method.call()

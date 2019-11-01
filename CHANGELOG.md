@@ -2,6 +2,7 @@
 
 * Namicorn#addressOrThrow - new method that throws ResolutionError if currency address is not found
 * Namicorn#namehash - new method for namehashing the domain name. Name hash of a domain is an ID that is used to store the information about the domain on the blockchain. If you would browse the blockchain, you would never see domain names, just name hashes.
+* Now throwing a resolution error when ens or zns is down
 
 ## 0.2.42
 * Added documentation to Namicorn, ENS and ZNS files
