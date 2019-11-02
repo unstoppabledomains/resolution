@@ -635,38 +635,64 @@ describe('ENS', () => {
     expect(namicorn.ens.registryAddress).toBeUndefined();
   });
 
-  it('checks ens multicoin support', async () => {
+  it('checks ens multicoin support #1', async () => {
     const ens = new Ens();
-
     const doge = await ens.address('testthing.eth', 'DOGE');
     expect(doge).toBe('DBXu2kgc3xtvCUWFcxFE3r9hEYgmuaaCyD');
+  });
 
+  it('checks ens multicoin support #2', async () => {
+    const ens = new Ens();
     const ltc = await ens.address('testthing.eth', 'LTC');
     expect(ltc).toBe('MV5rN5EcX1imDS2gEh5jPJXeiW5QN8YrK3');
+  });
 
+  it('checks ens multicoin support #3', async () => {
+    const ens = new Ens();
+    const eth = await ens.address('testthing.eth', 'ETH');
+    expect(eth).toBe('0x314159265dD8dbb310642f98f50C066173C1259b');
+  });
+
+  it('checks ens multicoin support #4', async () => {
+    const ens = new Ens();
+    const etc = await ens.address('testthing.eth', 'etc');
+    expect(etc).toBe('0x314159265dD8dbb310642f98f50C066173C1259b');
+  });
+
+  it('checks ens multicoin support #5', async () => {
+    const ens = new Ens();
+    const rsk = await ens.address('testthing.eth', 'rsk');
+    expect(rsk).toBe('0x314159265dD8DbB310642F98f50C066173c1259B');
+  });
+
+  it('checks ens multicoin support #6', async () => {
+    const ens = new Ens();
+    const xrp = await ens.address('testthing.eth', 'xrp');
+    expect(xrp).toBe('X7qvLs7gSnNoKvZzNWUT2e8st17QPY64PPe7zriLNuJszeg');
+  });
+
+  it('checks ens multicoin support #7', async () => {
+    const ens = new Ens();
+    const bch = await ens.address('testthing.eth', 'bch');
+    expect(bch).toBe('bitcoincash:qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a');
+  });
+
+  it('checks ens multicoin support #8', async () => {
+    const ens = new Ens();
     const btc = await ens.address('testthing.eth', 'BTC');
     expect(btc).toBe(
       'bc1pw508d6qejxtdg4y5r3zarvary0c5xw7kw508d6qejxtdg4y5r3zarvary0c5xw7k7grplx',
     );
-
-    const eth = await ens.address('testthing.eth', 'ETH');
-    expect(eth).toBe('0x314159265dD8dbb310642f98f50C066173C1259b');
-
-    const etc = await ens.address('testthing.eth', 'etc');
-    expect(etc).toBe('0x314159265dD8dbb310642f98f50C066173C1259b');
-
-    const rsk = await ens.address('testthing.eth', 'rsk');
-    expect(rsk).toBe('0x314159265dD8DbB310642F98f50C066173c1259B');
-
-    const xrp = await ens.address('testthing.eth', 'xrp');
-    expect(xrp).toBe('X7qvLs7gSnNoKvZzNWUT2e8st17QPY64PPe7zriLNuJszeg');
-
-    const bnb = await ens.address('testthing.eth', 'bnb');
-    expect(bnb).toBe('bnb1grpf0955h0ykzq3ar5nmum7y6gdfl6lxfn46h2');
-
-    const bch = await ens.address('testthing.eth', 'bch');
-    expect(bch).toBe('bitcoincash:qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a');
   });
+
+  it('checks unsupportedCurrency error', async () => {
+    const ens = new Ens();
+    await expectResolutionErrorCode(
+      ens.address('testthing.eth', 'bnb'),
+      'UnsupportedCurrency'
+    );
+  })
+
 
   it('checks ens unsupportedCurrency error', async () => {
     const ens = new Ens();

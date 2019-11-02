@@ -3,6 +3,7 @@ import { default as ensInterface } from './ens/contract/ens';
 import { default as registrarInterface } from './ens/contract/registrar';
 import { default as resolverInterface } from './ens/contract/resolver';
 import { hash } from 'eth-ens-namehash';
+import { formatsByName, formatsByCoinType } from '@ensdomains/address-encoder';
 import {
   SourceDefinition,
   NamicornResolution,
@@ -146,13 +147,18 @@ export default class Ens extends NamingService {
     if (!resolver || resolver === NullAddress)
       throw new ResolutionError('UnspecifiedResolver');
     const coinType = this.getCoinType(currencyTicker);
-    const addr = await this.fetchAddress(resolver, nodeHash, coinType);
-    if (!addr)
-      throw new ResolutionError('UnspecifiedCurrency', {
-        domain,
-        currencyTicker,
-      });
-    return addr;
+    try {
+      const addr = await this.fetchAddress(resolver, nodeHash, coinType);
+      if (!addr)
+        throw new ResolutionError('UnspecifiedCurrency', {
+          domain,
+          currencyTicker,
+        });    
+      return addr;
+    }catch(err) {
+      console.log({code : err.code, message: err.message});
+      throw new ResolutionError('UnsupportedCurrency', {domain, currencyTicker});
+    }
   }
 
   /**
@@ -237,12 +243,10 @@ export default class Ens extends NamingService {
   /** @ignore */
   private getCoinType(currencyTicker: string): number {
     const constants: Bip44Constants[] = require('bip44-constants');
-    const coin = constants.filter(
-      item => item[1] === currencyTicker.toUpperCase(),
-    );
-    if (coin.length !== 1)
+    const coin = constants.findIndex(item => item[1] === currencyTicker.toUpperCase() || item[2] === currencyTicker.toUpperCase());
+    if (coin < 0) 
       throw new ResolutionError('UnsupportedCurrency', { currencyTicker });
-    return coin[0][0];
+    return coin;
   }
 
   /**
@@ -258,18 +262,15 @@ export default class Ens extends NamingService {
       resolverInterface(resolver, coinType),
       resolver,
     );
-    console.log({
-      coinType,
-      resolverWithTwoArg: await this.callMethod(
-       resolverContract.methods.addr(nodeHash, coinType)),
-      resolverWithOneArgs: await this.callMethod(resolverContract.methods.addr(nodeHash))
-    });
-
-    if (coinType && coinType != 60)
-      return await this.callMethod(
-        resolverContract.methods.addr(nodeHash, coinType)
-      );
-    return await this.callMethod(resolverContract.methods.addr(nodeHash));
+    let addr = coinType && coinType != 60 && coinType > -1 ? await this.callMethod(
+      resolverContract.methods.addr(nodeHash, coinType)
+    ) : await this.callMethod(resolverContract.methods.addr(nodeHash));
+    // console.log({coinType});
+    // console.log(formatsByCoinType[coinType].encoder);
+    // console.log({addr});
+    // console.log(new Buffer(addr.replace('0x', ''), 'hex'));
+    const encoder = formatsByCoinType[coinType].encoder;
+    return encoder(new Buffer(addr.replace('0x', ''), 'hex'));
   }
 
   /**
