@@ -671,7 +671,7 @@ describe('ENS', () => {
   it('checks ens unsupportedCurrency error', async () => {
     const ens = new Ens();
     await expectResolutionErrorCode(
-      ens.address('whatever.zil', 'UNREALTICKER'),
+      ens.address('testthing.eth', 'UNREALTICKER'),
       'UnsupportedCurrency',
     );
   });

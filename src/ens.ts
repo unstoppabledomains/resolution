@@ -216,10 +216,9 @@ export default class Ens extends NamingService {
    */
 
   async _getOwner(nodeHash) {
-    const result = await this.callMethod(
+    return await this.callMethod(
       this.ensContract.methods.owner(nodeHash),
     );
-    return result;
   }
 
   /**
