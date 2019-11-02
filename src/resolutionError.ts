@@ -24,6 +24,8 @@ const HandlersByCode = {
     `${params.method} naming service is down at the moment`,
   UnsupportedCurrency: (params: { currencyTicker: string }) =>
     `${params.currencyTicker} is not supported`,
+  IncorrectResolverInterface: (params: { method: string }) =>
+    `Wrong ResolverInterace specified for ${params.method}`
 };
 
 /**
