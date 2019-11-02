@@ -121,7 +121,7 @@ export default class Ens extends NamingService {
       return null;
     }
     const resolverContract = new this.web3.eth.Contract(
-      resolverInterface,
+      resolverInterface(resolverAddress, 60),
       resolverAddress,
     );
 
@@ -255,12 +255,19 @@ export default class Ens extends NamingService {
       return null;
     }
     const resolverContract = new this.web3.eth.Contract(
-      resolverInterface,
+      resolverInterface(resolver, coinType),
       resolver,
     );
-    if (coinType)
+    console.log({
+      coinType,
+      resolverWithTwoArg: await this.callMethod(
+       resolverContract.methods.addr(nodeHash, coinType)),
+      resolverWithOneArgs: await this.callMethod(resolverContract.methods.addr(nodeHash))
+    });
+
+    if (coinType && coinType != 60)
       return await this.callMethod(
-        resolverContract.methods.addr(nodeHash, coinType),
+        resolverContract.methods.addr(nodeHash, coinType)
       );
     return await this.callMethod(resolverContract.methods.addr(nodeHash));
   }
