@@ -10,27 +10,32 @@ import {
   ZnsResolution,
   NullAddress,
 } from './types';
-import { ResolutionError } from './index';
+import Namicorn, { ResolutionError } from './index';
 import NamingService from './namingService';
 
+/** @ignore */
 const DefaultSource = 'https://api.zilliqa.com';
 
+/** @ignore */
 const NetworkIdMap = {
   1: 'mainnet',
   333: 'testnet',
   111: 'localnet',
 };
 
+/** @ignore */
 const RegistryMap = {
   mainnet: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
 };
 
+/** @ignore */
 const UrlMap = {
   mainnet: 'https://api.zilliqa.com',
   testnet: 'https://dev-api.zilliqa.com',
   localnet: 'http://localhost:4201',
 };
 
+/** @ignore */
 const UrlNetworkMap = (url: string) => {
   const invert = _(UrlMap)
     .invert()
@@ -38,13 +43,29 @@ const UrlNetworkMap = (url: string) => {
   return invert[url];
 };
 
+/**
+ * Class to support connection with Zilliqa naming service
+ * @param network - network string such as
+ * - mainnet
+ * - ropsten
+ * @param url - main api url such as
+ * - https://mainnet.infura.io
+ * @param registryAddress - address for a registry contract
+ */
 export default class Zns extends NamingService {
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
+  /** @ignore */
   private registry?: Contract;
+  /** @ignore */
   private zilliqa: Zilliqa;
 
+  /**
+   * Source object describing the network naming service operates on
+   * @param source - if specified as a string will be used as main url, if omited then defaults are used
+   * @throws ConfigurationError - when either network or url is setup incorrectly
+   */
   constructor(source: string | boolean | SourceDefinition = true) {
     super();
     source = this.normalizeSource(source);
@@ -68,9 +89,14 @@ export default class Zns extends NamingService {
     }
   }
 
+  /**
+   * Resolves the domain name
+   * @param domain - domain name to be resolved
+   * @returns - a promise that resolves in a detailed crypto resolution
+   */
   async resolve(domain: string): Promise<NamicornResolution | null> {
     const recordAddresses = await this.getRecordsAddresses(domain);
-    if (!recordAddresses) return null;
+    if (!recordAddresses) return Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
     const [ownerAddress, resolverAddress] = recordAddresses;
     const resolution = this.structureResolverRecords(
       await this.getResolverRecords(resolverAddress),
@@ -85,6 +111,28 @@ export default class Zns extends NamingService {
         ttl: parseInt(resolution.ttl as string) || 0,
       },
     };
+  }
+
+  /**
+   * Resolves domain name to a particular crypto address associated with it
+   * @param domain - domain name to be resolved
+   * @param currencyTicker specific currency ticker such as
+   *  - ZIL
+   *  - BTC
+   *  - ETH
+   * @throws ResolutionError
+   */
+  async address(domain: string, currencyTicker: string): Promise<string> {
+    const data = await this.resolve(domain);
+    if (!data.meta.owner || data.meta.owner === NullAddress)
+      throw new ResolutionError('UnregisteredDomain', { domain });
+    const address = data.addresses[currencyTicker.toUpperCase()];
+    if (!address)
+      throw new ResolutionError('UnspecifiedCurrency', {
+        domain,
+        currencyTicker,
+      });
+    return address;
   }
 
   /**
@@ -152,7 +200,9 @@ export default class Zns extends NamingService {
   }
 
   /** @ignore */
-  private async getResolverRecords(resolverAddress: string): Promise<ZnsResolution> {
+  private async getResolverRecords(
+    resolverAddress: string,
+  ): Promise<ZnsResolution> {
     if (!resolverAddress || resolverAddress == NullAddress) {
       return {};
     }

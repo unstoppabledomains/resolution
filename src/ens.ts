@@ -3,7 +3,12 @@ import { default as ensInterface } from './ens/contract/ens';
 import { default as registrarInterface } from './ens/contract/registrar';
 import { default as resolverInterface } from './ens/contract/resolver';
 import { hash } from 'eth-ens-namehash';
-import { SourceDefinition, NamicornResolution, NullAddress} from './types';
+import {
+  SourceDefinition,
+  NamicornResolution,
+  NullAddress,
+  Bip44Constants,
+} from './types';
 import NamingService from './namingService';
 import { ResolutionError } from './index';
 import Web3 from 'web3';
@@ -111,7 +116,7 @@ export default class Ens extends NamingService {
     }
     const reverseAddress = address + '.addr.reverse';
     const nodeHash = hash(reverseAddress);
-    const resolverAddress = await this.getResolver(nodeHash);
+    const resolverAddress = await this._getResolver(nodeHash);
     if (resolverAddress == NullAddress) {
       return null;
     }
@@ -124,6 +129,33 @@ export default class Ens extends NamingService {
   }
 
   /**
+   * Resolves domain to a specific cryptoAddress
+   * @param domain - domain name to be resolved
+   * @param currencyTicker currency ticker such as
+   *  - ZIL
+   *  - BTC
+   *  - ETH
+   * @returns - A promise that resolves in a string
+   */
+  async address(domain: string, currencyTicker: string): Promise<string> {
+    const nodeHash = this.namehash(domain);
+    const owner = await this._getOwner(nodeHash);
+    if (!owner || owner === NullAddress)
+      throw new ResolutionError('UnregisteredDomain', { domain });
+    const resolver = await this._getResolver(nodeHash);
+    if (!resolver || resolver === NullAddress)
+      throw new ResolutionError('UnspecifiedResolver');
+    const coinType = this.getCoinType(currencyTicker);
+    const addr = await this.fetchAddress(resolver, nodeHash, coinType);
+    if (!addr)
+      throw new ResolutionError('UnspecifiedCurrency', {
+        domain,
+        currencyTicker,
+      });
+    return addr;
+  }
+
+  /**
    * Resolves the given domain
    * @async
    * @param domain - domain name to be resolved
@@ -133,7 +165,7 @@ export default class Ens extends NamingService {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork()) {
       return null;
     }
-    const nodeHash = hash(domain);
+    const nodeHash = this.namehash(domain);
     var [owner, ttl, resolver] = await this.getResolutionInfo(nodeHash);
     if (owner == NullAddress) owner = null;
     const address = await this.fetchAddress(resolver, nodeHash);
@@ -173,8 +205,21 @@ export default class Ens extends NamingService {
    * This was done to make automated tests more configurable
    * @param nodeHash
    */
-  private getResolver(nodeHash) {
-    return this.callMethod(this.ensContract.methods.resolver(nodeHash));
+  async _getResolver(nodeHash) {
+    return await this.callMethod(this.ensContract.methods.resolver(nodeHash));
+  }
+
+  /**
+   * @ignore
+   * This was done to make automated tests more configurable
+   * @param nodeHash
+   */
+
+  async _getOwner(nodeHash) {
+    const result = await this.callMethod(
+      this.ensContract.methods.owner(nodeHash),
+    );
+    return result;
   }
 
   /**
@@ -190,12 +235,23 @@ export default class Ens extends NamingService {
     ]);
   }
 
+  /** @ignore */
+  private getCoinType(currencyTicker: string): number {
+    const constants: Bip44Constants[] = require('bip44-constants');
+    const coin = constants.filter(
+      item => item[1] === currencyTicker.toUpperCase(),
+    );
+    if (coin.length !== 1)
+      throw new ResolutionError('UnsupportedCurrency', { currencyTicker });
+    return coin[0][0];
+  }
+
   /**
    * @ignore
    * @param resolver - Resolver address
    * @param nodeHash - namehash of a domain name
    */
-  private async fetchAddress(resolver, nodeHash) {
+  private async fetchAddress(resolver, nodeHash, coinType?: number) {
     if (!resolver || resolver == NullAddress) {
       return null;
     }
@@ -203,7 +259,10 @@ export default class Ens extends NamingService {
       resolverInterface,
       resolver,
     );
-    //put it as a separate method to stub.
+    if (coinType)
+      return await this.callMethod(
+        resolverContract.methods.addr(nodeHash, coinType),
+      );
     return await this.callMethod(resolverContract.methods.addr(nodeHash));
   }
 
@@ -270,13 +329,13 @@ export default class Ens extends NamingService {
    *  @param method - Method to be called
    *  @throws ResolutionError -> When blockchain is down
    */
-  private async callMethod(method: {call: () => Promise<any>}): Promise<any> {
+  private async callMethod(method: { call: () => Promise<any> }): Promise<any> {
     try {
-      return await method.call()
-    } catch(error) {
-      const {message}: {message: string} = error;
+      return await method.call();
+    } catch (error) {
+      const { message }: { message: string } = error;
       if (message.match(/Invalid JSON RPC response/)) {
-        throw new ResolutionError('NamingServiceDown', {method: 'ENS'})
+        throw new ResolutionError('NamingServiceDown', { method: 'ENS' });
       }
       throw error;
     }

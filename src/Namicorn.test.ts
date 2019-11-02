@@ -34,7 +34,10 @@ const mockAPICalls = (topLevel: string, testName: string, url = MainnetUrl) => {
   });
 };
 
-const expectResolutionErrorCode = async (callback: Promise<any> | Function, code: string) => {
+const expectResolutionErrorCode = async (
+  callback: Promise<any> | Function,
+  code: string,
+) => {
   try {
     if (callback instanceof Promise) {
       await callback;
@@ -49,7 +52,7 @@ const expectResolutionErrorCode = async (callback: Promise<any> | Function, code
     }
   }
   expect(true).toBeFalsy();
-}
+};
 
 beforeEach(() => {
   nock.cleanAll();
@@ -351,25 +354,28 @@ describe('ENS', () => {
     expect(namicorn.ens.url).toBe('https://mainnet.infura.io');
     expect(namicorn.ens.network).toEqual('mainnet');
 
-    const eye = jest
-      .spyOn(namicorn.ens as any, 'getResolutionInfo')
+    const ownerEye = jest
+      .spyOn(namicorn.ens as any, '_getOwner')
       .mockImplementation(() =>
-        Promise.resolve([
-          '0x714ef33943d925731FBB89C99aF5780D888bD106',
-          '0',
-          '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
-        ]),
+        Promise.resolve('0x714ef33943d925731FBB89C99aF5780D888bD106'),
       );
 
-    const secondEye = jest
+    const resolverEye = jest
+      .spyOn(namicorn.ens, '_getResolver')
+      .mockImplementation(() =>
+        Promise.resolve('0x5FfC014343cd971B7eb70732021E26C35B744cc4'),
+      );
+
+    const FetchEye = jest
       .spyOn(namicorn.ens as any, 'fetchAddress')
       .mockImplementation(() =>
         Promise.resolve('0x714ef33943d925731FBB89C99aF5780D888bD106'),
       );
 
     var result = await namicorn.address('matthewgould.eth', 'ETH');
-    expect(eye).toHaveBeenCalled();
-    expect(secondEye).toHaveBeenCalled();
+    expect(ownerEye).toHaveBeenCalled();
+    expect(resolverEye).toHaveBeenCalled();
+    expect(FetchEye).toHaveBeenCalled();
     expect(result).toEqual('0x714ef33943d925731FBB89C99aF5780D888bD106');
   });
 
@@ -379,7 +385,7 @@ describe('ENS', () => {
       .spyOn(ens as any, 'resolverCallToName')
       .mockImplementation(() => 'adrian.argent.xyz');
     const secondEye = jest
-      .spyOn(ens as any, 'getResolver')
+      .spyOn(ens as any, '_getResolver')
       .mockImplementation(() => '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890');
     const result = await ens.reverse(
       '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
@@ -393,7 +399,7 @@ describe('ENS', () => {
   it('reverses address to ENS domain null', async () => {
     const ens = new Ens(MainnetUrl);
     const spy = jest
-      .spyOn(ens as any, 'getResolver')
+      .spyOn(ens as any, '_getResolver')
       .mockImplementation(() => '0x0000000000000000000000000000000000000000');
     const result = await ens.reverse(
       '0x112234455c3a32fd11230c42e7bccd4a84e02010',
@@ -409,25 +415,28 @@ describe('ENS', () => {
       blockchain: { ens: MainnetUrl },
     });
 
-    const spy = jest
-      .spyOn(namicorn.ens as any, 'getResolutionInfo')
+    const ownerEye = jest
+      .spyOn(namicorn.ens as any, '_getOwner')
       .mockImplementation(() =>
-        Promise.resolve([
-          '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
-          Number(0x00),
-          '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
-        ]),
+        Promise.resolve('0xb0E7a465D255aE83eb7F8a50504F3867B945164C'),
       );
 
-    const secondSpy = jest
+    const resolverEye = jest
+      .spyOn(namicorn.ens, '_getResolver')
+      .mockImplementation(() =>
+        Promise.resolve('0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890'),
+      );
+
+    const fetchEye = jest
       .spyOn(namicorn.ens as any, 'fetchAddress')
       .mockImplementation(() =>
         Promise.resolve('0xb0E7a465D255aE83eb7F8a50504F3867B945164C'),
       );
 
     const result = await namicorn.address('adrian.argent.xyz', 'ETH');
-    expect(spy).toBeCalled();
-    expect(secondSpy).toBeCalled();
+    expect(ownerEye).toBeCalled();
+    expect(resolverEye).toBeCalled();
+    expect(fetchEye).toBeCalled();
     expect(result).toEqual('0xb0E7a465D255aE83eb7F8a50504F3867B945164C');
   });
 
@@ -436,25 +445,27 @@ describe('ENS', () => {
       blockchain: { ens: MainnetUrl },
     });
 
-    const spy = jest
-      .spyOn(namicorn.ens as any, 'getResolutionInfo')
+    const ownerEye = jest
+      .spyOn(namicorn.ens as any, '_getOwner')
       .mockImplementation(() =>
-        Promise.resolve([
-          '0xf3dE750A73C11a6a2863761E930BF5fE979d5663',
-          Number(0x00),
-          '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
-        ]),
+        Promise.resolve('0xf3dE750A73C11a6a2863761E930BF5fE979d5663'),
       );
 
-    const secondSpy = jest
+    const resolverEye = jest
+      .spyOn(namicorn.ens, '_getResolver')
+      .mockImplementation(() =>
+        Promise.resolve('0xBD5F5ec7ed5f19b53726344540296C02584A5237'),
+      );
+    const fetchEye = jest
       .spyOn(namicorn.ens as any, 'fetchAddress')
       .mockImplementation(() =>
         Promise.resolve('0xf3dE750A73C11a6a2863761E930BF5fE979d5663'),
       );
 
     const result = await namicorn.address('john.luxe', 'ETH');
-    expect(spy).toBeCalled();
-    expect(secondSpy).toBeCalled();
+    expect(ownerEye).toBeCalled();
+    expect(resolverEye).toBeCalled();
+    expect(fetchEye).toBeCalled();
     expect(result).toEqual('0xf3dE750A73C11a6a2863761E930BF5fE979d5663');
   });
 
@@ -463,23 +474,13 @@ describe('ENS', () => {
       blockchain: { ens: MainnetUrl },
     });
 
-    const spy = jest
-      .spyOn(namicorn.ens as any, 'getResolutionInfo')
+    const ownerEye = jest
+      .spyOn(namicorn.ens as any, '_getOwner')
       .mockImplementation(() =>
-        Promise.resolve([
-          '0x0000000000000000000000000000000000000000',
-          Number(0x00),
-          '0x0000000000000000000000000000000000000000',
-        ]),
+        Promise.resolve('0x0000000000000000000000000000000000000000'),
       );
-
-    const secondSpy = jest
-      .spyOn(namicorn.ens as any, 'fetchAddress')
-      .mockImplementation(() => Promise.resolve(null));
-
     const result = await namicorn.address('something.luxe', 'ETH');
-    expect(spy).toBeCalled();
-    expect(secondSpy).toBeCalled();
+    expect(ownerEye).toBeCalled();
     expect(result).toEqual(null);
   });
 
@@ -488,7 +489,8 @@ describe('ENS', () => {
       blockchain: { ens: MainnetUrl },
     });
     await expectResolutionErrorCode(
-      namicorn.addressOrThrow('something.luxe', 'ETH'), 'UnregisteredDomain',
+      namicorn.addressOrThrow('something.luxe', 'ETH'),
+      'UnregisteredDomain',
     );
   });
 
@@ -632,6 +634,47 @@ describe('ENS', () => {
     expect(namicorn.ens.url).toBe('https://custom.notinfura.io');
     expect(namicorn.ens.registryAddress).toBeUndefined();
   });
+
+  it('checks ens multicoin support', async () => {
+    const ens = new Ens();
+
+    const doge = await ens.address('testthing.eth', 'DOGE');
+    expect(doge).toBe('DBXu2kgc3xtvCUWFcxFE3r9hEYgmuaaCyD');
+
+    const ltc = await ens.address('testthing.eth', 'LTC');
+    expect(ltc).toBe('MV5rN5EcX1imDS2gEh5jPJXeiW5QN8YrK3');
+
+    const btc = await ens.address('testthing.eth', 'BTC');
+    expect(btc).toBe(
+      'bc1pw508d6qejxtdg4y5r3zarvary0c5xw7kw508d6qejxtdg4y5r3zarvary0c5xw7k7grplx',
+    );
+
+    const eth = await ens.address('testthing.eth', 'ETH');
+    expect(eth).toBe('0x314159265dD8dbb310642f98f50C066173C1259b');
+
+    const etc = await ens.address('testthing.eth', 'etc');
+    expect(etc).toBe('0x314159265dD8dbb310642f98f50C066173C1259b');
+
+    const rsk = await ens.address('testthing.eth', 'rsk');
+    expect(rsk).toBe('0x314159265dD8DbB310642F98f50C066173c1259B');
+
+    const xrp = await ens.address('testthing.eth', 'xrp');
+    expect(xrp).toBe('X7qvLs7gSnNoKvZzNWUT2e8st17QPY64PPe7zriLNuJszeg');
+
+    const bnb = await ens.address('testthing.eth', 'bnb');
+    expect(bnb).toBe('bnb1grpf0955h0ykzq3ar5nmum7y6gdfl6lxfn46h2');
+
+    const bch = await ens.address('testthing.eth', 'bch');
+    expect(bch).toBe('bitcoincash:qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a');
+  });
+
+  it('checks ens unsupportedCurrency error', async () => {
+    const ens = new Ens();
+    await expectResolutionErrorCode(
+      ens.address('whatever.zil', 'UNREALTICKER'),
+      'UnsupportedCurrency',
+    );
+  });
 });
 
 describe('Namicorn', () => {
@@ -639,7 +682,7 @@ describe('Namicorn', () => {
     const namicorn = new Namicorn();
     await expectResolutionErrorCode(
       namicorn.addressOrThrow('sdncdoncvdinvcsdncs.zil', 'ZIL'),
-      "UnregisteredDomain",
+      'UnregisteredDomain',
     );
   });
 
@@ -647,7 +690,7 @@ describe('Namicorn', () => {
     const namicorn = new Namicorn();
     await expectResolutionErrorCode(
       namicorn.addressOrThrow('brad.zil', 'INVALID_CURRENCY_SYMBOL'),
-      "UnspecifiedCurrency",
+      'UnspecifiedCurrency',
     );
   });
 
@@ -655,7 +698,7 @@ describe('Namicorn', () => {
     const namicorn = new Namicorn({ blockchain: true });
     await expectResolutionErrorCode(
       namicorn.addressOrThrow('bogdangusiev.qq', 'ZIL'),
-      "UnsupportedDomain",
+      'UnsupportedDomain',
     );
   });
 
@@ -681,7 +724,7 @@ describe('Namicorn', () => {
     const namicorn = new Namicorn();
     await expectResolutionErrorCode(
       () => namicorn.namehash('something.hello.com'),
-      "UnsupportedDomain",
+      'UnsupportedDomain',
     );
   });
 });
