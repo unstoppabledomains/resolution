@@ -148,17 +148,19 @@ export default class Ens extends NamingService {
       throw new ResolutionError('UnspecifiedResolver');
     const coinType = this.getCoinType(currencyTicker);
     try {
-      const addr = await this.fetchAddress(resolver, nodeHash, coinType);
-      if (!addr)
-        throw new ResolutionError('UnspecifiedCurrency', {
-          domain,
-          currencyTicker,
-        });    
-      return addr;
+      var addr = await this.fetchAddress(resolver, nodeHash, coinType);
     }catch(err) {
       console.log({code : err.code, message: err.message});
-      throw new ResolutionError('UnsupportedCurrency', {domain, currencyTicker});
+      if (err instanceof ResolutionError)
+        throw new ResolutionError('UnsupportedCurrency', {domain, currencyTicker});
+      else throw err;
     }
+    if (!addr)
+      throw new ResolutionError('UnspecifiedCurrency', {
+        domain,
+        currencyTicker,
+      });    
+    return addr;
   }
 
   /**
@@ -265,12 +267,9 @@ export default class Ens extends NamingService {
     let addr = coinType && coinType != 60 && coinType > -1 ? await this.callMethod(
       resolverContract.methods.addr(nodeHash, coinType)
     ) : await this.callMethod(resolverContract.methods.addr(nodeHash));
-    // console.log({coinType});
-    // console.log(formatsByCoinType[coinType].encoder);
-    // console.log({addr});
-    // console.log(new Buffer(addr.replace('0x', ''), 'hex'));
     const encoder = formatsByCoinType[coinType].encoder;
-    return encoder(new Buffer(addr.replace('0x', ''), 'hex'));
+    const data = new Buffer(addr.replace('0x', ''), 'hex');
+    return encoder(data);
   }
 
   /**
