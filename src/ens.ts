@@ -3,32 +3,16 @@ import { default as ensInterface } from './ens/contract/ens';
 import { default as registrarInterface } from './ens/contract/registrar';
 import { default as resolverInterface } from './ens/contract/resolver';
 import { hash } from 'eth-ens-namehash';
-import { SourceDefinition, NamicornResolution, NullAddress} from './types';
-import NamingService from './namingService';
-import { ResolutionError } from './index';
+import {
+  SourceDefinition,
+  NamicornResolution,
+  NullAddress,
+  NamingServiceSource,
+  NetworkIdMap,
+  RegistryMap
+} from './types';
+import { EtheriumNamingService } from './namingService';
 import Web3 from 'web3';
-
-/** @ignore */
-const DefaultUrl = 'https://mainnet.infura.io';
-/** @ignore */
-const NetworkIdMap = {
-  1: 'mainnet',
-  3: 'ropsten',
-  4: 'kovan',
-  42: 'rinkeby',
-  5: 'goerli',
-};
-/** @ignore */
-const NetworkNameMap = _(NetworkIdMap)
-  .invert()
-  .mapValues((v, k) => parseInt(v))
-  .value();
-
-/** @ignore */
-const RegistryMap = {
-  mainnet: '0x314159265dd8dbb310642f98f50c066173c1259b',
-  ropsten: '0x112234455c3a32fd11230c42e7bccd4a84e02010',
-};
 
 /**
  * Class to support connection with Etherium naming service
@@ -39,7 +23,7 @@ const RegistryMap = {
  * - https://mainnet.infura.io
  * @param registryAddress - address for a registry contract
  */
-export default class Ens extends NamingService {
+export default class Ens extends EtheriumNamingService {
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
@@ -47,13 +31,18 @@ export default class Ens extends NamingService {
   private ensContract: any;
   /**  @ignore */
   private web3: any;
-
+  /** @ignore */
+  readonly RegistryMap: RegistryMap = {
+    mainnet: '0x314159265dd8dbb310642f98f50c066173c1259b',
+    ropsten: '0x112234455c3a32fd11230c42e7bccd4a84e02010',
+  };
+  
   /**
    * Source object describing the network naming service operates on
    * @param source - if specified as a string will be used as main url, if omited then defaults are used
    * @throws ConfigurationError - when either network or url is setup incorrectly
    */
-  constructor(source: string | boolean | SourceDefinition = true) {
+  constructor(source: NamingServiceSource = true) {
     super();
     source = this.normalizeSource(source);
     this.web3 = new Web3(source.url);
@@ -67,7 +56,7 @@ export default class Ens extends NamingService {
     }
     this.registryAddress = source.registry
       ? source.registry
-      : RegistryMap[this.network];
+      : this.RegistryMap[this.network];
     if (this.registryAddress) {
       this.ensContract = new this.web3.eth.Contract(
         ensInterface,
@@ -85,14 +74,6 @@ export default class Ens extends NamingService {
     return (
       domain.indexOf('.') > 0 && /^.{1,}\.(eth|luxe|xyz|test)$/.test(domain)
     );
-  }
-
-  /**
-   * Checks if the current network is supported
-   * @returns
-   */
-  isSupportedNetwork(): boolean {
-    return this.registryAddress != null;
   }
 
   /**
@@ -160,12 +141,29 @@ export default class Ens extends NamingService {
 
   /**
    * @ignore
+   * @param resolver - Resolver address
+   * @param nodeHash - namehash of a domain name
+   */
+  protected async fetchAddress(resolver, nodeHash) {
+    if (!resolver || resolver == NullAddress) {
+      return null;
+    }
+    const resolverContract = new this.web3.eth.Contract(
+      resolverInterface,
+      resolver,
+    );
+    //put it as a separate method to stub.
+    return await this.callEthMethod(resolverContract.methods.addr(nodeHash));
+  }
+
+  /**
+   * @ignore
    * This was done to make automated tests more configurable
    * @param resolverContract
    * @param nodeHash
    */
   private resolverCallToName(resolverContract, nodeHash) {
-    return this.callMethod(resolverContract.methods.name(nodeHash));
+    return this.callEthMethod(resolverContract.methods.name(nodeHash));
   }
 
   /**
@@ -174,7 +172,7 @@ export default class Ens extends NamingService {
    * @param nodeHash
    */
   private getResolver(nodeHash) {
-    return this.callMethod(this.ensContract.methods.resolver(nodeHash));
+    return this.callEthMethod(this.ensContract.methods.resolver(nodeHash));
   }
 
   /**
@@ -184,101 +182,9 @@ export default class Ens extends NamingService {
    */
   private async getResolutionInfo(nodeHash) {
     return await Promise.all([
-      this.callMethod(this.ensContract.methods.owner(nodeHash)),
-      this.callMethod(this.ensContract.methods.ttl(nodeHash)),
-      this.callMethod(this.ensContract.methods.resolver(nodeHash)),
+      this.callEthMethod(this.ensContract.methods.owner(nodeHash)),
+      this.callEthMethod(this.ensContract.methods.ttl(nodeHash)),
+      this.callEthMethod(this.ensContract.methods.resolver(nodeHash)),
     ]);
-  }
-
-  /**
-   * @ignore
-   * @param resolver - Resolver address
-   * @param nodeHash - namehash of a domain name
-   */
-  private async fetchAddress(resolver, nodeHash) {
-    if (!resolver || resolver == NullAddress) {
-      return null;
-    }
-    const resolverContract = new this.web3.eth.Contract(
-      resolverInterface,
-      resolver,
-    );
-    //put it as a separate method to stub.
-    return await this.callMethod(resolverContract.methods.addr(nodeHash));
-  }
-
-  /**
-   * Normalizes the source object based on type
-   * @ignore
-   * @param source
-   * @returns
-   */
-  protected normalizeSource(
-    source: string | boolean | SourceDefinition,
-  ): SourceDefinition {
-    switch (typeof source) {
-      case 'boolean': {
-        return { url: DefaultUrl, network: this.networkFromUrl(DefaultUrl) };
-      }
-      case 'string': {
-        return {
-          url: source as string,
-          network: this.networkFromUrl(source as string),
-        };
-      }
-      case 'object': {
-        source = _.clone(source) as SourceDefinition;
-        if (typeof source.network == 'number') {
-          source.network = NetworkIdMap[source.network];
-        }
-        if (source.registry) {
-          source.network = source.network ? source.network : 'mainnet';
-          source.url = source.url
-            ? source.url
-            : `https://${source.network}.infura.io`;
-        }
-        if (
-          source.network &&
-          !source.url &&
-          NetworkNameMap.hasOwnProperty(source.network)
-        ) {
-          source.url = `https://${source.network}.infura.io`;
-        }
-        if (source.url && !source.network) {
-          source.network = this.networkFromUrl(source.url);
-        }
-        return source;
-      }
-    }
-  }
-
-  /**
-   * Look up for network from url provided
-   * @ignore
-   * @param url - main api url for blockchain
-   * @returns - network such as:
-   *  - mainnet
-   *  - testnet
-   */
-  private networkFromUrl(url: string): string {
-    return _.find(NetworkIdMap, name => url.indexOf(name) >= 0);
-  }
-
-  /**
-   *  @ignore
-   * Internal wrapper for ens method. Used to throw an error when ens is down
-   *  @param method - Method to be called
-   *  @throws ResolutionError -> When blockchain is down
-   */
-  private async callMethod(method: {call: () => Promise<any>}): Promise<any> {
-    try {
-      return await method.call()
-    } catch(error) {
-      const {message}: {message: string} = error;
-      if (message.match(/Invalid JSON RPC response/)) {
-        throw new ResolutionError('NamingServiceDown', {method: 'ENS'})
-      }
-      throw error;
-    }
-  }
+  } 
 }

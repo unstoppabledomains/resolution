@@ -34,7 +34,10 @@ const mockAPICalls = (topLevel: string, testName: string, url = MainnetUrl) => {
   });
 };
 
-const expectResolutionErrorCode = async (callback: Promise<any> | Function, code: string) => {
+const expectResolutionErrorCode = async (
+  callback: Promise<any> | Function,
+  code: string,
+) => {
   try {
     if (callback instanceof Promise) {
       await callback;
@@ -49,7 +52,7 @@ const expectResolutionErrorCode = async (callback: Promise<any> | Function, code
     }
   }
   expect(true).toBeFalsy();
-}
+};
 
 beforeEach(() => {
   nock.cleanAll();
@@ -328,16 +331,13 @@ describe('ZNS', () => {
 });
 
 describe('CNS', () => {
-
   it('label.crypto should resolve to {test: value}', async () => {
     const namicorn = new Namicorn();
     expect(namicorn.cns).toBeDefined();
     const result = await namicorn.resolve('label.crypto');
-    expect(result).toEqual({test: 'value'});
+    expect(result).toEqual({ test: 'value' });
   });
-
-})
-
+});
 
 describe('ENS', () => {
   it('allows ens network specified as string', async () => {
@@ -492,7 +492,8 @@ describe('ENS', () => {
       blockchain: { ens: MainnetUrl },
     });
     await expectResolutionErrorCode(
-      namicorn.addressOrThrow('something.luxe', 'ETH'), 'UnregisteredDomain',
+      namicorn.addressOrThrow('something.luxe', 'ETH'),
+      'UnregisteredDomain',
     );
   });
 
@@ -651,7 +652,7 @@ describe('Namicorn', () => {
     const namicorn = new Namicorn();
     await expectResolutionErrorCode(
       namicorn.addressOrThrow('sdncdoncvdinvcsdncs.zil', 'ZIL'),
-      "UnregisteredDomain",
+      'UnregisteredDomain',
     );
   });
 
@@ -659,7 +660,7 @@ describe('Namicorn', () => {
     const namicorn = new Namicorn();
     await expectResolutionErrorCode(
       namicorn.addressOrThrow('brad.zil', 'INVALID_CURRENCY_SYMBOL'),
-      "UnspecifiedCurrency",
+      'UnspecifiedCurrency',
     );
   });
 
@@ -667,7 +668,7 @@ describe('Namicorn', () => {
     const namicorn = new Namicorn({ blockchain: true });
     await expectResolutionErrorCode(
       namicorn.addressOrThrow('bogdangusiev.qq', 'ZIL'),
-      "UnsupportedDomain",
+      'UnsupportedDomain',
     );
   });
 
@@ -693,7 +694,7 @@ describe('Namicorn', () => {
     const namicorn = new Namicorn();
     await expectResolutionErrorCode(
       () => namicorn.namehash('something.hello.com'),
-      "UnsupportedDomain",
+      'UnsupportedDomain',
     );
   });
 });

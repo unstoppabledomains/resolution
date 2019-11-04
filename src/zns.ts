@@ -9,17 +9,14 @@ import {
   Dictionary,
   ZnsResolution,
   NullAddress,
+  NamingServiceSource,
+  NetworkIdMap,
 } from './types';
 import { ResolutionError } from './index';
 import NamingService from './namingService';
 
 const DefaultSource = 'https://api.zilliqa.com';
 
-const NetworkIdMap = {
-  1: 'mainnet',
-  333: 'testnet',
-  111: 'localnet',
-};
 
 const RegistryMap = {
   mainnet: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
@@ -42,10 +39,15 @@ export default class Zns extends NamingService {
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
+  readonly NetworkIdMap:NetworkIdMap = {
+    1: 'mainnet',
+    333: 'testnet',
+    111: 'localnet',
+  };
   private registry?: Contract;
   private zilliqa: Zilliqa;
 
-  constructor(source: string | boolean | SourceDefinition = true) {
+  constructor(source: NamingServiceSource = true) {
     super();
     source = this.normalizeSource(source);
     this.network = source.network as string;
@@ -152,7 +154,9 @@ export default class Zns extends NamingService {
   }
 
   /** @ignore */
-  private async getResolverRecords(resolverAddress: string): Promise<ZnsResolution> {
+  private async getResolverRecords(
+    resolverAddress: string,
+  ): Promise<ZnsResolution> {
     if (!resolverAddress || resolverAddress == NullAddress) {
       return {};
     }
@@ -164,9 +168,7 @@ export default class Zns extends NamingService {
   }
 
   /** @ignore */
-  protected normalizeSource(
-    source: string | boolean | SourceDefinition,
-  ): SourceDefinition {
+  protected normalizeSource(source: NamingServiceSource): SourceDefinition {
     switch (typeof source) {
       case 'boolean': {
         return { url: DefaultSource, network: 'mainnet' };
@@ -180,7 +182,7 @@ export default class Zns extends NamingService {
       case 'object': {
         source = _.clone(source) as SourceDefinition;
         if (typeof source.network == 'number') {
-          source.network = NetworkIdMap[source.network];
+          source.network = this.NetworkIdMap[source.network];
         }
         if (source.registry) {
           source.network = source.network ? source.network : 'mainnet';

@@ -112,9 +112,9 @@ class Namicorn {
           headers: headers,
         });
         return response.json();
-      } catch(error) {
+      } catch (error) {
         if (error.name !== 'FetchError') throw error;
-        throw new ResolutionError("NamingServiceDown", {method: 'UD'})
+        throw new ResolutionError('NamingServiceDown', { method: 'UD' });
       }
     }
   }
@@ -195,7 +195,7 @@ class Namicorn {
    * @returns
    */
   isSupportedDomain(domain: string): boolean {
-    return !!this.getNamingMethod(domain)
+    return !!this.getNamingMethod(domain);
   }
 
   /**
