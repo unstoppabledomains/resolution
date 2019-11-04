@@ -276,7 +276,7 @@ export default class Ens extends NamingService {
             resolverContract.methods.addr(nodeHash, coinType),
           )
         : await this._callMethod(
-            resolverContract.methods.addr(nodeHash, coinType),
+            resolverContract.methods.addr(nodeHash),
           );
       const data = Buffer.from(addr.replace('0x', ''), 'hex');
       return formatsByCoinType[coinType].encoder(data);
