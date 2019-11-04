@@ -2,6 +2,7 @@ import { ResolutionError } from './index';
 import NamingService from './namingService';
 import nodeFetch from 'node-fetch';
 import { NamicornResolution, NullAddress } from './types';
+import fs from 'fs';
 
 /** @ignore  */
 const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
@@ -35,7 +36,8 @@ export default class Udapi extends NamingService {
     const DefaultUserAgent = isNode()
       ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'
       : navigator.userAgent;
-    const version = require('../package.json').version;
+    const pckg = JSON.parse(fs.readFileSync('./package.json') as any);
+    const version = pckg.version;
     const CustomUserAgent = `${DefaultUserAgent} namicorn/${version}`;
     this.headers = { 'X-user-agent': CustomUserAgent };
   }
