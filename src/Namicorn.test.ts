@@ -57,14 +57,6 @@ beforeEach(() => {
 });
 
 describe('ZNS', () => {
-  it('resolving from unstoppable API', async () => {
-    const testName = 'should work';
-    mockAPICalls('UD_API', testName, DefaultUrl);
-    const namicorn = new Namicorn({ blockchain: false });
-    const result = await namicorn.address('cofounding.zil', 'eth');
-    expect(result).toEqual('0xaa91734f90795e80751c96e682a321bb3c1a4186');
-  });
-
   it('resolves .zil name using blockchain', async () => {
     const testName = 'resolves .zil name using blockchain';
     mockAPICalls('ZIL', testName, ZilliqaUrl);
@@ -334,6 +326,18 @@ describe('ZNS', () => {
     });
   });
 });
+
+describe('CNS', () => {
+
+  it('label.crypto should resolve to {test: value}', async () => {
+    const namicorn = new Namicorn();
+    expect(namicorn.cns).toBeDefined();
+    const result = await namicorn.resolve('label.crypto');
+    expect(result).toEqual({test: 'value'});
+  });
+
+})
+
 
 describe('ENS', () => {
   it('allows ens network specified as string', async () => {
@@ -635,6 +639,14 @@ describe('ENS', () => {
 });
 
 describe('Namicorn', () => {
+  it('resolving from unstoppable API', async () => {
+    const testName = 'should work';
+    mockAPICalls('UD_API', testName, DefaultUrl);
+    const namicorn = new Namicorn({ blockchain: false });
+    const result = await namicorn.address('cofounding.zil', 'eth');
+    expect(result).toEqual('0xaa91734f90795e80751c96e682a321bb3c1a4186');
+  });
+
   it('checks Namicorn#addressOrThrow error #1', async () => {
     const namicorn = new Namicorn();
     await expectResolutionErrorCode(
