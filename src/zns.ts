@@ -210,7 +210,7 @@ export default class Zns extends NamingService {
     const resolver = this.zilliqa.contracts.at(
       toChecksumAddress(resolverAddress),
     );
-     return (await this.getContractField(resolver, 'records') ||
+    return ((await this.getContractField(resolver, 'records')) ||
       {}) as Dictionary<string>;
   }
 
