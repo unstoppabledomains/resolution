@@ -151,7 +151,7 @@ export default class Ens extends NamingService {
     try {
       var addr = await this.fetchAddress(resolver, nodeHash, coinType);
     } catch (err) {
-      if (err instanceof ResolutionError && err.code === 'UnsupportedCurrency')
+      if (err instanceof ResolutionError && err.code === 'UnsupportedCurrency' || err.name === 'TypeError')
         throw new ResolutionError('UnsupportedCurrency', {
           domain,
           currencyTicker,
@@ -278,12 +278,8 @@ export default class Ens extends NamingService {
         : await this._callMethod(
             resolverContract.methods.addr(nodeHash, coinType),
           );
-    if (addr && formatsByCoinType[coinType]) {
       const data = Buffer.from(addr.replace('0x', ''), 'hex');
       return formatsByCoinType[coinType].encoder(data);
-    } else {
-      throw new ResolutionError('UnsupportedCurrency', {});
-    }
   }
 
   /**
