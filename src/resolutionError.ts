@@ -22,6 +22,10 @@ const HandlersByCode = {
     `Domain ${params.domain} has no ${params.currencyTicker} attached to it`,
   NamingServiceDown: (params: { method: string }) =>
     `${params.method} naming service is down at the moment`,
+  UnsupportedCurrency: (params: { currencyTicker: string }) =>
+    `${params.currencyTicker} is not supported`,
+  IncorrectResolverInterface: (params: { method: string }) =>
+    `Domain resolver is configured incorrectly for ${params.method}`,
 };
 
 /**
@@ -41,7 +45,7 @@ export default class ResolutionError extends Error {
   readonly method?: string;
   readonly currencyTicker?: string;
 
-  constructor(code: ErrorCode, options: ResolutionErrorOptions) {
+  constructor(code: ErrorCode, options: ResolutionErrorOptions = {}) {
     const resolutionErrorHandler: ResolutionErrorHandler = HandlersByCode[code];
     const { domain, method, currencyTicker } = options;
     super(resolutionErrorHandler({ domain, method, currencyTicker }));

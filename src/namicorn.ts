@@ -1,40 +1,9 @@
-import nodeFetch from 'node-fetch';
 import Ens from './ens';
 import Zns from './zns';
-import { Blockchain, NamicornResolution, NullAddress } from './types';
+import Udapi from './unstoppableAPI';
+import { Blockchain, NamicornResolution } from './types';
 import ResolutionError from './resolutionError';
-
-const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
-
-/**
- * @ignore
- * Node env has special properties stored in process which are not inside the browser env.
- * Multiple checks is to avoid hitting the undefined while going deeper.
- */
-const isNode = () => {
-  if (typeof process === 'object') {
-    if (typeof process.versions === 'object') {
-      if (typeof process.versions.node !== 'undefined') {
-        return true;
-      }
-    }
-  }
-  return false;
-};
-
-/** @ignore */
-const myFetch = isNode() ? nodeFetch : window.fetch;
-
-/** @ignore Used internaly to set the right user-agent for fetch */
-const DefaultUserAgent = isNode()
-  ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'
-  : navigator.userAgent;
-/** @ignore */
-const version = require('../package.json').version;
-/** @ignore */
-const CustomUserAgent = `${DefaultUserAgent} namicorn/${version}`;
-/** @ignore */
-const headers = { 'X-user-agent': CustomUserAgent };
+import NamingService from './namingService';
 
 /**
  * Blockchain domain resolution library - Namicorn.
@@ -56,26 +25,20 @@ class Namicorn {
     },
   };
 
-  readonly api: string;
   readonly blockchain: Blockchain | boolean;
-  /**
-   * @ignore
-   */
+  /** @ignore */
   readonly ens?: Ens;
-  /**
-   * @ignore
-   */
+  /** @ignore */
   readonly zns?: Zns;
+  /** @ignore */
+  readonly api?: Udapi;
 
   /**
    * Namicorn constructor
-   * @property {Blockchain} blockchain - main configuration object
+   * @property blockchain - main configuration object
    */
-  constructor({
-    blockchain = true,
-    api = DefaultUrl,
-  }: { api?: string; blockchain?: Blockchain } = {}) {
-    this.api = api.toString();
+  constructor({ blockchain = true }: { blockchain?: Blockchain } = {}) {
+    this.api = new Udapi();
     this.blockchain = !!blockchain;
     if (blockchain) {
       if (blockchain == true) {
@@ -103,20 +66,9 @@ class Namicorn {
    * @returns - Returns a promise that resolves in an object
    */
   async resolve(domain: string): Promise<NamicornResolution> {
-    if (this.blockchain) {
-      return await this.resolveUsingBlockchain(domain);
-    } else {
-      try {
-        const response = await myFetch(`${this.api}/${domain}`, {
-          method: 'GET',
-          headers: headers,
-        });
-        return response.json();
-      } catch(error) {
-        if (error.name !== 'FetchError') throw error;
-        throw new ResolutionError("NamingServiceDown", {method: 'UD'})
-      }
-    }
+    const method = this.getNamingMethodOrThrow(domain);
+    const result = await method.resolve(domain);
+    return result || Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
   }
 
   /**
@@ -154,16 +106,8 @@ class Namicorn {
     domain: string,
     currencyTicker: string,
   ): Promise<string> {
-    var data = await this.resolve(domain);
-    if (!data.meta.owner || data.meta.owner === NullAddress)
-      throw new ResolutionError('UnregisteredDomain', { domain });
-    const address = data.addresses[currencyTicker.toUpperCase()];
-    if (!address)
-      throw new ResolutionError('UnspecifiedCurrency', {
-        domain,
-        currencyTicker,
-      });
-    return address;
+    const method = this.getNamingMethodOrThrow(domain);
+    return await method.address(domain, currencyTicker);
   }
 
   /**
@@ -195,7 +139,7 @@ class Namicorn {
    * @returns
    */
   isSupportedDomain(domain: string): boolean {
-    return !!this.getNamingMethod(domain)
+    return !!this.getNamingMethod(domain);
   }
 
   /**
@@ -210,26 +154,22 @@ class Namicorn {
 
   /**
    * @ignore
-   */
-  private async resolveUsingBlockchain(
-    domain: string,
-  ): Promise<NamicornResolution> {
-    const method = this.getNamingMethod(domain);
-    if (!method) throw new ResolutionError('UnsupportedDomain', { domain });
-    const result = await method.resolve(domain);
-    return result || Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
-  }
-
-  /**
-   * @ignore
    * Used internally to get the right method (ens or zns)
    * @param domain - domain name
    */
-  private getNamingMethod(domain: string) {
-    const methods = [this.ens, this.zns];
+  private getNamingMethod(domain: string): NamingService | undefined {
+    const methods: Array<NamingService | undefined> = this.blockchain
+      ? [this.ens, this.zns]
+      : [this.api];
     const method = methods.find(
       method => method && method.isSupportedDomain(domain),
     );
+    return method;
+  }
+
+  private getNamingMethodOrThrow(domain: string) {
+    const method = this.getNamingMethod(domain);
+    if (!method) throw new ResolutionError('UnsupportedDomain', { domain });
     return method;
   }
 }
