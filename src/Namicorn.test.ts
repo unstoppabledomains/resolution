@@ -287,16 +287,12 @@ describe('ZNS', () => {
 
   it('should resolve with resolution key setuped #2', async () => {
     const namicorn = new Namicorn();
-    const eye = jest
-      .spyOn(namicorn.zns as any, 'getRecordsAddresses')
-      .mockResolvedValue([
-        'zil1f6vyj5hgvll3xtx5kuxd8ucn66x9zxmkp34agy',
-        '0xa9b1d3647e4deb9ce4e601c2c9e0a2fdf2d7415a',
-      ]);
+    const eye = mockAsyncMethod(namicorn.zns, 'getRecordsAddresses', [
+      'zil1f6vyj5hgvll3xtx5kuxd8ucn66x9zxmkp34agy',
+      '0xa9b1d3647e4deb9ce4e601c2c9e0a2fdf2d7415a',
+    ]);
 
-    const secondEye = jest
-      .spyOn(namicorn.zns as any, 'getResolverRecords')
-      .mockResolvedValue({
+    const secondEye = mockAsyncMethod(namicorn.zns, 'getResolverRecords', {
         'ipfs.html.hash': 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
         'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
         'ipfs.redirect_domain.value': 'www.unstoppabledomains.com',
@@ -392,9 +388,7 @@ describe('ENS', () => {
 
   it('reverses address to ENS domain null', async () => {
     const ens = new Ens(MainnetUrl);
-    const spy = jest
-      .spyOn(ens as any, '_getResolver')
-      .mockImplementation(() => '0x0000000000000000000000000000000000000000');
+    const spy = mockAsyncMethod(ens as any, '_getResolver', NullAddress);
     const result = await ens.reverse(
       '0x112234455c3a32fd11230c42e7bccd4a84e02010',
       'ETH',
