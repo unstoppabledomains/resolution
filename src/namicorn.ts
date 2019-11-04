@@ -1,6 +1,7 @@
 import nodeFetch from 'node-fetch';
 import Ens from './ens';
 import Zns from './zns';
+import Cns from './cns';
 import { Blockchain, NamicornResolution, NullAddress } from './types';
 import ResolutionError from './resolutionError';
 
@@ -58,14 +59,12 @@ class Namicorn {
 
   readonly api: string;
   readonly blockchain: Blockchain | boolean;
-  /**
-   * @ignore
-   */
+  /** @ignore */
   readonly ens?: Ens;
-  /**
-   * @ignore
-   */
+  /** @ignore */
   readonly zns?: Zns;
+  /** @ignore */
+  readonly cns?: Cns;
 
   /**
    * Namicorn constructor
@@ -87,11 +86,17 @@ class Namicorn {
       if (blockchain.zns === undefined) {
         blockchain.zns = true;
       }
+      if (blockchain.cns == undefined) {
+        blockchain.cns = true;
+      }
       if (blockchain.ens) {
         this.ens = new Ens(blockchain.ens);
       }
       if (blockchain.zns) {
         this.zns = new Zns(blockchain.zns);
+      }
+      if (blockchain.cns) {
+        this.cns = new Cns(blockchain.cns);
       }
     }
   }
@@ -226,7 +231,7 @@ class Namicorn {
    * @param domain - domain name
    */
   private getNamingMethod(domain: string) {
-    const methods = [this.ens, this.zns];
+    const methods = [this.ens, this.zns, this.cns];
     const method = methods.find(
       method => method && method.isSupportedDomain(domain),
     );

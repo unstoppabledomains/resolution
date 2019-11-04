@@ -80,8 +80,9 @@ export type NetworkIdMap = {
 export type Blockchain =
   | boolean
   | {
-      ens?: string | boolean | SourceDefinition;
-      zns?: string | boolean | SourceDefinition;
+      ens?: NamingServiceSource 
+      zns?: NamingServiceSource
+      cns?: NamingServiceSource
     };
 
 /**
