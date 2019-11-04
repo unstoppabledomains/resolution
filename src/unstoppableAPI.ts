@@ -25,6 +25,7 @@ const myFetch = isNode() ? nodeFetch : window.fetch;
 export default class Udapi extends NamingService {
   /** @ignore */
   private url: string;
+  /** @ignore */
   private headers: {
     [key: string]: string;
   };
