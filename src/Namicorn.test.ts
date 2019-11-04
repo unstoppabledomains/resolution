@@ -81,6 +81,14 @@ describe("Unstoppable API", () => {
     expect(namicorn.isSupportedDomain('cofounding.eth')).toEqual(true);
     expect(namicorn.isSupportedDomain('cofounding.unknown')).toEqual(false);
   })
+
+  it('throws NamingServiceDown on FetchError', async () => {
+    const namicorn = new Namicorn({ blockchain: false });
+    const error = new Error();
+    error.name = 'FetchError';
+    jest.spyOn(namicorn.api as any, "fetch").mockRejectedValue(error)
+    await expectResolutionErrorCode(namicorn.resolve('hello.zil'), "NamingServiceDown")
+  })
 })
 
 describe('ZNS', () => {

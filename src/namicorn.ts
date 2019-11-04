@@ -31,7 +31,7 @@ class Namicorn {
   /** @ignore */
   readonly zns?: Zns;
   /** @ignore */
-  private api?: Udapi;
+  readonly api?: Udapi;
 
   /**
    * Namicorn constructor
@@ -66,16 +66,9 @@ class Namicorn {
    * @returns - Returns a promise that resolves in an object
    */
   async resolve(domain: string): Promise<NamicornResolution> {
-    if (this.blockchain) {
-      return await this.resolveUsingBlockchain(domain);
-    } else {
-      try {
-        return await this.api.resolve(domain);
-      } catch (error) {
-        if (error.name !== 'FetchError') throw error;
-        throw new ResolutionError('NamingServiceDown', { method: 'UD' });
-      }
-    }
+    const method = this.getNamingMethodOrThrow(domain);
+    const result = await method.resolve(domain);
+    return result || Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
   }
 
   /**
@@ -157,17 +150,6 @@ class Namicorn {
   isSupportedDomainInNetwork(domain: string): boolean {
     const method = this.getNamingMethod(domain);
     return method && method.isSupportedNetwork();
-  }
-
-  /**
-   * @ignore
-   */
-  private async resolveUsingBlockchain(
-    domain: string,
-  ): Promise<NamicornResolution> {
-    const method = this.getNamingMethodOrThrow(domain);
-    const result = await method.resolve(domain);
-    return result || Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
   }
 
   /**

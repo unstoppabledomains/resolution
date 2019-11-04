@@ -21,9 +21,6 @@ const isNode = () => {
   return false;
 };
 
-/** @ignore */
-const myFetch = isNode() ? nodeFetch : window.fetch;
-
 export default class Udapi extends NamingService {
   /** @ignore */
   private url: string;
@@ -87,11 +84,16 @@ export default class Udapi extends NamingService {
    * @param domain - domain name to be resolved
    */
   async resolve(domain: string): Promise<NamicornResolution> {
-    const response = await myFetch(`${this.url}/${domain}`, {
-      method: 'GET',
-      headers: this.headers,
-    });
-    return await response.json();
+    try {
+      const response = await this.fetch(`${this.url}/${domain}`, {
+        method: 'GET',
+        headers: this.headers,
+      });
+      return await response.json();
+    } catch (error) {
+      if (error.name !== 'FetchError') throw error;
+      throw new ResolutionError('NamingServiceDown', { method: 'UD' });
+    }
   }
 
   /** @ignore */
@@ -105,5 +107,10 @@ export default class Udapi extends NamingService {
   private findMethod(domain: string) {
     return [new Zns(), new Ens()]
       .find(m => m.isSupportedDomain(domain))
+  }
+
+  /** @ignore */
+  private async fetch(url, options) {
+    return isNode() ? nodeFetch(url, options) : window.fetch(url, options);
   }
 }
