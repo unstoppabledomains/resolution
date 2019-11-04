@@ -113,8 +113,7 @@ class Namicorn {
     domain: string,
     currencyTicker: string,
   ): Promise<string> {
-    const method = this.getNamingMethod(domain);
-    if (!method) throw new ResolutionError('UnsupportedDomain', { domain });
+    const method = this.getNamingMethodOrThrow(domain);
     return await method.address(domain, currencyTicker);
   }
 
@@ -166,8 +165,7 @@ class Namicorn {
   private async resolveUsingBlockchain(
     domain: string,
   ): Promise<NamicornResolution> {
-    const method = this.getNamingMethod(domain);
-    if (!method) throw new ResolutionError('UnsupportedDomain', { domain });
+    const method = this.getNamingMethodOrThrow(domain);
     const result = await method.resolve(domain);
     return result || Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
   }
@@ -177,12 +175,17 @@ class Namicorn {
    * Used internally to get the right method (ens or zns)
    * @param domain - domain name
    */
-  private getNamingMethod(domain: string) {
-    //if (!this.blockchain) return this.api;
-    const methods: NamingService[] = this.blockchain ? [this.ens, this.zns] : [this.api];
+  private getNamingMethod(domain: string): NamingService | undefined {
+    const methods: Array<NamingService | undefined> = this.blockchain ? [this.ens, this.zns] : [this.api];
     const method = methods.find(
       method => method && method.isSupportedDomain(domain),
     );
+    return method;
+  }
+
+  private getNamingMethodOrThrow(domain: string) {
+    const method = this.getNamingMethod(domain);
+    if (!method) throw new ResolutionError('UnsupportedDomain', { domain });
     return method;
   }
 }
