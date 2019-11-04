@@ -689,10 +689,9 @@ describe('ENS', () => {
     const ens = new Ens();
     await expectResolutionErrorCode(
       ens.address('testthing.eth', 'bnb'),
-      'UnsupportedCurrency'
+      'UnsupportedCurrency',
     );
-  })
-
+  });
 
   it('checks ens unsupportedCurrency error', async () => {
     const ens = new Ens();
