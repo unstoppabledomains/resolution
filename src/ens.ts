@@ -9,6 +9,7 @@ import {
   NamicornResolution,
   NullAddress,
   Bip44Constants,
+  EthCoinIndex,
 } from './types';
 import NamingService from './namingService';
 import { ResolutionError } from './index';
@@ -122,7 +123,7 @@ export default class Ens extends NamingService {
       return null;
     }
     const resolverContract = new this.web3.eth.Contract(
-      resolverInterface(resolverAddress, 60),
+      resolverInterface(resolverAddress, EthCoinIndex),
       resolverAddress,
     );
 
@@ -270,7 +271,7 @@ export default class Ens extends NamingService {
       resolver,
     );
     const addr: string =
-      coinType != 60 && coinType > -1
+      coinType != EthCoinIndex && coinType > -1
         ? await this._callMethod(
             resolverContract.methods.addr(nodeHash, coinType),
           )

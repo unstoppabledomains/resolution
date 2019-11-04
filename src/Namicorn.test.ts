@@ -8,6 +8,9 @@ const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
 const MainnetUrl = 'https://mainnet.infura.io';
 const ZilliqaUrl = 'https://api.zilliqa.com';
 
+const mockAsyncMethod = (object: any, method: string, value) => {
+  return jest.spyOn(object, method).mockResolvedValue(value);
+}
 const mockAPICalls = (topLevel: string, testName: string, url = MainnetUrl) => {
   if (process.env.LIVE) {
     return;
@@ -247,16 +250,12 @@ describe('ZNS', () => {
   it('should resolve with resolution key setuped', async () => {
     const namicorn = new Namicorn();
 
-    const eye = jest
-      .spyOn(namicorn.zns as any, 'getRecordsAddresses')
-      .mockResolvedValue([
-        'zil194qcjskuuxh6qtg8xw3qqrr3kdc6dtq8ct6j9s',
-        '0xdac22230adfe4601f00631eae92df6d77f054891',
-      ]);
+    const eye = mockAsyncMethod(namicorn.zns, 'getRecordsAddresses', [
+      'zil194qcjskuuxh6qtg8xw3qqrr3kdc6dtq8ct6j9s',
+      '0xdac22230adfe4601f00631eae92df6d77f054891',
+    ]);
 
-    const secondEye = jest
-      .spyOn(namicorn.zns as any, 'getResolverRecords')
-      .mockResolvedValue({
+    const secondEye = mockAsyncMethod(namicorn.zns as any, 'getResolverRecords', {
         'crypto.BCH.address': 'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6',
         'crypto.BTC.address': '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB',
         'crypto.ETH.address': '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
@@ -366,39 +365,21 @@ describe('ENS', () => {
     expect(namicorn.ens.url).toBe('https://mainnet.infura.io');
     expect(namicorn.ens.network).toEqual('mainnet');
 
-    const ownerEye = jest
-      .spyOn(namicorn.ens as any, '_getOwner')
-      .mockImplementation(() =>
-        Promise.resolve('0x714ef33943d925731FBB89C99aF5780D888bD106'),
-      );
-
-    const resolverEye = jest
-      .spyOn(namicorn.ens, '_getResolver')
-      .mockImplementation(() =>
-        Promise.resolve('0x5FfC014343cd971B7eb70732021E26C35B744cc4'),
-      );
-
-    const FetchEye = jest
-      .spyOn(namicorn.ens as any, 'fetchAddress')
-      .mockImplementation(() =>
-        Promise.resolve('0x714ef33943d925731FBB89C99aF5780D888bD106'),
-      );
+    const ownerEye = mockAsyncMethod(namicorn.ens, '_getOwner', '0x714ef33943d925731FBB89C99aF5780D888bD106')
+    const resolverEye = mockAsyncMethod(namicorn.ens, '_getResolver', '0x5FfC014343cd971B7eb70732021E26C35B744cc4');
+    const fetchEye = mockAsyncMethod(namicorn.ens, 'fetchAddress', '0x714ef33943d925731FBB89C99aF5780D888bD106')
 
     var result = await namicorn.address('matthewgould.eth', 'ETH');
     expect(ownerEye).toHaveBeenCalled();
     expect(resolverEye).toHaveBeenCalled();
-    expect(FetchEye).toHaveBeenCalled();
+    expect(fetchEye).toHaveBeenCalled();
     expect(result).toEqual('0x714ef33943d925731FBB89C99aF5780D888bD106');
   });
 
   it('reverses address to ENS domain', async () => {
     const ens = new Ens(MainnetUrl);
-    const eye = jest
-      .spyOn(ens as any, 'resolverCallToName')
-      .mockImplementation(() => 'adrian.argent.xyz');
-    const secondEye = jest
-      .spyOn(ens as any, '_getResolver')
-      .mockImplementation(() => '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890');
+    const eye = mockAsyncMethod(ens, 'resolverCallToName', 'adrian.argent.xyz');
+    const secondEye = mockAsyncMethod(ens as any, '_getResolver', '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890');
     const result = await ens.reverse(
       '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
       'ETH',
