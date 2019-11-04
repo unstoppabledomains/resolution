@@ -207,7 +207,7 @@ export default class Ens extends NamingService {
    * @param nodeHash
    */
   private resolverCallToName(resolverContract, nodeHash) {
-    return this.callMethod(resolverContract.methods.name(nodeHash));
+    return this._callMethod(resolverContract.methods.name(nodeHash));
   }
 
   /**
@@ -216,7 +216,7 @@ export default class Ens extends NamingService {
    * @param nodeHash
    */
   async _getResolver(nodeHash) {
-    return await this.callMethod(this.ensContract.methods.resolver(nodeHash));
+    return await this._callMethod(this.ensContract.methods.resolver(nodeHash));
   }
 
   /**
@@ -226,7 +226,7 @@ export default class Ens extends NamingService {
    */
 
   async _getOwner(nodeHash) {
-    return await this.callMethod(this.ensContract.methods.owner(nodeHash));
+    return await this._callMethod(this.ensContract.methods.owner(nodeHash));
   }
 
   /**
@@ -236,9 +236,9 @@ export default class Ens extends NamingService {
    */
   private async getResolutionInfo(nodeHash) {
     return await Promise.all([
-      this.callMethod(this.ensContract.methods.owner(nodeHash)),
-      this.callMethod(this.ensContract.methods.ttl(nodeHash)),
-      this.callMethod(this.ensContract.methods.resolver(nodeHash)),
+      this._callMethod(this.ensContract.methods.owner(nodeHash)),
+      this._callMethod(this.ensContract.methods.ttl(nodeHash)),
+      this._callMethod(this.ensContract.methods.resolver(nodeHash)),
     ]);
   }
 
@@ -270,10 +270,10 @@ export default class Ens extends NamingService {
     );
     const addr: string =
       coinType != 60 && coinType > -1
-        ? await this.callMethod(
+        ? await this._callMethod(
             resolverContract.methods.addr(nodeHash, coinType),
           )
-        : await this.callMethod(
+        : await this._callMethod(
             resolverContract.methods.addr(nodeHash, coinType),
           );
     if (addr && formatsByCoinType[coinType]) {
@@ -347,7 +347,7 @@ export default class Ens extends NamingService {
    *  @param method - Method to be called
    *  @throws ResolutionError -> When blockchain is down
    */
-  private async callMethod(method: { call: () => Promise<any> }): Promise<any> {
+  async _callMethod(method: { call: () => Promise<any> }): Promise<any> {
     try {
       return await method.call();
     } catch (error) {

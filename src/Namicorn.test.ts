@@ -637,49 +637,197 @@ describe('ENS', () => {
 
   it('checks ens multicoin support #1', async () => {
     const ens = new Ens();
+    const ownerSpy = jest
+      .spyOn(ens, '_getOwner')
+      .mockImplementation(() =>
+        Promise.resolve('0x0904Dac3347eA47d208F3Fd67402D039a3b99859'),
+      );
+    const resolverSpy = jest
+      .spyOn(ens, '_getResolver')
+      .mockImplementation(() =>
+        Promise.resolve('0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8'),
+      );
+    const addrSpy = jest
+      .spyOn(ens, '_callMethod')
+      .mockImplementation(() =>
+        Promise.resolve('0x76a9144620b70031f0e9437e374a2100934fba4911046088ac'),
+      );
     const doge = await ens.address('testthing.eth', 'DOGE');
+    expect(ownerSpy).toBeCalled();
+    expect(resolverSpy).toBeCalled();
+    expect(addrSpy).toBeCalled();
     expect(doge).toBe('DBXu2kgc3xtvCUWFcxFE3r9hEYgmuaaCyD');
   });
 
   it('checks ens multicoin support #2', async () => {
     const ens = new Ens();
+    const ownerSpy = jest
+      .spyOn(ens, '_getOwner')
+      .mockImplementation(() =>
+        Promise.resolve('0x0904Dac3347eA47d208F3Fd67402D039a3b99859'),
+      );
+    const resolverSpy = jest
+      .spyOn(ens, '_getResolver')
+      .mockImplementation(() =>
+        Promise.resolve('0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8'),
+      );
+    const addrSpy = jest
+      .spyOn(ens, '_callMethod')
+      .mockImplementation(() =>
+        Promise.resolve('0xa914e8604d28ef5d2a7caafe8741e5dd4816b7cb19ea87'),
+      );
     const ltc = await ens.address('testthing.eth', 'LTC');
+    expect(ownerSpy).toBeCalled();
+    expect(resolverSpy).toBeCalled();
+    expect(addrSpy).toBeCalled();
     expect(ltc).toBe('MV5rN5EcX1imDS2gEh5jPJXeiW5QN8YrK3');
   });
 
   it('checks ens multicoin support #3', async () => {
     const ens = new Ens();
+    const ownerSpy = jest
+      .spyOn(ens, '_getOwner')
+      .mockImplementation(() =>
+        Promise.resolve('0x0904Dac3347eA47d208F3Fd67402D039a3b99859'),
+      );
+    const resolverSpy = jest
+      .spyOn(ens, '_getResolver')
+      .mockImplementation(() =>
+        Promise.resolve('0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8'),
+      );
+    const addrSpy = jest
+      .spyOn(ens, '_callMethod')
+      .mockImplementation(() =>
+        Promise.resolve('0x314159265dd8dbb310642f98f50c066173c1259b'),
+      );
     const eth = await ens.address('testthing.eth', 'ETH');
+    expect(ownerSpy).toBeCalled();
+    expect(resolverSpy).toBeCalled();
+    expect(addrSpy).toBeCalled();
     expect(eth).toBe('0x314159265dD8dbb310642f98f50C066173C1259b');
   });
 
   it('checks ens multicoin support #4', async () => {
     const ens = new Ens();
+    const ownerSpy = jest
+      .spyOn(ens, '_getOwner')
+      .mockImplementation(() =>
+        Promise.resolve('0x0904Dac3347eA47d208F3Fd67402D039a3b99859'),
+      );
+    const resolverSpy = jest
+      .spyOn(ens, '_getResolver')
+      .mockImplementation(() =>
+        Promise.resolve('0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8'),
+      );
+    const addrSpy = jest
+      .spyOn(ens, '_callMethod')
+      .mockImplementation(() =>
+        Promise.resolve('0x314159265dd8dbb310642f98f50c066173c1259b'),
+      );
     const etc = await ens.address('testthing.eth', 'etc');
+    expect(ownerSpy).toBeCalled();
+    expect(resolverSpy).toBeCalled();
+    expect(addrSpy).toBeCalled();
     expect(etc).toBe('0x314159265dD8dbb310642f98f50C066173C1259b');
   });
 
   it('checks ens multicoin support #5', async () => {
     const ens = new Ens();
+    const ownerSpy = jest
+      .spyOn(ens, '_getOwner')
+      .mockImplementation(() =>
+        Promise.resolve('0x0904Dac3347eA47d208F3Fd67402D039a3b99859'),
+      );
+    const resolverSpy = jest
+      .spyOn(ens, '_getResolver')
+      .mockImplementation(() =>
+        Promise.resolve('0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8'),
+      );
+    const addrSpy = jest
+      .spyOn(ens, '_callMethod')
+      .mockImplementation(() =>
+        Promise.resolve('0x314159265dd8dbb310642f98f50c066173c1259b'),
+      );
     const rsk = await ens.address('testthing.eth', 'rsk');
+    expect(ownerSpy).toBeCalled();
+    expect(resolverSpy).toBeCalled();
+    expect(addrSpy).toBeCalled();
     expect(rsk).toBe('0x314159265dD8DbB310642F98f50C066173c1259B');
   });
 
   it('checks ens multicoin support #6', async () => {
     const ens = new Ens();
+    const ownerSpy = jest
+      .spyOn(ens, '_getOwner')
+      .mockImplementation(() =>
+        Promise.resolve('0x0904Dac3347eA47d208F3Fd67402D039a3b99859'),
+      );
+    const resolverSpy = jest
+      .spyOn(ens, '_getResolver')
+      .mockImplementation(() =>
+        Promise.resolve('0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8'),
+      );
+    const addrSpy = jest
+      .spyOn(ens, '_callMethod')
+      .mockImplementation(() =>
+        Promise.resolve(
+          '0x05444b4e9c06f24296074f7bc48f92a97916c6dc5ea9000000000000000000',
+        ),
+      );
     const xrp = await ens.address('testthing.eth', 'xrp');
+    expect(ownerSpy).toBeCalled();
+    expect(resolverSpy).toBeCalled();
+    expect(addrSpy).toBeCalled();
     expect(xrp).toBe('X7qvLs7gSnNoKvZzNWUT2e8st17QPY64PPe7zriLNuJszeg');
   });
 
   it('checks ens multicoin support #7', async () => {
     const ens = new Ens();
+    const ownerSpy = jest
+      .spyOn(ens, '_getOwner')
+      .mockImplementation(() =>
+        Promise.resolve('0x0904Dac3347eA47d208F3Fd67402D039a3b99859'),
+      );
+    const resolverSpy = jest
+      .spyOn(ens, '_getResolver')
+      .mockImplementation(() =>
+        Promise.resolve('0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8'),
+      );
+    const addrSpy = jest
+      .spyOn(ens, '_callMethod')
+      .mockImplementation(() =>
+        Promise.resolve('0x76a91476a04053bda0a88bda5177b86a15c3b29f55987388ac'),
+      );
     const bch = await ens.address('testthing.eth', 'bch');
+    expect(ownerSpy).toBeCalled();
+    expect(resolverSpy).toBeCalled();
+    expect(addrSpy).toBeCalled();
     expect(bch).toBe('bitcoincash:qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a');
   });
 
   it('checks ens multicoin support #8', async () => {
     const ens = new Ens();
+    const ownerSpy = jest
+      .spyOn(ens, '_getOwner')
+      .mockImplementation(() =>
+        Promise.resolve('0x0904Dac3347eA47d208F3Fd67402D039a3b99859'),
+      );
+    const resolverSpy = jest
+      .spyOn(ens, '_getResolver')
+      .mockImplementation(() =>
+        Promise.resolve('0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8'),
+      );
+    const addrSpy = jest
+      .spyOn(ens, '_callMethod')
+      .mockImplementation(() =>
+        Promise.resolve(
+          '0x5128751e76e8199196d454941c45d1b3a323f1433bd6751e76e8199196d454941c45d1b3a323f1433bd6',
+        ),
+      );
     const btc = await ens.address('testthing.eth', 'BTC');
+    expect(ownerSpy).toBeCalled();
+    expect(resolverSpy).toBeCalled();
+    expect(addrSpy).toBeCalled();
     expect(btc).toBe(
       'bc1pw508d6qejxtdg4y5r3zarvary0c5xw7kw508d6qejxtdg4y5r3zarvary0c5xw7k7grplx',
     );
@@ -687,6 +835,7 @@ describe('ENS', () => {
 
   it('checks unsupportedCurrency error', async () => {
     const ens = new Ens();
+
     await expectResolutionErrorCode(
       ens.address('testthing.eth', 'bnb'),
       'UnsupportedCurrency',
@@ -697,6 +846,7 @@ describe('ENS', () => {
     const ens = new Ens();
     await expectResolutionErrorCode(
       ens.address('testthing.eth', 'UNREALTICKER'),
+
       'UnsupportedCurrency',
     );
   });
