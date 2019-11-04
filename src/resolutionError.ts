@@ -25,7 +25,7 @@ const HandlersByCode = {
   UnsupportedCurrency: (params: { currencyTicker: string }) =>
     `${params.currencyTicker} is not supported`,
   IncorrectResolverInterface: (params: { method: string }) =>
-    `Wrong ResolverInterace specified for ${params.method}`,
+    `Domain resolver is configured incorrectly for ${params.method}`,
 };
 
 /**
