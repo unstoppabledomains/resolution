@@ -197,6 +197,7 @@ export default class Ens extends NamingService {
    * @return ENS namehash of a domain
    */
   namehash(domain: string): string {
+    this.ensureSupportedDomain(domain);
     return hash(domain);
   }
 

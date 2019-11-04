@@ -59,15 +59,27 @@ beforeEach(() => {
   jest.restoreAllMocks();
 });
 
-describe('ZNS', () => {
-  it('resolving from unstoppable API', async () => {
+describe("Unstoppable API", () => {
+  it('resolves a domain', async () => {
     const testName = 'should work';
     mockAPICalls('UD_API', testName, DefaultUrl);
     const namicorn = new Namicorn({ blockchain: false });
     const result = await namicorn.address('cofounding.zil', 'eth');
     expect(result).toEqual('0xaa91734f90795e80751c96e682a321bb3c1a4186');
   });
+  it('namehashes zil domain', async () => {
+    const namicorn = new Namicorn({ blockchain: false });
+    expect(namicorn.namehash('cofounding.zil')).toEqual('0x1cc365ffd60bb50538e01d24c1f1e26c887c36f26a0de250660b8a1465c60667');
+  });
+  it('supports zil and eth domains', async () => {
+    const namicorn = new Namicorn({ blockchain: false });
+    expect(namicorn.isSupportedDomain('cofounding.zil')).toEqual(true);
+    expect(namicorn.isSupportedDomain('cofounding.eth')).toEqual(true);
+    expect(namicorn.isSupportedDomain('cofounding.unknown')).toEqual(false);
+  })
+})
 
+describe('ZNS', () => {
   it('resolves .zil name using blockchain', async () => {
     const testName = 'resolves .zil name using blockchain';
     mockAPICalls('ZIL', testName, ZilliqaUrl);

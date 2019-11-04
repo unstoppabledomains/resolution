@@ -174,6 +174,7 @@ export default class Zns extends NamingService {
    * @returns ZNS namehash
    */
   namehash(domain: string): string {
+    this.ensureSupportedDomain(domain);
     return namehash(domain);
   }
 

@@ -2,6 +2,8 @@ import { ResolutionError } from './index';
 import NamingService from './namingService';
 import nodeFetch from 'node-fetch';
 import { NamicornResolution, NullAddress } from './types';
+import Zns from './zns'
+import Ens from './ens'
 import fs from 'fs';
 
 /** @ignore  */
@@ -45,16 +47,18 @@ export default class Udapi extends NamingService {
 
   /** @ignore */
   isSupportedDomain(domain: string): boolean {
-    throw new Error('Method not implemented.');
+    return !!this.findMethod(domain);
   }
 
   /** @ignore */
   isSupportedNetwork(): boolean {
-    throw new Error('Method not implemented.');
+    return true;
   }
   /** @ignore */
   namehash(domain: string): string {
-    throw new Error('Method not implemented.');
+    const method = this.findMethod(domain)
+    if (!method) throw new ResolutionError('UnsupportedDomain', { domain });
+    return method.namehash(domain)
   }
 
   /**
@@ -95,5 +99,11 @@ export default class Udapi extends NamingService {
     source: string | boolean | import('./types').SourceDefinition,
   ) {
     throw new Error('Method not implemented.');
+  }
+
+  /** @ignore */
+  private findMethod(domain: string) {
+    return [new Zns(), new Ens()]
+      .find(m => m.isSupportedDomain(domain))
   }
 }

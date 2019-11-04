@@ -3,6 +3,7 @@ import Zns from './zns';
 import Udapi from './unstoppableAPI';
 import { Blockchain, NamicornResolution } from './types';
 import ResolutionError from './resolutionError';
+import NamingService from './namingService'
 
 /**
  * Blockchain domain resolution library - Namicorn.
@@ -177,8 +178,8 @@ class Namicorn {
    * @param domain - domain name
    */
   private getNamingMethod(domain: string) {
-    if (!this.blockchain) return this.api;
-    const methods = [this.ens, this.zns];
+    //if (!this.blockchain) return this.api;
+    const methods: NamingService[] = this.blockchain ? [this.ens, this.zns] : [this.api];
     const method = methods.find(
       method => method && method.isSupportedDomain(domain),
     );
