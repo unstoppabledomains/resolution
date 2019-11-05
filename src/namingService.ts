@@ -17,13 +17,18 @@ import ResolutionError from './resolutionError';
 export default abstract class NamingService {
   abstract isSupportedDomain(domain: string): boolean;
   abstract isSupportedNetwork(): boolean;
-  abstract async resolve(domain: string): Promise<NamicornResolution | null> 
   abstract namehash(domain: string): string;
+  abstract address(domain: string, currencyTicker: string): Promise<string>;
+  abstract resolve(domain: string): Promise<NamicornResolution>;
   protected abstract normalizeSource(
     source: NamingServiceSource,
   ): SourceDefinition;
 
-
+  protected ensureSupportedDomain(domain: string): void {
+    if (!this.isSupportedDomain(domain)) {
+      throw new ResolutionError('UnsupportedDomain', { domain });
+    }
+  }
 }
 
 

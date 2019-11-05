@@ -15,7 +15,6 @@ import Web3 from 'web3';
  * @param registryAddress - address for a registry contract
  */
 export default class Cns extends EtheriumNamingService {
-
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
@@ -84,6 +83,19 @@ export default class Cns extends EtheriumNamingService {
    * @return ENS namehash of a domain
    */
   namehash(domain: string): string {
+    throw new Error("Method not implemented.");
+  }
+
+ /**
+   * Resolves domain to a specific cryptoAddress
+   * @param domain - domain name to be resolved
+   * @param currencyTicker currency ticker such as
+   *  - ZIL
+   *  - BTC
+   *  - ETH
+   * @returns - A promise that resolves in a string
+   */
+  address(domain: string, currencyTicker: string): Promise<string> {
     throw new Error("Method not implemented.");
   }
 

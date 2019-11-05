@@ -12,22 +12,26 @@ import {
   NamingServiceSource,
   NetworkIdMap,
 } from './types';
-import { ResolutionError } from './index';
+import Namicorn, { ResolutionError } from './index';
 import NamingService from './namingService';
 
+/** @ignore */
 const DefaultSource = 'https://api.zilliqa.com';
 
 
+/** @ignore */
 const RegistryMap = {
   mainnet: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
 };
 
+/** @ignore */
 const UrlMap = {
   mainnet: 'https://api.zilliqa.com',
   testnet: 'https://dev-api.zilliqa.com',
   localnet: 'http://localhost:4201',
 };
 
+/** @ignore */
 const UrlNetworkMap = (url: string) => {
   const invert = _(UrlMap)
     .invert()
@@ -35,6 +39,15 @@ const UrlNetworkMap = (url: string) => {
   return invert[url];
 };
 
+/**
+ * Class to support connection with Zilliqa naming service
+ * @param network - network string such as
+ * - mainnet
+ * - ropsten
+ * @param url - main api url such as
+ * - https://mainnet.infura.io
+ * @param registryAddress - address for a registry contract
+ */
 export default class Zns extends NamingService {
   readonly network: string;
   readonly url: string;
@@ -45,6 +58,7 @@ export default class Zns extends NamingService {
     111: 'localnet',
   };
   private registry?: Contract;
+  /** @ignore */
   private zilliqa: Zilliqa;
 
   constructor(source: NamingServiceSource = true) {
@@ -70,9 +84,14 @@ export default class Zns extends NamingService {
     }
   }
 
+  /**
+   * Resolves the domain name
+   * @param domain - domain name to be resolved
+   * @returns - a promise that resolves in a detailed crypto resolution
+   */
   async resolve(domain: string): Promise<NamicornResolution | null> {
     const recordAddresses = await this.getRecordsAddresses(domain);
-    if (!recordAddresses) return null;
+    if (!recordAddresses) return Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
     const [ownerAddress, resolverAddress] = recordAddresses;
     const resolution = this.structureResolverRecords(
       await this.getResolverRecords(resolverAddress),
@@ -87,6 +106,28 @@ export default class Zns extends NamingService {
         ttl: parseInt(resolution.ttl as string) || 0,
       },
     };
+  }
+
+  /**
+   * Resolves domain name to a particular crypto address associated with it
+   * @param domain - domain name to be resolved
+   * @param currencyTicker specific currency ticker such as
+   *  - ZIL
+   *  - BTC
+   *  - ETH
+   * @throws ResolutionError
+   */
+  async address(domain: string, currencyTicker: string): Promise<string> {
+    const data = await this.resolve(domain);
+    if (!data.meta.owner || data.meta.owner === NullAddress)
+      throw new ResolutionError('UnregisteredDomain', { domain });
+    const address = data.addresses[currencyTicker.toUpperCase()];
+    if (!address)
+      throw new ResolutionError('UnspecifiedCurrency', {
+        domain,
+        currencyTicker,
+      });
+    return address;
   }
 
   /**
@@ -128,6 +169,7 @@ export default class Zns extends NamingService {
    * @returns ZNS namehash
    */
   namehash(domain: string): string {
+    this.ensureSupportedDomain(domain);
     return namehash(domain);
   }
 
