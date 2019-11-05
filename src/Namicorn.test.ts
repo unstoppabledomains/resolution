@@ -156,7 +156,6 @@ describe('ZNS', () => {
 
   it('checks normalizeSource zns (boolean - false)', async () => {
     const namicorn = new Namicorn({ blockchain: { zns: false } });
-    new Namicorn({ blockchain: { zns: false } });
     expect(namicorn.zns).toBeUndefined();
   });
 
@@ -535,6 +534,19 @@ describe('ENS', () => {
     );
   });
 
+  it('resolves name with resolver but without an owner', async () => {
+    const ens = new Ens();
+    const ownerSpy = mockAsyncMethod(ens, '_getOwner', NullAddress);
+    const resolverSpy = mockAsyncMethod(ens, '_getResolver', '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8');
+    const addrSpy = mockAsyncMethod(ens, '_callMethod', '0x76a9144620b70031f0e9437e374a2100934fba4911046088ac');
+    const doge = await ens.address('testthing.eth', 'DOGE');
+    expect(ownerSpy).toBeCalled();
+    expect(resolverSpy).toBeCalled();
+    expect(addrSpy).toBeCalled();
+    expect(doge).toBe('DBXu2kgc3xtvCUWFcxFE3r9hEYgmuaaCyD');
+
+  });
+
   it('checks if the network is supported(true)', async () => {
     const ens = new Ens({ network: 1 });
     const answer = ens.isSupportedNetwork();
@@ -854,20 +866,16 @@ describe('ENS', () => {
     );
   });
 
-  it('checks unsupportedCurrency error', async () => {
-    const ens = new Ens();
-
+  it('checks UnsupportedCurrency error', async () => {
     await expectResolutionErrorCode(
-      ens.address('testthing.eth', 'bnb'),
+      new Namicorn().addressOrThrow('testthing.eth', 'bnb'),
       'UnsupportedCurrency',
     );
   });
 
-  it('checks ens unsupportedCurrency error', async () => {
-    const ens = new Ens();
+  it('checks UnsupportedCurrency error', async () => {
     await expectResolutionErrorCode(
-      ens.address('testthing.eth', 'UNREALTICKER'),
-
+      new Namicorn().addressOrThrow('testthing.eth', 'UNREALTICKER'),
       'UnsupportedCurrency',
     );
   });

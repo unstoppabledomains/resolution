@@ -141,21 +141,19 @@ export default class Ens extends NamingService {
    */
   async address(domain: string, currencyTicker: string): Promise<string> {
     const nodeHash = this.namehash(domain);
-    const owner = await this._getOwner(nodeHash);
-    if (!owner || owner === NullAddress)
-      throw new ResolutionError('UnregisteredDomain', { domain });
+    const ownerPromise = this._getOwner(nodeHash)
     const resolver = await this._getResolver(nodeHash);
-    if (!resolver || resolver === NullAddress)
-      throw new ResolutionError('UnspecifiedResolver');
+    if (!resolver || resolver === NullAddress) {
+      const owner = await ownerPromise;
+      if (!owner || owner === NullAddress)
+        throw new ResolutionError('UnregisteredDomain', { domain });
+      throw new ResolutionError('UnspecifiedResolver', { domain });
+    }
     const coinType = this.getCoinType(currencyTicker);
     try {
       var addr = await this.fetchAddress(resolver, nodeHash, coinType);
     } catch (err) {
-      if (
-        (err instanceof ResolutionError &&
-          err.code === 'UnsupportedCurrency') ||
-        err.name === 'TypeError'
-      )
+      if (err.name === 'TypeError')
         throw new ResolutionError('UnsupportedCurrency', {
           domain,
           currencyTicker,
@@ -256,7 +254,7 @@ export default class Ens extends NamingService {
         item[1] === currencyTicker.toUpperCase() ||
         item[2] === currencyTicker.toUpperCase(),
     );
-    if (coin < 0)
+    if (coin < 0 || !formatsByCoinType[coin])
       throw new ResolutionError('UnsupportedCurrency', { currencyTicker });
     return coin;
   }
@@ -275,7 +273,7 @@ export default class Ens extends NamingService {
       resolver,
     );
     const addr: string =
-      coinType != EthCoinIndex && coinType > -1
+      coinType != EthCoinIndex
         ? await this._callMethod(
             resolverContract.methods.addr(nodeHash, coinType),
           )
@@ -352,7 +350,7 @@ export default class Ens extends NamingService {
       return await method.call();
     } catch (error) {
       const { message }: { message: string } = error;
-      if (message.match(/Invalid JSON RPC response/)) {
+      if (message.match(/Invalid JSON RPC response/) || message.match(/legacy access request rate exceeded/)) {
         throw new ResolutionError('NamingServiceDown', { method: 'ENS' });
       }
       throw error;
