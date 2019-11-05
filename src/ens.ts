@@ -147,7 +147,7 @@ export default class Ens extends NamingService {
       const owner = await ownerPromise;
       if (!owner || owner === NullAddress)
         throw new ResolutionError('UnregisteredDomain', { domain });
-      throw new ResolutionError('UnspecifiedResolver');
+      throw new ResolutionError('UnspecifiedResolver', { domain });
     }
     const coinType = this.getCoinType(currencyTicker);
     try {
