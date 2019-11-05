@@ -141,12 +141,14 @@ export default class Ens extends NamingService {
    */
   async address(domain: string, currencyTicker: string): Promise<string> {
     const nodeHash = this.namehash(domain);
-    const owner = await this._getOwner(nodeHash);
-    if (!owner || owner === NullAddress)
-      throw new ResolutionError('UnregisteredDomain', { domain });
+    const ownerPromise = this._getOwner(nodeHash)
     const resolver = await this._getResolver(nodeHash);
-    if (!resolver || resolver === NullAddress)
+    if (!resolver || resolver === NullAddress) {
+      const owner = await ownerPromise;
+      if (!owner || owner === NullAddress)
+        throw new ResolutionError('UnregisteredDomain', { domain });
       throw new ResolutionError('UnspecifiedResolver');
+    }
     const coinType = this.getCoinType(currencyTicker);
     try {
       var addr = await this.fetchAddress(resolver, nodeHash, coinType);
@@ -352,7 +354,7 @@ export default class Ens extends NamingService {
       return await method.call();
     } catch (error) {
       const { message }: { message: string } = error;
-      if (message.match(/Invalid JSON RPC response/)) {
+      if (message.match(/Invalid JSON RPC response/) || message.match(/legacy access request rate exceeded/)) {
         throw new ResolutionError('NamingServiceDown', { method: 'ENS' });
       }
       throw error;
