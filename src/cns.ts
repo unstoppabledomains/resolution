@@ -3,6 +3,7 @@ import {EtheriumNamingService} from './namingService';
 import { Contract } from 'web3-eth-contract';
 import { NamingServiceSource, RegistryMap } from './types';
 import { default as cnsInterface } from './cns/contract/cns';
+import { hash } from 'eth-ens-namehash';
 import Web3 from 'web3';
 
 /**
@@ -83,7 +84,8 @@ export default class Cns extends EtheriumNamingService {
    * @return ENS namehash of a domain
    */
   namehash(domain: string): string {
-    throw new Error("Method not implemented.");
+    this.ensureSupportedDomain(domain)
+    return hash(domain);
   }
 
  /**
