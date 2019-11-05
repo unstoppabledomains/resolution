@@ -167,6 +167,7 @@ class Namicorn {
     return method;
   }
 
+  /** @ignore */
   private getNamingMethodOrThrow(domain: string) {
     const method = this.getNamingMethod(domain);
     if (!method) throw new ResolutionError('UnsupportedDomain', { domain });
