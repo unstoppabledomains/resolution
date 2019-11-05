@@ -866,20 +866,16 @@ describe('ENS', () => {
     );
   });
 
-  it('checks unsupportedCurrency error', async () => {
-    const ens = new Ens();
-
+  it('checks UnsupportedCurrency error', async () => {
     await expectResolutionErrorCode(
-      ens.address('testthing.eth', 'bnb'),
+      new Namicorn().addressOrThrow('testthing.eth', 'bnb'),
       'UnsupportedCurrency',
     );
   });
 
-  it('checks ens unsupportedCurrency error', async () => {
-    const ens = new Ens();
+  it('checks UnsupportedCurrency error', async () => {
     await expectResolutionErrorCode(
-      ens.address('testthing.eth', 'UNREALTICKER'),
-
+      new Namicorn().addressOrThrow('testthing.eth', 'UNREALTICKER'),
       'UnsupportedCurrency',
     );
   });
