@@ -7,13 +7,16 @@ import NamingService from './namingService';
 
 /**
  * Blockchain domain resolution library - Namicorn.
- *
+ * TESTING DIFFERENT DOCS !!!
  * @example
  * ```
  * let namicorn = new Namicorn({blockchain: {ens: {url: 'https://mainnet.infura.io', network: 'mainnet'}}});
  * let domain = brad.zil
  * let resolution = namicorn.address(domain);
  * ```
+ * 
+ * 
+ * 
  */
 class Namicorn {
   static readonly UNCLAIMED_DOMAIN_RESPONSE: NamicornResolution = {
