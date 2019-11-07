@@ -166,8 +166,8 @@ class Namicorn {
    * @param domain - domain name
    */
   private getNamingMethod(domain: string): NamingService | undefined {
-    const methods: (Ens | Zns | Udapi)[]= this.blockchain
-      ? [this.ens, this.zns]
+    const methods: (Ens | Zns | Udapi | Cns)[]= this.blockchain
+      ? [this.ens, this.zns, this.cns]
       : [this.api];
     const method = methods.find(
       method => method && method.isSupportedDomain(domain),

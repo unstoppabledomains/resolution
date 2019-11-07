@@ -1,7 +1,7 @@
 import { ResolutionError } from './index';
 import NamingService from './namingService';
 import nodeFetch from 'node-fetch';
-import { NamicornResolution, NullAddress } from './types';
+import { NamicornResolution, NullAddress, SourceDefinition, NamingServiceSource } from './types';
 import Zns from './zns';
 import Ens from './ens';
 import fs from 'fs';
@@ -98,8 +98,8 @@ export default class Udapi extends NamingService {
 
   /** @ignore */
   protected normalizeSource(
-    source: string | boolean | import('./types').SourceDefinition,
-  ) {
+    source: NamingServiceSource,
+  ): SourceDefinition {
     throw new Error('Method not implemented.');
   }
 

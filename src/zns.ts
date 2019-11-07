@@ -96,7 +96,6 @@ export default class Zns extends NamingService {
     const resolution = this.structureResolverRecords(
       await this.getResolverRecords(resolverAddress),
     );
-
     const addresses = _.mapValues(resolution.crypto || {}, 'address');
     return {
       addresses,

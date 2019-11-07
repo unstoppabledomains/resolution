@@ -104,3 +104,6 @@ export type ResolverContract = Contract;
 
 export const NullAddress = '0x0000000000000000000000000000000000000000';
 export const EthCoinIndex = 60;
+
+export type address = string;
+export type ethnodehash = string;

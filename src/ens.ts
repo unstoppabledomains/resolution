@@ -9,7 +9,6 @@ import {
   NullAddress,
   NamingServiceSource,
   RegistryMap,
-  Bip44Constants,
   EthCoinIndex
 } from './types';
 import { EtheriumNamingService } from './namingService';
@@ -213,19 +212,6 @@ export default class Ens extends EtheriumNamingService {
     ]);
   }
 
-  /** @ignore */
-  private getCoinType(currencyTicker: string): number {
-    const constants: Bip44Constants[] = require('bip44-constants');
-    const coin = constants.findIndex(
-      item =>
-        item[1] === currencyTicker.toUpperCase() ||
-        item[2] === currencyTicker.toUpperCase(),
-    );
-    if (coin < 0 || !formatsByCoinType[coin])
-      throw new ResolutionError('UnsupportedCurrency', { currencyTicker });
-    return coin;
-  }
-
   /**
    * @ignore
    * @param resolver - Resolver address
@@ -248,15 +234,6 @@ export default class Ens extends EtheriumNamingService {
     if (!addr) return null;
     const data = Buffer.from(addr.replace('0x', ''), 'hex');
     return formatsByCoinType[coinType].encoder(data);
-  }
-
-  /**
-   * @ignore
-   * This was done to make automated tests more configurable
-   * @param nodeHash
-   */
-  private getResolver(nodeHash) {
-    return this.callEthMethod(this.ensContract.methods.resolver(nodeHash));
   }
 
   async _callMethod(method: { call: () => Promise<any> }): Promise<any> {

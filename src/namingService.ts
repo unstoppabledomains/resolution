@@ -6,8 +6,10 @@ import {
   NetworkIdMap,
   BlockhanNetworkUrlMap,
   NamicornResolution,
+  Bip44Constants,
 } from './types';
 import ResolutionError from './resolutionError';
+import { formatsByCoinType } from '@ensdomains/address-encoder';
 
 /**
  * Abstract class for different Naming Service supports like
@@ -58,25 +60,7 @@ export abstract class EtheriumNamingService extends NamingService {
     .mapValues((v, k) => parseInt(v))
     .value();
 
-  /**
-   *  @ignore
-   * Internal wrapper for ens method. Used to throw an error when ens is down
-   *  @param method - Method to be called
-   *  @throws ResolutionError -> When blockchain is down
-   */
-  protected async callEthMethod(method: {
-    call: () => Promise<any>;
-  }): Promise<any> {
-    try {
-      return await method.call();
-    } catch (error) {
-      const { message }: { message: string } = error;
-      if (message.match(/Invalid JSON RPC response/)) {
-        throw new ResolutionError('NamingServiceDown', { method: 'ENS' });
-      }
-      throw error;
-    }
-  }
+ 
 
   /**
    * Look up for network from url provided
@@ -141,6 +125,19 @@ export abstract class EtheriumNamingService extends NamingService {
       }
     }
   }
+
+    /** @ignore */
+    protected getCoinType(currencyTicker: string): number {
+      const constants: Bip44Constants[] = require('bip44-constants');
+      const coin = constants.findIndex(
+        item =>
+          item[1] === currencyTicker.toUpperCase() ||
+          item[2] === currencyTicker.toUpperCase(),
+      );
+      if (coin < 0 || !formatsByCoinType[coin])
+        throw new ResolutionError('UnsupportedCurrency', { currencyTicker });
+      return coin;
+    }
 
    /**
    * Checks if the current network is supported
