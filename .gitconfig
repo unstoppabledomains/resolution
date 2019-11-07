@@ -1,0 +1,2 @@
+[alias]
+    publish-docs = subtree push --prefix
