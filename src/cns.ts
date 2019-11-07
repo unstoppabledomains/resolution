@@ -144,7 +144,7 @@ export default class Cns extends EtheriumNamingService {
   }
 
   /** @ignore */
-  private async getOwner(nodeHash): Promise<address> {
+  protected async owner(nodeHash): Promise<address> {
     return await this.callMethod(this.cnsContract.methods.ownerOf(nodeHash))
   }
 
@@ -156,7 +156,7 @@ export default class Cns extends EtheriumNamingService {
    */
   private async getResolutionMeta(domain: string): Promise<[ethnodehash, address, number, address]> {
     const nodeHash = this.namehash(domain);
-    const ownerPromise = this.getOwner(nodeHash);
+    const ownerPromise = this.owner(nodeHash);
     const resolver:string = await this.getResolver(nodeHash);
     if (!resolver || resolver === NullAddress) {
       var owner = await ownerPromise;
