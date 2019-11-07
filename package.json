@@ -5,15 +5,18 @@
   "main": "./lib/namicorn.js",
   "types": "./lib/namicorn.d.ts",
   "scripts": {
-    "release": "yarn build && yarn test &&  yarn docs && yarn publish --patch",
-    "release:minor": "yarn build && yarn test && yarn docs && yarn publish --minor",
-    "release:major": "yarn build && yarn test && yarn docs && yarn publish --major ",
+    "release": "yarn build && yarn test &&  yarn docs && yarn publish --patch && yarn docs:deploy",
+    "release:minor": "yarn build && yarn test && yarn docs && yarn publish --minor && yarn docs:deploy",
+    "release:major": "yarn build && yarn test && yarn docs && yarn publish --major && yarn docs:deploy ",
     "test": "jest",
     "start": "npm run build:live",
     "build": "tsc -p .",
     "format": "prettier --semi --write -l **/*.{js,json,ts}",
     "build:live": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
-    "docs": "yarn run typedoc"
+    "docs": "yarn docs:pregeneration && yarn docs:generate",
+    "docs:pregeneration": "node ./predocs.js",
+    "docs:generate": "yarn run typedoc",
+    "docs:deploy": "./deploy-docs.sh dist v0.3.0"
   },
   "files": [
     "lib"

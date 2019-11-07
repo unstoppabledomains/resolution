@@ -7,7 +7,6 @@ import NamingService from './namingService';
 
 /**
  * Blockchain domain resolution library - Namicorn.
- *
  * @example
  * ```
  * let namicorn = new Namicorn({blockchain: {ens: {url: 'https://mainnet.infura.io', network: 'mainnet'}}});
