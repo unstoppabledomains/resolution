@@ -133,7 +133,7 @@ export default class Cns extends EtheriumNamingService {
       resolverInterface,
       resolver
     );
-    const addrKey = `crypto.${coinName.toUpperCase()}`;
+    const addrKey = `crypto.${coinName.toUpperCase()}.address`;
     const addr: string = await this.callMethod(resolverContract.methods.get(addrKey, nodeHash))    
     return addr;
   }
