@@ -38,7 +38,7 @@ export default class Udapi extends NamingService {
     const DefaultUserAgent = isNode()
       ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'
       : navigator.userAgent;
-    const pckg = JSON.parse(fs.readFileSync('./package.json') as any);
+    const pckg = JSON.parse(fs.readFileSync(`${__dirname}/../package.json`) as any);
     const version = pckg.version;
     const CustomUserAgent = `${DefaultUserAgent} namicorn/${version}`;
     this.headers = { 'X-user-agent': CustomUserAgent };
