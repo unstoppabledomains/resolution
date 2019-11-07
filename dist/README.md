@@ -1,0 +1,1 @@
+This is where namicorn formal documentation is going to be stored and served via gh-pages.
