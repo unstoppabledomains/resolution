@@ -128,7 +128,7 @@ export default class Cns extends EtheriumNamingService {
    * @param resolver - Resolver address
    * @param nodeHash - namehash of a domain name
    */
-  protected async fetchAddress(resolver: address, nodeHash: ethnodehash, coinName?: string): Promise<address> {
+  private async fetchAddress(resolver: address, nodeHash: ethnodehash, coinName?: string): Promise<address> {
     const resolverContract = new this.web3.eth.Contract(
       resolverInterface,
       resolver

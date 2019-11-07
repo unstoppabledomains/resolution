@@ -217,7 +217,7 @@ export default class Ens extends EtheriumNamingService {
    * @param resolver - Resolver address
    * @param nodeHash - namehash of a domain name
    */
-  protected async fetchAddress(resolver, nodeHash, coinType?: number) {
+   private async fetchAddress(resolver, nodeHash, coinType?: number) {
     if (!resolver || resolver == NullAddress) {
       return null;
     }

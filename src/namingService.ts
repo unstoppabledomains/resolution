@@ -36,8 +36,6 @@ export default abstract class NamingService {
 
 export abstract class EtheriumNamingService extends NamingService {
   abstract registryAddress?: string;
-  protected abstract async fetchAddress(resolver, nodeHash);
-
   readonly NetworkIdMap: NetworkIdMap = {
     1: 'mainnet',
     3: 'ropsten',
