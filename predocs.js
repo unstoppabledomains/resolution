@@ -3,6 +3,8 @@ const fs = require('fs');
 const pckg = JSON.parse(fs.readFileSync('./package.json'));
 const version = pckg.version;
 
+pckg.scripts["docs:deploy"] = `./deploy-docs.sh dist ${version}`;
+fs.writeFileSync('./package.json', JSON.stringify(pckg));
 const tsconfig = JSON.parse(fs.readFileSync('./tsconfig.json'));
 tsconfig.typedocOptions.out = `./dist/v${version}`;
 fs.writeFileSync('./tsconfig.json', JSON.stringify(tsconfig));
