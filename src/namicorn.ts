@@ -111,6 +111,16 @@ class Namicorn {
   }
 
   /**
+   * Owner of the domain
+   * @param domain - domain name
+   * @returns - an owner address of the domain
+   */
+  async owner(domain: string): Promise<string | null> {
+    const method = this.getNamingMethod(domain);
+    return await method.owner(domain) || null;
+  }
+
+  /**
    * This method is only for ens at the moment. Reverse the ens address to a ens registered domain name
    * @async
    * @param address - address you wish to reverse

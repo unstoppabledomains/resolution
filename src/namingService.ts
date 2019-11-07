@@ -11,6 +11,7 @@ export default abstract class NamingService {
   abstract isSupportedNetwork(): boolean;
   abstract namehash(domain: string): string;
   abstract address(domain: string, currencyTicker: string): Promise<string>;
+  abstract owner(domain: string): Promise<string | null>;
   abstract resolve(domain: string): Promise<NamicornResolution>;
   protected abstract normalizeSource(
     source: boolean | string | SourceDefinition,

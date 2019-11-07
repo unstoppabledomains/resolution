@@ -1,367 +1,71 @@
 {
-  "ENS": {
-    "resolves .eth name using blockchain": [
-      {
-        "METHOD": "POST",
-        "REQUEST": {
-          "jsonrpc": "2.0",
-          "id": 3,
-          "method": "eth_call",
-          "params": [
-            {
-              "data": "0x0178b8bf2b53e3f567989ee41b897998d89eb4d8cf0715fb2cfb41a64939a532c09e495e",
-              "to": "0x314159265dd8dbb310642f98f50c066173c1259b"
-            },
-            "latest"
-          ]
+  "ud_api_generic_test": [
+    {
+      "METHOD": "GET",
+      "REQUEST": "/cofounding.zil",
+      "RESPONSE": {
+        "addresses": {
+          "ETH": "0xaa91734f90795e80751c96e682a321bb3c1a4186",
+          "BTC": "1NZKHwpfqprxzcaijcjf71CZr27D8osagR"
         },
-        "RESPONSE": {
-          "jsonrpc": "2.0",
-          "id": 3,
-          "result": "0x0000000000000000000000005ffc014343cd971b7eb70732021e26c35b744cc4"
-        }
-      },
-      {
-        "METHOD": "POST",
-        "REQUEST": {
-          "jsonrpc": "2.0",
-          "id": 1,
-          "method": "eth_call",
-          "params": [
-            {
-              "data": "0x02571be32b53e3f567989ee41b897998d89eb4d8cf0715fb2cfb41a64939a532c09e495e",
-              "to": "0x314159265dd8dbb310642f98f50c066173c1259b"
-            },
-            "latest"
-          ]
-        },
-        "RESPONSE": {
-          "jsonrpc": "2.0",
-          "id": 1,
-          "result": "0x000000000000000000000000714ef33943d925731fbb89c99af5780d888bd106"
-        }
-      },
-      {
-        "METHOD": "POST",
-        "REQUEST": {
-          "jsonrpc": "2.0",
-          "id": 2,
-          "method": "eth_call",
-          "params": [
-            {
-              "data": "0x16a25cbd2b53e3f567989ee41b897998d89eb4d8cf0715fb2cfb41a64939a532c09e495e",
-              "to": "0x314159265dd8dbb310642f98f50c066173c1259b"
-            },
-            "latest"
-          ]
-        },
-        "RESPONSE": {
-          "jsonrpc": "2.0",
-          "id": 2,
-          "result": "0x0000000000000000000000000000000000000000000000000000000000000000"
-        }
-      },
-      {
-        "METHOD": "POST",
-        "REQUEST": {
-          "jsonrpc": "2.0",
-          "id": 4,
-          "method": "eth_call",
-          "params": [
-            {
-              "data": "0x3b3b57de2b53e3f567989ee41b897998d89eb4d8cf0715fb2cfb41a64939a532c09e495e",
-              "to": "0x5ffc014343cd971b7eb70732021e26c35b744cc4"
-            },
-            "latest"
-          ]
-        },
-        "RESPONSE": {
-          "jsonrpc": "2.0",
-          "id": 4,
-          "result": "0x000000000000000000000000714ef33943d925731fbb89c99af5780d888bd106"
+        "meta": {
+          "owner": "0x267ca17e8b3bbf49c52a4c3b473cdebcbaf9025e",
+          "type": "zns",
+          "ttl": 0
         }
       }
-    ],
-    "reverses address to ENS domain": [
-      {
-        "METHOD": "POST",
-        "REQUEST": {
-          "jsonrpc": "2.0",
-          "id": 0,
-          "method": "eth_call",
-          "params": [
-            {
-              "data": "0x0178b8bf1cca0a55a5f8e0de860680b1251f86b49bc610ac4e0e0ad51ff3bababa0f14b9",
-              "to": "0x314159265dd8dbb310642f98f50c066173c1259b"
-            },
-            "latest"
+    }
+  ],
+  "zil_using_blockchain": [
+    {
+      "METHOD": "POST",
+      "REQUEST": {
+        "id": 1,
+        "jsonrpc": "2.0",
+        "method": "GetSmartContractSubState",
+        "params": [
+          "9611c53be6d1b32058b2747bdececed7e1216793",
+          "records",
+          [
+            "0x1cc365ffd60bb50538e01d24c1f1e26c887c36f26a0de250660b8a1465c60667"
           ]
-        },
-        "RESPONSE": {
-          "jsonrpc": "2.0",
-          "id": 0,
-          "result": "0x000000000000000000000000da1756bb923af5d1a05e277cb1e54f1d0a127890"
-        }
+        ]
       },
-      {
-        "METHOD": "POST",
-        "REQUEST": {
-          "jsonrpc": "2.0",
-          "id": 1,
-          "method": "eth_call",
-          "params": [
-            {
-              "data": "0x691f34311cca0a55a5f8e0de860680b1251f86b49bc610ac4e0e0ad51ff3bababa0f14b9",
-              "to": "0xda1756bb923af5d1a05e277cb1e54f1d0a127890"
-            },
-            "latest"
-          ]
-        },
-        "RESPONSE": {
-          "jsonrpc": "2.0",
-          "id": 1,
-          "result": "0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001161647269616e2e617267656e742e78797a000000000000000000000000000000"
-        }
-      }
-    ],
-    "reverses address to ENS domain null": [
-      {
-        "METHOD": "POST",
-        "REQUEST": {
-          "jsonrpc": "2.0",
-          "id": 0,
-          "method": "eth_call",
-          "params": [
-            {
-              "data": "0x0178b8bf87e42cc24fdb84b1425752e06e0b84fb5511a6b35a7c9ed2f39b4a445c9831cb",
-              "to": "0x314159265dd8dbb310642f98f50c066173c1259b"
-            },
-            "latest"
-          ]
-        },
-        "RESPONSE": {
-          "jsonrpc": "2.0",
-          "id": 0,
-          "result": "0x0000000000000000000000000000000000000000000000000000000000000000"
-        }
-      }
-    ],
-    "resolves .xyz name using ENS blockchain": [
-      {
-        "METHOD": "POST",
-        "REQUEST": {
-          "jsonrpc": "2.0",
-          "id": 2,
-          "method": "eth_call",
-          "params": [
-            {
-              "data": "0x0178b8bf4da70a332a7a98a58486f551a455b1398ce309d9bd3a4f0800da4eec299829a4",
-              "to": "0x314159265dd8dbb310642f98f50c066173c1259b"
-            },
-            "latest"
-          ]
-        },
-        "RESPONSE": {
-          "jsonrpc": "2.0",
-          "id": 2,
-          "result": "0x000000000000000000000000da1756bb923af5d1a05e277cb1e54f1d0a127890"
-        }
-      },
-      {
-        "METHOD": "POST",
-        "REQUEST": {
-          "jsonrpc": "2.0",
-          "id": 1,
-          "method": "eth_call",
-          "params": [
-            {
-              "data": "0x02571be34da70a332a7a98a58486f551a455b1398ce309d9bd3a4f0800da4eec299829a4",
-              "to": "0x314159265dd8dbb310642f98f50c066173c1259b"
-            },
-            "latest"
-          ]
-        },
-        "RESPONSE": {
-          "jsonrpc": "2.0",
-          "id": 0,
-          "result": "0x000000000000000000000000b0e7a465d255ae83eb7f8a50504f3867b945164c"
-        }
-      },
-      {
-        "METHOD": "POST",
-        "REQUEST": {
-          "jsonrpc": "2.0",
-          "id": 1,
-          "method": "eth_call",
-          "params": [
-            {
-              "data": "0x16a25cbd4da70a332a7a98a58486f551a455b1398ce309d9bd3a4f0800da4eec299829a4",
-              "to": "0x314159265dd8dbb310642f98f50c066173c1259b"
-            },
-            "latest"
-          ]
-        },
-        "RESPONSE": {
-          "jsonrpc": "2.0",
-          "id": 1,
-          "result": "0x0000000000000000000000000000000000000000000000000000000000000000"
-        }
-      },
-      {
-        "METHOD": "POST",
-        "REQUEST": {
-          "jsonrpc": "2.0",
-          "id": 3,
-          "method": "eth_call",
-          "params": [
-            {
-              "data": "0x3b3b57de4da70a332a7a98a58486f551a455b1398ce309d9bd3a4f0800da4eec299829a4",
-              "to": "0xda1756bb923af5d1a05e277cb1e54f1d0a127890"
-            },
-            "latest"
-          ]
-        },
-        "RESPONSE": {
-          "jsonrpc": "2.0",
-          "id": 3,
-          "result": "0x000000000000000000000000b0e7a465d255ae83eb7f8a50504f3867b945164c"
-        }
-      }
-    ],
-    "resolves .luxe name using ENS blockchain": [
-      {
-        "METHOD": "POST",
-        "REQUEST": {
-          "jsonrpc": "2.0",
-          "id": 2,
-          "method": "eth_call",
-          "params": [
-            {
-              "data": "0x0178b8bf5779f7c0e70112b9f1edacb0bf12f22c5ac9726c9d6ac003de847196ba85e241",
-              "to": "0x314159265dd8dbb310642f98f50c066173c1259b"
-            },
-            "latest"
-          ]
-        },
-        "RESPONSE": {
-          "jsonrpc": "2.0",
-          "id": 2,
-          "result": "0x0000000000000000000000000000000000000000000000000000000000000000"
-        }
-      },
-      {
-        "METHOD": "POST",
-        "REQUEST": {
-          "jsonrpc": "2.0",
-          "id": 1,
-          "method": "eth_call",
-          "params": [
-            {
-              "data": "0x16a25cbd5779f7c0e70112b9f1edacb0bf12f22c5ac9726c9d6ac003de847196ba85e241",
-              "to": "0x314159265dd8dbb310642f98f50c066173c1259b"
-            },
-            "latest"
-          ]
-        },
-        "RESPONSE": {
-          "jsonrpc": "2.0",
-          "id": 1,
-          "result": "0x0000000000000000000000000000000000000000000000000000000000000000"
-        }
-      },
-      {
-        "METHOD": "POST",
-        "REQUEST": {
-          "jsonrpc": "2.0",
-          "id": 1,
-          "method": "eth_call",
-          "params": [
-            {
-              "data": "0x02571be35779f7c0e70112b9f1edacb0bf12f22c5ac9726c9d6ac003de847196ba85e241",
-              "to": "0x314159265dd8dbb310642f98f50c066173c1259b"
-            },
-            "latest"
-          ]
-        },
-        "RESPONSE": {
-          "jsonrpc": "2.0",
-          "id": 0,
-          "result": "0x0000000000000000000000000000000000000000000000000000000000000000"
-        }
-      }
-    ]
-  },
-  "UD_API": {
-    "should work": [
-      {
-        "METHOD": "GET",
-        "REQUEST": "/cofounding.zil",
-        "RESPONSE": {
-          "addresses": {
-            "ETH": "0xaa91734f90795e80751c96e682a321bb3c1a4186",
-            "BTC": "1NZKHwpfqprxzcaijcjf71CZr27D8osagR"
-          },
-          "meta": {
-            "owner": "0x267ca17e8b3bbf49c52a4c3b473cdebcbaf9025e",
-            "type": "zns",
-            "ttl": 0
-          }
-        }
-      }
-    ]
-  },
-  "ZIL": {
-    "resolves .zil name using blockchain": [
-      {
-        "METHOD": "POST",
-        "REQUEST": {
-          "id": 1,
-          "jsonrpc": "2.0",
-          "method": "GetSmartContractSubState",
-          "params": [
-            "9611c53be6d1b32058b2747bdececed7e1216793",
-            "records",
-            [
-              "0x1cc365ffd60bb50538e01d24c1f1e26c887c36f26a0de250660b8a1465c60667"
-            ]
-          ]
-        },
-        "RESPONSE": {
-          "id": 1,
-          "jsonrpc": "2.0",
-          "result": {
-            "records": {
-              "0x1cc365ffd60bb50538e01d24c1f1e26c887c36f26a0de250660b8a1465c60667": {
-                "argtypes": [],
-                "arguments": [
-                  "0x267ca17e8b3bbf49c52a4c3b473cdebcbaf9025e",
-                  "0xb17c35e557a8c13a730696c92d716a58421e36ca"
-                ],
-                "constructor": "Record"
-              }
-            }
-          }
-        }
-      },
-      {
-        "METHOD": "POST",
-        "REQUEST": {
-          "id": 1,
-          "jsonrpc": "2.0",
-          "method": "GetSmartContractSubState",
-          "params": ["b17c35e557a8c13a730696c92d716a58421e36ca", "records", []]
-        },
-        "RESPONSE": {
-          "id": 1,
-          "jsonrpc": "2.0",
-          "result": {
-            "records": {
-              "crypto.ETH.address": "0xaa91734f90795e80751c96e682a321bb3c1a4186",
-              "crypto.BTC.address": "1NZKHwpfqprxzcaijcjf71CZr27D8osagR"
+      "RESPONSE": {
+        "id": 1,
+        "jsonrpc": "2.0",
+        "result": {
+          "records": {
+            "0x1cc365ffd60bb50538e01d24c1f1e26c887c36f26a0de250660b8a1465c60667": {
+              "argtypes": [],
+              "arguments": [
+                "0x267ca17e8b3bbf49c52a4c3b473cdebcbaf9025e",
+                "0xb17c35e557a8c13a730696c92d716a58421e36ca"
+              ],
+              "constructor": "Record"
             }
           }
         }
       }
-    ]
-  }
+    },
+    {
+      "METHOD": "POST",
+      "REQUEST": {
+        "id": 1,
+        "jsonrpc": "2.0",
+        "method": "GetSmartContractSubState",
+        "params": ["b17c35e557a8c13a730696c92d716a58421e36ca", "records", []]
+      },
+      "RESPONSE": {
+        "id": 1,
+        "jsonrpc": "2.0",
+        "result": {
+          "records": {
+            "crypto.ETH.address": "0xaa91734f90795e80751c96e682a321bb3c1a4186",
+            "crypto.BTC.address": "1NZKHwpfqprxzcaijcjf71CZr27D8osagR"
+          }
+        }
+      }
+    }
+  ]
 }

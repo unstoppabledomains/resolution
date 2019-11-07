@@ -141,7 +141,7 @@ export default class Ens extends NamingService {
    */
   async address(domain: string, currencyTicker: string): Promise<string> {
     const nodeHash = this.namehash(domain);
-    const ownerPromise = this._getOwner(nodeHash)
+    const ownerPromise = this.owner(domain)
     const resolver = await this._getResolver(nodeHash);
     if (!resolver || resolver === NullAddress) {
       const owner = await ownerPromise;
@@ -157,6 +157,16 @@ export default class Ens extends NamingService {
         currencyTicker,
       });
     return addr;
+  }
+
+  /**
+   * Owner of the domain
+   * @param domain - domain name
+   * @returns - an owner address of the domain
+   */
+  async owner(domain: string): Promise<string | null> {
+    const nodeHash = this.namehash(domain);
+    return await this._getOwner(nodeHash) || null;
   }
 
   /**

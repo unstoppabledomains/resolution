@@ -3,7 +3,7 @@ import Namicorn, { ResolutionError } from '.';
 import _ from 'lodash';
 import mockData from './testData/mockData.json';
 import Ens from './ens';
-import { NullAddress } from './types';
+import { Dictionary, NullAddress } from './types';
 import { toChecksumAddress } from '@zilliqa-js/crypto/dist/util';
 import { Zilliqa } from '@zilliqa-js/zilliqa';
 
@@ -17,19 +17,22 @@ const mockAsyncMethod = (object: any, method: string, value) => {
   else return jest.spyOn(object, method);
 };
 
+const mockAsyncMethods = (object: any, methods: Dictionary<any>) => {
+  return _.map(methods, (value, method) => mockAsyncMethod(object, method, value))
+}
+
 const expectSpyToBeCalled = (spies: any[]) => {
   if (!process.env.LIVE) {
     spies.forEach(spy => expect(spy).toBeCalled());
   }
 };
 
-const mockAPICalls = (topLevel: string, testName: string, url = MainnetUrl) => {
+const mockAPICalls = (testName: string, url = MainnetUrl) => {
   if (process.env.LIVE) {
     return;
   }
   const mcdt = mockData as any;
-  const tplvl = mcdt[topLevel] as any;
-  const mockCall = tplvl[testName] as [any];
+  const mockCall = mcdt[testName] as [any];
 
   mockCall.forEach(({ METHOD, REQUEST, RESPONSE }) => {
     switch (METHOD) {
@@ -76,8 +79,7 @@ beforeEach(() => {
 
 describe('Unstoppable API', () => {
   it('resolves a domain', async () => {
-    const testName = 'should work';
-    mockAPICalls('UD_API', testName, DefaultUrl);
+    mockAPICalls('ud_api_generic_test', DefaultUrl);
     const namicorn = new Namicorn({ blockchain: false });
     const result = await namicorn.address('cofounding.zil', 'eth');
     expect(result).toEqual('0xaa91734f90795e80751c96e682a321bb3c1a4186');
@@ -105,12 +107,19 @@ describe('Unstoppable API', () => {
       'NamingServiceDown',
     );
   });
+
+  it("returns owner of the domain", async () => {
+    const namicorn = new Namicorn({ blockchain: false });
+    mockAPICalls('ud_api_generic_test', DefaultUrl);
+    expect(await namicorn.owner('cofounding.zil')).toEqual('zil1ye72zl5t8wl5n3f2fsa5w0x7hja0jqj7mhct23');
+
+  });
 });
 
 describe('ZNS', () => {
   it('resolves .zil name using blockchain', async () => {
     const testName = 'resolves .zil name using blockchain';
-    mockAPICalls('ZIL', testName, ZilliqaUrl);
+    mockAPICalls('zil_using_blockchain', ZilliqaUrl);
     const namicorn = new Namicorn({ blockchain: { zns: ZilliqaUrl } });
     const result = await namicorn.resolve('cofounding.zil');
     expect(result).toBeDefined();
@@ -127,8 +136,8 @@ describe('ZNS', () => {
   it('resolves unclaimed domain using blockchain', async () => {
     const namicorn = new Namicorn({ blockchain: true });
     const result = await namicorn.resolve('test.zil');
-    expect(result.addresses).toEqual({});
-    expect(result.meta.owner).toEqual(null);
+    expect(await namicorn.address('test.zil', 'ETH')).toEqual(null);
+    expect(await namicorn.owner('test.zil')).toEqual(null);
   });
 
   it('resolves domain using blockchain #2', async () => {
@@ -280,7 +289,7 @@ describe('ZNS', () => {
     ]);
 
     const secondEye = mockAsyncMethod(
-      namicorn.zns as any,
+      namicorn.zns,
       'getResolverRecords',
       {
         'crypto.BCH.address': 'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6',
@@ -412,46 +421,37 @@ describe('ENS', () => {
     expect(namicorn.ens.url).toBe('https://mainnet.infura.io');
     expect(namicorn.ens.network).toEqual('mainnet');
 
-    const ownerEye = mockAsyncMethod(
+    const eyes = mockAsyncMethods(
       namicorn.ens,
-      '_getOwner',
-      '0x714ef33943d925731FBB89C99aF5780D888bD106',
-    );
-    const resolverEye = mockAsyncMethod(
-      namicorn.ens,
-      '_getResolver',
-      '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
-    );
-    const fetchEye = mockAsyncMethod(
-      namicorn.ens,
-      'fetchAddress',
-      '0x714ef33943d925731FBB89C99aF5780D888bD106',
+      {
+        _getOwner: '0x825ef33943d925731FBB89C99aF5780D888bD217',
+        _getResolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
+        fetchAddress: '0x714ef33943d925731FBB89C99aF5780D888bD106',
+      }
     );
 
-    var result = await namicorn.address('matthewgould.eth', 'ETH');
-    expectSpyToBeCalled([ownerEye, resolverEye, fetchEye]);
-    expect(result).toEqual('0x714ef33943d925731FBB89C99aF5780D888bD106');
+    expect(await namicorn.address('matthewgould.eth', 'ETH')).toEqual('0x714ef33943d925731FBB89C99aF5780D888bD106');
+    expect(await namicorn.owner('matthewgould.eth')).toEqual('0x825ef33943d925731FBB89C99aF5780D888bD217');
+    expectSpyToBeCalled(eyes);
   });
 
   it('reverses address to ENS domain', async () => {
     const ens = new Ens(MainnetUrl);
-    const eye = mockAsyncMethod(ens, 'resolverCallToName', 'adrian.argent.xyz');
-    const secondEye = mockAsyncMethod(
-      ens as any,
-      '_getResolver',
-      '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
-    );
+    const eyes = mockAsyncMethods(ens, {
+      'resolverCallToName': 'adrian.argent.xyz',
+      '_getResolver': '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
+    });
     const result = await ens.reverse(
       '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
       'ETH',
     );
-    expectSpyToBeCalled([eye, secondEye]);
+    expectSpyToBeCalled(eyes);
     expect(result).toEqual('adrian.argent.xyz');
   });
 
   it('reverses address to ENS domain null', async () => {
     const ens = new Ens(MainnetUrl);
-    const spy = mockAsyncMethod(ens as any, '_getResolver', NullAddress);
+    const spy = mockAsyncMethod(ens, '_getResolver', NullAddress);
     const result = await ens.reverse(
       '0x112234455c3a32fd11230c42e7bccd4a84e02010',
       'ETH',
@@ -465,25 +465,17 @@ describe('ENS', () => {
       blockchain: { ens: MainnetUrl },
     });
 
-    const ownerEye = mockAsyncMethod(
+    const eyes = mockAsyncMethods(
       namicorn.ens,
-      '_getOwner',
-      '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
-    );
-
-    const resolverEye = mockAsyncMethod(
-      namicorn.ens,
-      '_getResolver',
-      '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
-    );
-    const fetchEye = mockAsyncMethod(
-      namicorn.ens as any,
-      'fetchAddress',
-      '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
+      {
+        '_getOwner': '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
+        '_getResolver': '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
+        'fetchAddress': '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
+      }
     );
 
     const result = await namicorn.address('adrian.argent.xyz', 'ETH');
-    expectSpyToBeCalled([ownerEye, resolverEye, fetchEye]);
+    expectSpyToBeCalled(eyes);
     expect(result).toEqual('0xb0E7a465D255aE83eb7F8a50504F3867B945164C');
   });
 
@@ -492,24 +484,17 @@ describe('ENS', () => {
       blockchain: { ens: MainnetUrl },
     });
 
-    const ownerEye = mockAsyncMethod(
+    const eyes = mockAsyncMethods(
       namicorn.ens,
-      '_getOwner',
-      '0xf3dE750A73C11a6a2863761E930BF5fE979d5663',
-    );
-    const resolverEye = mockAsyncMethod(
-      namicorn.ens,
-      '_getResolver',
-      '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
-    );
-    const fetchEye = mockAsyncMethod(
-      namicorn.ens as any,
-      'fetchAddress',
-      '0xf3dE750A73C11a6a2863761E930BF5fE979d5663',
+      {
+        '_getOwner': '0xf3dE750A73C11a6a2863761E930BF5fE979d5663',
+        '_getResolver': '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
+        'fetchAddress': '0xf3dE750A73C11a6a2863761E930BF5fE979d5663',
+      }
     );
 
     const result = await namicorn.address('john.luxe', 'ETH');
-    expectSpyToBeCalled([ownerEye, resolverEye, fetchEye]);
+    expectSpyToBeCalled(eyes);
     expect(result).toEqual('0xf3dE750A73C11a6a2863761E930BF5fE979d5663');
   });
 
@@ -536,15 +521,17 @@ describe('ENS', () => {
 
   it('resolves name with resolver but without an owner', async () => {
     const ens = new Ens();
-    const ownerSpy = mockAsyncMethod(ens, '_getOwner', NullAddress);
-    const resolverSpy = mockAsyncMethod(ens, '_getResolver', '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8');
-    const addrSpy = mockAsyncMethod(ens, '_callMethod', '0x76a9144620b70031f0e9437e374a2100934fba4911046088ac');
+    const eyes = mockAsyncMethods(
+      ens,
+      {
+        '_getOwner': NullAddress,
+        '_getResolver': '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+        '_callMethod': '0x76a9144620b70031f0e9437e374a2100934fba4911046088ac',
+      }
+    );
     const doge = await ens.address('testthing.eth', 'DOGE');
-    expect(ownerSpy).toBeCalled();
-    expect(resolverSpy).toBeCalled();
-    expect(addrSpy).toBeCalled();
+    expectSpyToBeCalled(eyes);
     expect(doge).toBe('DBXu2kgc3xtvCUWFcxFE3r9hEYgmuaaCyD');
-
   });
 
   it('checks if the network is supported(true)', async () => {

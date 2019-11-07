@@ -1,6 +1,8 @@
+import { toBech32Address } from '@zilliqa-js/crypto';
+import nodeFetch from 'node-fetch';
+
 import { ResolutionError } from './index';
 import NamingService from './namingService';
-import nodeFetch from 'node-fetch';
 import { NamicornResolution, NullAddress } from './types';
 import Zns from './zns';
 import Ens from './ens';
@@ -77,6 +79,17 @@ export default class Udapi extends NamingService {
         currencyTicker,
       });
     return address;
+  }
+
+  /**
+   * Owner of the domain
+   * @param domain - domain name
+   * @returns - an owner address of the domain
+   */
+  async owner(domain: string): Promise<string | null> {
+    const {owner} = (await this.resolve(domain)).meta;
+    if (!owner) return null;
+    return owner.startsWith("zil1") ? owner : toBech32Address(owner);
   }
 
   /**

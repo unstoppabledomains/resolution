@@ -136,6 +136,15 @@ export default class Zns extends NamingService {
   }
 
   /**
+   * Owner of the domain
+   * @param domain - domain name
+   * @returns - an owner address of the domain
+   */
+  async owner(domain: string): Promise<string | null> {
+    return (await this.resolve(domain)).meta.owner;
+  }
+
+  /**
    * Resolves a domain
    * @param domain - domain name to be resolved
    * @returns - Everything what is stored on specified domain
