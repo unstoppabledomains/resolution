@@ -15,6 +15,6 @@
   "typedocOptions": {
     "mode": "file",
     "module": "commonjs",
-    "out": "../docs"
+    "out": "./docs"
   }
 }
