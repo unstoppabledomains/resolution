@@ -37,7 +37,6 @@ class Namicorn {
    * @property blockchain - main configuration object
    */
   constructor({ blockchain = true }: { blockchain?: Blockchain } = {}) {
-    this.api = new Udapi();
     this.blockchain = !!blockchain;
     if (blockchain) {
       if (blockchain == true) {
@@ -55,6 +54,8 @@ class Namicorn {
       if (blockchain.zns) {
         this.zns = new Zns(blockchain.zns);
       }
+    } else {
+      this.api = new Udapi();
     }
   }
 
