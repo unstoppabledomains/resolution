@@ -116,7 +116,7 @@ class Namicorn {
    */
   async owner(domain: string): Promise<string | null> {
     const method = this.getNamingMethod(domain);
-    return await method.owner(domain) || null;
+    return (await method.owner(domain)) || null;
   }
 
   /**

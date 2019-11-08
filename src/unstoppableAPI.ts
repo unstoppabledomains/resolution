@@ -6,7 +6,7 @@ import NamingService from './namingService';
 import { NamicornResolution, NullAddress } from './types';
 import Zns from './zns';
 import Ens from './ens';
-import fs from 'fs';
+// import * as pckg from '../package.json';
 
 /** @ignore  */
 const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
@@ -38,8 +38,7 @@ export default class Udapi extends NamingService {
     const DefaultUserAgent = isNode()
       ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'
       : navigator.userAgent;
-    const pckg = JSON.parse(fs.readFileSync(`${__dirname}/../package.json`) as any);
-    const version = pckg.version;
+    const version = process.env.npm_package_version;
     const CustomUserAgent = `${DefaultUserAgent} namicorn/${version}`;
     this.headers = { 'X-user-agent': CustomUserAgent };
   }
@@ -87,9 +86,9 @@ export default class Udapi extends NamingService {
    * @returns - an owner address of the domain
    */
   async owner(domain: string): Promise<string | null> {
-    const {owner} = (await this.resolve(domain)).meta;
+    const { owner } = (await this.resolve(domain)).meta;
     if (!owner) return null;
-    return owner.startsWith("zil1") ? owner : toBech32Address(owner);
+    return owner.startsWith('zil1') ? owner : toBech32Address(owner);
   }
 
   /**
