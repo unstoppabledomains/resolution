@@ -1,7 +1,7 @@
 import Ens from './ens';
 import Zns from './zns';
 import Udapi from './unstoppableAPI';
-import { Blockchain, NamicornResolution } from './types';
+import { Blockchain, NamicornResolution, UNCLAIMED_DOMAIN_RESPONSE } from './types';
 import ResolutionError from './resolutionError';
 import NamingService from './namingService';
 
@@ -15,15 +15,6 @@ import NamingService from './namingService';
  * ```
  */
 class Namicorn {
-  static readonly UNCLAIMED_DOMAIN_RESPONSE: NamicornResolution = {
-    addresses: {},
-    meta: {
-      owner: null, //available domain
-      type: '',
-      ttl: 0,
-    },
-  };
-
   readonly blockchain: Blockchain | boolean;
   /** @ignore */
   readonly ens?: Ens;
@@ -67,7 +58,7 @@ class Namicorn {
   async resolve(domain: string): Promise<NamicornResolution> {
     const method = this.getNamingMethodOrThrow(domain);
     const result = await method.resolve(domain);
-    return result || Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
+    return result || UNCLAIMED_DOMAIN_RESPONSE;
   }
 
   /**
@@ -184,4 +175,4 @@ class Namicorn {
   }
 }
 
-export { Namicorn, Namicorn as default };
+export { Namicorn, Namicorn as default, ResolutionError };

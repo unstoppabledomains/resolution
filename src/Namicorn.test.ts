@@ -3,7 +3,7 @@ import Namicorn, { ResolutionError } from '.';
 import _ from 'lodash';
 import mockData from './testData/mockData.json';
 import Ens from './ens';
-import { Dictionary, NullAddress } from './types';
+import { Dictionary, NullAddress, UNCLAIMED_DOMAIN_RESPONSE } from './types';
 import { toChecksumAddress } from '@zilliqa-js/crypto/dist/util';
 import { Zilliqa } from '@zilliqa-js/zilliqa';
 
@@ -40,13 +40,13 @@ const mockAPICalls = (testName: string, url = MainnetUrl) => {
     switch (METHOD) {
       case 'POST': {
         nock(url)
-          // .log(console.log)
+          // .log()
           .post('/', JSON.stringify(REQUEST))
           .reply(200, JSON.stringify(RESPONSE));
       }
       default: {
         nock(url)
-          // .log(console.log)
+          // .log()
           .get(REQUEST as string)
           .reply(200, RESPONSE);
       }
@@ -891,7 +891,7 @@ describe('Namicorn', () => {
   });
 
   it('provides empty response constant', async () => {
-    const response = Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
+    const response = UNCLAIMED_DOMAIN_RESPONSE;
     expect(response.addresses).toEqual({});
     expect(response.meta.owner).toEqual(null);
   });

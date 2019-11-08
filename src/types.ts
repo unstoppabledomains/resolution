@@ -66,3 +66,12 @@ export type ResolverContract = Contract;
 
 export const NullAddress = '0x0000000000000000000000000000000000000000';
 export const EthCoinIndex = 60;
+
+export const UNCLAIMED_DOMAIN_RESPONSE: NamicornResolution = {
+  addresses: {},
+  meta: {
+    owner: null, //available domain
+    type: '',
+    ttl: 0,
+  },
+};
