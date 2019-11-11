@@ -3,12 +3,15 @@ import Zns from './zns';
 import Cns from './cns';
 import { Blockchain, NamicornResolution, NullAddress } from './types';
 import Udapi from './unstoppableAPI';
+<<<<<<< HEAD
+=======
+import { Blockchain, NamicornResolution, UNCLAIMED_DOMAIN_RESPONSE } from './types';
+>>>>>>> f290833297d98b60f844d12d3e0e648530404c08
 import ResolutionError from './resolutionError';
 import NamingService from './namingService';
 
 /**
  * Blockchain domain resolution library - Namicorn.
- *
  * @example
  * ```
  * let namicorn = new Namicorn({blockchain: {ens: {url: 'https://mainnet.infura.io', network: 'mainnet'}}});
@@ -17,15 +20,6 @@ import NamingService from './namingService';
  * ```
  */
 class Namicorn {
-  static readonly UNCLAIMED_DOMAIN_RESPONSE: NamicornResolution = {
-    addresses: {},
-    meta: {
-      owner: null, //available domain
-      type: '',
-      ttl: 0,
-    },
-  };
-
   readonly blockchain: Blockchain | boolean;
   /** @ignore */
   readonly ens?: Ens;
@@ -40,7 +34,6 @@ class Namicorn {
    * @property blockchain - main configuration object
    */
   constructor({ blockchain = true }: { blockchain?: Blockchain } = {}) {
-    this.api = new Udapi();
     this.blockchain = !!blockchain;
     if (blockchain) {
       if (blockchain == true) {
@@ -61,9 +54,14 @@ class Namicorn {
       if (blockchain.zns) {
         this.zns = new Zns(blockchain.zns);
       }
+<<<<<<< HEAD
       if (blockchain.cns) {
         this.cns = new Cns(blockchain.cns);
       }
+=======
+    } else {
+      this.api = new Udapi();
+>>>>>>> f290833297d98b60f844d12d3e0e648530404c08
     }
   }
 
@@ -76,7 +74,7 @@ class Namicorn {
   async resolve(domain: string): Promise<NamicornResolution> {
     const method = this.getNamingMethodOrThrow(domain);
     const result = await method.resolve(domain);
-    return result || Namicorn.UNCLAIMED_DOMAIN_RESPONSE;
+    return result || UNCLAIMED_DOMAIN_RESPONSE;
   }
 
   /**
@@ -125,7 +123,7 @@ class Namicorn {
    */
   async owner(domain: string): Promise<string | null> {
     const method = this.getNamingMethod(domain);
-    return await method.owner(domain) || null;
+    return (await method.owner(domain)) || null;
   }
 
   /**
@@ -193,4 +191,4 @@ class Namicorn {
   }
 }
 
-export { Namicorn, Namicorn as default };
+export { Namicorn, Namicorn as default, ResolutionError };

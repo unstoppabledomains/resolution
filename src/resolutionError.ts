@@ -15,7 +15,8 @@ type ResolutionErrorOptions = {
 const HandlersByCode = {
   UnregisteredDomain: (params: { domain: string }) =>
     `Domain ${params.domain} is not registered`,
-  UnspecifiedResolver: (params: {domain: string }) => `Domain ${params.domain} is not configured`,
+  UnspecifiedResolver: (params: { domain: string }) =>
+    `Domain ${params.domain} is not configured`,
   UnsupportedDomain: (params: { domain: string }) =>
     `Domain ${params.domain} is not supported`,
   UnspecifiedCurrency: (params: { domain: string; currencyTicker: string }) =>

@@ -105,5 +105,16 @@ export type ResolverContract = Contract;
 export const NullAddress = '0x0000000000000000000000000000000000000000';
 export const EthCoinIndex = 60;
 
+<<<<<<< HEAD
 export type address = string;
 export type ethnodehash = string;
+=======
+export const UNCLAIMED_DOMAIN_RESPONSE: NamicornResolution = {
+  addresses: {},
+  meta: {
+    owner: null, //available domain
+    type: '',
+    ttl: 0,
+  },
+};
+>>>>>>> f290833297d98b60f844d12d3e0e648530404c08

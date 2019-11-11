@@ -116,7 +116,7 @@ export default class Ens extends EtheriumNamingService {
    */
   async address(domain: string, currencyTicker: string): Promise<string> {
     const nodeHash = this.namehash(domain);
-    const ownerPromise = this.owner(domain)
+    const ownerPromise = this.owner(domain);
     const resolver = await this._getResolver(nodeHash);
     if (!resolver || resolver === NullAddress) {
       const owner = await ownerPromise;
@@ -141,7 +141,7 @@ export default class Ens extends EtheriumNamingService {
    */
   async owner(domain: string): Promise<string | null> {
     const nodeHash = this.namehash(domain);
-    return await this._getOwner(nodeHash) || null;
+    return (await this._getOwner(nodeHash)) || null;
   }
 
   /**
@@ -195,7 +195,7 @@ export default class Ens extends EtheriumNamingService {
    * This was done to make automated tests more configurable
    * @param nodeHash
    */
-  async _getResolver(nodeHash) {
+  private async _getResolver(nodeHash) {
     return await this._callMethod(this.ensContract.methods.resolver(nodeHash));
   }
 
@@ -205,7 +205,7 @@ export default class Ens extends EtheriumNamingService {
    * @param nodeHash
    */
 
-  async _getOwner(nodeHash) {
+  private async _getOwner(nodeHash) {
     return await this._callMethod(this.ensContract.methods.owner(nodeHash));
   }
 
@@ -251,7 +251,10 @@ export default class Ens extends EtheriumNamingService {
       return await method.call();
     } catch (error) {
       const { message }: { message: string } = error;
-      if (message.match(/Invalid JSON RPC response/) || message.match(/legacy access request rate exceeded/)) {
+      if (
+        message.match(/Invalid JSON RPC response/) ||
+        message.match(/legacy access request rate exceeded/)
+      ) {
         throw new ResolutionError('NamingServiceDown', { method: 'ENS' });
       }
       throw error;
