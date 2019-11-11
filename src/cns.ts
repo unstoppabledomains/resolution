@@ -144,7 +144,7 @@ export default class Cns extends EtheriumNamingService {
   }
 
   /** @ignore */
-  protected async owner(nodeHash): Promise<address> {
+  async owner(nodeHash): Promise<address> {
     return await this.callMethod(this.cnsContract.methods.ownerOf(nodeHash))
   }
 

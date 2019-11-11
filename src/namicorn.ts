@@ -1,12 +1,8 @@
 import Ens from './ens';
 import Zns from './zns';
 import Cns from './cns';
-import { Blockchain, NamicornResolution, NullAddress } from './types';
 import Udapi from './unstoppableAPI';
-<<<<<<< HEAD
-=======
 import { Blockchain, NamicornResolution, UNCLAIMED_DOMAIN_RESPONSE } from './types';
->>>>>>> f290833297d98b60f844d12d3e0e648530404c08
 import ResolutionError from './resolutionError';
 import NamingService from './namingService';
 
@@ -54,14 +50,11 @@ class Namicorn {
       if (blockchain.zns) {
         this.zns = new Zns(blockchain.zns);
       }
-<<<<<<< HEAD
       if (blockchain.cns) {
         this.cns = new Cns(blockchain.cns);
       }
-=======
     } else {
       this.api = new Udapi();
->>>>>>> f290833297d98b60f844d12d3e0e648530404c08
     }
   }
 
