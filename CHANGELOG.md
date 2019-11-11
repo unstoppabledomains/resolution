@@ -1,6 +1,12 @@
-## Unreleased
+## Unreleased 
+
+## 0.3.1 - 0.3.2
 
 * Namicorn#owner method - returns an owner address of the domain
+* Fixed issue with user agent on browsers instances for namicorn
+* Added docs generation scripts
+* Unstoppable API is not initilized when blockchain param is true inside the Namicorn configuration
+
 
 ## 0.3.0
 * Namicorn#addressOrThrow - new method that throws ResolutionError if currency address is not found
