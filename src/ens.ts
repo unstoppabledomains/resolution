@@ -220,7 +220,7 @@ export default class Ens extends NamingService {
    * This was done to make automated tests more configurable
    * @param nodeHash
    */
-  async _getResolver(nodeHash) {
+  private async _getResolver(nodeHash) {
     return await this._callMethod(this.ensContract.methods.resolver(nodeHash));
   }
 
@@ -230,7 +230,7 @@ export default class Ens extends NamingService {
    * @param nodeHash
    */
 
-  async _getOwner(nodeHash) {
+  private async _getOwner(nodeHash) {
     return await this._callMethod(this.ensContract.methods.owner(nodeHash));
   }
 
@@ -347,7 +347,7 @@ export default class Ens extends NamingService {
    *  @param method - Method to be called
    *  @throws ResolutionError -> When blockchain is down
    */
-  async _callMethod(method: { call: () => Promise<any> }): Promise<any> {
+  private async _callMethod(method: { call: () => Promise<any> }): Promise<any> {
     try {
       return await method.call();
     } catch (error) {
