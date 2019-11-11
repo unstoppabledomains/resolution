@@ -75,3 +75,8 @@ export const UNCLAIMED_DOMAIN_RESPONSE: NamicornResolution = {
     ttl: 0,
   },
 };
+
+export type WhoIsStructure = {
+  email: string,
+  for_sale: boolean
+}

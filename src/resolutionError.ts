@@ -27,6 +27,10 @@ const HandlersByCode = {
     `${params.currencyTicker} is not supported`,
   IncorrectResolverInterface: (params: { method: string }) =>
     `Domain resolver is configured incorrectly for ${params.method}`,
+  NoIPFSConfigurationFound: (params: { domain: string }) =>
+    `Domain ${params.domain} has no IPFS configuration`,
+    UnconfiguredWhoIs: (params: { domain: string }) =>
+    `Domain ${params.domain} has no whois configuration`
 };
 
 /**

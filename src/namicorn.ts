@@ -1,7 +1,7 @@
 import Ens from './ens';
 import Zns from './zns';
 import Udapi from './unstoppableAPI';
-import { Blockchain, NamicornResolution, UNCLAIMED_DOMAIN_RESPONSE } from './types';
+import { Blockchain, NamicornResolution, UNCLAIMED_DOMAIN_RESPONSE, WhoIsStructure } from './types';
 import ResolutionError from './resolutionError';
 import NamingService from './namingService';
 
@@ -82,6 +82,32 @@ class Namicorn {
         throw error;
       }
     }
+  }
+
+  /**
+   * Resolves the ipfs hash configured for domain records on ZNS
+   * @param domain - domain name
+   * @throws ResolutionError
+   * - UnsupportedDomain if it is not supported by ZNS
+   * @returns a Promise that resolves in ipfsHash
+   */
+  async ipfsHash(domain: string): Promise<string> {
+    if (!this.zns.isSupportedDomain(domain))
+      throw new ResolutionError('UnsupportedDomain', {domain});
+    return await this.zns.ipfsHash(domain);
+  }
+
+  /**
+   * Resolves the ipfs who is configurations from domain records on ZNS
+   * @param domain - domain name
+   * @throws ResolutionError 
+   *  - UnsupportedDomain if the domain is not supported by ZNS
+   * @returns a Promise that resolves in whoIsStructure object
+   */
+  async ipfsWhoIs(domain: string): Promise<WhoIsStructure> {
+    if (!this.zns.isSupportedDomain(domain))
+      throw new ResolutionError('UnsupportedDomain', {domain});
+    return await this.zns.ipfsWhois(domain);
   }
 
   /**

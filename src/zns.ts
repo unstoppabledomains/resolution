@@ -10,9 +10,11 @@ import {
   ZnsResolution,
   NullAddress,
   UNCLAIMED_DOMAIN_RESPONSE,
+  WhoIsStructure,
 } from './types';
 import Namicorn, { ResolutionError } from './index';
 import NamingService from './namingService';
+import { WSAEHOSTUNREACH } from 'constants';
 
 /** @ignore */
 const DefaultSource = 'https://api.zilliqa.com';
@@ -152,6 +154,40 @@ export default class Zns extends NamingService {
    */
   async resolution(domain: string): Promise<ZnsResolution> {
     return this.structureResolverRecords(await this.records(domain));
+  }
+
+  /**
+   * Resolves the ipfs hash stored in domain record
+   * @param domain - domain name
+   * @throws ResolutionError with 
+   *  - NoIPFSConfigurationFound code when records has no fields for ipfs
+   *  - UnregisteredDomain code when no records was found
+   * @returns a promise that resolves in a value stored under ipfs.html.value or undefined. 
+   */
+  async ipfsHash(domain: string): Promise<string> {
+    const record = await this.structureResolverRecords(await this.records(domain));
+    if (!record)
+      throw new ResolutionError('UnregisteredDomain', {domain});
+    if (!record.ipfs || !record.ipfs.html)
+      throw new ResolutionError('NoIPFSConfigurationFound', {domain});
+    return record.ipfs.html.value;
+  }
+
+  /**
+   * Resolves ipfs whois object stored in domain record
+   * @param domain - domain name
+   * @throws ResolutionError with 
+   *  - UncofiguredWhoIs code when no such filed found in records
+   *  - UnregisteredDomain code when no records was found
+   */
+  async ipfsWhois(domain: string): Promise<WhoIsStructure> {
+    const record = await this.structureResolverRecords(await this.records(domain));
+    if (!record)
+      throw new ResolutionError('UnregisteredDomain', {domain});
+    if (!record.whois)
+      throw new ResolutionError('UnconfiguredWhoIs', {domain});
+    const whois = _.mapValues(record.whois || {}, 'value');
+    return whois as WhoIsStructure;
   }
 
   /**
