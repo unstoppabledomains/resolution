@@ -1,4 +1,6 @@
 ## Unreleased 
+* Namicorn#ipfsHash -> gets ipfs hash for a specific domain from zns 
+* Namicorn#ipfsWhois -> gets ipfs whois object for a specific domain from zns
 
 ## 0.3.1 - 0.3.2
 
