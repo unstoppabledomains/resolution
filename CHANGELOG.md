@@ -1,3 +1,5 @@
+## Unreleased 
+
 ## 0.3.1 - 0.3.2
 
 * Namicorn#owner method - returns an owner address of the domain
