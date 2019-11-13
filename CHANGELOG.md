@@ -1,6 +1,7 @@
 ## Unreleased 
-* Namicorn#ipfsHash -> gets ipfs hash for a specific domain from zns 
-* Namicorn#ipfsWhois -> gets ipfs whois object for a specific domain from zns
+* Namicorn#ipfsHash -> gets ipfs hash for a specific supported domain
+* Namicorn#ipfsEmail -> gets ipfs email field of whois object for a specific supported domain
+* Namicorn#ipfsRedirect -> gets ipfs redirect url record for a specific supported domain
 
 ## 0.3.1 - 0.3.2
 
