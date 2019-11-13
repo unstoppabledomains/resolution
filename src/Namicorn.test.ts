@@ -669,9 +669,9 @@ describe('ENS', () => {
   it('checks ens multicoin support #1', async () => {
     const ens = new Ens();
     const eyes = mockAsyncMethods(ens, {
-      '_getOwner': '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-      '_getResolver': '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-      '_callMethod': '0x76a9144620b70031f0e9437e374a2100934fba4911046088ac',
+      _getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
+      _getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      _callMethod: '0x76a9144620b70031f0e9437e374a2100934fba4911046088ac',
     });
     const doge = await ens.address('testthing.eth', 'DOGE');
     expectSpyToBeCalled(eyes);
@@ -680,14 +680,11 @@ describe('ENS', () => {
 
   it('checks ens multicoin support #2', async () => {
     const ens = new Ens();
-    const eyes = mockAsyncMethods(
-      ens,
-      {
-        '_getOwner': '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-        '_getResolver': '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-        '_callMethod': '0xa914e8604d28ef5d2a7caafe8741e5dd4816b7cb19ea87',
-      }
-    );
+    const eyes = mockAsyncMethods(ens, {
+      _getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
+      _getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      _callMethod: '0xa914e8604d28ef5d2a7caafe8741e5dd4816b7cb19ea87',
+    });
     const ltc = await ens.address('testthing.eth', 'LTC');
     expectSpyToBeCalled(eyes);
     expect(ltc).toBe('MV5rN5EcX1imDS2gEh5jPJXeiW5QN8YrK3');
@@ -695,14 +692,11 @@ describe('ENS', () => {
 
   it('checks ens multicoin support #3', async () => {
     const ens = new Ens();
-    const eyes = mockAsyncMethods(
-      ens,
-      {
-        '_getOwner': '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-        '_getResolver': '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-        '_callMethod': '0x314159265dd8dbb310642f98f50c066173c1259b',
-      }
-    );
+    const eyes = mockAsyncMethods(ens, {
+      _getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
+      _getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      _callMethod: '0x314159265dd8dbb310642f98f50c066173c1259b',
+    });
     const eth = await ens.address('testthing.eth', 'ETH');
     expectSpyToBeCalled(eyes);
     expect(eth).toBe('0x314159265dD8dbb310642f98f50C066173C1259b');
@@ -710,14 +704,11 @@ describe('ENS', () => {
 
   it('checks ens multicoin support #4', async () => {
     const ens = new Ens();
-    const eyes = mockAsyncMethods(
-      ens,
-      {
-        '_getOwner': '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-        '_getResolver': '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-        '_callMethod': '0x314159265dd8dbb310642f98f50c066173c1259b',
-      }
-    );
+    const eyes = mockAsyncMethods(ens, {
+      _getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
+      _getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      _callMethod: '0x314159265dd8dbb310642f98f50c066173c1259b',
+    });
     const etc = await ens.address('testthing.eth', 'etc');
     expectSpyToBeCalled(eyes);
     expect(etc).toBe('0x314159265dD8dbb310642f98f50C066173C1259b');
@@ -725,14 +716,11 @@ describe('ENS', () => {
 
   it('checks ens multicoin support #5', async () => {
     const ens = new Ens();
-    const eyes = mockAsyncMethods(
-      ens,
-      {
-        '_getOwner': '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-        '_getResolver': '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-        '_callMethod': '0x314159265dd8dbb310642f98f50c066173c1259b',
-      }
-    );
+    const eyes = mockAsyncMethods(ens, {
+      _getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
+      _getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      _callMethod: '0x314159265dd8dbb310642f98f50c066173c1259b',
+    });
     const rsk = await ens.address('testthing.eth', 'rsk');
     expectSpyToBeCalled(eyes);
     expect(rsk).toBe('0x314159265dD8DbB310642F98f50C066173c1259B');
@@ -740,14 +728,12 @@ describe('ENS', () => {
 
   it('checks ens multicoin support #6', async () => {
     const ens = new Ens();
-    const eyes = mockAsyncMethods(
-      ens,
-      {
-        '_getOwner': '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-        '_getResolver': '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-        '_callMethod': '0x05444b4e9c06f24296074f7bc48f92a97916c6dc5ea9000000000000000000',
-      }
-    );
+    const eyes = mockAsyncMethods(ens, {
+      _getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
+      _getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      _callMethod:
+        '0x05444b4e9c06f24296074f7bc48f92a97916c6dc5ea9000000000000000000',
+    });
     const xrp = await ens.address('testthing.eth', 'xrp');
     expectSpyToBeCalled(eyes);
     expect(xrp).toBe('X7qvLs7gSnNoKvZzNWUT2e8st17QPY64PPe7zriLNuJszeg');
@@ -755,14 +741,11 @@ describe('ENS', () => {
 
   it('checks ens multicoin support #7', async () => {
     const ens = new Ens();
-    const eyes = mockAsyncMethods(
-      ens,
-      {
-        '_getOwner': '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-        '_getResolver': '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-        '_callMethod': '0x76a91476a04053bda0a88bda5177b86a15c3b29f55987388ac',
-      }
-    );
+    const eyes = mockAsyncMethods(ens, {
+      _getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
+      _getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      _callMethod: '0x76a91476a04053bda0a88bda5177b86a15c3b29f55987388ac',
+    });
     const bch = await ens.address('testthing.eth', 'bch');
     expectSpyToBeCalled(eyes);
     expect(bch).toBe('bitcoincash:qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a');
@@ -770,14 +753,12 @@ describe('ENS', () => {
 
   it('checks ens multicoin support #8', async () => {
     const ens = new Ens();
-    const eyes = mockAsyncMethods(
-      ens,
-      {
-        '_getOwner': '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-        '_getResolver': '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-        '_callMethod': '0x5128751e76e8199196d454941c45d1b3a323f1433bd6751e76e8199196d454941c45d1b3a323f1433bd6',
-      }
-    );
+    const eyes = mockAsyncMethods(ens, {
+      _getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
+      _getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      _callMethod:
+        '0x5128751e76e8199196d454941c45d1b3a323f1433bd6751e76e8199196d454941c45d1b3a323f1433bd6',
+    });
     const btc = await ens.address('testthing.eth', 'BTC');
     expectSpyToBeCalled(eyes);
     expect(btc).toBe(
