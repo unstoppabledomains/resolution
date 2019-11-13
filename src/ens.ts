@@ -84,6 +84,7 @@ export default class Ens extends NamingService {
     }
   }
 
+  /** @ignore */
   supportsRecords(): boolean {
     return this._supportsRecords;
   }

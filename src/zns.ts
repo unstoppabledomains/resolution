@@ -216,6 +216,7 @@ export default class Zns extends NamingService {
     return this.registryAddress != null;
   }
 
+  /** @ignore */
   supportsRecords(): boolean {
     return this._supportsRecords;
   }

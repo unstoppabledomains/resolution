@@ -96,7 +96,7 @@ class Namicorn {
    */
   async ipfsHash(domain: string): Promise<string> {
     const method = this.getNamingMethodOrThrow(domain);
-    if (!method.supportsRecords)
+    if (!method.supportsRecords())
       throw new ResolutionError('RecordNotFound', { domain });
     return await method.ipfsHash(domain);
   }
@@ -109,7 +109,7 @@ class Namicorn {
    */
   async ipfsRedirect(domain: string): Promise<string> {
     const method = this.getNamingMethodOrThrow(domain);
-    if (!method.supportsRecords)
+    if (!method.supportsRecords())
       throw new ResolutionError('RecordNotFound', { domain });
     return await method.ipfsRedirect(domain);
   }
@@ -122,7 +122,7 @@ class Namicorn {
    */
   async ipfsEmail(domain: string): Promise<string> {
     const method = this.getNamingMethodOrThrow(domain);
-    if (!method.supportsRecords)
+    if (!method.supportsRecords())
       throw new ResolutionError('RecordNotFound', { domain });
     return await method.ipfsEmail(domain);
   }
