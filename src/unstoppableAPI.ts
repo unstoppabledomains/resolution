@@ -3,7 +3,7 @@ import nodeFetch from 'node-fetch';
 
 import { ResolutionError } from './index';
 import NamingService from './namingService';
-import { NamicornResolution, NullAddress } from './types';
+import { NamicornResolution, NullAddress, WhoIsStructure } from './types';
 import Zns from './zns';
 import Ens from './ens';
 // import * as pckg from '../package.json';
@@ -48,6 +48,12 @@ export default class Udapi extends NamingService {
     return !!this.findMethod(domain);
   }
 
+  supportsRecords(domain?: string): boolean {
+    if (!domain) throw new Error('Domain is required for supportsRecords method on unstoppable API call');
+    const method = this.findMethod(domain);
+    return method.supportsRecords();
+  }
+
   /** @ignore */
   isSupportedNetwork(): boolean {
     return true;
@@ -78,6 +84,22 @@ export default class Udapi extends NamingService {
         currencyTicker,
       });
     return address;
+  }
+
+  
+  async ipfsHash(domain:string): Promise<string> {
+    const method = this.findMethodOrThrow(domain);
+    return await method.ipfsHash(domain);
+  }
+
+  async ipfsEmail(domain:string): Promise<string> {
+    const method = this.findMethodOrThrow(domain);
+    return await method.ipfsEmail(domain);
+  }
+
+  async ipfsRedirect(domain: string): Promise<string> {
+    const method = this.findMethodOrThrow(domain);
+    return await method.ipfsRedirect(domain);
   }
 
   /**
@@ -117,7 +139,21 @@ export default class Udapi extends NamingService {
 
   /** @ignore */
   private findMethod(domain: string) {
-    return [new Zns(), new Ens()].find(m => m.isSupportedDomain(domain));
+    try {
+      const method = this.findMethodOrThrow(domain);
+      return method;
+    }
+    catch(err) {
+      if (err instanceof ResolutionError)
+        return null;
+      throw err;
+    }
+  }
+
+  private findMethodOrThrow(domain:string) {
+    const method = [new Zns(), new Ens()].find(m => m.isSupportedDomain(domain));
+    if (!method) throw new ResolutionError('UnsupportedDomain', {domain});
+    return method;
   }
 
   /** @ignore */

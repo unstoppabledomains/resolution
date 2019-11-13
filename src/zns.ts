@@ -59,6 +59,7 @@ export default class Zns extends NamingService {
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
+  private _supportsRecords: boolean;
   /** @ignore */
   private registry?: Contract;
   /** @ignore */
@@ -72,6 +73,7 @@ export default class Zns extends NamingService {
   constructor(source: string | boolean | SourceDefinition = true) {
     super();
     source = this.normalizeSource(source);
+    this._supportsRecords = true;
     this.network = source.network as string;
     this.url = source.url;
     this.zilliqa = new Zilliqa(this.url);
@@ -165,29 +167,28 @@ export default class Zns extends NamingService {
    * @returns a promise that resolves in a value stored under ipfs.html.value or undefined. 
    */
   async ipfsHash(domain: string): Promise<string> {
-    const record = await this.structureResolverRecords(await this.records(domain));
-    if (!record)
-      throw new ResolutionError('UnregisteredDomain', {domain});
-    if (!record.ipfs || !record.ipfs.html)
-      throw new ResolutionError('NoIPFSConfigurationFound', {domain});
-    return record.ipfs.html.value;
+    const records = await this.records(domain)
+    if (!records || !records['ipfs.html.value']) throw new ResolutionError('RecordNotFound', {domain});
+    return records['ipfs.html.value'];
+  }
+
+  async ipfsRedirect(domain: string): Promise<string> {
+    const records = await this.records(domain);
+    if (!records || !records['ipfs.redirect_domain.value']) throw new ResolutionError('RecordNotFound', {domain});
+    return records['ipfs.redirect_domain.value'];
   }
 
   /**
-   * Resolves ipfs whois object stored in domain record
+   * Resolves ipfs email stored in whois object
    * @param domain - domain name
    * @throws ResolutionError with 
    *  - UncofiguredWhoIs code when no such filed found in records
    *  - UnregisteredDomain code when no records was found
    */
-  async ipfsWhois(domain: string): Promise<WhoIsStructure> {
-    const record = await this.structureResolverRecords(await this.records(domain));
-    if (!record)
-      throw new ResolutionError('UnregisteredDomain', {domain});
-    if (!record.whois)
-      throw new ResolutionError('UnconfiguredWhoIs', {domain});
-    const whois = _.mapValues(record.whois || {}, 'value');
-    return whois as WhoIsStructure;
+  async ipfsEmail(domain: string): Promise<string> {
+    const records = await this.records(domain)
+    if (!records || !records['whois.email.value']) throw new ResolutionError('RecordNotFound', {domain});
+    return records['whois.email.value'];
   }
 
   /**
@@ -212,6 +213,11 @@ export default class Zns extends NamingService {
    */
   isSupportedNetwork(): boolean {
     return this.registryAddress != null;
+  }
+
+
+  supportsRecords(): boolean {
+    return this._supportsRecords;
   }
 
   /**

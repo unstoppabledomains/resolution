@@ -29,8 +29,10 @@ const HandlersByCode = {
     `Domain resolver is configured incorrectly for ${params.method}`,
   NoIPFSConfigurationFound: (params: { domain: string }) =>
     `Domain ${params.domain} has no IPFS configuration`,
-    UnconfiguredWhoIs: (params: { domain: string }) =>
-    `Domain ${params.domain} has no whois configuration`
+  UnconfiguredWhoIs: (params: { domain: string }) =>
+    `Domain ${params.domain} has no whois configuration`,
+  RecordNotFound: (params: { domain: string }) =>
+    `No records found for ${params.domain}`
 };
 
 /**

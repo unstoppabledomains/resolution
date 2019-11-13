@@ -60,7 +60,7 @@ const expectResolutionErrorCode = async (
 ) => {
   try {
     if (callback instanceof Promise) {
-      await callback;
+       await callback;
     } else {
       callback();
     }
@@ -850,4 +850,24 @@ describe('Namicorn', () => {
       'UnsupportedDomain',
     );
   });
+
+  it('checks return of ipfs hash for brad.zil', async () => {
+    const namicorn = new Namicorn();
+    const hash = await namicorn.ipfsHash('brad.zil');
+    expect(hash).toBe('QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK');
+  })
+
+  it('checks return of ipfsEmail for ergergergerg.zil', async () => {
+    const namicorn = new Namicorn();
+    const email = await namicorn.ipfsEmail('ergergergerg.zil');
+    expect(email).toBe('matt+test@unstoppabledomains.com');
+  })
+
+  it('checks error for ipfs email on brad.zil', async () => {
+    const namicorn = new Namicorn();
+    await expectResolutionErrorCode(
+      namicorn.ipfsEmail('brad.zil'),
+      'RecordNotFound'
+    )
+  })
 });

@@ -88,26 +88,24 @@ class Namicorn {
    * Resolves the ipfs hash configured for domain records on ZNS
    * @param domain - domain name
    * @throws ResolutionError
-   * - UnsupportedDomain if it is not supported by ZNS
    * @returns a Promise that resolves in ipfsHash
    */
   async ipfsHash(domain: string): Promise<string> {
-    if (!this.zns.isSupportedDomain(domain))
-      throw new ResolutionError('UnsupportedDomain', {domain});
-    return await this.zns.ipfsHash(domain);
+    const method = this.getNamingMethodOrThrow(domain);
+    if (!method.supportsRecords) throw new ResolutionError('RecordNotFound', {domain});
+    return await method.ipfsHash(domain);
   }
 
   /**
-   * Resolves the ipfs who is configurations from domain records on ZNS
+   * Resolves the ipfs email field from whois configurations
    * @param domain - domain name
    * @throws ResolutionError 
-   *  - UnsupportedDomain if the domain is not supported by ZNS
-   * @returns a Promise that resolves in whoIsStructure object
+   * @returns a Promise that resolves in an email address configured for this domain whois
    */
-  async ipfsWhoIs(domain: string): Promise<WhoIsStructure> {
-    if (!this.zns.isSupportedDomain(domain))
-      throw new ResolutionError('UnsupportedDomain', {domain});
-    return await this.zns.ipfsWhois(domain);
+  async ipfsEmail(domain: string): Promise<string> {
+    const method = this.getNamingMethodOrThrow(domain);
+    if (!method.supportsRecords) throw new ResolutionError('RecordNotFound', {domain});
+    return await method.ipfsEmail(domain);
   }
 
   /**

@@ -10,10 +10,12 @@ import {
   NullAddress,
   Bip44Constants,
   EthCoinIndex,
+  WhoIsStructure,
 } from './types';
 import NamingService from './namingService';
 import { ResolutionError } from './index';
 import Web3 from 'web3';
+import { ENGINE_METHOD_DIGESTS } from 'constants';
 
 /** @ignore */
 const DefaultUrl = 'https://mainnet.infura.io';
@@ -50,6 +52,7 @@ export default class Ens extends NamingService {
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
+  private _supportsRecords: boolean;
   /** @ignore */
   private ensContract: any;
   /**  @ignore */
@@ -63,6 +66,7 @@ export default class Ens extends NamingService {
   constructor(source: string | boolean | SourceDefinition = true) {
     super();
     source = this.normalizeSource(source);
+    this._supportsRecords = false;
     this.web3 = new Web3(source.url);
     this.network = <string>source.network;
     this.url = source.url;
@@ -83,6 +87,10 @@ export default class Ens extends NamingService {
     }
   }
 
+  supportsRecords(): boolean {
+    return this._supportsRecords;   
+  }
+
   /**
    * Checks if the domain is in valid format
    * @param domain - domain name to be checked
@@ -100,6 +108,18 @@ export default class Ens extends NamingService {
    */
   isSupportedNetwork(): boolean {
     return this.registryAddress != null;
+  }
+
+  async ipfsHash(domain:string): Promise<string> {
+    throw new Error('Method is not available on ENS');
+  }
+
+  async ipfsEmail(domain:string): Promise<string> {
+    throw new Error('Method is not available on ENS');
+  }
+
+  async ipfsRedirect(domain: string): Promise<string> {
+    throw new Error('Method is not available on ENS');
   }
 
   /**
