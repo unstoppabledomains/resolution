@@ -1,15 +1,10 @@
 const fs = require('fs');
+const version = process.env.npm_package_version;
 
-const pckg = JSON.parse(fs.readFileSync('./package.json'));
-const version = pckg.version;
+let README = '';
 
-pckg.scripts["docs:deploy"] = `./deploy-docs.sh dist ${version}`;
-fs.writeFileSync('./package.json', JSON.stringify(pckg));
-const tsconfig = JSON.parse(fs.readFileSync('./tsconfig.json'));
-tsconfig.typedocOptions.out = `./dist/v${version}`;
-fs.writeFileSync('./tsconfig.json', JSON.stringify(tsconfig));
 
-let README = fs.readFileSync('./dist/README.md', 'utf8');
+let README = fs.readFileSync('./docs/README.md', 'utf8');
 
 const ReadmeLink = (readme, version) => {
   const draft = /\[(Current Version)\]\((.+)\)/;
@@ -23,4 +18,4 @@ const ReadmeLink = (readme, version) => {
   return newReadme;
 }
 README = ReadmeLink(README, `v${version}`);
-fs.writeFileSync('./dist/README.md', README);
+fs.writeFileSync('./docs/README.md', README);
