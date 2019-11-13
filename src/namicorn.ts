@@ -1,7 +1,11 @@
 import Ens from './ens';
 import Zns from './zns';
 import Udapi from './unstoppableAPI';
-import { Blockchain, NamicornResolution, UNCLAIMED_DOMAIN_RESPONSE } from './types';
+import {
+  Blockchain,
+  NamicornResolution,
+  UNCLAIMED_DOMAIN_RESPONSE,
+} from './types';
 import ResolutionError from './resolutionError';
 import NamingService from './namingService';
 

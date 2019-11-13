@@ -347,7 +347,9 @@ export default class Ens extends NamingService {
    *  @param method - Method to be called
    *  @throws ResolutionError -> When blockchain is down
    */
-  private async _callMethod(method: { call: () => Promise<any> }): Promise<any> {
+  private async _callMethod(method: {
+    call: () => Promise<any>;
+  }): Promise<any> {
     try {
       return await method.call();
     } catch (error) {

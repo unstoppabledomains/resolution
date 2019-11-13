@@ -1,10 +1,12 @@
 #!/bin/sh
-if [ -z "$1" ]
-then
-  echo "Which folder do you want to deploy to GitHub Pages?"
-  exit 1
+git="git -C ./docs/";
+echo "deploying the docs"
+if [ -z "./docs" ]; then
+  echo "docs were not found"
+  mkdir -p dist
+  git clone https://github.com/unstoppabledomains/namicorn.git docs
+  $git checkout gh-pages
 fi
-BRANCHNAME="$(git rev-parse --abbrev-ref HEAD)"
-git add './dist'
-git commit -m "$2"
-git push origin `git subtree split --prefix dist ${BRANCHNAME}`:gh-pages --force
+$git add '.'
+$git commit -m "$1"
+$git push origin 
