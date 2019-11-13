@@ -10,11 +10,9 @@ import {
   ZnsResolution,
   NullAddress,
   UNCLAIMED_DOMAIN_RESPONSE,
-  WhoIsStructure,
 } from './types';
-import Namicorn, { ResolutionError } from './index';
+import { ResolutionError } from './index';
 import NamingService from './namingService';
-import { WSAEHOSTUNREACH } from 'constants';
 
 /** @ignore */
 const DefaultSource = 'https://api.zilliqa.com';
@@ -161,33 +159,36 @@ export default class Zns extends NamingService {
   /**
    * Resolves the ipfs hash stored in domain record
    * @param domain - domain name
-   * @throws ResolutionError with 
+   * @throws ResolutionError with
    *  - NoIPFSConfigurationFound code when records has no fields for ipfs
    *  - UnregisteredDomain code when no records was found
-   * @returns a promise that resolves in a value stored under ipfs.html.value or undefined. 
+   * @returns a promise that resolves in a value stored under ipfs.html.value or undefined.
    */
   async ipfsHash(domain: string): Promise<string> {
-    const records = await this.records(domain)
-    if (!records || !records['ipfs.html.value']) throw new ResolutionError('RecordNotFound', {domain});
+    const records = await this.records(domain);
+    if (!records || !records['ipfs.html.value'])
+      throw new ResolutionError('RecordNotFound', { domain });
     return records['ipfs.html.value'];
   }
 
   async ipfsRedirect(domain: string): Promise<string> {
     const records = await this.records(domain);
-    if (!records || !records['ipfs.redirect_domain.value']) throw new ResolutionError('RecordNotFound', {domain});
+    if (!records || !records['ipfs.redirect_domain.value'])
+      throw new ResolutionError('RecordNotFound', { domain });
     return records['ipfs.redirect_domain.value'];
   }
 
   /**
    * Resolves ipfs email stored in whois object
    * @param domain - domain name
-   * @throws ResolutionError with 
+   * @throws ResolutionError with
    *  - UncofiguredWhoIs code when no such filed found in records
    *  - UnregisteredDomain code when no records was found
    */
   async ipfsEmail(domain: string): Promise<string> {
-    const records = await this.records(domain)
-    if (!records || !records['whois.email.value']) throw new ResolutionError('RecordNotFound', {domain});
+    const records = await this.records(domain);
+    if (!records || !records['whois.email.value'])
+      throw new ResolutionError('RecordNotFound', { domain });
     return records['whois.email.value'];
   }
 
@@ -214,7 +215,6 @@ export default class Zns extends NamingService {
   isSupportedNetwork(): boolean {
     return this.registryAddress != null;
   }
-
 
   supportsRecords(): boolean {
     return this._supportsRecords;

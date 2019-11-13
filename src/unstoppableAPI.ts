@@ -3,7 +3,7 @@ import nodeFetch from 'node-fetch';
 
 import { ResolutionError } from './index';
 import NamingService from './namingService';
-import { NamicornResolution, NullAddress, WhoIsStructure } from './types';
+import { NamicornResolution, NullAddress } from './types';
 import Zns from './zns';
 import Ens from './ens';
 // import * as pckg from '../package.json';
@@ -49,7 +49,10 @@ export default class Udapi extends NamingService {
   }
 
   supportsRecords(domain?: string): boolean {
-    if (!domain) throw new Error('Domain is required for supportsRecords method on unstoppable API call');
+    if (!domain)
+      throw new Error(
+        'Domain is required for supportsRecords method on unstoppable API call',
+      );
     const method = this.findMethod(domain);
     return method.supportsRecords();
   }
@@ -86,13 +89,12 @@ export default class Udapi extends NamingService {
     return address;
   }
 
-  
-  async ipfsHash(domain:string): Promise<string> {
+  async ipfsHash(domain: string): Promise<string> {
     const method = this.findMethodOrThrow(domain);
     return await method.ipfsHash(domain);
   }
 
-  async ipfsEmail(domain:string): Promise<string> {
+  async ipfsEmail(domain: string): Promise<string> {
     const method = this.findMethodOrThrow(domain);
     return await method.ipfsEmail(domain);
   }
@@ -142,17 +144,17 @@ export default class Udapi extends NamingService {
     try {
       const method = this.findMethodOrThrow(domain);
       return method;
-    }
-    catch(err) {
-      if (err instanceof ResolutionError)
-        return null;
+    } catch (err) {
+      if (err instanceof ResolutionError) return null;
       throw err;
     }
   }
 
-  private findMethodOrThrow(domain:string) {
-    const method = [new Zns(), new Ens()].find(m => m.isSupportedDomain(domain));
-    if (!method) throw new ResolutionError('UnsupportedDomain', {domain});
+  private findMethodOrThrow(domain: string) {
+    const method = [new Zns(), new Ens()].find(m =>
+      m.isSupportedDomain(domain),
+    );
+    if (!method) throw new ResolutionError('UnsupportedDomain', { domain });
     return method;
   }
 

@@ -1,21 +1,18 @@
 import _ from 'lodash';
 import { default as ensInterface } from './ens/contract/ens';
-import { default as registrarInterface } from './ens/contract/registrar';
 import { default as resolverInterface } from './ens/contract/resolver';
 import { hash } from 'eth-ens-namehash';
-import { formatsByName, formatsByCoinType } from '@ensdomains/address-encoder';
+import { formatsByCoinType } from '@ensdomains/address-encoder';
 import {
   SourceDefinition,
   NamicornResolution,
   NullAddress,
   Bip44Constants,
   EthCoinIndex,
-  WhoIsStructure,
 } from './types';
 import NamingService from './namingService';
 import { ResolutionError } from './index';
 import Web3 from 'web3';
-import { ENGINE_METHOD_DIGESTS } from 'constants';
 
 /** @ignore */
 const DefaultUrl = 'https://mainnet.infura.io';
@@ -88,7 +85,7 @@ export default class Ens extends NamingService {
   }
 
   supportsRecords(): boolean {
-    return this._supportsRecords;   
+    return this._supportsRecords;
   }
 
   /**
@@ -110,11 +107,11 @@ export default class Ens extends NamingService {
     return this.registryAddress != null;
   }
 
-  async ipfsHash(domain:string): Promise<string> {
+  async ipfsHash(domain: string): Promise<string> {
     throw new Error('Method is not available on ENS');
   }
 
-  async ipfsEmail(domain:string): Promise<string> {
+  async ipfsEmail(domain: string): Promise<string> {
     throw new Error('Method is not available on ENS');
   }
 
@@ -367,7 +364,9 @@ export default class Ens extends NamingService {
    *  @param method - Method to be called
    *  @throws ResolutionError -> When blockchain is down
    */
-  private async _callMethod(method: { call: () => Promise<any> }): Promise<any> {
+  private async _callMethod(method: {
+    call: () => Promise<any>;
+  }): Promise<any> {
     try {
       return await method.call();
     } catch (error) {

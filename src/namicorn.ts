@@ -1,7 +1,11 @@
 import Ens from './ens';
 import Zns from './zns';
 import Udapi from './unstoppableAPI';
-import { Blockchain, NamicornResolution, UNCLAIMED_DOMAIN_RESPONSE, WhoIsStructure } from './types';
+import {
+  Blockchain,
+  NamicornResolution,
+  UNCLAIMED_DOMAIN_RESPONSE,
+} from './types';
 import ResolutionError from './resolutionError';
 import NamingService from './namingService';
 
@@ -92,7 +96,8 @@ class Namicorn {
    */
   async ipfsHash(domain: string): Promise<string> {
     const method = this.getNamingMethodOrThrow(domain);
-    if (!method.supportsRecords) throw new ResolutionError('RecordNotFound', {domain});
+    if (!method.supportsRecords)
+      throw new ResolutionError('RecordNotFound', { domain });
     return await method.ipfsHash(domain);
   }
 
@@ -104,19 +109,21 @@ class Namicorn {
    */
   async ipfsRedirect(domain: string): Promise<string> {
     const method = this.getNamingMethodOrThrow(domain);
-    if (!method.supportsRecords) throw new ResolutionError('RecordNotFound', {domain});
+    if (!method.supportsRecords)
+      throw new ResolutionError('RecordNotFound', { domain });
     return await method.ipfsRedirect(domain);
   }
 
   /**
    * Resolves the ipfs email field from whois configurations
    * @param domain - domain name
-   * @throws ResolutionError 
+   * @throws ResolutionError
    * @returns a Promise that resolves in an email address configured for this domain whois
    */
   async ipfsEmail(domain: string): Promise<string> {
     const method = this.getNamingMethodOrThrow(domain);
-    if (!method.supportsRecords) throw new ResolutionError('RecordNotFound', {domain});
+    if (!method.supportsRecords)
+      throw new ResolutionError('RecordNotFound', { domain });
     return await method.ipfsEmail(domain);
   }
 

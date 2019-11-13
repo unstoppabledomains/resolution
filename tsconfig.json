@@ -18,6 +18,5 @@
     "typedocOptions": {
         "mode": "file",
         "module": "commonjs",
-        "out": "./dist/v0.3.1"
     }
 }

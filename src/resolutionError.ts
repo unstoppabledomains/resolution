@@ -32,7 +32,7 @@ const HandlersByCode = {
   UnconfiguredWhoIs: (params: { domain: string }) =>
     `Domain ${params.domain} has no whois configuration`,
   RecordNotFound: (params: { domain: string }) =>
-    `No records found for ${params.domain}`
+    `No records found for ${params.domain}`,
 };
 
 /**
