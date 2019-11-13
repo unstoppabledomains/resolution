@@ -97,6 +97,18 @@ class Namicorn {
   }
 
   /**
+   * Resolves the ipfs redirect url for a supported domain records
+   * @param domain - domain name
+   * @throws ResolutionError
+   * @returns A Promise that resolves in redirect url
+   */
+  async ipfsRedirect(domain: string): Promise<string> {
+    const method = this.getNamingMethodOrThrow(domain);
+    if (!method.supportsRecords) throw new ResolutionError('RecordNotFound', {domain});
+    return await method.ipfsRedirect(domain);
+  }
+
+  /**
    * Resolves the ipfs email field from whois configurations
    * @param domain - domain name
    * @throws ResolutionError 
