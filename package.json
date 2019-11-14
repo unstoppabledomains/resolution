@@ -13,10 +13,11 @@
     "build": "tsc -p .",
     "format": "prettier --semi --write -l **/*.{js,json,ts}",
     "build:live": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
-    "docs": "yarn docs:pregeneration && yarn docs:generate",
-    "docs:pregeneration": "./predocs.sh v$npm_package_version",
+    "docs": "yarn docs:clone && yarn docs:generate && yarn docs:readme",
+    "docs:clone": "[ -d ./docs ] || git clone --branch gh-pages git@github.com:unstoppabledomains/namicorn.git docs",
     "docs:generate": "yarn run typedoc --out \"./docs/v$npm_package_version\"",
-    "docs:deploy": "./deploy-docs.sh v$npm_package_version"
+    "docs:readme": "./docs-readme.sh",
+    "docs:deploy": "./deploy-docs.sh"
   },
   "files": [
     "lib"

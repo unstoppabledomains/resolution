@@ -1,12 +1,19 @@
 #!/bin/sh
+set -e
+
 git="git -C ./docs/";
-echo "deploying the docs"
-if [ -z "./docs" ]; then
-  echo "docs were not found"
-  mkdir -p dist
-  git clone https://github.com/unstoppabledomains/namicorn.git docs
-  $git checkout gh-pages
+
+if [ ! -d "./docs" ]; then
+  echo "./docs directory not found"
+  exit 1
 fi
+
+if [[ $($git status --short) == '' ]]; then
+  echo "./docs tree is not dirty"
+  exit 1
+fi
+
+echo "deploying the docs"
 $git add '.'
-$git commit -m "$1"
+$git commit -m "v$npm_package_version"
 $git push origin 
