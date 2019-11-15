@@ -1,4 +1,4 @@
-import { toChecksumAddress, toBech32Address, fromBech32Address } from '@zilliqa-js/crypto';
+import { toChecksumAddress, toBech32Address, fromBech32Address } from './zns/utils';
 import namehash from './zns/namehash';
 import _ from 'lodash';
 import {
@@ -290,6 +290,7 @@ private async fetchSubState(contractAddress: string, field: string, keys: string
       let result = (await this.fetchSubState(contractAddr, field, keys)) || {};
       return result[field];
     } catch (err) {
+      // console.log(err.code, err.message);
       if (err.name == 'FetchError')
         throw new ResolutionError('NamingServiceDown', { method: 'ZNS' });
       else throw err;

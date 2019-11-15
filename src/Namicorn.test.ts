@@ -122,7 +122,8 @@ describe('Unstoppable API', () => {
 describe('ZNS', () => {
   it('resolves .zil name using blockchain', async () => {
     const testName = 'resolves .zil name using blockchain';
-    mockAPICalls('zil_using_blockchain', ZilliqaUrl);
+    //TODO: mock the right request Something is wrong with it 
+    // mockAPICalls('zil_using_blockchain', ZilliqaUrl);
     const namicorn = new Namicorn({ blockchain: { zns: ZilliqaUrl } });
     const result = await namicorn.resolve('cofounding.zil');
     expect(result).toBeDefined();
@@ -337,7 +338,7 @@ describe('ZNS', () => {
 
     const secondEye = mockAsyncMethod(namicorn.zns, 'getResolverRecords', {
       'ipfs.html.hash': 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
-      'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
+      'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu',
       'ipfs.redirect_domain.value': 'www.unstoppabledomains.com',
       'whois.email.value': 'matt+test@unstoppabledomains.com',
       'whois.for_sale.value': 'true',
@@ -349,7 +350,7 @@ describe('ZNS', () => {
       ipfs: {
         html: {
           hash: 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
-          value: 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
+          value: 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu',
         },
         redirect_domain: { value: 'www.unstoppabledomains.com' },
       },
