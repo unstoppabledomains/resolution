@@ -7,6 +7,7 @@ type ResolutionErrorOptions = {
   method?: string;
   domain?: string;
   currencyTicker?: string;
+  recordName?: string;
 };
 /**
  * @ignore
@@ -27,12 +28,8 @@ const HandlersByCode = {
     `${params.currencyTicker} is not supported`,
   IncorrectResolverInterface: (params: { method: string }) =>
     `Domain resolver is configured incorrectly for ${params.method}`,
-  NoIPFSConfigurationFound: (params: { domain: string }) =>
-    `Domain ${params.domain} has no IPFS configuration`,
-  UnconfiguredWhoIs: (params: { domain: string }) =>
-    `Domain ${params.domain} has no whois configuration`,
-  RecordNotFound: (params: { domain: string }) =>
-    `No records found for ${params.domain}`,
+  RecordNotFound: (params: {recordname: string, domain: string }) =>
+    `No ${params.recordname} record found for ${params.domain}`,
 };
 
 /**
@@ -54,8 +51,8 @@ export default class ResolutionError extends Error {
 
   constructor(code: ErrorCode, options: ResolutionErrorOptions = {}) {
     const resolutionErrorHandler: ResolutionErrorHandler = HandlersByCode[code];
-    const { domain, method, currencyTicker } = options;
-    super(resolutionErrorHandler({ domain, method, currencyTicker }));
+    const { domain, method, currencyTicker, recordName } = options;
+    super(resolutionErrorHandler({ domain, method, currencyTicker, recordName }));
     this.code = code;
     this.domain = domain;
     this.method = method;

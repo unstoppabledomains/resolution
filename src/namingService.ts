@@ -13,10 +13,10 @@ export default abstract class NamingService {
   abstract address(domain: string, currencyTicker: string): Promise<string>;
   abstract owner(domain: string): Promise<string | null>;
   abstract ipfsHash(domain: string): Promise<string>;
-  abstract ipfsEmail(domain: string): Promise<string>;
+  abstract email(domain: string): Promise<string>;
   abstract ipfsRedirect(domain: string): Promise<string>;
   abstract resolve(domain: string): Promise<NamicornResolution>;
-  abstract supportsRecords(): boolean;
+  abstract supportsRecords(domain: string): boolean;
   protected abstract normalizeSource(
     source: boolean | string | SourceDefinition,
   );

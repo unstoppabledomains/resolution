@@ -94,9 +94,9 @@ export default class Udapi extends NamingService {
     return await method.ipfsHash(domain);
   }
 
-  async ipfsEmail(domain: string): Promise<string> {
+  async email(domain: string): Promise<string> {
     const method = this.findMethodOrThrow(domain);
-    return await method.ipfsEmail(domain);
+    return await method.email(domain);
   }
 
   async ipfsRedirect(domain: string): Promise<string> {

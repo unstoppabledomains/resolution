@@ -838,16 +838,16 @@ describe('Namicorn', () => {
     expect(hash).toBe('QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK');
   });
 
-  it('checks return of ipfsEmail for ergergergerg.zil', async () => {
+  it('checks return of email for ergergergerg.zil', async () => {
     const namicorn = new Namicorn();
-    const email = await namicorn.ipfsEmail('ergergergerg.zil');
+    const email = await namicorn.email('ergergergerg.zil');
     expect(email).toBe('matt+test@unstoppabledomains.com');
   });
 
-  it('checks error for ipfs email on brad.zil', async () => {
+  it('checks error for  email on brad.zil', async () => {
     const namicorn = new Namicorn();
     await expectResolutionErrorCode(
-      namicorn.ipfsEmail('brad.zil'),
+      namicorn.email('brad.zil'),
       'RecordNotFound',
     );
   });

@@ -108,14 +108,17 @@ export default class Ens extends NamingService {
     return this.registryAddress != null;
   }
 
+  /** @ignore */
   async ipfsHash(domain: string): Promise<string> {
     throw new Error('Method is not available on ENS');
   }
 
-  async ipfsEmail(domain: string): Promise<string> {
+  /** @ignore */
+  async email(domain: string): Promise<string> {
     throw new Error('Method is not available on ENS');
   }
 
+/** @ignore */
   async ipfsRedirect(domain: string): Promise<string> {
     throw new Error('Method is not available on ENS');
   }
