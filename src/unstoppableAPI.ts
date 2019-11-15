@@ -1,5 +1,4 @@
 import { toBech32Address } from '@zilliqa-js/crypto';
-import nodeFetch from 'node-fetch';
 
 import { ResolutionError } from './index';
 import NamingService from './namingService';
@@ -11,17 +10,7 @@ import Ens from './ens';
 /** @ignore  */
 const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
 
-/** @ignore */
-const isNode = () => {
-  if (typeof process === 'object') {
-    if (typeof process.versions === 'object') {
-      if (typeof process.versions.node !== 'undefined') {
-        return true;
-      }
-    }
-  }
-  return false;
-};
+
 
 export default class Udapi extends NamingService {
   /** @ignore */
@@ -35,7 +24,7 @@ export default class Udapi extends NamingService {
     super();
     this.url = DefaultUrl;
 
-    const DefaultUserAgent = isNode()
+    const DefaultUserAgent = this.isNode()
       ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'
       : navigator.userAgent;
     const version = process.env.npm_package_version;
@@ -120,8 +109,5 @@ export default class Udapi extends NamingService {
     return [new Zns(), new Ens()].find(m => m.isSupportedDomain(domain));
   }
 
-  /** @ignore */
-  private async fetch(url, options) {
-    return isNode() ? nodeFetch(url, options) : window.fetch(url, options);
-  }
+
 }
