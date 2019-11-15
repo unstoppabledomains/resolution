@@ -48,7 +48,7 @@ export default class Udapi extends NamingService {
     return !!this.findMethod(domain);
   }
 
-  supportsRecords(domain?: string): boolean {
+  supportsRecords(domain: string): boolean {
     if (!domain)
       throw new Error(
         'Domain is required for supportsRecords method on unstoppable API call',
