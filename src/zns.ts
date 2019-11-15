@@ -1,4 +1,8 @@
-import { toChecksumAddress, toBech32Address, fromBech32Address } from './zns/utils';
+import {
+  toChecksumAddress,
+  toBech32Address,
+  fromBech32Address,
+} from './zns/utils';
 import namehash from './zns/namehash';
 import _ from 'lodash';
 import {
@@ -263,21 +267,25 @@ export default class Zns extends NamingService {
     return ((await this.getRecordsAddresses(domain)) || [])[1];
   }
 
-private async fetchSubState(contractAddress: string, field: string, keys: string[] = []): Promise<any> {
-  const response = await this.fetch('https://api.zilliqa.com/', {
-    method: 'POST',
-    body: JSON.stringify({
-      id: '1',
-      jsonrpc: '2.0',
-      method: 'GetSmartContractSubState',
-      params: [contractAddress.replace('0x', ''), field, keys],
-    }),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }).then(res => res.json());
-  return response.result;
-}
+  private async fetchSubState(
+    contractAddress: string,
+    field: string,
+    keys: string[] = [],
+  ): Promise<any> {
+    const response = await this.fetch('https://api.zilliqa.com/', {
+      method: 'POST',
+      body: JSON.stringify({
+        id: '1',
+        jsonrpc: '2.0',
+        method: 'GetSmartContractSubState',
+        params: [contractAddress.replace('0x', ''), field, keys],
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());
+    return response.result;
+  }
 
   /** @ignore */
   private async getContractField(
@@ -286,11 +294,12 @@ private async fetchSubState(contractAddress: string, field: string, keys: string
     keys: string[] = [],
   ): Promise<any> {
     try {
-      const contractAddr = contractAddress.startsWith('zil1') ? fromBech32Address(contractAddress) : contractAddress;
+      const contractAddr = contractAddress.startsWith('zil1')
+        ? fromBech32Address(contractAddress)
+        : contractAddress;
       let result = (await this.fetchSubState(contractAddr, field, keys)) || {};
       return result[field];
     } catch (err) {
-      // console.log(err.code, err.message);
       if (err.name == 'FetchError')
         throw new ResolutionError('NamingServiceDown', { method: 'ZNS' });
       else throw err;

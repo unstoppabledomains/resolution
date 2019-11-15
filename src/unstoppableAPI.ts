@@ -1,4 +1,4 @@
-import { toBech32Address } from '@zilliqa-js/crypto';
+import { toBech32Address } from './zns/utils';
 
 import { ResolutionError } from './index';
 import NamingService from './namingService';
@@ -9,8 +9,6 @@ import Ens from './ens';
 
 /** @ignore  */
 const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
-
-
 
 export default class Udapi extends NamingService {
   /** @ignore */
@@ -108,6 +106,4 @@ export default class Udapi extends NamingService {
   private findMethod(domain: string) {
     return [new Zns(), new Ens()].find(m => m.isSupportedDomain(domain));
   }
-
-
 }
