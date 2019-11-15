@@ -5,6 +5,10 @@ Supported domain zones:
 
 * .zil 
 * .eth 
-* .etcetera
+* .test
+* .xyz
+* .luxe
+* .crypto (under development)
 
+[API Referrence](https://unstoppabledomains.github.io/namicorn/)
 [Documentation](https://docs.unstoppabledomains.com/#tag/namicorn)
