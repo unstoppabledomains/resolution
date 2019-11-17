@@ -267,6 +267,7 @@ export default class Zns extends NamingService {
     return ((await this.getRecordsAddresses(domain)) || [])[1];
   }
 
+  /** @ignore */
   private async fetchSubState(
     contractAddress: string,
     field: string,
