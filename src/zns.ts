@@ -13,7 +13,7 @@ import {
   NullAddress,
   UNCLAIMED_DOMAIN_RESPONSE,
 } from './types';
-import Namicorn, { ResolutionError } from './index';
+import { ResolutionError } from './index';
 import NamingService from './namingService';
 
 /** @ignore */
