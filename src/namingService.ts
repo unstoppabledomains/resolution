@@ -11,15 +11,13 @@ export default abstract class NamingService {
   abstract isSupportedNetwork(): boolean;
   abstract namehash(domain: string): string;
   abstract address(domain: string, currencyTicker: string): Promise<string>;
-  abstract owner(domain: string): Promise<string | null>;
-  abstract ipfsHash(domain: string): Promise<string>;
-  abstract email(domain: string): Promise<string>;
-  abstract ipfsRedirect(domain: string): Promise<string>;
+  abstract owner(domain: string): Promise<string>;
+  abstract record(domain: string, key: string): Promise<string>;
   abstract resolve(domain: string): Promise<NamicornResolution>;
   abstract supportsRecords(domain: string): boolean;
   protected abstract normalizeSource(
     source: boolean | string | SourceDefinition,
-  );
+  ): SourceDefinition;
 
   protected ensureSupportedDomain(domain: string): void {
     if (!this.isSupportedDomain(domain)) {

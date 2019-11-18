@@ -95,10 +95,7 @@ class Namicorn {
    * @returns a Promise that resolves in ipfsHash
    */
   async ipfsHash(domain: string): Promise<string> {
-    const method = this.getNamingMethodOrThrow(domain);
-    if (!method.supportsRecords(domain))
-      throw new ResolutionError('RecordNotFound', { domain, recordName: "ipfs hash configuration" });
-    return await method.ipfsHash(domain);
+    return await this.getNamingMethodOrThrow(domain).record(domain, "ipfs.html.value");
   }
 
   /**
@@ -108,10 +105,7 @@ class Namicorn {
    * @returns A Promise that resolves in redirect url
    */
   async ipfsRedirect(domain: string): Promise<string> {
-    const method = this.getNamingMethodOrThrow(domain);
-    if (!method.supportsRecords(domain))
-      throw new ResolutionError('RecordNotFound', { domain, recordName: "ipfs redirect url" });
-    return await method.ipfsRedirect(domain);
+    return await this.getNamingMethodOrThrow(domain).record(domain, "ipfs.redirect_domain.value");
   }
 
   /**
@@ -121,10 +115,7 @@ class Namicorn {
    * @returns a Promise that resolves in an email address configured for this domain whois
    */
   async email(domain: string): Promise<string> {
-    const method = this.getNamingMethodOrThrow(domain);
-    if (!method.supportsRecords(domain))
-      throw new ResolutionError('RecordNotFound', { domain, recordName: "domain owner's email" });
-    return await method.email(domain);
+    return await this.getNamingMethodOrThrow(domain).record(domain, "whois.email.value");
   }
 
   /**

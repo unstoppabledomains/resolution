@@ -157,38 +157,13 @@ export default class Zns extends NamingService {
   }
 
   /**
-   * Resolves the ipfs hash stored in domain record
+   * Resolves a specific field from domain's record
    * @param domain - domain name
-   * @throws ResolutionError with
-   *  - NoIPFSConfigurationFound code when records has no fields for ipfs
-   *  - UnregisteredDomain code when no records was found
-   * @returns a promise that resolves in a value stored under ipfs.html.value or undefined.
+   * @param field - resolver record name to be queried
+   * @returns record field associated with the domain
    */
-  async ipfsHash(domain: string): Promise<string> {
-    const records = await this.records(domain);
-    return this.getRecordFieldOrThrow(records, "ipfs.html.value", domain);
-  }
-
-  /**
-   * Resolves the ipfs redirect url stored in domain records
-   * @param domain - domain name
-   * @returns a promise that resolves in a value stored under ipfs.html.redirect_domain.value
-   */
-  async ipfsRedirect(domain: string): Promise<string> {
-    const records = await this.records(domain);
-    return this.getRecordFieldOrThrow(records, "ipfs.redirect_domain.value", domain);
-  }
-
-  /**
-   * Resolves ipfs email stored in whois object
-   * @param domain - domain name
-   * @throws ResolutionError with
-   *  - UncofiguredWhoIs code when no such filed found in records
-   *  - UnregisteredDomain code when no records was found
-   */
-  async email(domain: string): Promise<string> {
-    const records = await this.records(domain);
-    return this.getRecordFieldOrThrow(records, 'whois.email.value', domain);
+  async record(domain: string, field: string) {
+    return this.getRecordFieldOrThrow(domain, await this.records(domain), field);
   }
 
   /**
@@ -231,21 +206,9 @@ export default class Zns extends NamingService {
   }
 
   /** @ignore */
-  private getRecordFieldOrThrow(records: Dictionary<string>, field: string, domain: string) {
-    try {
-      return this.getRecordField(records, field);
-    }catch(err) {
-      if (err instanceof ResolutionError)
-        throw new ResolutionError('RecordNotFound', { domain })
-      throw err;
-    }
-  }
-
-
-  /** @ignore */
-  private getRecordField(records: Dictionary<string>, field: string) {
-    if (!records || !records[field])
-      throw new ResolutionError('RecordNotFound');
+  private getRecordFieldOrThrow(domain: string, records: Dictionary<string>, field: string): string {
+    if (!records || !records[field]) 
+      throw new ResolutionError('RecordNotFound', { domain, recordName: field });
     return records[field];
   }
 

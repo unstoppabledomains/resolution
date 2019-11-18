@@ -45,7 +45,7 @@ const RegistryMap = {
  * - https://mainnet.infura.io
  * @param registryAddress - address for a registry contract
  */
-export default class Ens extends NamingService {
+export default class Ens extends NamingService { 
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
@@ -123,6 +123,10 @@ export default class Ens extends NamingService {
     throw new Error('Method is not available on ENS');
   }
 
+  record(domain: string, key: string): Promise<string> {
+    throw new Error("Method not implemented.");
+  }
+  
   /**
    * Reverse the ens address to a ens registered domain name
    * @async

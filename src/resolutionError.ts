@@ -28,8 +28,8 @@ const HandlersByCode = {
     `${params.currencyTicker} is not supported`,
   IncorrectResolverInterface: (params: { method: string }) =>
     `Domain resolver is configured incorrectly for ${params.method}`,
-  RecordNotFound: (params: {recordname: string, domain: string }) =>
-    `No ${params.recordname} record found for ${params.domain}`,
+  RecordNotFound: (params: {recordName: string, domain: string }) =>
+    `No ${params.recordName} record found for ${params.domain}`,
 };
 
 /**

@@ -3,7 +3,7 @@ import nodeFetch from 'node-fetch';
 
 import { ResolutionError } from './index';
 import NamingService from './namingService';
-import { NamicornResolution, NullAddress } from './types';
+import { NamicornResolution, NullAddress, SourceDefinition } from './types';
 import Zns from './zns';
 import Ens from './ens';
 // import * as pckg from '../package.json';
@@ -24,6 +24,9 @@ const isNode = () => {
 };
 
 export default class Udapi extends NamingService {
+  record(domain: string, key: string): Promise<string> {
+    throw new Error("Method not implemented.");
+  }
   /** @ignore */
   private url: string;
   /** @ignore */
@@ -90,18 +93,15 @@ export default class Udapi extends NamingService {
   }
 
   async ipfsHash(domain: string): Promise<string> {
-    const method = this.findMethodOrThrow(domain);
-    return await method.ipfsHash(domain);
+    return await this.findMethodOrThrow(domain).record(domain, 'ipfs.hash.value');
   }
 
   async email(domain: string): Promise<string> {
-    const method = this.findMethodOrThrow(domain);
-    return await method.email(domain);
+    return await this.findMethodOrThrow(domain).record(domain, 'whois.email.value');
   }
 
   async ipfsRedirect(domain: string): Promise<string> {
-    const method = this.findMethodOrThrow(domain);
-    return await method.ipfsRedirect(domain);
+    return await this.findMethodOrThrow(domain).record(domain, 'ipfs.redirect_domain.value');
   }
 
   /**
@@ -135,7 +135,7 @@ export default class Udapi extends NamingService {
   /** @ignore */
   protected normalizeSource(
     source: string | boolean | import('./types').SourceDefinition,
-  ) {
+  ): SourceDefinition {
     throw new Error('Method not implemented.');
   }
 
