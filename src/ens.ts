@@ -114,7 +114,7 @@ export default class Ens extends NamingService {
     }
     const reverseAddress = address + '.addr.reverse';
     const nodeHash = hash(reverseAddress);
-    const resolverAddress = await this._getResolver(nodeHash);
+    const resolverAddress = await this.getResolver(nodeHash);
     if (resolverAddress == NullAddress) {
       return null;
     }
@@ -139,7 +139,7 @@ export default class Ens extends NamingService {
   async address(domain: string, currencyTicker: string): Promise<string> {
     const nodeHash = this.namehash(domain);
     const ownerPromise = this.owner(domain);
-    const resolver = await this._getResolver(nodeHash);
+    const resolver = await this.getResolver(nodeHash);
     if (!resolver || resolver === NullAddress) {
       const owner = await ownerPromise;
       if (!owner || owner === NullAddress)
@@ -163,7 +163,7 @@ export default class Ens extends NamingService {
    */
   async owner(domain: string): Promise<string | null> {
     const nodeHash = this.namehash(domain);
-    return (await this._getOwner(nodeHash)) || null;
+    return (await this.getOwner(nodeHash)) || null;
   }
 
   /**
@@ -206,21 +206,21 @@ export default class Ens extends NamingService {
    * This was done to make automated tests more configurable
    */
   private resolverCallToName(resolverContract, nodeHash) {
-    return this._callMethod(resolverContract.methods.name(nodeHash));
+    return this.callMethod(resolverContract.methods.name(nodeHash));
   }
 
   /**
    * This was done to make automated tests more configurable
    */
-  private async _getResolver(nodeHash) {
-    return await this._callMethod(this.ensContract.methods.resolver(nodeHash));
+  private async getResolver(nodeHash) {
+    return await this.callMethod(this.ensContract.methods.resolver(nodeHash));
   }
 
   /**
    * This was done to make automated tests more configurable
    */
-  private async _getOwner(nodeHash) {
-    return await this._callMethod(this.ensContract.methods.owner(nodeHash));
+  private async getOwner(nodeHash) {
+    return await this.callMethod(this.ensContract.methods.owner(nodeHash));
   }
 
   /**
@@ -228,9 +228,9 @@ export default class Ens extends NamingService {
    */
   private async getResolutionInfo(nodeHash) {
     return await Promise.all([
-      this._callMethod(this.ensContract.methods.owner(nodeHash)),
-      this._callMethod(this.ensContract.methods.ttl(nodeHash)),
-      this._callMethod(this.ensContract.methods.resolver(nodeHash)),
+      this.callMethod(this.ensContract.methods.owner(nodeHash)),
+      this.callMethod(this.ensContract.methods.ttl(nodeHash)),
+      this.callMethod(this.ensContract.methods.resolver(nodeHash)),
     ]);
   }
 
@@ -260,10 +260,10 @@ export default class Ens extends NamingService {
     );
     const addr: string =
       coinType != EthCoinIndex
-        ? await this._callMethod(
+        ? await this.callMethod(
             resolverContract.methods.addr(nodeHash, coinType),
           )
-        : await this._callMethod(resolverContract.methods.addr(nodeHash));
+        : await this.callMethod(resolverContract.methods.addr(nodeHash));
     if (!addr) return null;
     const data = Buffer.from(addr.replace('0x', ''), 'hex');
     return formatsByCoinType[coinType].encoder(data);
@@ -327,7 +327,7 @@ export default class Ens extends NamingService {
    *  @param method - method to be called
    *  @throws ResolutionError -> When blockchain is down
    */
-  private async _callMethod(method: {
+  private async callMethod(method: {
     call: () => Promise<any>;
   }): Promise<any> {
     try {

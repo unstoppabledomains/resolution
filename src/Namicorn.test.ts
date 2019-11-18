@@ -420,8 +420,8 @@ describe('ENS', () => {
     expect(namicorn.ens.network).toEqual('mainnet');
 
     const eyes = mockAsyncMethods(namicorn.ens, {
-      _getOwner: '0x825ef33943d925731FBB89C99aF5780D888bD217',
-      _getResolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
+      getOwner: '0x825ef33943d925731FBB89C99aF5780D888bD217',
+      getResolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
       fetchAddress: '0x714ef33943d925731FBB89C99aF5780D888bD106',
     });
 
@@ -438,7 +438,7 @@ describe('ENS', () => {
     const ens = new Ens(MainnetUrl);
     const eyes = mockAsyncMethods(ens, {
       resolverCallToName: 'adrian.argent.xyz',
-      _getResolver: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
+      getResolver: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
     });
     const result = await ens.reverse(
       '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
@@ -450,7 +450,7 @@ describe('ENS', () => {
 
   it('reverses address to ENS domain null', async () => {
     const ens = new Ens(MainnetUrl);
-    const spy = mockAsyncMethod(ens, '_getResolver', NullAddress);
+    const spy = mockAsyncMethod(ens, 'getResolver', NullAddress);
     const result = await ens.reverse(
       '0x112234455c3a32fd11230c42e7bccd4a84e02010',
       'ETH',
@@ -465,8 +465,8 @@ describe('ENS', () => {
     });
 
     const eyes = mockAsyncMethods(namicorn.ens, {
-      _getOwner: '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
-      _getResolver: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
+      getOwner: '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
+      getResolver: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
       fetchAddress: '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
     });
 
@@ -481,8 +481,8 @@ describe('ENS', () => {
     });
 
     const eyes = mockAsyncMethods(namicorn.ens, {
-      _getOwner: '0xf3dE750A73C11a6a2863761E930BF5fE979d5663',
-      _getResolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
+      getOwner: '0xf3dE750A73C11a6a2863761E930BF5fE979d5663',
+      getResolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
       fetchAddress: '0xf3dE750A73C11a6a2863761E930BF5fE979d5663',
     });
 
@@ -496,7 +496,7 @@ describe('ENS', () => {
       blockchain: { ens: MainnetUrl },
     });
 
-    const ownerEye = mockAsyncMethod(namicorn.ens, '_getOwner', NullAddress);
+    const ownerEye = mockAsyncMethod(namicorn.ens, 'getOwner', NullAddress);
     const result = await namicorn.address('something.luxe', 'ETH');
     expectSpyToBeCalled([ownerEye]);
     expect(result).toEqual(null);
@@ -515,9 +515,9 @@ describe('ENS', () => {
   it('resolves name with resolver but without an owner', async () => {
     const ens = new Ens();
     const eyes = mockAsyncMethods(ens, {
-      _getOwner: NullAddress,
-      _getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-      _callMethod: '0x76a9144620b70031f0e9437e374a2100934fba4911046088ac',
+      getOwner: NullAddress,
+      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      callMethod: '0x76a9144620b70031f0e9437e374a2100934fba4911046088ac',
     });
     const doge = await ens.address('testthing.eth', 'DOGE');
     expectSpyToBeCalled(eyes);
@@ -668,9 +668,9 @@ describe('ENS', () => {
   it('checks ens multicoin support #1', async () => {
     const ens = new Ens();
     const eyes = mockAsyncMethods(ens, {
-      _getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-      _getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-      _callMethod: '0x76a9144620b70031f0e9437e374a2100934fba4911046088ac',
+      getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
+      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      callMethod: '0x76a9144620b70031f0e9437e374a2100934fba4911046088ac',
     });
     const doge = await ens.address('testthing.eth', 'DOGE');
     expectSpyToBeCalled(eyes);
@@ -680,9 +680,9 @@ describe('ENS', () => {
   it('checks ens multicoin support #2', async () => {
     const ens = new Ens();
     const eyes = mockAsyncMethods(ens, {
-      _getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-      _getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-      _callMethod: '0xa914e8604d28ef5d2a7caafe8741e5dd4816b7cb19ea87',
+      getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
+      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      callMethod: '0xa914e8604d28ef5d2a7caafe8741e5dd4816b7cb19ea87',
     });
     const ltc = await ens.address('testthing.eth', 'LTC');
     expectSpyToBeCalled(eyes);
@@ -692,9 +692,9 @@ describe('ENS', () => {
   it('checks ens multicoin support #3', async () => {
     const ens = new Ens();
     const eyes = mockAsyncMethods(ens, {
-      _getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-      _getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-      _callMethod: '0x314159265dd8dbb310642f98f50c066173c1259b',
+      getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
+      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      callMethod: '0x314159265dd8dbb310642f98f50c066173c1259b',
     });
     const eth = await ens.address('testthing.eth', 'ETH');
     expectSpyToBeCalled(eyes);
@@ -704,9 +704,9 @@ describe('ENS', () => {
   it('checks ens multicoin support #4', async () => {
     const ens = new Ens();
     const eyes = mockAsyncMethods(ens, {
-      _getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-      _getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-      _callMethod: '0x314159265dd8dbb310642f98f50c066173c1259b',
+      getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
+      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      callMethod: '0x314159265dd8dbb310642f98f50c066173c1259b',
     });
     const etc = await ens.address('testthing.eth', 'etc');
     expectSpyToBeCalled(eyes);
@@ -716,9 +716,9 @@ describe('ENS', () => {
   it('checks ens multicoin support #5', async () => {
     const ens = new Ens();
     const eyes = mockAsyncMethods(ens, {
-      _getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-      _getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-      _callMethod: '0x314159265dd8dbb310642f98f50c066173c1259b',
+      getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
+      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      callMethod: '0x314159265dd8dbb310642f98f50c066173c1259b',
     });
     const rsk = await ens.address('testthing.eth', 'rsk');
     expectSpyToBeCalled(eyes);
@@ -728,9 +728,9 @@ describe('ENS', () => {
   it('checks ens multicoin support #6', async () => {
     const ens = new Ens();
     const eyes = mockAsyncMethods(ens, {
-      _getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-      _getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-      _callMethod:
+      getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
+      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      callMethod:
         '0x05444b4e9c06f24296074f7bc48f92a97916c6dc5ea9000000000000000000',
     });
     const xrp = await ens.address('testthing.eth', 'xrp');
@@ -741,9 +741,9 @@ describe('ENS', () => {
   it('checks ens multicoin support #7', async () => {
     const ens = new Ens();
     const eyes = mockAsyncMethods(ens, {
-      _getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-      _getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-      _callMethod: '0x76a91476a04053bda0a88bda5177b86a15c3b29f55987388ac',
+      getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
+      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      callMethod: '0x76a91476a04053bda0a88bda5177b86a15c3b29f55987388ac',
     });
     const bch = await ens.address('testthing.eth', 'bch');
     expectSpyToBeCalled(eyes);
@@ -753,9 +753,9 @@ describe('ENS', () => {
   it('checks ens multicoin support #8', async () => {
     const ens = new Ens();
     const eyes = mockAsyncMethods(ens, {
-      _getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-      _getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-      _callMethod:
+      getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
+      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      callMethod:
         '0x5128751e76e8199196d454941c45d1b3a323f1433bd6751e76e8199196d454941c45d1b3a323f1433bd6',
     });
     const btc = await ens.address('testthing.eth', 'BTC');
