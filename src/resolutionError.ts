@@ -10,7 +10,7 @@ type ResolutionErrorOptions = {
   recordName?: string;
 };
 /**
- * @ignore
+ * @internal
  * Internal Mapping object from ResolutionErrorCode to a ResolutionErrorHandler
  */
 const HandlersByCode = {

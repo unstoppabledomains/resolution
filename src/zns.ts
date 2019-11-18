@@ -16,29 +16,24 @@ import {
 import { ResolutionError } from './index';
 import NamingService from './namingService';
 
-/** @ignore */
 const DefaultSource = 'https://api.zilliqa.com';
 
-/** @ignore */
 const NetworkIdMap = {
   1: 'mainnet',
   333: 'testnet',
   111: 'localnet',
 };
 
-/** @ignore */
 const RegistryMap = {
   mainnet: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
 };
 
-/** @ignore */
 const UrlMap = {
   mainnet: 'https://api.zilliqa.com',
   testnet: 'https://dev-api.zilliqa.com',
   localnet: 'http://localhost:4201',
 };
 
-/** @ignore */
 const UrlNetworkMap = (url: string) => {
   const invert = _(UrlMap)
     .invert()
@@ -59,11 +54,10 @@ export default class Zns extends NamingService {
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
-  /** @ignore */
 
   /**
    * Source object describing the network naming service operates on
-   * @param source - if specified as a string will be used as main url, if omited then defaults are used
+   * @param source - if specified as a string will be used as main url, if omitted then defaults are used
    * @throws ConfigurationError - when either network or url is setup incorrectly
    */
   constructor(source: string | boolean | SourceDefinition = true) {
@@ -90,7 +84,7 @@ export default class Zns extends NamingService {
   /**
    * Resolves the domain name
    * @param domain - domain name to be resolved
-   * @returns - a promise that resolves in a detailed crypto resolution
+   * @returns A promise that resolves in a detailed crypto resolution
    */
   async resolve(domain: string): Promise<NamicornResolution | null> {
     const recordAddresses = await this.getRecordsAddresses(domain);
@@ -114,10 +108,11 @@ export default class Zns extends NamingService {
   /**
    * Resolves domain name to a particular crypto address associated with it
    * @param domain - domain name to be resolved
-   * @param currencyTicker specific currency ticker such as
+   * @param currencyTicker - specific currency ticker such as
    *  - ZIL
    *  - BTC
    *  - ETH
+   * @returns A promise that resolves in a string
    * @throws ResolutionError
    */
   async address(domain: string, currencyTicker: string): Promise<string> {
@@ -136,7 +131,7 @@ export default class Zns extends NamingService {
   /**
    * Owner of the domain
    * @param domain - domain name
-   * @returns - an owner address of the domain
+   * @returns An owner address of the domain
    */
   async owner(domain: string): Promise<string | null> {
     return (await this.resolve(domain)).meta.owner;
@@ -145,7 +140,7 @@ export default class Zns extends NamingService {
   /**
    * Resolves a domain
    * @param domain - domain name to be resolved
-   * @returns - Everything what is stored on specified domain
+   * @returns Everything what is stored on specified domain
    */
   async resolution(domain: string): Promise<ZnsResolution> {
     return this.structureResolverRecords(await this.records(domain));
@@ -155,7 +150,7 @@ export default class Zns extends NamingService {
    * Resolves a specific field from domain's record
    * @param domain - domain name
    * @param field - resolver record name to be queried
-   * @returns record field associated with the domain
+   * @returns Record field associated with the domain
    */
   async record(domain: string, field: string) {
     return this.getRecordFieldOrThrow(
@@ -168,7 +163,7 @@ export default class Zns extends NamingService {
   /**
    * Resolver Records
    * @param domain - domain name to be resolved
-   * @returns - ZNS resolver records in an plain key-value format
+   * @returns ZNS resolver records in an plain key-value format
    */
   async records(domain: string): Promise<Dictionary<string>> {
     return await this.getResolverRecords(await this.resolverAddress(domain));
@@ -176,7 +171,6 @@ export default class Zns extends NamingService {
 
   /**
    * Checks if domain is supported by zns
-   * @param domain
    */
   isSupportedDomain(domain: string): boolean {
     return domain.indexOf('.') > 0 && /^.{1,}\.(zil)$/.test(domain);
@@ -199,7 +193,6 @@ export default class Zns extends NamingService {
     return namehash(domain);
   }
 
-  /** @ignore */
   private getRecordFieldOrThrow(
     domain: string,
     records: Dictionary<string>,
@@ -213,7 +206,6 @@ export default class Zns extends NamingService {
     return records[field];
   }
 
-  /** @ignore */
   private async getRecordsAddresses(
     domain: string,
   ): Promise<[string, string] | undefined> {
@@ -235,7 +227,6 @@ export default class Zns extends NamingService {
     return [ownerAddress, resolverAddress];
   }
 
-  /** @ignore */
   private async getResolverRecords(
     resolverAddress: string,
   ): Promise<ZnsResolution> {
@@ -247,7 +238,7 @@ export default class Zns extends NamingService {
       {}) as Dictionary<string>;
   }
 
-  /** @ignore */
+  /** @internal */
   protected normalizeSource(
     source: string | boolean | SourceDefinition,
   ): SourceDefinition {
@@ -281,7 +272,6 @@ export default class Zns extends NamingService {
     }
   }
 
-  /** @ignore */
   private structureResolverRecords(records: Dictionary<string>): ZnsResolution {
     return _.transform(
       records,
@@ -290,12 +280,10 @@ export default class Zns extends NamingService {
     );
   }
 
-  /** @ignore */
   private async resolverAddress(domain: string): Promise<string | undefined> {
     return ((await this.getRecordsAddresses(domain)) || [])[1];
   }
 
-  /** @ignore */
   private async fetchSubState(
     contractAddress: string,
     field: string,
@@ -316,7 +304,6 @@ export default class Zns extends NamingService {
     return response.result;
   }
 
-  /** @ignore */
   private async getContractField(
     contractAddress: string,
     field: string,
@@ -335,7 +322,6 @@ export default class Zns extends NamingService {
     }
   }
 
-  /** @ignore */
   private async getContractMapValue(
     contractAddress: string,
     field: string,

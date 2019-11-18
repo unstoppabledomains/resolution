@@ -24,7 +24,7 @@ export default abstract class NamingService {
     }
   }
 
-  /** @ignore */
+  /** @internal */
   protected isNode = () => {
     if (typeof process === 'object') {
       if (typeof process.versions === 'object') {
@@ -36,7 +36,7 @@ export default abstract class NamingService {
     return false;
   };
 
-  /** @ignore */
+  /** @internal */
   protected async fetch(url, options) {
     return this.isNode() ? nodeFetch(url, options) : window.fetch(url, options);
   }

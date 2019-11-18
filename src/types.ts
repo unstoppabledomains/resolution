@@ -32,7 +32,7 @@ export type NamicornResolution = {
 };
 
 /**
- * @ignore
+ * @internal
  * Used internally to map network number to a string
  */
 export type NetworkIdMap = {

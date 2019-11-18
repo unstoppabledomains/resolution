@@ -7,13 +7,10 @@ import Zns from './zns';
 import Ens from './ens';
 // import * as pckg from '../package.json';
 
-/** @ignore  */
 const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
 
 export default class Udapi extends NamingService {
-  /** @ignore */
   private url: string;
-  /** @ignore */
   private headers: {
     [key: string]: string;
   };
@@ -30,16 +27,16 @@ export default class Udapi extends NamingService {
     this.headers = { 'X-user-agent': CustomUserAgent };
   }
 
-  /** @ignore */
+  /** @internal */
   isSupportedDomain(domain: string): boolean {
     return !!this.findMethod(domain);
   }
 
-  /** @ignore */
+  /** @internal */
   isSupportedNetwork(): boolean {
     return true;
   }
-  /** @ignore */
+  /** @internal */
   namehash(domain: string): string {
     const method = this.findMethod(domain);
     if (!method) throw new ResolutionError('UnsupportedDomain', { domain });
@@ -70,7 +67,7 @@ export default class Udapi extends NamingService {
   /**
    * Owner of the domain
    * @param domain - domain name
-   * @returns - an owner address of the domain
+   * @returns An owner address of the domain
    */
   async owner(domain: string): Promise<string | null> {
     const { owner } = (await this.resolve(domain)).meta;
@@ -95,19 +92,17 @@ export default class Udapi extends NamingService {
     }
   }
 
-  /** @ignore */
+  /** @internal */
   protected normalizeSource(
     source: string | boolean | import('./types').SourceDefinition,
   ): SourceDefinition {
     throw new Error('Method not implemented.');
   }
 
-  /** @ignore */
   private findMethod(domain: string) {
     return [new Zns(), new Ens()].find(m => m.isSupportedDomain(domain));
   }
 
-  /** @ignore */
   private findMethodOrThrow(domain: string) {
     const method = this.findMethod(domain);
     if (!method) throw new ResolutionError('UnsupportedDomain', { domain });
