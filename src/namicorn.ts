@@ -18,7 +18,7 @@ import NamingService from './namingService';
  * let resolution = namicorn.address(domain);
  * ```
  */
-class Namicorn {
+export default class Namicorn {
   readonly blockchain: Blockchain | boolean;
   /** @ignore */
   readonly ens?: Ens;
@@ -219,4 +219,4 @@ class Namicorn {
   }
 }
 
-export { Namicorn, Namicorn as default };
+export { Namicorn };
