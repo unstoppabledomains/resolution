@@ -219,4 +219,4 @@ class Namicorn {
   }
 }
 
-export { Namicorn, Namicorn as default, ResolutionError };
+export { Namicorn, Namicorn as default };
