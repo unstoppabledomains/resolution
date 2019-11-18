@@ -13,10 +13,13 @@
         "declaration": true,
         "allowSyntheticDefaultImports": true,
         "forceConsistentCasingInFileNames": true,
-        "resolveJsonModule": true
+        "resolveJsonModule": true,
+        "stripInternal": true
     },
     "typedocOptions": {
         "mode": "file",
         "module": "commonjs",
+        "excludePrivate": true,
+        "excludeNotExported": true
     }
 }
