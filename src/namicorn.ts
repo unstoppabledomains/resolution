@@ -4,7 +4,7 @@ import Udapi from './unstoppableAPI';
 import {
   Blockchain,
   NamicornResolution,
-  UNCLAIMED_DOMAIN_RESPONSE,
+  UnclaimedDomainResponse,
 } from './types';
 import ResolutionError from './resolutionError';
 import NamingService from './namingService';
@@ -63,7 +63,7 @@ export default class Namicorn {
   async resolve(domain: string): Promise<NamicornResolution> {
     const method = this.getNamingMethodOrThrow(domain);
     const result = await method.resolve(domain);
-    return result || UNCLAIMED_DOMAIN_RESPONSE;
+    return result || UnclaimedDomainResponse;
   }
 
   /**

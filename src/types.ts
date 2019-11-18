@@ -67,7 +67,7 @@ export type ResolverContract = Contract;
 export const NullAddress = '0x0000000000000000000000000000000000000000';
 export const EthCoinIndex = 60;
 
-export const UNCLAIMED_DOMAIN_RESPONSE: NamicornResolution = {
+export const UnclaimedDomainResponse: NamicornResolution = {
   addresses: {},
   meta: {
     owner: null, //available domain
@@ -75,3 +75,8 @@ export const UNCLAIMED_DOMAIN_RESPONSE: NamicornResolution = {
     ttl: 0,
   },
 };
+
+/**
+ * @deprecated Use UnclaimedDomainResponse instead (deprecated since 0.4.0, may be removed from 0.6.0)
+ */
+export const UNCLAIMED_DOMAIN_RESPONSE = UnclaimedDomainResponse;

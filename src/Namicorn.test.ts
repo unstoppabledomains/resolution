@@ -3,7 +3,7 @@ import Namicorn, { ResolutionError } from '.';
 import _ from 'lodash';
 import mockData from './testData/mockData.json';
 import Ens from './ens';
-import { Dictionary, NullAddress, UNCLAIMED_DOMAIN_RESPONSE } from './types';
+import { Dictionary, NullAddress, UnclaimedDomainResponse } from './types';
 
 const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
 const MainnetUrl = 'https://mainnet.infura.io';
@@ -812,7 +812,7 @@ describe('Namicorn', () => {
   });
 
   it('provides empty response constant', async () => {
-    const response = UNCLAIMED_DOMAIN_RESPONSE;
+    const response = UnclaimedDomainResponse;
     expect(response.addresses).toEqual({});
     expect(response.meta.owner).toEqual(null);
   });

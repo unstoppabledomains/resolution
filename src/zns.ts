@@ -11,7 +11,7 @@ import {
   Dictionary,
   ZnsResolution,
   NullAddress,
-  UNCLAIMED_DOMAIN_RESPONSE,
+  UnclaimedDomainResponse,
 } from './types';
 import { ResolutionError } from './index';
 import NamingService from './namingService';
@@ -88,7 +88,7 @@ export default class Zns extends NamingService {
    */
   async resolve(domain: string): Promise<NamicornResolution | null> {
     const recordAddresses = await this.getRecordsAddresses(domain);
-    if (!recordAddresses) return UNCLAIMED_DOMAIN_RESPONSE;
+    if (!recordAddresses) return UnclaimedDomainResponse;
     const [ownerAddress, resolverAddress] = recordAddresses;
     const resolution = this.structureResolverRecords(
       await this.getResolverRecords(resolverAddress),
