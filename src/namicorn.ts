@@ -95,7 +95,10 @@ class Namicorn {
    * @returns a Promise that resolves in ipfsHash
    */
   async ipfsHash(domain: string): Promise<string> {
-    return await this.getNamingMethodOrThrow(domain).record(domain, "ipfs.html.value");
+    return await this.getNamingMethodOrThrow(domain).record(
+      domain,
+      'ipfs.html.value',
+    );
   }
 
   /**
@@ -105,7 +108,10 @@ class Namicorn {
    * @returns A Promise that resolves in redirect url
    */
   async ipfsRedirect(domain: string): Promise<string> {
-    return await this.getNamingMethodOrThrow(domain).record(domain, "ipfs.redirect_domain.value");
+    return await this.getNamingMethodOrThrow(domain).record(
+      domain,
+      'ipfs.redirect_domain.value',
+    );
   }
 
   /**
@@ -115,7 +121,10 @@ class Namicorn {
    * @returns a Promise that resolves in an email address configured for this domain whois
    */
   async email(domain: string): Promise<string> {
-    return await this.getNamingMethodOrThrow(domain).record(domain, "whois.email.value");
+    return await this.getNamingMethodOrThrow(domain).record(
+      domain,
+      'whois.email.value',
+    );
   }
 
   /**

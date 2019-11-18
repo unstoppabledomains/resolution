@@ -57,7 +57,6 @@ export default class Zns extends NamingService {
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
-  private _supportsRecords: boolean;
   /** @ignore */
   private registry?: Contract;
   /** @ignore */
@@ -71,7 +70,6 @@ export default class Zns extends NamingService {
   constructor(source: string | boolean | SourceDefinition = true) {
     super();
     source = this.normalizeSource(source);
-    this._supportsRecords = true;
     this.network = source.network as string;
     this.url = source.url;
     this.zilliqa = new Zilliqa(this.url);
@@ -163,7 +161,11 @@ export default class Zns extends NamingService {
    * @returns record field associated with the domain
    */
   async record(domain: string, field: string) {
-    return this.getRecordFieldOrThrow(domain, await this.records(domain), field);
+    return this.getRecordFieldOrThrow(
+      domain,
+      await this.records(domain),
+      field,
+    );
   }
 
   /**
@@ -190,11 +192,6 @@ export default class Zns extends NamingService {
     return this.registryAddress != null;
   }
 
-  /** @ignore */
-  supportsRecords(): boolean {
-    return this._supportsRecords;
-  }
-
   /**
    * Produces ZNS namehash of a domain
    * @param domain - domain name to be hashed
@@ -206,9 +203,16 @@ export default class Zns extends NamingService {
   }
 
   /** @ignore */
-  private getRecordFieldOrThrow(domain: string, records: Dictionary<string>, field: string): string {
-    if (!records || !records[field]) 
-      throw new ResolutionError('RecordNotFound', { domain, recordName: field });
+  private getRecordFieldOrThrow(
+    domain: string,
+    records: Dictionary<string>,
+    field: string,
+  ): string {
+    if (!records || !records[field])
+      throw new ResolutionError('RecordNotFound', {
+        domain,
+        recordName: field,
+      });
     return records[field];
   }
 

@@ -14,7 +14,6 @@ export default abstract class NamingService {
   abstract owner(domain: string): Promise<string>;
   abstract record(domain: string, key: string): Promise<string>;
   abstract resolve(domain: string): Promise<NamicornResolution>;
-  abstract supportsRecords(domain: string): boolean;
   protected abstract normalizeSource(
     source: boolean | string | SourceDefinition,
   ): SourceDefinition;

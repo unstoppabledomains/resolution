@@ -45,11 +45,10 @@ const RegistryMap = {
  * - https://mainnet.infura.io
  * @param registryAddress - address for a registry contract
  */
-export default class Ens extends NamingService { 
+export default class Ens extends NamingService {
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
-  private _supportsRecords: boolean;
   /** @ignore */
   private ensContract: any;
   /**  @ignore */
@@ -63,7 +62,6 @@ export default class Ens extends NamingService {
   constructor(source: string | boolean | SourceDefinition = true) {
     super();
     source = this.normalizeSource(source);
-    this._supportsRecords = false;
     this.web3 = new Web3(source.url);
     this.network = <string>source.network;
     this.url = source.url;
@@ -82,11 +80,6 @@ export default class Ens extends NamingService {
         this.registryAddress,
       );
     }
-  }
-
-  /** @ignore */
-  supportsRecords(): boolean {
-    return this._supportsRecords;
   }
 
   /**
@@ -109,24 +102,10 @@ export default class Ens extends NamingService {
   }
 
   /** @ignore */
-  async ipfsHash(domain: string): Promise<string> {
-    throw new Error('Method is not available on ENS');
-  }
-
-  /** @ignore */
-  async email(domain: string): Promise<string> {
-    throw new Error('Method is not available on ENS');
-  }
-
-/** @ignore */
-  async ipfsRedirect(domain: string): Promise<string> {
-    throw new Error('Method is not available on ENS');
-  }
-
   record(domain: string, key: string): Promise<string> {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
-  
+
   /**
    * Reverse the ens address to a ens registered domain name
    * @async

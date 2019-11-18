@@ -1,4 +1,5 @@
 ## Unreleased 
+* NamingService#record -> gets an arbitraty record from the coresponding naming service
 * Namicorn#ipfsHash -> gets ipfs hash for a specific supported domain
 * Namicorn#email -> gets ipfs email field of whois object for a specific supported domain
 * Namicorn#ipfsRedirect -> gets ipfs redirect url record for a specific supported domain

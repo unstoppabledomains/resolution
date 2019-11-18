@@ -24,9 +24,6 @@ const isNode = () => {
 };
 
 export default class Udapi extends NamingService {
-  record(domain: string, key: string): Promise<string> {
-    throw new Error("Method not implemented.");
-  }
   /** @ignore */
   private url: string;
   /** @ignore */
@@ -37,7 +34,6 @@ export default class Udapi extends NamingService {
   constructor() {
     super();
     this.url = DefaultUrl;
-
     const DefaultUserAgent = isNode()
       ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'
       : navigator.userAgent;
@@ -49,15 +45,6 @@ export default class Udapi extends NamingService {
   /** @ignore */
   isSupportedDomain(domain: string): boolean {
     return !!this.findMethod(domain);
-  }
-
-  supportsRecords(domain: string): boolean {
-    if (!domain)
-      throw new Error(
-        'Domain is required for supportsRecords method on unstoppable API call',
-      );
-    const method = this.findMethod(domain);
-    return method.supportsRecords();
   }
 
   /** @ignore */
@@ -90,18 +77,6 @@ export default class Udapi extends NamingService {
         currencyTicker,
       });
     return address;
-  }
-
-  async ipfsHash(domain: string): Promise<string> {
-    return await this.findMethodOrThrow(domain).record(domain, 'ipfs.hash.value');
-  }
-
-  async email(domain: string): Promise<string> {
-    return await this.findMethodOrThrow(domain).record(domain, 'whois.email.value');
-  }
-
-  async ipfsRedirect(domain: string): Promise<string> {
-    return await this.findMethodOrThrow(domain).record(domain, 'ipfs.redirect_domain.value');
   }
 
   /**
@@ -150,6 +125,7 @@ export default class Udapi extends NamingService {
     }
   }
 
+  /** @ignore */
   private findMethodOrThrow(domain: string) {
     const method = [new Zns(), new Ens()].find(m =>
       m.isSupportedDomain(domain),
@@ -161,5 +137,14 @@ export default class Udapi extends NamingService {
   /** @ignore */
   private async fetch(url, options) {
     return isNode() ? nodeFetch(url, options) : window.fetch(url, options);
+  }
+
+  /**
+   * Looks up for an arbitrary key inside the records of certain domain
+   * @param domain - domain name
+   * @param key - key to look for
+   */
+  async record(domain: string, key: string): Promise<string> {
+    return await this.findMethodOrThrow(domain).record(domain, key);
   }
 }
