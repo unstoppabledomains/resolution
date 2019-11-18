@@ -116,20 +116,12 @@ export default class Udapi extends NamingService {
 
   /** @ignore */
   private findMethod(domain: string) {
-    try {
-      const method = this.findMethodOrThrow(domain);
-      return method;
-    } catch (err) {
-      if (err instanceof ResolutionError) return null;
-      throw err;
-    }
+    return [new Zns(), new Ens()].find(m => m.isSupportedDomain(domain));
   }
 
   /** @ignore */
   private findMethodOrThrow(domain: string) {
-    const method = [new Zns(), new Ens()].find(m =>
-      m.isSupportedDomain(domain),
-    );
+    const method = this.findMethod(domain);
     if (!method) throw new ResolutionError('UnsupportedDomain', { domain });
     return method;
   }
