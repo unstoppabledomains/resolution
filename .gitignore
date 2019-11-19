@@ -6,4 +6,4 @@ lib
 node_modules
 tmp
 docs
-dist
+docs/index.html

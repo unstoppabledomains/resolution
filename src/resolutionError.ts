@@ -7,6 +7,7 @@ type ResolutionErrorOptions = {
   method?: string;
   domain?: string;
   currencyTicker?: string;
+  recordName?: string;
 };
 /**
  * @ignore
@@ -27,6 +28,8 @@ const HandlersByCode = {
     `${params.currencyTicker} is not supported`,
   IncorrectResolverInterface: (params: { method: string }) =>
     `Domain resolver is configured incorrectly for ${params.method}`,
+  RecordNotFound: (params: { recordName: string; domain: string }) =>
+    `No ${params.recordName} record found for ${params.domain}`,
 };
 
 /**
@@ -48,8 +51,10 @@ export default class ResolutionError extends Error {
 
   constructor(code: ErrorCode, options: ResolutionErrorOptions = {}) {
     const resolutionErrorHandler: ResolutionErrorHandler = HandlersByCode[code];
-    const { domain, method, currencyTicker } = options;
-    super(resolutionErrorHandler({ domain, method, currencyTicker }));
+    const { domain, method, currencyTicker, recordName } = options;
+    super(
+      resolutionErrorHandler({ domain, method, currencyTicker, recordName }),
+    );
     this.code = code;
     this.domain = domain;
     this.method = method;
