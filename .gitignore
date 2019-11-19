@@ -7,5 +7,3 @@ node_modules
 tmp
 docs
 docs/index.html
-dist
-dist/**
