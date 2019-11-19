@@ -20,7 +20,7 @@
     {
       "METHOD": "POST",
       "REQUEST": {
-        "id": 1,
+        "id": "1",
         "jsonrpc": "2.0",
         "method": "GetSmartContractSubState",
         "params": [
@@ -51,7 +51,7 @@
     {
       "METHOD": "POST",
       "REQUEST": {
-        "id": 1,
+        "id": "1",
         "jsonrpc": "2.0",
         "method": "GetSmartContractSubState",
         "params": [

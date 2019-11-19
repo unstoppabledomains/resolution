@@ -1,3 +1,7 @@
+/**
+ * All functionality below came from here https://github.com/Zilliqa/Zilliqa-JavaScript-Library/tree/dev/packages/zilliqa-js-crypto/src
+ */
+
 import hashjs from 'hash.js';
 import BN from 'bn.js';
 

@@ -296,7 +296,7 @@ export default class Zns extends NamingService {
     field: string,
     keys: string[] = [],
   ): Promise<any> {
-    const response = await this.fetch('https://api.zilliqa.com/', {
+    const response = await this.fetch(this.url, {
       method: 'POST',
       body: JSON.stringify({
         id: '1',
