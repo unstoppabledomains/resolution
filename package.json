@@ -1,6 +1,6 @@
 {
   "name": "namicorn",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Crypto currency wallet domain name resolution library by Unstoppable Domains Inc.",
   "main": "./lib/index.js",
   "types": "./lib/namicorn.d.ts",
