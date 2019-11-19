@@ -9,7 +9,7 @@
     "release:minor": "yarn build && yarn test && yarn publish --minor && yarn docs",
     "release:major": "yarn build && yarn test && yarn publish --major && yarn docs",
     "test": "jest && yarn run test:size",
-    "test:size": "bundlesize",
+    "test:size": "yarn build && bundlesize",
     "start": "npm run build:live",
     "build": "tsc -p .",
     "format": "prettier --semi --write -l **/*.{js,json,ts}",

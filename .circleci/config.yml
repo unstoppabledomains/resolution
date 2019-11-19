@@ -121,9 +121,9 @@ jobs:
       #     paths:
       #       - ~/.cache/yarn
 
-      - run: ls -laR
+      # - run: ls -laR
       # run tests!
-      # - run: yarn run bundlesize -f "/home/circleci/project/**/**.js" -s 10kB
+      - run: yarn run bundlesize
 
 workflows:
   version: 2
