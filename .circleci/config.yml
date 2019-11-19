@@ -21,21 +21,10 @@ jobs:
       
       - checkout:
           name: Checking out the code
-      # Download and cache dependencies
-      - restore_cache:
-          name: Restore Yarn Package Cache
-          keys:
-            - yarn-packages-{{ checksum "yarn.lock" }}
 
       - run:
           name: Install Dependencies
           command: yarn install 
-
-      - save_cache:
-          name: Save Yarn Package Cache
-          key: yarn-packages-{{ checksum "yarn.lock" }}
-          paths:
-            - ~/.cache/yarn
 
       # run tests!
       - run: yarn test
@@ -50,21 +39,10 @@ jobs:
       
       - checkout:
           name: Checking out the code
-      # Download and cache dependencies
-      - restore_cache:
-          name: Restore Yarn Package Cache
-          keys:
-            - yarn-packages-{{ checksum "yarn.lock" }}
 
       - run:
           name: Install Dependencies
           command: yarn install 
-
-      - save_cache:
-          name: Save Yarn Package Cache
-          key: yarn-packages-{{ checksum "yarn.lock" }}
-          paths:
-            - ~/.cache/yarn
 
       # run tests!
       - run: yarn test
@@ -79,22 +57,11 @@ jobs:
           command: node --version
       - checkout:
           name: Checking out the code
-      # Download and cache dependencies
-      - restore_cache:
-          name: Restore Yarn Package Cache
-          keys:
-            - yarn-packages-{{ checksum "yarn.lock" }}
 
       - run:
           name: Install Dependencies
           command: yarn install 
-      - save_cache:
-          name: Save Yarn Package Cache
-          key: yarn-packages-{{ checksum "yarn.lock" }}
-          paths:
-            - ~/.cache/yarn
 
-      # run tests!
       - run: yarn test
 
   bundlesize:
@@ -111,10 +78,13 @@ jobs:
           name: Install Dependencies
           command: yarn install 
 
-      # run tests!
-      - run: yarn build
+      - run:
+          name: Building the project
+          command: yarn build
 
-      - run: yarn run test:size 
+      - run:
+          name: Testing the size of files
+          command: yarn run test:size 
 
 workflows:
   version: 2
