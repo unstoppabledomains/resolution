@@ -123,4 +123,5 @@ workflows:
       - build-node10
       - build-node11
       - build-node12
+      - bundlesize
 
