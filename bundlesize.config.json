@@ -2,7 +2,7 @@
   "files": [
     {
       "path": "./lib/**/**.js",
-      "maxSize": "10 kB"
+      "maxSize": "8 kB"
     }
   ]
 }
