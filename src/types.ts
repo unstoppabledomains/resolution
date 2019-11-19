@@ -77,6 +77,6 @@ export const UnclaimedDomainResponse: NamicornResolution = {
 };
 
 /**
- * @deprecated Use UnclaimedDomainResponse instead (deprecated since 0.4.0, may be removed from 0.6.0)
+ * @deprecated Use UnclaimedDomainResponse instead (deprecated since 0.3.4)
  */
 export const UNCLAIMED_DOMAIN_RESPONSE = UnclaimedDomainResponse;
