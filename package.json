@@ -5,9 +5,10 @@
   "main": "./lib/index.js",
   "types": "./lib/namicorn.d.ts",
   "scripts": {
-    "release": "yarn build && yarn test && yarn publish --patch && yarn docs && yarn docs:deploy && yarn git:push-tag",
-    "release:minor": "yarn build && yarn test && yarn publish --minor && yarn docs && yarn docs:deploy && yarn git:push-tag",
-    "release:major": "yarn build && yarn test && yarn publish --major && yarn docs && yarn docs:deploy && yarn git:push-tag",
+    "release": "yarn build && yarn test && yarn publish --patch && yarn docs && yarn docs:deploy && yarn release:tag",
+    "release:minor": "yarn build && yarn test && yarn publish --minor && yarn docs && yarn docs:deploy && yarn release:tag",
+    "release:major": "yarn build && yarn test && yarn publish --major && yarn docs && yarn docs:deploy && yarn release:tag",
+    "release:tag": "git push origin v$npm_package_version",
     "test": "jest",
     "start": "npm run build:live",
     "build": "tsc -p .",
@@ -17,8 +18,7 @@
     "docs:clone": "[ -d ./docs ] || git clone --branch gh-pages git@github.com:unstoppabledomains/namicorn.git docs",
     "docs:generate": "yarn run typedoc --out \"./docs/v$npm_package_version\"",
     "docs:readme": "./docs-readme.sh",
-    "docs:deploy": "./deploy-docs.sh",
-    "git:push-tag": "git push origin v$npm_package_version"
+    "docs:deploy": "./deploy-docs.sh"
   },
   "files": [
     "lib"
