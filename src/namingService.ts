@@ -1,6 +1,6 @@
 import { SourceDefinition, NamicornResolution } from './types';
 import ResolutionError from './resolutionError';
-
+import nodeFetch from 'node-fetch';
 /**
  * Abstract class for different Naming Service supports like
  * - ENS
@@ -22,5 +22,22 @@ export default abstract class NamingService {
     if (!this.isSupportedDomain(domain)) {
       throw new ResolutionError('UnsupportedDomain', { domain });
     }
+  }
+
+  /** @ignore */
+  protected isNode = () => {
+    if (typeof process === 'object') {
+      if (typeof process.versions === 'object') {
+        if (typeof process.versions.node !== 'undefined') {
+          return true;
+        }
+      }
+    }
+    return false;
+  };
+
+  /** @ignore */
+  protected async fetch(url, options) {
+    return this.isNode() ? nodeFetch(url, options) : window.fetch(url, options);
   }
 }

@@ -1,6 +1,8 @@
-import { Zilliqa } from '@zilliqa-js/zilliqa';
-import { Contract } from '@zilliqa-js/contract';
-import { toChecksumAddress, toBech32Address } from '@zilliqa-js/crypto';
+import {
+  toChecksumAddress,
+  toBech32Address,
+  fromBech32Address,
+} from './zns/utils';
 import namehash from './zns/namehash';
 import _ from 'lodash';
 import {
@@ -58,9 +60,6 @@ export default class Zns extends NamingService {
   readonly url: string;
   readonly registryAddress?: string;
   /** @ignore */
-  private registry?: Contract;
-  /** @ignore */
-  private zilliqa: Zilliqa;
 
   /**
    * Source object describing the network naming service operates on
@@ -72,7 +71,6 @@ export default class Zns extends NamingService {
     source = this.normalizeSource(source);
     this.network = source.network as string;
     this.url = source.url;
-    this.zilliqa = new Zilliqa(this.url);
     if (!this.network) {
       throw new Error('Unspecified network in Namicorn ZNS configuration');
     }
@@ -86,7 +84,6 @@ export default class Zns extends NamingService {
       this.registryAddress = this.registryAddress.startsWith('0x')
         ? toBech32Address(this.registryAddress)
         : this.registryAddress;
-      this.registry = this.zilliqa.contracts.at(this.registryAddress);
     }
   }
 
@@ -223,7 +220,7 @@ export default class Zns extends NamingService {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork())
       return undefined;
     const registryRecord = await this.getContractMapValue(
-      this.registry,
+      this.registryAddress,
       'records',
       namehash(domain),
     );
@@ -245,9 +242,7 @@ export default class Zns extends NamingService {
     if (!resolverAddress || resolverAddress == NullAddress) {
       return {};
     }
-    const resolver = this.zilliqa.contracts.at(
-      toChecksumAddress(resolverAddress),
-    );
+    const resolver = toChecksumAddress(resolverAddress);
     return ((await this.getContractField(resolver, 'records')) ||
       {}) as Dictionary<string>;
   }
@@ -301,13 +296,37 @@ export default class Zns extends NamingService {
   }
 
   /** @ignore */
+  private async fetchSubState(
+    contractAddress: string,
+    field: string,
+    keys: string[] = [],
+  ): Promise<any> {
+    const response = await this.fetch(this.url, {
+      method: 'POST',
+      body: JSON.stringify({
+        id: '1',
+        jsonrpc: '2.0',
+        method: 'GetSmartContractSubState',
+        params: [contractAddress.replace('0x', ''), field, keys],
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then(res => res.json());
+    return response.result;
+  }
+
+  /** @ignore */
   private async getContractField(
-    contract: Contract,
+    contractAddress: string,
     field: string,
     keys: string[] = [],
   ): Promise<any> {
     try {
-      let result = (await contract.getSubState(field, keys)) || {};
+      const contractAddr = contractAddress.startsWith('zil1')
+        ? fromBech32Address(contractAddress)
+        : contractAddress;
+      let result = (await this.fetchSubState(contractAddr, field, keys)) || {};
       return result[field];
     } catch (err) {
       if (err.name == 'FetchError')
@@ -318,11 +337,11 @@ export default class Zns extends NamingService {
 
   /** @ignore */
   private async getContractMapValue(
-    contract: Contract,
+    contractAddress: string,
     field: string,
     key: string,
   ): Promise<any> {
-    const record = await this.getContractField(contract, field, [key]);
+    const record = await this.getContractField(contractAddress, field, [key]);
     return (record && record[key]) || null;
   }
 }

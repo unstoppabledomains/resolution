@@ -4,8 +4,6 @@ import _ from 'lodash';
 import mockData from './testData/mockData.json';
 import Ens from './ens';
 import { Dictionary, NullAddress, UNCLAIMED_DOMAIN_RESPONSE } from './types';
-import { toChecksumAddress } from '@zilliqa-js/crypto/dist/util';
-import { Zilliqa } from '@zilliqa-js/zilliqa';
 
 const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
 const MainnetUrl = 'https://mainnet.infura.io';
@@ -122,6 +120,7 @@ describe('Unstoppable API', () => {
 describe('ZNS', () => {
   it('resolves .zil name using blockchain', async () => {
     const testName = 'resolves .zil name using blockchain';
+    //TODO: mock the right request Something is wrong with it
     mockAPICalls('zil_using_blockchain', ZilliqaUrl);
     const namicorn = new Namicorn({ blockchain: { zns: ZilliqaUrl } });
     const result = await namicorn.resolve('cofounding.zil');
@@ -337,7 +336,7 @@ describe('ZNS', () => {
 
     const secondEye = mockAsyncMethod(namicorn.zns, 'getResolverRecords', {
       'ipfs.html.hash': 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
-      'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
+      'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu',
       'ipfs.redirect_domain.value': 'www.unstoppabledomains.com',
       'whois.email.value': 'matt+test@unstoppabledomains.com',
       'whois.for_sale.value': 'true',
@@ -349,7 +348,7 @@ describe('ZNS', () => {
       ipfs: {
         html: {
           hash: 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
-          value: 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
+          value: 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu',
         },
         redirect_domain: { value: 'www.unstoppabledomains.com' },
       },

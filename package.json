@@ -57,7 +57,6 @@
   },
   "dependencies": {
     "@ensdomains/address-encoder": "^0.1.2",
-    "@zilliqa-js/zilliqa": "^0.8.1",
     "bip44-constants": "^8.0.4",
     "eth-ens-namehash": "^2.0.8",
     "lodash": "^4.17.15",
