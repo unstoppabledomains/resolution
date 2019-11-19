@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import { invert } from './utils';
 import { default as ensInterface } from './ens/contract/ens';
 import { default as resolverInterface } from './ens/contract/resolver';
 import { hash } from 'eth-ens-namehash';
@@ -25,10 +25,7 @@ const NetworkIdMap = {
   5: 'goerli',
 };
 /** @ignore */
-const NetworkNameMap = _(NetworkIdMap)
-  .invert()
-  .mapValues((v, k) => parseInt(v))
-  .value();
+const NetworkNameMap = invert(NetworkIdMap);
 
 /** @ignore */
 const RegistryMap = {
@@ -308,7 +305,7 @@ export default class Ens extends NamingService {
         };
       }
       case 'object': {
-        source = _.clone(source) as SourceDefinition;
+        source = {...source}
         if (typeof source.network == 'number') {
           source.network = NetworkIdMap[source.network];
         }
@@ -342,7 +339,11 @@ export default class Ens extends NamingService {
    *  - testnet
    */
   private networkFromUrl(url: string): string {
-    return _.find(NetworkIdMap, name => url.indexOf(name) >= 0);
+    for (const key in NetworkNameMap) {
+      if(!NetworkNameMap.hasOwnProperty(key)) continue;
+      if (url.indexOf(key) >= 0)
+        return key;  
+    }
   }
 
   /**

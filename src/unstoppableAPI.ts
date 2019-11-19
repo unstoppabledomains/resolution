@@ -113,7 +113,7 @@ export default class Udapi extends NamingService {
     if (!method) throw new ResolutionError('UnsupportedDomain', { domain });
     return method;
   }
-
+  
   /**
    * Looks up for an arbitrary key inside the records of certain domain
    * @param domain - domain name
