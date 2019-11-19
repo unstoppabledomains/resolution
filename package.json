@@ -34,7 +34,6 @@
   "homepage": "https://github.com/unstoppabledomains/namicorn#readme",
   "devDependencies": {
     "@types/jest": "^24.0.11",
-    "@types/lodash": "^4.14.138",
     "@types/node": "^11.13.7",
     "@types/node-fetch": "^2.5.0",
     "@types/web3": "^1.0.20",
@@ -59,9 +58,7 @@
     "@ensdomains/address-encoder": "^0.1.2",
     "bip44-constants": "^8.0.4",
     "eth-ens-namehash": "^2.0.8",
-    "lodash": "^4.17.15",
     "node-fetch": "^2.6.0",
-    "tslib": "^1.10.0",
     "web3": "^1.2.2"
   }
 }

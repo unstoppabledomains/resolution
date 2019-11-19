@@ -1,6 +1,5 @@
 import nock from 'nock';
 import Namicorn, { ResolutionError } from '.';
-import _ from 'lodash';
 import mockData from './testData/mockData.json';
 import Ens from './ens';
 import { Dictionary, NullAddress, UNCLAIMED_DOMAIN_RESPONSE } from './types';
@@ -16,9 +15,7 @@ const mockAsyncMethod = (object: any, method: string, value) => {
 };
 
 const mockAsyncMethods = (object: any, methods: Dictionary<any>) => {
-  return _.map(methods, (value, method) =>
-    mockAsyncMethod(object, method, value),
-  );
+  return Object.entries(methods).map(method => mockAsyncMethod(object, method[0], method[1]));
 };
 
 const expectSpyToBeCalled = (spies: any[]) => {

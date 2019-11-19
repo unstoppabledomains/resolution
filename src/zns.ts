@@ -4,7 +4,7 @@ import {
   fromBech32Address,
 } from './zns/utils';
 import namehash from './zns/namehash';
-import _ from 'lodash';
+import { mapValues, clone, set, transform, invert } from './utils';
 import {
   SourceDefinition,
   NamicornResolution,
@@ -39,12 +39,7 @@ const UrlMap = {
 };
 
 /** @ignore */
-const UrlNetworkMap = (url: string) => {
-  const invert = _(UrlMap)
-    .invert()
-    .value();
-  return invert[url];
-};
+const UrlNetworkMap = (url: string) => invert(UrlMap)[url];
 
 /**
  * Class to support connection with Zilliqa naming service
@@ -99,8 +94,7 @@ export default class Zns extends NamingService {
     const resolution = this.structureResolverRecords(
       await this.getResolverRecords(resolverAddress),
     );
-
-    const addresses = _.mapValues(resolution.crypto || {}, 'address');
+    const addresses = mapValues(resolution.crypto || {}, 'address');
     return {
       addresses,
       meta: {
@@ -262,7 +256,7 @@ export default class Zns extends NamingService {
         };
       }
       case 'object': {
-        source = _.clone(source) as SourceDefinition;
+        source = clone(source) as SourceDefinition;
         if (typeof source.network == 'number') {
           source.network = NetworkIdMap[source.network];
         }
@@ -283,11 +277,12 @@ export default class Zns extends NamingService {
 
   /** @ignore */
   private structureResolverRecords(records: Dictionary<string>): ZnsResolution {
-    return _.transform(
+    const result = transform(
       records,
-      (result, value, key) => _.set(result, key, value),
+      (result, value, key) => set(result, key, value),
       {},
     );
+    return result;
   }
 
   /** @ignore */
