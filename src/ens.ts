@@ -1,4 +1,4 @@
-import { invert, clone } from './utils';
+import { invert } from './utils';
 import { default as ensInterface } from './ens/contract/ens';
 import { default as resolverInterface } from './ens/contract/resolver';
 import { hash } from 'eth-ens-namehash';
@@ -13,7 +13,6 @@ import {
 import NamingService from './namingService';
 import { ResolutionError } from './index';
 import Web3 from 'web3';
-import { finished } from 'stream';
 
 /** @ignore */
 const DefaultUrl = 'https://mainnet.infura.io';
@@ -306,7 +305,7 @@ export default class Ens extends NamingService {
         };
       }
       case 'object': {
-        source = clone(source) as SourceDefinition;
+        source = {...source}
         if (typeof source.network == 'number') {
           source.network = NetworkIdMap[source.network];
         }

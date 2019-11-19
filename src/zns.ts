@@ -4,7 +4,7 @@ import {
   fromBech32Address,
 } from './zns/utils';
 import namehash from './zns/namehash';
-import { mapValues, clone, set, transform, invert } from './utils';
+import { set, invert } from './utils';
 import {
   SourceDefinition,
   NamicornResolution,
@@ -94,7 +94,8 @@ export default class Zns extends NamingService {
     const resolution = this.structureResolverRecords(
       await this.getResolverRecords(resolverAddress),
     );
-    const addresses = mapValues(resolution.crypto || {}, 'address');
+    const addresses = {};
+    Object.entries(resolution.crypto).map(([key, v]) => addresses[key] = v.address);
     return {
       addresses,
       meta: {
@@ -256,7 +257,7 @@ export default class Zns extends NamingService {
         };
       }
       case 'object': {
-        source = clone(source) as SourceDefinition;
+        source = { ...source }
         if (typeof source.network == 'number') {
           source.network = NetworkIdMap[source.network];
         }
@@ -277,11 +278,10 @@ export default class Zns extends NamingService {
 
   /** @ignore */
   private structureResolverRecords(records: Dictionary<string>): ZnsResolution {
-    const result = transform(
-      records,
-      (result, value, key) => set(result, key, value),
-      {},
-    );
+    const result = {}
+    for (const [key,value] of Object.entries(records)) {
+      set(result, key, value)
+    }
     return result;
   }
 
