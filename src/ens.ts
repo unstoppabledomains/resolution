@@ -22,7 +22,6 @@ const NetworkIdMap = {
   42: 'rinkeby',
   5: 'goerli',
 };
-/** @ignore */
 const NetworkNameMap = invert(NetworkIdMap);
 
 const RegistryMap = {
@@ -201,6 +200,48 @@ export default class Ens extends NamingService {
   }
 
   /**
+   * Normalizes the source object based on type
+   */
+  protected normalizeSource(
+    source: string | boolean | SourceDefinition,
+  ): SourceDefinition {
+    switch (typeof source) {
+      case 'boolean': {
+        return { url: DefaultUrl, network: this.networkFromUrl(DefaultUrl) };
+      }
+      case 'string': {
+        return {
+          url: source as string,
+          network: this.networkFromUrl(source as string),
+        };
+      }
+      case 'object': {
+        source = {...source}
+        if (typeof source.network == 'number') {
+          source.network = NetworkIdMap[source.network];
+        }
+        if (source.registry) {
+          source.network = source.network ? source.network : 'mainnet';
+          source.url = source.url
+            ? source.url
+            : `https://${source.network}.infura.io`;
+        }
+        if (
+          source.network &&
+          !source.url &&
+          NetworkNameMap.hasOwnProperty(source.network)
+        ) {
+          source.url = `https://${source.network}.infura.io`;
+        }
+        if (source.url && !source.network) {
+          source.network = this.networkFromUrl(source.url);
+        }
+        return source;
+      }
+    }
+  }
+
+  /**
    * This was done to make automated tests more configurable
    */
   private resolverCallToName(resolverContract, nodeHash) {
@@ -265,48 +306,6 @@ export default class Ens extends NamingService {
     if (!addr) return null;
     const data = Buffer.from(addr.replace('0x', ''), 'hex');
     return formatsByCoinType[coinType].encoder(data);
-  }
-
-  /**
-   * Normalizes the source object based on type
-   */
-  protected normalizeSource(
-    source: string | boolean | SourceDefinition,
-  ): SourceDefinition {
-    switch (typeof source) {
-      case 'boolean': {
-        return { url: DefaultUrl, network: this.networkFromUrl(DefaultUrl) };
-      }
-      case 'string': {
-        return {
-          url: source as string,
-          network: this.networkFromUrl(source as string),
-        };
-      }
-      case 'object': {
-        source = {...source}
-        if (typeof source.network == 'number') {
-          source.network = NetworkIdMap[source.network];
-        }
-        if (source.registry) {
-          source.network = source.network ? source.network : 'mainnet';
-          source.url = source.url
-            ? source.url
-            : `https://${source.network}.infura.io`;
-        }
-        if (
-          source.network &&
-          !source.url &&
-          NetworkNameMap.hasOwnProperty(source.network)
-        ) {
-          source.url = `https://${source.network}.infura.io`;
-        }
-        if (source.url && !source.network) {
-          source.network = this.networkFromUrl(source.url);
-        }
-        return source;
-      }
-    }
   }
 
   /**

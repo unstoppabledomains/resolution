@@ -34,7 +34,6 @@ const UrlMap = {
   localnet: 'http://localhost:4201',
 };
 
-/** @ignore */
 const UrlNetworkMap = (url: string) => invert(UrlMap)[url];
 
 /**
@@ -189,6 +188,40 @@ export default class Zns extends NamingService {
     return namehash(domain);
   }
 
+ /** @internal */
+ protected normalizeSource(
+  source: string | boolean | SourceDefinition,
+): SourceDefinition {
+  switch (typeof source) {
+    case 'boolean': {
+      return { url: DefaultSource, network: 'mainnet' };
+    }
+    case 'string': {
+      return {
+        url: source as string,
+        network: UrlNetworkMap(source),
+      };
+    }
+    case 'object': {
+      source = { ...source }
+      if (typeof source.network == 'number') {
+        source.network = NetworkIdMap[source.network];
+      }
+      if (source.registry) {
+        source.network = source.network ? source.network : 'mainnet';
+        source.url = source.url ? source.url : DefaultSource;
+      }
+      if (source.network && !source.url) {
+        source.url = UrlMap[source.network];
+      }
+      if (source.url && !source.network) {
+        source.network = UrlNetworkMap(source.url);
+      }
+      return source;
+    }
+  }
+}
+
   private getRecordFieldOrThrow(
     domain: string,
     records: Dictionary<string>,
@@ -232,41 +265,7 @@ export default class Zns extends NamingService {
     const resolver = toChecksumAddress(resolverAddress);
     return ((await this.getContractField(resolver, 'records')) ||
       {}) as Dictionary<string>;
-  }
-
-  /** @internal */
-  protected normalizeSource(
-    source: string | boolean | SourceDefinition,
-  ): SourceDefinition {
-    switch (typeof source) {
-      case 'boolean': {
-        return { url: DefaultSource, network: 'mainnet' };
-      }
-      case 'string': {
-        return {
-          url: source as string,
-          network: UrlNetworkMap(source),
-        };
-      }
-      case 'object': {
-        source = { ...source }
-        if (typeof source.network == 'number') {
-          source.network = NetworkIdMap[source.network];
-        }
-        if (source.registry) {
-          source.network = source.network ? source.network : 'mainnet';
-          source.url = source.url ? source.url : DefaultSource;
-        }
-        if (source.network && !source.url) {
-          source.url = UrlMap[source.network];
-        }
-        if (source.url && !source.network) {
-          source.network = UrlNetworkMap(source.url);
-        }
-        return source;
-      }
-    }
-  }
+  } 
 
   private structureResolverRecords(records: Dictionary<string>): ZnsResolution {
     const result = {}
