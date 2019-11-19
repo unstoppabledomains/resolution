@@ -2,7 +2,7 @@ import { toBech32Address } from './zns/utils';
 
 import { ResolutionError } from './index';
 import NamingService from './namingService';
-import { NamicornResolution, NullAddress } from './types';
+import { NamicornResolution, NullAddress, SourceDefinition } from './types';
 import Zns from './zns';
 import Ens from './ens';
 // import * as pckg from '../package.json';
@@ -98,12 +98,28 @@ export default class Udapi extends NamingService {
   /** @ignore */
   protected normalizeSource(
     source: string | boolean | import('./types').SourceDefinition,
-  ) {
+  ): SourceDefinition {
     throw new Error('Method not implemented.');
   }
 
   /** @ignore */
   private findMethod(domain: string) {
     return [new Zns(), new Ens()].find(m => m.isSupportedDomain(domain));
+  }
+
+  /** @ignore */
+  private findMethodOrThrow(domain: string) {
+    const method = this.findMethod(domain);
+    if (!method) throw new ResolutionError('UnsupportedDomain', { domain });
+    return method;
+  }
+
+  /**
+   * Looks up for an arbitrary key inside the records of certain domain
+   * @param domain - domain name
+   * @param key - key to look for
+   */
+  async record(domain: string, key: string): Promise<string> {
+    return await this.findMethodOrThrow(domain).record(domain, key);
   }
 }

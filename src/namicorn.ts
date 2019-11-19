@@ -89,6 +89,45 @@ class Namicorn {
   }
 
   /**
+   * Resolves the ipfs hash configured for domain records on ZNS
+   * @param domain - domain name
+   * @throws ResolutionError
+   * @returns a Promise that resolves in ipfsHash
+   */
+  async ipfsHash(domain: string): Promise<string> {
+    return await this.getNamingMethodOrThrow(domain).record(
+      domain,
+      'ipfs.html.value',
+    );
+  }
+
+  /**
+   * Resolves the ipfs redirect url for a supported domain records
+   * @param domain - domain name
+   * @throws ResolutionError
+   * @returns A Promise that resolves in redirect url
+   */
+  async ipfsRedirect(domain: string): Promise<string> {
+    return await this.getNamingMethodOrThrow(domain).record(
+      domain,
+      'ipfs.redirect_domain.value',
+    );
+  }
+
+  /**
+   * Resolves the ipfs email field from whois configurations
+   * @param domain - domain name
+   * @throws ResolutionError
+   * @returns a Promise that resolves in an email address configured for this domain whois
+   */
+  async email(domain: string): Promise<string> {
+    return await this.getNamingMethodOrThrow(domain).record(
+      domain,
+      'whois.email.value',
+    );
+  }
+
+  /**
    * Resolves given domain to a specific currency address or throws an error
    * @param domain - domain name
    * @param currencyTicker - currency ticker such as
@@ -180,4 +219,4 @@ class Namicorn {
   }
 }
 
-export { Namicorn, Namicorn as default, ResolutionError };
+export { Namicorn, Namicorn as default };

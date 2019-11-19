@@ -152,6 +152,20 @@ export default class Zns extends NamingService {
   }
 
   /**
+   * Resolves a specific field from domain's record
+   * @param domain - domain name
+   * @param field - resolver record name to be queried
+   * @returns record field associated with the domain
+   */
+  async record(domain: string, field: string) {
+    return this.getRecordFieldOrThrow(
+      domain,
+      await this.records(domain),
+      field,
+    );
+  }
+
+  /**
    * Resolver Records
    * @param domain - domain name to be resolved
    * @returns - ZNS resolver records in an plain key-value format
@@ -183,6 +197,20 @@ export default class Zns extends NamingService {
   namehash(domain: string): string {
     this.ensureSupportedDomain(domain);
     return namehash(domain);
+  }
+
+  /** @ignore */
+  private getRecordFieldOrThrow(
+    domain: string,
+    records: Dictionary<string>,
+    field: string,
+  ): string {
+    if (!records || !records[field])
+      throw new ResolutionError('RecordNotFound', {
+        domain,
+        recordName: field,
+      });
+    return records[field];
   }
 
   /** @ignore */

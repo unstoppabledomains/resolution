@@ -1,9 +1,8 @@
 import _ from 'lodash';
 import { default as ensInterface } from './ens/contract/ens';
-import { default as registrarInterface } from './ens/contract/registrar';
 import { default as resolverInterface } from './ens/contract/resolver';
 import { hash } from 'eth-ens-namehash';
-import { formatsByName, formatsByCoinType } from '@ensdomains/address-encoder';
+import { formatsByCoinType } from '@ensdomains/address-encoder';
 import {
   SourceDefinition,
   NamicornResolution,
@@ -100,6 +99,11 @@ export default class Ens extends NamingService {
    */
   isSupportedNetwork(): boolean {
     return this.registryAddress != null;
+  }
+
+  /** @ignore */
+  record(domain: string, key: string): Promise<string> {
+    throw new Error('Method not implemented.');
   }
 
   /**
