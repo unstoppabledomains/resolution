@@ -106,24 +106,15 @@ jobs:
           command: node --version
       - checkout:
           name: Checking out the code
-      # Download and cache dependencies
-      # - restore_cache:
-      #     name: Restore Yarn Package Cache
-      #     keys:
-      #       - yarn-packages-{{ checksum "yarn.lock" }}
 
       - run:
           name: Install Dependencies
           command: yarn install 
-      # - save_cache:
-      #     name: Save Yarn Package Cache
-      #     key: yarn-packages-{{ checksum "yarn.lock" }}
-      #     paths:
-      #       - ~/.cache/yarn
 
-      # - run: ls -laR
       # run tests!
-      - run: yarn run bundlesize -f "/home/circleci/project/src/**.js" -s 10kB
+      - run: yarn build
+
+      - run: yarn run test:size 
 
 workflows:
   version: 2
