@@ -14,9 +14,7 @@ import NamingService from './namingService';
 import { ResolutionError } from './index';
 import Web3 from 'web3';
 
-/** @ignore */
 const DefaultUrl = 'https://mainnet.infura.io';
-/** @ignore */
 const NetworkIdMap = {
   1: 'mainnet',
   3: 'ropsten',
@@ -27,7 +25,6 @@ const NetworkIdMap = {
 /** @ignore */
 const NetworkNameMap = invert(NetworkIdMap);
 
-/** @ignore */
 const RegistryMap = {
   mainnet: '0x314159265dd8dbb310642f98f50c066173c1259b',
   ropsten: '0x112234455c3a32fd11230c42e7bccd4a84e02010',
@@ -46,9 +43,7 @@ export default class Ens extends NamingService {
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
-  /** @ignore */
   private ensContract: any;
-  /**  @ignore */
   private web3: any;
 
   /**
@@ -82,7 +77,6 @@ export default class Ens extends NamingService {
   /**
    * Checks if the domain is in valid format
    * @param domain - domain name to be checked
-   * @returns
    */
   isSupportedDomain(domain: string): boolean {
     return (
@@ -92,13 +86,12 @@ export default class Ens extends NamingService {
 
   /**
    * Checks if the current network is supported
-   * @returns
    */
   isSupportedNetwork(): boolean {
     return this.registryAddress != null;
   }
 
-  /** @ignore */
+  /** @internal */
   record(domain: string, key: string): Promise<string> {
     throw new Error('Method not implemented.');
   }
@@ -108,7 +101,7 @@ export default class Ens extends NamingService {
    * @async
    * @param address - address you wish to reverse
    * @param currencyTicker - currency ticker like BTC, ETH, ZIL
-   * @returns - domain name attached to this address
+   * @returns Domain name attached to this address
    */
   async reverse(address: string, currencyTicker: string): Promise<string> {
     if (currencyTicker != 'ETH') {
@@ -119,7 +112,7 @@ export default class Ens extends NamingService {
     }
     const reverseAddress = address + '.addr.reverse';
     const nodeHash = hash(reverseAddress);
-    const resolverAddress = await this._getResolver(nodeHash);
+    const resolverAddress = await this.getResolver(nodeHash);
     if (resolverAddress == NullAddress) {
       return null;
     }
@@ -134,16 +127,17 @@ export default class Ens extends NamingService {
   /**
    * Resolves domain to a specific cryptoAddress
    * @param domain - domain name to be resolved
-   * @param currencyTicker currency ticker such as
+   * @param currencyTicker - specific currency ticker such as
    *  - ZIL
    *  - BTC
    *  - ETH
-   * @returns - A promise that resolves in a string
+   * @returns A promise that resolves in a string
+   * @throws ResolutionError
    */
   async address(domain: string, currencyTicker: string): Promise<string> {
     const nodeHash = this.namehash(domain);
     const ownerPromise = this.owner(domain);
-    const resolver = await this._getResolver(nodeHash);
+    const resolver = await this.getResolver(nodeHash);
     if (!resolver || resolver === NullAddress) {
       const owner = await ownerPromise;
       if (!owner || owner === NullAddress)
@@ -163,18 +157,18 @@ export default class Ens extends NamingService {
   /**
    * Owner of the domain
    * @param domain - domain name
-   * @returns - an owner address of the domain
+   * @returns An owner address of the domain
    */
   async owner(domain: string): Promise<string | null> {
     const nodeHash = this.namehash(domain);
-    return (await this._getOwner(nodeHash)) || null;
+    return (await this.getOwner(nodeHash)) || null;
   }
 
   /**
    * Resolves the given domain
    * @async
    * @param domain - domain name to be resolved
-   * @returns- Returns a promise that resolves in an object
+   * @returns A promise that resolves in an object
    */
   async resolve(domain: string): Promise<NamicornResolution | null> {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork()) {
@@ -199,7 +193,7 @@ export default class Ens extends NamingService {
   /**
    * Produces ENS namehash
    * @param domain - domain to be hashed
-   * @return ENS namehash of a domain
+   * @returns ENS namehash of a domain
    */
   namehash(domain: string): string {
     this.ensureSupportedDomain(domain);
@@ -207,48 +201,37 @@ export default class Ens extends NamingService {
   }
 
   /**
-   * @ignore
    * This was done to make automated tests more configurable
-   * @param resolverContract
-   * @param nodeHash
    */
   private resolverCallToName(resolverContract, nodeHash) {
-    return this._callMethod(resolverContract.methods.name(nodeHash));
+    return this.callMethod(resolverContract.methods.name(nodeHash));
   }
 
   /**
-   * @ignore
    * This was done to make automated tests more configurable
-   * @param nodeHash
    */
-  private async _getResolver(nodeHash) {
-    return await this._callMethod(this.ensContract.methods.resolver(nodeHash));
+  private async getResolver(nodeHash) {
+    return await this.callMethod(this.ensContract.methods.resolver(nodeHash));
   }
 
   /**
-   * @ignore
    * This was done to make automated tests more configurable
-   * @param nodeHash
    */
-
-  private async _getOwner(nodeHash) {
-    return await this._callMethod(this.ensContract.methods.owner(nodeHash));
+  private async getOwner(nodeHash) {
+    return await this.callMethod(this.ensContract.methods.owner(nodeHash));
   }
 
   /**
-   * @ignore
    * This was done to make automated tests more configurable
-   * @param nodeHash
    */
   private async getResolutionInfo(nodeHash) {
     return await Promise.all([
-      this._callMethod(this.ensContract.methods.owner(nodeHash)),
-      this._callMethod(this.ensContract.methods.ttl(nodeHash)),
-      this._callMethod(this.ensContract.methods.resolver(nodeHash)),
+      this.callMethod(this.ensContract.methods.owner(nodeHash)),
+      this.callMethod(this.ensContract.methods.ttl(nodeHash)),
+      this.callMethod(this.ensContract.methods.resolver(nodeHash)),
     ]);
   }
 
-  /** @ignore */
   private getCoinType(currencyTicker: string): number {
     const constants: Bip44Constants[] = require('bip44-constants');
     const coin = constants.findIndex(
@@ -262,8 +245,7 @@ export default class Ens extends NamingService {
   }
 
   /**
-   * @ignore
-   * @param resolver - Resolver address
+   * @param resolver - resolver address
    * @param nodeHash - namehash of a domain name
    */
   private async fetchAddress(resolver, nodeHash, coinType?: number) {
@@ -276,10 +258,10 @@ export default class Ens extends NamingService {
     );
     const addr: string =
       coinType != EthCoinIndex
-        ? await this._callMethod(
+        ? await this.callMethod(
             resolverContract.methods.addr(nodeHash, coinType),
           )
-        : await this._callMethod(resolverContract.methods.addr(nodeHash));
+        : await this.callMethod(resolverContract.methods.addr(nodeHash));
     if (!addr) return null;
     const data = Buffer.from(addr.replace('0x', ''), 'hex');
     return formatsByCoinType[coinType].encoder(data);
@@ -287,9 +269,6 @@ export default class Ens extends NamingService {
 
   /**
    * Normalizes the source object based on type
-   * @ignore
-   * @param source
-   * @returns
    */
   protected normalizeSource(
     source: string | boolean | SourceDefinition,
@@ -332,9 +311,8 @@ export default class Ens extends NamingService {
 
   /**
    * Look up for network from url provided
-   * @ignore
    * @param url - main api url for blockchain
-   * @returns - network such as:
+   * @returns Network such as:
    *  - mainnet
    *  - testnet
    */
@@ -347,12 +325,11 @@ export default class Ens extends NamingService {
   }
 
   /**
-   *  @ignore
    * Internal wrapper for ens method. Used to throw an error when ens is down
-   *  @param method - Method to be called
+   *  @param method - method to be called
    *  @throws ResolutionError -> When blockchain is down
    */
-  private async _callMethod(method: {
+  private async callMethod(method: {
     call: () => Promise<any>;
   }): Promise<any> {
     try {

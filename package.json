@@ -5,9 +5,10 @@
   "main": "./lib/index.js",
   "types": "./lib/namicorn.d.ts",
   "scripts": {
-    "release": "yarn build && yarn test && yarn publish --patch && yarn docs",
-    "release:minor": "yarn build && yarn test && yarn publish --minor && yarn docs",
-    "release:major": "yarn build && yarn test && yarn publish --major && yarn docs",
+    "release": "yarn build && yarn test && yarn publish --patch && yarn docs && yarn docs:deploy && yarn release:tag",
+    "release:minor": "yarn build && yarn test && yarn publish --minor && yarn docs && yarn docs:deploy && yarn release:tag",
+    "release:major": "yarn build && yarn test && yarn publish --major && yarn docs && yarn docs:deploy && yarn release:tag",
+    "release:tag": "git push origin v$npm_package_version",
     "test": "jest",
     "start": "npm run build:live",
     "build": "tsc -p .",
