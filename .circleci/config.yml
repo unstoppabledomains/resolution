@@ -124,7 +124,7 @@ jobs:
       # - run: ls -laR
       # run tests!
       - run: yarn build
-      - run: ls -laR "/home/circleci/project/
+      - run: ls -laR /home/circleci/project/
       - run: yarn run bundlesize -f "/home/circleci/project/**/**.js" -s 10kB
 
 workflows:
