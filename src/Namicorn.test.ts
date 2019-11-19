@@ -121,7 +121,7 @@ describe('ZNS', () => {
   it('resolves .zil name using blockchain', async () => {
     const testName = 'resolves .zil name using blockchain';
     //TODO: mock the right request Something is wrong with it
-    // mockAPICalls('zil_using_blockchain', ZilliqaUrl);
+    mockAPICalls('zil_using_blockchain', ZilliqaUrl);
     const namicorn = new Namicorn({ blockchain: { zns: ZilliqaUrl } });
     const result = await namicorn.resolve('cofounding.zil');
     expect(result).toBeDefined();
