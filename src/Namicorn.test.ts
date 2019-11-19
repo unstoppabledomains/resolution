@@ -831,4 +831,24 @@ describe('Namicorn', () => {
       'UnsupportedDomain',
     );
   });
+
+  it('checks return of ipfs hash for brad.zil', async () => {
+    const namicorn = new Namicorn();
+    const hash = await namicorn.ipfsHash('brad.zil');
+    expect(hash).toBe('QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK');
+  });
+
+  it('checks return of email for ergergergerg.zil', async () => {
+    const namicorn = new Namicorn();
+    const email = await namicorn.email('ergergergerg.zil');
+    expect(email).toBe('matt+test@unstoppabledomains.com');
+  });
+
+  it('checks error for  email on brad.zil', async () => {
+    const namicorn = new Namicorn();
+    await expectResolutionErrorCode(
+      namicorn.email('brad.zil'),
+      'RecordNotFound',
+    );
+  });
 });

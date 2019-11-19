@@ -3,7 +3,7 @@ import nodeFetch from 'node-fetch';
 
 import { ResolutionError } from './index';
 import NamingService from './namingService';
-import { NamicornResolution, NullAddress } from './types';
+import { NamicornResolution, NullAddress, SourceDefinition } from './types';
 import Zns from './zns';
 import Ens from './ens';
 // import * as pckg from '../package.json';
@@ -34,7 +34,6 @@ export default class Udapi extends NamingService {
   constructor() {
     super();
     this.url = DefaultUrl;
-
     const DefaultUserAgent = isNode()
       ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'
       : navigator.userAgent;
@@ -111,7 +110,7 @@ export default class Udapi extends NamingService {
   /** @ignore */
   protected normalizeSource(
     source: string | boolean | import('./types').SourceDefinition,
-  ) {
+  ): SourceDefinition {
     throw new Error('Method not implemented.');
   }
 
@@ -121,7 +120,23 @@ export default class Udapi extends NamingService {
   }
 
   /** @ignore */
+  private findMethodOrThrow(domain: string) {
+    const method = this.findMethod(domain);
+    if (!method) throw new ResolutionError('UnsupportedDomain', { domain });
+    return method;
+  }
+
+  /** @ignore */
   private async fetch(url, options) {
     return isNode() ? nodeFetch(url, options) : window.fetch(url, options);
+  }
+
+  /**
+   * Looks up for an arbitrary key inside the records of certain domain
+   * @param domain - domain name
+   * @param key - key to look for
+   */
+  async record(domain: string, key: string): Promise<string> {
+    return await this.findMethodOrThrow(domain).record(domain, key);
   }
 }
