@@ -11,7 +11,7 @@ import {
   EthCoinIndex,
 } from './types';
 import NamingService from './namingService';
-import { ResolutionError } from './index';
+import { ResolutionError, ResolutionErrorCode } from './index';
 import Web3 from 'web3';
 
 const DefaultUrl = 'https://mainnet.infura.io';
@@ -140,13 +140,17 @@ export default class Ens extends NamingService {
     if (!resolver || resolver === NullAddress) {
       const owner = await ownerPromise;
       if (!owner || owner === NullAddress)
-        throw new ResolutionError('UnregisteredDomain', { domain });
-      throw new ResolutionError('UnspecifiedResolver', { domain });
+        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+          domain,
+        });
+      throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
+        domain,
+      });
     }
     const coinType = this.getCoinType(currencyTicker);
     var addr = await this.fetchAddress(resolver, nodeHash, coinType);
     if (!addr)
-      throw new ResolutionError('UnspecifiedCurrency', {
+      throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
         domain,
         currencyTicker,
       });
@@ -216,7 +220,7 @@ export default class Ens extends NamingService {
         };
       }
       case 'object': {
-        source = {...source}
+        source = { ...source };
         if (typeof source.network == 'number') {
           source.network = NetworkIdMap[source.network];
         }
@@ -281,7 +285,9 @@ export default class Ens extends NamingService {
         item[2] === currencyTicker.toUpperCase(),
     );
     if (coin < 0 || !formatsByCoinType[coin])
-      throw new ResolutionError('UnsupportedCurrency', { currencyTicker });
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedCurrency, {
+        currencyTicker,
+      });
     return coin;
   }
 
@@ -317,9 +323,8 @@ export default class Ens extends NamingService {
    */
   private networkFromUrl(url: string): string {
     for (const key in NetworkNameMap) {
-      if(!NetworkNameMap.hasOwnProperty(key)) continue;
-      if (url.indexOf(key) >= 0)
-        return key;  
+      if (!NetworkNameMap.hasOwnProperty(key)) continue;
+      if (url.indexOf(key) >= 0) return key;
     }
   }
 
@@ -328,9 +333,7 @@ export default class Ens extends NamingService {
    *  @param method - method to be called
    *  @throws ResolutionError -> When blockchain is down
    */
-  private async callMethod(method: {
-    call: () => Promise<any>;
-  }): Promise<any> {
+  private async callMethod(method: { call: () => Promise<any> }): Promise<any> {
     try {
       return await method.call();
     } catch (error) {
@@ -339,7 +342,9 @@ export default class Ens extends NamingService {
         message.match(/Invalid JSON RPC response/) ||
         message.match(/legacy access request rate exceeded/)
       ) {
-        throw new ResolutionError('NamingServiceDown', { method: 'ENS' });
+        throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
+          method: 'ENS',
+        });
       }
       throw error;
     }

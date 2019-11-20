@@ -1,6 +1,7 @@
-import { SourceDefinition, NamicornResolution } from './types';
-import ResolutionError from './resolutionError';
+import { NamicornResolution, SourceDefinition } from './types';
+import ResolutionError, { ResolutionErrorCode } from './resolutionError';
 import nodeFetch from 'node-fetch';
+
 /**
  * Abstract class for different Naming Service supports like
  * - ENS
@@ -20,7 +21,9 @@ export default abstract class NamingService {
 
   protected ensureSupportedDomain(domain: string): void {
     if (!this.isSupportedDomain(domain)) {
-      throw new ResolutionError('UnsupportedDomain', { domain });
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
+        domain,
+      });
     }
   }
 
