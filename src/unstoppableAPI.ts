@@ -40,7 +40,9 @@ export default class Udapi extends NamingService {
   namehash(domain: string): string {
     const method = this.findMethod(domain);
     if (!method)
-      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, { domain });
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
+        domain,
+      });
     return method.namehash(domain);
   }
 
@@ -55,7 +57,9 @@ export default class Udapi extends NamingService {
   async address(domain: string, currencyTicker: string): Promise<string> {
     const data = await this.resolve(domain);
     if (!data.meta.owner || data.meta.owner === NullAddress)
-      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, { domain });
+      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+        domain,
+      });
     const address = data.addresses[currencyTicker.toUpperCase()];
     if (!address)
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
@@ -89,7 +93,9 @@ export default class Udapi extends NamingService {
       return await response.json();
     } catch (error) {
       if (error.name !== 'FetchError') throw error;
-      throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, { method: 'UD' });
+      throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
+        method: 'UD',
+      });
     }
   }
 
@@ -107,10 +113,12 @@ export default class Udapi extends NamingService {
   private findMethodOrThrow(domain: string) {
     const method = this.findMethod(domain);
     if (!method)
-      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, { domain });
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
+        domain,
+      });
     return method;
   }
-  
+
   /**
    * Looks up for an arbitrary key inside the records of certain domain
    * @param domain - domain name

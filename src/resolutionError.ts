@@ -30,16 +30,23 @@ const HandlersByCode = {
     `Domain ${params.domain} is not configured`,
   [ResolutionErrorCode.UnsupportedDomain]: (params: { domain: string }) =>
     `Domain ${params.domain} is not supported`,
-  [ResolutionErrorCode.UnspecifiedCurrency]: (params: { domain: string; currencyTicker: string }) =>
+  [ResolutionErrorCode.UnspecifiedCurrency]: (params: {
+    domain: string;
+    currencyTicker: string;
+  }) =>
     `Domain ${params.domain} has no ${params.currencyTicker} attached to it`,
   [ResolutionErrorCode.NamingServiceDown]: (params: { method: string }) =>
     `${params.method} naming service is down at the moment`,
-  [ResolutionErrorCode.UnsupportedCurrency]: (params: { currencyTicker: string }) =>
-    `${params.currencyTicker} is not supported`,
-  [ResolutionErrorCode.IncorrectResolverInterface]: (params: { method: string }) =>
-    `Domain resolver is configured incorrectly for ${params.method}`,
-  [ResolutionErrorCode.RecordNotFound]: (params: { recordName: string; domain: string }) =>
-    `No ${params.recordName} record found for ${params.domain}`,
+  [ResolutionErrorCode.UnsupportedCurrency]: (params: {
+    currencyTicker: string;
+  }) => `${params.currencyTicker} is not supported`,
+  [ResolutionErrorCode.IncorrectResolverInterface]: (params: {
+    method: string;
+  }) => `Domain resolver is configured incorrectly for ${params.method}`,
+  [ResolutionErrorCode.RecordNotFound]: (params: {
+    recordName: string;
+    domain: string;
+  }) => `No ${params.recordName} record found for ${params.domain}`,
 };
 
 /**

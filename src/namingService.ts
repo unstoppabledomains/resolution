@@ -21,7 +21,9 @@ export default abstract class NamingService {
 
   protected ensureSupportedDomain(domain: string): void {
     if (!this.isSupportedDomain(domain)) {
-      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, { domain });
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
+        domain,
+      });
     }
   }
 

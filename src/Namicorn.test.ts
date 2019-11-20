@@ -15,7 +15,9 @@ const mockAsyncMethod = (object: any, method: string, value) => {
 };
 
 const mockAsyncMethods = (object: any, methods: Dictionary<any>) => {
-  return Object.entries(methods).map(method => mockAsyncMethod(object, method[0], method[1]));
+  return Object.entries(methods).map(method =>
+    mockAsyncMethod(object, method[0], method[1]),
+  );
 };
 
 const expectSpyToBeCalled = (spies: any[]) => {
