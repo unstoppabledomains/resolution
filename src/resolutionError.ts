@@ -54,7 +54,7 @@ const HandlersByCode = {
  * @param method
  */
 export default class ResolutionError extends Error {
-  readonly code: ResolutionErrorCode | string;
+  readonly code: ResolutionErrorCode;
   readonly domain?: string;
   readonly method?: string;
   readonly currencyTicker?: string;
