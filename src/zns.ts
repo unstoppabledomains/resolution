@@ -1,19 +1,15 @@
-import {
-  toChecksumAddress,
-  toBech32Address,
-  fromBech32Address,
-} from './zns/utils';
+import { fromBech32Address, toBech32Address, toChecksumAddress } from './zns/utils';
 import namehash from './zns/namehash';
-import { set, invert } from './utils';
+import { invert, set } from './utils';
 import {
-  SourceDefinition,
-  NamicornResolution,
   Dictionary,
-  ZnsResolution,
+  NamicornResolution,
   NullAddress,
+  SourceDefinition,
   UnclaimedDomainResponse,
+  ZnsResolution,
 } from './types';
-import { ResolutionError } from './index';
+import { ResolutionError, ResolutionErrorCode } from './index';
 import NamingService from './namingService';
 
 const DefaultSource = 'https://api.zilliqa.com';
@@ -113,10 +109,10 @@ export default class Zns extends NamingService {
   async address(domain: string, currencyTicker: string): Promise<string> {
     const data = await this.resolve(domain);
     if (!data.meta.owner || data.meta.owner === NullAddress)
-      throw new ResolutionError('UnregisteredDomain', { domain });
+      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, { domain });
     const address = data.addresses[currencyTicker.toUpperCase()];
     if (!address)
-      throw new ResolutionError('UnspecifiedCurrency', {
+      throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
         domain,
         currencyTicker,
       });
@@ -228,7 +224,7 @@ export default class Zns extends NamingService {
     field: string,
   ): string {
     if (!records || !records[field])
-      throw new ResolutionError('RecordNotFound', {
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
         domain,
         recordName: field,
       });
@@ -312,7 +308,7 @@ export default class Zns extends NamingService {
       return result[field];
     } catch (err) {
       if (err.name == 'FetchError')
-        throw new ResolutionError('NamingServiceDown', { method: 'ZNS' });
+        throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, { method: 'ZNS' });
       else throw err;
     }
   }

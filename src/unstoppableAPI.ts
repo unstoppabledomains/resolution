@@ -1,6 +1,6 @@
 import { toBech32Address } from './zns/utils';
 
-import { ResolutionError } from './index';
+import { ResolutionError, ResolutionErrorCode } from './index';
 import NamingService from './namingService';
 import { NamicornResolution, NullAddress, SourceDefinition } from './types';
 import Zns from './zns';
@@ -39,7 +39,8 @@ export default class Udapi extends NamingService {
   /** @internal */
   namehash(domain: string): string {
     const method = this.findMethod(domain);
-    if (!method) throw new ResolutionError('UnsupportedDomain', { domain });
+    if (!method)
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, { domain });
     return method.namehash(domain);
   }
 
@@ -54,10 +55,10 @@ export default class Udapi extends NamingService {
   async address(domain: string, currencyTicker: string): Promise<string> {
     const data = await this.resolve(domain);
     if (!data.meta.owner || data.meta.owner === NullAddress)
-      throw new ResolutionError('UnregisteredDomain', { domain });
+      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, { domain });
     const address = data.addresses[currencyTicker.toUpperCase()];
     if (!address)
-      throw new ResolutionError('UnspecifiedCurrency', {
+      throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
         domain,
         currencyTicker,
       });
@@ -88,7 +89,7 @@ export default class Udapi extends NamingService {
       return await response.json();
     } catch (error) {
       if (error.name !== 'FetchError') throw error;
-      throw new ResolutionError('NamingServiceDown', { method: 'UD' });
+      throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, { method: 'UD' });
     }
   }
 
@@ -105,7 +106,8 @@ export default class Udapi extends NamingService {
 
   private findMethodOrThrow(domain: string) {
     const method = this.findMethod(domain);
-    if (!method) throw new ResolutionError('UnsupportedDomain', { domain });
+    if (!method)
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, { domain });
     return method;
   }
   

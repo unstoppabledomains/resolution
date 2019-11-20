@@ -1,12 +1,8 @@
 import Ens from './ens';
 import Zns from './zns';
 import Udapi from './unstoppableAPI';
-import {
-  Blockchain,
-  NamicornResolution,
-  UnclaimedDomainResponse,
-} from './types';
-import ResolutionError from './resolutionError';
+import { Blockchain, NamicornResolution, UnclaimedDomainResponse } from './types';
+import ResolutionError, { ResolutionErrorCode } from './resolutionError';
 import NamingService from './namingService';
 
 /**
@@ -172,9 +168,9 @@ export default class Namicorn {
    */
   namehash(domain: string): string {
     const method = this.getNamingMethod(domain);
-    if (!method) throw new ResolutionError('UnsupportedDomain', { domain });
-    const result = method.namehash(domain);
-    return result;
+    if (!method)
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, { domain });
+    return method.namehash(domain);
   }
 
   /**
@@ -210,7 +206,8 @@ export default class Namicorn {
 
   private getNamingMethodOrThrow(domain: string) {
     const method = this.getNamingMethod(domain);
-    if (!method) throw new ResolutionError('UnsupportedDomain', { domain });
+    if (!method)
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, { domain });
     return method;
   }
 }
