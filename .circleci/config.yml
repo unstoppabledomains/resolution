@@ -25,16 +25,16 @@ jobs:
       - restore_cache:
           name: Restore Yarn Package Cache
           keys:
-            - npm-deps-{{ .Branch }}
-            - npm-deps-{{ checksum "package.json" }}
-            - npm-deps-}
+            - npm-deps-{{ .Branch }}-{{ checksum "package.json" }}
+            - npm-deps-{{ .Branch }}-
+            - npm-deps-
       - run:
           name: Install Dependencies
           command: yarn install 
 
       - save_cache:
           name: Save Yarn Package Cache
-          key: npm-deps-{{ checksum "package.json" }}
+          key: npm-deps-{{ .Branch }}-{{ checksum "package.json" }}
           paths:
             - ~/.cache/yarn
 
@@ -55,9 +55,9 @@ jobs:
       - restore_cache:
           name: Restore Yarn Package Cache
           keys:
-            - npm-deps-{{ .Branch }}
-            - npm-deps-{{ checksum "package.json" }}
-            - npm-deps-}
+            - npm-deps-{{ .Branch }}-{{ checksum "package.json" }}
+            - npm-deps-{{ .Branch }}-
+            - npm-deps-
 
       - run:
           name: Install Dependencies
@@ -65,7 +65,7 @@ jobs:
 
       - save_cache:
           name: Save Yarn Package Cache
-          key: npm-deps-{{ checksum "package.json" }}
+          key: npm-deps-{{ .Branch }}-{{ checksum "package.json" }}
           paths:
             - ~/.cache/yarn
 
@@ -86,8 +86,8 @@ jobs:
       - restore_cache:
           name: Restore Yarn Package Cache
           keys:
-            - npm-deps-{{ .Branch }}
-            - npm-deps-{{ checksum "package.json" }}
+            - npm-deps-{{ .Branch }}-{{ checksum "package.json" }}
+            - npm-deps-{{ .Branch }}-
             - npm-deps-
 
       - run:
@@ -95,7 +95,7 @@ jobs:
           command: yarn install 
       - save_cache:
           name: Save Yarn Package Cache
-          key: npm-deps-{{ checksum "package.json" }}
+          key: npm-deps-{{ .Branch }}-{{ checksum "package.json" }}
           paths:
             - ~/.cache/yarn
 
@@ -117,8 +117,8 @@ jobs:
       - restore_cache:
           name: Restore Yarn Package Cache
           keys:
-            - npm-deps-{{ .Branch }}
-            - npm-deps-{{ checksum "package.json" }}
+            - npm-deps-{{ .Branch }}-{{ checksum "package.json" }}
+            - npm-deps-{{ .Branch }}-
             - npm-deps-
       - run:
           name: Install Dependencies
@@ -134,7 +134,7 @@ jobs:
             fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget
       - save_cache:
           name: Save Yarn Package Cache
-          key: npm-deps-{{ checksum "package.json" }}
+          key: npm-deps-{{ .Branch }}-{{ checksum "package.json" }}
           paths:
             - ~/.cache/yarn
       # run tests!
