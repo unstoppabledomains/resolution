@@ -13,7 +13,6 @@ import {
 } from './types';
 import NamingService from './namingService';
 import { ResolutionError, ResolutionErrorCode } from './index';
-import EnsProvider from './provider/provider';
 import Contract from './ens/contract/contract';
 
 const DefaultUrl = 'https://mainnet.infura.io';
@@ -45,7 +44,6 @@ export default class Ens extends NamingService {
   readonly url: string;
   readonly registryAddress?: string;
   private ensContract: Contract;
-  private provider: EnsProvider;
   /**
    * Source object describing the network naming service operates on
    * @param source - if specified as a string will be used as main url, if omited then defaults are used
@@ -54,7 +52,6 @@ export default class Ens extends NamingService {
   constructor(source: string | boolean | SourceDefinition = true) {
     super();
     source = this.normalizeSource(source);
-    this.provider = EnsProvider.getInstance(source.url);
     this.network = <string>source.network;
     this.url = source.url;
     if (!this.network) {
@@ -67,7 +64,7 @@ export default class Ens extends NamingService {
       ? source.registry
       : RegistryMap[this.network];
     if (this.registryAddress) {
-      this.ensContract = new Contract(ensInterface, this.registryAddress);
+      this.ensContract = new Contract(this.url, ensInterface, this.registryAddress);
     }
   }
 
@@ -113,7 +110,7 @@ export default class Ens extends NamingService {
     if (resolverAddress == NullAddress) {
       return null;
     }
-    const resolverContract = new Contract(
+    const resolverContract = new Contract(this.url,
       resolverInterface(resolverAddress, EthCoinIndex),
       resolverAddress,
     );
@@ -293,7 +290,7 @@ export default class Ens extends NamingService {
     if (!resolver || resolver == NullAddress) {
       return null;
     }
-    const resolverContract = new Contract(
+    const resolverContract = new Contract(this.url,
       resolverInterface(resolver, coinType),
       resolver,
     );
