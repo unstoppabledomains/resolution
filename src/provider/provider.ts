@@ -2,6 +2,7 @@ import keccak256 from 'keccak256';
 
 export type FourBytes = string;
 
+/** @internal */
 export default class EnsProvider {
   private static instance: EnsProvider;
   readonly url: string;

@@ -1,9 +1,8 @@
-import { ResolutionError, ResolutionErrorCode } from "../..";
 import EnsProvider, { FourBytes } from "../../provider/provider";
 import BaseConnection from "../../baseConnection";
 import {defaultAbiCoder as AbiCoder} from 'ethers/utils/abi-coder';
 
-/** Contract class describes the smartContract on the etherium */
+/** @internal */
 export default class Contract extends BaseConnection {
   readonly contractInterface: [any];
   readonly address: string;
@@ -32,8 +31,6 @@ export default class Contract extends BaseConnection {
         param.name === method &&
         param.inputs.length === args.length
     );
-    if (!methodDescription)
-      throw new ResolutionError(ResolutionErrorCode.IncorrectResolverInterface, {method: this.provider.namingService});
     const functionName: string = methodDescription.name;
     const functionInputTypes: [string] = methodDescription.inputs.map(input => input.type);
     const methodSignature: string = `${functionName}(${functionInputTypes.join(',')})`;

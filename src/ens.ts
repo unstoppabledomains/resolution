@@ -243,21 +243,21 @@ export default class Ens extends NamingService {
    * This was done to make automated tests more configurable
    */
   private resolverCallToName(resolverContract: Contract, nodeHash) {
-    return this.callMethod(() => resolverContract.fetchMethod('name', [nodeHash]) );
+    return this.callMethod(resolverContract, 'name', [nodeHash] );
   }
 
   /**
    * This was done to make automated tests more configurable
    */
   private async getResolver(nodeHash) {
-    return await this.callMethod(() => this.ensContract.fetchMethod('resolver', [nodeHash]) );
+    return await this.callMethod(this.ensContract, 'resolver', [nodeHash] );
   }
 
   /**
    * This was done to make automated tests more configurable
    */
   private async getOwner(nodeHash) {
-    return await  this.callMethod(() => this.ensContract.fetchMethod('owner', [nodeHash]) );
+    return await  this.callMethod(this.ensContract, 'owner', [nodeHash] );
   }
 
   /**
@@ -265,9 +265,9 @@ export default class Ens extends NamingService {
    */
   private async getResolutionInfo(nodeHash) {
     return await Promise.all([
-      this.callMethod(() => this.ensContract.fetchMethod('owner', [nodeHash]) ),
-      this.callMethod(() => this.ensContract.fetchMethod('ttl', [nodeHash]) ),
-      this.callMethod(() => this.ensContract.fetchMethod('resolver', [nodeHash]) ),
+      this.callMethod(this.ensContract, 'owner', [nodeHash]),
+      this.callMethod(this.ensContract, 'ttl', [nodeHash] ),
+      this.callMethod(this.ensContract, 'resolver', [nodeHash] ),
     ]);
   }
 
@@ -299,8 +299,8 @@ export default class Ens extends NamingService {
     );
     const addr: string =
       coinType != EthCoinIndex
-      ? await this.callMethod(() =>resolverContract.fetchMethod('addr', [nodeHash, coinType]) )
-      : await this.callMethod(() => resolverContract.fetchMethod('addr', [nodeHash]) );
+      ? await this.callMethod(resolverContract, 'addr', [nodeHash, coinType] )
+      : await this.callMethod(resolverContract, 'addr', [nodeHash] );
     if (!addr) return null;
     const data = Buffer.from(addr.replace('0x', ''), 'hex');
     return formatsByCoinType[coinType].encoder(data);
@@ -325,11 +325,10 @@ export default class Ens extends NamingService {
    *  @param method - method to be called
    *  @throws ResolutionError -> When blockchain is down
    */
-  private async callMethod(method: 
-    () => Promise<any>
+  private async callMethod(contract: Contract, methodname: string, params: any
   ): Promise<any> {
     try {
-      return await method();
+      return await contract.fetchMethod(methodname, params);
     } catch (error) {
       const { message }: { message: string } = error;
       if (
