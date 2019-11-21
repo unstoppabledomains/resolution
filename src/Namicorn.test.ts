@@ -1,5 +1,5 @@
 import nock from 'nock';
-import Namicorn, { ResolutionError } from '.';
+import Namicorn, { ResolutionError, ResolutionErrorCode } from '.';
 import mockData from './testData/mockData.json';
 import Ens from './ens';
 import { Dictionary, NullAddress, UnclaimedDomainResponse } from './types';
@@ -15,7 +15,9 @@ const mockAsyncMethod = (object: any, method: string, value) => {
 };
 
 const mockAsyncMethods = (object: any, methods: Dictionary<any>) => {
-  return Object.entries(methods).map(method => mockAsyncMethod(object, method[0], method[1]));
+  return Object.entries(methods).map(method =>
+    mockAsyncMethod(object, method[0], method[1]),
+  );
 };
 
 const expectSpyToBeCalled = (spies: any[]) => {
@@ -101,7 +103,7 @@ describe('Unstoppable API', () => {
     jest.spyOn(namicorn.api as any, 'fetch').mockRejectedValue(error);
     await expectResolutionErrorCode(
       namicorn.resolve('hello.zil'),
-      'NamingServiceDown',
+      ResolutionErrorCode.NamingServiceDown,
     );
   });
 
@@ -504,7 +506,7 @@ describe('ENS', () => {
     });
     await expectResolutionErrorCode(
       namicorn.addressOrThrow('something.luxe', 'ETH'),
-      'UnregisteredDomain',
+      ResolutionErrorCode.UnregisteredDomain,
     );
   });
 
@@ -764,14 +766,14 @@ describe('ENS', () => {
   it('checks UnsupportedCurrency error', async () => {
     await expectResolutionErrorCode(
       new Namicorn().addressOrThrow('testthing.eth', 'bnb'),
-      'UnsupportedCurrency',
+      ResolutionErrorCode.UnsupportedCurrency,
     );
   });
 
   it('checks UnsupportedCurrency error', async () => {
     await expectResolutionErrorCode(
       new Namicorn().addressOrThrow('testthing.eth', 'UNREALTICKER'),
-      'UnsupportedCurrency',
+      ResolutionErrorCode.UnsupportedCurrency,
     );
   });
 });
@@ -781,7 +783,7 @@ describe('Namicorn', () => {
     const namicorn = new Namicorn();
     await expectResolutionErrorCode(
       namicorn.addressOrThrow('sdncdoncvdinvcsdncs.zil', 'ZIL'),
-      'UnregisteredDomain',
+      ResolutionErrorCode.UnregisteredDomain,
     );
   });
 
@@ -789,7 +791,7 @@ describe('Namicorn', () => {
     const namicorn = new Namicorn();
     await expectResolutionErrorCode(
       namicorn.addressOrThrow('brad.zil', 'INVALID_CURRENCY_SYMBOL'),
-      'UnspecifiedCurrency',
+      ResolutionErrorCode.UnspecifiedCurrency,
     );
   });
 
@@ -797,7 +799,7 @@ describe('Namicorn', () => {
     const namicorn = new Namicorn({ blockchain: true });
     await expectResolutionErrorCode(
       namicorn.addressOrThrow('bogdangusiev.qq', 'ZIL'),
-      'UnsupportedDomain',
+      ResolutionErrorCode.UnsupportedDomain,
     );
   });
 
@@ -823,7 +825,7 @@ describe('Namicorn', () => {
     const namicorn = new Namicorn();
     await expectResolutionErrorCode(
       () => namicorn.namehash('something.hello.com'),
-      'UnsupportedDomain',
+      ResolutionErrorCode.UnsupportedDomain,
     );
   });
 
@@ -843,7 +845,7 @@ describe('Namicorn', () => {
     const namicorn = new Namicorn();
     await expectResolutionErrorCode(
       namicorn.email('brad.zil'),
-      'RecordNotFound',
+      ResolutionErrorCode.RecordNotFound,
     );
   });
 });

@@ -1,5 +1,5 @@
 import { SourceDefinition, NamicornResolution } from './types';
-import ResolutionError from './resolutionError';
+import ResolutionError, { ResolutionErrorCode } from './resolutionError';
 import BaseConnection from './baseConnection';
 
 /**
@@ -22,7 +22,9 @@ export default abstract class NamingService extends BaseConnection {
 
   protected ensureSupportedDomain(domain: string): void {
     if (!this.isSupportedDomain(domain)) {
-      throw new ResolutionError('UnsupportedDomain', { domain });
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
+        domain,
+      });
     }
   }
 }

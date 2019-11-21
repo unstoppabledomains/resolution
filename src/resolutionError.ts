@@ -1,5 +1,3 @@
-/** Alias for Resolution Error code */
-type ErrorCode = keyof typeof HandlersByCode;
 /** Alias for Resolution error handler function */
 type ResolutionErrorHandler = (error: ResolutionErrorOptions) => string;
 /** Explains Resolution Error options */
@@ -9,27 +7,46 @@ type ResolutionErrorOptions = {
   currencyTicker?: string;
   recordName?: string;
 };
+
+export enum ResolutionErrorCode {
+  UnregisteredDomain = 'UnregisteredDomain',
+  UnspecifiedResolver = 'UnspecifiedResolver',
+  UnsupportedDomain = 'UnsupportedDomain',
+  UnspecifiedCurrency = 'UnspecifiedCurrency',
+  NamingServiceDown = 'NamingServiceDown',
+  UnsupportedCurrency = 'UnsupportedCurrency',
+  IncorrectResolverInterface = 'IncorrectResolverInterface',
+  RecordNotFound = 'RecordNotFound',
+}
+
 /**
  * @internal
  * Internal Mapping object from ResolutionErrorCode to a ResolutionErrorHandler
  */
 const HandlersByCode = {
-  UnregisteredDomain: (params: { domain: string }) =>
+  [ResolutionErrorCode.UnregisteredDomain]: (params: { domain: string }) =>
     `Domain ${params.domain} is not registered`,
-  UnspecifiedResolver: (params: { domain: string }) =>
+  [ResolutionErrorCode.UnspecifiedResolver]: (params: { domain: string }) =>
     `Domain ${params.domain} is not configured`,
-  UnsupportedDomain: (params: { domain: string }) =>
+  [ResolutionErrorCode.UnsupportedDomain]: (params: { domain: string }) =>
     `Domain ${params.domain} is not supported`,
-  UnspecifiedCurrency: (params: { domain: string; currencyTicker: string }) =>
+  [ResolutionErrorCode.UnspecifiedCurrency]: (params: {
+    domain: string;
+    currencyTicker: string;
+  }) =>
     `Domain ${params.domain} has no ${params.currencyTicker} attached to it`,
-  NamingServiceDown: (params: { method: string }) =>
+  [ResolutionErrorCode.NamingServiceDown]: (params: { method: string }) =>
     `${params.method} naming service is down at the moment`,
-  UnsupportedCurrency: (params: { currencyTicker: string }) =>
-    `${params.currencyTicker} is not supported`,
-  IncorrectResolverInterface: (params: { method: string }) =>
-    `Domain resolver is configured incorrectly for ${params.method}`,
-  RecordNotFound: (params: { recordName: string; domain: string }) =>
-    `No ${params.recordName} record found for ${params.domain}`,
+  [ResolutionErrorCode.UnsupportedCurrency]: (params: {
+    currencyTicker: string;
+  }) => `${params.currencyTicker} is not supported`,
+  [ResolutionErrorCode.IncorrectResolverInterface]: (params: {
+    method: string;
+  }) => `Domain resolver is configured incorrectly for ${params.method}`,
+  [ResolutionErrorCode.RecordNotFound]: (params: {
+    recordName: string;
+    domain: string;
+  }) => `No ${params.recordName} record found for ${params.domain}`,
 };
 
 /**
@@ -44,12 +61,12 @@ const HandlersByCode = {
  * @param method
  */
 export default class ResolutionError extends Error {
-  readonly code: ErrorCode;
+  readonly code: ResolutionErrorCode;
   readonly domain?: string;
   readonly method?: string;
   readonly currencyTicker?: string;
 
-  constructor(code: ErrorCode, options: ResolutionErrorOptions = {}) {
+  constructor(code: ResolutionErrorCode, options: ResolutionErrorOptions = {}) {
     const resolutionErrorHandler: ResolutionErrorHandler = HandlersByCode[code];
     const { domain, method, currencyTicker, recordName } = options;
     super(

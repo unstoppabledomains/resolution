@@ -26,9 +26,7 @@
         "params": [
           "9611c53BE6d1b32058b2747bdeCECed7e1216793",
           "records",
-          [
-            "0x1cc365ffd60bb50538e01d24c1f1e26c887c36f26a0de250660b8a1465c60667"
-          ]
+          ["0x1cc365ffd60bb50538e01d24c1f1e26c887c36f26a0de250660b8a1465c60667"]
         ]
       },
       "RESPONSE": {
@@ -54,11 +52,7 @@
         "id": "1",
         "jsonrpc": "2.0",
         "method": "GetSmartContractSubState",
-        "params": [
-          "B17C35e557a8c13a730696C92D716A58421e36cA",
-          "records",
-          []
-        ]
+        "params": ["B17C35e557a8c13a730696C92D716A58421e36cA", "records", []]
       },
       "RESPONSE": {
         "id": 1,

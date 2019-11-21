@@ -1,4 +1,4 @@
-import { ResolutionError } from "../..";
+import { ResolutionError, ResolutionErrorCode } from "../..";
 import EnsProvider, { FourBytes } from "../../provider/provider";
 import BaseConnection from "../../baseConnection";
 import {defaultAbiCoder as AbiCoder} from 'ethers/utils/abi-coder';
@@ -33,7 +33,7 @@ export default class Contract extends BaseConnection {
         param.inputs.length === args.length
     );
     if (!methodDescription)
-      throw new ResolutionError('IncorrectResolverInterface', {method: this.provider.namingService});
+      throw new ResolutionError(ResolutionErrorCode.IncorrectResolverInterface, {method: this.provider.namingService});
     const functionName: string = methodDescription.name;
     const functionInputTypes: [string] = methodDescription.inputs.map(input => input.type);
     const methodSignature: string = `${functionName}(${functionInputTypes.join(',')})`;

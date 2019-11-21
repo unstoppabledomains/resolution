@@ -1,19 +1,19 @@
 import {
-  toChecksumAddress,
-  toBech32Address,
   fromBech32Address,
+  toBech32Address,
+  toChecksumAddress,
 } from './zns/utils';
 import namehash from './zns/namehash';
-import { set, invert } from './utils';
+import { invert, set } from './utils';
 import {
-  SourceDefinition,
-  NamicornResolution,
   Dictionary,
-  ZnsResolution,
+  NamicornResolution,
   NullAddress,
+  SourceDefinition,
   UnclaimedDomainResponse,
+  ZnsResolution,
 } from './types';
-import { ResolutionError } from './index';
+import { ResolutionError, ResolutionErrorCode } from './index';
 import NamingService from './namingService';
 
 const DefaultSource = 'https://api.zilliqa.com';
@@ -89,7 +89,9 @@ export default class Zns extends NamingService {
       await this.getResolverRecords(resolverAddress),
     );
     const addresses = {};
-    Object.entries(resolution.crypto).map(([key, v]) => addresses[key] = v.address);
+    Object.entries(resolution.crypto).map(
+      ([key, v]) => (addresses[key] = v.address),
+    );
     return {
       addresses,
       meta: {
@@ -113,10 +115,12 @@ export default class Zns extends NamingService {
   async address(domain: string, currencyTicker: string): Promise<string> {
     const data = await this.resolve(domain);
     if (!data.meta.owner || data.meta.owner === NullAddress)
-      throw new ResolutionError('UnregisteredDomain', { domain });
+      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+        domain,
+      });
     const address = data.addresses[currencyTicker.toUpperCase()];
     if (!address)
-      throw new ResolutionError('UnspecifiedCurrency', {
+      throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
         domain,
         currencyTicker,
       });
@@ -188,39 +192,39 @@ export default class Zns extends NamingService {
     return namehash(domain);
   }
 
- /** @internal */
- protected normalizeSource(
-  source: string | boolean | SourceDefinition,
-): SourceDefinition {
-  switch (typeof source) {
-    case 'boolean': {
-      return { url: DefaultSource, network: 'mainnet' };
-    }
-    case 'string': {
-      return {
-        url: source as string,
-        network: UrlNetworkMap(source),
-      };
-    }
-    case 'object': {
-      source = { ...source }
-      if (typeof source.network == 'number') {
-        source.network = NetworkIdMap[source.network];
+  /** @internal */
+  protected normalizeSource(
+    source: string | boolean | SourceDefinition,
+  ): SourceDefinition {
+    switch (typeof source) {
+      case 'boolean': {
+        return { url: DefaultSource, network: 'mainnet' };
       }
-      if (source.registry) {
-        source.network = source.network ? source.network : 'mainnet';
-        source.url = source.url ? source.url : DefaultSource;
+      case 'string': {
+        return {
+          url: source as string,
+          network: UrlNetworkMap(source),
+        };
       }
-      if (source.network && !source.url) {
-        source.url = UrlMap[source.network];
+      case 'object': {
+        source = { ...source };
+        if (typeof source.network == 'number') {
+          source.network = NetworkIdMap[source.network];
+        }
+        if (source.registry) {
+          source.network = source.network ? source.network : 'mainnet';
+          source.url = source.url ? source.url : DefaultSource;
+        }
+        if (source.network && !source.url) {
+          source.url = UrlMap[source.network];
+        }
+        if (source.url && !source.network) {
+          source.network = UrlNetworkMap(source.url);
+        }
+        return source;
       }
-      if (source.url && !source.network) {
-        source.network = UrlNetworkMap(source.url);
-      }
-      return source;
     }
   }
-}
 
   private getRecordFieldOrThrow(
     domain: string,
@@ -228,7 +232,7 @@ export default class Zns extends NamingService {
     field: string,
   ): string {
     if (!records || !records[field])
-      throw new ResolutionError('RecordNotFound', {
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
         domain,
         recordName: field,
       });
@@ -265,12 +269,12 @@ export default class Zns extends NamingService {
     const resolver = toChecksumAddress(resolverAddress);
     return ((await this.getContractField(resolver, 'records')) ||
       {}) as Dictionary<string>;
-  } 
+  }
 
   private structureResolverRecords(records: Dictionary<string>): ZnsResolution {
-    const result = {}
-    for (const [key,value] of Object.entries(records)) {
-      set(result, key, value)
+    const result = {};
+    for (const [key, value] of Object.entries(records)) {
+      set(result, key, value);
     }
     return result;
   }
@@ -312,7 +316,9 @@ export default class Zns extends NamingService {
       return result[field];
     } catch (err) {
       if (err.name == 'FetchError')
-        throw new ResolutionError('NamingServiceDown', { method: 'ZNS' });
+        throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
+          method: 'ZNS',
+        });
       else throw err;
     }
   }
