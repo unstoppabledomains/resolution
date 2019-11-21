@@ -1,12 +1,14 @@
 ## Unreleased
 
 ## 0.3.4
-* Deprecated UNCLAIMED_DOMAIN_RESPONSE (use UnclaimedDomainResponse instead) 
+
+* Deprecated `UNCLAIMED_DOMAIN_RESPONSE` (use `UnclaimedDomainResponse` instead) 
 * Excluded private, internal (public) and not exported symbols from the documentation
 * Excluded internal (public) symbols from the declaration files
 * Added ResolutionErrorCode enum for more convenient error handling
 
 ## 0.3.3 
+
 * NamingService#record -> gets an arbitrary record from the corresponding naming service
 * Namicorn#ipfsHash -> gets ipfs hash for a specific supported domain
 * Namicorn#email -> gets ipfs email field of whois object for a specific supported domain
