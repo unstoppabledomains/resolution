@@ -1,13 +1,13 @@
 import { SourceDefinition, NamicornResolution } from './types';
 import ResolutionError from './resolutionError';
 import BaseConnection from './baseConnection';
+
 /**
  * Abstract class for different Naming Service supports like
  * - ENS
  * - ZNS
  *
  */
-
 export default abstract class NamingService extends BaseConnection {
   abstract isSupportedDomain(domain: string): boolean;
   abstract isSupportedNetwork(): boolean;

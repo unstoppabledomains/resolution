@@ -13,7 +13,6 @@ import {
 } from './types';
 import NamingService from './namingService';
 import { ResolutionError } from './index';
-import Web3 from 'web3';
 import EnsProvider from './provider/provider';
 import Contract from './ens/contract/contract';
 
@@ -47,14 +46,6 @@ export default class Ens extends NamingService {
   readonly registryAddress?: string;
   private ensContract: Contract;
   private provider: EnsProvider;
-  private methodBytesMap = {
-    owner: "0x02571be3",
-    resolver: "0x0178b8bf",
-    ttl: "0x16a25cbd",
-    oldAddr: "0xd6898710",
-    newAddr: "0x7e8f15da"
-
-  }
   /**
    * Source object describing the network naming service operates on
    * @param source - if specified as a string will be used as main url, if omited then defaults are used
@@ -251,22 +242,22 @@ export default class Ens extends NamingService {
   /**
    * This was done to make automated tests more configurable
    */
-  private resolverCallToName(resolverContract, nodeHash) {
-    return this.callMethod(resolverContract.fetchMethod('name', [nodeHash]));
+  private resolverCallToName(resolverContract: Contract, nodeHash) {
+    return this.callMethod(() => resolverContract.fetchMethod('name', [nodeHash]) );
   }
 
   /**
    * This was done to make automated tests more configurable
    */
   private async getResolver(nodeHash) {
-    return await this.callMethod({call: () => this.ensContract.fetchMethod('resolver', nodeHash)});
+    return await this.callMethod(() => this.ensContract.fetchMethod('resolver', [nodeHash]) );
   }
 
   /**
    * This was done to make automated tests more configurable
    */
   private async getOwner(nodeHash) {
-    return await  this.callMethod({call : () => this.ensContract.fetchMethod('owner', nodeHash)});
+    return await  this.callMethod(() => this.ensContract.fetchMethod('owner', [nodeHash]) );
   }
 
   /**
@@ -274,9 +265,9 @@ export default class Ens extends NamingService {
    */
   private async getResolutionInfo(nodeHash) {
     return await Promise.all([
-      this.callMethod({ call: () => this.ensContract.fetchMethod('owner', [nodeHash]) }),
-      this.callMethod({ call: () => this.ensContract.fetchMethod('ttl', [nodeHash]) }),
-      this.callMethod({ call: () => this.ensContract.fetchMethod('resolver', [nodeHash]) }),
+      this.callMethod(() => this.ensContract.fetchMethod('owner', [nodeHash]) ),
+      this.callMethod(() => this.ensContract.fetchMethod('ttl', [nodeHash]) ),
+      this.callMethod(() => this.ensContract.fetchMethod('resolver', [nodeHash]) ),
     ]);
   }
 
@@ -306,8 +297,8 @@ export default class Ens extends NamingService {
     );
     const addr: string =
       coinType != EthCoinIndex
-      ? await resolverContract.fetchMethod('addr', [nodeHash, coinType])
-      : await resolverContract.fetchMethod('addr', [nodeHash]);
+      ? await this.callMethod(() =>resolverContract.fetchMethod('addr', [nodeHash, coinType]) )
+      : await this.callMethod(() => resolverContract.fetchMethod('addr', [nodeHash]) );
     if (!addr) return null;
     const data = Buffer.from(addr.replace('0x', ''), 'hex');
     return formatsByCoinType[coinType].encoder(data);
@@ -327,17 +318,17 @@ export default class Ens extends NamingService {
         return key;
     }
   }
-  
+
   /**
    * Internal wrapper for ens method. Used to throw an error when ens is down
    *  @param method - method to be called
    *  @throws ResolutionError -> When blockchain is down
    */
-  private async callMethod(method: {
-    call: () => Promise<any>;
-  }): Promise<any> {
+  private async callMethod(method: 
+    () => Promise<any>
+  ): Promise<any> {
     try {
-      return await method.call();
+      return await method();
     } catch (error) {
       const { message }: { message: string } = error;
       if (

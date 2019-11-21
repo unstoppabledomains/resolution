@@ -1,42 +1,44 @@
 import { ResolutionError } from "../..";
 import EnsProvider, { FourBytes } from "../../provider/provider";
 import BaseConnection from "../../baseConnection";
+import {defaultAbiCoder as AbiCoder} from 'ethers/utils/abi-coder';
 
-
+/** Contract class describes the smartContract on the etherium */
 export default class Contract extends BaseConnection {
   readonly contractInterface: [any];
   readonly address: string;
   readonly provider: EnsProvider;
 
-  constructor(contractInterface, address) {
+  /**
+   * @param contractInterface JSON-RPC interface of smartContract
+   * @param address Contract's address
+   */
+  constructor(contractInterface, address: string) {
     super();
     this.contractInterface = contractInterface;
     this.address = address;
     this.provider = EnsProvider.getInstance();
   }
 
-  //? Not sure what should I do with overloaded functions like addr....
-  //! params first arg is always nodehash
-  async fetchMethod(method: string, params: any[]) {
+  /**
+   * Used to fetch a Contract method
+   * @param method - method name 
+   * @param args - method args
+   * @async
+   */
+  async fetchMethod(method: string, args: string[]): Promise<any> {
     const methodDescription = this.contractInterface.find(
       param =>
         param.name === method &&
-        param.inputs.length === params.length
+        param.inputs.length === args.length
     );
-    console.log(this.contractInterface);
-    // if (!methodDescription)
-    //   throw new ResolutionError('IncorrectResolverInterface', {method: this.provider.namingService});
-    const functionName = methodDescription.name;
-    const functionInputTypes = methodDescription.inputs.map(input => input.type) as [string];
-    const methodSignature = `${functionName}(${functionInputTypes.join(', ')})`;
-    console.log({methodSignature});
-    
-    const initialBytes: FourBytes = '0x' + this.provider.FourBytesHash(methodSignature);
-
-    console.log({initialBytes});
-    
-    const dataParam = initialBytes + params[0].replace('0x', '');
-    console.log({dataParam});
+    if (!methodDescription)
+      throw new ResolutionError('IncorrectResolverInterface', {method: this.provider.namingService});
+    const functionName: string = methodDescription.name;
+    const functionInputTypes: [string] = methodDescription.inputs.map(input => input.type);
+    const methodSignature: string = `${functionName}(${functionInputTypes.join(',')})`;
+    const initialBytes: FourBytes = this.provider.FourBytesHash(methodSignature);
+    const dataParam: string = initialBytes + AbiCoder.encode(methodDescription.inputs, args).replace('0x', '');
     const response = await this.fetch(this.provider.url, {
       method: 'POST',
       body: JSON.stringify({
@@ -54,8 +56,7 @@ export default class Contract extends BaseConnection {
       headers: {
         'Content-Type': 'application/json',
       }
-    }
-    ).then(res => res.json());
-    return response.result;
+    }).then(res => res.json());
+    return AbiCoder.decode( methodDescription.outputs , response.result )[0];
   }
 }
