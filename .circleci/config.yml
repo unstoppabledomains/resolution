@@ -25,7 +25,9 @@ jobs:
       - restore_cache:
           name: Restore Yarn Package Cache
           keys:
-            - yarn-packages-{{ checksum "yarn.lock" }}
+            - npm-deps-{{ .Branch }}-{{ checksum "package.json" }}
+            - npm-deps-{{ .Branch }}-
+            - npm-deps-
 
       - run:
           name: Install Dependencies
@@ -33,7 +35,7 @@ jobs:
 
       - save_cache:
           name: Save Yarn Package Cache
-          key: yarn-packages-{{ checksum "yarn.lock" }}
+          key: npm-deps-{{ .Branch }}-{{ checksum "package.json" }}
           paths:
             - ~/.cache/yarn
 
@@ -54,7 +56,9 @@ jobs:
       - restore_cache:
           name: Restore Yarn Package Cache
           keys:
-            - yarn-packages-{{ checksum "yarn.lock" }}
+            - npm-deps-{{ .Branch }}-{{ checksum "package.json" }}
+            - npm-deps-{{ .Branch }}-
+            - npm-deps-
 
       - run:
           name: Install Dependencies
@@ -62,7 +66,7 @@ jobs:
 
       - save_cache:
           name: Save Yarn Package Cache
-          key: yarn-packages-{{ checksum "yarn.lock" }}
+          key: npm-deps-{{ .Branch }}-{{ checksum "package.json" }}
           paths:
             - ~/.cache/yarn
 
@@ -83,14 +87,16 @@ jobs:
       - restore_cache:
           name: Restore Yarn Package Cache
           keys:
-            - yarn-packages-{{ checksum "yarn.lock" }}
+            - npm-deps-{{ .Branch }}-{{ checksum "package.json" }}
+            - npm-deps-{{ .Branch }}-
+            - npm-deps-
 
       - run:
           name: Install Dependencies
           command: yarn install 
       - save_cache:
           name: Save Yarn Package Cache
-          key: yarn-packages-{{ checksum "yarn.lock" }}
+          key: npm-deps-{{ .Branch }}-{{ checksum "package.json" }}
           paths:
             - ~/.cache/yarn
 

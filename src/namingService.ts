@@ -1,13 +1,14 @@
-import { NamicornResolution, SourceDefinition } from './types';
+import { SourceDefinition, NamicornResolution } from './types';
 import ResolutionError, { ResolutionErrorCode } from './resolutionError';
-import nodeFetch from 'node-fetch';
+import BaseConnection from './baseConnection';
 
 /**
  * Abstract class for different Naming Service supports like
  * - ENS
  * - ZNS
+ *
  */
-export default abstract class NamingService {
+export default abstract class NamingService extends BaseConnection {
   abstract isSupportedDomain(domain: string): boolean;
   abstract isSupportedNetwork(): boolean;
   abstract namehash(domain: string): string;
@@ -25,22 +26,5 @@ export default abstract class NamingService {
         domain,
       });
     }
-  }
-
-  /** @internal */
-  protected isNode = () => {
-    if (typeof process === 'object') {
-      if (typeof process.versions === 'object') {
-        if (typeof process.versions.node !== 'undefined') {
-          return true;
-        }
-      }
-    }
-    return false;
-  };
-
-  /** @internal */
-  protected async fetch(url, options) {
-    return this.isNode() ? nodeFetch(url, options) : window.fetch(url, options);
   }
 }

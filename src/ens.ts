@@ -9,10 +9,11 @@ import {
   NullAddress,
   Bip44Constants,
   EthCoinIndex,
+  NullAddressExtended,
 } from './types';
 import NamingService from './namingService';
 import { ResolutionError, ResolutionErrorCode } from './index';
-import Web3 from 'web3';
+import Contract from './ens/contract/contract';
 
 const DefaultUrl = 'https://mainnet.infura.io';
 const NetworkIdMap = {
@@ -42,9 +43,7 @@ export default class Ens extends NamingService {
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
-  private ensContract: any;
-  private web3: any;
-
+  private ensContract: Contract;
   /**
    * Source object describing the network naming service operates on
    * @param source - if specified as a string will be used as main url, if omited then defaults are used
@@ -53,7 +52,6 @@ export default class Ens extends NamingService {
   constructor(source: string | boolean | SourceDefinition = true) {
     super();
     source = this.normalizeSource(source);
-    this.web3 = new Web3(source.url);
     this.network = <string>source.network;
     this.url = source.url;
     if (!this.network) {
@@ -66,10 +64,7 @@ export default class Ens extends NamingService {
       ? source.registry
       : RegistryMap[this.network];
     if (this.registryAddress) {
-      this.ensContract = new this.web3.eth.Contract(
-        ensInterface,
-        this.registryAddress,
-      );
+      this.ensContract = new Contract(this.url, ensInterface, this.registryAddress);
     }
   }
 
@@ -115,7 +110,7 @@ export default class Ens extends NamingService {
     if (resolverAddress == NullAddress) {
       return null;
     }
-    const resolverContract = new this.web3.eth.Contract(
+    const resolverContract = new Contract(this.url,
       resolverInterface(resolverAddress, EthCoinIndex),
       resolverAddress,
     );
@@ -137,15 +132,11 @@ export default class Ens extends NamingService {
     const nodeHash = this.namehash(domain);
     const ownerPromise = this.owner(domain);
     const resolver = await this.getResolver(nodeHash);
-    if (!resolver || resolver === NullAddress) {
+    if (!resolver || resolver === NullAddress || resolver === NullAddressExtended) {
       const owner = await ownerPromise;
-      if (!owner || owner === NullAddress)
-        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-          domain,
-        });
-      throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
-        domain,
-      });
+      if (!owner || owner === NullAddress || owner === NullAddressExtended)
+        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, { domain });
+      throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, { domain });
     }
     const coinType = this.getCoinType(currencyTicker);
     var addr = await this.fetchAddress(resolver, nodeHash, coinType);
@@ -248,22 +239,22 @@ export default class Ens extends NamingService {
   /**
    * This was done to make automated tests more configurable
    */
-  private resolverCallToName(resolverContract, nodeHash) {
-    return this.callMethod(resolverContract.methods.name(nodeHash));
+  private resolverCallToName(resolverContract: Contract, nodeHash) {
+    return this.callMethod(resolverContract, 'name', [nodeHash] );
   }
 
   /**
    * This was done to make automated tests more configurable
    */
   private async getResolver(nodeHash) {
-    return await this.callMethod(this.ensContract.methods.resolver(nodeHash));
+    return await this.callMethod(this.ensContract, 'resolver', [nodeHash] );
   }
 
   /**
    * This was done to make automated tests more configurable
    */
   private async getOwner(nodeHash) {
-    return await this.callMethod(this.ensContract.methods.owner(nodeHash));
+    return await  this.callMethod(this.ensContract, 'owner', [nodeHash] );
   }
 
   /**
@@ -271,9 +262,9 @@ export default class Ens extends NamingService {
    */
   private async getResolutionInfo(nodeHash) {
     return await Promise.all([
-      this.callMethod(this.ensContract.methods.owner(nodeHash)),
-      this.callMethod(this.ensContract.methods.ttl(nodeHash)),
-      this.callMethod(this.ensContract.methods.resolver(nodeHash)),
+      this.callMethod(this.ensContract, 'owner', [nodeHash]),
+      this.callMethod(this.ensContract, 'ttl', [nodeHash] ),
+      this.callMethod(this.ensContract, 'resolver', [nodeHash] ),
     ]);
   }
 
@@ -299,16 +290,14 @@ export default class Ens extends NamingService {
     if (!resolver || resolver == NullAddress) {
       return null;
     }
-    const resolverContract = new this.web3.eth.Contract(
+    const resolverContract = new Contract(this.url,
       resolverInterface(resolver, coinType),
       resolver,
     );
     const addr: string =
       coinType != EthCoinIndex
-        ? await this.callMethod(
-            resolverContract.methods.addr(nodeHash, coinType),
-          )
-        : await this.callMethod(resolverContract.methods.addr(nodeHash));
+      ? await this.callMethod(resolverContract, 'addr', [nodeHash, coinType] )
+      : await this.callMethod(resolverContract, 'addr', [nodeHash] );
     if (!addr) return null;
     const data = Buffer.from(addr.replace('0x', ''), 'hex');
     return formatsByCoinType[coinType].encoder(data);
@@ -333,9 +322,10 @@ export default class Ens extends NamingService {
    *  @param method - method to be called
    *  @throws ResolutionError -> When blockchain is down
    */
-  private async callMethod(method: { call: () => Promise<any> }): Promise<any> {
+  private async callMethod(contract: Contract, methodname: string, params: any
+  ): Promise<any> {
     try {
-      return await method.call();
+      return await contract.fetchMethod(methodname, params);
     } catch (error) {
       const { message }: { message: string } = error;
       if (
