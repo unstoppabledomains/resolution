@@ -133,6 +133,11 @@ describe('ZNS', () => {
     expect(result.meta.ttl).toEqual(0);
   });
 
+  it('supports root "zil" domain', async () => {
+    const namicorn = new Namicorn()
+    expect(namicorn.namehash('zil')).toEqual('0x9915d0456b878862e822e2361da37232f626a2e47505c8795134a95d36138ed3');
+  })
+
   it('resolves unclaimed domain using blockchain', async () => {
     const namicorn = new Namicorn({ blockchain: true });
     const result = await namicorn.resolve('test.zil');
