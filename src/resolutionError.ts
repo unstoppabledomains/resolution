@@ -60,7 +60,7 @@ const HandlersByCode = {
  * @param domain - Domain name that was being used
  * @param method
  */
-export default class ResolutionError extends Error {
+export class ResolutionError extends Error {
   readonly code: ResolutionErrorCode;
   readonly domain?: string;
   readonly method?: string;
@@ -80,3 +80,4 @@ export default class ResolutionError extends Error {
     Object.setPrototypeOf(this, ResolutionError.prototype);
   }
 }
+export default ResolutionError;

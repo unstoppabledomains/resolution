@@ -1,4 +1,5 @@
 import Namicorn from './namicorn';
-import ResolutionError, { ResolutionErrorCode } from './resolutionError';
+export { UnclaimedDomainResponse } from './types';
+export { ResolutionError, ResolutionErrorCode } from './resolutionError';
 export default Namicorn;
-export { Namicorn, ResolutionError, ResolutionErrorCode };
+export { Namicorn };
