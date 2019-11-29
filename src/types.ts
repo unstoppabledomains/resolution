@@ -1,5 +1,3 @@
-import { Contract } from 'web3-eth-contract';
-
 export type Dictionary<T> = { [k: string]: T };
 
 /**
@@ -62,7 +60,6 @@ export type ZnsResolution = {
 export type Bip44Constants = [number, string, string];
 export type owner = string;
 export type ttl = string;
-export type ResolverContract = Contract;
 
 export const NullAddress = '0x0000000000000000000000000000000000000000';
 export const NullAddressExtended = '0x0000000000000000000000000000000000000000000000000000000000000000';
