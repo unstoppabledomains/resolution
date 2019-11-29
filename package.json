@@ -2,8 +2,8 @@
   "name": "namicorn",
   "version": "0.3.5",
   "description": "Crypto currency wallet domain name resolution library by Unstoppable Domains Inc.",
-  "main": "./lib/index.js",
-  "types": "./lib/index.d.ts",
+  "main": "./build/index.js",
+  "types": "./build/index.d.ts",
   "scripts": {
     "release": "yarn build && yarn test && yarn publish --patch && yarn docs && yarn docs:deploy && yarn release:tag",
     "release:minor": "yarn build && yarn test && yarn publish --minor && yarn docs && yarn docs:deploy && yarn release:tag",
@@ -21,7 +21,7 @@
     "docs:deploy": "./deploy-docs.sh"
   },
   "files": [
-    "lib"
+    "build"
   ],
   "repository": {
     "type": "git",

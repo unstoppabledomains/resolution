@@ -3,7 +3,7 @@
     "target": "es5",
     "moduleResolution": "node",
     "lib": ["es6", "dom"],
-    "outDir": "lib",
+    "outDir": "build",
     "rootDir": "src",
     "strict": false,
     "esModuleInterop": true,
