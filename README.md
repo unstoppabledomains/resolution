@@ -3,7 +3,7 @@
 A library for interacting with blockchain domain names.
 
 You can use Namicorn in a `<script>` tag from a
-[CDN](https://unpkg.com/browse/namicorn/lib/index.js), or as the `namicorn`
+[CDN](https://unpkg.com/browse/namicorn/build/index.js), or as the `namicorn`
 package on the [npm](https://www.npmjs.com/package/namicorn) registry.
 
 Supported domain zones:
