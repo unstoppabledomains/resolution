@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 0.3.6
+
+* Fix root tld support for ZNS
+
 ## 0.3.4
 
 * Deprecated `UNCLAIMED_DOMAIN_RESPONSE` (use `UnclaimedDomainResponse` instead) 
