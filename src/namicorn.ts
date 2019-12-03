@@ -2,8 +2,12 @@ import Ens from './ens';
 import Zns from './zns';
 import Cns from './cns';
 import Udapi from './unstoppableAPI';
-import { Blockchain, NamicornResolution, UNCLAIMED_DOMAIN_RESPONSE } from './types';
-import ResolutionError from './resolutionError';
+import {
+  Blockchain,
+  NamicornResolution,
+  UnclaimedDomainResponse,
+} from './types';
+import ResolutionError, { ResolutionErrorCode } from './resolutionError';
 import NamingService from './namingService';
 
 /**
@@ -15,11 +19,11 @@ import NamingService from './namingService';
  * let resolution = namicorn.address(domain);
  * ```
  */
-class Namicorn {
+export default class Namicorn {
   readonly blockchain: Blockchain | boolean;
-  /** @ignore */
+  /** @internal */
   readonly ens?: Ens;
-  /** @ignore */
+  /** @internal */
   readonly zns?: Zns;
   /** @ignore */
   readonly cns?: Cns;
@@ -62,12 +66,12 @@ class Namicorn {
    * Resolves the given domain
    * @async
    * @param domain - domain name to be resolved
-   * @returns - Returns a promise that resolves in an object
+   * @returns A promise that resolves in an object
    */
   async resolve(domain: string): Promise<NamicornResolution> {
     const method = this.getNamingMethodOrThrow(domain);
     const result = await method.resolve(domain);
-    return result || UNCLAIMED_DOMAIN_RESPONSE;
+    return result || UnclaimedDomainResponse;
   }
 
   /**
@@ -75,7 +79,7 @@ class Namicorn {
    * @async
    * @param domain - domain name to be resolved
    * @param currencyTicker - currency ticker like BTC, ETH, ZIL
-   * @returns - A promise that resolves in an address or null
+   * @returns A promise that resolves in an address or null
    */
   async address(
     domain: string,
@@ -90,6 +94,45 @@ class Namicorn {
         throw error;
       }
     }
+  }
+
+  /**
+   * Resolves the ipfs hash configured for domain records on ZNS
+   * @param domain - domain name
+   * @throws ResolutionError
+   * @returns A Promise that resolves in ipfsHash
+   */
+  async ipfsHash(domain: string): Promise<string> {
+    return await this.getNamingMethodOrThrow(domain).record(
+      domain,
+      'ipfs.html.value',
+    );
+  }
+
+  /**
+   * Resolves the ipfs redirect url for a supported domain records
+   * @param domain - domain name
+   * @throws ResolutionError
+   * @returns A Promise that resolves in redirect url
+   */
+  async ipfsRedirect(domain: string): Promise<string> {
+    return await this.getNamingMethodOrThrow(domain).record(
+      domain,
+      'ipfs.redirect_domain.value',
+    );
+  }
+
+  /**
+   * Resolves the ipfs email field from whois configurations
+   * @param domain - domain name
+   * @throws ResolutionError
+   * @returns A Promise that resolves in an email address configured for this domain whois
+   */
+  async email(domain: string): Promise<string> {
+    return await this.getNamingMethodOrThrow(domain).record(
+      domain,
+      'whois.email.value',
+    );
   }
 
   /**
@@ -112,7 +155,7 @@ class Namicorn {
   /**
    * Owner of the domain
    * @param domain - domain name
-   * @returns - an owner address of the domain
+   * @returns An owner address of the domain
    */
   async owner(domain: string): Promise<string | null> {
     const method = this.getNamingMethod(domain);
@@ -124,7 +167,7 @@ class Namicorn {
    * @async
    * @param address - address you wish to reverse
    * @param currencyTicker - currency ticker like BTC, ETH, ZIL
-   * @returns - domain name attached to this address
+   * @returns Domain name attached to this address
    */
   async reverse(address: string, currencyTicker: string): Promise<string> {
     return await this.ens.reverse(address, currencyTicker);
@@ -133,19 +176,20 @@ class Namicorn {
   /**
    * Produce a namehash from supported naming service
    * @param domain - domain name to be hashed
-   * @returns - namehash either for ENS or ZNS
+   * @returns Namehash either for ENS or ZNS
    */
   namehash(domain: string): string {
     const method = this.getNamingMethod(domain);
-    if (!method) throw new ResolutionError('UnsupportedDomain', { domain });
-    const result = method.namehash(domain);
-    return result;
+    if (!method)
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
+        domain,
+      });
+    return method.namehash(domain);
   }
 
   /**
    * Checks if the domain is in valid format
    * @param domain - domain name to be checked
-   * @returns
    */
   isSupportedDomain(domain: string): boolean {
     return !!this.getNamingMethod(domain);
@@ -154,7 +198,6 @@ class Namicorn {
   /**
    * Checks if the domain is supported by the specified network as well as if it is in valid format
    * @param domain - domain name to be checked
-   * @returns
    */
   isSupportedDomainInNetwork(domain: string): boolean {
     const method = this.getNamingMethod(domain);
@@ -162,7 +205,6 @@ class Namicorn {
   }
 
   /**
-   * @ignore
    * Used internally to get the right method (ens or zns)
    * @param domain - domain name
    */
@@ -176,12 +218,14 @@ class Namicorn {
     return method as NamingService;
   }
 
-  /** @ignore */
   private getNamingMethodOrThrow(domain: string) {
     const method = this.getNamingMethod(domain);
-    if (!method) throw new ResolutionError('UnsupportedDomain', { domain });
+    if (!method)
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
+        domain,
+      });
     return method;
   }
 }
 
-export { Namicorn, Namicorn as default, ResolutionError };
+export { Namicorn };

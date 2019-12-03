@@ -1,6 +1,26 @@
 ## Unreleased
 
+## 0.3.4
+
+* Deprecated `UNCLAIMED_DOMAIN_RESPONSE` (use `UnclaimedDomainResponse` instead) 
+* Excluded private, internal (public) and not exported symbols from the documentation
+* Excluded internal (public) symbols from the declaration files
+* Added ResolutionErrorCode enum for more convenient error handling
+
+## 0.3.3 
+
+* NamingService#record -> gets an arbitrary record from the corresponding naming service
+* Namicorn#ipfsHash -> gets ipfs hash for a specific supported domain
+* Namicorn#email -> gets ipfs email field of whois object for a specific supported domain
+* Namicorn#ipfsRedirect -> gets ipfs redirect url record for a specific supported domain
+
+## 0.3.1 - 0.3.2
+
 * Namicorn#owner method - returns an owner address of the domain
+* Fixed issue with user agent on browsers instances for namicorn
+* Added docs generation scripts
+* Unstoppable API is not initilized when blockchain param is true inside the Namicorn configuration
+
 
 ## 0.3.0
 * Namicorn#addressOrThrow - new method that throws ResolutionError if currency address is not found

@@ -1,25 +1,27 @@
 {
   "name": "namicorn",
-  "version": "0.3.2",
+  "version": "0.3.5",
   "description": "Crypto currency wallet domain name resolution library by Unstoppable Domains Inc.",
-  "main": "./lib/namicorn.js",
-  "types": "./lib/namicorn.d.ts",
+  "main": "./build/index.js",
+  "types": "./build/index.d.ts",
   "scripts": {
-    "release": "yarn build && yarn test &&  yarn docs && yarn publish --patch && yarn docs:deploy",
-    "release:minor": "yarn build && yarn test && yarn docs && yarn publish --minor && yarn docs:deploy",
-    "release:major": "yarn build && yarn test && yarn docs && yarn publish --major && yarn docs:deploy ",
+    "release": "yarn build && yarn test && yarn publish --patch && yarn docs && yarn docs:deploy && yarn release:tag",
+    "release:minor": "yarn build && yarn test && yarn publish --minor && yarn docs && yarn docs:deploy && yarn release:tag",
+    "release:major": "yarn build && yarn test && yarn publish --major && yarn docs && yarn docs:deploy && yarn release:tag",
+    "release:tag": "git push origin v$npm_package_version",
     "test": "jest",
     "start": "npm run build:live",
     "build": "tsc -p .",
     "format": "prettier --semi --write -l **/*.{js,json,ts}",
     "build:live": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
-    "docs": "yarn docs:pregeneration && yarn docs:generate",
-    "docs:pregeneration": "node ./predocs.js && yarn format",
-    "docs:generate": "yarn run typedoc",
-    "docs:deploy": "./deploy-docs.sh dist 0.3.1"
+    "docs": "yarn docs:clone && yarn docs:generate && yarn docs:readme",
+    "docs:clone": "[ -d ./docs ] || git clone --branch gh-pages git@github.com:unstoppabledomains/namicorn.git docs",
+    "docs:generate": "yarn run typedoc --out \"./docs/v$npm_package_version\"",
+    "docs:readme": "./docs-readme.sh",
+    "docs:deploy": "./deploy-docs.sh"
   },
   "files": [
-    "lib"
+    "build"
   ],
   "repository": {
     "type": "git",
@@ -33,7 +35,6 @@
   "homepage": "https://github.com/unstoppabledomains/namicorn#readme",
   "devDependencies": {
     "@types/jest": "^24.0.11",
-    "@types/lodash": "^4.14.138",
     "@types/node": "^11.13.7",
     "@types/node-fetch": "^2.5.0",
     "@types/web3": "^1.0.20",
@@ -56,12 +57,10 @@
   },
   "dependencies": {
     "@ensdomains/address-encoder": "^0.1.2",
-    "@zilliqa-js/zilliqa": "^0.8.1",
     "bip44-constants": "^8.0.4",
     "eth-ens-namehash": "^2.0.8",
-    "lodash": "^4.17.15",
-    "node-fetch": "^2.6.0",
-    "tslib": "^1.10.0",
-    "web3": "^1.2.2"
+    "ethers": "^4.0.39",
+    "keccak256": "^1.0.0",
+    "node-fetch": "^2.6.0"
   }
 }

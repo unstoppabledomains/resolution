@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import {
   NamingServiceSource,
   SourceDefinition,
@@ -8,20 +7,24 @@ import {
   NamicornResolution,
   Bip44Constants,
 } from './types';
-import ResolutionError from './resolutionError';
 import { formatsByCoinType } from '@ensdomains/address-encoder';
+import ResolutionError, { ResolutionErrorCode } from './resolutionError';
+import BaseConnection from './baseConnection';
+import { invert } from './utils';
 
 /**
  * Abstract class for different Naming Service supports like
  * - ENS
  * - ZNS
+ *
  */
-export default abstract class NamingService {
+export default abstract class NamingService extends BaseConnection {
   abstract isSupportedDomain(domain: string): boolean;
   abstract isSupportedNetwork(): boolean;
   abstract namehash(domain: string): string;
   abstract address(domain: string, currencyTicker: string): Promise<string>;
-  abstract owner(domain: string): Promise<string | null>;
+  abstract owner(domain: string): Promise<string>;
+  abstract record(domain: string, key: string): Promise<string>;
   abstract resolve(domain: string): Promise<NamicornResolution>;
   protected abstract normalizeSource(
     source: NamingServiceSource,
@@ -29,12 +32,12 @@ export default abstract class NamingService {
 
   protected ensureSupportedDomain(domain: string): void {
     if (!this.isSupportedDomain(domain)) {
-      throw new ResolutionError('UnsupportedDomain', { domain });
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
+        domain,
+      });
     }
   }
 }
-
-
 export abstract class EtheriumNamingService extends NamingService {
   abstract registryAddress?: string;
   readonly NetworkIdMap: NetworkIdMap = {
@@ -53,27 +56,21 @@ export abstract class EtheriumNamingService extends NamingService {
     goerli: 'https://goerli.infura.io',
   };
 
-  /** @ignore */
-  readonly NetworkNameMap = _(this.NetworkIdMap)
-    .invert()
-    .mapValues((v, k) => parseInt(v))
-    .value();
-
+  readonly NetworkNameMap = invert(this.NetworkIdMap);
  
 
   /**
    * Look up for network from url provided
-   * @ignore
    * @param url - main api url for blockchain
-   * @returns - network such as:
+   * @returns Network such as:
    *  - mainnet
    *  - testnet
    */
-  protected _etheriumNetworkFromUrl(
-    url: string,
-    NetworkIdMap: EnsNetworkIdMap,
-  ): string {
-    return _.find(NetworkIdMap, name => url.indexOf(name) >= 0);
+  private networkFromUrl(url: string): string {
+    for (const key in this.NetworkNameMap) {
+      if (!this.NetworkNameMap.hasOwnProperty(key)) continue;
+      if (url.indexOf(key) >= 0) return key;
+    }
   }
 
    /**
@@ -87,17 +84,17 @@ export abstract class EtheriumNamingService extends NamingService {
       case 'boolean': {
         return {
           url: this.UrlMap['mainnet'],
-          network: this._etheriumNetworkFromUrl(this.UrlMap['mainnet'], this.NetworkIdMap),
+          network: this.networkFromUrl(this.UrlMap['mainnet']),
         };
       }
       case 'string': {
         return {
           url: source as string,
-          network: this._etheriumNetworkFromUrl(source as string, this.NetworkIdMap),
+          network: this.networkFromUrl(source as string),
         };
       }
       case 'object': {
-        source = _.clone(source) as SourceDefinition;
+        source = { ...source };
         if (typeof source.network == 'number') {
           source.network = this.NetworkIdMap[source.network];
         }
@@ -115,9 +112,8 @@ export abstract class EtheriumNamingService extends NamingService {
           source.url = `https://${source.network}.infura.io`;
         }
         if (source.url && !source.network) {
-          source.network = this._etheriumNetworkFromUrl(
-            source.url,
-            this.NetworkIdMap,
+          source.network = this.networkFromUrl(
+            source.url
           );
         }
         return source;
@@ -134,7 +130,7 @@ export abstract class EtheriumNamingService extends NamingService {
           item[2] === currencyTicker.toUpperCase(),
       );
       if (coin < 0 || !formatsByCoinType[coin])
-        throw new ResolutionError('UnsupportedCurrency', { currencyTicker });
+        throw new ResolutionError(ResolutionErrorCode.UnsupportedCurrency, { currencyTicker });
       return coin;
     }
 

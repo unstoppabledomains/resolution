@@ -1,19 +1,23 @@
-import _ from 'lodash';
+import { invert } from './utils';
 import { default as ensInterface } from './ens/contract/ens';
-import { default as registrarInterface } from './ens/contract/registrar';
 import { default as resolverInterface } from './ens/contract/resolver';
 import { hash } from 'eth-ens-namehash';
 import { formatsByCoinType } from '@ensdomains/address-encoder';
 import {
   NamicornResolution,
   NullAddress,
+  EthCoinIndex,
+  NullAddressExtended,
   NamingServiceSource,
-  RegistryMap,
-  EthCoinIndex
 } from './types';
-import { EtheriumNamingService } from './namingService';
-import { ResolutionError } from './index';
-import Web3 from 'web3';
+import  { EtheriumNamingService } from './namingService';
+import { ResolutionError, ResolutionErrorCode } from './index';
+import Contract from './ens/contract/contract';
+
+const RegistryMap = {
+  mainnet: '0x314159265dd8dbb310642f98f50c066173c1259b',
+  ropsten: '0x112234455c3a32fd11230c42e7bccd4a84e02010',
+};
 
 /**
  * Class to support connection with Etherium naming service
@@ -28,16 +32,7 @@ export default class Ens extends EtheriumNamingService {
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
-  /** @ignore */
-  private ensContract: any;
-  /**  @ignore */
-  private web3: any;
-  /** @ignore */
-  readonly RegistryMap: RegistryMap = {
-    mainnet: '0x314159265dd8dbb310642f98f50c066173c1259b',
-    ropsten: '0x112234455c3a32fd11230c42e7bccd4a84e02010',
-  };
-  
+  private ensContract: Contract;
   /**
    * Source object describing the network naming service operates on
    * @param source - if specified as a string will be used as main url, if omited then defaults are used
@@ -46,7 +41,6 @@ export default class Ens extends EtheriumNamingService {
   constructor(source: NamingServiceSource = true) {
     super();
     source = this.normalizeSource(source);
-    this.web3 = new Web3(source.url);
     this.network = <string>source.network;
     this.url = source.url;
     if (!this.network) {
@@ -57,19 +51,15 @@ export default class Ens extends EtheriumNamingService {
     }
     this.registryAddress = source.registry
       ? source.registry
-      : this.RegistryMap[this.network];
+      : RegistryMap[this.network];
     if (this.registryAddress) {
-      this.ensContract = new this.web3.eth.Contract(
-        ensInterface,
-        this.registryAddress,
-      );
+      this.ensContract = new Contract(this.url, ensInterface, this.registryAddress);
     }
   }
 
   /**
    * Checks if the domain is in valid format
    * @param domain - domain name to be checked
-   * @returns
    */
   isSupportedDomain(domain: string): boolean {
     return (
@@ -78,11 +68,23 @@ export default class Ens extends EtheriumNamingService {
   }
 
   /**
+   * Checks if the current network is supported
+   */
+  isSupportedNetwork(): boolean {
+    return this.registryAddress != null;
+  }
+
+  /** @internal */
+  record(domain: string, key: string): Promise<string> {
+    throw new Error('Method not implemented.');
+  }
+
+  /**
    * Reverse the ens address to a ens registered domain name
    * @async
    * @param address - address you wish to reverse
    * @param currencyTicker - currency ticker like BTC, ETH, ZIL
-   * @returns - domain name attached to this address
+   * @returns Domain name attached to this address
    */
   async reverse(address: string, currencyTicker: string): Promise<string> {
     if (currencyTicker != 'ETH') {
@@ -93,11 +95,11 @@ export default class Ens extends EtheriumNamingService {
     }
     const reverseAddress = address + '.addr.reverse';
     const nodeHash = hash(reverseAddress);
-    const resolverAddress = await this._getResolver(nodeHash);
+    const resolverAddress = await this.getResolver(nodeHash);
     if (resolverAddress == NullAddress) {
       return null;
     }
-    const resolverContract = new this.web3.eth.Contract(
+    const resolverContract = new Contract(this.url,
       resolverInterface(resolverAddress, EthCoinIndex),
       resolverAddress,
     );
@@ -108,26 +110,27 @@ export default class Ens extends EtheriumNamingService {
   /**
    * Resolves domain to a specific cryptoAddress
    * @param domain - domain name to be resolved
-   * @param currencyTicker currency ticker such as
+   * @param currencyTicker - specific currency ticker such as
    *  - ZIL
    *  - BTC
    *  - ETH
-   * @returns - A promise that resolves in a string
+   * @returns A promise that resolves in a string
+   * @throws ResolutionError
    */
   async address(domain: string, currencyTicker: string): Promise<string> {
     const nodeHash = this.namehash(domain);
     const ownerPromise = this.owner(domain);
-    const resolver = await this._getResolver(nodeHash);
-    if (!resolver || resolver === NullAddress) {
+    const resolver = await this.getResolver(nodeHash);
+    if (!resolver || resolver === NullAddress || resolver === NullAddressExtended) {
       const owner = await ownerPromise;
-      if (!owner || owner === NullAddress)
-        throw new ResolutionError('UnregisteredDomain', { domain });
-      throw new ResolutionError('UnspecifiedResolver', { domain });
+      if (!owner || owner === NullAddress || owner === NullAddressExtended)
+        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, { domain });
+      throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, { domain });
     }
     const coinType = this.getCoinType(currencyTicker);
     var addr = await this.fetchAddress(resolver, nodeHash, coinType);
     if (!addr)
-      throw new ResolutionError('UnspecifiedCurrency', {
+      throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
         domain,
         currencyTicker,
       });
@@ -137,18 +140,18 @@ export default class Ens extends EtheriumNamingService {
   /**
    * Owner of the domain
    * @param domain - domain name
-   * @returns - an owner address of the domain
+   * @returns An owner address of the domain
    */
   async owner(domain: string): Promise<string | null> {
     const nodeHash = this.namehash(domain);
-    return (await this._getOwner(nodeHash)) || null;
+    return (await this.getOwner(nodeHash)) || null;
   }
 
   /**
    * Resolves the given domain
    * @async
    * @param domain - domain name to be resolved
-   * @returns- Returns a promise that resolves in an object
+   * @returns A promise that resolves in an object
    */
   async resolve(domain: string): Promise<NamicornResolution | null> {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork()) {
@@ -173,89 +176,85 @@ export default class Ens extends EtheriumNamingService {
   /**
    * Produces ENS namehash
    * @param domain - domain to be hashed
-   * @return ENS namehash of a domain
+   * @returns ENS namehash of a domain
    */
   namehash(domain: string): string {
     this.ensureSupportedDomain(domain);
     return hash(domain);
   }
 
-  /**
-   * @ignore
+   /**
    * This was done to make automated tests more configurable
-   * @param resolverContract
-   * @param nodeHash
    */
-  private resolverCallToName(resolverContract, nodeHash) {
-    return this._callMethod(resolverContract.methods.name(nodeHash));
+  private resolverCallToName(resolverContract: Contract, nodeHash) {
+    return this.callMethod(resolverContract, 'name', [nodeHash] );
   }
 
   /**
-   * @ignore
    * This was done to make automated tests more configurable
-   * @param nodeHash
    */
-  private async _getResolver(nodeHash) {
-    return await this._callMethod(this.ensContract.methods.resolver(nodeHash));
+  private async getResolver(nodeHash) {
+    return await this.callMethod(this.ensContract, 'resolver', [nodeHash] );
   }
 
   /**
-   * @ignore
    * This was done to make automated tests more configurable
-   * @param nodeHash
    */
-
-  private async _getOwner(nodeHash) {
-    return await this._callMethod(this.ensContract.methods.owner(nodeHash));
+  private async getOwner(nodeHash) {
+    return await  this.callMethod(this.ensContract, 'owner', [nodeHash] );
   }
 
   /**
-   * @ignore
    * This was done to make automated tests more configurable
-   * @param nodeHash
    */
   private async getResolutionInfo(nodeHash) {
     return await Promise.all([
-      this._callMethod(this.ensContract.methods.owner(nodeHash)),
-      this._callMethod(this.ensContract.methods.ttl(nodeHash)),
-      this._callMethod(this.ensContract.methods.resolver(nodeHash)),
+      this.callMethod(this.ensContract, 'owner', [nodeHash]),
+      this.callMethod(this.ensContract, 'ttl', [nodeHash] ),
+      this.callMethod(this.ensContract, 'resolver', [nodeHash] ),
     ]);
   }
 
   /**
-   * @ignore
-   * @param resolver - Resolver address
+   * @param resolver - resolver address
    * @param nodeHash - namehash of a domain name
    */
    private async fetchAddress(resolver, nodeHash, coinType?: number) {
     if (!resolver || resolver == NullAddress) {
       return null;
     }
-    const resolverContract = new this.web3.eth.Contract(
+    const resolverContract = new Contract(this.url,
       resolverInterface(resolver, coinType),
       resolver,
     );
     const addr: string =
       coinType != EthCoinIndex
-        ? await this._callMethod(
-            resolverContract.methods.addr(nodeHash, coinType),
-          )
-        : await this._callMethod(resolverContract.methods.addr(nodeHash));
+      ? await this.callMethod(resolverContract, 'addr', [nodeHash, coinType] )
+      : await this.callMethod(resolverContract, 'addr', [nodeHash] );
     if (!addr) return null;
     const data = Buffer.from(addr.replace('0x', ''), 'hex');
     return formatsByCoinType[coinType].encoder(data);
   }
 
-  async _callMethod(method: { call: () => Promise<any> }): Promise<any> {
+
+  /**
+   * Internal wrapper for ens method. Used to throw an error when ens is down
+   *  @param method - method to be called
+   *  @throws ResolutionError -> When blockchain is down
+   */
+  private async callMethod(contract: Contract, methodname: string, params: any
+  ): Promise<any> {
     try {
-      return await method.call();
+      return await contract.fetchMethod(methodname, params);
     } catch (error) {
       const { message }: { message: string } = error;
       if (
         message.match(/Invalid JSON RPC response/) ||
         message.match(/legacy access request rate exceeded/)
       ) {
-        throw new ResolutionError('NamingServiceDown', { method: 'ENS' });
+        throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
+          method: 'ENS',
+        });
       }
       throw error;
     }

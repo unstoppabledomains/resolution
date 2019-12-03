@@ -1,11 +1,8 @@
 import nock from 'nock';
-import Namicorn, { ResolutionError } from '.';
-import _ from 'lodash';
+import Namicorn, { ResolutionError, ResolutionErrorCode } from '.';
 import mockData from './testData/mockData.json';
 import Ens from './ens';
-import { Dictionary, NullAddress, UNCLAIMED_DOMAIN_RESPONSE } from './types';
-import { toChecksumAddress } from '@zilliqa-js/crypto/dist/util';
-import { Zilliqa } from '@zilliqa-js/zilliqa';
+import { Dictionary, NullAddress, UnclaimedDomainResponse } from './types';
 
 const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
 const MainnetUrl = 'https://mainnet.infura.io';
@@ -18,8 +15,8 @@ const mockAsyncMethod = (object: any, method: string, value) => {
 };
 
 const mockAsyncMethods = (object: any, methods: Dictionary<any>) => {
-  return _.map(methods, (value, method) =>
-    mockAsyncMethod(object, method, value),
+  return Object.entries(methods).map(method =>
+    mockAsyncMethod(object, method[0], method[1]),
   );
 };
 
@@ -106,7 +103,7 @@ describe('Unstoppable API', () => {
     jest.spyOn(namicorn.api as any, 'fetch').mockRejectedValue(error);
     await expectResolutionErrorCode(
       namicorn.resolve('hello.zil'),
-      'NamingServiceDown',
+      ResolutionErrorCode.NamingServiceDown,
     );
   });
 
@@ -135,6 +132,11 @@ describe('ZNS', () => {
     expect(result.meta.type).toEqual('zns');
     expect(result.meta.ttl).toEqual(0);
   });
+
+  it('supports root "zil" domain', async () => {
+    const namicorn = new Namicorn()
+    expect(namicorn.namehash('zil')).toEqual('0x9915d0456b878862e822e2361da37232f626a2e47505c8795134a95d36138ed3');
+  })
 
   it('resolves unclaimed domain using blockchain', async () => {
     const namicorn = new Namicorn({ blockchain: true });
@@ -337,7 +339,7 @@ describe('ZNS', () => {
 
     const secondEye = mockAsyncMethod(namicorn.zns, 'getResolverRecords', {
       'ipfs.html.hash': 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
-      'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
+      'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu',
       'ipfs.redirect_domain.value': 'www.unstoppabledomains.com',
       'whois.email.value': 'matt+test@unstoppabledomains.com',
       'whois.for_sale.value': 'true',
@@ -349,7 +351,7 @@ describe('ZNS', () => {
       ipfs: {
         html: {
           hash: 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
-          value: 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
+          value: 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu',
         },
         redirect_domain: { value: 'www.unstoppabledomains.com' },
       },
@@ -386,32 +388,17 @@ describe('ZNS', () => {
       },
     });
   });
-
-  // BREAKS RANDOMLY...
-  // it('should check for wrong interface on zns', async () => {
-  //   const namicorn = new Namicorn();
-  //   const zilliqa = new Zilliqa('https://api.zilliqa.com');
-  //   const { zns } = namicorn as any;
-  //   expect(zns).toBeDefined();
-
-  //   const resolver = zilliqa.contracts.at(
-  //     toChecksumAddress('0xdac22230adfe4601f00631eae92df6d77f054891'),
-  //   );
-  //   expectResolutionErrorCode(
-  //     zns.getContractField(resolver, 'unknownField'),
-  //     'IncorrectResolverInterface'
-  //   );
-  // })
 });
 
-describe('CNS', () => {
-  it('label.crypto should resolve to {test: value}', async () => {
-    const namicorn = new Namicorn();
-    expect(namicorn.cns).toBeDefined();
-    const result = await namicorn.resolve('label.crypto');
-    expect(result).toEqual({ test: 'value' });
-  });
-});
+//TODO: Make more tests
+// describe('CNS', () => {
+//   it('label.crypto should resolve to {test: value}', async () => {
+//     const namicorn = new Namicorn();
+//     expect(namicorn.cns).toBeDefined();
+//     const result = await namicorn.resolve('label.crypto');
+//     expect(result).toEqual({ test: 'value' });
+//   });
+// });
 
 describe('ENS', () => {
   it('allows ens network specified as string', async () => {
@@ -430,8 +417,8 @@ describe('ENS', () => {
     expect(namicorn.ens.network).toEqual('mainnet');
 
     const eyes = mockAsyncMethods(namicorn.ens, {
-      _getOwner: '0x825ef33943d925731FBB89C99aF5780D888bD217',
-      _getResolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
+      getOwner: '0x825ef33943d925731FBB89C99aF5780D888bD217',
+      getResolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
       fetchAddress: '0x714ef33943d925731FBB89C99aF5780D888bD106',
     });
 
@@ -448,7 +435,7 @@ describe('ENS', () => {
     const ens = new Ens(MainnetUrl);
     const eyes = mockAsyncMethods(ens, {
       resolverCallToName: 'adrian.argent.xyz',
-      _getResolver: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
+      getResolver: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
     });
     const result = await ens.reverse(
       '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
@@ -460,7 +447,7 @@ describe('ENS', () => {
 
   it('reverses address to ENS domain null', async () => {
     const ens = new Ens(MainnetUrl);
-    const spy = mockAsyncMethod(ens, '_getResolver', NullAddress);
+    const spy = mockAsyncMethod(ens, 'getResolver', NullAddress);
     const result = await ens.reverse(
       '0x112234455c3a32fd11230c42e7bccd4a84e02010',
       'ETH',
@@ -475,8 +462,8 @@ describe('ENS', () => {
     });
 
     const eyes = mockAsyncMethods(namicorn.ens, {
-      _getOwner: '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
-      _getResolver: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
+      getOwner: '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
+      getResolver: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
       fetchAddress: '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
     });
 
@@ -491,8 +478,8 @@ describe('ENS', () => {
     });
 
     const eyes = mockAsyncMethods(namicorn.ens, {
-      _getOwner: '0xf3dE750A73C11a6a2863761E930BF5fE979d5663',
-      _getResolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
+      getOwner: '0xf3dE750A73C11a6a2863761E930BF5fE979d5663',
+      getResolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
       fetchAddress: '0xf3dE750A73C11a6a2863761E930BF5fE979d5663',
     });
 
@@ -506,7 +493,7 @@ describe('ENS', () => {
       blockchain: { ens: MainnetUrl },
     });
 
-    const ownerEye = mockAsyncMethod(namicorn.ens, '_getOwner', NullAddress);
+    const ownerEye = mockAsyncMethod(namicorn.ens, 'getOwner', NullAddress);
     const result = await namicorn.address('something.luxe', 'ETH');
     expectSpyToBeCalled([ownerEye]);
     expect(result).toEqual(null);
@@ -518,16 +505,16 @@ describe('ENS', () => {
     });
     await expectResolutionErrorCode(
       namicorn.addressOrThrow('something.luxe', 'ETH'),
-      'UnregisteredDomain',
+      ResolutionErrorCode.UnregisteredDomain,
     );
   });
 
   it('resolves name with resolver but without an owner', async () => {
     const ens = new Ens();
     const eyes = mockAsyncMethods(ens, {
-      _getOwner: NullAddress,
-      _getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-      _callMethod: '0x76a9144620b70031f0e9437e374a2100934fba4911046088ac',
+      getOwner: NullAddress,
+      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      callMethod: '0x76a9144620b70031f0e9437e374a2100934fba4911046088ac',
     });
     const doge = await ens.address('testthing.eth', 'DOGE');
     expectSpyToBeCalled(eyes);
@@ -678,9 +665,9 @@ describe('ENS', () => {
   it('checks ens multicoin support #1', async () => {
     const ens = new Ens();
     const eyes = mockAsyncMethods(ens, {
-      '_getOwner': '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-      '_getResolver': '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-      '_callMethod': '0x76a9144620b70031f0e9437e374a2100934fba4911046088ac',
+      getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
+      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      callMethod: '0x76a9144620b70031f0e9437e374a2100934fba4911046088ac',
     });
     const doge = await ens.address('testthing.eth', 'DOGE');
     expectSpyToBeCalled(eyes);
@@ -689,14 +676,11 @@ describe('ENS', () => {
 
   it('checks ens multicoin support #2', async () => {
     const ens = new Ens();
-    const eyes = mockAsyncMethods(
-      ens,
-      {
-        '_getOwner': '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-        '_getResolver': '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-        '_callMethod': '0xa914e8604d28ef5d2a7caafe8741e5dd4816b7cb19ea87',
-      }
-    );
+    const eyes = mockAsyncMethods(ens, {
+      getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
+      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      callMethod: '0xa914e8604d28ef5d2a7caafe8741e5dd4816b7cb19ea87',
+    });
     const ltc = await ens.address('testthing.eth', 'LTC');
     expectSpyToBeCalled(eyes);
     expect(ltc).toBe('MV5rN5EcX1imDS2gEh5jPJXeiW5QN8YrK3');
@@ -704,14 +688,11 @@ describe('ENS', () => {
 
   it('checks ens multicoin support #3', async () => {
     const ens = new Ens();
-    const eyes = mockAsyncMethods(
-      ens,
-      {
-        '_getOwner': '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-        '_getResolver': '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-        '_callMethod': '0x314159265dd8dbb310642f98f50c066173c1259b',
-      }
-    );
+    const eyes = mockAsyncMethods(ens, {
+      getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
+      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      callMethod: '0x314159265dd8dbb310642f98f50c066173c1259b',
+    });
     const eth = await ens.address('testthing.eth', 'ETH');
     expectSpyToBeCalled(eyes);
     expect(eth).toBe('0x314159265dD8dbb310642f98f50C066173C1259b');
@@ -719,14 +700,11 @@ describe('ENS', () => {
 
   it('checks ens multicoin support #4', async () => {
     const ens = new Ens();
-    const eyes = mockAsyncMethods(
-      ens,
-      {
-        '_getOwner': '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-        '_getResolver': '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-        '_callMethod': '0x314159265dd8dbb310642f98f50c066173c1259b',
-      }
-    );
+    const eyes = mockAsyncMethods(ens, {
+      getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
+      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      callMethod: '0x314159265dd8dbb310642f98f50c066173c1259b',
+    });
     const etc = await ens.address('testthing.eth', 'etc');
     expectSpyToBeCalled(eyes);
     expect(etc).toBe('0x314159265dD8dbb310642f98f50C066173C1259b');
@@ -734,14 +712,11 @@ describe('ENS', () => {
 
   it('checks ens multicoin support #5', async () => {
     const ens = new Ens();
-    const eyes = mockAsyncMethods(
-      ens,
-      {
-        '_getOwner': '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-        '_getResolver': '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-        '_callMethod': '0x314159265dd8dbb310642f98f50c066173c1259b',
-      }
-    );
+    const eyes = mockAsyncMethods(ens, {
+      getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
+      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      callMethod: '0x314159265dd8dbb310642f98f50c066173c1259b',
+    });
     const rsk = await ens.address('testthing.eth', 'rsk');
     expectSpyToBeCalled(eyes);
     expect(rsk).toBe('0x314159265dD8DbB310642F98f50C066173c1259B');
@@ -749,14 +724,12 @@ describe('ENS', () => {
 
   it('checks ens multicoin support #6', async () => {
     const ens = new Ens();
-    const eyes = mockAsyncMethods(
-      ens,
-      {
-        '_getOwner': '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-        '_getResolver': '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-        '_callMethod': '0x05444b4e9c06f24296074f7bc48f92a97916c6dc5ea9000000000000000000',
-      }
-    );
+    const eyes = mockAsyncMethods(ens, {
+      getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
+      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      callMethod:
+        '0x05444b4e9c06f24296074f7bc48f92a97916c6dc5ea9000000000000000000',
+    });
     const xrp = await ens.address('testthing.eth', 'xrp');
     expectSpyToBeCalled(eyes);
     expect(xrp).toBe('X7qvLs7gSnNoKvZzNWUT2e8st17QPY64PPe7zriLNuJszeg');
@@ -764,14 +737,11 @@ describe('ENS', () => {
 
   it('checks ens multicoin support #7', async () => {
     const ens = new Ens();
-    const eyes = mockAsyncMethods(
-      ens,
-      {
-        '_getOwner': '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-        '_getResolver': '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-        '_callMethod': '0x76a91476a04053bda0a88bda5177b86a15c3b29f55987388ac',
-      }
-    );
+    const eyes = mockAsyncMethods(ens, {
+      getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
+      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      callMethod: '0x76a91476a04053bda0a88bda5177b86a15c3b29f55987388ac',
+    });
     const bch = await ens.address('testthing.eth', 'bch');
     expectSpyToBeCalled(eyes);
     expect(bch).toBe('bitcoincash:qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a');
@@ -779,14 +749,12 @@ describe('ENS', () => {
 
   it('checks ens multicoin support #8', async () => {
     const ens = new Ens();
-    const eyes = mockAsyncMethods(
-      ens,
-      {
-        '_getOwner': '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-        '_getResolver': '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-        '_callMethod': '0x5128751e76e8199196d454941c45d1b3a323f1433bd6751e76e8199196d454941c45d1b3a323f1433bd6',
-      }
-    );
+    const eyes = mockAsyncMethods(ens, {
+      getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
+      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      callMethod:
+        '0x5128751e76e8199196d454941c45d1b3a323f1433bd6751e76e8199196d454941c45d1b3a323f1433bd6',
+    });
     const btc = await ens.address('testthing.eth', 'BTC');
     expectSpyToBeCalled(eyes);
     expect(btc).toBe(
@@ -797,14 +765,14 @@ describe('ENS', () => {
   it('checks UnsupportedCurrency error', async () => {
     await expectResolutionErrorCode(
       new Namicorn().addressOrThrow('testthing.eth', 'bnb'),
-      'UnsupportedCurrency',
+      ResolutionErrorCode.UnsupportedCurrency,
     );
   });
 
   it('checks UnsupportedCurrency error', async () => {
     await expectResolutionErrorCode(
       new Namicorn().addressOrThrow('testthing.eth', 'UNREALTICKER'),
-      'UnsupportedCurrency',
+      ResolutionErrorCode.UnsupportedCurrency,
     );
   });
 });
@@ -822,7 +790,7 @@ describe('Namicorn', () => {
     const namicorn = new Namicorn();
     await expectResolutionErrorCode(
       namicorn.addressOrThrow('sdncdoncvdinvcsdncs.zil', 'ZIL'),
-      'UnregisteredDomain',
+      ResolutionErrorCode.UnregisteredDomain,
     );
   });
 
@@ -830,7 +798,7 @@ describe('Namicorn', () => {
     const namicorn = new Namicorn();
     await expectResolutionErrorCode(
       namicorn.addressOrThrow('brad.zil', 'INVALID_CURRENCY_SYMBOL'),
-      'UnspecifiedCurrency',
+      ResolutionErrorCode.UnspecifiedCurrency,
     );
   });
 
@@ -838,7 +806,7 @@ describe('Namicorn', () => {
     const namicorn = new Namicorn({ blockchain: true });
     await expectResolutionErrorCode(
       namicorn.addressOrThrow('bogdangusiev.qq', 'ZIL'),
-      'UnsupportedDomain',
+      ResolutionErrorCode.UnsupportedDomain,
     );
   });
 
@@ -849,7 +817,7 @@ describe('Namicorn', () => {
   });
 
   it('provides empty response constant', async () => {
-    const response = UNCLAIMED_DOMAIN_RESPONSE;
+    const response = UnclaimedDomainResponse;
     expect(response.addresses).toEqual({});
     expect(response.meta.owner).toEqual(null);
   });
@@ -864,7 +832,27 @@ describe('Namicorn', () => {
     const namicorn = new Namicorn();
     await expectResolutionErrorCode(
       () => namicorn.namehash('something.hello.com'),
-      'UnsupportedDomain',
+      ResolutionErrorCode.UnsupportedDomain,
+    );
+  });
+
+  it('checks return of ipfs hash for brad.zil', async () => {
+    const namicorn = new Namicorn();
+    const hash = await namicorn.ipfsHash('brad.zil');
+    expect(hash).toBe('QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK');
+  });
+
+  it('checks return of email for ergergergerg.zil', async () => {
+    const namicorn = new Namicorn();
+    const email = await namicorn.email('ergergergerg.zil');
+    expect(email).toBe('matt+test@unstoppabledomains.com');
+  });
+
+  it('checks error for  email on brad.zil', async () => {
+    const namicorn = new Namicorn();
+    await expectResolutionErrorCode(
+      namicorn.email('brad.zil'),
+      ResolutionErrorCode.RecordNotFound,
     );
   });
 });

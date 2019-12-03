@@ -1,32 +1,16 @@
-import { toBech32Address } from '@zilliqa-js/crypto';
-import nodeFetch from 'node-fetch';
+import { toBech32Address } from './zns/utils';
 
-import { ResolutionError } from './index';
+import { ResolutionError, ResolutionErrorCode } from './index';
 import NamingService from './namingService';
 import { NamicornResolution, NullAddress, NamingServiceSource, SourceDefinition } from './types';
 import Zns from './zns';
 import Ens from './ens';
 // import * as pckg from '../package.json';
 
-/** @ignore  */
 const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
 
-/** @ignore */
-const isNode = () => {
-  if (typeof process === 'object') {
-    if (typeof process.versions === 'object') {
-      if (typeof process.versions.node !== 'undefined') {
-        return true;
-      }
-    }
-  }
-  return false;
-};
-
 export default class Udapi extends NamingService {
-  /** @ignore */
   private url: string;
-  /** @ignore */
   private headers: {
     [key: string]: string;
   };
@@ -35,7 +19,7 @@ export default class Udapi extends NamingService {
     super();
     this.url = DefaultUrl;
 
-    const DefaultUserAgent = isNode()
+    const DefaultUserAgent = this.isNode()
       ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'
       : navigator.userAgent;
     const version = process.env.npm_package_version;
@@ -43,19 +27,22 @@ export default class Udapi extends NamingService {
     this.headers = { 'X-user-agent': CustomUserAgent };
   }
 
-  /** @ignore */
+  /** @internal */
   isSupportedDomain(domain: string): boolean {
     return !!this.findMethod(domain);
   }
 
-  /** @ignore */
+  /** @internal */
   isSupportedNetwork(): boolean {
     return true;
   }
-  /** @ignore */
+  /** @internal */
   namehash(domain: string): string {
     const method = this.findMethod(domain);
-    if (!method) throw new ResolutionError('UnsupportedDomain', { domain });
+    if (!method)
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
+        domain,
+      });
     return method.namehash(domain);
   }
 
@@ -70,10 +57,12 @@ export default class Udapi extends NamingService {
   async address(domain: string, currencyTicker: string): Promise<string> {
     const data = await this.resolve(domain);
     if (!data.meta.owner || data.meta.owner === NullAddress)
-      throw new ResolutionError('UnregisteredDomain', { domain });
+      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+        domain,
+      });
     const address = data.addresses[currencyTicker.toUpperCase()];
     if (!address)
-      throw new ResolutionError('UnspecifiedCurrency', {
+      throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
         domain,
         currencyTicker,
       });
@@ -83,7 +72,7 @@ export default class Udapi extends NamingService {
   /**
    * Owner of the domain
    * @param domain - domain name
-   * @returns - an owner address of the domain
+   * @returns An owner address of the domain
    */
   async owner(domain: string): Promise<string | null> {
     const { owner } = (await this.resolve(domain)).meta;
@@ -104,24 +93,38 @@ export default class Udapi extends NamingService {
       return await response.json();
     } catch (error) {
       if (error.name !== 'FetchError') throw error;
-      throw new ResolutionError('NamingServiceDown', { method: 'UD' });
+      throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
+        method: 'UD',
+      });
     }
   }
 
-  /** @ignore */
+  /** @internal */
   protected normalizeSource(
     source: NamingServiceSource,
   ): SourceDefinition {
     throw new Error('Method not implemented.');
   }
 
-  /** @ignore */
   private findMethod(domain: string) {
     return [new Zns(), new Ens()].find(m => m.isSupportedDomain(domain));
   }
 
-  /** @ignore */
-  private async fetch(url, options) {
-    return isNode() ? nodeFetch(url, options) : window.fetch(url, options);
+  private findMethodOrThrow(domain: string) {
+    const method = this.findMethod(domain);
+    if (!method)
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
+        domain,
+      });
+    return method;
+  }
+
+  /**
+   * Looks up for an arbitrary key inside the records of certain domain
+   * @param domain - domain name
+   * @param key - key to look for
+   */
+  async record(domain: string, key: string): Promise<string> {
+    return await this.findMethodOrThrow(domain).record(domain, key);
   }
 }

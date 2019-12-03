@@ -1,11 +1,12 @@
 import _ from 'lodash';
 import {EtheriumNamingService} from './namingService';
-import { NamingServiceSource, RegistryMap, NullAddress, NamicornResolution, address, ethnodehash } from './types';
+import { NamingServiceSource, RegistryMap, NullAddress, NamicornResolution} from './types';
 import { hash } from 'eth-ens-namehash';
 import { default as resolverInterface} from './cns/contract/resolver';
 import { default as cnsInterface} from './cns/contract/registry';
 import Web3 from 'web3';
 import { ResolutionError } from '.';
+import { ResolutionErrorCode } from './resolutionError';
 
 /**
  * Class to support connection with Crypto naming service
@@ -112,11 +113,11 @@ export default class Cns extends EtheriumNamingService {
    *  - ETH
    * @returns - A promise that resolves in a string
    */
-  async address(domain: string, currencyTicker: string): Promise<address> {
+  async address(domain: string, currencyTicker: string): Promise<string> {
     const [nodeHash, _, __, resolver] = await this.getResolutionMeta(domain);
-    var addr = await this.fetchAddress(resolver, nodeHash, currencyTicker);
+    const addr: string = await this.fetchAddress(resolver, nodeHash, currencyTicker);
     if (!addr)
-      throw new ResolutionError('UnspecifiedCurrency', {
+      throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
         domain,
         currencyTicker,
       });
@@ -128,7 +129,7 @@ export default class Cns extends EtheriumNamingService {
    * @param resolver - Resolver address
    * @param nodeHash - namehash of a domain name
    */
-  private async fetchAddress(resolver: address, nodeHash: ethnodehash, coinName?: string): Promise<address> {
+  private async fetchAddress(resolver: string, nodeHash: string, coinName?: string): Promise<string> {
     const resolverContract = new this.web3.eth.Contract(
       resolverInterface,
       resolver
@@ -139,14 +140,20 @@ export default class Cns extends EtheriumNamingService {
   }
 
   /** @ignore */
-  private async getResolver(nodeHash): Promise<address> {
+  private async getResolver(nodeHash): Promise<string> {
     return await this.callMethod(this.cnsContract.methods.resolverOf(nodeHash));
   }
 
   /** @ignore */
-  async owner(nodeHash): Promise<address> {
+  async owner(nodeHash): Promise<string> {
     return await this.callMethod(this.cnsContract.methods.ownerOf(nodeHash))
   }
+
+  /** @internal */
+  async record(domain: string, key: string): Promise<string> {
+    // TODO: implement record
+    throw new Error("Method not implemented.");
+  }  
 
   /**
    * @ignore
@@ -154,15 +161,15 @@ export default class Cns extends EtheriumNamingService {
    * @param domain
    * @retuns Promise that resolves to [nodehash, owner, ttl, resolver]
    */
-  private async getResolutionMeta(domain: string): Promise<[ethnodehash, address, number, address]> {
+  private async getResolutionMeta(domain: string): Promise<[string, string, number, string]> {
     const nodeHash = this.namehash(domain);
     const ownerPromise = this.owner(nodeHash);
     const resolver:string = await this.getResolver(nodeHash);
     if (!resolver || resolver === NullAddress) {
       var owner = await ownerPromise;
       if (!owner || owner === NullAddress)
-        throw new ResolutionError('UnregisteredDomain', { domain });
-      throw new ResolutionError('UnspecifiedResolver', { domain });
+        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, { domain });
+      throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, { domain });
     }
     const resolverContract = new this.web3.eth.Contract(resolverInterface, resolver);
     const ttl = await this.callMethod(resolverContract.methods.get('ttl', nodeHash));
@@ -176,7 +183,7 @@ export default class Cns extends EtheriumNamingService {
     } catch (error) {
       const { message }: { message: string } = error;
       if (message.match(/Invalid JSON RPC response/) || message.match(/legacy access request rate exceeded/)) {
-        throw new ResolutionError('NamingServiceDown', { method: 'CNS' });
+        throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, { method: 'CNS' });
       }
       throw error;
     }

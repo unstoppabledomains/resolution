@@ -1,10 +1,19 @@
 #!/bin/sh
-if [ -z "$1" ]
-then
-  echo "Which folder do you want to deploy to GitHub Pages?"
+set -e
+
+git="git -C ./docs/";
+
+if [ ! -d "./docs" ]; then
+  echo "./docs directory not found"
   exit 1
 fi
-BRANCHNAME="$(git rev-parse --abbrev-ref HEAD)"
-git add './dist'
-git commit -m "$2"
-git push origin `git subtree split --prefix dist ${BRANCHNAME}`:gh-pages --force
+
+if [[ $($git status --short) == '' ]]; then
+  echo "./docs tree is not dirty"
+  exit 1
+fi
+
+echo "deploying the docs"
+$git add '.'
+$git commit -m "v$npm_package_version"
+$git push origin --force 
