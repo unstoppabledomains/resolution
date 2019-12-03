@@ -12,6 +12,7 @@ import {
   SourceDefinition,
   UnclaimedDomainResponse,
   ZnsResolution,
+  NamingServiceSource,
 } from './types';
 import { ResolutionError, ResolutionErrorCode } from './index';
 import NamingService from './namingService';
@@ -194,7 +195,7 @@ export default class Zns extends NamingService {
 
   /** @internal */
   protected normalizeSource(
-    source: string | boolean | SourceDefinition,
+    source: NamingServiceSource
   ): SourceDefinition {
     switch (typeof source) {
       case 'boolean': {

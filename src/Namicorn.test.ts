@@ -390,16 +390,6 @@ describe('ZNS', () => {
   });
 });
 
-//TODO: Make more tests
-// describe('CNS', () => {
-//   it('label.crypto should resolve to {test: value}', async () => {
-//     const namicorn = new Namicorn();
-//     expect(namicorn.cns).toBeDefined();
-//     const result = await namicorn.resolve('label.crypto');
-//     expect(result).toEqual({ test: 'value' });
-//   });
-// });
-
 describe('ENS', () => {
   it('allows ens network specified as string', async () => {
     const namicorn = new Namicorn({

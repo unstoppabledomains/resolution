@@ -1,7 +1,6 @@
 import {
   NamingServiceSource,
   SourceDefinition,
-  EnsNetworkIdMap,
   NetworkIdMap,
   BlockhanNetworkUrlMap,
   NamicornResolution,

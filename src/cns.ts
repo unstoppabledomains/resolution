@@ -1,12 +1,12 @@
-import _ from 'lodash';
-import {EtheriumNamingService} from './namingService';
+import { EtheriumNamingService } from './namingService';
 import { NamingServiceSource, RegistryMap, NullAddress, NamicornResolution} from './types';
 import { hash } from 'eth-ens-namehash';
 import { default as resolverInterface} from './cns/contract/resolver';
 import { default as cnsInterface} from './cns/contract/registry';
-import Web3 from 'web3';
 import { ResolutionError } from '.';
 import { ResolutionErrorCode } from './resolutionError';
+import Contract from './ens/contract/contract';
+import { formatsByCoinType } from '@ensdomains/address-encoder';
 
 /**
  * Class to support connection with Crypto naming service
@@ -27,7 +27,7 @@ export default class Cns extends EtheriumNamingService {
   private web3: any;
   /** @ignore */
   readonly RegistryMap: RegistryMap = {
-    mainnet: '0x4158485d4754D0F6D8D9b740bd37eD89b6891f35',
+    mainnet: '0x234Dad2a1bCfB3b66c5c6040c17112A81565493e',
   };
 
  /**
@@ -46,12 +46,12 @@ export default class Cns extends EtheriumNamingService {
     if (!this.url) {
       throw new Error('Unspecified url in Namicorn CNS configuration');
     }
-    this.web3 = new Web3(source.url)
     this.registryAddress = source.registry
       ? source.registry
       : this.RegistryMap[this.network];
     if (this.registryAddress) {
-      this.cnsContract = new this.web3.eth.Contract(
+      this.cnsContract = new Contract(
+        this.url,
         cnsInterface,
         this.registryAddress,
       );
@@ -116,6 +116,8 @@ export default class Cns extends EtheriumNamingService {
   async address(domain: string, currencyTicker: string): Promise<string> {
     const [nodeHash, _, __, resolver] = await this.getResolutionMeta(domain);
     const addr: string = await this.fetchAddress(resolver, nodeHash, currencyTicker);
+    console.log({addr});
+    
     if (!addr)
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
         domain,
@@ -130,23 +132,32 @@ export default class Cns extends EtheriumNamingService {
    * @param nodeHash - namehash of a domain name
    */
   private async fetchAddress(resolver: string, nodeHash: string, coinName?: string): Promise<string> {
-    const resolverContract = new this.web3.eth.Contract(
+    console.log('loool');
+    const resolverContract = new Contract(
+      this.url,
       resolverInterface,
       resolver
     );
     const addrKey = `crypto.${coinName.toUpperCase()}.address`;
-    const addr: string = await this.callMethod(resolverContract.methods.get(addrKey, nodeHash))    
+    console.log({addrKey});
+    const addr: string = await this.callMethod(resolverContract, 'get', [addrKey, nodeHash]);
+    console.log({addr});
     return addr;
   }
 
   /** @ignore */
   private async getResolver(nodeHash): Promise<string> {
-    return await this.callMethod(this.cnsContract.methods.resolverOf(nodeHash));
+    
+    const test =  await this.callMethod(this.cnsContract, 'resolverOf', [nodeHash]);
+    console.log('getting resolver');
+    console.log({resolver: test});
+    return test;
+    
   }
 
   /** @ignore */
   async owner(nodeHash): Promise<string> {
-    return await this.callMethod(this.cnsContract.methods.ownerOf(nodeHash))
+    return await this.callMethod(this.cnsContract, 'ownerOf', [nodeHash]);
   }
 
   /** @internal */
@@ -162,30 +173,47 @@ export default class Cns extends EtheriumNamingService {
    * @retuns Promise that resolves to [nodehash, owner, ttl, resolver]
    */
   private async getResolutionMeta(domain: string): Promise<[string, string, number, string]> {
+    
     const nodeHash = this.namehash(domain);
     const ownerPromise = this.owner(nodeHash);
+    
+    
     const resolver:string = await this.getResolver(nodeHash);
+    
     if (!resolver || resolver === NullAddress) {
       var owner = await ownerPromise;
       if (!owner || owner === NullAddress)
         throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, { domain });
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, { domain });
     }
-    const resolverContract = new this.web3.eth.Contract(resolverInterface, resolver);
-    const ttl = await this.callMethod(resolverContract.methods.get('ttl', nodeHash));
+    const resolverContract = new Contract(this.url, resolverInterface, resolver);
+    // const ttl = await this.callMethod(resolverContract, 'get', ['ttl', nodeHash]);
+    const ttl = '0';
+    console.log({ttl});
+    
     return [nodeHash, owner, parseInt(ttl) || 0, resolver];
   }
 
-  /** @ignore */
-  private async callMethod(method: { call: () => Promise<any> }): Promise<any> {
-    try {
-      return await method.call();
-    } catch (error) {
-      const { message }: { message: string } = error;
-      if (message.match(/Invalid JSON RPC response/) || message.match(/legacy access request rate exceeded/)) {
-        throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, { method: 'CNS' });
+   /**
+   * Internal wrapper for ens method. Used to throw an error when ens is down
+   *  @param method - method to be called
+   *  @throws ResolutionError -> When blockchain is down
+   */
+  private async callMethod(contract: Contract, methodname: string, params: any
+    ): Promise<any> {
+      try {
+        return await contract.fetchMethod(methodname, params);
+      } catch (error) {
+        const { message }: { message: string } = error;
+        if (
+          message.match(/Invalid JSON RPC response/) ||
+          message.match(/legacy access request rate exceeded/)
+        ) {
+          throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
+            method: 'CNS',
+          });
+        }
+        throw error;
       }
-      throw error;
     }
-  }
 }

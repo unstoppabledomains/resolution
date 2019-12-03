@@ -5,7 +5,7 @@ export default [
           {
               "internalType": "bytes",
               "name": "key",
-              "type": "bytes"
+              "type": "string"
           },
           {
               "internalType": "uint256",
