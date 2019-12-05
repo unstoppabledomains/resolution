@@ -1,30 +1,17 @@
 import nock from 'nock';
-import Namicorn, { ResolutionError, ResolutionErrorCode } from '.';
+import Namicorn, { ResolutionErrorCode } from '.';
 import mockData from './testData/mockData.json';
 import Ens from './ens';
-import { Dictionary, NullAddress, UnclaimedDomainResponse } from './types';
-
+import { NullAddress, UnclaimedDomainResponse } from './types';
+import {
+  mockAsyncMethod,
+  mockAsyncMethods,
+  expectSpyToBeCalled,
+  expectResolutionErrorCode,
+} from './utils/testHelpers';
 const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
 const MainnetUrl = 'https://mainnet.infura.io';
 const ZilliqaUrl = 'https://api.zilliqa.com';
-
-const mockAsyncMethod = (object: any, method: string, value) => {
-  if (!process.env.LIVE)
-    return jest.spyOn(object, method).mockResolvedValue(value);
-  else return jest.spyOn(object, method);
-};
-
-const mockAsyncMethods = (object: any, methods: Dictionary<any>) => {
-  return Object.entries(methods).map(method =>
-    mockAsyncMethod(object, method[0], method[1]),
-  );
-};
-
-const expectSpyToBeCalled = (spies: any[]) => {
-  if (!process.env.LIVE) {
-    spies.forEach(spy => expect(spy).toBeCalled());
-  }
-};
 
 const mockAPICalls = (testName: string, url = MainnetUrl) => {
   if (process.env.LIVE) {
@@ -49,26 +36,6 @@ const mockAPICalls = (testName: string, url = MainnetUrl) => {
       }
     }
   });
-};
-
-const expectResolutionErrorCode = async (
-  callback: Promise<any> | Function,
-  code: string,
-) => {
-  try {
-    if (callback instanceof Promise) {
-      await callback;
-    } else {
-      callback();
-    }
-  } catch (error) {
-    if (error instanceof ResolutionError) {
-      return expect(error.code).toEqual(code);
-    } else {
-      throw error;
-    }
-  }
-  expect(true).toBeFalsy();
 };
 
 beforeEach(() => {
@@ -134,9 +101,11 @@ describe('ZNS', () => {
   });
 
   it('supports root "zil" domain', async () => {
-    const namicorn = new Namicorn()
-    expect(namicorn.namehash('zil')).toEqual('0x9915d0456b878862e822e2361da37232f626a2e47505c8795134a95d36138ed3');
-  })
+    const namicorn = new Namicorn();
+    expect(namicorn.namehash('zil')).toEqual(
+      '0x9915d0456b878862e822e2361da37232f626a2e47505c8795134a95d36138ed3',
+    );
+  });
 
   it('resolves unclaimed domain using blockchain', async () => {
     const namicorn = new Namicorn({ blockchain: true });
@@ -388,22 +357,6 @@ describe('ZNS', () => {
       },
     });
   });
-
-  // BREAKS RANDOMLY...
-  // it('should check for wrong interface on zns', async () => {
-  //   const namicorn = new Namicorn();
-  //   const zilliqa = new Zilliqa('https://api.zilliqa.com');
-  //   const { zns } = namicorn as any;
-  //   expect(zns).toBeDefined();
-
-  //   const resolver = zilliqa.contracts.at(
-  //     toChecksumAddress('0xdac22230adfe4601f00631eae92df6d77f054891'),
-  //   );
-  //   expectResolutionErrorCode(
-  //     zns.getContractField(resolver, 'unknownField'),
-  //     'IncorrectResolverInterface'
-  //   );
-  // })
 });
 
 describe('ENS', () => {

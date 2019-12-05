@@ -13,6 +13,43 @@ export interface SourceDefinition {
 }
 
 /**
+ * NamingServiceSource
+ * just an alias
+ * @typedef {string | boolean | SourceDefinition}
+ */
+export type NamingServiceSource = string | boolean | SourceDefinition;
+
+/**
+ * EnsNetworkIdMap
+ * type represending the map between network number and network name
+ * @typedef
+ */
+export type EnsNetworkIdMap = {
+  [key: number]: string;
+};
+
+/**
+ * BlockcahinNetworkUrlMap
+ * type representing a map between network name such as
+ *  - mainnet
+ *  - ropsten
+ * and a corresponding url
+ * @typede
+ */
+
+export interface BlockhanNetworkUrlMap {
+  [key: string]: string;
+}
+
+/**
+ * RegistryMap
+ * type represending the map between network name and registry address for specific NamingService
+ */
+export interface RegistryMap {
+  [key: string]: string;
+}
+
+/**
  * NamicornResulution
  * @typedef {Object} NamicornResolution
  * @property {Object} addresses - resolution addresses for various currency addresses attached to the domain
@@ -43,8 +80,9 @@ export type NetworkIdMap = {
 export type Blockchain =
   | boolean
   | {
-      ens?: string | boolean | SourceDefinition;
-      zns?: string | boolean | SourceDefinition;
+      ens?: NamingServiceSource;
+      zns?: NamingServiceSource;
+      cns?: NamingServiceSource;
     };
 
 /**
@@ -62,7 +100,8 @@ export type owner = string;
 export type ttl = string;
 
 export const NullAddress = '0x0000000000000000000000000000000000000000';
-export const NullAddressExtended = '0x0000000000000000000000000000000000000000000000000000000000000000';
+export const NullAddressExtended =
+  '0x0000000000000000000000000000000000000000000000000000000000000000';
 export const EthCoinIndex = 60;
 
 export const UnclaimedDomainResponse: NamicornResolution = {

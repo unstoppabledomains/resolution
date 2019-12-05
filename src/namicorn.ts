@@ -1,5 +1,6 @@
 import Ens from './ens';
 import Zns from './zns';
+import Cns from './cns';
 import Udapi from './unstoppableAPI';
 import {
   Blockchain,
@@ -25,6 +26,7 @@ export default class Namicorn {
   /** @internal */
   readonly zns?: Zns;
   /** @internal */
+  readonly cns?: Cns;
   readonly api?: Udapi;
 
   /**
@@ -43,11 +45,17 @@ export default class Namicorn {
       if (blockchain.zns === undefined) {
         blockchain.zns = true;
       }
+      if (blockchain.cns == undefined) {
+        blockchain.cns = true;
+      }
       if (blockchain.ens) {
         this.ens = new Ens(blockchain.ens);
       }
       if (blockchain.zns) {
         this.zns = new Zns(blockchain.zns);
+      }
+      if (blockchain.cns) {
+        this.cns = new Cns(blockchain.cns);
       }
     } else {
       this.api = new Udapi();
@@ -201,13 +209,13 @@ export default class Namicorn {
    * @param domain - domain name
    */
   private getNamingMethod(domain: string): NamingService | undefined {
-    const methods: Array<NamingService | undefined> = this.blockchain
-      ? [this.ens, this.zns]
+    const methods: (Ens | Zns | Udapi | Cns)[] = this.blockchain
+      ? [this.ens, this.zns, this.cns]
       : [this.api];
     const method = methods.find(
       method => method && method.isSupportedDomain(domain),
     );
-    return method;
+    return method as NamingService;
   }
 
   private getNamingMethodOrThrow(domain: string) {

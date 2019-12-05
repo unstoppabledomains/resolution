@@ -12,6 +12,7 @@ import {
   SourceDefinition,
   UnclaimedDomainResponse,
   ZnsResolution,
+  NamingServiceSource,
 } from './types';
 import { ResolutionError, ResolutionErrorCode } from './index';
 import NamingService from './namingService';
@@ -172,7 +173,10 @@ export default class Zns extends NamingService {
    * Checks if domain is supported by zns
    */
   isSupportedDomain(domain: string): boolean {
-    return (domain.indexOf('.') > 0 && /^.{1,}\.(zil)$/.test(domain)) || domain === "zil";
+    return (
+      (domain.indexOf('.') > 0 && /^.{1,}\.(zil)$/.test(domain)) ||
+      domain === 'zil'
+    );
   }
 
   /**
@@ -193,9 +197,7 @@ export default class Zns extends NamingService {
   }
 
   /** @internal */
-  protected normalizeSource(
-    source: string | boolean | SourceDefinition,
-  ): SourceDefinition {
+  protected normalizeSource(source: NamingServiceSource): SourceDefinition {
     switch (typeof source) {
       case 'boolean': {
         return { url: DefaultSource, network: 'mainnet' };

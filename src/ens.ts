@@ -1,29 +1,18 @@
-import { invert } from './utils';
 import { default as ensInterface } from './ens/contract/ens';
 import { default as resolverInterface } from './ens/contract/resolver';
 import { hash } from 'eth-ens-namehash';
 import { formatsByCoinType } from '@ensdomains/address-encoder';
 import {
-  SourceDefinition,
   NamicornResolution,
   NullAddress,
-  Bip44Constants,
   EthCoinIndex,
   NullAddressExtended,
+  NamingServiceSource,
+  Bip44Constants,
 } from './types';
-import NamingService from './namingService';
+import { EtheriumNamingService } from './namingService';
 import { ResolutionError, ResolutionErrorCode } from './index';
-import Contract from './ens/contract/contract';
-
-const DefaultUrl = 'https://mainnet.infura.io';
-const NetworkIdMap = {
-  1: 'mainnet',
-  3: 'ropsten',
-  4: 'kovan',
-  42: 'rinkeby',
-  5: 'goerli',
-};
-const NetworkNameMap = invert(NetworkIdMap);
+import Contract from './utils/contract';
 
 const RegistryMap = {
   mainnet: '0x314159265dd8dbb310642f98f50c066173c1259b',
@@ -39,7 +28,8 @@ const RegistryMap = {
  * - https://mainnet.infura.io
  * @param registryAddress - address for a registry contract
  */
-export default class Ens extends NamingService {
+export default class Ens extends EtheriumNamingService {
+  name = 'ENS';
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
@@ -49,7 +39,7 @@ export default class Ens extends NamingService {
    * @param source - if specified as a string will be used as main url, if omited then defaults are used
    * @throws ConfigurationError - when either network or url is setup incorrectly
    */
-  constructor(source: string | boolean | SourceDefinition = true) {
+  constructor(source: NamingServiceSource = true) {
     super();
     source = this.normalizeSource(source);
     this.network = <string>source.network;
@@ -64,7 +54,11 @@ export default class Ens extends NamingService {
       ? source.registry
       : RegistryMap[this.network];
     if (this.registryAddress) {
-      this.ensContract = new Contract(this.url, ensInterface, this.registryAddress);
+      this.ensContract = new Contract(
+        this.url,
+        ensInterface,
+        this.registryAddress,
+      );
     }
   }
 
@@ -110,7 +104,8 @@ export default class Ens extends NamingService {
     if (resolverAddress == NullAddress) {
       return null;
     }
-    const resolverContract = new Contract(this.url,
+    const resolverContract = new Contract(
+      this.url,
       resolverInterface(resolverAddress, EthCoinIndex),
       resolverAddress,
     );
@@ -132,11 +127,19 @@ export default class Ens extends NamingService {
     const nodeHash = this.namehash(domain);
     const ownerPromise = this.owner(domain);
     const resolver = await this.getResolver(nodeHash);
-    if (!resolver || resolver === NullAddress || resolver === NullAddressExtended) {
+    if (
+      !resolver ||
+      resolver === NullAddress ||
+      resolver === NullAddressExtended
+    ) {
       const owner = await ownerPromise;
       if (!owner || owner === NullAddress || owner === NullAddressExtended)
-        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, { domain });
-      throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, { domain });
+        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+          domain,
+        });
+      throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
+        domain,
+      });
     }
     const coinType = this.getCoinType(currencyTicker);
     var addr = await this.fetchAddress(resolver, nodeHash, coinType);
@@ -195,66 +198,24 @@ export default class Ens extends NamingService {
   }
 
   /**
-   * Normalizes the source object based on type
-   */
-  protected normalizeSource(
-    source: string | boolean | SourceDefinition,
-  ): SourceDefinition {
-    switch (typeof source) {
-      case 'boolean': {
-        return { url: DefaultUrl, network: this.networkFromUrl(DefaultUrl) };
-      }
-      case 'string': {
-        return {
-          url: source as string,
-          network: this.networkFromUrl(source as string),
-        };
-      }
-      case 'object': {
-        source = { ...source };
-        if (typeof source.network == 'number') {
-          source.network = NetworkIdMap[source.network];
-        }
-        if (source.registry) {
-          source.network = source.network ? source.network : 'mainnet';
-          source.url = source.url
-            ? source.url
-            : `https://${source.network}.infura.io`;
-        }
-        if (
-          source.network &&
-          !source.url &&
-          NetworkNameMap.hasOwnProperty(source.network)
-        ) {
-          source.url = `https://${source.network}.infura.io`;
-        }
-        if (source.url && !source.network) {
-          source.network = this.networkFromUrl(source.url);
-        }
-        return source;
-      }
-    }
-  }
-
-  /**
    * This was done to make automated tests more configurable
    */
   private resolverCallToName(resolverContract: Contract, nodeHash) {
-    return this.callMethod(resolverContract, 'name', [nodeHash] );
+    return this.callMethod(resolverContract, 'name', [nodeHash]);
   }
 
   /**
    * This was done to make automated tests more configurable
    */
   private async getResolver(nodeHash) {
-    return await this.callMethod(this.ensContract, 'resolver', [nodeHash] );
+    return await this.callMethod(this.ensContract, 'resolver', [nodeHash]);
   }
 
   /**
    * This was done to make automated tests more configurable
    */
   private async getOwner(nodeHash) {
-    return await  this.callMethod(this.ensContract, 'owner', [nodeHash] );
+    return await this.callMethod(this.ensContract, 'owner', [nodeHash]);
   }
 
   /**
@@ -263,24 +224,25 @@ export default class Ens extends NamingService {
   private async getResolutionInfo(nodeHash) {
     return await Promise.all([
       this.callMethod(this.ensContract, 'owner', [nodeHash]),
-      this.callMethod(this.ensContract, 'ttl', [nodeHash] ),
-      this.callMethod(this.ensContract, 'resolver', [nodeHash] ),
+      this.callMethod(this.ensContract, 'ttl', [nodeHash]),
+      this.callMethod(this.ensContract, 'resolver', [nodeHash]),
     ]);
   }
 
-  private getCoinType(currencyTicker: string): number {
-    const constants: Bip44Constants[] = require('bip44-constants');
-    const coin = constants.findIndex(
-      item =>
-        item[1] === currencyTicker.toUpperCase() ||
-        item[2] === currencyTicker.toUpperCase(),
-    );
-    if (coin < 0 || !formatsByCoinType[coin])
-      throw new ResolutionError(ResolutionErrorCode.UnsupportedCurrency, {
-        currencyTicker,
-      });
-    return coin;
-  }
+    /** @internal */
+    protected getCoinType(currencyTicker: string): number {
+      const constants: Bip44Constants[] = require('bip44-constants');
+      const coin = constants.findIndex(
+        item =>
+          item[1] === currencyTicker.toUpperCase() ||
+          item[2] === currencyTicker.toUpperCase(),
+      );
+      if (coin < 0 || !formatsByCoinType[coin])
+        throw new ResolutionError(ResolutionErrorCode.UnsupportedCurrency, {
+          currencyTicker,
+        });
+      return coin;
+    }
 
   /**
    * @param resolver - resolver address
@@ -290,53 +252,17 @@ export default class Ens extends NamingService {
     if (!resolver || resolver == NullAddress) {
       return null;
     }
-    const resolverContract = new Contract(this.url,
+    const resolverContract = new Contract(
+      this.url,
       resolverInterface(resolver, coinType),
       resolver,
     );
     const addr: string =
       coinType != EthCoinIndex
-      ? await this.callMethod(resolverContract, 'addr', [nodeHash, coinType] )
-      : await this.callMethod(resolverContract, 'addr', [nodeHash] );
+        ? await this.callMethod(resolverContract, 'addr', [nodeHash, coinType])
+        : await this.callMethod(resolverContract, 'addr', [nodeHash]);
     if (!addr) return null;
     const data = Buffer.from(addr.replace('0x', ''), 'hex');
     return formatsByCoinType[coinType].encoder(data);
-  }
-
-  /**
-   * Look up for network from url provided
-   * @param url - main api url for blockchain
-   * @returns Network such as:
-   *  - mainnet
-   *  - testnet
-   */
-  private networkFromUrl(url: string): string {
-    for (const key in NetworkNameMap) {
-      if (!NetworkNameMap.hasOwnProperty(key)) continue;
-      if (url.indexOf(key) >= 0) return key;
-    }
-  }
-
-  /**
-   * Internal wrapper for ens method. Used to throw an error when ens is down
-   *  @param method - method to be called
-   *  @throws ResolutionError -> When blockchain is down
-   */
-  private async callMethod(contract: Contract, methodname: string, params: any
-  ): Promise<any> {
-    try {
-      return await contract.fetchMethod(methodname, params);
-    } catch (error) {
-      const { message }: { message: string } = error;
-      if (
-        message.match(/Invalid JSON RPC response/) ||
-        message.match(/legacy access request rate exceeded/)
-      ) {
-        throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
-          method: 'ENS',
-        });
-      }
-      throw error;
-    }
   }
 }
