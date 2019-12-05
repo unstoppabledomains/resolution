@@ -1,13 +1,12 @@
-const labelDomain = 'reseller-test-braden-6.crypto';
 import Namicorn from '.';
 import {
-  mockAsyncMethod,
   mockAsyncMethods,
   expectSpyToBeCalled,
   expectResolutionErrorCode,
 } from './utils/testHelpers';
 import { ResolutionErrorCode } from './resolutionError';
 
+const labelDomain = 'reseller-test-braden-6.crypto';
 beforeEach(() => {
   jest.restoreAllMocks();
 });
@@ -26,8 +25,6 @@ const mockCryptoCalls = (
 };
 
 describe('CNS', () => {
-  //TODO(Johnny) -> Create mocks for all blockchain interactions
-  // ? Probably just Contact#fetchMethod for getting the resolver addr and some specific responses.
   it('should define the default cns contract', () => {
     const namicorn = new Namicorn();
     expect(namicorn.cns).toBeDefined();
