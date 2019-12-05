@@ -164,7 +164,11 @@ export default class Cns extends EtheriumNamingService {
     return await this.callMethod(this.cnsContract, 'ownerOf', [tokenId]);
   }
 
-  private getTtl = async (contract: Contract, methodname: string, params: any[]):Promise<string> =>
+  private getTtl = async (
+    contract: Contract,
+    methodname: string,
+    params: any[],
+  ): Promise<string> =>
     await this.callMethod(this.cnsContract, methodname, params);
 
   /** @internal */
@@ -190,7 +194,11 @@ export default class Cns extends EtheriumNamingService {
   }
 
   /** This is done to make testwriting easy */
-  private async getRecord(contract: Contract, methodname: string, params: any[]):Promise<any> {
+  private async getRecord(
+    contract: Contract,
+    methodname: string,
+    params: any[],
+  ): Promise<any> {
     return await this.callMethod(contract, methodname, params);
   }
 
@@ -204,9 +212,7 @@ export default class Cns extends EtheriumNamingService {
     const tokenId = this.namehash(domain);
     const owner: string = await this.owner(tokenId);
     const resolver: string = await this.getResolver(tokenId);
-    
-    
-    
+
     if (!resolver || resolver === NullAddress) {
       if (!owner || owner === NullAddress)
         throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
@@ -221,10 +227,7 @@ export default class Cns extends EtheriumNamingService {
       resolverInterface,
       resolver,
     );
-    const ttl = await this.getTtl(resolverContract, 'get', [
-      'ttl',
-      tokenId,
-    ]);
+    const ttl = await this.getTtl(resolverContract, 'get', ['ttl', tokenId]);
     return [tokenId, owner, parseInt(ttl) || 0, resolver];
   }
 

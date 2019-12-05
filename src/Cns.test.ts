@@ -10,18 +10,20 @@ import { ResolutionErrorCode } from './resolutionError';
 
 beforeEach(() => {
   jest.restoreAllMocks();
-})
+});
 
-const mockCryptoCalls = (object, mockAddress: string):jest.SpyInstance<any, unknown[]>[] => {
+const mockCryptoCalls = (
+  object,
+  mockAddress: string,
+): jest.SpyInstance<any, unknown[]>[] => {
   const eyes = mockAsyncMethods(object, {
     getResolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
     owner: '0x1a5363ca3ceef73b1544732e3264f6d600cf678e',
     getTtl: '0',
-    getRecord: mockAddress
+    getRecord: mockAddress,
   });
   return eyes;
-}
-
+};
 
 describe('CNS', () => {
   //TODO(Johnny) -> Create mocks for all blockchain interactions
@@ -40,7 +42,7 @@ describe('CNS', () => {
       getRecord: 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
     });
     const ipfs_hash = await namicorn.cns.record(labelDomain, 'ipfs.html2');
-    expectSpyToBeCalled(eyes)
+    expectSpyToBeCalled(eyes);
     expect(ipfs_hash).toBe('QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK');
   });
 
@@ -68,7 +70,10 @@ describe('CNS', () => {
 
   it(`checks the BCH address on ${labelDomain}`, async () => {
     const namicorn = new Namicorn();
-    const eyes = mockCryptoCalls(namicorn.cns, 'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6');
+    const eyes = mockCryptoCalls(
+      namicorn.cns,
+      'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6',
+    );
     const addr = await namicorn.cns.address(labelDomain, 'BCH');
     expectSpyToBeCalled(eyes);
     expect(addr).toBe('qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6');
@@ -76,7 +81,10 @@ describe('CNS', () => {
 
   it(`checks the BTC address on ${labelDomain}`, async () => {
     const namicorn = new Namicorn();
-    const eyes = mockCryptoCalls(namicorn.cns, '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB');
+    const eyes = mockCryptoCalls(
+      namicorn.cns,
+      '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB',
+    );
     const addr = await namicorn.cns.address(labelDomain, 'BTC');
     expectSpyToBeCalled(eyes);
     expect(addr).toBe('1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB');
@@ -84,7 +92,10 @@ describe('CNS', () => {
 
   it(`checks the DASH address on ${labelDomain}`, async () => {
     const namicorn = new Namicorn();
-    const eyes = mockCryptoCalls(namicorn.cns, 'XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j'); 
+    const eyes = mockCryptoCalls(
+      namicorn.cns,
+      'XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j',
+    );
     const addr = await namicorn.cns.address(labelDomain, 'DASH');
     expectSpyToBeCalled(eyes);
     expect(addr).toBe('XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j');
@@ -92,7 +103,10 @@ describe('CNS', () => {
 
   it(`checks the ETH address on ${labelDomain}`, async () => {
     const namicorn = new Namicorn();
-    const eyes = mockCryptoCalls(namicorn.cns, '0x45b31e01AA6f42F0549aD482BE81635ED3149abb'); 
+    const eyes = mockCryptoCalls(
+      namicorn.cns,
+      '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
+    );
     const addr = await namicorn.cns.address(labelDomain, 'ETH');
     expectSpyToBeCalled(eyes);
     expect(addr).toBe('0x45b31e01AA6f42F0549aD482BE81635ED3149abb');
@@ -100,7 +114,10 @@ describe('CNS', () => {
 
   it(`checks the LTC address on ${labelDomain}`, async () => {
     const namicorn = new Namicorn();
-    const eyes = mockCryptoCalls(namicorn.cns, 'LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL'); 
+    const eyes = mockCryptoCalls(
+      namicorn.cns,
+      'LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL',
+    );
     const addr = await namicorn.cns.address(labelDomain, 'LTC');
     expectSpyToBeCalled(eyes);
     expect(addr).toBe('LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL');
@@ -108,7 +125,10 @@ describe('CNS', () => {
 
   it(`checks the XMR address on ${labelDomain}`, async () => {
     const namicorn = new Namicorn();
-    const eyes = mockCryptoCalls(namicorn.cns, '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d');     
+    const eyes = mockCryptoCalls(
+      namicorn.cns,
+      '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d',
+    );
     const addr = await namicorn.cns.address(labelDomain, 'XMR');
     expectSpyToBeCalled(eyes);
     expect(addr).toBe(
@@ -118,7 +138,10 @@ describe('CNS', () => {
 
   it(`checks the ZEC address on ${labelDomain}`, async () => {
     const namicorn = new Namicorn();
-    const eyes = mockCryptoCalls(namicorn.cns, 't1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV'); 
+    const eyes = mockCryptoCalls(
+      namicorn.cns,
+      't1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV',
+    );
     const addr = await namicorn.cns.address(labelDomain, 'ZEC');
     expectSpyToBeCalled(eyes);
     expect(addr).toBe('t1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV');
@@ -126,7 +149,10 @@ describe('CNS', () => {
 
   it(`checks the ZIL address on ${labelDomain}`, async () => {
     const namicorn = new Namicorn();
-    const eyes = mockCryptoCalls(namicorn.cns, 'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj');  
+    const eyes = mockCryptoCalls(
+      namicorn.cns,
+      'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
+    );
     const addr = await namicorn.cns.address(labelDomain, 'ZIL');
     expectSpyToBeCalled(eyes);
     expect(addr).toBe('zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj');

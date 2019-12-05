@@ -1,7 +1,7 @@
-import BaseConnection from "../../baseConnection";
+import BaseConnection from "../baseConnection";
 import {defaultAbiCoder as AbiCoder} from 'ethers/utils/abi-coder';
 import keccak256  from "keccak256";
-import ResolutionError, { ResolutionErrorCode } from "../../resolutionError";
+import ResolutionError, { ResolutionErrorCode } from "../resolutionError";
 
 type FourBytes = string;
 
