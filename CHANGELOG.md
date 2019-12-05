@@ -1,4 +1,5 @@
 ## Unreleased
+* .crypto support with Namicorn.cns
 
 ## 0.3.4
 
