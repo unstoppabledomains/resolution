@@ -6,10 +6,12 @@ import {
   NamicornResolution,
   Bip44Constants,
 } from './types';
+import { hash } from 'eth-ens-namehash';
 import { formatsByCoinType } from '@ensdomains/address-encoder';
 import ResolutionError, { ResolutionErrorCode } from './resolutionError';
 import BaseConnection from './baseConnection';
 import { invert } from './utils';
+import Contract from './utils/contract';
 
 /**
  * Abstract class for different Naming Service supports like
@@ -18,6 +20,7 @@ import { invert } from './utils';
  *
  */
 export default abstract class NamingService extends BaseConnection {
+  readonly name: string;
   abstract isSupportedDomain(domain: string): boolean;
   abstract isSupportedNetwork(): boolean;
   abstract namehash(domain: string): string;
@@ -73,7 +76,7 @@ export abstract class EtheriumNamingService extends NamingService {
 
   /**
    * Normalizes the source object based on type
-   * @ignore
+   * @internal
    * @param source
    * @returns
    */
@@ -117,19 +120,14 @@ export abstract class EtheriumNamingService extends NamingService {
     }
   }
 
-  /** @ignore */
-  protected getCoinType(currencyTicker: string): number {
-    const constants: Bip44Constants[] = require('bip44-constants');
-    const coin = constants.findIndex(
-      item =>
-        item[1] === currencyTicker.toUpperCase() ||
-        item[2] === currencyTicker.toUpperCase(),
-    );
-    if (coin < 0 || !formatsByCoinType[coin])
-      throw new ResolutionError(ResolutionErrorCode.UnsupportedCurrency, {
-        currencyTicker,
-      });
-    return coin;
+   /**
+   * Produces ENS namehash
+   * @param domain - domain to be hashed
+   * @return ENS namehash of a domain
+   */
+  namehash(domain: string): string {
+    this.ensureSupportedDomain(domain);
+    return hash(domain);
   }
 
   /**
@@ -139,4 +137,32 @@ export abstract class EtheriumNamingService extends NamingService {
   isSupportedNetwork(): boolean {
     return this.registryAddress != null;
   }
+
+  
+  /**
+   * Internal wrapper for ens method. Used to throw an error when ens is down
+   *  @param method - method to be called
+   *  @throws ResolutionError -> When blockchain is down
+   */
+  protected async callMethod(
+    contract: Contract,
+    methodname: string,
+    params: any,
+  ): Promise<any> {
+    try {
+      return await contract.fetchMethod(methodname, params);
+    } catch (error) {
+      const { message }: { message: string } = error;
+      if (
+        message.match(/Invalid JSON RPC response/) ||
+        message.match(/legacy access request rate exceeded/)
+      ) {
+        throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
+          method: this.name,
+        });
+      }
+      throw error;
+    }
+  }
+
 }

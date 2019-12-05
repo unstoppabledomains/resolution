@@ -737,14 +737,6 @@ describe('ENS', () => {
 });
 
 describe('Namicorn', () => {
-  it('resolving from unstoppable API', async () => {
-    // const testName = 'should work';
-    // mockAPICalls(testName, DefaultUrl);
-    const namicorn = new Namicorn({ blockchain: false });
-    const result = await namicorn.address('cofounding.zil', 'eth');
-    expect(result).toEqual('0xaa91734f90795e80751c96e682a321bb3c1a4186');
-  });
-
   it('checks Namicorn#addressOrThrow error #1', async () => {
     const namicorn = new Namicorn();
     await expectResolutionErrorCode(

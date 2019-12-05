@@ -25,7 +25,7 @@ export default class Namicorn {
   readonly ens?: Ens;
   /** @internal */
   readonly zns?: Zns;
-  /** @ignore */
+  /** @internal */
   readonly cns?: Cns;
   readonly api?: Udapi;
 

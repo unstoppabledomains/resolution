@@ -8,6 +8,7 @@ import {
   EthCoinIndex,
   NullAddressExtended,
   NamingServiceSource,
+  Bip44Constants,
 } from './types';
 import { EtheriumNamingService } from './namingService';
 import { ResolutionError, ResolutionErrorCode } from './index';
@@ -28,6 +29,7 @@ const RegistryMap = {
  * @param registryAddress - address for a registry contract
  */
 export default class Ens extends EtheriumNamingService {
+  name = 'ENS';
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
@@ -227,6 +229,21 @@ export default class Ens extends EtheriumNamingService {
     ]);
   }
 
+    /** @internal */
+    protected getCoinType(currencyTicker: string): number {
+      const constants: Bip44Constants[] = require('bip44-constants');
+      const coin = constants.findIndex(
+        item =>
+          item[1] === currencyTicker.toUpperCase() ||
+          item[2] === currencyTicker.toUpperCase(),
+      );
+      if (coin < 0 || !formatsByCoinType[coin])
+        throw new ResolutionError(ResolutionErrorCode.UnsupportedCurrency, {
+          currencyTicker,
+        });
+      return coin;
+    }
+
   /**
    * @param resolver - resolver address
    * @param nodeHash - namehash of a domain name
@@ -247,31 +264,5 @@ export default class Ens extends EtheriumNamingService {
     if (!addr) return null;
     const data = Buffer.from(addr.replace('0x', ''), 'hex');
     return formatsByCoinType[coinType].encoder(data);
-  }
-
-  /**
-   * Internal wrapper for ens method. Used to throw an error when ens is down
-   *  @param method - method to be called
-   *  @throws ResolutionError -> When blockchain is down
-   */
-  private async callMethod(
-    contract: Contract,
-    methodname: string,
-    params: any,
-  ): Promise<any> {
-    try {
-      return await contract.fetchMethod(methodname, params);
-    } catch (error) {
-      const { message }: { message: string } = error;
-      if (
-        message.match(/Invalid JSON RPC response/) ||
-        message.match(/legacy access request rate exceeded/)
-      ) {
-        throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
-          method: 'ENS',
-        });
-      }
-      throw error;
-    }
   }
 }

@@ -5,7 +5,6 @@ import {
   NullAddress,
   NamicornResolution,
 } from './types';
-import { hash } from 'eth-ens-namehash';
 import { default as resolverInterface } from './cns/contract/resolver';
 import { default as cnsInterface } from './cns/contract/registry';
 import { ResolutionError } from '.';
@@ -22,12 +21,13 @@ import Contract from './utils/contract';
  * @param registryAddress - address for a registry contract
  */
 export default class Cns extends EtheriumNamingService {
+  name = 'CNS';
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
-  /** @ignore */
+  /** @internal */
   private cnsContract: any;
-  /** @ignore */
+  /** @internal */
   readonly RegistryMap: RegistryMap = {
     mainnet: '0x608624cA9dacbf78B19232e15f67107Da0AeE715',
   };
@@ -70,42 +70,13 @@ export default class Cns extends EtheriumNamingService {
   }
 
   /**
-   * Resolves the given domain. [DEPRICATED]
+   * Resolves the given domain. [DEPRECATED]
    * @async
    * @param domain - domain name to be resolved
    * @returns- Returns a promise that resolves in an object
    */
   async resolve(domain: string): Promise<NamicornResolution> {
-    try {
-      this.ensureSupportedDomain(domain);
-      var [tokenId, owner, ttl, resolver] = await this.getResolutionMeta(
-        domain,
-      );
-    } catch (err) {
-      if (err instanceof ResolutionError) return null;
-      throw err;
-    }
-    const address = await this.fetchAddress(resolver, tokenId, 'ETH');
-    return {
-      addresses: {
-        ETH: address,
-      },
-      meta: {
-        owner,
-        type: 'cns',
-        ttl,
-      },
-    };
-  }
-
-  /**
-   * Produces ENS namehash
-   * @param domain - domain to be hashed
-   * @return ENS namehash of a domain
-   */
-  namehash(domain: string): string {
-    this.ensureSupportedDomain(domain);
-    return hash(domain);
+    throw new Error('This method is unsupported for CNS');
   }
 
   /**
@@ -133,7 +104,7 @@ export default class Cns extends EtheriumNamingService {
   }
 
   /**
-   * @ignore
+   * @internal
    * @param resolver - Resolver address
    * @param tokenId - namehash of a domain name
    */
@@ -155,7 +126,7 @@ export default class Cns extends EtheriumNamingService {
     return addr;
   }
 
-  /** @ignore */
+  /** @internal */
   private getResolver = async (tokenId): Promise<string> =>
     await this.callMethod(this.cnsContract, 'resolverOf', [tokenId]);
 
@@ -229,31 +200,5 @@ export default class Cns extends EtheriumNamingService {
     );
     const ttl = await this.getTtl(resolverContract, 'get', ['ttl', tokenId]);
     return [tokenId, owner, parseInt(ttl) || 0, resolver];
-  }
-
-  /**
-   * Internal wrapper for ens method. Used to throw an error when ens is down
-   *  @param method - method to be called
-   *  @throws ResolutionError -> When blockchain is down
-   */
-  private async callMethod(
-    contract: Contract,
-    methodname: string,
-    params: any,
-  ): Promise<any> {
-    try {
-      return await contract.fetchMethod(methodname, params);
-    } catch (error) {
-      const { message }: { message: string } = error;
-      if (
-        message.match(/Invalid JSON RPC response/) ||
-        message.match(/legacy access request rate exceeded/)
-      ) {
-        throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
-          method: 'CNS',
-        });
-      }
-      throw error;
-    }
   }
 }
