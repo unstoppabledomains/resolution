@@ -13,7 +13,7 @@ Supported domain zones:
 - .test
 - .xyz
 - .luxe
-- .crypto (under development)
+- .crypto 
 
 [API Referrence](https://unstoppabledomains.github.io/namicorn/)
 [Documentation](https://docs.unstoppabledomains.com/#tag/namicorn)
