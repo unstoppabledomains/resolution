@@ -30,23 +30,23 @@ export type EnsNetworkIdMap = {
 
 /**
  * BlockcahinNetworkUrlMap
- * type representing a map between network name such as 
+ * type representing a map between network name such as
  *  - mainnet
  *  - ropsten
- * and a corresponding url 
+ * and a corresponding url
  * @typede
  */
 
 export interface BlockhanNetworkUrlMap {
-  [key: string]: string
-};
+  [key: string]: string;
+}
 
 /**
  * RegistryMap
  * type represending the map between network name and registry address for specific NamingService
  */
 export interface RegistryMap {
-  [key: string]: string
+  [key: string]: string;
 }
 
 /**
@@ -80,9 +80,9 @@ export type NetworkIdMap = {
 export type Blockchain =
   | boolean
   | {
-      ens?: NamingServiceSource 
-      zns?: NamingServiceSource
-      cns?: NamingServiceSource
+      ens?: NamingServiceSource;
+      zns?: NamingServiceSource;
+      cns?: NamingServiceSource;
     };
 
 /**
@@ -100,7 +100,8 @@ export type owner = string;
 export type ttl = string;
 
 export const NullAddress = '0x0000000000000000000000000000000000000000';
-export const NullAddressExtended = '0x0000000000000000000000000000000000000000000000000000000000000000';
+export const NullAddressExtended =
+  '0x0000000000000000000000000000000000000000000000000000000000000000';
 export const EthCoinIndex = 60;
 
 export const UnclaimedDomainResponse: NamicornResolution = {

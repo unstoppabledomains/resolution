@@ -47,7 +47,7 @@ export abstract class EtheriumNamingService extends NamingService {
     5: 'goerli',
   };
 
-  readonly UrlMap:BlockhanNetworkUrlMap = {
+  readonly UrlMap: BlockhanNetworkUrlMap = {
     mainnet: 'https://mainnet.infura.io',
     ropsten: 'https://ropsten.infura.io',
     kovan: 'https://kovan.infura.io',
@@ -56,7 +56,6 @@ export abstract class EtheriumNamingService extends NamingService {
   };
 
   readonly NetworkNameMap = invert(this.NetworkIdMap);
- 
 
   /**
    * Look up for network from url provided
@@ -72,7 +71,7 @@ export abstract class EtheriumNamingService extends NamingService {
     }
   }
 
-   /**
+  /**
    * Normalizes the source object based on type
    * @ignore
    * @param source
@@ -111,29 +110,29 @@ export abstract class EtheriumNamingService extends NamingService {
           source.url = `https://${source.network}.infura.io`;
         }
         if (source.url && !source.network) {
-          source.network = this.networkFromUrl(
-            source.url
-          );
+          source.network = this.networkFromUrl(source.url);
         }
         return source;
       }
     }
   }
 
-    /** @ignore */
-    protected getCoinType(currencyTicker: string): number {
-      const constants: Bip44Constants[] = require('bip44-constants');
-      const coin = constants.findIndex(
-        item =>
-          item[1] === currencyTicker.toUpperCase() ||
-          item[2] === currencyTicker.toUpperCase(),
-      );
-      if (coin < 0 || !formatsByCoinType[coin])
-        throw new ResolutionError(ResolutionErrorCode.UnsupportedCurrency, { currencyTicker });
-      return coin;
-    }
+  /** @ignore */
+  protected getCoinType(currencyTicker: string): number {
+    const constants: Bip44Constants[] = require('bip44-constants');
+    const coin = constants.findIndex(
+      item =>
+        item[1] === currencyTicker.toUpperCase() ||
+        item[2] === currencyTicker.toUpperCase(),
+    );
+    if (coin < 0 || !formatsByCoinType[coin])
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedCurrency, {
+        currencyTicker,
+      });
+    return coin;
+  }
 
-   /**
+  /**
    * Checks if the current network is supported
    * @returns
    */

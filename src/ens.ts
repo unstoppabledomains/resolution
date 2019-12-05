@@ -1,4 +1,3 @@
-import { invert } from './utils';
 import { default as ensInterface } from './ens/contract/ens';
 import { default as resolverInterface } from './ens/contract/resolver';
 import { hash } from 'eth-ens-namehash';
@@ -10,9 +9,9 @@ import {
   NullAddressExtended,
   NamingServiceSource,
 } from './types';
-import  { EtheriumNamingService } from './namingService';
+import { EtheriumNamingService } from './namingService';
 import { ResolutionError, ResolutionErrorCode } from './index';
-import Contract from './ens/contract/contract';
+import Contract from './utils/contract';
 
 const RegistryMap = {
   mainnet: '0x314159265dd8dbb310642f98f50c066173c1259b',
@@ -53,7 +52,11 @@ export default class Ens extends EtheriumNamingService {
       ? source.registry
       : RegistryMap[this.network];
     if (this.registryAddress) {
-      this.ensContract = new Contract(this.url, ensInterface, this.registryAddress);
+      this.ensContract = new Contract(
+        this.url,
+        ensInterface,
+        this.registryAddress,
+      );
     }
   }
 
@@ -99,7 +102,8 @@ export default class Ens extends EtheriumNamingService {
     if (resolverAddress == NullAddress) {
       return null;
     }
-    const resolverContract = new Contract(this.url,
+    const resolverContract = new Contract(
+      this.url,
       resolverInterface(resolverAddress, EthCoinIndex),
       resolverAddress,
     );
@@ -121,11 +125,19 @@ export default class Ens extends EtheriumNamingService {
     const nodeHash = this.namehash(domain);
     const ownerPromise = this.owner(domain);
     const resolver = await this.getResolver(nodeHash);
-    if (!resolver || resolver === NullAddress || resolver === NullAddressExtended) {
+    if (
+      !resolver ||
+      resolver === NullAddress ||
+      resolver === NullAddressExtended
+    ) {
       const owner = await ownerPromise;
       if (!owner || owner === NullAddress || owner === NullAddressExtended)
-        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, { domain });
-      throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, { domain });
+        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+          domain,
+        });
+      throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
+        domain,
+      });
     }
     const coinType = this.getCoinType(currencyTicker);
     var addr = await this.fetchAddress(resolver, nodeHash, coinType);
@@ -183,25 +195,25 @@ export default class Ens extends EtheriumNamingService {
     return hash(domain);
   }
 
-   /**
+  /**
    * This was done to make automated tests more configurable
    */
   private resolverCallToName(resolverContract: Contract, nodeHash) {
-    return this.callMethod(resolverContract, 'name', [nodeHash] );
+    return this.callMethod(resolverContract, 'name', [nodeHash]);
   }
 
   /**
    * This was done to make automated tests more configurable
    */
   private async getResolver(nodeHash) {
-    return await this.callMethod(this.ensContract, 'resolver', [nodeHash] );
+    return await this.callMethod(this.ensContract, 'resolver', [nodeHash]);
   }
 
   /**
    * This was done to make automated tests more configurable
    */
   private async getOwner(nodeHash) {
-    return await  this.callMethod(this.ensContract, 'owner', [nodeHash] );
+    return await this.callMethod(this.ensContract, 'owner', [nodeHash]);
   }
 
   /**
@@ -210,8 +222,8 @@ export default class Ens extends EtheriumNamingService {
   private async getResolutionInfo(nodeHash) {
     return await Promise.all([
       this.callMethod(this.ensContract, 'owner', [nodeHash]),
-      this.callMethod(this.ensContract, 'ttl', [nodeHash] ),
-      this.callMethod(this.ensContract, 'resolver', [nodeHash] ),
+      this.callMethod(this.ensContract, 'ttl', [nodeHash]),
+      this.callMethod(this.ensContract, 'resolver', [nodeHash]),
     ]);
   }
 
@@ -219,30 +231,33 @@ export default class Ens extends EtheriumNamingService {
    * @param resolver - resolver address
    * @param nodeHash - namehash of a domain name
    */
-   private async fetchAddress(resolver, nodeHash, coinType?: number) {
+  private async fetchAddress(resolver, nodeHash, coinType?: number) {
     if (!resolver || resolver == NullAddress) {
       return null;
     }
-    const resolverContract = new Contract(this.url,
+    const resolverContract = new Contract(
+      this.url,
       resolverInterface(resolver, coinType),
       resolver,
     );
     const addr: string =
       coinType != EthCoinIndex
-      ? await this.callMethod(resolverContract, 'addr', [nodeHash, coinType] )
-      : await this.callMethod(resolverContract, 'addr', [nodeHash] );
+        ? await this.callMethod(resolverContract, 'addr', [nodeHash, coinType])
+        : await this.callMethod(resolverContract, 'addr', [nodeHash]);
     if (!addr) return null;
     const data = Buffer.from(addr.replace('0x', ''), 'hex');
     return formatsByCoinType[coinType].encoder(data);
   }
-
 
   /**
    * Internal wrapper for ens method. Used to throw an error when ens is down
    *  @param method - method to be called
    *  @throws ResolutionError -> When blockchain is down
    */
-  private async callMethod(contract: Contract, methodname: string, params: any
+  private async callMethod(
+    contract: Contract,
+    methodname: string,
+    params: any,
   ): Promise<any> {
     try {
       return await contract.fetchMethod(methodname, params);

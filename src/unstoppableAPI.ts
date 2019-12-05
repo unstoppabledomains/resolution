@@ -2,7 +2,12 @@ import { toBech32Address } from './zns/utils';
 
 import { ResolutionError, ResolutionErrorCode } from './index';
 import NamingService from './namingService';
-import { NamicornResolution, NullAddress, NamingServiceSource, SourceDefinition } from './types';
+import {
+  NamicornResolution,
+  NullAddress,
+  NamingServiceSource,
+  SourceDefinition,
+} from './types';
 import Zns from './zns';
 import Ens from './ens';
 // import * as pckg from '../package.json';
@@ -100,9 +105,7 @@ export default class Udapi extends NamingService {
   }
 
   /** @internal */
-  protected normalizeSource(
-    source: NamingServiceSource,
-  ): SourceDefinition {
+  protected normalizeSource(source: NamingServiceSource): SourceDefinition {
     throw new Error('Method not implemented.');
   }
 
