@@ -1,12 +1,16 @@
 import { EtheriumNamingService } from './namingService';
-import { NamingServiceSource, RegistryMap, NullAddress, NamicornResolution} from './types';
+import {
+  NamingServiceSource,
+  RegistryMap,
+  NullAddress,
+  NamicornResolution,
+} from './types';
 import { hash } from 'eth-ens-namehash';
-import { default as resolverInterface} from './cns/contract/resolver';
-import { default as cnsInterface} from './cns/contract/registry';
+import { default as resolverInterface } from './cns/contract/resolver';
+import { default as cnsInterface } from './cns/contract/registry';
 import { ResolutionError } from '.';
 import { ResolutionErrorCode } from './resolutionError';
-import Contract from './ens/contract/contract';
-import { formatsByCoinType } from '@ensdomains/address-encoder';
+import Contract from './utils/contract';
 
 /**
  * Class to support connection with Crypto naming service
@@ -24,13 +28,11 @@ export default class Cns extends EtheriumNamingService {
   /** @ignore */
   private cnsContract: any;
   /** @ignore */
-  private web3: any;
-  /** @ignore */
   readonly RegistryMap: RegistryMap = {
-    mainnet: '0x234Dad2a1bCfB3b66c5c6040c17112A81565493e',
+    mainnet: '0x608624cA9dacbf78B19232e15f67107Da0AeE715',
   };
 
- /**
+  /**
    * Source object describing the network naming service operates on
    * @param source - if specified as a string will be used as main url, if omited then defaults are used
    * @throws ConfigurationError - when either network or url is setup incorrectly
@@ -74,24 +76,26 @@ export default class Cns extends EtheriumNamingService {
    * @returns- Returns a promise that resolves in an object
    */
   async resolve(domain: string): Promise<NamicornResolution> {
-    try {    
+    try {
       this.ensureSupportedDomain(domain);
-      var [nodeHash, owner, ttl, resolver] = await this.getResolutionMeta(domain);
-    } catch(err) {
-      if (err instanceof ResolutionError)
-        return null;
+      var [tokenId, owner, ttl, resolver] = await this.getResolutionMeta(
+        domain,
+      );
+    } catch (err) {
+      if (err instanceof ResolutionError) return null;
       throw err;
     }
-    const address = await this.fetchAddress(resolver, nodeHash, 'ETH');
+    const address = await this.fetchAddress(resolver, tokenId, 'ETH');
     return {
       addresses: {
-        'ETH': address,
+        ETH: address,
       },
       meta: {
-          owner,
-          type: 'cns',
-          ttl
-      }};
+        owner,
+        type: 'cns',
+        ttl,
+      },
+    };
   }
 
   /**
@@ -100,11 +104,11 @@ export default class Cns extends EtheriumNamingService {
    * @return ENS namehash of a domain
    */
   namehash(domain: string): string {
-    this.ensureSupportedDomain(domain)
+    this.ensureSupportedDomain(domain);
     return hash(domain);
   }
 
- /**
+  /**
    * Resolves domain to a specific cryptoAddress
    * @param domain - domain name to be resolved
    * @param currencyTicker currency ticker such as
@@ -114,10 +118,12 @@ export default class Cns extends EtheriumNamingService {
    * @returns - A promise that resolves in a string
    */
   async address(domain: string, currencyTicker: string): Promise<string> {
-    const [nodeHash, _, __, resolver] = await this.getResolutionMeta(domain);
-    const addr: string = await this.fetchAddress(resolver, nodeHash, currencyTicker);
-    console.log({addr});
-    
+    const [tokenId, _, __, resolver] = await this.getResolutionMeta(domain);
+    const addr: string = await this.fetchAddress(
+      resolver,
+      tokenId,
+      currencyTicker,
+    );
     if (!addr)
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
         domain,
@@ -126,94 +132,125 @@ export default class Cns extends EtheriumNamingService {
     return addr;
   }
 
-   /**
+  /**
    * @ignore
    * @param resolver - Resolver address
-   * @param nodeHash - namehash of a domain name
+   * @param tokenId - namehash of a domain name
    */
-  private async fetchAddress(resolver: string, nodeHash: string, coinName?: string): Promise<string> {
-    console.log('loool');
+  private async fetchAddress(
+    resolver: string,
+    tokenId: string,
+    coinName?: string,
+  ): Promise<string> {
     const resolverContract = new Contract(
       this.url,
       resolverInterface,
-      resolver
+      resolver,
     );
     const addrKey = `crypto.${coinName.toUpperCase()}.address`;
-    console.log({addrKey});
-    const addr: string = await this.callMethod(resolverContract, 'get', [addrKey, nodeHash]);
-    console.log({addr});
+    const addr: string = await this.getRecord(resolverContract, 'get', [
+      addrKey,
+      tokenId,
+    ]);
     return addr;
   }
 
   /** @ignore */
-  private async getResolver(nodeHash): Promise<string> {
-    
-    const test =  await this.callMethod(this.cnsContract, 'resolverOf', [nodeHash]);
-    console.log('getting resolver');
-    console.log({resolver: test});
-    return test;
-    
+  private getResolver = async (tokenId): Promise<string> =>
+    await this.callMethod(this.cnsContract, 'resolverOf', [tokenId]);
+
+  /** @internal */
+  async owner(tokenId): Promise<string> {
+    return await this.callMethod(this.cnsContract, 'ownerOf', [tokenId]);
   }
 
-  /** @ignore */
-  async owner(nodeHash): Promise<string> {
-    return await this.callMethod(this.cnsContract, 'ownerOf', [nodeHash]);
-  }
+  private getTtl = async (contract: Contract, methodname: string, params: any[]):Promise<string> =>
+    await this.callMethod(this.cnsContract, methodname, params);
 
   /** @internal */
   async record(domain: string, key: string): Promise<string> {
-    // TODO: implement record
-    throw new Error("Method not implemented.");
-  }  
-
-  /**
-   * @ignore
-   * This was done to make automated tests more configurable
-   * @param domain
-   * @retuns Promise that resolves to [nodehash, owner, ttl, resolver]
-   */
-  private async getResolutionMeta(domain: string): Promise<[string, string, number, string]> {
-    
-    const nodeHash = this.namehash(domain);
-    const ownerPromise = this.owner(nodeHash);
-    
-    
-    const resolver:string = await this.getResolver(nodeHash);
-    
-    if (!resolver || resolver === NullAddress) {
-      var owner = await ownerPromise;
-      if (!owner || owner === NullAddress)
-        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, { domain });
-      throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, { domain });
-    }
-    const resolverContract = new Contract(this.url, resolverInterface, resolver);
-    // const ttl = await this.callMethod(resolverContract, 'get', ['ttl', nodeHash]);
-    const ttl = '0';
-    console.log({ttl});
-    
-    return [nodeHash, owner, parseInt(ttl) || 0, resolver];
+    const tokenId = this.namehash(domain);
+    const resolver: string = await this.getResolver(tokenId);
+    const resolverContract = new Contract(
+      this.url,
+      resolverInterface,
+      resolver,
+    );
+    const record: string = await this.getRecord(resolverContract, 'get', [
+      key,
+      tokenId,
+    ]);
+    // Wrong Record checks
+    if (!record || record === '0x' || record == NullAddress)
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+        recordName: key,
+        domain: domain,
+      });
+    return record;
   }
 
-   /**
+  /** This is done to make testwriting easy */
+  private async getRecord(contract: Contract, methodname: string, params: any[]):Promise<any> {
+    return await this.callMethod(contract, methodname, params);
+  }
+
+  /**
+   * @param domain
+   * @retuns Promise that resolves to [tokenId, owner, ttl, resolver]
+   */
+  private async getResolutionMeta(
+    domain: string,
+  ): Promise<[string, string, number, string]> {
+    const tokenId = this.namehash(domain);
+    const owner: string = await this.owner(tokenId);
+    const resolver: string = await this.getResolver(tokenId);
+    
+    
+    
+    if (!resolver || resolver === NullAddress) {
+      if (!owner || owner === NullAddress)
+        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+          domain,
+        });
+      throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
+        domain,
+      });
+    }
+    const resolverContract = new Contract(
+      this.url,
+      resolverInterface,
+      resolver,
+    );
+    const ttl = await this.getTtl(resolverContract, 'get', [
+      'ttl',
+      tokenId,
+    ]);
+    return [tokenId, owner, parseInt(ttl) || 0, resolver];
+  }
+
+  /**
    * Internal wrapper for ens method. Used to throw an error when ens is down
    *  @param method - method to be called
    *  @throws ResolutionError -> When blockchain is down
    */
-  private async callMethod(contract: Contract, methodname: string, params: any
-    ): Promise<any> {
-      try {
-        return await contract.fetchMethod(methodname, params);
-      } catch (error) {
-        const { message }: { message: string } = error;
-        if (
-          message.match(/Invalid JSON RPC response/) ||
-          message.match(/legacy access request rate exceeded/)
-        ) {
-          throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
-            method: 'CNS',
-          });
-        }
-        throw error;
+  private async callMethod(
+    contract: Contract,
+    methodname: string,
+    params: any,
+  ): Promise<any> {
+    try {
+      return await contract.fetchMethod(methodname, params);
+    } catch (error) {
+      const { message }: { message: string } = error;
+      if (
+        message.match(/Invalid JSON RPC response/) ||
+        message.match(/legacy access request rate exceeded/)
+      ) {
+        throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
+          method: 'CNS',
+        });
       }
+      throw error;
     }
+  }
 }
