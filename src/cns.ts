@@ -3,7 +3,7 @@ import {
   NamingServiceSource,
   RegistryMap,
   NullAddress,
-  NamicornResolution,
+  ResolutionResponse,
 } from './types';
 import { default as resolverInterface } from './cns/contract/resolver';
 import { default as cnsInterface } from './cns/contract/registry';
@@ -43,10 +43,10 @@ export default class Cns extends EtheriumNamingService {
     this.network = source.network as string;
     this.url = source.url;
     if (!this.network) {
-      throw new Error('Unspecified network in Namicorn CNS configuration');
+      throw new Error('Unspecified network in Resolution CNS configuration');
     }
     if (!this.url) {
-      throw new Error('Unspecified url in Namicorn CNS configuration');
+      throw new Error('Unspecified url in Resolution CNS configuration');
     }
     this.registryAddress = source.registry
       ? source.registry
@@ -75,7 +75,7 @@ export default class Cns extends EtheriumNamingService {
    * @param domain - domain name to be resolved
    * @returns- Returns a promise that resolves in an object
    */
-  async resolve(domain: string): Promise<NamicornResolution> {
+  async resolve(domain: string): Promise<ResolutionResponse> {
     throw new Error('This method is unsupported for CNS');
   }
 
@@ -152,7 +152,7 @@ export default class Cns extends EtheriumNamingService {
       resolver,
     );
     const record: string = await this.getRecord(resolverContract, 'get', [
-      key,
+      key.replace('.value', ''),
       tokenId,
     ]);
     // Wrong Record checks

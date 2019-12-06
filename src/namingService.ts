@@ -3,7 +3,7 @@ import {
   SourceDefinition,
   NetworkIdMap,
   BlockhanNetworkUrlMap,
-  NamicornResolution,
+  ResolutionResponse,
   Bip44Constants,
 } from './types';
 import { hash } from 'eth-ens-namehash';
@@ -27,7 +27,7 @@ export default abstract class NamingService extends BaseConnection {
   abstract address(domain: string, currencyTicker: string): Promise<string>;
   abstract owner(domain: string): Promise<string>;
   abstract record(domain: string, key: string): Promise<string>;
-  abstract resolve(domain: string): Promise<NamicornResolution>;
+  abstract resolve(domain: string): Promise<ResolutionResponse>;
   protected abstract normalizeSource(
     source: NamingServiceSource,
   ): SourceDefinition;

@@ -7,7 +7,7 @@ import namehash from './zns/namehash';
 import { invert, set } from './utils';
 import {
   Dictionary,
-  NamicornResolution,
+  ResolutionResponse,
   NullAddress,
   SourceDefinition,
   UnclaimedDomainResponse,
@@ -62,10 +62,10 @@ export default class Zns extends NamingService {
     this.network = source.network as string;
     this.url = source.url;
     if (!this.network) {
-      throw new Error('Unspecified network in Namicorn ZNS configuration');
+      throw new Error('Unspecified network in Resolution ZNS configuration');
     }
     if (!this.url) {
-      throw new Error('Unspecified url in Namicorn ZNS configuration');
+      throw new Error('Unspecified url in Resolution ZNS configuration');
     }
     this.registryAddress = source.registry
       ? source.registry
@@ -80,17 +80,17 @@ export default class Zns extends NamingService {
   /**
    * Resolves the domain name
    * @param domain - domain name to be resolved
-   * @returns A promise that resolves in a detailed crypto resolution
+   * @returns A promise that resolves in a detailed crypto Resolution
    */
-  async resolve(domain: string): Promise<NamicornResolution | null> {
+  async resolve(domain: string): Promise<ResolutionResponse | null> {
     const recordAddresses = await this.getRecordsAddresses(domain);
     if (!recordAddresses) return UnclaimedDomainResponse;
     const [ownerAddress, resolverAddress] = recordAddresses;
-    const resolution = this.structureResolverRecords(
+    const Resolution = this.structureResolverRecords(
       await this.getResolverRecords(resolverAddress),
     );
     const addresses = {};
-    Object.entries(resolution.crypto).map(
+    Object.entries(Resolution.crypto).map(
       ([key, v]) => (addresses[key] = v.address),
     );
     return {
@@ -98,7 +98,7 @@ export default class Zns extends NamingService {
       meta: {
         owner: ownerAddress || null,
         type: 'zns',
-        ttl: parseInt(resolution.ttl as string) || 0,
+        ttl: parseInt(Resolution.ttl as string) || 0,
       },
     };
   }
@@ -142,7 +142,7 @@ export default class Zns extends NamingService {
    * @param domain - domain name to be resolved
    * @returns Everything what is stored on specified domain
    */
-  async resolution(domain: string): Promise<ZnsResolution> {
+  async Resolution(domain: string): Promise<ZnsResolution> {
     return this.structureResolverRecords(await this.records(domain));
   }
 
@@ -180,7 +180,7 @@ export default class Zns extends NamingService {
   }
 
   /**
-   * Checks if zns is supported by current namicorn instance
+   * Checks if zns is supported by current Resolution instance
    */
   isSupportedNetwork(): boolean {
     return this.registryAddress != null;

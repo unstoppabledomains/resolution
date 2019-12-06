@@ -1,8 +1,11 @@
 {
-  "name": "namicorn",
-  "version": "0.3.6",
-  "description": "Crypto currency wallet domain name resolution library by Unstoppable Domains Inc.",
+  "name": "@unstoppabledomains/resolution",
+  "version": "1.0.1",
+  "description": "Domain Resolution for blockchain domains",
   "main": "./build/index.js",
+  "directories": {
+    "doc": "docs"
+  },
   "types": "./build/index.d.ts",
   "scripts": {
     "release": "yarn build && yarn test && yarn publish --patch && yarn docs && yarn docs:deploy && yarn release:tag",
@@ -15,7 +18,7 @@
     "format": "prettier --semi --write -l **/*.{js,json,ts}",
     "build:live": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
     "docs": "yarn docs:clone && yarn docs:generate && yarn docs:readme",
-    "docs:clone": "[ -d ./docs ] || git clone --branch gh-pages git@github.com:unstoppabledomains/namicorn.git docs",
+    "docs:clone": "[ -d ./docs ] || git clone --branch gh-pages git@ggithub.com/unstoppabledomains/-unstoppabledomains-Resolution.git docs",
     "docs:generate": "yarn run typedoc --out \"./docs/v$npm_package_version\"",
     "docs:readme": "./docs-readme.sh",
     "docs:deploy": "./deploy-docs.sh"
@@ -23,16 +26,16 @@
   "files": [
     "build"
   ],
+  "author": "JohnnyJumper <https://github.com/JohnnyJumper>, Bogdan Gusiev <https://github.com/bogdan>, Braden Pezeshki <https://github.com/perfect-cents, Vladyslav Batyrenko <https://github.com/mvlabat>, Matthew Gould <https://github.com/theporpoise>",
   "repository": {
     "type": "git",
-    "url": "git://github.com/unstoppabledomains/namicorn.git"
+    "url": "https://github.com/unstoppabledomains/-unstoppabledomains-Resolution.git"
   },
-  "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/unstoppabledomains/namicorn/issues"
+    "url": "https://github.com/unstoppabledomains/-unstoppabledomains-Resolution.git"
   },
-  "homepage": "https://github.com/unstoppabledomains/namicorn#readme",
+  "homepage": "https://github.com/unstoppabledomains/-unstoppabledomains-Resolution.git#readme",
   "devDependencies": {
     "@types/jest": "^24.0.11",
     "@types/node": "^11.13.7",

@@ -3,7 +3,7 @@ import { default as resolverInterface } from './ens/contract/resolver';
 import { hash } from 'eth-ens-namehash';
 import { formatsByCoinType } from '@ensdomains/address-encoder';
 import {
-  NamicornResolution,
+  ResolutionResponse,
   NullAddress,
   EthCoinIndex,
   NullAddressExtended,
@@ -45,10 +45,10 @@ export default class Ens extends EtheriumNamingService {
     this.network = <string>source.network;
     this.url = source.url;
     if (!this.network) {
-      throw new Error('Unspecified network in Namicorn ENS configuration');
+      throw new Error('Unspecified network in Resolution ENS configuration');
     }
     if (!this.url) {
-      throw new Error('Unspecified url in Namicorn ENS configuration');
+      throw new Error('Unspecified url in Resolution ENS configuration');
     }
     this.registryAddress = source.registry
       ? source.registry
@@ -167,7 +167,7 @@ export default class Ens extends EtheriumNamingService {
    * @param domain - domain name to be resolved
    * @returns A promise that resolves in an object
    */
-  async resolve(domain: string): Promise<NamicornResolution | null> {
+  async resolve(domain: string): Promise<ResolutionResponse | null> {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork()) {
       return null;
     }

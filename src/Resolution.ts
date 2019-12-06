@@ -4,22 +4,22 @@ import Cns from './cns';
 import Udapi from './unstoppableAPI';
 import {
   Blockchain,
-  NamicornResolution,
   UnclaimedDomainResponse,
+  ResolutionResponse
 } from './types';
 import ResolutionError, { ResolutionErrorCode } from './resolutionError';
 import NamingService from './namingService';
 
 /**
- * Blockchain domain resolution library - Namicorn.
+ * Blockchain domain Resolution library - Resolution.
  * @example
  * ```
- * let namicorn = new Namicorn({blockchain: {ens: {url: 'https://mainnet.infura.io', network: 'mainnet'}}});
+ * let Resolution = new Resolution({blockchain: {ens: {url: 'https://mainnet.infura.io', network: 'mainnet'}}});
  * let domain = brad.zil
- * let resolution = namicorn.address(domain);
+ * let Resolution = Resolution.address(domain);
  * ```
  */
-export default class Namicorn {
+export default class Resolution {
   readonly blockchain: Blockchain | boolean;
   /** @internal */
   readonly ens?: Ens;
@@ -31,7 +31,7 @@ export default class Namicorn {
   readonly api?: Udapi;
 
   /**
-   * Namicorn constructor
+   * Resolution constructor
    * @property blockchain - main configuration object
    */
   constructor({ blockchain = true }: { blockchain?: Blockchain } = {}) {
@@ -69,7 +69,7 @@ export default class Namicorn {
    * @param domain - domain name to be resolved
    * @returns A promise that resolves in an object
    */
-  async resolve(domain: string): Promise<NamicornResolution> {
+  async resolve(domain: string): Promise<ResolutionResponse> {
     const method = this.getNamingMethodOrThrow(domain);
     const result = await method.resolve(domain);
     return result || UnclaimedDomainResponse;
@@ -229,4 +229,4 @@ export default class Namicorn {
   }
 }
 
-export { Namicorn };
+export { Resolution };
