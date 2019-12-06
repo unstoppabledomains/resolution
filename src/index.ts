@@ -1,5 +1,5 @@
-import Namicorn from './namicorn';
+import Resolution from './Resolution';
 export { UnclaimedDomainResponse } from './types';
 export { ResolutionError, ResolutionErrorCode } from './resolutionError';
-export default Namicorn;
-export { Namicorn };
+export default Resolution;
+export { Resolution };

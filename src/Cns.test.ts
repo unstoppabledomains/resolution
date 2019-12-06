@@ -1,4 +1,4 @@
-import Namicorn from '.';
+import Resolution from '.';
 import {
   mockAsyncMethods,
   expectSpyToBeCalled,
@@ -26,38 +26,38 @@ const mockCryptoCalls = (
 
 describe('CNS', () => {
   it('should define the default cns contract', () => {
-    const namicorn = new Namicorn();
-    expect(namicorn.cns).toBeDefined();
-    expect(namicorn.cns.network).toBe('mainnet');
-    expect(namicorn.cns.url).toBe('https://mainnet.infura.io');
+    const resolution = new Resolution();
+    expect(resolution.cns).toBeDefined();
+    expect(resolution.cns.network).toBe('mainnet');
+    expect(resolution.cns.url).toBe('https://mainnet.infura.io');
   });
 
   it('checks the ipfs hash record', async () => {
-    const namicorn = new Namicorn();
-    const eyes = mockAsyncMethods(namicorn.cns, {
+    const resolution = new Resolution();
+    const eyes = mockAsyncMethods(resolution.cns, {
       getResolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
       getRecord: 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
     });
-    const ipfs_hash = await namicorn.cns.record(labelDomain, 'ipfs.html2');
+    const ipfs_hash = await resolution.cns.record(labelDomain, 'ipfs.html2');
     expectSpyToBeCalled(eyes);
     expect(ipfs_hash).toBe('QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK');
   });
 
   it('Should return NoRecord Resolution error', async () => {
-    const namicorn = new Namicorn();
+    const resolution = new Resolution();
     await expectResolutionErrorCode(
-      namicorn.cns.record(labelDomain, 'No.such.record'),
+      resolution.cns.record(labelDomain, 'No.such.record'),
       ResolutionErrorCode.RecordNotFound,
     );
   });
 
   it('checks the ipfs redirect_domain record', async () => {
-    const namicorn = new Namicorn();
-    const eyes = mockAsyncMethods(namicorn.cns, {
+    const resolution = new Resolution();
+    const eyes = mockAsyncMethods(resolution.cns, {
       getResolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
       getRecord: 'www.unstoppabledomains.com',
     });
-    const ipfs_redirect_domain = await namicorn.cns.record(
+    const ipfs_redirect_domain = await resolution.cns.record(
       labelDomain,
       'ipfs.redirect_domain',
     );
@@ -66,67 +66,67 @@ describe('CNS', () => {
   });
 
   it(`checks the BCH address on ${labelDomain}`, async () => {
-    const namicorn = new Namicorn();
+    const resolution = new Resolution();
     const eyes = mockCryptoCalls(
-      namicorn.cns,
+      resolution.cns,
       'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6',
     );
-    const addr = await namicorn.cns.address(labelDomain, 'BCH');
+    const addr = await resolution.cns.address(labelDomain, 'BCH');
     expectSpyToBeCalled(eyes);
     expect(addr).toBe('qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6');
   });
 
   it(`checks the BTC address on ${labelDomain}`, async () => {
-    const namicorn = new Namicorn();
+    const resolution = new Resolution();
     const eyes = mockCryptoCalls(
-      namicorn.cns,
+      resolution.cns,
       '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB',
     );
-    const addr = await namicorn.cns.address(labelDomain, 'BTC');
+    const addr = await resolution.cns.address(labelDomain, 'BTC');
     expectSpyToBeCalled(eyes);
     expect(addr).toBe('1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB');
   });
 
   it(`checks the DASH address on ${labelDomain}`, async () => {
-    const namicorn = new Namicorn();
+    const resolution = new Resolution();
     const eyes = mockCryptoCalls(
-      namicorn.cns,
+      resolution.cns,
       'XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j',
     );
-    const addr = await namicorn.cns.address(labelDomain, 'DASH');
+    const addr = await resolution.cns.address(labelDomain, 'DASH');
     expectSpyToBeCalled(eyes);
     expect(addr).toBe('XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j');
   });
 
   it(`checks the ETH address on ${labelDomain}`, async () => {
-    const namicorn = new Namicorn();
+    const resolution = new Resolution();
     const eyes = mockCryptoCalls(
-      namicorn.cns,
+      resolution.cns,
       '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
     );
-    const addr = await namicorn.cns.address(labelDomain, 'ETH');
+    const addr = await resolution.cns.address(labelDomain, 'ETH');
     expectSpyToBeCalled(eyes);
     expect(addr).toBe('0x45b31e01AA6f42F0549aD482BE81635ED3149abb');
   });
 
   it(`checks the LTC address on ${labelDomain}`, async () => {
-    const namicorn = new Namicorn();
+    const resolution = new Resolution();
     const eyes = mockCryptoCalls(
-      namicorn.cns,
+      resolution.cns,
       'LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL',
     );
-    const addr = await namicorn.cns.address(labelDomain, 'LTC');
+    const addr = await resolution.cns.address(labelDomain, 'LTC');
     expectSpyToBeCalled(eyes);
     expect(addr).toBe('LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL');
   });
 
   it(`checks the XMR address on ${labelDomain}`, async () => {
-    const namicorn = new Namicorn();
+    const resolution = new Resolution();
     const eyes = mockCryptoCalls(
-      namicorn.cns,
+      resolution.cns,
       '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d',
     );
-    const addr = await namicorn.cns.address(labelDomain, 'XMR');
+    const addr = await resolution.cns.address(labelDomain, 'XMR');
     expectSpyToBeCalled(eyes);
     expect(addr).toBe(
       '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d',
@@ -134,24 +134,35 @@ describe('CNS', () => {
   });
 
   it(`checks the ZEC address on ${labelDomain}`, async () => {
-    const namicorn = new Namicorn();
+    const resolution = new Resolution();
     const eyes = mockCryptoCalls(
-      namicorn.cns,
+      resolution.cns,
       't1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV',
     );
-    const addr = await namicorn.cns.address(labelDomain, 'ZEC');
+    const addr = await resolution.cns.address(labelDomain, 'ZEC');
     expectSpyToBeCalled(eyes);
     expect(addr).toBe('t1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV');
   });
 
   it(`checks the ZIL address on ${labelDomain}`, async () => {
-    const namicorn = new Namicorn();
+    const resolution = new Resolution();
     const eyes = mockCryptoCalls(
-      namicorn.cns,
+      resolution.cns,
       'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
     );
-    const addr = await namicorn.cns.address(labelDomain, 'ZIL');
+    const addr = await resolution.cns.address(labelDomain, 'ZIL');
     expectSpyToBeCalled(eyes);
     expect(addr).toBe('zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj');
   });
+
+  it('checks it from resolution main object', async () => {
+    const resolution = new Resolution();
+    const eyes = mockCryptoCalls(
+      resolution.cns,
+      'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
+    );
+    const addr = await resolution.address(labelDomain, 'ZIL');
+    expectSpyToBeCalled(eyes);
+    expect(addr).toBe('zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj');
+  })
 });

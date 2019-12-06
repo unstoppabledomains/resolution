@@ -50,12 +50,12 @@ export interface RegistryMap {
 }
 
 /**
- * NamicornResulution
- * @typedef {Object} NamicornResolution
- * @property {Object} addresses - resolution addresses for various currency addresses attached to the domain
+ * ResolutionResulution
+ * @typedef ResolutionResponse
+ * @property {Object} addresses - Resolution addresses for various currency addresses attached to the domain
  * @property {Object} meta - meta information about the owner of the domain
  */
-export type NamicornResolution = {
+export type ResolutionResponse = {
   addresses: {
     [key: string]: string;
   };
@@ -75,7 +75,7 @@ export type NetworkIdMap = {
 };
 
 /**
- * Main configurational object for Namicorn instance
+ * Main configurational object for Resolution instance
  */
 export type Blockchain =
   | boolean
@@ -104,7 +104,7 @@ export const NullAddressExtended =
   '0x0000000000000000000000000000000000000000000000000000000000000000';
 export const EthCoinIndex = 60;
 
-export const UnclaimedDomainResponse: NamicornResolution = {
+export const UnclaimedDomainResponse: ResolutionResponse = {
   addresses: {},
   meta: {
     owner: null, //available domain

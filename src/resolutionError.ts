@@ -50,9 +50,9 @@ const HandlersByCode = {
 };
 
 /**
- * Resolution Error class is designed to control every error being thrown by Namicorn
+ * Resolution Error class is designed to control every error being thrown by Resolution
  * @param code - Error Code
- * - UnsupportedDomain - domain is not supported by current namicorn instance
+ * - UnsupportedDomain - domain is not supported by current Resolution instance
  * - NamingServiceDown - blockchain API is down
  * - UnregisteredDomain - domain is not owned by any address
  * - UnspecifiedResolver - domain has no resolver specified
