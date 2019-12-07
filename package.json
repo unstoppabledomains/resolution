@@ -29,13 +29,13 @@
   "author": "JohnnyJumper <https://github.com/JohnnyJumper>, Bogdan Gusiev <https://github.com/bogdan>, Braden Pezeshki <https://github.com/perfect-cents, Vladyslav Batyrenko <https://github.com/mvlabat>, Matthew Gould <https://github.com/theporpoise>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/unstoppabledomains/-unstoppabledomains-Resolution.git"
+    "url": "https://github.com/unstoppabledomains/resolution.git"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/unstoppabledomains/-unstoppabledomains-Resolution.git"
+    "url": "https://github.com/unstoppabledomains/resolution.git"
   },
-  "homepage": "https://github.com/unstoppabledomains/-unstoppabledomains-Resolution.git#readme",
+  "homepage": "https://github.com/unstoppabledomains/resolution.git#readme",
   "devDependencies": {
     "@types/jest": "^24.0.11",
     "@types/node": "^11.13.7",
