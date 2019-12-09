@@ -1,10 +1,10 @@
-# namicorn
+# Resolution
 
 A library for interacting with blockchain domain names.
 
-You can use Namicorn in a `<script>` tag from a
-[CDN](https://unpkg.com/browse/namicorn/lib/index.js), or as the `namicorn`
-package on the [npm](https://www.npmjs.com/package/namicorn) registry.
+You can use Resolution in a `<script>` tag from a
+[CDN](https://unpkg.com/browse/Resolution/build/index.js), or as the `Resolution`
+package on the [npm](https://www.npmjs.com/package/@unstoppabledomains/resolution) registry.
 
 Supported domain zones:
 
@@ -13,7 +13,7 @@ Supported domain zones:
 - .test
 - .xyz
 - .luxe
-- .crypto (under development)
+- .crypto 
 
-[API Referrence](https://unstoppabledomains.github.io/namicorn/)
-[Documentation](https://docs.unstoppabledomains.com/#tag/namicorn)
+[API Referrence](https://unstoppabledomains.github.io/-unstoppabledomains-resolution/)
+[Documentation](https://docs.unstoppabledomains.com/#tag/Resolution)

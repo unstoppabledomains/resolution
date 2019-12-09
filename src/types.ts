@@ -13,12 +13,49 @@ export interface SourceDefinition {
 }
 
 /**
- * NamicornResulution
- * @typedef {Object} NamicornResolution
- * @property {Object} addresses - resolution addresses for various currency addresses attached to the domain
+ * NamingServiceSource
+ * just an alias
+ * @typedef {string | boolean | SourceDefinition}
+ */
+export type NamingServiceSource = string | boolean | SourceDefinition;
+
+/**
+ * EnsNetworkIdMap
+ * type represending the map between network number and network name
+ * @typedef
+ */
+export type EnsNetworkIdMap = {
+  [key: number]: string;
+};
+
+/**
+ * BlockcahinNetworkUrlMap
+ * type representing a map between network name such as
+ *  - mainnet
+ *  - ropsten
+ * and a corresponding url
+ * @typede
+ */
+
+export interface BlockhanNetworkUrlMap {
+  [key: string]: string;
+}
+
+/**
+ * RegistryMap
+ * type represending the map between network name and registry address for specific NamingService
+ */
+export interface RegistryMap {
+  [key: string]: string;
+}
+
+/**
+ * ResolutionResulution
+ * @typedef ResolutionResponse
+ * @property {Object} addresses - Resolution addresses for various currency addresses attached to the domain
  * @property {Object} meta - meta information about the owner of the domain
  */
-export type NamicornResolution = {
+export type ResolutionResponse = {
   addresses: {
     [key: string]: string;
   };
@@ -38,13 +75,14 @@ export type NetworkIdMap = {
 };
 
 /**
- * Main configurational object for Namicorn instance
+ * Main configurational object for Resolution instance
  */
 export type Blockchain =
   | boolean
   | {
-      ens?: string | boolean | SourceDefinition;
-      zns?: string | boolean | SourceDefinition;
+      ens?: NamingServiceSource;
+      zns?: NamingServiceSource;
+      cns?: NamingServiceSource;
     };
 
 /**
@@ -62,10 +100,11 @@ export type owner = string;
 export type ttl = string;
 
 export const NullAddress = '0x0000000000000000000000000000000000000000';
-export const NullAddressExtended = '0x0000000000000000000000000000000000000000000000000000000000000000';
+export const NullAddressExtended =
+  '0x0000000000000000000000000000000000000000000000000000000000000000';
 export const EthCoinIndex = 60;
 
-export const UnclaimedDomainResponse: NamicornResolution = {
+export const UnclaimedDomainResponse: ResolutionResponse = {
   addresses: {},
   meta: {
     owner: null, //available domain

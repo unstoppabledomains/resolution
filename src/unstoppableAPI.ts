@@ -2,13 +2,17 @@ import { toBech32Address } from './zns/utils';
 
 import { ResolutionError, ResolutionErrorCode } from './index';
 import NamingService from './namingService';
-import { NamicornResolution, NullAddress, SourceDefinition } from './types';
+import {
+  ResolutionResponse,
+  NullAddress,
+  NamingServiceSource,
+  SourceDefinition,
+} from './types';
 import Zns from './zns';
 import Ens from './ens';
 // import * as pckg from '../package.json';
 
 const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
-
 export default class Udapi extends NamingService {
   private url: string;
   private headers: {
@@ -23,7 +27,7 @@ export default class Udapi extends NamingService {
       ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'
       : navigator.userAgent;
     const version = process.env.npm_package_version;
-    const CustomUserAgent = `${DefaultUserAgent} namicorn/${version}`;
+    const CustomUserAgent = `${DefaultUserAgent} Resolution/${version}`;
     this.headers = { 'X-user-agent': CustomUserAgent };
   }
 
@@ -36,6 +40,7 @@ export default class Udapi extends NamingService {
   isSupportedNetwork(): boolean {
     return true;
   }
+
   /** @internal */
   namehash(domain: string): string {
     const method = this.findMethod(domain);
@@ -84,7 +89,7 @@ export default class Udapi extends NamingService {
    * Resolves the domain name via UD API mirror
    * @param domain - domain name to be resolved
    */
-  async resolve(domain: string): Promise<NamicornResolution> {
+  async resolve(domain: string): Promise<ResolutionResponse> {
     try {
       const response = await this.fetch(`${this.url}/${domain}`, {
         method: 'GET',
@@ -100,9 +105,7 @@ export default class Udapi extends NamingService {
   }
 
   /** @internal */
-  protected normalizeSource(
-    source: string | boolean | import('./types').SourceDefinition,
-  ): SourceDefinition {
+  protected normalizeSource(source: NamingServiceSource): SourceDefinition {
     throw new Error('Method not implemented.');
   }
 

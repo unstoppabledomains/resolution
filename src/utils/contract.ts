@@ -1,6 +1,7 @@
-import BaseConnection from "../../baseConnection";
+import BaseConnection from "../baseConnection";
 import {defaultAbiCoder as AbiCoder} from 'ethers/utils/abi-coder';
 import keccak256  from "keccak256";
+import ResolutionError, { ResolutionErrorCode } from "../resolutionError";
 
 type FourBytes = string;
 
@@ -56,6 +57,8 @@ export default class Contract extends BaseConnection {
         'Content-Type': 'application/json',
       }
     }).then(res => res.json());
+    if (response.result === '0x')
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound,{recordName: method, domain: args[0] } );
     return AbiCoder.decode( methodDescription.outputs , response.result )[0];
   }
 

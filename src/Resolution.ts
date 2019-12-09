@@ -1,34 +1,37 @@
 import Ens from './ens';
 import Zns from './zns';
+import Cns from './cns';
 import Udapi from './unstoppableAPI';
 import {
   Blockchain,
-  NamicornResolution,
   UnclaimedDomainResponse,
+  ResolutionResponse
 } from './types';
 import ResolutionError, { ResolutionErrorCode } from './resolutionError';
 import NamingService from './namingService';
 
 /**
- * Blockchain domain resolution library - Namicorn.
+ * Blockchain domain Resolution library - Resolution.
  * @example
  * ```
- * let namicorn = new Namicorn({blockchain: {ens: {url: 'https://mainnet.infura.io', network: 'mainnet'}}});
+ * let Resolution = new Resolution({blockchain: {ens: {url: 'https://mainnet.infura.io', network: 'mainnet'}}});
  * let domain = brad.zil
- * let resolution = namicorn.address(domain);
+ * let Resolution = Resolution.address(domain);
  * ```
  */
-export default class Namicorn {
+export default class Resolution {
   readonly blockchain: Blockchain | boolean;
   /** @internal */
   readonly ens?: Ens;
   /** @internal */
   readonly zns?: Zns;
   /** @internal */
+  readonly cns?: Cns;
+  /** @internal */
   readonly api?: Udapi;
 
   /**
-   * Namicorn constructor
+   * Resolution constructor
    * @property blockchain - main configuration object
    */
   constructor({ blockchain = true }: { blockchain?: Blockchain } = {}) {
@@ -43,11 +46,17 @@ export default class Namicorn {
       if (blockchain.zns === undefined) {
         blockchain.zns = true;
       }
+      if (blockchain.cns == undefined) {
+        blockchain.cns = true;
+      }
       if (blockchain.ens) {
         this.ens = new Ens(blockchain.ens);
       }
       if (blockchain.zns) {
         this.zns = new Zns(blockchain.zns);
+      }
+      if (blockchain.cns) {
+        this.cns = new Cns(blockchain.cns);
       }
     } else {
       this.api = new Udapi();
@@ -60,7 +69,7 @@ export default class Namicorn {
    * @param domain - domain name to be resolved
    * @returns A promise that resolves in an object
    */
-  async resolve(domain: string): Promise<NamicornResolution> {
+  async resolve(domain: string): Promise<ResolutionResponse> {
     const method = this.getNamingMethodOrThrow(domain);
     const result = await method.resolve(domain);
     return result || UnclaimedDomainResponse;
@@ -201,13 +210,13 @@ export default class Namicorn {
    * @param domain - domain name
    */
   private getNamingMethod(domain: string): NamingService | undefined {
-    const methods: Array<NamingService | undefined> = this.blockchain
-      ? [this.ens, this.zns]
+    const methods: (Ens | Zns | Udapi | Cns)[] = this.blockchain
+      ? [this.ens, this.zns, this.cns]
       : [this.api];
     const method = methods.find(
       method => method && method.isSupportedDomain(domain),
     );
-    return method;
+    return method as NamingService;
   }
 
   private getNamingMethodOrThrow(domain: string) {
@@ -220,4 +229,4 @@ export default class Namicorn {
   }
 }
 
-export { Namicorn };
+export { Resolution };
