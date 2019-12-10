@@ -1,10 +1,7 @@
 import nock from 'nock';
 import Resolution, { ResolutionErrorCode } from '.';
 import { UnclaimedDomainResponse } from './types';
-import {
-  expectResolutionErrorCode,
-  
-} from './utils/testHelpers';
+import { expectResolutionErrorCode } from './utils/testHelpers';
 
 beforeEach(() => {
   nock.cleanAll();

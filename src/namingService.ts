@@ -120,7 +120,7 @@ export abstract class EtheriumNamingService extends NamingService {
     }
   }
 
-   /**
+  /**
    * Produces ENS namehash
    * @param domain - domain to be hashed
    * @return ENS namehash of a domain
@@ -138,7 +138,6 @@ export abstract class EtheriumNamingService extends NamingService {
     return this.registryAddress != null;
   }
 
-  
   /**
    * Internal wrapper for ens method. Used to throw an error when ens is down
    *  @param method - method to be called
@@ -164,5 +163,4 @@ export abstract class EtheriumNamingService extends NamingService {
       throw error;
     }
   }
-
 }

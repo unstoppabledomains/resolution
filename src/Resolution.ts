@@ -5,7 +5,7 @@ import Udapi from './unstoppableAPI';
 import {
   Blockchain,
   UnclaimedDomainResponse,
-  ResolutionResponse
+  ResolutionResponse,
 } from './types';
 import ResolutionError, { ResolutionErrorCode } from './resolutionError';
 import NamingService from './namingService';

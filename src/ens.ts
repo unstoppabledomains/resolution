@@ -141,7 +141,7 @@ export default class Ens extends EtheriumNamingService {
         domain,
       });
     }
-    const coinType = this.getCoinType(currencyTicker);
+    const coinType = this.getCoinType(currencyTicker.toUpperCase());
     var addr = await this.fetchAddress(resolver, nodeHash, coinType);
     if (!addr)
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
@@ -229,20 +229,20 @@ export default class Ens extends EtheriumNamingService {
     ]);
   }
 
-    /** @internal */
-    protected getCoinType(currencyTicker: string): number {
-      const constants: Bip44Constants[] = require('bip44-constants');
-      const coin = constants.findIndex(
-        item =>
-          item[1] === currencyTicker.toUpperCase() ||
-          item[2] === currencyTicker.toUpperCase(),
-      );
-      if (coin < 0 || !formatsByCoinType[coin])
-        throw new ResolutionError(ResolutionErrorCode.UnsupportedCurrency, {
-          currencyTicker,
-        });
-      return coin;
-    }
+  /** @internal */
+  protected getCoinType(currencyTicker: string): number {
+    const constants: Bip44Constants[] = require('bip44-constants');
+    const coin = constants.findIndex(
+      item =>
+        item[1] === currencyTicker.toUpperCase() ||
+        item[2] === currencyTicker.toUpperCase(),
+    );
+    if (coin < 0 || !formatsByCoinType[coin])
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedCurrency, {
+        currencyTicker,
+      });
+    return coin;
+  }
 
   /**
    * @param resolver - resolver address

@@ -164,5 +164,5 @@ describe('CNS', () => {
     const addr = await resolution.address(labelDomain, 'ZIL');
     expectSpyToBeCalled(eyes);
     expect(addr).toBe('zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj');
-  })
+  });
 });

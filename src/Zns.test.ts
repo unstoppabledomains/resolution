@@ -3,9 +3,8 @@ import {
   mockAsyncMethod,
   expectSpyToBeCalled,
   ZilliqaUrl,
-  mockAPICalls
+  mockAPICalls,
 } from './utils/testHelpers';
-
 
 beforeEach(() => {
   jest.restoreAllMocks();
@@ -93,7 +92,9 @@ describe('ZNS', () => {
   });
 
   it('checks normalizeSource zns (object) #2', async () => {
-    const resolution = new Resolution({ blockchain: { zns: { network: 333 } } });
+    const resolution = new Resolution({
+      blockchain: { zns: { network: 333 } },
+    });
     expect(resolution.zns.url).toBe('https://dev-api.zilliqa.com');
     expect(resolution.zns.network).toBe('testnet');
     expect(resolution.zns.registryAddress).toBeUndefined();

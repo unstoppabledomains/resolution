@@ -10,7 +10,6 @@ import {
   MainnetUrl,
 } from './utils/testHelpers';
 
-
 beforeEach(() => {
   nock.cleanAll();
   jest.restoreAllMocks();
@@ -33,7 +32,7 @@ describe('ENS', () => {
     expect(resolution.ens.network).toEqual('mainnet');
 
     const eyes = mockAsyncMethods(resolution.ens, {
-      getOwner: '0x825ef33943d925731FBB89C99aF5780D888bD217',
+      getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
       getResolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
       fetchAddress: '0x714ef33943d925731FBB89C99aF5780D888bD106',
     });
@@ -42,7 +41,7 @@ describe('ENS', () => {
       '0x714ef33943d925731FBB89C99aF5780D888bD106',
     );
     expect(await resolution.owner('matthewgould.eth')).toEqual(
-      '0x825ef33943d925731FBB89C99aF5780D888bD217',
+      '0x714ef33943d925731FBB89C99aF5780D888bD106',
     );
     expectSpyToBeCalled(eyes);
   });
