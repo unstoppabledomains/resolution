@@ -29,7 +29,7 @@ export default class Cns extends EtheriumNamingService {
   private cnsContract: any;
   /** @internal */
   readonly RegistryMap: RegistryMap = {
-    mainnet: '0x608624cA9dacbf78B19232e15f67107Da0AeE715',
+    mainnet: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe',
   };
 
   /**
