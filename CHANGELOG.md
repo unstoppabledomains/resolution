@@ -1,5 +1,10 @@
 ## Unreleased
 
+## 1.0.3
+
+* Fixed bug with not having a ttl record on the blockchain. Now returns 0 instead of throwing an error
+* Changed main registry address for CNS to 0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe
+
 ## 1.0.2
 
 * Fixed bug with not finding cointypes when currency ticker is given as smallcase
