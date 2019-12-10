@@ -158,7 +158,16 @@ export default class Ens extends EtheriumNamingService {
    */
   async owner(domain: string): Promise<string | null> {
     const nodeHash = this.namehash(domain);
-    return (await this.getOwner(nodeHash)) || null;
+    try {
+      return await this.getOwner(nodeHash);
+    } catch (err) {
+      if (
+        err instanceof ResolutionError &&
+        err.code === ResolutionErrorCode.RecordNotFound
+      )
+        return null;
+      throw err;
+    }
   }
 
   /**
@@ -208,7 +217,16 @@ export default class Ens extends EtheriumNamingService {
    * This was done to make automated tests more configurable
    */
   private async getResolver(nodeHash) {
-    return await this.callMethod(this.ensContract, 'resolver', [nodeHash]);
+    try {
+      return await this.callMethod(this.ensContract, 'resolver', [nodeHash]);
+    } catch (err) {
+      if (
+        err instanceof ResolutionError &&
+        err.code === ResolutionErrorCode.RecordNotFound
+      )
+        return null;
+      throw err;
+    }
   }
 
   /**
