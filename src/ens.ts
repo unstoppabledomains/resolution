@@ -13,6 +13,7 @@ import {
 import { EtheriumNamingService } from './namingService';
 import { ResolutionError, ResolutionErrorCode } from './index';
 import Contract from './utils/contract';
+import Resolution from './Resolution';
 
 const RegistryMap = {
   mainnet: '0x314159265dd8dbb310642f98f50c066173c1259b',
@@ -181,9 +182,9 @@ export default class Ens extends EtheriumNamingService {
       return null;
     }
     const nodeHash = this.namehash(domain);
-    var [owner, ttl, resolver] = await this.getResolutionInfo(nodeHash);
+    var [owner, ttl, resolver] = await this.getResolutionInfo(domain);
     if (owner == NullAddress) owner = null;
-    const address = await this.fetchAddress(resolver, nodeHash);
+    const address = await this.fetchAddress(resolver, nodeHash, EthCoinIndex);
     return {
       addresses: {
         ETH: address,
@@ -213,6 +214,16 @@ export default class Ens extends EtheriumNamingService {
     return this.callMethod(resolverContract, 'name', [nodeHash]);
   }
 
+  private async getTTL(nodeHash) {
+    try {
+      return await this.callMethod(this.ensContract, 'ttl', [nodeHash]);
+    } catch (err) {
+      if ( err instanceof ResolutionError && err.code === ResolutionErrorCode.RecordNotFound)
+        return 0;
+      throw err;
+    }
+  }
+
   /**
    * This was done to make automated tests more configurable
    */
@@ -239,12 +250,9 @@ export default class Ens extends EtheriumNamingService {
   /**
    * This was done to make automated tests more configurable
    */
-  private async getResolutionInfo(nodeHash) {
-    return await Promise.all([
-      this.callMethod(this.ensContract, 'owner', [nodeHash]),
-      this.callMethod(this.ensContract, 'ttl', [nodeHash]),
-      this.callMethod(this.ensContract, 'resolver', [nodeHash]),
-    ]);
+  private async getResolutionInfo(domain: string) {
+    const nodeHash = this.namehash(domain);
+    return await Promise.all([this.owner(domain), this.getTTL(nodeHash), this.getResolver(nodeHash)]);
   }
 
   /** @internal */

@@ -390,4 +390,27 @@ describe('ENS', () => {
       ResolutionErrorCode.UnsupportedCurrency,
     );
   });
+
+  it('Checks resolution#resolve, should pass without any errors', async () => {
+    const resolution = new Resolution();
+    const eyes = mockAsyncMethods(resolution.ens, {
+      getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
+      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      getTTL: 0,
+      callMethod:
+        '0x714ef33943d925731FBB89C99aF5780D888bD106',
+    });
+    const resolutionObj = await resolution.resolve('matthewgould.eth');
+    expectSpyToBeCalled(eyes);
+    expect(resolutionObj).toStrictEqual({
+      addresses: { ETH: '0x714ef33943d925731FBB89C99aF5780D888bD106' },
+      meta:
+      {
+        owner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
+        type: 'ens',
+        ttl: 0
+      }
+    });
+  });
+
 });
