@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 1.0.2
+
+* Fixed bug with not finding cointypes when currency ticker is given as smallcase
+
 ## 1.0.1
 
 * .crypto support with Resolution.cns
