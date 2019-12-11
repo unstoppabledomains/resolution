@@ -178,14 +178,10 @@ export default class Resolution {
    * Produce a namehash from supported naming service
    * @param domain - domain name to be hashed
    * @returns Namehash either for ENS or ZNS
+   * @throws ResolutionError with UnsupportedDomain error code if domain extension is unknown
    */
   namehash(domain: string): string {
-    const method = this.getNamingMethod(domain);
-    if (!method)
-      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
-        domain,
-      });
-    return method.namehash(domain);
+    return this.getNamingMethodOrThrow(domain).namehash(domain);
   }
 
   /**
