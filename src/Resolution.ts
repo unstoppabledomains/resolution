@@ -201,6 +201,10 @@ export default class Resolution {
     return method && method.isSupportedNetwork();
   }
 
+  serviceName(domain: string): string {
+    return this.getNamingMethodOrThrow(domain).serviceName(domain);
+  }
+
   /**
    * Used internally to get the right method (ens or zns)
    * @param domain - domain name
