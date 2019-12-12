@@ -1,5 +1,7 @@
 ## Unreleased
 
+## 1.0.4
+
 * Raise `ResolutionError` with `NamingServiceDown` code on error on ethereum RPC response
 * BREAKING CHANGE: use capital letter for service name inside `Resolution#resolve => {meta: {type}}`
 * NamingService#serviceName(domain: string): string

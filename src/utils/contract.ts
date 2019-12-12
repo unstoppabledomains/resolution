@@ -44,7 +44,7 @@ export default class Contract extends BaseConnection {
     const dataParam: string = initialBytes + AbiCoder.encode(methodDescription.inputs, args).replace('0x', '');
     const response = await this.fetchData(dataParam);
     if (response.error) {
-      throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {method: name})
+      throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {method: this.name})
     }
     if (response.result === '0x' || response.result === NullAddress || response.result === NullAddressExtended)
       throw new ResolutionError(ResolutionErrorCode.RecordNotFound,{recordName: method, domain: args[0] } );
