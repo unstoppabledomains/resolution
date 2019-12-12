@@ -47,6 +47,7 @@ export default abstract class NamingService extends BaseConnection {
 }
 export abstract class EtheriumNamingService extends NamingService {
   abstract registryAddress?: string;
+  abstract readonly url: string;
   readonly NetworkIdMap: NetworkIdMap = {
     1: 'mainnet',
     3: 'ropsten',
@@ -167,5 +168,9 @@ export abstract class EtheriumNamingService extends NamingService {
       }
       throw error;
     }
+  }
+
+  protected buildContract(abi, address) {
+    return new Contract(this.name, this.url, abi, address)
   }
 }

@@ -52,8 +52,7 @@ export default class Cns extends EtheriumNamingService {
       ? source.registry
       : this.RegistryMap[this.network];
     if (this.registryAddress) {
-      this.cnsContract = new Contract(
-        this.url,
+      this.cnsContract = this.buildContract(
         cnsInterface,
         this.registryAddress,
       );
@@ -113,8 +112,7 @@ export default class Cns extends EtheriumNamingService {
     tokenId: string,
     coinName?: string,
   ): Promise<string> {
-    const resolverContract = new Contract(
-      this.url,
+    const resolverContract = this.buildContract(
       resolverInterface,
       resolver,
     );
@@ -146,8 +144,7 @@ export default class Cns extends EtheriumNamingService {
   async record(domain: string, key: string): Promise<string> {
     const tokenId = this.namehash(domain);
     const resolver: string = await this.getResolver(tokenId);
-    const resolverContract = new Contract(
-      this.url,
+    const resolverContract = this.buildContract(
       resolverInterface,
       resolver,
     );
@@ -193,8 +190,7 @@ export default class Cns extends EtheriumNamingService {
         domain,
       });
     }
-    const resolverContract = new Contract(
-      this.url,
+    const resolverContract = this.buildContract(
       resolverInterface,
       resolver,
     );

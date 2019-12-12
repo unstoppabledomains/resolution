@@ -55,8 +55,7 @@ export default class Ens extends EtheriumNamingService {
       ? source.registry
       : RegistryMap[this.network];
     if (this.registryAddress) {
-      this.ensContract = new Contract(
-        this.url,
+      this.ensContract = this.buildContract(
         ensInterface,
         this.registryAddress,
       );
@@ -105,8 +104,7 @@ export default class Ens extends EtheriumNamingService {
     if (resolverAddress == NullAddress) {
       return null;
     }
-    const resolverContract = new Contract(
-      this.url,
+    const resolverContract = this.buildContract(
       resolverInterface(resolverAddress, EthCoinIndex),
       resolverAddress,
     );
@@ -278,8 +276,7 @@ export default class Ens extends EtheriumNamingService {
     if (!resolver || resolver == NullAddress) {
       return null;
     }
-    const resolverContract = new Contract(
-      this.url,
+    const resolverContract = this.buildContract(
       resolverInterface(resolver, coinType),
       resolver,
     );

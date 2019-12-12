@@ -11,13 +11,15 @@ export default class Contract extends BaseConnection {
   readonly contractInterface: [any];
   readonly address: string;
   readonly url: string;
+  readonly name: string;
 
   /**
    * @param contractInterface JSON-RPC interface of smartContract
    * @param address Contract's address
    */
-  constructor(url: string, contractInterface, address: string) {
+  constructor(name: string, url: string, contractInterface, address: string) {
     super();
+    this.name = name;
     this.url = url;
     this.contractInterface = contractInterface;
     this.address = address;
@@ -40,24 +42,10 @@ export default class Contract extends BaseConnection {
     const methodSignature: string = `${functionName}(${functionInputTypes.join(',')})`;
     const initialBytes: FourBytes = this.fourBytesHash(methodSignature);
     const dataParam: string = initialBytes + AbiCoder.encode(methodDescription.inputs, args).replace('0x', '');
-    const response = await this.fetch(this.url, {
-      method: 'POST',
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        id: 1,
-        method: "eth_call",
-        params: [
-          {
-            data: dataParam,
-            to: this.address
-          },
-          "latest"
-        ],
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    }).then(res => res.json());
+    const response = await this.fetchData(dataParam);
+    if (response.error) {
+      throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {method: name})
+    }
     if (response.result === '0x' || response.result === NullAddress || response.result === NullAddressExtended)
       throw new ResolutionError(ResolutionErrorCode.RecordNotFound,{recordName: method, domain: args[0] } );
     return AbiCoder.decode( methodDescription.outputs , response.result )[0];
@@ -72,5 +60,27 @@ export default class Contract extends BaseConnection {
    */
   private fourBytesHash(method: string): FourBytes {
     return '0x' + keccak256(method).toString('hex').slice(0,8);
+  }
+
+  private async fetchData(data: string): Promise<any> {
+    const response = await this.fetch(this.url, {
+      method: 'POST',
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: 1,
+        method: "eth_call",
+        params: [
+          {
+            data,
+            to: this.address
+          },
+          "latest"
+        ],
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+    return await response.json();
   }
 }
