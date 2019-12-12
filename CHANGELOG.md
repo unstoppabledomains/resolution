@@ -1,5 +1,6 @@
 ## Unreleased
 
+* BREAKING CHANGE: use capital letter for service name inside `Resolution#resolve => {meta: {type}}`
 * NamingService#serviceName(domain: string): string
 
 ## 1.0.3

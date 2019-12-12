@@ -23,7 +23,7 @@ describe('ZNS', () => {
     expect(result.meta.owner).toEqual(
       'zil1ye72zl5t8wl5n3f2fsa5w0x7hja0jqj7mhct23',
     );
-    expect(result.meta.type).toEqual('zns');
+    expect(result.meta.type).toEqual('ZNS');
     expect(result.meta.ttl).toEqual(0);
   });
 

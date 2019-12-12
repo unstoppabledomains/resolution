@@ -191,7 +191,7 @@ export default class Ens extends EtheriumNamingService {
       },
       meta: {
         owner,
-        type: 'ens',
+        type: this.name,
         ttl: Number(ttl),
       },
     };

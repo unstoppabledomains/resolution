@@ -70,8 +70,8 @@ export default class Cns extends EtheriumNamingService {
   }
 
   /**
-   * Resolves the given domain. [DEPRECATED]
-   * @async
+   * Resolves the given domain.
+   * @deprecated
    * @param domain - domain name to be resolved
    * @returns- Returns a promise that resolves in an object
    */

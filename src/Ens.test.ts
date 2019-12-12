@@ -407,7 +407,7 @@ describe('ENS', () => {
       meta:
       {
         owner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
-        type: 'ens',
+        type: 'ENS',
         ttl: 0
       }
     });

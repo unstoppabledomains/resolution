@@ -25,7 +25,7 @@ export default class Contract extends BaseConnection {
 
   /**
    * Used to fetch a Contract method
-   * @param method - method name 
+   * @param method - method name
    * @param args - method args
    * @async
    */

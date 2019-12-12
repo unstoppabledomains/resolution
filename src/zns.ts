@@ -98,7 +98,7 @@ export default class Zns extends NamingService {
       addresses,
       meta: {
         owner: ownerAddress || null,
-        type: 'zns',
+        type: this.name,
         ttl: parseInt(Resolution.ttl as string) || 0,
       },
     };
