@@ -78,4 +78,67 @@ describe('Resolution', () => {
       ResolutionErrorCode.RecordNotFound,
     );
   });
+
+
+  describe('serviceName', () => {
+    it('checks ens service name', () => {
+      const resolution = new Resolution();
+      const serviceName = resolution.serviceName('domain.eth');
+      expect(serviceName).toBe('ENS');
+    });
+
+    it('checks ens service name 2', () => {
+      const resolution = new Resolution();
+      const serviceName = resolution.serviceName('domain.luxe');
+      expect(serviceName).toBe('ENS');
+    });
+
+    it('checks ens service name', () => {
+      const resolution = new Resolution();
+      const serviceName = resolution.serviceName('domain.xyz');
+      expect(serviceName).toBe('ENS');
+    });
+
+    it('checks zns service name', () => {
+      const resolution = new Resolution();
+      const serviceName = resolution.serviceName('domain.zil');
+      expect(serviceName).toBe('ZNS');
+    });
+
+    it('checks cns service name', () => {
+      const resolution = new Resolution();
+      const serviceName = resolution.serviceName('domain.crypto');
+      expect(serviceName).toBe('CNS');
+    });
+
+    it('checks naming service via api', () => {
+      const resolution = new Resolution({blockchain: false});
+      const serviceName = resolution.serviceName('domain.zil');
+      expect(serviceName).toBe('ZNS');
+    });
+
+    it('checks naming service via api 2', () => {
+      const resolution = new Resolution({blockchain: false});
+      const serviceName = resolution.serviceName('domain.luxe');
+      expect(serviceName).toBe('ENS');
+    });
+
+    it('checks naming service via api 3', () => {
+      const resolution = new Resolution({blockchain: false});
+      const serviceName = resolution.serviceName('domain.xyz');
+      expect(serviceName).toBe('ENS');
+    });
+
+    it('checks naming service via api 4', () => {
+      const resolution = new Resolution({blockchain: false});
+      const serviceName = resolution.serviceName('domain.eth');
+      expect(serviceName).toBe('ENS');
+    });
+
+    it('checks naming service via api 5', () => {
+      const resolution = new Resolution({blockchain: false});
+      const serviceName = resolution.serviceName('domain.crypto');
+      expect(serviceName).toBe('CNS');
+    });
+  })
 });
