@@ -34,7 +34,6 @@ export default class Ens extends EtheriumNamingService {
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
-  private ensContract: Contract;
   /**
    * Source object describing the network naming service operates on
    * @param source - if specified as a string will be used as main url, if omited then defaults are used
@@ -55,7 +54,7 @@ export default class Ens extends EtheriumNamingService {
       ? source.registry
       : RegistryMap[this.network];
     if (this.registryAddress) {
-      this.ensContract = this.buildContract(
+      this.registryContract = this.buildContract(
         ensInterface,
         this.registryAddress,
       );
@@ -214,7 +213,7 @@ export default class Ens extends EtheriumNamingService {
 
   private async getTTL(nodeHash) {
     try {
-      return await this.callMethod(this.ensContract, 'ttl', [nodeHash]);
+      return await this.callMethod(this.registryContract, 'ttl', [nodeHash]);
     } catch (err) {
       if ( err instanceof ResolutionError && err.code === ResolutionErrorCode.RecordNotFound)
         return 0;
@@ -227,7 +226,7 @@ export default class Ens extends EtheriumNamingService {
    */
   private async getResolver(nodeHash) {
     try {
-      return await this.callMethod(this.ensContract, 'resolver', [nodeHash]);
+      return await this.callMethod(this.registryContract, 'resolver', [nodeHash]);
     } catch (err) {
       if (
         err instanceof ResolutionError &&
@@ -242,7 +241,7 @@ export default class Ens extends EtheriumNamingService {
    * This was done to make automated tests more configurable
    */
   private async getOwner(nodeHash) {
-    return await this.callMethod(this.ensContract, 'owner', [nodeHash]);
+    return await this.callMethod(this.registryContract, 'owner', [nodeHash]);
   }
 
   /**

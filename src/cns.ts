@@ -26,8 +26,6 @@ export default class Cns extends EtheriumNamingService {
   readonly url: string;
   readonly registryAddress?: string;
   /** @internal */
-  private cnsContract: any;
-  /** @internal */
   readonly RegistryMap: RegistryMap = {
     mainnet: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe',
   };
@@ -52,7 +50,7 @@ export default class Cns extends EtheriumNamingService {
       ? source.registry
       : this.RegistryMap[this.network];
     if (this.registryAddress) {
-      this.cnsContract = this.buildContract(
+      this.registryContract = this.buildContract(
         cnsInterface,
         this.registryAddress,
       );
@@ -126,11 +124,11 @@ export default class Cns extends EtheriumNamingService {
 
   /** @internal */
   private getResolver = async (tokenId): Promise<string> =>
-    await this.callMethod(this.cnsContract, 'resolverOf', [tokenId]);
+    await this.callMethod(this.registryContract, 'resolverOf', [tokenId]);
 
   /** @internal */
   async owner(tokenId): Promise<string> {
-    return await this.callMethod(this.cnsContract, 'ownerOf', [tokenId]);
+    return await this.callMethod(this.registryContract, 'ownerOf', [tokenId]);
   }
 
   private getTtl = async (
@@ -138,7 +136,7 @@ export default class Cns extends EtheriumNamingService {
     methodname: string,
     params: any[],
   ): Promise<string> =>
-    await this.callMethod(this.cnsContract, methodname, params);
+    await this.callMethod(this.registryContract, methodname, params);
 
   /** @internal */
   async record(domain: string, key: string): Promise<string> {
