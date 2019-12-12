@@ -1,5 +1,7 @@
 ## Unreleased
 
+* NamingService#serviceName(domain: string): string
+
 ## 1.0.3
 
 * Fixed bug with not having a ttl record on the blockchain. Now returns 0 instead of throwing an error
