@@ -10,6 +10,7 @@ import {
 } from './types';
 import Zns from './zns';
 import Ens from './ens';
+import Cns from './cns';
 // import * as pckg from '../package.json';
 
 const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
@@ -104,13 +105,17 @@ export default class Udapi extends NamingService {
     }
   }
 
+  serviceName(domain: string): string {
+    return this.findMethodOrThrow(domain).name;
+  }
+
   /** @internal */
   protected normalizeSource(source: NamingServiceSource): SourceDefinition {
     throw new Error('Method not implemented.');
   }
 
   private findMethod(domain: string) {
-    return [new Zns(), new Ens()].find(m => m.isSupportedDomain(domain));
+    return [new Zns(), new Ens(), new Cns()].find(m => m.isSupportedDomain(domain));
   }
 
   private findMethodOrThrow(domain: string) {

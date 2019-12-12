@@ -28,6 +28,11 @@ export default abstract class NamingService extends BaseConnection {
   abstract owner(domain: string): Promise<string>;
   abstract record(domain: string, key: string): Promise<string>;
   abstract resolve(domain: string): Promise<ResolutionResponse>;
+  
+  serviceName(domain: string): string {
+    return this.name;
+  }
+  
   protected abstract normalizeSource(
     source: NamingServiceSource,
   ): SourceDefinition;

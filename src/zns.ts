@@ -50,7 +50,7 @@ export default class Zns extends NamingService {
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
-
+  readonly name: string;
   /**
    * Source object describing the network naming service operates on
    * @param source - if specified as a string will be used as main url, if omitted then defaults are used
@@ -59,6 +59,7 @@ export default class Zns extends NamingService {
   constructor(source: string | boolean | SourceDefinition = true) {
     super();
     source = this.normalizeSource(source);
+    this.name = "ZNS";
     this.network = source.network as string;
     this.url = source.url;
     if (!this.network) {
