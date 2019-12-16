@@ -12,7 +12,6 @@ import {
 import { EtheriumNamingService } from './namingService';
 import { ResolutionError, ResolutionErrorCode } from './index';
 import Contract from './utils/contract';
-import Resolution from './Resolution';
 
 const RegistryMap = {
   mainnet: '0x314159265dd8dbb310642f98f50c066173c1259b',

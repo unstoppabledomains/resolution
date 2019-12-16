@@ -124,7 +124,11 @@ export default class Cns extends EtheriumNamingService {
 
   /** @internal */
   private getResolver = async (tokenId): Promise<string> =>
-    await this.callMethod(this.registryContract, 'resolverOf', [tokenId]);
+    await this.callMethod(this.registryContract, 'resolverOf', [tokenId]).catch((err) => {
+      if (err instanceof ResolutionError && err.code === ResolutionErrorCode.RecordNotFound)
+        return undefined;
+      throw err;
+    });
 
   /** @internal */
   async owner(tokenId): Promise<string> {
@@ -136,7 +140,7 @@ export default class Cns extends EtheriumNamingService {
     methodname: string,
     params: any[],
   ): Promise<string> =>
-    await this.callMethod(this.registryContract, methodname, params);
+    await this.callMethod(contract, methodname, params);
 
   /** @internal */
   async record(domain: string, key: string): Promise<string> {
