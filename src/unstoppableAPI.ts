@@ -27,7 +27,7 @@ export default class Udapi extends NamingService {
     const DefaultUserAgent = this.isNode()
       ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'
       : navigator.userAgent;
-    const version = process.env.npm_package_version;
+    const version = require('./package.json').version;
     const CustomUserAgent = `${DefaultUserAgent} Resolution/${version}`;
     this.headers = { 'X-user-agent': CustomUserAgent };
   }
