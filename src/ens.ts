@@ -230,7 +230,7 @@ export default class Ens extends EtheriumNamingService {
         err instanceof ResolutionError &&
         err.code === ResolutionErrorCode.RecordNotFound
       )
-        return null;
+        return undefined;
       throw err;
     }
   }
