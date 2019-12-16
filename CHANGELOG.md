@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 1.0.5
+
+* Instead of `NoRecordFound` returning `UnregisteredDomain` error for .crypto in situations when there is no resolver 
+
 ## 1.0.4
 
 * Raise `ResolutionError` with `NamingServiceDown` code on error on ethereum RPC response
