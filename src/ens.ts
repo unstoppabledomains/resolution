@@ -4,11 +4,10 @@ import { hash } from 'eth-ens-namehash';
 import { formatsByCoinType } from '@ensdomains/address-encoder';
 import {
   ResolutionResponse,
-  NullAddress,
   EthCoinIndex,
-  NullAddressExtended,
   NamingServiceSource,
   Bip44Constants,
+  isNullAddress,
 } from './types';
 import { EtheriumNamingService } from './namingService';
 import { ResolutionError, ResolutionErrorCode } from './index';
@@ -100,7 +99,7 @@ export default class Ens extends EtheriumNamingService {
     const reverseAddress = address + '.addr.reverse';
     const nodeHash = hash(reverseAddress);
     const resolverAddress = await this.getResolver(nodeHash);
-    if (resolverAddress == NullAddress) {
+    if (isNullAddress(resolverAddress)) {
       return null;
     }
     const resolverContract = this.buildContract(
@@ -127,11 +126,10 @@ export default class Ens extends EtheriumNamingService {
     const resolver = await this.getResolver(nodeHash);
     if (
       !resolver ||
-      resolver === NullAddress ||
-      resolver === NullAddressExtended
+      isNullAddress(resolver)
     ) {
       const owner = await ownerPromise;
-      if (!owner || owner === NullAddress || owner === NullAddressExtended)
+      if (!owner || isNullAddress(owner) )
         throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
           domain,
         });
@@ -180,7 +178,7 @@ export default class Ens extends EtheriumNamingService {
     }
     const nodeHash = this.namehash(domain);
     var [owner, ttl, resolver] = await this.getResolutionInfo(domain);
-    if (owner == NullAddress) owner = null;
+    if (isNullAddress(owner)) owner = null;
     const address = await this.fetchAddress(resolver, nodeHash, EthCoinIndex);
     return {
       addresses: {
@@ -272,7 +270,7 @@ export default class Ens extends EtheriumNamingService {
    * @param nodeHash - namehash of a domain name
    */
   private async fetchAddress(resolver, nodeHash, coinType?: number) {
-    if (!resolver || resolver == NullAddress) {
+    if (!resolver || isNullAddress(resolver)) {
       return null;
     }
     const resolverContract = this.buildContract(

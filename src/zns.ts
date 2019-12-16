@@ -8,11 +8,11 @@ import { invert, set } from './utils';
 import {
   Dictionary,
   ResolutionResponse,
-  NullAddress,
   SourceDefinition,
   UnclaimedDomainResponse,
   ZnsResolution,
   NamingServiceSource,
+  isNullAddress,
 } from './types';
 import { ResolutionError, ResolutionErrorCode } from './index';
 import NamingService from './namingService';
@@ -116,7 +116,7 @@ export default class Zns extends NamingService {
    */
   async address(domain: string, currencyTicker: string): Promise<string> {
     const data = await this.resolve(domain);
-    if (!data.meta.owner || data.meta.owner === NullAddress)
+    if (!data.meta.owner || isNullAddress(data.meta.owner))
       throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
         domain,
       });
@@ -266,7 +266,7 @@ export default class Zns extends NamingService {
   private async getResolverRecords(
     resolverAddress: string,
   ): Promise<ZnsResolution> {
-    if (!resolverAddress || resolverAddress == NullAddress) {
+    if (!resolverAddress || isNullAddress(resolverAddress)) {
       return {};
     }
     const resolver = toChecksumAddress(resolverAddress);

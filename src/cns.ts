@@ -2,8 +2,8 @@ import { EtheriumNamingService } from './namingService';
 import {
   NamingServiceSource,
   RegistryMap,
-  NullAddress,
   ResolutionResponse,
+  isNullAddress,
 } from './types';
 import { default as resolverInterface } from './cns/contract/resolver';
 import { default as cnsInterface } from './cns/contract/registry';
@@ -151,7 +151,7 @@ export default class Cns extends EtheriumNamingService {
       tokenId,
     ]);
     // Wrong Record checks
-    if (!record || record === '0x' || record == NullAddress)
+    if (!record || isNullAddress(record))
       throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
         recordName: key,
         domain: domain,
@@ -179,8 +179,8 @@ export default class Cns extends EtheriumNamingService {
     const owner: string = await this.owner(tokenId);
     const resolver: string = await this.getResolver(tokenId);
 
-    if (!resolver || resolver === NullAddress) {
-      if (!owner || owner === NullAddress)
+    if (!resolver || isNullAddress(resolver)) {
+      if (!owner || isNullAddress(owner))
         throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
           domain,
         });

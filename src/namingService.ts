@@ -4,10 +4,8 @@ import {
   NetworkIdMap,
   BlockhanNetworkUrlMap,
   ResolutionResponse,
-  Bip44Constants,
 } from './types';
 import { hash } from 'eth-ens-namehash';
-import { formatsByCoinType } from '@ensdomains/address-encoder';
 import ResolutionError, { ResolutionErrorCode } from './resolutionError';
 import BaseConnection from './baseConnection';
 import { invert } from './utils';

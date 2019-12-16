@@ -4,9 +4,9 @@ import { ResolutionError, ResolutionErrorCode } from './index';
 import NamingService from './namingService';
 import {
   ResolutionResponse,
-  NullAddress,
   NamingServiceSource,
   SourceDefinition,
+  isNullAddress,
 } from './types';
 import Zns from './zns';
 import Ens from './ens';
@@ -62,7 +62,7 @@ export default class Udapi extends NamingService {
    */
   async address(domain: string, currencyTicker: string): Promise<string> {
     const data = await this.resolve(domain);
-    if (!data.meta.owner || data.meta.owner === NullAddress)
+    if (!data.meta.owner || isNullAddress(data.meta.owner))
       throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
         domain,
       });

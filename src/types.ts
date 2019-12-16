@@ -99,9 +99,16 @@ export type Bip44Constants = [number, string, string];
 export type owner = string;
 export type ttl = string;
 
-export const NullAddress = '0x0000000000000000000000000000000000000000';
-export const NullAddressExtended =
-  '0x0000000000000000000000000000000000000000000000000000000000000000';
+export enum NullAddress {
+ '0x',
+ '0x0000000000000000000000000000000000000000',
+ '0x0000000000000000000000000000000000000000000000000000000000000000'
+};
+
+export function isNullAddress(key: string): boolean {
+  return Object.values(NullAddress).includes(key);
+}
+
 export const EthCoinIndex = 60;
 
 export const UnclaimedDomainResponse: ResolutionResponse = {

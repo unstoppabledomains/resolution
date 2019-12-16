@@ -2,7 +2,7 @@ import BaseConnection from "../baseConnection";
 import {defaultAbiCoder as AbiCoder} from 'ethers/utils/abi-coder';
 import keccak256  from "keccak256";
 import ResolutionError, { ResolutionErrorCode } from "../resolutionError";
-import { NullAddress, NullAddressExtended } from "../types";
+import { isNullAddress } from "../types";
 
 type FourBytes = string;
 
@@ -46,7 +46,7 @@ export default class Contract extends BaseConnection {
     if (response.error) {
       throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {method: this.name})
     }
-    if (response.result === '0x' || response.result === NullAddress || response.result === NullAddressExtended)
+    if (isNullAddress(response.result))
       throw new ResolutionError(ResolutionErrorCode.RecordNotFound,{recordName: method, domain: args[0] } );
     return AbiCoder.decode( methodDescription.outputs , response.result )[0];
   }
