@@ -11,19 +11,18 @@ import {
 import Zns from './zns';
 import Ens from './ens';
 import Cns from './cns';
-// import * as pckg from '../package.json';
 
-const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
 export default class Udapi extends NamingService {
+  readonly name: string;
   private url: string;
   private headers: {
     [key: string]: string;
   };
 
-  constructor() {
+  constructor(url: string) {
     super();
-    this.url = DefaultUrl;
-
+    this.url = url;
+    this.name = 'UDAPI';
     const DefaultUserAgent = this.isNode()
       ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'
       : navigator.userAgent;

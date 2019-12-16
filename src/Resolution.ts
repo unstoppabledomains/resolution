@@ -6,6 +6,8 @@ import {
   Blockchain,
   UnclaimedDomainResponse,
   ResolutionResponse,
+  DefaultAPI,
+  API
 } from './types';
 import ResolutionError, { ResolutionErrorCode } from './resolutionError';
 import NamingService from './namingService';
@@ -34,7 +36,7 @@ export default class Resolution {
    * Resolution constructor
    * @property blockchain - main configuration object
    */
-  constructor({ blockchain = true }: { blockchain?: Blockchain } = {}) {
+  constructor({ blockchain = true, api = DefaultAPI }: { blockchain?: Blockchain, api?: API } = {}) {
     this.blockchain = !!blockchain;
     if (blockchain) {
       if (blockchain == true) {
@@ -46,7 +48,7 @@ export default class Resolution {
       if (blockchain.zns === undefined) {
         blockchain.zns = true;
       }
-      if (blockchain.cns == undefined) {
+      if (blockchain.cns === undefined) {
         blockchain.cns = true;
       }
       if (blockchain.ens) {
@@ -59,7 +61,7 @@ export default class Resolution {
         this.cns = new Cns(blockchain.cns);
       }
     } else {
-      this.api = new Udapi();
+      this.api = new Udapi(api.url);
     }
   }
 
