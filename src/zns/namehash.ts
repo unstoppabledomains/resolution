@@ -1,20 +1,23 @@
 import sha3 from './sha3'
 
-export default (name = '', { parent = null, prefix = true } = {}) => {
+export const namehash = (name = '', { parent = null, prefix = true } = {}) => {
   parent = parent || '0000000000000000000000000000000000000000000000000000000000000000'
-  if (parent.match(/^0x/)) {
-    parent = parent.substr(2)
-  }
   const address = [parent]
     .concat(
       name
       .split('.')
       .reverse()
       .filter(label => label)
-      .map(label => sha3(label, {hexPrefix: false})),
     )
-    .reduce((a, labelHash) =>
-      sha3(a + labelHash, {hexPrefix: false, inputEnc: 'hex'}),
+    .reduce((parent, label) =>
+      childhash(parent, label, {prefix: false}),
     )
   return prefix ? '0x' + address : address;
-}
+};
+
+export const childhash = (parent: string, child: string, options: {prefix: boolean} = {prefix: true}) => {
+  parent = parent.replace(/^0x/, "");
+  return sha3(parent + sha3(child, {hexPrefix: false}), {hexPrefix: options.prefix, inputEnc: 'hex'});
+};
+
+export default namehash;
