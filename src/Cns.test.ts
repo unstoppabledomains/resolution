@@ -165,4 +165,12 @@ describe('CNS', () => {
     expectSpyToBeCalled(eyes);
     expect(addr).toBe('zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj');
   });
+
+  describe("namehash", () => {
+    it("supports root node", async () => {
+      const resolution = new Resolution();
+      expect(resolution.isSupportedDomain('crypto')).toEqual(true);
+      expect(new Resolution().namehash('crypto')).toEqual('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
+    });
+  });
 });

@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 1.0.8
+
+* Support Resolution#namehash of .crypto root node
+
 ## 1.0.7
 
 * Fixed compatibility with some versions of hash.js library

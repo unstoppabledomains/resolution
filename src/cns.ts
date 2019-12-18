@@ -64,7 +64,7 @@ export default class Cns extends EtheriumNamingService {
    * @returns
    */
   isSupportedDomain(domain: string): boolean {
-    return domain.indexOf('.') > 0 && /^.{1,}\.(crypto)$/.test(domain);
+    return domain === "crypto" || (domain.indexOf('.') > 0 && /^.{1,}\.(crypto)$/.test(domain));
   }
 
   /**
