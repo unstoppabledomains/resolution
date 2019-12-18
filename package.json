@@ -1,6 +1,6 @@
 {
   "name": "@unstoppabledomains/resolution",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Domain Resolution for blockchain domains",
   "main": "./build/index.js",
   "directories": {
