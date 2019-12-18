@@ -13,8 +13,10 @@ export default abstract class BaseConnection {
     return false;
   };
 
+  protected isBrowser = new Function("try {return this===window;}catch(e){ return false;}");
+
   /** @internal */
   protected async fetch(url, options) {
-    return this.isNode() ? nodeFetch(url, options) : window.fetch(url, options);
+    return this.isBrowser() ? window.fetch(url, options) : nodeFetch(url, options);
   }
 }

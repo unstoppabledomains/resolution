@@ -28,7 +28,7 @@ const RegistryMap = {
  * @param registryAddress - address for a registry contract
  */
 export default class Ens extends EtheriumNamingService {
-  name = 'ENS';
+  readonly name: string;
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
@@ -39,6 +39,7 @@ export default class Ens extends EtheriumNamingService {
    */
   constructor(source: NamingServiceSource = true) {
     super();
+    this.name = 'ENS';
     source = this.normalizeSource(source);
     this.network = <string>source.network;
     this.url = source.url;
@@ -229,7 +230,7 @@ export default class Ens extends EtheriumNamingService {
         err instanceof ResolutionError &&
         err.code === ResolutionErrorCode.RecordNotFound
       )
-        return null;
+        return undefined;
       throw err;
     }
   }

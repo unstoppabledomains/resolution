@@ -21,7 +21,7 @@ import Contract from './utils/contract';
  * @param registryAddress - address for a registry contract
  */
 export default class Cns extends EtheriumNamingService {
-  name = 'CNS';
+  readonly name: string;
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
@@ -37,6 +37,7 @@ export default class Cns extends EtheriumNamingService {
    */
   constructor(source: NamingServiceSource = true) {
     super();
+    this.name = 'CNS';
     source = this.normalizeSource(source);
     this.network = source.network as string;
     this.url = source.url;

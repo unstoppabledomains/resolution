@@ -74,6 +74,8 @@ export type NetworkIdMap = {
   [key: number]: string;
 };
 
+export const UDApiDefaultUrl = "https://unstoppabledomains.com/api/v1";
+
 /**
  * Main configurational object for Resolution instance
  */
@@ -84,6 +86,14 @@ export type Blockchain =
       zns?: NamingServiceSource;
       cns?: NamingServiceSource;
     };
+
+export type API = {
+  url: string
+}
+
+export const DefaultAPI:API = {
+  url: UDApiDefaultUrl
+};
 
 /**
  * Default structure of ZnsResolution records
