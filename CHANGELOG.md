@@ -1,5 +1,8 @@
 ## Unreleased
 
+## 1.0.9-1.0.10
+* Revert back changes made for browser / node detection.
+
 ## 1.0.8
 
 * Support Resolution#namehash of .crypto root node
