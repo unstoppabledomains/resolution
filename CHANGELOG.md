@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 1.0.7
+
+* Fixed compatibility with some versions of hash.js library
+
 ## 1.0.5
 
 * Instead of `NoRecordFound` returning `UnregisteredDomain` error for .crypto in situations when there is no resolver 
