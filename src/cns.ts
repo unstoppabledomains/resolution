@@ -1,4 +1,4 @@
-import { EtheriumNamingService } from './namingService';
+import { EthereumNamingService } from './namingService';
 import {
   NamingServiceSource,
   RegistryMap,
@@ -20,7 +20,7 @@ import Contract from './utils/contract';
  * - https://mainnet.infura.io
  * @param registryAddress - address for a registry contract
  */
-export default class Cns extends EtheriumNamingService {
+export default class Cns extends EthereumNamingService {
   readonly name: string;
   readonly network: string;
   readonly url: string;
