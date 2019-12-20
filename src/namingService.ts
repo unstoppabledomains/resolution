@@ -43,7 +43,7 @@ export default abstract class NamingService extends BaseConnection {
     }
   }
 }
-export abstract class EtheriumNamingService extends NamingService {
+export abstract class EthereumNamingService extends NamingService {
   abstract registryAddress?: string;
   abstract url: string;
   protected registryContract: Contract;

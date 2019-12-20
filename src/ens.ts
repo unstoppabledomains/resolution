@@ -9,7 +9,7 @@ import {
   Bip44Constants,
   isNullAddress,
 } from './types';
-import { EtheriumNamingService } from './namingService';
+import { EthereumNamingService } from './namingService';
 import { ResolutionError, ResolutionErrorCode } from './index';
 import Contract from './utils/contract';
 
@@ -19,7 +19,7 @@ const RegistryMap = {
 };
 
 /**
- * Class to support connection with Etherium naming service
+ * Class to support connection with Ethereum naming service
  * @param network - network string such as
  * - mainnet
  * - ropsten
@@ -27,7 +27,7 @@ const RegistryMap = {
  * - https://mainnet.infura.io
  * @param registryAddress - address for a registry contract
  */
-export default class Ens extends EtheriumNamingService {
+export default class Ens extends EthereumNamingService {
   readonly name: string;
   readonly network: string;
   readonly url: string;
