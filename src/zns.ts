@@ -175,7 +175,7 @@ export default class Zns extends NamingService {
    */
   isSupportedDomain(domain: string): boolean {
     return (
-      (domain.indexOf('.') > 0 && /^.{1,}\.(zil)$/.test(domain)) ||
+      (domain.indexOf('.') > 0 && /^[a-zA-Z0-9].{1,}\.(zil)$/.test(domain)) ||
       domain === 'zil'
     );
   }

@@ -66,7 +66,7 @@ export default class Ens extends EthereumNamingService {
    */
   isSupportedDomain(domain: string): boolean {
     return (
-      domain.indexOf('.') > 0 && /^.{1,}\.(eth|luxe|xyz|test)$/.test(domain)
+      domain.indexOf('.') > 0 && /^[a-zA-Z0-9].{1,}\.(eth|luxe|xyz|test)$/.test(domain)
     );
   }
 
