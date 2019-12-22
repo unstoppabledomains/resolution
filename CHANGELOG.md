@@ -1,5 +1,7 @@
 ## Unreleased
 
+* Domain that starts with '-' are not valid anymore.
+
 ## 1.0.9-1.0.10
 * Revert back changes made for browser / node detection.
 
