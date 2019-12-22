@@ -87,6 +87,14 @@ describe('Resolution', () => {
     );
   })
 
+  it('should be invalid domain 2', async () => {
+    const resolution = new Resolution();
+    await expectResolutionErrorCode(
+      () => resolution.namehash('whatever-.eth'),
+      ResolutionErrorCode.UnsupportedDomain
+    );
+  })
+
 
   describe('serviceName', () => {
     it('checks ens service name', () => {
