@@ -7,6 +7,8 @@ import {
   NamingServiceSource,
   SourceDefinition,
   isNullAddress,
+  IPFS,
+  WHOIS,
 } from './types';
 import Zns from './zns';
 import Ens from './ens';
@@ -39,6 +41,13 @@ export default class Udapi extends NamingService {
   /** @internal */
   isSupportedNetwork(): boolean {
     return true;
+  }
+
+  ipfs(domain: string): Promise<IPFS> {
+    return this.findMethodOrThrow(domain).ipfs(domain);
+  }
+  whois(domain: string): Promise<WHOIS> {
+    return this.findMethodOrThrow(domain).whois(domain);
   }
 
   /** @internal */
