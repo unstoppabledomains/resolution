@@ -7,11 +7,12 @@ import {
   UnclaimedDomainResponse,
   ResolutionResponse,
   DefaultAPI,
-  API
+  API,
+  IPFS,
+  WHOIS,
 } from './types';
 import ResolutionError, { ResolutionErrorCode } from './resolutionError';
 import NamingService from './namingService';
-
 /**
  * Blockchain domain Resolution library - Resolution.
  * @example
@@ -100,12 +101,32 @@ export default class Resolution {
   }
 
   /**
+   * Resolves the ipfs metadata from the domain
+   * @param domain - domain name
+   */
+  async ipfs(domain: string): Promise<IPFS> {
+    return await this.getNamingMethodOrThrow(domain).ipfs(domain);
+  }
+
+  /**
+   * Resolves whois metadata from the domain
+   * @param domain - domain name
+   */
+  async whois(domain: string): Promise<WHOIS> {
+    return await this.getNamingMethodOrThrow(domain).whois(domain);
+  }
+
+  /**
    * Resolves the ipfs hash configured for domain records on ZNS
+   * @deprecated
    * @param domain - domain name
    * @throws ResolutionError
    * @returns A Promise that resolves in ipfsHash
    */
   async ipfsHash(domain: string): Promise<string> {
+    const method = this.getNamingMethodOrThrow(domain) as any;
+    if (method.name === 'ENS')
+      return await method.ipfsHash(this.namehash(domain));
     return await this.getNamingMethodOrThrow(domain).record(
       domain,
       'ipfs.html.value',
@@ -114,6 +135,7 @@ export default class Resolution {
 
   /**
    * Resolves the ipfs redirect url for a supported domain records
+   * @deprecated
    * @param domain - domain name
    * @throws ResolutionError
    * @returns A Promise that resolves in redirect url
@@ -127,6 +149,7 @@ export default class Resolution {
 
   /**
    * Resolves the ipfs email field from whois configurations
+   * @deprecated
    * @param domain - domain name
    * @throws ResolutionError
    * @returns A Promise that resolves in an email address configured for this domain whois

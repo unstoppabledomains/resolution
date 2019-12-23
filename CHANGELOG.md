@@ -1,5 +1,6 @@
 ## Unreleased
 
+* Depricated: [ Resolution#ipfsHash, Resolution#ipfsRedirect, Resolution#email ] -> use Resolution#ipfs || Resolution#whois
 * Domain that starts and ends with '-' are not valid anymore.
 
 ## 1.0.9-1.0.10

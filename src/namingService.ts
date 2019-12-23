@@ -4,6 +4,8 @@ import {
   NetworkIdMap,
   BlockhanNetworkUrlMap,
   ResolutionResponse,
+  IPFS,
+  WHOIS
 } from './types';
 import { hash } from 'eth-ens-namehash';
 import ResolutionError, { ResolutionErrorCode } from './resolutionError';
@@ -26,6 +28,8 @@ export default abstract class NamingService extends BaseConnection {
   abstract owner(domain: string): Promise<string>;
   abstract record(domain: string, key: string): Promise<string>;
   abstract resolve(domain: string): Promise<ResolutionResponse>;
+  abstract ipfs(domain: string): Promise<IPFS>;
+  abstract whois(domain: string): Promise<WHOIS>;
 
   serviceName(domain: string): string {
     return this.name;
@@ -170,7 +174,7 @@ export abstract class EthereumNamingService extends NamingService {
     }
   }
 
-  protected buildContract(abi, address) {
+   buildContract(abi, address) {
     return new Contract(this.name, this.url, abi, address)
   }
 }

@@ -413,4 +413,23 @@ describe('ENS', () => {
     });
   });
 
+  describe('ContentHash', () => {
+    it('should get an ipfsHash ', async () => {
+      const resolution = new Resolution();
+      const hash = await resolution.ipfsHash('almonit.eth');
+      expect(hash).toBe('QmV3RLU7X2QBaBJ7vdkYJPtiYVTdfWaQD6RetzFUzmrJf3');
+    });
+  });
+
+  describe('whois', () => {
+    it('should resolve a whois ', async () => {
+      const resolution = new Resolution();
+      const whois = await resolution.whois('almonit.eth');
+      expect(whois).toStrictEqual(
+        { email: '', url: '', avatar: '', description: '', notice: '' }
+      );
+    });
+
+    //todo: Find some domains with valid info on whois
+  });
 });

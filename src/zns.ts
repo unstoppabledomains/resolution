@@ -13,9 +13,12 @@ import {
   ZnsResolution,
   NamingServiceSource,
   isNullAddress,
+  IPFS,
+  WHOIS,
 } from './types';
 import { ResolutionError, ResolutionErrorCode } from './index';
 import NamingService from './namingService';
+import Resolution from './Resolution';
 
 const DefaultSource = 'https://api.zilliqa.com';
 
@@ -91,9 +94,10 @@ export default class Zns extends NamingService {
       await this.getResolverRecords(resolverAddress),
     );
     const addresses = {};
-    Object.entries(Resolution.crypto).map(
-      ([key, v]) => (addresses[key] = v.address),
-    );
+    if (Resolution.crypto)
+      Object.entries(Resolution.crypto).map(
+        ([key, v]) => (addresses[key] = v.address),
+      );
     return {
       addresses,
       meta: {
@@ -129,6 +133,29 @@ export default class Zns extends NamingService {
     return address;
   }
 
+  async ipfs(domain: string): Promise<IPFS> {
+    const records = await this.records(domain);
+    const hash = this.getRecordFieldOrThrow(
+      domain,
+      records,
+      'ipfs.html.value',
+    );
+    const redirect = this.getRecordFieldOrThrow(
+      domain,
+      records,
+      'ipfs.redirect_domain.value',
+    ); 
+    return {hash, redirect};
+  }
+
+  async whois(domain: string): Promise<WHOIS> {
+    const records = await this.records(domain);
+    const email = this.getRecordField(domain, records, 'whois.email.value');
+    const url = this.getRecordField(domain, records, 'ipfs.redirect_domain.value');
+    const for_sale = this.getRecordField(domain, records, 'whois.for_sale.value') || false;
+    return {email, url, for_sale: !!for_sale};
+  }
+
   /**
    * Owner of the domain
    * @param domain - domain name
@@ -138,8 +165,13 @@ export default class Zns extends NamingService {
     return (await this.resolve(domain)).meta.owner;
   }
 
+  async resolution(domain: string): Promise<ZnsResolution> {
+    return this.structureResolverRecords(await this.records(domain));
+  }
+
   /**
    * Resolves a domain
+   * @depricated
    * @param domain - domain name to be resolved
    * @returns Everything what is stored on specified domain
    */
@@ -228,6 +260,16 @@ export default class Zns extends NamingService {
       }
     }
   }
+
+  private getRecordField(domain: string, records: Dictionary<string>, field: string): string {
+    try {
+      return this.getRecordFieldOrThrow(domain, records, field);
+    } catch(err) {
+      if (err instanceof ResolutionError)
+        return undefined;
+      throw err;
+    }
+  };
 
   private getRecordFieldOrThrow(
     domain: string,

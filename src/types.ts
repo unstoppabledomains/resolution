@@ -109,6 +109,20 @@ export type Bip44Constants = [number, string, string];
 export type owner = string;
 export type ttl = string;
 
+export interface IPFS {
+  hash?: string,
+  redirect?: string
+};
+
+export interface WHOIS {
+  email?: string,
+  url ?: string,
+  avatar ?: string,
+  description ?: string,
+  notice ?: string,
+  for_sale ?: boolean
+}
+
 export enum NullAddress {
  '0x',
  '0x0000000000000000000000000000000000000000',
@@ -134,3 +148,6 @@ export const UnclaimedDomainResponse: ResolutionResponse = {
  * @deprecated Use UnclaimedDomainResponse instead (deprecated since 0.3.4)
  */
 export const UNCLAIMED_DOMAIN_RESPONSE = UnclaimedDomainResponse;
+
+
+

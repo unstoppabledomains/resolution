@@ -8,10 +8,13 @@ import {
   NamingServiceSource,
   Bip44Constants,
   isNullAddress,
+  IPFS,
+  WHOIS,
 } from './types';
 import { EthereumNamingService } from './namingService';
 import { ResolutionError, ResolutionErrorCode } from './index';
 import Contract from './utils/contract';
+import { throws } from 'assert';
 
 const RegistryMap = {
   mainnet: '0x314159265dd8dbb310642f98f50c066173c1259b',
@@ -129,7 +132,7 @@ export default class Ens extends EthereumNamingService {
       isNullAddress(resolver)
     ) {
       const owner = await ownerPromise;
-      if (!owner || isNullAddress(owner) )
+      if (!owner || isNullAddress(owner))
         throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
           domain,
         });
@@ -203,17 +206,91 @@ export default class Ens extends EthereumNamingService {
   }
 
   /**
+   * Retrives the ipfs information stored on na ens domain
+   * @param domain - domain name
+   * @returns 
+   *  - hash property ipfs hash
+   *  - redirect url
+   */
+  async ipfs(domain: string): Promise<IPFS> {
+    const nodeHash = this.namehash(domain);
+    const hash = await this.ipfsHash(nodeHash);
+    const redirect = await this.getTextRecord(await this.getResolver(nodeHash), nodeHash, 'url');
+    return { hash, redirect };
+  }
+
+  /**
+   * Retrives the whois information stored on an ens domain
+   * @param domain 
+   */
+  async whois(domain: string): Promise<WHOIS> {
+    const nodeHash = this.namehash(domain);
+    const resolverAddress = await this.getResolver(nodeHash);
+    const resolver = this.buildContract(resolverInterface(resolverAddress, EthCoinIndex), resolverAddress);
+    const email = this.getTextRecord(resolver, nodeHash, 'email');
+    const url = this.getTextRecord(resolver, nodeHash, 'url');
+    const avatar = this.getTextRecord(resolver, nodeHash, 'avatar');
+    const description = this.getTextRecord(resolver, nodeHash, 'description');
+    const notice = this.getTextRecord(resolver, nodeHash, 'notice');
+    const whois = await this.structurePromiseArray({ email, url, avatar, description, notice });
+    return whois;
+  }
+
+  /**
+   * waits for each property of the predicate and returns a resolved object
+   * @param predicate - { [key: string]: Promise<string> }
+   * @returns - resolved object with same keys
+   */
+  private async structurePromiseArray(predicate: any) {
+    return new Promise(async (resolve, reject) => {
+      const entries = Object.entries(predicate);
+      Promise.all(entries.map(async ([key, value]: [string, Promise<string>]) => {
+        return {
+          [key]: await value
+        };
+      }))
+        .then((resolved) => {
+          var resolvedObject: { [key: string]: string } = {};
+          resolved.map(res => {
+            const key = Object.keys(res)[0];
+            resolvedObject[key] = res[key];
+          });
+          resolve(resolvedObject);
+        });
+    });
+  }
+
+  private async ipfsHash(nodeHash): Promise<string> {
+    const resolverAddress = await this.getResolver(nodeHash);
+    const resolverContract = this.buildContract(resolverInterface(resolverAddress, EthCoinIndex), resolverAddress);
+    const contentHashDecoder = require('content-hash');
+    const contentHash = await this._getContentHash(resolverContract, nodeHash);
+    if (!contentHash)
+      // throw ResolutionError ipfs is not connected for the domain
+      return contentHashDecoder.decode(contentHash);
+  }
+
+  private async getTextRecord(resolver: Contract, nodeHash, key: string): Promise<string> {
+    return await this.callMethod(resolver, 'text', [nodeHash, key]);
+  }
+
+  // todo(john): mock this in tests!
+  private async _getContentHash(resolverContract: Contract, nodeHash) {
+    return await this.callMethod(resolverContract, 'contenthash', [nodeHash]);
+  }
+
+  /**
    * This was done to make automated tests more configurable
    */
-  private resolverCallToName(resolverContract: Contract, nodeHash) {
-    return this.callMethod(resolverContract, 'name', [nodeHash]);
+  private async resolverCallToName(resolverContract: Contract, nodeHash) {
+    return await this.callMethod(resolverContract, 'name', [nodeHash]);
   }
 
   private async getTTL(nodeHash) {
     try {
       return await this.callMethod(this.registryContract, 'ttl', [nodeHash]);
     } catch (err) {
-      if ( err instanceof ResolutionError && err.code === ResolutionErrorCode.RecordNotFound)
+      if (err instanceof ResolutionError && err.code === ResolutionErrorCode.RecordNotFound)
         return 0;
       throw err;
     }
@@ -222,7 +299,7 @@ export default class Ens extends EthereumNamingService {
   /**
    * This was done to make automated tests more configurable
    */
-  private async getResolver(nodeHash) {
+  async getResolver(nodeHash) {
     try {
       return await this.callMethod(this.registryContract, 'resolver', [nodeHash]);
     } catch (err) {

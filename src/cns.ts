@@ -4,6 +4,8 @@ import {
   RegistryMap,
   ResolutionResponse,
   isNullAddress,
+  IPFS,
+  WHOIS,
 } from './types';
 import { default as resolverInterface } from './cns/contract/resolver';
 import { default as cnsInterface } from './cns/contract/registry';
@@ -101,6 +103,19 @@ export default class Cns extends EthereumNamingService {
     return addr;
   }
 
+  async ipfs(domain: string): Promise<IPFS> {
+    const hashPromise = await this.record(domain, 'ipfs.html');
+    // const redirect = await this.record(domain, 'ipfs.redirect_domain');
+    const redirect = "";
+    return {hash: hashPromise, redirect};
+  }
+
+  async whois(domain: string): Promise<WHOIS> {
+    const emailPromise = this.record(domain, 'whois.email');
+    const urlPromise = this.record(domain, 'ipfs.redirect_domain');
+    return await Promise.all([emailPromise, urlPromise]).then(([email, url]) => {return {email, url}});
+  }
+
   /**
    * @internal
    * @param resolver - Resolver address
@@ -146,7 +161,7 @@ export default class Cns extends EthereumNamingService {
   /** @internal */
   async record(domain: string, key: string): Promise<string> {
     const tokenId = this.namehash(domain);
-    const resolver: string = await this.getResolver(tokenId);
+    const resolver: string = await this.getResolver(tokenId);    
     const resolverContract = this.buildContract(
       resolverInterface,
       resolver,
