@@ -7,6 +7,7 @@ import {
 } from './types';
 import { default as resolverInterface } from './cns/contract/resolver';
 import { default as cnsInterface } from './cns/contract/registry';
+import { default as hash } from './cns/contract/namehash';
 import { ResolutionError } from '.';
 import { ResolutionErrorCode } from './resolutionError';
 import Contract from './utils/contract';
@@ -121,6 +122,16 @@ export default class Cns extends EthereumNamingService {
       tokenId,
     ]);
     return addr;
+  }
+
+  /**
+   * Produces CNS namehash
+   * @param domain - domain to be hashed
+   * @returns CNS namehash of a domain
+   */
+  namehash(domain: string): string {
+    this.ensureSupportedDomain(domain);
+    return hash(domain);
   }
 
   /** @internal */
