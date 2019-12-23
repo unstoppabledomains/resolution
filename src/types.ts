@@ -74,7 +74,7 @@ export type NetworkIdMap = {
   [key: number]: string;
 };
 
-export const UDApiDefaultUrl = "https://unstoppabledomains.com/api/v1";
+export const UDApiDefaultUrl = 'https://unstoppabledomains.com/api/v1';
 
 /**
  * Main configurational object for Resolution instance
@@ -88,11 +88,11 @@ export type Blockchain =
     };
 
 export type API = {
-  url: string
-}
+  url: string;
+};
 
-export const DefaultAPI:API = {
-  url: UDApiDefaultUrl
+export const DefaultAPI: API = {
+  url: UDApiDefaultUrl,
 };
 
 /**
@@ -110,24 +110,24 @@ export type owner = string;
 export type ttl = string;
 
 export interface IPFS {
-  hash?: string,
-  redirect?: string
-};
+  hash?: string;
+  redirect?: string;
+}
 
 export interface WHOIS {
-  email?: string,
-  url ?: string,
-  avatar ?: string,
-  description ?: string,
-  notice ?: string,
-  for_sale ?: boolean
+  email?: string;
+  url?: string;
+  avatar?: string;
+  description?: string;
+  notice?: string;
+  for_sale?: boolean;
 }
 
 export enum NullAddress {
- '0x',
- '0x0000000000000000000000000000000000000000',
- '0x0000000000000000000000000000000000000000000000000000000000000000'
-};
+  '0x',
+  '0x0000000000000000000000000000000000000000',
+  '0x0000000000000000000000000000000000000000000000000000000000000000',
+}
 
 export function isNullAddress(key: string): boolean {
   return Object.values(NullAddress).includes(key);
@@ -148,6 +148,3 @@ export const UnclaimedDomainResponse: ResolutionResponse = {
  * @deprecated Use UnclaimedDomainResponse instead (deprecated since 0.3.4)
  */
 export const UNCLAIMED_DOMAIN_RESPONSE = UnclaimedDomainResponse;
-
-
-

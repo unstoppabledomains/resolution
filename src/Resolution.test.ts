@@ -83,18 +83,17 @@ describe('Resolution', () => {
     const resolution = new Resolution();
     await expectResolutionErrorCode(
       () => resolution.namehash('-hello.eth'),
-      ResolutionErrorCode.UnsupportedDomain
+      ResolutionErrorCode.UnsupportedDomain,
     );
-  })
+  });
 
   it('should be invalid domain 2', async () => {
     const resolution = new Resolution();
     await expectResolutionErrorCode(
       () => resolution.namehash('whatever-.eth'),
-      ResolutionErrorCode.UnsupportedDomain
+      ResolutionErrorCode.UnsupportedDomain,
     );
-  })
-
+  });
 
   describe('serviceName', () => {
     it('checks ens service name', () => {
@@ -128,33 +127,33 @@ describe('Resolution', () => {
     });
 
     it('checks naming service via api', () => {
-      const resolution = new Resolution({blockchain: false});
+      const resolution = new Resolution({ blockchain: false });
       const serviceName = resolution.serviceName('domain.zil');
       expect(serviceName).toBe('ZNS');
     });
 
     it('checks naming service via api 2', () => {
-      const resolution = new Resolution({blockchain: false});
+      const resolution = new Resolution({ blockchain: false });
       const serviceName = resolution.serviceName('domain.luxe');
       expect(serviceName).toBe('ENS');
     });
 
     it('checks naming service via api 3', () => {
-      const resolution = new Resolution({blockchain: false});
+      const resolution = new Resolution({ blockchain: false });
       const serviceName = resolution.serviceName('domain.xyz');
       expect(serviceName).toBe('ENS');
     });
 
     it('checks naming service via api 4', () => {
-      const resolution = new Resolution({blockchain: false});
+      const resolution = new Resolution({ blockchain: false });
       const serviceName = resolution.serviceName('domain.eth');
       expect(serviceName).toBe('ENS');
     });
 
     it('checks naming service via api 5', () => {
-      const resolution = new Resolution({blockchain: false});
+      const resolution = new Resolution({ blockchain: false });
       const serviceName = resolution.serviceName('domain.crypto');
       expect(serviceName).toBe('CNS');
     });
-  })
+  });
 });

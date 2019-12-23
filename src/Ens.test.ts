@@ -108,7 +108,11 @@ describe('ENS', () => {
       blockchain: { ens: MainnetUrl },
     });
 
-    const ownerEye = mockAsyncMethod(resolution.ens, 'getOwner', NullAddress[1]);
+    const ownerEye = mockAsyncMethod(
+      resolution.ens,
+      'getOwner',
+      NullAddress[1],
+    );
     const result = await resolution.address('something.luxe', 'ETH');
     expectSpyToBeCalled([ownerEye]);
     expect(result).toEqual(null);
@@ -397,19 +401,17 @@ describe('ENS', () => {
       getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       getTTL: 0,
-      callMethod:
-        '0x714ef33943d925731FBB89C99aF5780D888bD106',
+      callMethod: '0x714ef33943d925731FBB89C99aF5780D888bD106',
     });
     const resolutionObj = await resolution.resolve('matthewgould.eth');
     expectSpyToBeCalled(eyes);
     expect(resolutionObj).toStrictEqual({
       addresses: { ETH: '0x714ef33943d925731FBB89C99aF5780D888bD106' },
-      meta:
-      {
+      meta: {
         owner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
         type: 'ENS',
-        ttl: 0
-      }
+        ttl: 0,
+      },
     });
   });
 
@@ -425,9 +427,13 @@ describe('ENS', () => {
     it('should resolve a whois ', async () => {
       const resolution = new Resolution();
       const whois = await resolution.whois('almonit.eth');
-      expect(whois).toStrictEqual(
-        { email: '', url: '', avatar: '', description: '', notice: '' }
-      );
+      expect(whois).toStrictEqual({
+        email: '',
+        url: '',
+        avatar: '',
+        description: '',
+        notice: '',
+      });
     });
 
     //todo: Find some domains with valid info on whois

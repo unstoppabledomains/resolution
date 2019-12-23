@@ -37,7 +37,10 @@ export default class Resolution {
    * Resolution constructor
    * @property blockchain - main configuration object
    */
-  constructor({ blockchain = true, api = DefaultAPI }: { blockchain?: Blockchain, api?: API } = {}) {
+  constructor({
+    blockchain = true,
+    api = DefaultAPI,
+  }: { blockchain?: Blockchain; api?: API } = {}) {
     this.blockchain = !!blockchain;
     if (blockchain) {
       if (blockchain == true) {

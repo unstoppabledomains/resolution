@@ -66,7 +66,10 @@ export default class Cns extends EthereumNamingService {
    * @returns
    */
   isSupportedDomain(domain: string): boolean {
-    return domain === "crypto" || (domain.indexOf('.') > 0 && /^.{1,}\.(crypto)$/.test(domain));
+    return (
+      domain === 'crypto' ||
+      (domain.indexOf('.') > 0 && /^.{1,}\.(crypto)$/.test(domain))
+    );
   }
 
   /**
@@ -106,14 +109,18 @@ export default class Cns extends EthereumNamingService {
   async ipfs(domain: string): Promise<IPFS> {
     const hashPromise = await this.record(domain, 'ipfs.html');
     // const redirect = await this.record(domain, 'ipfs.redirect_domain');
-    const redirect = "";
-    return {hash: hashPromise, redirect};
+    const redirect = '';
+    return { hash: hashPromise, redirect };
   }
 
   async whois(domain: string): Promise<WHOIS> {
     const emailPromise = this.record(domain, 'whois.email');
     const urlPromise = this.record(domain, 'ipfs.redirect_domain');
-    return await Promise.all([emailPromise, urlPromise]).then(([email, url]) => {return {email, url}});
+    return await Promise.all([emailPromise, urlPromise]).then(
+      ([email, url]) => {
+        return { email, url };
+      },
+    );
   }
 
   /**
@@ -126,10 +133,7 @@ export default class Cns extends EthereumNamingService {
     tokenId: string,
     coinName?: string,
   ): Promise<string> {
-    const resolverContract = this.buildContract(
-      resolverInterface,
-      resolver,
-    );
+    const resolverContract = this.buildContract(resolverInterface, resolver);
     const addrKey = `crypto.${coinName.toUpperCase()}.address`;
     const addr: string = await this.getRecord(resolverContract, 'get', [
       addrKey,
@@ -140,11 +144,16 @@ export default class Cns extends EthereumNamingService {
 
   /** @internal */
   private getResolver = async (tokenId): Promise<string> =>
-    await this.callMethod(this.registryContract, 'resolverOf', [tokenId]).catch((err) => {
-      if (err instanceof ResolutionError && err.code === ResolutionErrorCode.RecordNotFound)
-        return undefined;
-      throw err;
-    });
+    await this.callMethod(this.registryContract, 'resolverOf', [tokenId]).catch(
+      err => {
+        if (
+          err instanceof ResolutionError &&
+          err.code === ResolutionErrorCode.RecordNotFound
+        )
+          return undefined;
+        throw err;
+      },
+    );
 
   /** @internal */
   async owner(tokenId): Promise<string> {
@@ -155,17 +164,13 @@ export default class Cns extends EthereumNamingService {
     contract: Contract,
     methodname: string,
     params: any[],
-  ): Promise<string> =>
-    await this.callMethod(contract, methodname, params);
+  ): Promise<string> => await this.callMethod(contract, methodname, params);
 
   /** @internal */
   async record(domain: string, key: string): Promise<string> {
     const tokenId = this.namehash(domain);
-    const resolver: string = await this.getResolver(tokenId);    
-    const resolverContract = this.buildContract(
-      resolverInterface,
-      resolver,
-    );
+    const resolver: string = await this.getResolver(tokenId);
+    const resolverContract = this.buildContract(resolverInterface, resolver);
     const record: string = await this.getRecord(resolverContract, 'get', [
       key.replace('.value', ''),
       tokenId,
@@ -208,10 +213,7 @@ export default class Cns extends EthereumNamingService {
         domain,
       });
     }
-    const resolverContract = this.buildContract(
-      resolverInterface,
-      resolver,
-    );
+    const resolverContract = this.buildContract(resolverInterface, resolver);
     const ttl = await this.getTtl(resolverContract, 'get', ['ttl', tokenId]);
     return [tokenId, owner, parseInt(ttl) || 0, resolver];
   }

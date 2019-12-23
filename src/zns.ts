@@ -62,7 +62,7 @@ export default class Zns extends NamingService {
   constructor(source: string | boolean | SourceDefinition = true) {
     super();
     source = this.normalizeSource(source);
-    this.name = "ZNS";
+    this.name = 'ZNS';
     this.network = source.network as string;
     this.url = source.url;
     if (!this.network) {
@@ -135,25 +135,26 @@ export default class Zns extends NamingService {
 
   async ipfs(domain: string): Promise<IPFS> {
     const records = await this.records(domain);
-    const hash = this.getRecordFieldOrThrow(
-      domain,
-      records,
-      'ipfs.html.value',
-    );
+    const hash = this.getRecordFieldOrThrow(domain, records, 'ipfs.html.value');
     const redirect = this.getRecordFieldOrThrow(
       domain,
       records,
       'ipfs.redirect_domain.value',
-    ); 
-    return {hash, redirect};
+    );
+    return { hash, redirect };
   }
 
   async whois(domain: string): Promise<WHOIS> {
     const records = await this.records(domain);
     const email = this.getRecordField(domain, records, 'whois.email.value');
-    const url = this.getRecordField(domain, records, 'ipfs.redirect_domain.value');
-    const for_sale = this.getRecordField(domain, records, 'whois.for_sale.value') || false;
-    return {email, url, for_sale: !!for_sale};
+    const url = this.getRecordField(
+      domain,
+      records,
+      'ipfs.redirect_domain.value',
+    );
+    const for_sale =
+      this.getRecordField(domain, records, 'whois.for_sale.value') || false;
+    return { email, url, for_sale: !!for_sale };
   }
 
   /**
@@ -207,7 +208,8 @@ export default class Zns extends NamingService {
    */
   isSupportedDomain(domain: string): boolean {
     return (
-      (domain.indexOf('.') > 0 && /^[a-zA-Z0-9].{1,}[^-]\.(zil)$/.test(domain)) ||
+      (domain.indexOf('.') > 0 &&
+        /^[a-zA-Z0-9].{1,}[^-]\.(zil)$/.test(domain)) ||
       domain === 'zil'
     );
   }
@@ -261,15 +263,18 @@ export default class Zns extends NamingService {
     }
   }
 
-  private getRecordField(domain: string, records: Dictionary<string>, field: string): string {
+  private getRecordField(
+    domain: string,
+    records: Dictionary<string>,
+    field: string,
+  ): string {
     try {
       return this.getRecordFieldOrThrow(domain, records, field);
-    } catch(err) {
-      if (err instanceof ResolutionError)
-        return undefined;
+    } catch (err) {
+      if (err instanceof ResolutionError) return undefined;
       throw err;
     }
-  };
+  }
 
   private getRecordFieldOrThrow(
     domain: string,

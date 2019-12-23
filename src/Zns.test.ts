@@ -292,16 +292,20 @@ describe('ZNS', () => {
     it('should return whois method', async () => {
       const resolution = new Resolution();
       const whois = await resolution.whois('ergergergerg.zil');
-      expect(whois).toStrictEqual({ email: 'matt+test@unstoppabledomains.com',
-      url: 'www.unstoppabledomains.com',
-      for_sale: true });
+      expect(whois).toStrictEqual({
+        email: 'matt+test@unstoppabledomains.com',
+        url: 'www.unstoppabledomains.com',
+        for_sale: true,
+      });
     });
 
     it('should return ipfs method', async () => {
       const resolution = new Resolution();
       const ipfs = await resolution.ipfs('ergergergerg.zil');
-      expect(ipfs).toStrictEqual({ hash: 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu',
-      redirect: 'www.unstoppabledomains.com' } );
+      expect(ipfs).toStrictEqual({
+        hash: 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu',
+        redirect: 'www.unstoppabledomains.com',
+      });
     });
   });
 });

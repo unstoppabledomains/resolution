@@ -5,7 +5,7 @@ import {
   BlockhanNetworkUrlMap,
   ResolutionResponse,
   IPFS,
-  WHOIS
+  WHOIS,
 } from './types';
 import { hash } from 'eth-ens-namehash';
 import ResolutionError, { ResolutionErrorCode } from './resolutionError';
@@ -174,7 +174,7 @@ export abstract class EthereumNamingService extends NamingService {
     }
   }
 
-   buildContract(abi, address) {
-    return new Contract(this.name, this.url, abi, address)
+  buildContract(abi, address) {
+    return new Contract(this.name, this.url, abi, address);
   }
 }
