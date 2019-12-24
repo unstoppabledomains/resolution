@@ -8,9 +8,15 @@ export const ZilliqaUrl = 'https://api.zilliqa.com';
 export const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
 
 export function mockAsyncMethod(object: any, method: string, value) {
-  if (!process.env.LIVE)
-    return jest.spyOn(object, method).mockResolvedValue(value);
-  else return jest.spyOn(object, method);
+  const spy = jest.spyOn(object, method);
+  if (!process.env.LIVE) {
+    if (value instanceof Error) {
+      return spy.mockRejectedValue(value);
+    } else {
+      return spy.mockResolvedValue(value);
+    }
+  }
+  return spy;
 };
 
 export function mockAsyncMethods(object: any, methods: Dictionary<any>) {

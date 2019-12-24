@@ -1,5 +1,5 @@
 import nock from 'nock';
-import Resolution, { ResolutionErrorCode } from '.';
+import Resolution, { ResolutionErrorCode, ResolutionError } from '.';
 import Ens from './ens';
 import { NullAddress } from './types';
 import {
@@ -34,7 +34,7 @@ describe('ENS', () => {
     const eyes = mockAsyncMethods(resolution.ens, {
       getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
       getResolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
-      fetchAddress: '0x714ef33943d925731FBB89C99aF5780D888bD106',
+      fetchAddressOrThrow: '0x714ef33943d925731FBB89C99aF5780D888bD106',
     });
 
     expect(await resolution.address('matthewgould.eth', 'ETH')).toEqual(
@@ -79,7 +79,7 @@ describe('ENS', () => {
     const eyes = mockAsyncMethods(resolution.ens, {
       getOwner: '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
       getResolver: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
-      fetchAddress: '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
+      fetchAddressOrThrow: '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
     });
 
     const result = await resolution.address('adrian.argent.xyz', 'ETH');
@@ -95,7 +95,7 @@ describe('ENS', () => {
     const eyes = mockAsyncMethods(resolution.ens, {
       getOwner: '0xf3dE750A73C11a6a2863761E930BF5fE979d5663',
       getResolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
-      fetchAddress: '0xf3dE750A73C11a6a2863761E930BF5fE979d5663',
+      fetchAddressOrThrow: '0xf3dE750A73C11a6a2863761E930BF5fE979d5663',
     });
 
     const result = await resolution.address('john.luxe', 'ETH');
@@ -391,25 +391,48 @@ describe('ENS', () => {
     );
   });
 
-  it('Checks resolution#resolve, should pass without any errors', async () => {
-    const resolution = new Resolution();
-    const eyes = mockAsyncMethods(resolution.ens, {
-      getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
-      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-      getTTL: 0,
-      callMethod:
+  describe(".resolve", () => {
+    it('passes without any errors', async () => {
+      const resolution = new Resolution();
+      const eyes = mockAsyncMethods(resolution.ens, {
+        getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
+        getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+        getTTL: 0,
+        callMethod:
         '0x714ef33943d925731FBB89C99aF5780D888bD106',
+      });
+      const resolutionObj = await resolution.resolve('matthewgould.eth');
+      expectSpyToBeCalled(eyes);
+      expect(resolutionObj).toStrictEqual({
+        addresses: { ETH: '0x714ef33943d925731FBB89C99aF5780D888bD106' },
+        meta:
+        {
+          owner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
+          type: 'ENS',
+          ttl: 0
+        }
+      });
     });
-    const resolutionObj = await resolution.resolve('matthewgould.eth');
-    expectSpyToBeCalled(eyes);
-    expect(resolutionObj).toStrictEqual({
-      addresses: { ETH: '0x714ef33943d925731FBB89C99aF5780D888bD106' },
-      meta:
-      {
-        owner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
-        type: 'ENS',
-        ttl: 0
-      }
+
+    it("returns undefined address", async () => {
+      const resolution = new Resolution();
+      const eyes = mockAsyncMethods(resolution.ens, {
+        getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
+        getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+        getTTL: 0,
+        fetchAddressOrThrow: new ResolutionError(ResolutionErrorCode.RecordNotFound)
+      });
+      const result = await resolution.resolve('matthewgould.eth');
+      expectSpyToBeCalled(eyes);
+      expect(result).toStrictEqual({
+        addresses: { ETH: null},
+        meta:
+        {
+          owner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
+          type: 'ENS',
+          ttl: 0
+        }
+      });
     });
   });
 
