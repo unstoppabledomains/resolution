@@ -170,7 +170,25 @@ describe('CNS', () => {
     it("supports root node", async () => {
       const resolution = new Resolution();
       expect(resolution.isSupportedDomain('crypto')).toEqual(true);
-      expect(new Resolution().namehash('crypto')).toEqual('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
+      expect(resolution.namehash('crypto')).toEqual('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
     });
+
+    it('starts with -', async () => {
+      const resolution = new Resolution();
+      expect(resolution.isSupportedDomain('-hello.crypto')).toEqual(true);
+      expect(resolution.namehash('-hello.crypto')).toBe('0xc4ad028bcae9b201104e15f872d3e85b182939b06829f75a128275177f2ff9b2');
+    })
+
+    it('ends with -', async () => {
+      const resolution = new Resolution();
+      expect(resolution.isSupportedDomain('hello-.crypto')).toEqual(true);
+      expect(resolution.namehash('hello-.crypto')).toBe('0x82eaa6ef14e438940bfd7747e0e4c4fec42af20cee28ddd0a7d79f52b1c59b72');
+    })
+
+    it('starts and ends with -', async () => {
+      const resolution = new Resolution();
+      expect(resolution.isSupportedDomain('-hello-.crypto')).toEqual(true);
+      expect(resolution.namehash('-hello-.crypto')).toBe('0x90cc1963ff09ce95ee2dbb3830df4f2115da9756e087a50283b3e65f6ffe2a4e');
+    })
   });
 });

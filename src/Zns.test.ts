@@ -1,9 +1,10 @@
-import Resolution from '.';
+import Resolution, { ResolutionErrorCode } from '.';
 import {
   mockAsyncMethod,
   expectSpyToBeCalled,
   ZilliqaUrl,
   mockAPICalls,
+  expectResolutionErrorCode,
 } from './utils/testHelpers';
 
 beforeEach(() => {
@@ -286,4 +287,24 @@ describe('ZNS', () => {
   //     },
   //   });
   // });
+
+  describe('.namehash', () => {
+    it('starts with -', async () => {
+      const resolution = new Resolution();
+      expect(resolution.isSupportedDomain('-hello.zil')).toEqual(false);
+      expectResolutionErrorCode(() => resolution.namehash('-hello.zil'), ResolutionErrorCode.UnsupportedDomain);
+    })
+
+    it('ends with -', async () => {
+      const resolution = new Resolution();
+      expect(resolution.isSupportedDomain('hello-.zil')).toEqual(false);
+      expectResolutionErrorCode(() => resolution.namehash('hello-.zil'), ResolutionErrorCode.UnsupportedDomain);
+    })
+
+    it('starts and ends with -', async () => {
+      const resolution = new Resolution();
+      expect(resolution.isSupportedDomain('-hello-.zil')).toEqual(false);
+      expectResolutionErrorCode(() => resolution.namehash('-hello-.zil'), ResolutionErrorCode.UnsupportedDomain);
+    })
+  });
 });
