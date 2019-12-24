@@ -436,4 +436,24 @@ describe('ENS', () => {
     });
   });
 
+  describe('.namehash',() => {
+    it('starts with -', async () => {
+      const resolution = new Resolution();
+      expect(resolution.isSupportedDomain('-hello.eth')).toEqual(false);
+      expectResolutionErrorCode(() => resolution.namehash('-hello.eth'), ResolutionErrorCode.UnsupportedDomain);
+    })
+
+    it('ends with -', async () => {
+      const resolution = new Resolution();
+      expect(resolution.isSupportedDomain('hello-.eth')).toEqual(false);
+      expectResolutionErrorCode(() => resolution.namehash('hello-.eth'), ResolutionErrorCode.UnsupportedDomain);
+    })
+
+    it('starts and ends with -', async () => {
+      const resolution = new Resolution();
+      expect(resolution.isSupportedDomain('-hello-.eth')).toEqual(false);
+      expectResolutionErrorCode(() => resolution.namehash('-hello-.eth'), ResolutionErrorCode.UnsupportedDomain);
+    })
+  });
+
 });
