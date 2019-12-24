@@ -59,7 +59,7 @@ export default class Zns extends NamingService {
   constructor(source: string | boolean | SourceDefinition = true) {
     super();
     source = this.normalizeSource(source);
-    this.name = "ZNS";
+    this.name = 'ZNS';
     this.network = source.network as string;
     this.url = source.url;
     if (!this.network) {
@@ -148,15 +148,27 @@ export default class Zns extends NamingService {
   }
 
   async ipfsHash(domain: string): Promise<string> {
-    return this.getRecordFieldOrThrow(domain, await this.records(domain), 'ipfs.html.value');
+    return this.getRecordFieldOrThrow(
+      domain,
+      await this.records(domain),
+      'ipfs.html.value',
+    );
   }
- 
+
   async httpUrl(domain: string): Promise<string> {
-    return  this.getRecordFieldOrThrow(domain, await this.records(domain),  'ipfs.redirect_domain.value');
+    return this.getRecordFieldOrThrow(
+      domain,
+      await this.records(domain),
+      'ipfs.redirect_domain.value',
+    );
   }
 
   async email(domain: string): Promise<string> {
-    return this.getRecordFieldOrThrow(domain, await this.records(domain), 'whois.email.value');
+    return this.getRecordFieldOrThrow(
+      domain,
+      await this.records(domain),
+      'whois.email.value',
+    );
   }
 
   /**
@@ -187,7 +199,8 @@ export default class Zns extends NamingService {
    */
   isSupportedDomain(domain: string): boolean {
     return (
-      (domain.indexOf('.') > 0 && /^[a-zA-Z0-9].{1,}[^-]\.(zil)$/.test(domain)) ||
+      (domain.indexOf('.') > 0 &&
+        /^[a-zA-Z0-9].{1,}[^-]\.(zil)$/.test(domain)) ||
       domain === 'zil'
     );
   }

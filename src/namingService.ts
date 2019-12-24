@@ -174,6 +174,6 @@ export abstract class EthereumNamingService extends NamingService {
   }
 
   protected buildContract(abi, address) {
-    return new Contract(this.name, this.url, abi, address)
+    return new Contract(this.name, this.url, abi, address);
   }
 }

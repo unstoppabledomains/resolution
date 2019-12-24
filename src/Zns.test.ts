@@ -290,11 +290,14 @@ describe('ZNS', () => {
   describe('Meta data', () => {
     it('should return owner email from zns', async () => {
       const resolution = new Resolution();
-      const eye = mockAsyncMethod(resolution.zns, 'getContractMapValue', { argtypes: [],
-        arguments:
-         [ '0x4e984952e867ff132cd4b70cd3f313d68c511b76',
-           '0xa9b1d3647e4deb9ce4e601c2c9e0a2fdf2d7415a' ],
-        constructor: 'Record' });
+      const eye = mockAsyncMethod(resolution.zns, 'getContractMapValue', {
+        argtypes: [],
+        arguments: [
+          '0x4e984952e867ff132cd4b70cd3f313d68c511b76',
+          '0xa9b1d3647e4deb9ce4e601c2c9e0a2fdf2d7415a',
+        ],
+        constructor: 'Record',
+      });
       const secondEye = mockAsyncMethod(resolution.zns, 'getResolverRecords', {
         'ipfs.html.hash': 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
         'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu',
@@ -309,11 +312,14 @@ describe('ZNS', () => {
 
     it('should return ipfs hash from zns', async () => {
       const resolution = new Resolution();
-      const eye = mockAsyncMethod(resolution.zns, 'getContractMapValue', { argtypes: [],
-        arguments:
-         [ '0x4e984952e867ff132cd4b70cd3f313d68c511b76',
-           '0xa9b1d3647e4deb9ce4e601c2c9e0a2fdf2d7415a' ],
-        constructor: 'Record' });
+      const eye = mockAsyncMethod(resolution.zns, 'getContractMapValue', {
+        argtypes: [],
+        arguments: [
+          '0x4e984952e867ff132cd4b70cd3f313d68c511b76',
+          '0xa9b1d3647e4deb9ce4e601c2c9e0a2fdf2d7415a',
+        ],
+        constructor: 'Record',
+      });
       const secondEye = mockAsyncMethod(resolution.zns, 'getResolverRecords', {
         'ipfs.html.hash': 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
         'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu',
@@ -323,16 +329,21 @@ describe('ZNS', () => {
       });
       const ipfs = await resolution.ipfsHash('ergergergerg.zil');
       expectSpyToBeCalled([eye, secondEye]);
-      expect(ipfs).toStrictEqual('QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu');
+      expect(ipfs).toStrictEqual(
+        'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu',
+      );
     });
 
     it('should return httpUrl associated with the domain', async () => {
       const resolution = new Resolution();
-      const eye = mockAsyncMethod(resolution.zns, 'getContractMapValue', { argtypes: [],
-        arguments:
-         [ '0x4e984952e867ff132cd4b70cd3f313d68c511b76',
-           '0xa9b1d3647e4deb9ce4e601c2c9e0a2fdf2d7415a' ],
-        constructor: 'Record' });
+      const eye = mockAsyncMethod(resolution.zns, 'getContractMapValue', {
+        argtypes: [],
+        arguments: [
+          '0x4e984952e867ff132cd4b70cd3f313d68c511b76',
+          '0xa9b1d3647e4deb9ce4e601c2c9e0a2fdf2d7415a',
+        ],
+        constructor: 'Record',
+      });
       const secondEye = mockAsyncMethod(resolution.zns, 'getResolverRecords', {
         'ipfs.html.hash': 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
         'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu',
@@ -343,7 +354,6 @@ describe('ZNS', () => {
       const httpUrl = await resolution.httpUrl('ergergergerg.zil');
       expectSpyToBeCalled([eye, secondEye]);
       expect(httpUrl).toBe('www.unstoppabledomains.com');
-    })
+    });
   });
-
 });

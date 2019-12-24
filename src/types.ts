@@ -74,7 +74,7 @@ export type NetworkIdMap = {
   [key: number]: string;
 };
 
-export const UDApiDefaultUrl = "https://unstoppabledomains.com/api/v1";
+export const UDApiDefaultUrl = 'https://unstoppabledomains.com/api/v1';
 
 /**
  * Main configurational object for Resolution instance
@@ -88,11 +88,11 @@ export type Blockchain =
     };
 
 export type API = {
-  url: string
-}
+  url: string;
+};
 
-export const DefaultAPI:API = {
-  url: UDApiDefaultUrl
+export const DefaultAPI: API = {
+  url: UDApiDefaultUrl,
 };
 
 /**
@@ -110,10 +110,10 @@ export type owner = string;
 export type ttl = string;
 
 export enum NullAddress {
- '0x',
- '0x0000000000000000000000000000000000000000',
- '0x0000000000000000000000000000000000000000000000000000000000000000'
-};
+  '0x',
+  '0x0000000000000000000000000000000000000000',
+  '0x0000000000000000000000000000000000000000000000000000000000000000',
+}
 
 export function isNullAddress(key: string): boolean {
   return Object.values(NullAddress).includes(key);

@@ -67,7 +67,8 @@ export default class Ens extends EthereumNamingService {
    */
   isSupportedDomain(domain: string): boolean {
     return (
-      domain.indexOf('.') > 0 && /^[a-zA-Z0-9].{1,}[^-]\.(eth|luxe|xyz|test)$/.test(domain)
+      domain.indexOf('.') > 0 &&
+      /^[a-zA-Z0-9].{1,}[^-]\.(eth|luxe|xyz|test)$/.test(domain)
     );
   }
 
@@ -125,12 +126,9 @@ export default class Ens extends EthereumNamingService {
     const nodeHash = this.namehash(domain);
     const ownerPromise = this.owner(domain);
     const resolver = await this.getResolver(nodeHash);
-    if (
-      !resolver ||
-      isNullAddress(resolver)
-    ) {
+    if (!resolver || isNullAddress(resolver)) {
       const owner = await ownerPromise;
-      if (!owner || isNullAddress(owner) )
+      if (!owner || isNullAddress(owner))
         throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
           domain,
         });
@@ -197,9 +195,13 @@ export default class Ens extends EthereumNamingService {
    * resolves an ipfsHash stored on domain
    * @param domain - domain name
    */
-  async ipfsHash(domain:string): Promise<string> {
-    const hash =  await this.getContentHash(domain);
-    if (!hash) throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {recordName: 'ipfs hash', domain: domain});
+  async ipfsHash(domain: string): Promise<string> {
+    const hash = await this.getContentHash(domain);
+    if (!hash)
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+        recordName: 'ipfs hash',
+        domain: domain,
+      });
     return hash;
   }
 
@@ -208,11 +210,13 @@ export default class Ens extends EthereumNamingService {
    * @param domain - domain name
    */
   async httpUrl(domain: string): Promise<string> {
-    const nodeHash = this.namehash(domain);
-    const resolverAddr = await this.getResolver(nodeHash);
-    const resolver = this.buildContract(resolverInterface(resolverAddr),resolverAddr);
-    const httpUrl =  await this.getTextRecord(resolver, domain, 'url');
-    if (!httpUrl) throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {recordName: 'redirect url', domain: domain});
+    const resolver = await this.getResolverContract(domain);
+    const httpUrl = await this.getTextRecord(resolver, domain, 'url');
+    if (!httpUrl)
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+        recordName: 'redirect url',
+        domain: domain,
+      });
     return httpUrl;
   }
   /**
@@ -220,13 +224,15 @@ export default class Ens extends EthereumNamingService {
    * @param domain - domain name
    */
   async email(domain: string): Promise<string> {
-    const nodeHash = this.namehash(domain);
-    const resolverAddr = await this.getResolver(nodeHash);
-    const resolver = this.buildContract(resolverInterface(resolverAddr),resolverAddr); 
+    const resolver = await this.getResolverContract(domain);
     const email = await this.getTextRecord(resolver, domain, 'email');
-    if (!email) throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {recordName: 'email', domain: domain});
+    if (!email)
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+        recordName: 'email',
+        domain: domain,
+      });
     return email;
-  }  
+  }
 
   /**
    * Produces ENS namehash
@@ -238,26 +244,48 @@ export default class Ens extends EthereumNamingService {
     return hash(domain);
   }
 
-  private async getContentHash(domain:string):Promise<string> {
+  private async getContentHash(domain: string): Promise<string> {
     const nodeHash = this.namehash(domain);
-    const resolverAddress = await this.getResolver(nodeHash);
-    if (!resolverAddress) {
-      const owner = await this.getOwner(nodeHash);
-      if (!owner || isNullAddress(owner)) throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {domain: domain});
-      throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {domain: domain});
-    }
-    const resolverContract = this.buildContract(resolverInterface(resolverAddress), resolverAddress);
-    const contentHashEncoded = await this.callMethod(resolverContract, 'contenthash', [nodeHash]);
+    const resolverContract = await this.getResolverContract(domain);
+    const contentHashEncoded = await this.callMethod(
+      resolverContract,
+      'contenthash',
+      [nodeHash],
+    );
     const codec = contentHash.getCodec(contentHashEncoded);
     if (codec === 'swarm-ns') return undefined;
     return contentHash.decode(contentHashEncoded);
   }
 
-  private async getTextRecord(resolver:Contract, domain, key) {
+  private async getTextRecord(resolver: Contract, domain, key) {
     const nodeHash = this.namehash(domain);
     const record = await this.callMethod(resolver, 'text', [nodeHash, key]);
-    if (!record) throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {recordName: key, domain:domain});
+    if (!record)
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+        recordName: key,
+        domain: domain,
+      });
     return record;
+  }
+
+  private async getResolverContract(domain: string): Promise<Contract> {
+    const nodeHash = this.namehash(domain);
+    const resolverAddress = await this.getResolver(nodeHash);
+    if (!resolverAddress) {
+      const owner = await this.getOwner(nodeHash);
+      if (!owner || isNullAddress(owner))
+        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+          domain: domain,
+        });
+      throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
+        domain: domain,
+      });
+    }
+    const resolverContract = this.buildContract(
+      resolverInterface(resolverAddress),
+      resolverAddress,
+    );
+    return resolverContract;
   }
 
   /**
@@ -271,7 +299,10 @@ export default class Ens extends EthereumNamingService {
     try {
       return await this.callMethod(this.registryContract, 'ttl', [nodeHash]);
     } catch (err) {
-      if ( err instanceof ResolutionError && err.code === ResolutionErrorCode.RecordNotFound)
+      if (
+        err instanceof ResolutionError &&
+        err.code === ResolutionErrorCode.RecordNotFound
+      )
         return 0;
       throw err;
     }
@@ -282,7 +313,9 @@ export default class Ens extends EthereumNamingService {
    */
   private async getResolver(nodeHash) {
     try {
-      return await this.callMethod(this.registryContract, 'resolver', [nodeHash]);
+      return await this.callMethod(this.registryContract, 'resolver', [
+        nodeHash,
+      ]);
     } catch (err) {
       if (
         err instanceof ResolutionError &&
@@ -305,7 +338,11 @@ export default class Ens extends EthereumNamingService {
    */
   private async getResolutionInfo(domain: string) {
     const nodeHash = this.namehash(domain);
-    return await Promise.all([this.owner(domain), this.getTTL(nodeHash), this.getResolver(nodeHash)]);
+    return await Promise.all([
+      this.owner(domain),
+      this.getTTL(nodeHash),
+      this.getResolver(nodeHash),
+    ]);
   }
 
   /** @internal */
@@ -342,12 +379,14 @@ export default class Ens extends EthereumNamingService {
 
   private async fetchAddress(resolver, nodeHash, coin) {
     try {
-      return await this.fetchAddressOrThrow(resolver, nodeHash, EthCoinIndex)
-    } catch(error) {
-      if (!(
-        error instanceof ResolutionError &&
-        error.code === ResolutionErrorCode.RecordNotFound
-      )) {
+      return await this.fetchAddressOrThrow(resolver, nodeHash, EthCoinIndex);
+    } catch (error) {
+      if (
+        !(
+          error instanceof ResolutionError &&
+          error.code === ResolutionErrorCode.RecordNotFound
+        )
+      ) {
         throw error;
       }
       return null;
