@@ -138,7 +138,7 @@ export default class Ens extends EthereumNamingService {
       });
     }
     const coinType = this.getCoinType(currencyTicker.toUpperCase());
-    var addr = await this.fetchAddress(resolver, nodeHash, coinType);
+    var addr = await this.fetchAddressOrThrow(resolver, nodeHash, coinType);
     if (!addr)
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
         domain,
@@ -265,11 +265,7 @@ export default class Ens extends EthereumNamingService {
     return coin;
   }
 
-  /**
-   * @param resolver - resolver address
-   * @param nodeHash - namehash of a domain name
-   */
-  private async fetchAddress(resolver, nodeHash, coinType?: number) {
+  private async fetchAddressOrThrow(resolver, nodeHash, coinType?: number) {
     if (!resolver || isNullAddress(resolver)) {
       return null;
     }
@@ -284,5 +280,19 @@ export default class Ens extends EthereumNamingService {
     if (!addr) return null;
     const data = Buffer.from(addr.replace('0x', ''), 'hex');
     return formatsByCoinType[coinType].encoder(data);
+  }
+
+  private async fetchAddress(resolver, nodeHash, coin) {
+    try {
+      return await this.fetchAddressOrThrow(resolver, nodeHash, EthCoinIndex)
+    } catch(error) {
+      if (!(
+        error instanceof ResolutionError &&
+        error.code === ResolutionErrorCode.RecordNotFound
+      )) {
+        throw error;
+      }
+      return null;
+    }
   }
 }

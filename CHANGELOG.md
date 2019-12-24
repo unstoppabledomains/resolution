@@ -1,8 +1,10 @@
 ## Unreleased
 
-* Domain that starts and ends with '-' are not valid anymore.
+* Domain that starts and ends with '-' are not valid anymore in ENS.
+* Bugfix Resolution#resolve on ENS domain when resolver has no address record
 
 ## 1.0.9-1.0.10
+
 * Revert back changes made for browser / node detection.
 
 ## 1.0.8
