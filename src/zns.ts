@@ -147,6 +147,18 @@ export default class Zns extends NamingService {
     return this.structureResolverRecords(await this.records(domain));
   }
 
+  async ipfsHash(domain: string): Promise<string> {
+    return this.getRecordFieldOrThrow(domain, await this.records(domain), 'ipfs.html.value');
+  }
+ 
+  async httpUrl(domain: string): Promise<string> {
+    return  this.getRecordFieldOrThrow(domain, await this.records(domain),  'ipfs.redirect_domain.value');
+  }
+
+  async email(domain: string): Promise<string> {
+    return this.getRecordFieldOrThrow(domain, await this.records(domain), 'whois.email.value');
+  }
+
   /**
    * Resolves a specific field from domain's record
    * @param domain - domain name

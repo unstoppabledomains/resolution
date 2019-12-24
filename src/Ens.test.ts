@@ -413,4 +413,30 @@ describe('ENS', () => {
     });
   });
 
+
+  describe('metadata', () => {
+
+    it('should return a valid ipfsHash', async () => {
+      const resolution = new Resolution();
+      const ipfsHash = await resolution.ipfsHash('almonit.eth');
+      expect(ipfsHash).toBe('QmV3RLU7X2QBaBJ7vdkYJPtiYVTdfWaQD6RetzFUzmrJf3');
+    });
+
+    //todo(johny) find some domains with url property set
+    it('should return appropriate httpUrl', async () => {
+      const resolution = new Resolution();
+      const httpUrlPromise = resolution.httpUrl('matthewgould.eth');
+      await expectResolutionErrorCode(httpUrlPromise, ResolutionErrorCode.RecordNotFound );
+    });
+
+    it('should return resolution error for not finding the email', async () => {
+      const resolution = new Resolution();
+      const emailPromise =  resolution.email('matthewgould.eth');
+      await expectResolutionErrorCode(emailPromise, ResolutionErrorCode.RecordNotFound); 
+      
+    })
+
+
+  });
+
 });

@@ -136,6 +136,29 @@ export default class Cns extends EthereumNamingService {
     return await this.callMethod(this.registryContract, 'ownerOf', [tokenId]);
   }
 
+  /**
+   * resolves an ipfsHash stored on domain
+   * @param domain - domain name
+   */
+  async ipfsHash(domain: string): Promise<string> {
+    return await this.record(domain, 'ipfs.html.value');
+  }
+ /**
+   * resolves an email address stored on domain
+   * @param domain - domain name
+   */ 
+  async email(domain: string): Promise<string> {
+    return await this.record(domain, 'whois.email.value');
+  }
+
+  /**
+   * resolves an httpUrl stored on domain
+   * @param domain - domain name
+   */
+  async httpUrl(domain: string): Promise<string> {
+    return await this.record(domain, 'ipfs.redirect_domain.value');
+  }
+
   private getTtl = async (
     contract: Contract,
     methodname: string,
@@ -152,7 +175,7 @@ export default class Cns extends EthereumNamingService {
       resolver,
     );
     const record: string = await this.getRecord(resolverContract, 'get', [
-      key.replace('.value', ''),
+      key,
       tokenId,
     ]);
     // Wrong Record checks

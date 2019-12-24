@@ -85,6 +85,18 @@ export default class Udapi extends NamingService {
     return owner.startsWith('zil1') ? owner : toBech32Address(owner);
   }
 
+  async ipfsHash(domain: string): Promise<string> {
+    return await this.findMethodOrThrow(domain).ipfsHash(domain);
+  }
+
+  async email(domain: string): Promise<string> {
+    return await this.findMethodOrThrow(domain).email(domain);
+  }
+
+  async httpUrl(domain: string): Promise<string> {
+    return await this.findMethodOrThrow(domain).httpUrl(domain);
+  }
+
   /**
    * Resolves the domain name via UD API mirror
    * @param domain - domain name to be resolved

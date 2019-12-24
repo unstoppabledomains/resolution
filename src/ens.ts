@@ -12,6 +12,7 @@ import {
 import { EthereumNamingService } from './namingService';
 import { ResolutionError, ResolutionErrorCode } from './index';
 import Contract from './utils/contract';
+import contentHash from 'content-hash';
 
 const RegistryMap = {
   mainnet: '0x314159265dd8dbb310642f98f50c066173c1259b',
@@ -193,6 +194,41 @@ export default class Ens extends EthereumNamingService {
   }
 
   /**
+   * resolves an ipfsHash stored on domain
+   * @param domain - domain name
+   */
+  async ipfsHash(domain:string): Promise<string> {
+    const hash =  await this.getContentHash(domain);
+    if (!hash) throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {recordName: 'ipfs hash', domain: domain});
+    return hash;
+  }
+
+  /**
+   * resolves a httpUrl stored on domain
+   * @param domain - domain name
+   */
+  async httpUrl(domain: string): Promise<string> {
+    const nodeHash = this.namehash(domain);
+    const resolverAddr = await this.getResolver(nodeHash);
+    const resolver = this.buildContract(resolverInterface(resolverAddr),resolverAddr);
+    const httpUrl =  await this.getTextRecord(resolver, domain, 'url');
+    if (!httpUrl) throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {recordName: 'redirect url', domain: domain});
+    return httpUrl;
+  }
+  /**
+   * resolves an email stored on domain
+   * @param domain - domain name
+   */
+  async email(domain: string): Promise<string> {
+    const nodeHash = this.namehash(domain);
+    const resolverAddr = await this.getResolver(nodeHash);
+    const resolver = this.buildContract(resolverInterface(resolverAddr),resolverAddr); 
+    const email = await this.getTextRecord(resolver, domain, 'email');
+    if (!email) throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {recordName: 'email', domain: domain});
+    return email;
+  }  
+
+  /**
    * Produces ENS namehash
    * @param domain - domain to be hashed
    * @returns ENS namehash of a domain
@@ -200,6 +236,28 @@ export default class Ens extends EthereumNamingService {
   namehash(domain: string): string {
     this.ensureSupportedDomain(domain);
     return hash(domain);
+  }
+
+  private async getContentHash(domain:string):Promise<string> {
+    const nodeHash = this.namehash(domain);
+    const resolverAddress = await this.getResolver(nodeHash);
+    if (!resolverAddress) {
+      const owner = await this.getOwner(nodeHash);
+      if (!owner || isNullAddress(owner)) throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {domain: domain});
+      throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {domain: domain});
+    }
+    const resolverContract = this.buildContract(resolverInterface(resolverAddress), resolverAddress);
+    const contentHashEncoded = await this.callMethod(resolverContract, 'contenthash', [nodeHash]);
+    const codec = contentHash.getCodec(contentHashEncoded);
+    if (codec === 'swarm-ns') return undefined;
+    return contentHash.decode(contentHashEncoded);
+  }
+
+  private async getTextRecord(resolver:Contract, domain, key) {
+    const nodeHash = this.namehash(domain);
+    const record = await this.callMethod(resolver, 'text', [nodeHash, key]);
+    if (!record) throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {recordName: key, domain:domain});
+    return record;
   }
 
   /**

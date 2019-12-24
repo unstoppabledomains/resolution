@@ -26,6 +26,9 @@ export default abstract class NamingService extends BaseConnection {
   abstract owner(domain: string): Promise<string>;
   abstract record(domain: string, key: string): Promise<string>;
   abstract resolve(domain: string): Promise<ResolutionResponse>;
+  abstract ipfsHash(domain: string): Promise<string>;
+  abstract email(domain: string): Promise<string>;
+  abstract httpUrl(domain: string): Promise<string>;
 
   serviceName(domain: string): string {
     return this.name;
