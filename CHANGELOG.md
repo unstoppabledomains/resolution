@@ -1,7 +1,10 @@
 ## Unreleased
 
-* Domain that starts and ends with '-' are not valid anymore in ENS.
+## 1.0.11
+
+* Domains that start or end with `-` are not valid anymore in ENS
 * Bugfix Resolution#resolve on ENS domain when resolver has no address record
+* Domains that start or end with `-` are valid for CNS
 
 ## 1.0.9-1.0.10
 
