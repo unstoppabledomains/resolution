@@ -253,7 +253,7 @@ export default class Ens extends EthereumNamingService {
       [nodeHash],
     );
     const codec = contentHash.getCodec(contentHashEncoded);
-    if (codec === 'swarm-ns') return undefined;
+    if (codec !== 'ipfs-ns') return undefined;
     return contentHash.decode(contentHashEncoded);
   }
 
