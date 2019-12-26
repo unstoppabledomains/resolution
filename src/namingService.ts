@@ -5,7 +5,7 @@ import {
   BlockhanNetworkUrlMap,
   ResolutionResponse,
 } from './types';
-import { hash } from 'eth-ens-namehash';
+import { default as hash } from './ens/namehash';
 import ResolutionError, { ResolutionErrorCode } from './resolutionError';
 import BaseConnection from './baseConnection';
 import { invert } from './utils';
@@ -143,16 +143,6 @@ export abstract class EthereumNamingService extends NamingService {
         return source;
       }
     }
-  }
-
-  /**
-   * Produces ENS namehash
-   * @param domain - domain to be hashed
-   * @return ENS namehash of a domain
-   */
-  namehash(domain: string): string {
-    this.ensureSupportedDomain(domain);
-    return hash(domain);
   }
 
   /**

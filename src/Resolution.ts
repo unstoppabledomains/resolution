@@ -11,6 +11,7 @@ import {
 } from './types';
 import ResolutionError, { ResolutionErrorCode } from './resolutionError';
 import NamingService from './namingService';
+import { nodeHash } from './ens/namehash';
 
 /**
  * Blockchain domain Resolution library - Resolution.
@@ -184,6 +185,24 @@ export default class Resolution {
    */
   namehash(domain: string): string {
     return this.getNamingMethodOrThrow(domain).namehash(domain);
+  }
+
+  /**
+   * returns a childhash for specific namingService
+   * @param parent -> hash for parent
+   * @param label -> hash for label
+   * @param method -> namingservice name, if omited CNS is used as default
+   */
+  childhash(parent: nodeHash, label: string, method?: string):nodeHash {
+    if (!method) method = 'CNS';
+    switch (method) {
+      case 'ENS':
+        return this.ens.childhash(parent, label);
+      case 'CNS':
+        return this.cns.childhash(parent, label);
+      case 'ZNS': 
+        return this.zns.childhash(parent, label);
+    }
   }
 
   /**

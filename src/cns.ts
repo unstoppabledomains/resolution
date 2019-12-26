@@ -7,10 +7,11 @@ import {
 } from './types';
 import { default as resolverInterface } from './cns/contract/resolver';
 import { default as cnsInterface } from './cns/contract/registry';
-import { default as hash } from './cns/contract/namehash';
+import { default as hash, childhash } from './cns/namehash';
 import { ResolutionError } from '.';
 import { ResolutionErrorCode } from './resolutionError';
 import Contract from './utils/contract';
+import { nodeHash } from './ens/namehash';
 
 /**
  * Class to support connection with Crypto naming service
@@ -132,6 +133,16 @@ export default class Cns extends EthereumNamingService {
   namehash(domain: string): string {
     this.ensureSupportedDomain(domain);
     return hash(domain);
+  }
+
+  
+  /**
+   * Returns the childhash
+   * @param parent - nodehash of a parent
+   * @param label - child 
+   */
+  childhash(parent: nodeHash, label: string): nodeHash {
+    return childhash(parent, label);
   }
 
   /** @internal */

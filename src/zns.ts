@@ -3,7 +3,7 @@ import {
   toBech32Address,
   toChecksumAddress,
 } from './zns/utils';
-import namehash from './zns/namehash';
+import namehash, { childhash } from './zns/namehash';
 import { invert, set } from './utils';
 import {
   Dictionary,
@@ -16,6 +16,7 @@ import {
 } from './types';
 import { ResolutionError, ResolutionErrorCode } from './index';
 import NamingService from './namingService';
+import { nodeHash } from './ens/namehash';
 
 const DefaultSource = 'https://api.zilliqa.com';
 
@@ -195,6 +196,15 @@ export default class Zns extends NamingService {
   namehash(domain: string): string {
     this.ensureSupportedDomain(domain);
     return namehash(domain);
+  }
+
+  /**
+   * Returns the childhash
+   * @param parent - nodehash of a parent
+   * @param label - child 
+   */
+  childhash(parent: nodeHash, label: string): string {
+    return childhash(parent, label);
   }
 
   /** @internal */

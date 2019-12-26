@@ -437,6 +437,11 @@ describe('ENS', () => {
   });
 
   describe('.namehash',() => {
+    it('should hash appropriately', async () => {
+      const resolution = new Resolution();
+      expect(resolution.namehash('alice.eth')).toBe('0x787192fc5378cc32aa956ddfdedbf26b24e8d78e40109add0eea2c1a012c3dec');
+    })
+    
     it('starts with -', async () => {
       const resolution = new Resolution();
       expect(resolution.isSupportedDomain('-hello.eth')).toEqual(false);
