@@ -4,6 +4,7 @@ import {
   RegistryMap,
   ResolutionResponse,
   isNullAddress,
+  nodeHash
 } from './types';
 import { default as resolverInterface } from './cns/contract/resolver';
 import { default as cnsInterface } from './cns/contract/registry';
@@ -11,7 +12,6 @@ import { default as hash, childhash } from './cns/namehash';
 import { ResolutionError } from '.';
 import { ResolutionErrorCode } from './resolutionError';
 import Contract from './utils/contract';
-import { nodeHash } from './ens/namehash';
 
 /**
  * Class to support connection with Crypto naming service
@@ -110,7 +110,7 @@ export default class Cns extends EthereumNamingService {
    */
   private async fetchAddress(
     resolver: string,
-    tokenId: string,
+    tokenId: nodeHash,
     coinName?: string,
   ): Promise<string> {
     const resolverContract = this.buildContract(
@@ -130,7 +130,7 @@ export default class Cns extends EthereumNamingService {
    * @param domain - domain to be hashed
    * @returns CNS namehash of a domain
    */
-  namehash(domain: string): string {
+  namehash(domain: string): nodeHash {
     this.ensureSupportedDomain(domain);
     return hash(domain);
   }
@@ -146,7 +146,7 @@ export default class Cns extends EthereumNamingService {
   }
 
   /** @internal */
-  private getResolver = async (tokenId): Promise<string> => {
+  private getResolver = async (tokenId: nodeHash): Promise<string> => {
     return await this.ignoreResolutionError(
       ResolutionErrorCode.RecordNotFound,
       this.callMethod(this.registryContract, 'resolverOf', [tokenId]),
@@ -155,7 +155,7 @@ export default class Cns extends EthereumNamingService {
 
 
   /** @internal */
-  async owner(tokenId): Promise<string> {
+  async owner(tokenId: nodeHash): Promise<string> {
     return await this.callMethod(this.registryContract, 'ownerOf', [tokenId]);
   }
 

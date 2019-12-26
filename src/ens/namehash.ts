@@ -1,7 +1,6 @@
 var sha3 = require('js-sha3').keccak_256
 var uts46 = require('idna-uts46-hx')
-
-export type nodeHash = string;
+import {nodeHash} from '../types';
 
 export default function (domain: string, { parent = null, prefix = true } = {}): nodeHash {
   parent = parent || '0000000000000000000000000000000000000000000000000000000000000000';

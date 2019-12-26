@@ -1,6 +1,6 @@
 import { default as ensInterface } from './ens/contract/ens';
 import { default as resolverInterface } from './ens/contract/resolver';
-import { default as hash, nodeHash, childhash } from './ens/namehash';
+import { default as hash, childhash } from './ens/namehash';
 import { formatsByCoinType } from '@ensdomains/address-encoder';
 import {
   ResolutionResponse,
@@ -8,6 +8,7 @@ import {
   NamingServiceSource,
   Bip44Constants,
   isNullAddress,
+  nodeHash
 } from './types';
 import { EthereumNamingService } from './namingService';
 import { ResolutionError, ResolutionErrorCode } from './index';
@@ -191,7 +192,7 @@ export default class Ens extends EthereumNamingService {
    * @param domain - domain to be hashed
    * @returns ENS namehash of a domain
    */
-  namehash(domain: string): string {
+  namehash(domain: string): nodeHash {
     this.ensureSupportedDomain(domain);
     return hash(domain);
   }

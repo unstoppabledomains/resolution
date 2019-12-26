@@ -7,11 +7,11 @@ import {
   UnclaimedDomainResponse,
   ResolutionResponse,
   DefaultAPI,
-  API
+  API,
+  nodeHash
 } from './types';
 import ResolutionError, { ResolutionErrorCode } from './resolutionError';
 import NamingService from './namingService';
-import { nodeHash } from './ens/namehash';
 
 /**
  * Blockchain domain Resolution library - Resolution.

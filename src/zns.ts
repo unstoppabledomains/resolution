@@ -13,10 +13,11 @@ import {
   ZnsResolution,
   NamingServiceSource,
   isNullAddress,
+  nodeHash
 } from './types';
 import { ResolutionError, ResolutionErrorCode } from './index';
 import NamingService from './namingService';
-import { nodeHash } from './ens/namehash';
+
 
 const DefaultSource = 'https://api.zilliqa.com';
 
