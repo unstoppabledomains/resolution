@@ -148,21 +148,21 @@ export default class Zns extends NamingService {
   }
 
   async ipfsHash(domain: string): Promise<string> {
-    return await this.getRecordOtThrow(
+    return await this.getRecordOrThrow(
       domain,
       'ipfs.html.value',
     );
   }
 
   async httpUrl(domain: string): Promise<string> {
-    return await this.getRecordOtThrow(
+    return await this.getRecordOrThrow(
       domain,
       'ipfs.redirect_domain.value',
     );
   }
 
   async email(domain: string): Promise<string> {
-    return await this.getRecordOtThrow(
+    return await this.getRecordOrThrow(
       domain,
       'whois.email.value',
     );
@@ -175,7 +175,7 @@ export default class Zns extends NamingService {
    * @returns Record field associated with the domain
    */
   async record(domain: string, field: string) {
-    return await this.getRecordOtThrow(
+    return await this.getRecordOrThrow(
       domain,
       field,
     );
@@ -250,7 +250,7 @@ export default class Zns extends NamingService {
     }
   }
 
-  private async  getRecordOtThrow(domain:string, field: string): Promise<string> {
+  private async  getRecordOrThrow(domain:string, field: string): Promise<string> {
     const records = await this.records(domain);
     return this.getRecordFieldOrThrow(domain, records, field);
   }
