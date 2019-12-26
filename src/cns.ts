@@ -135,12 +135,13 @@ export default class Cns extends EthereumNamingService {
   }
 
   /** @internal */
-  private getResolver = async (tokenId): Promise<string> =>
-    await this.callMethod(this.registryContract, 'resolverOf', [tokenId]).catch((err) => {
-      if (err instanceof ResolutionError && err.code === ResolutionErrorCode.RecordNotFound)
-        return undefined;
-      throw err;
-    });
+  private getResolver = async (tokenId): Promise<string> => {
+    return await this.ignoreResolutionError(
+      ResolutionErrorCode.RecordNotFound,
+      this.callMethod(this.registryContract, 'resolverOf', [tokenId]),
+    );
+  }
+
 
   /** @internal */
   async owner(tokenId): Promise<string> {

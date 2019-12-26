@@ -154,16 +154,10 @@ export default class Ens extends EthereumNamingService {
    */
   async owner(domain: string): Promise<string | null> {
     const nodeHash = this.namehash(domain);
-    try {
-      return await this.getOwner(nodeHash);
-    } catch (err) {
-      if (
-        err instanceof ResolutionError &&
-        err.code === ResolutionErrorCode.RecordNotFound
-      )
-        return null;
-      throw err;
-    }
+    return await this.ignoreResolutionError(
+      ResolutionErrorCode.RecordNotFound,
+      this.getOwner(nodeHash),
+    ) || null;
   }
 
   /**
@@ -210,29 +204,20 @@ export default class Ens extends EthereumNamingService {
   }
 
   private async getTTL(nodeHash) {
-    try {
-      return await this.callMethod(this.registryContract, 'ttl', [nodeHash]);
-    } catch (err) {
-      if ( err instanceof ResolutionError && err.code === ResolutionErrorCode.RecordNotFound)
-        return 0;
-      throw err;
-    }
+    return await this.ignoreResolutionError(
+      ResolutionErrorCode.RecordNotFound,
+      this.callMethod(this.registryContract, 'ttl', [nodeHash]),
+    );
   }
 
   /**
    * This was done to make automated tests more configurable
    */
   private async getResolver(nodeHash) {
-    try {
-      return await this.callMethod(this.registryContract, 'resolver', [nodeHash]);
-    } catch (err) {
-      if (
-        err instanceof ResolutionError &&
-        err.code === ResolutionErrorCode.RecordNotFound
-      )
-        return undefined;
-      throw err;
-    }
+    return await this.ignoreResolutionError(
+      ResolutionErrorCode.RecordNotFound,
+      this.callMethod(this.registryContract, 'resolver', [nodeHash]),
+    );
   }
 
   /**
@@ -283,16 +268,9 @@ export default class Ens extends EthereumNamingService {
   }
 
   private async fetchAddress(resolver, nodeHash, coin) {
-    try {
-      return await this.fetchAddressOrThrow(resolver, nodeHash, EthCoinIndex)
-    } catch(error) {
-      if (!(
-        error instanceof ResolutionError &&
-        error.code === ResolutionErrorCode.RecordNotFound
-      )) {
-        throw error;
-      }
-      return null;
-    }
+    return await this.ignoreResolutionError(
+      ResolutionErrorCode.RecordNotFound,
+      this.fetchAddressOrThrow(resolver, nodeHash, EthCoinIndex),
+    ) || null;
   }
 }

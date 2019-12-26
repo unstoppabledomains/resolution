@@ -42,7 +42,26 @@ export default abstract class NamingService extends BaseConnection {
       });
     }
   }
-}
+
+  /* @internal */
+  protected async ignoreResolutionError<T>(code: ResolutionErrorCode | undefined, promise: Promise<T>): Promise<T | undefined> {
+    try {
+      return await promise;
+    } catch(error) {
+      if (this.isResolutionError(error, code)) {
+        return undefined;
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  /* @internal */
+  protected isResolutionError(error: any, code?: ResolutionErrorCode): boolean {
+    return error instanceof ResolutionError && (!code || error.code === code);
+  }
+};
+
 export abstract class EthereumNamingService extends NamingService {
   abstract registryAddress?: string;
   abstract url: string;
