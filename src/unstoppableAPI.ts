@@ -1,5 +1,4 @@
 import { toBech32Address } from './zns/utils';
-
 import { ResolutionError, ResolutionErrorCode } from './index';
 import NamingService from './namingService';
 import {
@@ -85,16 +84,40 @@ export default class Udapi extends NamingService {
     return owner.startsWith('zil1') ? owner : toBech32Address(owner);
   }
 
+  /**
+   * Resolves ipfshash from domain
+   * @param domain - domain name
+   * @throws ResolutionError.RecordNotFound if not found
+   */
   async ipfsHash(domain: string): Promise<string> {
-    return await this.findMethodOrThrow(domain).ipfsHash(domain);
+    const answer = await this.resolve(domain);
+    if (!answer || !answer.ipfs || !answer.ipfs.html)
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {recordName: 'ipfs hash', domain: domain});
+    return answer.ipfs.html;
   }
 
+  /**
+   * Resolves email from domain
+   * @param domain - domain name
+   * @throws ResolutionError.RecordNotFound if not found
+   */
   async email(domain: string): Promise<string> {
-    return await this.findMethodOrThrow(domain).email(domain);
+    const answer = await this.resolve(domain);
+    if (!answer || !answer.whois || !answer.whois.email)
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {recordName: 'email', domain: domain});
+    return answer.whois.email;
   }
 
+  /**
+   * Resolves httpUrl from domain
+   * @param domain - domain name
+   * @throws ResolutionError.RecordNotFound if not found
+   */
   async httpUrl(domain: string): Promise<string> {
-    return await this.findMethodOrThrow(domain).httpUrl(domain);
+    const answer = await this.resolve(domain);
+    if (!answer || !answer.ipfs || !answer.ipfs.redirect_domain)
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {recordName: 'httpUrl', domain: domain});
+    return answer.ipfs.redirect_domain;
   }
 
   /**

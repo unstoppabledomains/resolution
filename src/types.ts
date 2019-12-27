@@ -56,6 +56,14 @@ export interface RegistryMap {
  * @property {Object} meta - meta information about the owner of the domain
  */
 export type ResolutionResponse = {
+  ipfs?: {
+    html?: string,
+    redirect_domain ?: string
+  },
+  whois?: {
+    email?: string,
+    for_sale?: boolean
+  },
   addresses: {
     [key: string]: string;
   };
