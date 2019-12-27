@@ -187,6 +187,15 @@ export default class Resolution {
   }
 
   /**
+   * Checks weather the domain name matches the hash
+   * @param domain - domain name to check againt
+   * @param hash - hash obtained from the blockchain
+   */
+  isValidHash(domain: string, hash: string): boolean {
+    return this.namehash(domain) === hash;
+  }
+
+  /**
    * Checks if the domain is in valid format
    * @param domain - domain name to be checked
    */

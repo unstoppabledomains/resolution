@@ -2,6 +2,7 @@
 
 * Domain that starts and ends with '-' are not valid anymore in ENS.
 * Bugfix Resolution#resolve on ENS domain when resolver has no address record
+* Resolution#isValidHash method - checks wheather a domain name matches the given hash from the blockchain
 
 ## 1.0.9-1.0.10
 
