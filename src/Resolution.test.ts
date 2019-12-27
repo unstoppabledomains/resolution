@@ -59,7 +59,7 @@ describe('Resolution', () => {
     );
   });
 
-  it('checks return of ipfs hash for brad.zil', async () => {
+  it('checks return of IPFS hash for brad.zil', async () => {
     const resolution = new Resolution();
     const hash = await resolution.ipfsHash('brad.zil');
     expect(hash).toBe('QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK');

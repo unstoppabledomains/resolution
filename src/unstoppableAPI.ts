@@ -92,7 +92,7 @@ export default class Udapi extends NamingService {
   async ipfsHash(domain: string): Promise<string> {
     const answer = await this.resolve(domain);
     if (!answer || !answer.ipfs || !answer.ipfs.html)
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {recordName: 'ipfs hash', domain: domain});
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {recordName: 'IPFS hash', domain: domain});
     return answer.ipfs.html;
   }
 

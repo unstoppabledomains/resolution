@@ -32,7 +32,7 @@ describe('CNS', () => {
     expect(resolution.cns.url).toBe('https://mainnet.infura.io');
   });
 
-  it('checks the ipfs hash record', async () => {
+  it('checks the IPFS hash record', async () => {
     const resolution = new Resolution();
     const eyes = mockAsyncMethods(resolution.cns, {
       getResolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',

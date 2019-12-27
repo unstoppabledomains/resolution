@@ -311,7 +311,7 @@ describe('ZNS', () => {
       expect(email).toBe('matt+test@unstoppabledomains.com');
     });
 
-    it('should return ipfs hash from zns', async () => {
+    it('should return IPFS hash from zns', async () => {
       const resolution = new Resolution();
       const eye = mockAsyncMethod(resolution.zns, 'getContractMapValue', {
         argtypes: [],

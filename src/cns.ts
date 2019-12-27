@@ -213,20 +213,13 @@ export default class Cns extends EthereumNamingService {
     domain: string,
   ): Promise<[string, string, number, string]> {
     const tokenId = this.namehash(domain);
-    const owner: string = await this.owner(tokenId);
+    const ownerPromise = this.owner(tokenId);
     const resolver: string = await this.getResolver(tokenId);
-
     if (!resolver || isNullAddress(resolver)) {
-      if (!owner || isNullAddress(owner))
-        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-          domain,
-        });
-      throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
-        domain,
-      });
+      this.throwOwnershipError(domain, ownerPromise);
     }
     const resolverContract = this.buildContract(resolverInterface, resolver);
     const ttl = await this.getTtl(resolverContract, 'get', ['ttl', tokenId]);
-    return [tokenId, owner, parseInt(ttl) || 0, resolver];
+    return [tokenId, await ownerPromise, parseInt(ttl) || 0, resolver];
   }
 }

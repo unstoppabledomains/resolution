@@ -103,7 +103,7 @@ export default class Resolution {
   }
 
   /**
-   * Resolves the ipfs hash configured for domain records on ZNS
+   * Resolves the IPFS hash configured for domain records on ZNS
    * @param domain - domain name
    * @throws ResolutionError
    */
