@@ -1,6 +1,6 @@
 ## Unreleased
 
-## 1.0.11
+## 1.0.13
 
 * Domain that starts and ends with '-' are not valid anymore in ENS.
 * Bugfix Resolution#resolve on ENS domain when resolver has no address record
