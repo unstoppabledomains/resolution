@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 1.0.14
+
+* Bugfix #namehash for ZNS
+
 ## 1.0.13
 
 * Domain that starts and ends with '-' are not valid anymore in ENS.
