@@ -283,19 +283,19 @@ describe('ZNS', () => {
       expect(resolution.isSupportedDomain('hello.zil')).toBeFalsy();
     });
 
-    it('doesnt starts with -', async () => {
+    it('starts with -', async () => {
       const resolution = new Resolution();
-      expect(resolution.isSupportedDomain('-hello.zil')).toEqual(false);
+      expect(resolution.isSupportedDomain('-hello.zil')).toEqual(true);
     })
 
-    it('doesnt ends with -', async () => {
+    it('ends with -', async () => {
       const resolution = new Resolution();
-      expect(resolution.isSupportedDomain('hello-.zil')).toEqual(false);
+      expect(resolution.isSupportedDomain('hello-.zil')).toEqual(true);
     })
 
-    it('doesnt starts and ends with -', async () => {
+    it('starts and ends with -', async () => {
       const resolution = new Resolution();
-      expect(resolution.isSupportedDomain('-hello-.zil')).toEqual(false);
+      expect(resolution.isSupportedDomain('-hello-.zil')).toEqual(true);
     })
   });
 
