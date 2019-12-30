@@ -8,7 +8,7 @@
   },
   "types": "./build/index.d.ts",
   "scripts": {
-    "release": "yarn build && yarn test && yarn publish --patch && yarn docs && yarn docs:deploy && yarn release:tag",
+    "release": "yarn build && yarn test && git push && yarn publish --patch && yarn docs && yarn docs:deploy && yarn release:tag",
     "release:minor": "yarn build && yarn test && yarn publish --minor && yarn docs && yarn docs:deploy && yarn release:tag",
     "release:major": "yarn build && yarn test && yarn publish --major && yarn docs && yarn docs:deploy && yarn release:tag",
     "release:tag": "git push origin v$npm_package_version",
