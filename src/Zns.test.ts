@@ -28,12 +28,6 @@ describe('ZNS', () => {
     expect(result.meta.ttl).toEqual(0);
   });
 
-  it('supports root "zil" domain', async () => {
-    const resolution = new Resolution();
-    expect(resolution.namehash('zil')).toEqual(
-      '0x9915d0456b878862e822e2361da37232f626a2e47505c8795134a95d36138ed3',
-    );
-  });
   //TODO: Mock this test (live data is not correct anymore)
   // it('resolves unclaimed domain using blockchain', async () => {
   //   const resolution = new Resolution({ blockchain: true });
@@ -52,12 +46,6 @@ describe('ZNS', () => {
   //     ttl: 0,
   //   });
   // });
-
-  it("doesn't support zil domain when zns is disabled", () => {
-    const resolution = new Resolution({ blockchain: { zns: false } });
-    expect(resolution.zns).toBeUndefined();
-    expect(resolution.isSupportedDomain('hello.zil')).toBeFalsy();
-  });
 
   it('checks normalizeSource zns (boolean)', async () => {
     const resolution = new Resolution({ blockchain: { zns: true } });
@@ -288,23 +276,42 @@ describe('ZNS', () => {
   //   });
   // });
 
-  describe('.namehash', () => {
-    it('starts with -', async () => {
+  describe(".isSupportedDomain", () => {
+    it("doesn't support zil domain when zns is disabled", () => {
+      const resolution = new Resolution({ blockchain: { zns: false } });
+      expect(resolution.zns).toBeUndefined();
+      expect(resolution.isSupportedDomain('hello.zil')).toBeFalsy();
+    });
+
+    it('doesnt starts with -', async () => {
       const resolution = new Resolution();
       expect(resolution.isSupportedDomain('-hello.zil')).toEqual(false);
-      expectResolutionErrorCode(() => resolution.namehash('-hello.zil'), ResolutionErrorCode.UnsupportedDomain);
     })
 
-    it('ends with -', async () => {
+    it('doesnt ends with -', async () => {
       const resolution = new Resolution();
       expect(resolution.isSupportedDomain('hello-.zil')).toEqual(false);
-      expectResolutionErrorCode(() => resolution.namehash('hello-.zil'), ResolutionErrorCode.UnsupportedDomain);
     })
 
-    it('starts and ends with -', async () => {
+    it('doesnt starts and ends with -', async () => {
       const resolution = new Resolution();
       expect(resolution.isSupportedDomain('-hello-.zil')).toEqual(false);
-      expectResolutionErrorCode(() => resolution.namehash('-hello-.zil'), ResolutionErrorCode.UnsupportedDomain);
     })
+  });
+
+  describe('.namehash', () => {
+    it('supports standard domain', async () => {
+      const resolution = new Resolution();
+      expect(resolution.namehash('ny.zil')).toEqual(
+        '0xd45bcb80c1ca68da09082d7618280839a1102446b639b294d07e9a1692ec241f',
+      );
+    });
+
+    it('supports root "zil" domain', async () => {
+      const resolution = new Resolution();
+      expect(resolution.namehash('zil')).toEqual(
+        '0x9915d0456b878862e822e2361da37232f626a2e47505c8795134a95d36138ed3',
+      );
+    });
   });
 });
