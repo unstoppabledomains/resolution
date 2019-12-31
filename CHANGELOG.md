@@ -59,7 +59,7 @@
 ## 0.3.3 
 
 * NamingService#record -> gets an arbitrary record from the corresponding naming service
-* Resolution#ipfsHash -> gets ipfs hash for a specific supported domain
+* Resolution#ipfsHash -> gets IPFS hash for a specific supported domain
 * Resolution#email -> gets ipfs email field of whois object for a specific supported domain
 * Resolution#ipfsRedirect -> gets ipfs redirect url record for a specific supported domain
 

@@ -289,6 +289,7 @@ describe('ZNS', () => {
       expect(resolution.isSupportedDomain('-hello.zil')).toEqual(true);
     })
 
+<<<<<<< HEAD
     it('ends with -',  () => {
       const resolution = new Resolution();
       expect(resolution.isSupportedDomain('hello-.zil')).toEqual(true);
@@ -345,4 +346,76 @@ describe('ZNS', () => {
         });
     });
   })
+=======
+    describe('.namehash', () => {
+      it('supports standard domain', async () => {
+        const resolution = new Resolution();
+        expect(resolution.namehash('ny.zil')).toEqual(
+          '0xd45bcb80c1ca68da09082d7618280839a1102446b639b294d07e9a1692ec241f',
+        );
+      });
+
+      it('supports root "zil" domain', async () => {
+        const resolution = new Resolution();
+        expect(resolution.namehash('zil')).toEqual(
+          '0x9915d0456b878862e822e2361da37232f626a2e47505c8795134a95d36138ed3',
+        );
+      });
+
+      it("raises ResoltuionError when domain is not supported", async () => {
+        const resolution = new Resolution();
+        expectResolutionErrorCode(() => resolution.namehash('hello.world'), ResolutionErrorCode.UnsupportedDomain);
+      });
+    });
+    
+    describe('.record-data', () => {
+      it('should return IPFS hash from zns', async () => {
+        const resolution = new Resolution();
+        const eye = mockAsyncMethod(resolution.zns, 'getContractMapValue', {
+          argtypes: [],
+          arguments: [
+            '0x4e984952e867ff132cd4b70cd3f313d68c511b76',
+            '0xa9b1d3647e4deb9ce4e601c2c9e0a2fdf2d7415a',
+          ],
+          constructor: 'Record',
+        });
+        const secondEye = mockAsyncMethod(resolution.zns, 'getResolverRecords', {
+          'ipfs.html.hash': 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
+          'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu',
+          'ipfs.redirect_domain.value': 'www.unstoppabledomains.com',
+          'whois.email.value': 'matt+test@unstoppabledomains.com',
+          'whois.for_sale.value': 'true',
+        });
+        const hash = await resolution.ipfsHash('ergergergerg.zil');
+        expectSpyToBeCalled([eye, secondEye]);
+        expect(hash).toStrictEqual(
+          'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu',
+        );
+      });
+  
+      it('should return httpUrl associated with the domain', async () => {
+        const resolution = new Resolution();
+        const eye = mockAsyncMethod(resolution.zns, 'getContractMapValue', {
+          argtypes: [],
+          arguments: [
+            '0x4e984952e867ff132cd4b70cd3f313d68c511b76',
+            '0xa9b1d3647e4deb9ce4e601c2c9e0a2fdf2d7415a',
+          ],
+          constructor: 'Record',
+        });
+        const secondEye = mockAsyncMethod(resolution.zns, 'getResolverRecords', {
+          'ipfs.html.hash': 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
+          'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu',
+          'ipfs.redirect_domain.value': 'www.unstoppabledomains.com',
+          'whois.email.value': 'matt+test@unstoppabledomains.com',
+          'whois.for_sale.value': 'true',
+        });
+        const httpUrl = await resolution.httpUrl('ergergergerg.zil');
+        expectSpyToBeCalled([eye, secondEye]);
+        expect(httpUrl).toBe('www.unstoppabledomains.com');
+      });
+    });
+  });
+  
+>>>>>>> master
 });

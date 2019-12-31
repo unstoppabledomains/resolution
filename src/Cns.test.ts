@@ -32,7 +32,7 @@ describe('CNS', () => {
     expect(resolution.cns.url).toBe('https://mainnet.infura.io');
   });
 
-  it('checks the ipfs hash record', async () => {
+  it('checks the IPFS hash record', async () => {
     const resolution = new Resolution();
     const eyes = mockAsyncMethods(resolution.cns, {
       getResolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
@@ -173,52 +173,78 @@ describe('CNS', () => {
         expect(cns.isSupportedDomain('crypto')).toEqual(true);
         expect(cns.namehash('crypto')).toEqual('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
       });
-  
+
       it('starts with -', async () => {
         const cns = new Resolution().cns;
         expect(cns.isSupportedDomain('-hello.crypto')).toEqual(true);
         expect(cns.namehash('-hello.crypto')).toBe('0xc4ad028bcae9b201104e15f872d3e85b182939b06829f75a128275177f2ff9b2');
       })
-  
+
       it('ends with -', async () => {
         const cns = new Resolution().cns;
         expect(cns.isSupportedDomain('hello-.crypto')).toEqual(true);
         expect(cns.namehash('hello-.crypto')).toBe('0x82eaa6ef14e438940bfd7747e0e4c4fec42af20cee28ddd0a7d79f52b1c59b72');
       })
-  
+
       it('starts and ends with -', async () => {
         const cns = new Resolution().cns;
         expect(cns.isSupportedDomain('-hello-.crypto')).toEqual(true);
         expect(cns.namehash('-hello-.crypto')).toBe('0x90cc1963ff09ce95ee2dbb3830df4f2115da9756e087a50283b3e65f6ffe2a4e');
       })
-    });
 
-    describe('.childhash', () => {
-     
-        
-      it('checks root crypto domain', () => {
-        const cns = new Resolution().cns;
-        const rootHash ='0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f';
-        expect(cns.namehash('crypto')).toBe(rootHash);
-        expect(cns.childhash('0000000000000000000000000000000000000000000000000000000000000000', 'crypto')).toBe(rootHash);
-      });
+      describe('.childhash', () => {
+        it('checks root crypto domain', () => {
+          const cns = new Resolution().cns;
+          const rootHash = '0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f';
+          expect(cns.namehash('crypto')).toBe(rootHash);
+          expect(cns.childhash('0000000000000000000000000000000000000000000000000000000000000000', 'crypto')).toBe(rootHash);
+        });
 
-      it('checks the childhash functionality', () => {
-        const cns = new Resolution().cns;
-        const domain = 'hello.world.crypto';
-        const namehash = cns.namehash(domain);
-        const childhash = cns.childhash(cns.namehash("world.crypto"), "hello");
-        expect(namehash).toBe(childhash);
-      });
+        it('checks the childhash functionality', () => {
+          const cns = new Resolution().cns;
+          const domain = 'hello.world.crypto';
+          const namehash = cns.namehash(domain);
+          const childhash = cns.childhash(cns.namehash("world.crypto"), "hello");
+          expect(namehash).toBe(childhash);
+        });
 
-      it('checks childhash multi level domain', () => {
-        const cns = new Resolution().cns;
-        const domain = 'ich.ni.san.yon.hello.world.crypto';
-        const namehash = cns.namehash(domain);
-        const childhash = cns.childhash(cns.namehash("ni.san.yon.hello.world.crypto"), "ich");
-        expect(childhash).toBe(namehash);
+        it('checks childhash multi level domain', () => {
+          const cns = new Resolution().cns;
+          const domain = 'ich.ni.san.yon.hello.world.crypto';
+          const namehash = cns.namehash(domain);
+          const childhash = cns.childhash(cns.namehash("ni.san.yon.hello.world.crypto"), "ich");
+          expect(childhash).toBe(namehash);
+        });
       });
     });
   });
 
+  
+  describe('meta data', () => {
+    const domain = 'reseller-test-ryan019.crypto';
+    it('should resolve with ipfs stored on cns', async () => {
+      const resolution = new Resolution();
+      const ipfsHash = await resolution.ipfsHash(domain);
+      expect(ipfsHash).toBe(
+        '0x033dc48b5db4ca62861643e9d2c411d9eb6d1975@gmail.com',
+      );
+    });
+
+    it('should resolve with email stored on cns', async () => {
+      const resolution = new Resolution();
+      const email = await resolution.email(domain);
+      expect(email).toBe(
+        '0x033dc48b5db4ca62861643e9d2c411d9eb6d1975@gmail.com',
+      );
+    });
+
+    it('should resolve with httpUrl stored on cns', async () => {
+      const resolution = new Resolution();
+      const httpUrl = await resolution.httpUrl(domain);
+      expect(httpUrl).toBe(
+        '0x033dc48b5db4ca62861643e9d2c411d9eb6d1975@gmail.com',
+      );
+      expect(resolution.namehash('crypto')).toEqual('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
+    });
+  });
 });
