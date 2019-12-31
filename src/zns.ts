@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import {
   fromBech32Address,
   toBech32Address,
@@ -176,10 +177,8 @@ export default class Zns extends NamingService {
    * Checks if domain is supported by zns
    */
   isSupportedDomain(domain: string): boolean {
-    return (
-      (domain.indexOf('.') > 0 && /^[a-zA-Z0-9].{1,}[^-]\.(zil)$/.test(domain)) ||
-      domain === 'zil'
-    );
+    const tokens = domain.split(".");
+    return tokens.length && _.last(tokens) === "zil";
   }
 
   /**
