@@ -141,8 +141,8 @@ export default class Cns extends EthereumNamingService {
    * @param parent - nodehash of a parent
    * @param label - child 
    */
-  childhash(parent: nodeHash, label: string): nodeHash {
-    return childhash(parent, label);
+  childhash(parent: nodeHash, label: string, options: {prefix: boolean} = {prefix: true}): nodeHash {
+    return childhash(parent, label, options);
   }
 
   /** @internal */

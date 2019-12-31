@@ -19,6 +19,12 @@ export interface SourceDefinition {
  */
 export type NamingServiceSource = string | boolean | SourceDefinition;
 
+export enum NamingServiceName {
+  ENS = "ENS",
+  CNS = "CNS",
+  ZNS = "ZNS"
+};
+
 /**
  * EnsNetworkIdMap
  * type represending the map between network number and network name

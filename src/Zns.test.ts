@@ -6,6 +6,7 @@ import {
   mockAPICalls,
   expectResolutionErrorCode,
 } from './utils/testHelpers';
+import { NamingServiceName } from './types';
 
 beforeEach(() => {
   jest.restoreAllMocks();
@@ -283,40 +284,65 @@ describe('ZNS', () => {
       expect(resolution.isSupportedDomain('hello.zil')).toBeFalsy();
     });
 
-    it('starts with -', async () => {
+    it('starts with -', () => {
       const resolution = new Resolution();
       expect(resolution.isSupportedDomain('-hello.zil')).toEqual(true);
     })
 
-    it('ends with -', async () => {
+    it('ends with -',  () => {
       const resolution = new Resolution();
       expect(resolution.isSupportedDomain('hello-.zil')).toEqual(true);
     })
 
-    it('starts and ends with -', async () => {
+    it('starts and ends with -', () => {
       const resolution = new Resolution();
       expect(resolution.isSupportedDomain('-hello-.zil')).toEqual(true);
     })
   });
-
-  describe('.namehash', () => {
-    it('supports standard domain', async () => {
-      const resolution = new Resolution();
-      expect(resolution.namehash('ny.zil')).toEqual(
-        '0xd45bcb80c1ca68da09082d7618280839a1102446b639b294d07e9a1692ec241f',
-      );
+  describe('.Hashing', () => {
+    describe('.namehash', () => {
+      it('supports standard domain', () => {
+        const resolution = new Resolution();
+        expect(resolution.zns.namehash('ny.zil')).toEqual(
+          '0xd45bcb80c1ca68da09082d7618280839a1102446b639b294d07e9a1692ec241f',
+        );
+      });
+  
+      it('supports root "zil" domain', () => {
+        const resolution = new Resolution();
+        expect(resolution.zns.namehash('zil')).toEqual(
+          '0x9915d0456b878862e822e2361da37232f626a2e47505c8795134a95d36138ed3',
+        );
+      });
+  
+      it("raises ResoltuionError when domain is not supported",  () => {
+        const resolution = new Resolution();
+        expectResolutionErrorCode(() => resolution.zns.namehash('hello.world'), ResolutionErrorCode.UnsupportedDomain);
+      });
     });
+    describe('.childhash', () => {
+        it ('checks childhash', () => {
+          const zns = new Resolution().zns;
+          const domain = 'hello.world.zil';
+          const namehash = zns.namehash(domain);
+          const childhash = zns.childhash(zns.namehash("world.zil"), "hello");
+          expect(namehash).toBe(childhash);
+        });
 
-    it('supports root "zil" domain', async () => {
-      const resolution = new Resolution();
-      expect(resolution.namehash('zil')).toEqual(
-        '0x9915d0456b878862e822e2361da37232f626a2e47505c8795134a95d36138ed3',
-      );
-    });
+        it('checks root "zil domain', () => {
+          const zns = new Resolution().zns;
+          const rootHash ='0x9915d0456b878862e822e2361da37232f626a2e47505c8795134a95d36138ed3';
+          expect(zns.namehash('zil')).toBe(rootHash);
+          expect(zns.childhash('0000000000000000000000000000000000000000000000000000000000000000', 'zil')).toBe(rootHash);
+        });
 
-    it("raises ResoltuionError when domain is not supported", async () => {
-      const resolution = new Resolution();
-      expectResolutionErrorCode(() => resolution.namehash('hello.world'), ResolutionErrorCode.UnsupportedDomain);
+        it('checks childhash multi level domain', () => {
+          const zns = new Resolution().zns;
+          const domain = 'ich.ni.san.yon.hello.world.zil';
+          const namehash = zns.namehash(domain);
+          const childhash = zns.childhash(zns.namehash("ni.san.yon.hello.world.zil"), "ich");
+          expect(childhash).toBe(namehash);
+        });
     });
-  });
+  })
 });

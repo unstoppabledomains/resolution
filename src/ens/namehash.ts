@@ -10,13 +10,14 @@ export default function (domain: string, { parent = null, prefix = true } = {}):
       .reverse()
       .filter(label => label)
   )
-    .reduce((parent, label) => childhash(parent, label))
+    .reduce((parent, label) => childhash(parent, label, { prefix: false }))
   return prefix ? '0x' + assembledHash : assembledHash;
 }
 
-export function childhash(parent: nodeHash, label: string): nodeHash {
+export function childhash(parent: nodeHash, label: string, options: {prefix: boolean} = {prefix: true}): nodeHash {
+  parent = parent.replace(/^0x/, "");
   const childHash = sha3(label);
-  return sha3(Buffer.from(parent + childHash, 'hex'));
+  return (options.prefix ? '0x' : '' ) + sha3(Buffer.from(parent + childHash, 'hex'));
 }
 
 export function normalize(name: string): string {
