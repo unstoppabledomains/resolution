@@ -28,12 +28,6 @@ describe('ZNS', () => {
     expect(result.meta.ttl).toEqual(0);
   });
 
-  it('supports root "zil" domain', async () => {
-    const resolution = new Resolution();
-    expect(resolution.namehash('zil')).toEqual(
-      '0x9915d0456b878862e822e2361da37232f626a2e47505c8795134a95d36138ed3',
-    );
-  });
   //TODO: Mock this test (live data is not correct anymore)
   // it('resolves unclaimed domain using blockchain', async () => {
   //   const resolution = new Resolution({ blockchain: true });
@@ -52,12 +46,6 @@ describe('ZNS', () => {
   //     ttl: 0,
   //   });
   // });
-
-  it("doesn't support zil domain when zns is disabled", () => {
-    const resolution = new Resolution({ blockchain: { zns: false } });
-    expect(resolution.zns).toBeUndefined();
-    expect(resolution.isSupportedDomain('hello.zil')).toBeFalsy();
-  });
 
   it('checks normalizeSource zns (boolean)', async () => {
     const resolution = new Resolution({ blockchain: { zns: true } });
@@ -288,28 +276,17 @@ describe('ZNS', () => {
   //   });
   // });
 
-  describe('Meta data', () => {
-    it('should return owner email from zns', async () => {
-      const resolution = new Resolution();
-      const eye = mockAsyncMethod(resolution.zns, 'getContractMapValue', {
-        argtypes: [],
-        arguments: [
-          '0x4e984952e867ff132cd4b70cd3f313d68c511b76',
-          '0xa9b1d3647e4deb9ce4e601c2c9e0a2fdf2d7415a',
-        ],
-        constructor: 'Record',
-      });
-      const secondEye = mockAsyncMethod(resolution.zns, 'getResolverRecords', {
-        'ipfs.html.hash': 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
-        'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu',
-        'ipfs.redirect_domain.value': 'www.unstoppabledomains.com',
-        'whois.email.value': 'matt+test@unstoppabledomains.com',
-        'whois.for_sale.value': 'true',
-      });
-      const email = await resolution.email('ergergergerg.zil');
-      expectSpyToBeCalled([eye, secondEye]);
-      expect(email).toBe('matt+test@unstoppabledomains.com');
+  describe(".isSupportedDomain", () => {
+    it("doesn't support zil domain when zns is disabled", () => {
+      const resolution = new Resolution({ blockchain: { zns: false } });
+      expect(resolution.zns).toBeUndefined();
+      expect(resolution.isSupportedDomain('hello.zil')).toBeFalsy();
     });
+
+    it('starts with -', async () => {
+      const resolution = new Resolution();
+      expect(resolution.isSupportedDomain('-hello.zil')).toEqual(true);
+    })
 
     it('should return IPFS hash from zns', async () => {
       const resolution = new Resolution();
@@ -356,24 +333,26 @@ describe('ZNS', () => {
       expectSpyToBeCalled([eye, secondEye]);
       expect(httpUrl).toBe('www.unstoppabledomains.com');
     });
+
     describe('.namehash', () => {
-      it('starts with -', async () => {
+      it('supports standard domain', async () => {
         const resolution = new Resolution();
-        expect(resolution.isSupportedDomain('-hello.zil')).toEqual(false);
-        expectResolutionErrorCode(() => resolution.namehash('-hello.zil'), ResolutionErrorCode.UnsupportedDomain);
-      })
+        expect(resolution.namehash('ny.zil')).toEqual(
+          '0xd45bcb80c1ca68da09082d7618280839a1102446b639b294d07e9a1692ec241f',
+        );
+      });
 
-      it('ends with -', async () => {
+      it('supports root "zil" domain', async () => {
         const resolution = new Resolution();
-        expect(resolution.isSupportedDomain('hello-.zil')).toEqual(false);
-        expectResolutionErrorCode(() => resolution.namehash('hello-.zil'), ResolutionErrorCode.UnsupportedDomain);
-      })
+        expect(resolution.namehash('zil')).toEqual(
+          '0x9915d0456b878862e822e2361da37232f626a2e47505c8795134a95d36138ed3',
+        );
+      });
 
-      it('starts and ends with -', async () => {
+      it("raises ResoltuionError when domain is not supported", async () => {
         const resolution = new Resolution();
-        expect(resolution.isSupportedDomain('-hello-.zil')).toEqual(false);
-        expectResolutionErrorCode(() => resolution.namehash('-hello-.zil'), ResolutionErrorCode.UnsupportedDomain);
-      })
+        expectResolutionErrorCode(() => resolution.namehash('hello.world'), ResolutionErrorCode.UnsupportedDomain);
+      });
     });
   });
 });

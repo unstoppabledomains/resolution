@@ -155,5 +155,15 @@ describe('Resolution', () => {
       const serviceName = resolution.serviceName('domain.crypto');
       expect(serviceName).toBe('CNS');
     });
+  })
+  describe("isValidHash", () => {
+    it("works", async () => {
+      const resolution = new Resolution();
+      const domain = "hello.world.zil"
+      const hash = resolution.namehash(domain);
+      const invalidHash = resolution.namehash("world.zil");
+      expect(resolution.isValidHash(domain, hash)).toEqual(true);
+      expect(resolution.isValidHash(domain, invalidHash)).toEqual(false);
+    });
   });
 });
