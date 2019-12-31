@@ -60,7 +60,7 @@ export default class Zns extends NamingService {
   constructor(source: string | boolean | SourceDefinition = true) {
     super();
     source = this.normalizeSource(source);
-    this.name = "ZNS";
+    this.name = 'ZNS';
     this.network = source.network as string;
     this.url = source.url;
     if (!this.network) {
@@ -148,6 +148,27 @@ export default class Zns extends NamingService {
     return this.structureResolverRecords(await this.records(domain));
   }
 
+  async ipfsHash(domain: string): Promise<string> {
+    return await this.getRecordOrThrow(
+      domain,
+      'ipfs.html.value',
+    );
+  }
+
+  async httpUrl(domain: string): Promise<string> {
+    return await this.getRecordOrThrow(
+      domain,
+      'ipfs.redirect_domain.value',
+    );
+  }
+
+  async email(domain: string): Promise<string> {
+    return await this.getRecordOrThrow(
+      domain,
+      'whois.email.value',
+    );
+  }
+
   /**
    * Resolves a specific field from domain's record
    * @param domain - domain name
@@ -155,9 +176,8 @@ export default class Zns extends NamingService {
    * @returns Record field associated with the domain
    */
   async record(domain: string, field: string) {
-    return this.getRecordFieldOrThrow(
+    return await this.getRecordOrThrow(
       domain,
-      await this.records(domain),
       field,
     );
   }
@@ -226,6 +246,11 @@ export default class Zns extends NamingService {
         return source;
       }
     }
+  }
+
+  private async  getRecordOrThrow(domain:string, field: string): Promise<string> {
+    const records = await this.records(domain);
+    return this.getRecordFieldOrThrow(domain, records, field);
   }
 
   private getRecordFieldOrThrow(

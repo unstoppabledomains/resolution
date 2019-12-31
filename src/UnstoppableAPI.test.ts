@@ -49,4 +49,24 @@ describe('Unstoppable API', () => {
       'zil1ye72zl5t8wl5n3f2fsa5w0x7hja0jqj7mhct23',
     );
   });
+
+  it('should return a valid ipfsHash from API', async () => {
+    const resolution = new Resolution({blockchain: false});
+    const ipfsHash = await resolution.ipfsHash('brad.zil');
+    expect(ipfsHash).toBe('QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK');
+  });
+
+  it('should return a valid email from API', async () => {
+    const resolution = new Resolution({blockchain: false});
+    const email = await resolution.email('ergergergerg.zil');
+    expect(email).toBe('matt+test@unstoppabledomains.com');
+  });
+
+  it('should return a valid httpUrl from API', async () => {
+    const resolution = new Resolution({blockchain: false});
+    const httpUrl = await resolution.httpUrl('brad.zil');
+    expect(httpUrl).toBe('www.unstoppabledomains.com');
+  });
+
+
 });

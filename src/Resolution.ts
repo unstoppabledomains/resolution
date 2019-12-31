@@ -7,7 +7,7 @@ import {
   UnclaimedDomainResponse,
   ResolutionResponse,
   DefaultAPI,
-  API
+  API,
 } from './types';
 import ResolutionError, { ResolutionErrorCode } from './resolutionError';
 import NamingService from './namingService';
@@ -36,7 +36,10 @@ export default class Resolution {
    * Resolution constructor
    * @property blockchain - main configuration object
    */
-  constructor({ blockchain = true, api = DefaultAPI }: { blockchain?: Blockchain, api?: API } = {}) {
+  constructor({
+    blockchain = true,
+    api = DefaultAPI,
+  }: { blockchain?: Blockchain; api?: API } = {}) {
     this.blockchain = !!blockchain;
     if (blockchain) {
       if (blockchain == true) {
@@ -100,20 +103,25 @@ export default class Resolution {
   }
 
   /**
-   * Resolves the ipfs hash configured for domain records on ZNS
+   * Resolves the IPFS hash configured for domain records on ZNS
    * @param domain - domain name
    * @throws ResolutionError
-   * @returns A Promise that resolves in ipfsHash
    */
   async ipfsHash(domain: string): Promise<string> {
-    return await this.getNamingMethodOrThrow(domain).record(
-      domain,
-      'ipfs.html.value',
-    );
+    return await this.getNamingMethodOrThrow(domain).ipfsHash(domain);
+  }
+
+  /**
+   * Resolves the httpUrl attached to domain
+   * @param domain - domain name
+   */
+  async httpUrl(domain: string): Promise<string> {
+    return await this.getNamingMethodOrThrow(domain).httpUrl(domain);
   }
 
   /**
    * Resolves the ipfs redirect url for a supported domain records
+   * @deprecated - use Resolution#httpUrl instead
    * @param domain - domain name
    * @throws ResolutionError
    * @returns A Promise that resolves in redirect url
@@ -132,10 +140,7 @@ export default class Resolution {
    * @returns A Promise that resolves in an email address configured for this domain whois
    */
   async email(domain: string): Promise<string> {
-    return await this.getNamingMethodOrThrow(domain).record(
-      domain,
-      'whois.email.value',
-    );
+    return await this.getNamingMethodOrThrow(domain).email(domain);
   }
 
   /**

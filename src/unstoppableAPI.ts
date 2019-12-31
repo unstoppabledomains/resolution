@@ -1,5 +1,4 @@
 import { toBech32Address } from './zns/utils';
-
 import { ResolutionError, ResolutionErrorCode } from './index';
 import NamingService from './namingService';
 import {
@@ -26,7 +25,7 @@ export default class Udapi extends NamingService {
     const DefaultUserAgent = this.isNode()
       ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'
       : navigator.userAgent;
-    const version = "1.0.9";
+    const version = '1.0.9';
     const CustomUserAgent = `${DefaultUserAgent} Resolution/${version}`;
     this.headers = { 'X-user-agent': CustomUserAgent };
   }
@@ -86,6 +85,42 @@ export default class Udapi extends NamingService {
   }
 
   /**
+   * Resolves ipfshash from domain
+   * @param domain - domain name
+   * @throws ResolutionError.RecordNotFound if not found
+   */
+  async ipfsHash(domain: string): Promise<string> {
+    const answer = await this.resolve(domain);
+    if (!answer || !answer.ipfs || !answer.ipfs.html)
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {recordName: 'IPFS hash', domain: domain});
+    return answer.ipfs.html;
+  }
+
+  /**
+   * Resolves email from domain
+   * @param domain - domain name
+   * @throws ResolutionError.RecordNotFound if not found
+   */
+  async email(domain: string): Promise<string> {
+    const answer = await this.resolve(domain);
+    if (!answer || !answer.whois || !answer.whois.email)
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {recordName: 'email', domain: domain});
+    return answer.whois.email;
+  }
+
+  /**
+   * Resolves httpUrl from domain
+   * @param domain - domain name
+   * @throws ResolutionError.RecordNotFound if not found
+   */
+  async httpUrl(domain: string): Promise<string> {
+    const answer = await this.resolve(domain);
+    if (!answer || !answer.ipfs || !answer.ipfs.redirect_domain)
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {recordName: 'httpUrl', domain: domain});
+    return answer.ipfs.redirect_domain;
+  }
+
+  /**
    * Resolves the domain name via UD API mirror
    * @param domain - domain name to be resolved
    */
@@ -114,7 +149,9 @@ export default class Udapi extends NamingService {
   }
 
   private findMethod(domain: string) {
-    return [new Zns(), new Ens(), new Cns()].find(m => m.isSupportedDomain(domain));
+    return [new Zns(), new Ens(), new Cns()].find(m =>
+      m.isSupportedDomain(domain),
+    );
   }
 
   private findMethodOrThrow(domain: string) {

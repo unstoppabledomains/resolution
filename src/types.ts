@@ -56,6 +56,14 @@ export interface RegistryMap {
  * @property {Object} meta - meta information about the owner of the domain
  */
 export type ResolutionResponse = {
+  ipfs?: {
+    html?: string,
+    redirect_domain ?: string
+  },
+  whois?: {
+    email?: string,
+    for_sale?: boolean
+  },
   addresses: {
     [key: string]: string;
   };
@@ -74,7 +82,7 @@ export type NetworkIdMap = {
   [key: number]: string;
 };
 
-export const UDApiDefaultUrl = "https://unstoppabledomains.com/api/v1";
+export const UDApiDefaultUrl = 'https://unstoppabledomains.com/api/v1';
 
 /**
  * Main configurational object for Resolution instance
@@ -88,11 +96,11 @@ export type Blockchain =
     };
 
 export type API = {
-  url: string
-}
+  url: string;
+};
 
-export const DefaultAPI:API = {
-  url: UDApiDefaultUrl
+export const DefaultAPI: API = {
+  url: UDApiDefaultUrl,
 };
 
 /**
@@ -110,10 +118,10 @@ export type owner = string;
 export type ttl = string;
 
 export enum NullAddress {
- '0x',
- '0x0000000000000000000000000000000000000000',
- '0x0000000000000000000000000000000000000000000000000000000000000000'
-};
+  '0x',
+  '0x0000000000000000000000000000000000000000',
+  '0x0000000000000000000000000000000000000000000000000000000000000000',
+}
 
 export function isNullAddress(key: string): boolean {
   return Object.values(NullAddress).includes(key);

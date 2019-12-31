@@ -4,6 +4,7 @@ import {
   NetworkIdMap,
   BlockhanNetworkUrlMap,
   ResolutionResponse,
+  isNullAddress,
 } from './types';
 import { hash } from 'eth-ens-namehash';
 import ResolutionError, { ResolutionErrorCode } from './resolutionError';
@@ -26,6 +27,9 @@ export default abstract class NamingService extends BaseConnection {
   abstract owner(domain: string): Promise<string>;
   abstract record(domain: string, key: string): Promise<string>;
   abstract resolve(domain: string): Promise<ResolutionResponse>;
+  abstract ipfsHash(domain: string): Promise<string>;
+  abstract email(domain: string): Promise<string>;
+  abstract httpUrl(domain: string): Promise<string>;
 
   serviceName(domain: string): string {
     return this.name;
@@ -190,6 +194,17 @@ export abstract class EthereumNamingService extends NamingService {
   }
 
   protected buildContract(abi, address) {
-    return new Contract(this.name, this.url, abi, address)
+    return new Contract(this.name, this.url, abi, address);
+  }
+
+  protected async throwOwnershipError(domain, ownerPromise?: Promise<string>) {
+    const owner = ownerPromise ? await ownerPromise : await this.owner(domain);
+    if (!owner || isNullAddress(owner))
+      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+        domain,
+      });
+    throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
+      domain,
+    });
   }
 }

@@ -65,7 +65,10 @@ export default class Cns extends EthereumNamingService {
    * @returns
    */
   isSupportedDomain(domain: string): boolean {
-    return domain === "crypto" || (domain.indexOf('.') > 0 && /^.{1,}\.(crypto)$/.test(domain));
+    return (
+      domain === 'crypto' ||
+      (domain.indexOf('.') > 0 && /^.{1,}\.(crypto)$/.test(domain))
+    );
   }
 
   /**
@@ -112,10 +115,7 @@ export default class Cns extends EthereumNamingService {
     tokenId: string,
     coinName?: string,
   ): Promise<string> {
-    const resolverContract = this.buildContract(
-      resolverInterface,
-      resolver,
-    );
+    const resolverContract = this.buildContract(resolverInterface, resolver);
     const addrKey = `crypto.${coinName.toUpperCase()}.address`;
     const addr: string = await this.getRecord(resolverContract, 'get', [
       addrKey,
@@ -148,23 +148,43 @@ export default class Cns extends EthereumNamingService {
     return await this.callMethod(this.registryContract, 'ownerOf', [tokenId]);
   }
 
+  /**
+   * resolves an ipfsHash stored on domain
+   * @param domain - domain name
+   */
+  async ipfsHash(domain: string): Promise<string> {
+    return await this.record(domain, 'ipfs.html.value');
+  }
+  /**
+   * resolves an email address stored on domain
+   * @param domain - domain name
+   */
+
+  async email(domain: string): Promise<string> {
+    return await this.record(domain, 'whois.email.value');
+  }
+
+  /**
+   * resolves an httpUrl stored on domain
+   * @param domain - domain name
+   */
+  async httpUrl(domain: string): Promise<string> {
+    return await this.record(domain, 'ipfs.redirect_domain.value');
+  }
+
   private getTtl = async (
     contract: Contract,
     methodname: string,
     params: any[],
-  ): Promise<string> =>
-    await this.callMethod(contract, methodname, params);
+  ): Promise<string> => await this.callMethod(contract, methodname, params);
 
   /** @internal */
   async record(domain: string, key: string): Promise<string> {
     const tokenId = this.namehash(domain);
     const resolver: string = await this.getResolver(tokenId);
-    const resolverContract = this.buildContract(
-      resolverInterface,
-      resolver,
-    );
+    const resolverContract = this.buildContract(resolverInterface, resolver);
     const record: string = await this.getRecord(resolverContract, 'get', [
-      key.replace('.value', ''),
+      key,
       tokenId,
     ]);
     // Wrong Record checks
@@ -193,23 +213,13 @@ export default class Cns extends EthereumNamingService {
     domain: string,
   ): Promise<[string, string, number, string]> {
     const tokenId = this.namehash(domain);
-    const owner: string = await this.owner(tokenId);
+    const ownerPromise = this.owner(tokenId);
     const resolver: string = await this.getResolver(tokenId);
-
     if (!resolver || isNullAddress(resolver)) {
-      if (!owner || isNullAddress(owner))
-        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-          domain,
-        });
-      throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
-        domain,
-      });
+      this.throwOwnershipError(domain, ownerPromise);
     }
-    const resolverContract = this.buildContract(
-      resolverInterface,
-      resolver,
-    );
+    const resolverContract = this.buildContract(resolverInterface, resolver);
     const ttl = await this.getTtl(resolverContract, 'get', ['ttl', tokenId]);
-    return [tokenId, owner, parseInt(ttl) || 0, resolver];
+    return [tokenId, await ownerPromise, parseInt(ttl) || 0, resolver];
   }
 }

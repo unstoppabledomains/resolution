@@ -108,7 +108,11 @@ describe('ENS', () => {
       blockchain: { ens: MainnetUrl },
     });
 
-    const ownerEye = mockAsyncMethod(resolution.ens, 'getOwner', NullAddress[1]);
+    const ownerEye = mockAsyncMethod(
+      resolution.ens,
+      'getOwner',
+      NullAddress[1],
+    );
     const result = await resolution.address('something.luxe', 'ETH');
     expectSpyToBeCalled([ownerEye]);
     expect(result).toEqual(null);
@@ -391,51 +395,76 @@ describe('ENS', () => {
     );
   });
 
-  describe(".resolve", () => {
+  describe('.resolve', () => {
     it('passes without any errors', async () => {
       const resolution = new Resolution();
       const eyes = mockAsyncMethods(resolution.ens, {
         getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
         getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
         getTTL: 0,
-        callMethod:
-        '0x714ef33943d925731FBB89C99aF5780D888bD106',
+        callMethod: '0x714ef33943d925731FBB89C99aF5780D888bD106',
       });
       const resolutionObj = await resolution.resolve('matthewgould.eth');
       expectSpyToBeCalled(eyes);
       expect(resolutionObj).toStrictEqual({
         addresses: { ETH: '0x714ef33943d925731FBB89C99aF5780D888bD106' },
-        meta:
-        {
+        meta: {
           owner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
           type: 'ENS',
-          ttl: 0
-        }
+          ttl: 0,
+        },
       });
     });
 
-    it("returns undefined address", async () => {
+    it('returns undefined address', async () => {
       const resolution = new Resolution();
       const eyes = mockAsyncMethods(resolution.ens, {
         getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
         getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
         getTTL: 0,
-        fetchAddressOrThrow: new ResolutionError(ResolutionErrorCode.RecordNotFound)
+        fetchAddressOrThrow: new ResolutionError(
+          ResolutionErrorCode.RecordNotFound,
+        ),
       });
       const result = await resolution.resolve('matthewgould.eth');
       expectSpyToBeCalled(eyes);
       expect(result).toStrictEqual({
-        addresses: { ETH: null},
-        meta:
-        {
+        addresses: { ETH: null },
+        meta: {
           owner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
           type: 'ENS',
-          ttl: 0
-        }
+          ttl: 0,
+        },
       });
     });
   });
 
+  describe('metadata', () => {
+    it('should return a valid ipfsHash', async () => {
+      const resolution = new Resolution();
+      const ipfsHash = await resolution.ipfsHash('almonit.eth');
+      expect(ipfsHash).toBe('QmV3RLU7X2QBaBJ7vdkYJPtiYVTdfWaQD6RetzFUzmrJf3');
+    });
+
+    //todo(johny) find some domains with url property set
+    it('should return appropriate httpUrl', async () => {
+      const resolution = new Resolution();
+      const httpUrlPromise = resolution.httpUrl('matthewgould.eth');
+      await expectResolutionErrorCode(
+        httpUrlPromise,
+        ResolutionErrorCode.RecordNotFound,
+      );
+    });
+
+    it('should return resolution error for not finding the email', async () => {
+      const resolution = new Resolution();
+      const emailPromise = resolution.email('matthewgould.eth');
+      await expectResolutionErrorCode(
+        emailPromise,
+        ResolutionErrorCode.RecordNotFound,
+      );
+    });
+  });
   describe('.namehash',() => {
     it('starts with -', async () => {
       const resolution = new Resolution();
