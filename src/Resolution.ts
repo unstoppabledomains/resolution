@@ -8,7 +8,8 @@ import {
   ResolutionResponse,
   DefaultAPI,
   API,
-  nodeHash
+  nodeHash,
+  NamingServiceName
 } from './types';
 import ResolutionError, { ResolutionErrorCode } from './resolutionError';
 import NamingService from './namingService';
@@ -191,17 +192,18 @@ export default class Resolution {
    * returns a childhash for specific namingService
    * @param parent -> hash for parent
    * @param label -> hash for label
-   * @param method -> namingservice name, if omited CNS is used as default
+   * @param method -> "ENS", "CNS" or "ZNS"
    */
-  childhash(parent: nodeHash, label: string, method?: string):nodeHash {
-    if (!method) method = 'CNS';
+  childhash(parent: nodeHash, label: string, method: NamingServiceName):nodeHash {
     switch (method) {
-      case 'ENS':
+      case NamingServiceName.ENS:
         return this.ens.childhash(parent, label);
-      case 'CNS':
+      case NamingServiceName.CNS:
         return this.cns.childhash(parent, label);
-      case 'ZNS': 
+      case NamingServiceName.ZNS: 
         return this.zns.childhash(parent, label);
+      default: 
+        throw new Error('Incorrect method is provided')
     }
   }
   /**
