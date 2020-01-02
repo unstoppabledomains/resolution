@@ -129,6 +129,7 @@ export default class Resolution {
    * @returns A Promise that resolves in redirect url
    */
   async ipfsRedirect(domain: string): Promise<string> {
+    console.warn('Resolution#ipfsRedirect is depricated since 1.0.15, use Resolution#httpUrl instead');
     return await this.getNamingMethodOrThrow(domain).record(
       domain,
       'ipfs.redirect_domain.value',
