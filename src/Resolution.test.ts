@@ -1,6 +1,6 @@
 import nock from 'nock';
 import Resolution, { ResolutionErrorCode } from '.';
-import { UnclaimedDomainResponse } from './types';
+import { UnclaimedDomainResponse, NamingServiceName } from './types';
 import { expectResolutionErrorCode } from './utils/testHelpers';
 
 beforeEach(() => {
@@ -166,4 +166,24 @@ describe('Resolution', () => {
       expect(resolution.isValidHash(domain, invalidHash)).toEqual(false);
     });
   });
+
+  describe('.Hashing', () => {
+    describe('.childhash', () => {
+      it ('checks childhash', () => {
+        const resolution = new Resolution();
+        const domain = 'hello.world.zil';
+        const namehash = resolution.namehash(domain);
+        const childhash = resolution.childhash(resolution.namehash("world.zil"), "hello", NamingServiceName.ZNS);
+        expect(childhash).toBe(namehash);
+      });
+
+      it('checks childhash multi level domain', () => {
+        const cns = new Resolution().cns;
+        const domain = 'ich.ni.san.yon.hello.world.crypto';
+        const namehash = cns.namehash(domain);
+        const childhash = cns.childhash(cns.namehash("ni.san.yon.hello.world.crypto"), "ich");
+        expect(childhash).toBe(namehash);
+      });
+    });
+  })
 });

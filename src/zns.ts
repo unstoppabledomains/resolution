@@ -4,7 +4,7 @@ import {
   toBech32Address,
   toChecksumAddress,
 } from './zns/utils';
-import namehash from './zns/namehash';
+import namehash, { childhash } from './zns/namehash';
 import { invert, set } from './utils';
 import {
   Dictionary,
@@ -13,10 +13,13 @@ import {
   UnclaimedDomainResponse,
   ZnsResolution,
   NamingServiceSource,
+  NamingServiceName,
   isNullAddress,
+  nodeHash
 } from './types';
 import { ResolutionError, ResolutionErrorCode } from './index';
 import NamingService from './namingService';
+
 
 const DefaultSource = 'https://api.zilliqa.com';
 
@@ -48,10 +51,11 @@ const UrlNetworkMap = (url: string) => invert(UrlMap)[url];
  * @param registryAddress - address for a registry contract
  */
 export default class Zns extends NamingService {
+  readonly name = NamingServiceName.ZNS;
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
-  readonly name: string;
+
   /**
    * Source object describing the network naming service operates on
    * @param source - if specified as a string will be used as main url, if omitted then defaults are used
@@ -60,7 +64,6 @@ export default class Zns extends NamingService {
   constructor(source: string | boolean | SourceDefinition = true) {
     super();
     source = this.normalizeSource(source);
-    this.name = 'ZNS';
     this.network = source.network as string;
     this.url = source.url;
     if (!this.network) {
@@ -216,6 +219,15 @@ export default class Zns extends NamingService {
     return namehash(domain);
   }
 
+  /**
+   * Returns the childhash
+   * @param parent - nodehash of a parent
+   * @param label - child
+   */
+  childhash(parent: nodeHash, label: string): string {
+    return childhash(parent, label);
+  }
+
   /** @internal */
   protected normalizeSource(source: NamingServiceSource): SourceDefinition {
     switch (typeof source) {
@@ -344,7 +356,7 @@ export default class Zns extends NamingService {
     } catch (err) {
       if (err.name == 'FetchError')
         throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
-          method: 'ZNS',
+          method: NamingServiceName.ZNS,
         });
       else throw err;
     }

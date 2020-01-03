@@ -166,16 +166,60 @@ describe('CNS', () => {
     expect(addr).toBe('zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj');
   });
 
-  describe('namehash', () => {
-    it('supports root node', async () => {
-      const resolution = new Resolution();
-      expect(resolution.isSupportedDomain('crypto')).toEqual(true);
-      expect(new Resolution().namehash('crypto')).toEqual(
-        '0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f',
-      );
+  describe('.Hashing', () => {
+    describe(".namehash", () => {
+      it("supports root node", async () => {
+        const cns = new Resolution().cns;
+        expect(cns.isSupportedDomain('crypto')).toEqual(true);
+        expect(cns.namehash('crypto')).toEqual('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
+      });
+
+      it('starts with -', async () => {
+        const cns = new Resolution().cns;
+        expect(cns.isSupportedDomain('-hello.crypto')).toEqual(true);
+        expect(cns.namehash('-hello.crypto')).toBe('0xc4ad028bcae9b201104e15f872d3e85b182939b06829f75a128275177f2ff9b2');
+      })
+
+      it('ends with -', async () => {
+        const cns = new Resolution().cns;
+        expect(cns.isSupportedDomain('hello-.crypto')).toEqual(true);
+        expect(cns.namehash('hello-.crypto')).toBe('0x82eaa6ef14e438940bfd7747e0e4c4fec42af20cee28ddd0a7d79f52b1c59b72');
+      })
+
+      it('starts and ends with -', async () => {
+        const cns = new Resolution().cns;
+        expect(cns.isSupportedDomain('-hello-.crypto')).toEqual(true);
+        expect(cns.namehash('-hello-.crypto')).toBe('0x90cc1963ff09ce95ee2dbb3830df4f2115da9756e087a50283b3e65f6ffe2a4e');
+      })
+
+      describe('.childhash', () => {
+        it('checks root crypto domain', () => {
+          const cns = new Resolution().cns;
+          const rootHash = '0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f';
+          expect(cns.namehash('crypto')).toBe(rootHash);
+          expect(cns.childhash('0000000000000000000000000000000000000000000000000000000000000000', 'crypto')).toBe(rootHash);
+        });
+
+        it('checks the childhash functionality', () => {
+          const cns = new Resolution().cns;
+          const domain = 'hello.world.crypto';
+          const namehash = cns.namehash(domain);
+          const childhash = cns.childhash(cns.namehash("world.crypto"), "hello");
+          expect(namehash).toBe(childhash);
+        });
+
+        it('checks childhash multi level domain', () => {
+          const cns = new Resolution().cns;
+          const domain = 'ich.ni.san.yon.hello.world.crypto';
+          const namehash = cns.namehash(domain);
+          const childhash = cns.childhash(cns.namehash("ni.san.yon.hello.world.crypto"), "ich");
+          expect(childhash).toBe(namehash);
+        });
+      });
     });
   });
 
+  
   describe('meta data', () => {
     const domain = 'reseller-test-ryan019.crypto';
     it('should resolve with ipfs stored on cns', async () => {
@@ -202,23 +246,5 @@ describe('CNS', () => {
       );
       expect(resolution.namehash('crypto')).toEqual('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f');
     });
-
-    it('starts with -', async () => {
-      const resolution = new Resolution();
-      expect(resolution.isSupportedDomain('-hello.crypto')).toEqual(true);
-      expect(resolution.namehash('-hello.crypto')).toBe('0xc4ad028bcae9b201104e15f872d3e85b182939b06829f75a128275177f2ff9b2');
-    })
-
-    it('ends with -', async () => {
-      const resolution = new Resolution();
-      expect(resolution.isSupportedDomain('hello-.crypto')).toEqual(true);
-      expect(resolution.namehash('hello-.crypto')).toBe('0x82eaa6ef14e438940bfd7747e0e4c4fec42af20cee28ddd0a7d79f52b1c59b72');
-    })
-
-    it('starts and ends with -', async () => {
-      const resolution = new Resolution();
-      expect(resolution.isSupportedDomain('-hello-.crypto')).toEqual(true);
-      expect(resolution.namehash('-hello-.crypto')).toBe('0x90cc1963ff09ce95ee2dbb3830df4f2115da9756e087a50283b3e65f6ffe2a4e');
-    })
   });
 });

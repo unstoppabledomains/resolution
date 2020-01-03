@@ -8,6 +8,8 @@ import {
   ResolutionResponse,
   DefaultAPI,
   API,
+  nodeHash,
+  NamingServiceName
 } from './types';
 import ResolutionError, { ResolutionErrorCode } from './resolutionError';
 import NamingService from './namingService';
@@ -127,6 +129,7 @@ export default class Resolution {
    * @returns A Promise that resolves in redirect url
    */
   async ipfsRedirect(domain: string): Promise<string> {
+    console.warn('Resolution#ipfsRedirect is depricated since 1.0.15, use Resolution#httpUrl instead');
     return await this.getNamingMethodOrThrow(domain).record(
       domain,
       'ipfs.redirect_domain.value',
@@ -192,6 +195,24 @@ export default class Resolution {
   }
 
   /**
+   * returns a childhash for specific namingService
+   * @param parent -> hash for parent
+   * @param label -> hash for label
+   * @param method -> "ENS", "CNS" or "ZNS"
+   */
+  childhash(parent: nodeHash, label: string, method: NamingServiceName):nodeHash {
+    switch (method) {
+      case NamingServiceName.ENS:
+        return this.ens.childhash(parent, label);
+      case NamingServiceName.CNS:
+        return this.cns.childhash(parent, label);
+      case NamingServiceName.ZNS:
+        return this.zns.childhash(parent, label);
+      default:
+        throw new Error('Incorrect method is provided')
+    }
+  }
+  /**
    * Checks weather the domain name matches the hash
    * @param domain - domain name to check againt
    * @param hash - hash obtained from the blockchain
@@ -217,7 +238,7 @@ export default class Resolution {
     return method && method.isSupportedNetwork();
   }
 
-  serviceName(domain: string): string {
+  serviceName(domain: string): NamingServiceName {
     return this.getNamingMethodOrThrow(domain).serviceName(domain);
   }
 

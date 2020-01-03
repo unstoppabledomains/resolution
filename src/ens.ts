@@ -1,13 +1,15 @@
 import { default as ensInterface } from './ens/contract/ens';
 import { default as resolverInterface } from './ens/contract/resolver';
-import { hash } from 'eth-ens-namehash';
+import { default as hash, childhash } from './ens/namehash';
 import { formatsByCoinType } from '@ensdomains/address-encoder';
 import {
   ResolutionResponse,
   EthCoinIndex,
   NamingServiceSource,
+  NamingServiceName,
   Bip44Constants,
   isNullAddress,
+  nodeHash
 } from './types';
 import { EthereumNamingService } from './namingService';
 import { ResolutionError, ResolutionErrorCode } from './index';
@@ -29,7 +31,7 @@ const RegistryMap = {
  * @param registryAddress - address for a registry contract
  */
 export default class Ens extends EthereumNamingService {
-  readonly name: string;
+  readonly name = NamingServiceName.ENS;
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
@@ -40,7 +42,6 @@ export default class Ens extends EthereumNamingService {
    */
   constructor(source: NamingServiceSource = true) {
     super();
-    this.name = 'ENS';
     source = this.normalizeSource(source);
     this.network = <string>source.network;
     this.url = source.url;
@@ -66,9 +67,8 @@ export default class Ens extends EthereumNamingService {
    * @param domain - domain name to be checked
    */
   isSupportedDomain(domain: string): boolean {
-    return (
-      domain.indexOf('.') > 0 &&
-      /^[a-zA-Z0-9].{1,}[^-]\.(eth|luxe|xyz|test)$/.test(domain)
+    return ( domain === "eth" ||
+      domain.indexOf('.') > 0 && /^[^-]*[^-]*\.(eth|luxe|xyz|test)$/.test(domain)
     );
   }
 
@@ -215,7 +215,7 @@ export default class Ens extends EthereumNamingService {
    * @param domain - domain to be hashed
    * @returns ENS namehash of a domain
    */
-  namehash(domain: string): string {
+  namehash(domain: string): nodeHash {
     this.ensureSupportedDomain(domain);
     return hash(domain);
   }
@@ -255,6 +255,15 @@ export default class Ens extends EthereumNamingService {
       resolverAddress,
     );
     return resolverContract;
+  }
+
+  /**
+   * Returns the childhash
+   * @param parent - nodehash of a parent
+   * @param label - child
+   */
+  childhash(parent: nodeHash, label: string, options: {prefix: boolean} = {prefix: true}): nodeHash {
+    return childhash(parent, label, options);
   }
 
   /**

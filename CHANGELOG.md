@@ -2,7 +2,7 @@
 
 ## 1.0.15
 * Resolution#ipfsHash(domain:string): Promise<string> -> method to return an ipfsHash from the domain's records
-* Depricate Resolution#ipfsRedirect
+* Deprecate Resolution#ipfsRedirect
 * Resolution#httpUrl(domain:string): Promise<string> -> method to use instead of depricated Resolution#ipfsRedirect, returns an http url from the domain's records
 * Resolution#email(domain:string): Promise<string> -> method to return an email from the domain's records
 

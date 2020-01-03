@@ -1,12 +1,14 @@
 import {
   NamingServiceSource,
+  ResolutionMethod,
+  NamingServiceName,
   SourceDefinition,
   NetworkIdMap,
   BlockhanNetworkUrlMap,
   ResolutionResponse,
   isNullAddress,
 } from './types';
-import { hash } from 'eth-ens-namehash';
+import { default as hash } from './ens/namehash';
 import ResolutionError, { ResolutionErrorCode } from './resolutionError';
 import BaseConnection from './baseConnection';
 import { invert } from './utils';
@@ -19,7 +21,7 @@ import Contract from './utils/contract';
  *
  */
 export default abstract class NamingService extends BaseConnection {
-  readonly name: string;
+  readonly name: ResolutionMethod;
   abstract isSupportedDomain(domain: string): boolean;
   abstract isSupportedNetwork(): boolean;
   abstract namehash(domain: string): string;
@@ -31,8 +33,8 @@ export default abstract class NamingService extends BaseConnection {
   abstract email(domain: string): Promise<string>;
   abstract httpUrl(domain: string): Promise<string>;
 
-  serviceName(domain: string): string {
-    return this.name;
+  serviceName(domain: string): NamingServiceName {
+    return this.name as NamingServiceName;
   }
 
   protected abstract normalizeSource(
@@ -67,6 +69,7 @@ export default abstract class NamingService extends BaseConnection {
 };
 
 export abstract class EthereumNamingService extends NamingService {
+  readonly name: NamingServiceName;
   abstract registryAddress?: string;
   abstract url: string;
   protected registryContract: Contract;
@@ -147,16 +150,6 @@ export abstract class EthereumNamingService extends NamingService {
         return source;
       }
     }
-  }
-
-  /**
-   * Produces ENS namehash
-   * @param domain - domain to be hashed
-   * @return ENS namehash of a domain
-   */
-  namehash(domain: string): string {
-    this.ensureSupportedDomain(domain);
-    return hash(domain);
   }
 
   /**

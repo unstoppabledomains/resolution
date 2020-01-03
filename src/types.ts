@@ -19,6 +19,14 @@ export interface SourceDefinition {
  */
 export type NamingServiceSource = string | boolean | SourceDefinition;
 
+export enum NamingServiceName {
+  ENS = "ENS",
+  CNS = "CNS",
+  ZNS = "ZNS"
+};
+
+export type ResolutionMethod  = NamingServiceName | "UDAPI";
+
 /**
  * EnsNetworkIdMap
  * type represending the map between network number and network name
@@ -116,7 +124,7 @@ export type ZnsResolution = {
 export type Bip44Constants = [number, string, string];
 export type owner = string;
 export type ttl = string;
-
+export type nodeHash = string;
 export enum NullAddress {
   '0x',
   '0x0000000000000000000000000000000000000000',
