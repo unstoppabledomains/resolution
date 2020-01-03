@@ -356,7 +356,7 @@ export default class Zns extends NamingService {
     } catch (err) {
       if (err.name == 'FetchError')
         throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
-          method: 'ZNS',
+          method: NamingServiceName.ZNS,
         });
       else throw err;
     }

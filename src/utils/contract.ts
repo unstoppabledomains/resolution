@@ -2,7 +2,7 @@ import BaseConnection from "../baseConnection";
 import {defaultAbiCoder as AbiCoder} from 'ethers/utils/abi-coder';
 import keccak256  from "keccak256";
 import ResolutionError, { ResolutionErrorCode } from "../resolutionError";
-import { isNullAddress } from "../types";
+import { isNullAddress, NamingServiceName } from "../types";
 
 type FourBytes = string;
 
@@ -11,13 +11,13 @@ export default class Contract extends BaseConnection {
   readonly contractInterface: [any];
   readonly address: string;
   readonly url: string;
-  readonly name: string;
+  readonly name: NamingServiceName;
 
   /**
    * @param contractInterface JSON-RPC interface of smartContract
    * @param address Contract's address
    */
-  constructor(name: string, url: string, contractInterface, address: string) {
+  constructor(name: NamingServiceName, url: string, contractInterface, address: string) {
     super();
     this.name = name;
     this.url = url;
