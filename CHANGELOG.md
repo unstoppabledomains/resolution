@@ -1,5 +1,8 @@
 ## Unreleased
 
+## 1.0.16
+* Resolution#childhash(parent: NodeHash, label: string) -> method to return a childhash
+
 ## 1.0.15
 * Resolution#ipfsHash(domain:string): Promise<string> -> method to return an ipfsHash from the domain's records
 * Deprecate Resolution#ipfsRedirect
