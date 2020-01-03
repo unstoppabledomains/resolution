@@ -4,6 +4,7 @@ import NamingService from './namingService';
 import {
   ResolutionResponse,
   NamingServiceSource,
+  NamingServiceName,
   SourceDefinition,
   isNullAddress,
 } from './types';
@@ -12,7 +13,7 @@ import Ens from './ens';
 import Cns from './cns';
 
 export default class Udapi extends NamingService {
-  readonly name: string;
+  readonly name = "UDAPI";
   private url: string;
   private headers: {
     [key: string]: string;
@@ -21,7 +22,6 @@ export default class Udapi extends NamingService {
   constructor(url: string) {
     super();
     this.url = url;
-    this.name = 'UDAPI';
     const DefaultUserAgent = this.isNode()
       ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'
       : navigator.userAgent;
@@ -134,12 +134,12 @@ export default class Udapi extends NamingService {
     } catch (error) {
       if (error.name !== 'FetchError') throw error;
       throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
-        method: 'UD',
+        method: this.name,
       });
     }
   }
 
-  serviceName(domain: string): string {
+  serviceName(domain: string): NamingServiceName {
     return this.findMethodOrThrow(domain).name;
   }
 

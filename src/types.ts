@@ -25,6 +25,8 @@ export enum NamingServiceName {
   ZNS = "ZNS"
 };
 
+export type ResolutionMethod  = NamingServiceName | "UDAPI";
+
 /**
  * EnsNetworkIdMap
  * type represending the map between network number and network name

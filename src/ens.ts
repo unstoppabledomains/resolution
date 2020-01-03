@@ -6,6 +6,7 @@ import {
   ResolutionResponse,
   EthCoinIndex,
   NamingServiceSource,
+  NamingServiceName,
   Bip44Constants,
   isNullAddress,
   nodeHash
@@ -30,7 +31,7 @@ const RegistryMap = {
  * @param registryAddress - address for a registry contract
  */
 export default class Ens extends EthereumNamingService {
-  readonly name: string;
+  readonly name = NamingServiceName.ENS;
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
@@ -41,7 +42,6 @@ export default class Ens extends EthereumNamingService {
    */
   constructor(source: NamingServiceSource = true) {
     super();
-    this.name = 'ENS';
     source = this.normalizeSource(source);
     this.network = <string>source.network;
     this.url = source.url;
@@ -67,7 +67,7 @@ export default class Ens extends EthereumNamingService {
    * @param domain - domain name to be checked
    */
   isSupportedDomain(domain: string): boolean {
-    return ( domain === "eth" || 
+    return ( domain === "eth" ||
       domain.indexOf('.') > 0 && /^[^-]*[^-]*\.(eth|luxe|xyz|test)$/.test(domain)
     );
   }
@@ -260,7 +260,7 @@ export default class Ens extends EthereumNamingService {
   /**
    * Returns the childhash
    * @param parent - nodehash of a parent
-   * @param label - child 
+   * @param label - child
    */
   childhash(parent: nodeHash, label: string, options: {prefix: boolean} = {prefix: true}): nodeHash {
     return childhash(parent, label, options);

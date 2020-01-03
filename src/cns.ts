@@ -1,6 +1,7 @@
 import { EthereumNamingService } from './namingService';
 import {
   NamingServiceSource,
+  NamingServiceName,
   RegistryMap,
   ResolutionResponse,
   isNullAddress,
@@ -23,7 +24,7 @@ import Contract from './utils/contract';
  * @param registryAddress - address for a registry contract
  */
 export default class Cns extends EthereumNamingService {
-  readonly name: string;
+  readonly name = NamingServiceName.CNS;
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
@@ -39,7 +40,6 @@ export default class Cns extends EthereumNamingService {
    */
   constructor(source: NamingServiceSource = true) {
     super();
-    this.name = 'CNS';
     source = this.normalizeSource(source);
     this.network = source.network as string;
     this.url = source.url;
@@ -135,11 +135,11 @@ export default class Cns extends EthereumNamingService {
     return hash(domain);
   }
 
-  
+
   /**
    * Returns the childhash
    * @param parent - nodehash of a parent
-   * @param label - child 
+   * @param label - child
    */
   childhash(parent: nodeHash, label: string, options: {prefix: boolean} = {prefix: true}): nodeHash {
     return childhash(parent, label, options);

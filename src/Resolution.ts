@@ -206,9 +206,9 @@ export default class Resolution {
         return this.ens.childhash(parent, label);
       case NamingServiceName.CNS:
         return this.cns.childhash(parent, label);
-      case NamingServiceName.ZNS: 
+      case NamingServiceName.ZNS:
         return this.zns.childhash(parent, label);
-      default: 
+      default:
         throw new Error('Incorrect method is provided')
     }
   }
@@ -238,7 +238,7 @@ export default class Resolution {
     return method && method.isSupportedNetwork();
   }
 
-  serviceName(domain: string): string {
+  serviceName(domain: string): NamingServiceName {
     return this.getNamingMethodOrThrow(domain).serviceName(domain);
   }
 

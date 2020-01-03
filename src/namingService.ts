@@ -1,5 +1,7 @@
 import {
   NamingServiceSource,
+  ResolutionMethod,
+  NamingServiceName,
   SourceDefinition,
   NetworkIdMap,
   BlockhanNetworkUrlMap,
@@ -19,7 +21,7 @@ import Contract from './utils/contract';
  *
  */
 export default abstract class NamingService extends BaseConnection {
-  readonly name: string;
+  readonly name: ResolutionMethod;
   abstract isSupportedDomain(domain: string): boolean;
   abstract isSupportedNetwork(): boolean;
   abstract namehash(domain: string): string;
@@ -31,8 +33,8 @@ export default abstract class NamingService extends BaseConnection {
   abstract email(domain: string): Promise<string>;
   abstract httpUrl(domain: string): Promise<string>;
 
-  serviceName(domain: string): string {
-    return this.name;
+  serviceName(domain: string): NamingServiceName {
+    return this.name as NamingServiceName;
   }
 
   protected abstract normalizeSource(

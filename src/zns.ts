@@ -13,6 +13,7 @@ import {
   UnclaimedDomainResponse,
   ZnsResolution,
   NamingServiceSource,
+  NamingServiceName,
   isNullAddress,
   nodeHash
 } from './types';
@@ -50,10 +51,11 @@ const UrlNetworkMap = (url: string) => invert(UrlMap)[url];
  * @param registryAddress - address for a registry contract
  */
 export default class Zns extends NamingService {
+  readonly name = NamingServiceName.ZNS;
   readonly network: string;
   readonly url: string;
   readonly registryAddress?: string;
-  readonly name: string;
+
   /**
    * Source object describing the network naming service operates on
    * @param source - if specified as a string will be used as main url, if omitted then defaults are used
@@ -62,7 +64,6 @@ export default class Zns extends NamingService {
   constructor(source: string | boolean | SourceDefinition = true) {
     super();
     source = this.normalizeSource(source);
-    this.name = 'ZNS';
     this.network = source.network as string;
     this.url = source.url;
     if (!this.network) {
@@ -221,7 +222,7 @@ export default class Zns extends NamingService {
   /**
    * Returns the childhash
    * @param parent - nodehash of a parent
-   * @param label - child 
+   * @param label - child
    */
   childhash(parent: nodeHash, label: string): string {
     return childhash(parent, label);
