@@ -1,8 +1,9 @@
+import {ResolutionMethod} from './types';
 /** Alias for Resolution error handler function */
 type ResolutionErrorHandler = (error: ResolutionErrorOptions) => string;
 /** Explains Resolution Error options */
 type ResolutionErrorOptions = {
-  method?: string;
+  method?: ResolutionMethod;
   domain?: string;
   currencyTicker?: string;
   recordName?: string;
@@ -35,13 +36,13 @@ const HandlersByCode = {
     currencyTicker: string;
   }) =>
     `Domain ${params.domain} has no ${params.currencyTicker} attached to it`,
-  [ResolutionErrorCode.NamingServiceDown]: (params: { method: string }) =>
+  [ResolutionErrorCode.NamingServiceDown]: (params: { method: ResolutionMethod }) =>
     `${params.method} naming service is down at the moment`,
   [ResolutionErrorCode.UnsupportedCurrency]: (params: {
     currencyTicker: string;
   }) => `${params.currencyTicker} is not supported`,
   [ResolutionErrorCode.IncorrectResolverInterface]: (params: {
-    method: string;
+    method: ResolutionMethod;
   }) => `Domain resolver is configured incorrectly for ${params.method}`,
   [ResolutionErrorCode.RecordNotFound]: (params: {
     recordName: string;
