@@ -7,5 +7,6 @@ describe('Exported variables', () => {
     expect(Index.ResolutionError).toBeDefined();
     expect(Index.ResolutionErrorCode).toBeDefined();
     expect(Index.UnclaimedDomainResponse).toBeDefined();
+    expect(Index.NamingServiceName).toBeDefined();
   });
 });
