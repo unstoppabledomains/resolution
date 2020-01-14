@@ -2,7 +2,6 @@ import nock from 'nock';
 import {Dictionary } from '../types';
 import {ResolutionError} from '../index';
 import mockData from '../testData/mockData.json';
-import Resolution from '../Resolution';
 
 export const MainnetUrl = 'https://mainnet.infura.io';
 export const ZilliqaUrl = 'https://api.zilliqa.com';

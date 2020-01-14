@@ -55,26 +55,27 @@ describe('Unstoppable API', () => {
   it('should return a valid ipfsHash from API', async () => {
     const resolution = new Resolution({ blockchain: false });
     const eyes = mockAsyncMethod(resolution.api, 'resolve', {
-      "addresses": {
-        "BCH": "qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6",
-        "BTC": "1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB",
-        "DASH": "XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j",
-        "ETH": "0x45b31e01AA6f42F0549aD482BE81635ED3149abb",
-        "LTC": "LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL",
-        "XMR": "447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d",
-        "ZEC": "t1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV",
-        "ZIL": "zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj"
+      addresses: {
+        BCH: 'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6',
+        BTC: '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB',
+        DASH: 'XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j',
+        ETH: '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
+        LTC: 'LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL',
+        XMR:
+          '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d',
+        ZEC: 't1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV',
+        ZIL: 'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
       },
-      "whois": {},
-      "ipfs": {
-        "html": "QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK",
-        "redirect_domain": "www.unstoppabledomains.com"
+      whois: {},
+      ipfs: {
+        html: 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
+        redirect_domain: 'www.unstoppabledomains.com',
       },
-      "meta": {
-        "owner": "0x2d418942dce1afa02d0733a2000c71b371a6ac07",
-        "type": "ZNS",
-        "ttl": 0
-      }
+      meta: {
+        owner: '0x2d418942dce1afa02d0733a2000c71b371a6ac07',
+        type: 'ZNS',
+        ttl: 0,
+      },
     });
     const ipfsHash = await resolution.ipfsHash('brad.zil');
     expectSpyToBeCalled([eyes]);
@@ -83,24 +84,22 @@ describe('Unstoppable API', () => {
 
   it('should return a valid email from API', async () => {
     const resolution = new Resolution({ blockchain: false });
-    const eyes = mockAsyncMethod(resolution.api, 'resolve',
-      {
-        "addresses": {},
-        "whois": {
-          "email": "matt+test@unstoppabledomains.com",
-          "for_sale": "true"
-        },
-        "ipfs": {
-          "html": "QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu",
-          "redirect_domain": "www.unstoppabledomains.com"
-        },
-        "meta": {
-          "owner": "0x4e984952e867ff132cd4b70cd3f313d68c511b76",
-          "type": "ZNS",
-          "ttl": 0
-        }
-      }
-    );
+    const eyes = mockAsyncMethod(resolution.api, 'resolve', {
+      addresses: {},
+      whois: {
+        email: 'matt+test@unstoppabledomains.com',
+        for_sale: 'true',
+      },
+      ipfs: {
+        html: 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu',
+        redirect_domain: 'www.unstoppabledomains.com',
+      },
+      meta: {
+        owner: '0x4e984952e867ff132cd4b70cd3f313d68c511b76',
+        type: 'ZNS',
+        ttl: 0,
+      },
+    });
     const email = await resolution.email('ergergergerg.zil');
     expectSpyToBeCalled([eyes]);
     expect(email).toBe('matt+test@unstoppabledomains.com');
@@ -109,26 +108,27 @@ describe('Unstoppable API', () => {
   it('should return a valid httpUrl from API', async () => {
     const resolution = new Resolution({ blockchain: false });
     const eyes = mockAsyncMethod(resolution.api, 'resolve', {
-      "addresses": {
-        "BCH": "qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6",
-        "BTC": "1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB",
-        "DASH": "XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j",
-        "ETH": "0x45b31e01AA6f42F0549aD482BE81635ED3149abb",
-        "LTC": "LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL",
-        "XMR": "447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d",
-        "ZEC": "t1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV",
-        "ZIL": "zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj"
+      addresses: {
+        BCH: 'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6',
+        BTC: '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB',
+        DASH: 'XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j',
+        ETH: '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
+        LTC: 'LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL',
+        XMR:
+          '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d',
+        ZEC: 't1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV',
+        ZIL: 'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
       },
-      "whois": {},
-      "ipfs": {
-        "html": "QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK",
-        "redirect_domain": "www.unstoppabledomains.com"
+      whois: {},
+      ipfs: {
+        html: 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
+        redirect_domain: 'www.unstoppabledomains.com',
       },
-      "meta": {
-        "owner": "0x2d418942dce1afa02d0733a2000c71b371a6ac07",
-        "type": "ZNS",
-        "ttl": 0
-      }
+      meta: {
+        owner: '0x2d418942dce1afa02d0733a2000c71b371a6ac07',
+        type: 'ZNS',
+        ttl: 0,
+      },
     });
     const httpUrl = await resolution.httpUrl('brad.zil');
     expectSpyToBeCalled([eyes]);
