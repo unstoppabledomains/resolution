@@ -155,13 +155,13 @@ describe('Resolution', () => {
       const serviceName = resolution.serviceName('domain.crypto');
       expect(serviceName).toBe('CNS');
     });
-  })
-  describe("isValidHash", () => {
-    it("works", async () => {
+  });
+  describe('isValidHash', () => {
+    it('works', async () => {
       const resolution = new Resolution();
-      const domain = "hello.world.zil"
+      const domain = 'hello.world.zil';
       const hash = resolution.namehash(domain);
-      const invalidHash = resolution.namehash("world.zil");
+      const invalidHash = resolution.namehash('world.zil');
       expect(resolution.isValidHash(domain, hash)).toEqual(true);
       expect(resolution.isValidHash(domain, invalidHash)).toEqual(false);
     });
@@ -169,11 +169,15 @@ describe('Resolution', () => {
 
   describe('.Hashing', () => {
     describe('.childhash', () => {
-      it ('checks childhash', () => {
+      it('checks childhash', () => {
         const resolution = new Resolution();
         const domain = 'hello.world.zil';
         const namehash = resolution.namehash(domain);
-        const childhash = resolution.childhash(resolution.namehash("world.zil"), "hello", NamingServiceName.ZNS);
+        const childhash = resolution.childhash(
+          resolution.namehash('world.zil'),
+          'hello',
+          NamingServiceName.ZNS,
+        );
         expect(childhash).toBe(namehash);
       });
 
@@ -181,9 +185,12 @@ describe('Resolution', () => {
         const cns = new Resolution().cns;
         const domain = 'ich.ni.san.yon.hello.world.crypto';
         const namehash = cns.namehash(domain);
-        const childhash = cns.childhash(cns.namehash("ni.san.yon.hello.world.crypto"), "ich");
+        const childhash = cns.childhash(
+          cns.namehash('ni.san.yon.hello.world.crypto'),
+          'ich',
+        );
         expect(childhash).toBe(namehash);
       });
     });
-  })
+  });
 });

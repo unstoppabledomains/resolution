@@ -50,10 +50,13 @@ export default abstract class NamingService extends BaseConnection {
   }
 
   /* @internal */
-  protected async ignoreResolutionError<T>(code: ResolutionErrorCode | undefined, promise: Promise<T>): Promise<T | undefined> {
+  protected async ignoreResolutionError<T>(
+    code: ResolutionErrorCode | undefined,
+    promise: Promise<T>,
+  ): Promise<T | undefined> {
     try {
       return await promise;
-    } catch(error) {
+    } catch (error) {
       if (this.isResolutionError(error, code)) {
         return undefined;
       } else {
@@ -66,7 +69,7 @@ export default abstract class NamingService extends BaseConnection {
   protected isResolutionError(error: any, code?: ResolutionErrorCode): boolean {
     return error instanceof ResolutionError && (!code || error.code === code);
   }
-};
+}
 
 export abstract class EthereumNamingService extends NamingService {
   readonly name: NamingServiceName;

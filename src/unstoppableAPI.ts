@@ -13,7 +13,7 @@ import Ens from './ens';
 import Cns from './cns';
 
 export default class Udapi extends NamingService {
-  readonly name = "UDAPI";
+  readonly name = 'UDAPI';
   private url: string;
   private headers: {
     [key: string]: string;
@@ -92,7 +92,10 @@ export default class Udapi extends NamingService {
   async ipfsHash(domain: string): Promise<string> {
     const answer = await this.resolve(domain);
     if (!answer || !answer.ipfs || !answer.ipfs.html)
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {recordName: 'IPFS hash', domain: domain});
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+        recordName: 'IPFS hash',
+        domain: domain,
+      });
     return answer.ipfs.html;
   }
 
@@ -104,7 +107,10 @@ export default class Udapi extends NamingService {
   async email(domain: string): Promise<string> {
     const answer = await this.resolve(domain);
     if (!answer || !answer.whois || !answer.whois.email)
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {recordName: 'email', domain: domain});
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+        recordName: 'email',
+        domain: domain,
+      });
     return answer.whois.email;
   }
 
@@ -116,7 +122,10 @@ export default class Udapi extends NamingService {
   async httpUrl(domain: string): Promise<string> {
     const answer = await this.resolve(domain);
     if (!answer || !answer.ipfs || !answer.ipfs.redirect_domain)
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {recordName: 'httpUrl', domain: domain});
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+        recordName: 'httpUrl',
+        domain: domain,
+      });
     return answer.ipfs.redirect_domain;
   }
 

@@ -20,12 +20,12 @@ export interface SourceDefinition {
 export type NamingServiceSource = string | boolean | SourceDefinition;
 
 export enum NamingServiceName {
-  ENS = "ENS",
-  CNS = "CNS",
-  ZNS = "ZNS"
-};
+  ENS = 'ENS',
+  CNS = 'CNS',
+  ZNS = 'ZNS',
+}
 
-export type ResolutionMethod  = NamingServiceName | "UDAPI";
+export type ResolutionMethod = NamingServiceName | 'UDAPI';
 
 /**
  * EnsNetworkIdMap
@@ -65,13 +65,13 @@ export interface RegistryMap {
  */
 export type ResolutionResponse = {
   ipfs?: {
-    html?: string,
-    redirect_domain ?: string
-  },
+    html?: string;
+    redirect_domain?: string;
+  };
   whois?: {
-    email?: string,
-    for_sale?: boolean
-  },
+    email?: string;
+    for_sale?: boolean;
+  };
   addresses: {
     [key: string]: string;
   };

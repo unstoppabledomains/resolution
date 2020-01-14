@@ -9,7 +9,7 @@ import {
   NamingServiceName,
   Bip44Constants,
   isNullAddress,
-  nodeHash
+  nodeHash,
 } from './types';
 import { EthereumNamingService } from './namingService';
 import { ResolutionError, ResolutionErrorCode } from './index';
@@ -67,8 +67,10 @@ export default class Ens extends EthereumNamingService {
    * @param domain - domain name to be checked
    */
   isSupportedDomain(domain: string): boolean {
-    return ( domain === "eth" ||
-      domain.indexOf('.') > 0 && /^[^-]*[^-]*\.(eth|luxe|xyz|test)$/.test(domain)
+    return (
+      domain === 'eth' ||
+      (domain.indexOf('.') > 0 &&
+        /^[^-]*[^-]*\.(eth|luxe|xyz|test)$/.test(domain))
     );
   }
 
@@ -145,10 +147,12 @@ export default class Ens extends EthereumNamingService {
    */
   async owner(domain: string): Promise<string | null> {
     const nodeHash = this.namehash(domain);
-    return await this.ignoreResolutionError(
-      ResolutionErrorCode.RecordNotFound,
-      this.getOwner(nodeHash),
-    ) || null;
+    return (
+      (await this.ignoreResolutionError(
+        ResolutionErrorCode.RecordNotFound,
+        this.getOwner(nodeHash),
+      )) || null
+    );
   }
 
   /**
@@ -262,7 +266,11 @@ export default class Ens extends EthereumNamingService {
    * @param parent - nodehash of a parent
    * @param label - child
    */
-  childhash(parent: nodeHash, label: string, options: {prefix: boolean} = {prefix: true}): nodeHash {
+  childhash(
+    parent: nodeHash,
+    label: string,
+    options: { prefix: boolean } = { prefix: true },
+  ): nodeHash {
     return childhash(parent, label, options);
   }
 
@@ -342,9 +350,11 @@ export default class Ens extends EthereumNamingService {
   }
 
   private async fetchAddress(resolver, nodeHash, coin) {
-    return await this.ignoreResolutionError(
-      ResolutionErrorCode.RecordNotFound,
-      this.fetchAddressOrThrow(resolver, nodeHash, EthCoinIndex),
-    ) || null;
+    return (
+      (await this.ignoreResolutionError(
+        ResolutionErrorCode.RecordNotFound,
+        this.fetchAddressOrThrow(resolver, nodeHash, EthCoinIndex),
+      )) || null
+    );
   }
 }

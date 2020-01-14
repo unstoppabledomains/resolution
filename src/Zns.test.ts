@@ -277,7 +277,7 @@ describe('ZNS', () => {
   //   });
   // });
 
-  describe(".isSupportedDomain", () => {
+  describe('.isSupportedDomain', () => {
     it("doesn't support zil domain when zns is disabled", () => {
       const resolution = new Resolution({ blockchain: { zns: false } });
       expect(resolution.zns).toBeUndefined();
@@ -287,19 +287,18 @@ describe('ZNS', () => {
     it('starts with -', () => {
       const resolution = new Resolution();
       expect(resolution.isSupportedDomain('-hello.zil')).toEqual(true);
-    })
+    });
 
-    it('ends with -',  () => {
+    it('ends with -', () => {
       const resolution = new Resolution();
       expect(resolution.isSupportedDomain('hello-.zil')).toEqual(true);
-    })
+    });
 
     it('starts and ends with -', () => {
       const resolution = new Resolution();
       expect(resolution.isSupportedDomain('-hello-.zil')).toEqual(true);
-    })
+    });
   });
-
 
   describe('.Hashing', () => {
     describe('.namehash', () => {
@@ -309,42 +308,54 @@ describe('ZNS', () => {
           '0xd45bcb80c1ca68da09082d7618280839a1102446b639b294d07e9a1692ec241f',
         );
       });
-  
+
       it('supports root "zil" domain', () => {
         const resolution = new Resolution();
         expect(resolution.zns.namehash('zil')).toEqual(
           '0x9915d0456b878862e822e2361da37232f626a2e47505c8795134a95d36138ed3',
         );
       });
-  
-      it("raises ResoltuionError when domain is not supported",  () => {
+
+      it('raises ResoltuionError when domain is not supported', () => {
         const resolution = new Resolution();
-        expectResolutionErrorCode(() => resolution.zns.namehash('hello.world'), ResolutionErrorCode.UnsupportedDomain);
+        expectResolutionErrorCode(
+          () => resolution.zns.namehash('hello.world'),
+          ResolutionErrorCode.UnsupportedDomain,
+        );
       });
     });
     describe('.childhash', () => {
-        it ('checks childhash', () => {
-          const zns = new Resolution().zns;
-          const domain = 'hello.world.zil';
-          const namehash = zns.namehash(domain);
-          const childhash = zns.childhash(zns.namehash("world.zil"), "hello");
-          expect(namehash).toBe(childhash);
-        });
+      it('checks childhash', () => {
+        const zns = new Resolution().zns;
+        const domain = 'hello.world.zil';
+        const namehash = zns.namehash(domain);
+        const childhash = zns.childhash(zns.namehash('world.zil'), 'hello');
+        expect(namehash).toBe(childhash);
+      });
 
-        it('checks root "zil domain', () => {
-          const zns = new Resolution().zns;
-          const rootHash ='0x9915d0456b878862e822e2361da37232f626a2e47505c8795134a95d36138ed3';
-          expect(zns.namehash('zil')).toBe(rootHash);
-          expect(zns.childhash('0000000000000000000000000000000000000000000000000000000000000000', 'zil')).toBe(rootHash);
-        });
+      it('checks root "zil domain', () => {
+        const zns = new Resolution().zns;
+        const rootHash =
+          '0x9915d0456b878862e822e2361da37232f626a2e47505c8795134a95d36138ed3';
+        expect(zns.namehash('zil')).toBe(rootHash);
+        expect(
+          zns.childhash(
+            '0000000000000000000000000000000000000000000000000000000000000000',
+            'zil',
+          ),
+        ).toBe(rootHash);
+      });
 
-        it('checks childhash multi level domain', () => {
-          const zns = new Resolution().zns;
-          const domain = 'ich.ni.san.yon.hello.world.zil';
-          const namehash = zns.namehash(domain);
-          const childhash = zns.childhash(zns.namehash("ni.san.yon.hello.world.zil"), "ich");
-          expect(childhash).toBe(namehash);
-        });
+      it('checks childhash multi level domain', () => {
+        const zns = new Resolution().zns;
+        const domain = 'ich.ni.san.yon.hello.world.zil';
+        const namehash = zns.namehash(domain);
+        const childhash = zns.childhash(
+          zns.namehash('ni.san.yon.hello.world.zil'),
+          'ich',
+        );
+        expect(childhash).toBe(namehash);
+      });
     });
   });
 

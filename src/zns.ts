@@ -15,11 +15,10 @@ import {
   NamingServiceSource,
   NamingServiceName,
   isNullAddress,
-  nodeHash
+  nodeHash,
 } from './types';
 import { ResolutionError, ResolutionErrorCode } from './index';
 import NamingService from './namingService';
-
 
 const DefaultSource = 'https://api.zilliqa.com';
 
@@ -152,24 +151,15 @@ export default class Zns extends NamingService {
   }
 
   async ipfsHash(domain: string): Promise<string> {
-    return await this.getRecordOrThrow(
-      domain,
-      'ipfs.html.value',
-    );
+    return await this.getRecordOrThrow(domain, 'ipfs.html.value');
   }
 
   async httpUrl(domain: string): Promise<string> {
-    return await this.getRecordOrThrow(
-      domain,
-      'ipfs.redirect_domain.value',
-    );
+    return await this.getRecordOrThrow(domain, 'ipfs.redirect_domain.value');
   }
 
   async email(domain: string): Promise<string> {
-    return await this.getRecordOrThrow(
-      domain,
-      'whois.email.value',
-    );
+    return await this.getRecordOrThrow(domain, 'whois.email.value');
   }
 
   /**
@@ -179,10 +169,7 @@ export default class Zns extends NamingService {
    * @returns Record field associated with the domain
    */
   async record(domain: string, field: string) {
-    return await this.getRecordOrThrow(
-      domain,
-      field,
-    );
+    return await this.getRecordOrThrow(domain, field);
   }
 
   /**
@@ -198,8 +185,8 @@ export default class Zns extends NamingService {
    * Checks if domain is supported by zns
    */
   isSupportedDomain(domain: string): boolean {
-    const tokens = domain.split(".");
-    return tokens.length && _.last(tokens) === "zil";
+    const tokens = domain.split('.');
+    return tokens.length && _.last(tokens) === 'zil';
   }
 
   /**
@@ -260,7 +247,10 @@ export default class Zns extends NamingService {
     }
   }
 
-  private async  getRecordOrThrow(domain:string, field: string): Promise<string> {
+  private async getRecordOrThrow(
+    domain: string,
+    field: string,
+  ): Promise<string> {
     const records = await this.records(domain);
     return this.getRecordFieldOrThrow(domain, records, field);
   }

@@ -9,7 +9,7 @@ import {
   DefaultAPI,
   API,
   nodeHash,
-  NamingServiceName
+  NamingServiceName,
 } from './types';
 import ResolutionError, { ResolutionErrorCode } from './resolutionError';
 import NamingService from './namingService';
@@ -129,7 +129,9 @@ export default class Resolution {
    * @returns A Promise that resolves in redirect url
    */
   async ipfsRedirect(domain: string): Promise<string> {
-    console.warn('Resolution#ipfsRedirect is depricated since 1.0.15, use Resolution#httpUrl instead');
+    console.warn(
+      'Resolution#ipfsRedirect is depricated since 1.0.15, use Resolution#httpUrl instead',
+    );
     return await this.getNamingMethodOrThrow(domain).record(
       domain,
       'ipfs.redirect_domain.value',
@@ -200,7 +202,11 @@ export default class Resolution {
    * @param label -> hash for label
    * @param method -> "ENS", "CNS" or "ZNS"
    */
-  childhash(parent: nodeHash, label: string, method: NamingServiceName):nodeHash {
+  childhash(
+    parent: nodeHash,
+    label: string,
+    method: NamingServiceName,
+  ): nodeHash {
     switch (method) {
       case NamingServiceName.ENS:
         return this.ens.childhash(parent, label);
@@ -209,7 +215,7 @@ export default class Resolution {
       case NamingServiceName.ZNS:
         return this.zns.childhash(parent, label);
       default:
-        throw new Error('Incorrect method is provided')
+        throw new Error('Incorrect method is provided');
     }
   }
   /**
