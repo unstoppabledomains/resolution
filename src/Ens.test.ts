@@ -8,8 +8,11 @@ import {
   expectSpyToBeCalled,
   expectResolutionErrorCode,
   MainnetUrl,
+  secretInfuraLink,
 } from './utils/testHelpers';
+import dotenv from 'dotenv';
 
+dotenv.config();
 beforeEach(() => {
   nock.cleanAll();
   jest.restoreAllMocks();
@@ -383,21 +386,21 @@ describe('ENS', () => {
 
   it('checks UnsupportedCurrency error', async () => {
     await expectResolutionErrorCode(
-      new Resolution().addressOrThrow('testthing.eth', 'bnb'),
+      new Resolution({blockchain: {ens: {url: secretInfuraLink()}}}).addressOrThrow('testthing.eth', 'bnb'),
       ResolutionErrorCode.UnsupportedCurrency,
     );
   });
 
   it('checks UnsupportedCurrency error', async () => {
     await expectResolutionErrorCode(
-      new Resolution().addressOrThrow('testthing.eth', 'UNREALTICKER'),
+      new Resolution({blockchain: {ens: {url: secretInfuraLink()}}}).addressOrThrow('testthing.eth', 'UNREALTICKER'),
       ResolutionErrorCode.UnsupportedCurrency,
     );
   });
 
   describe('.resolve', () => {
     it('passes without any errors', async () => {
-      const resolution = new Resolution();
+      const resolution = new Resolution({blockchain: {ens: {url: secretInfuraLink()}}});
       const eyes = mockAsyncMethods(resolution.ens, {
         getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
         getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
@@ -417,7 +420,7 @@ describe('ENS', () => {
     });
 
     it('returns undefined address', async () => {
-      const resolution = new Resolution();
+      const resolution = new Resolution({blockchain: {ens: {url: secretInfuraLink()}}})
       const eyes = mockAsyncMethods(resolution.ens, {
         getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
         getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
@@ -442,7 +445,7 @@ describe('ENS', () => {
   describe('.Hashing', () => {
     describe('.namehash', () => {
       it('supports root node', async () => {
-        const ens = new Resolution().ens;
+        const ens = new Resolution({blockchain: {ens: {url: secretInfuraLink()}}}).ens;
         expect(ens.isSupportedDomain('eth')).toEqual(true);
         expect(ens.namehash('eth')).toEqual(
           '0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae',
@@ -450,7 +453,7 @@ describe('ENS', () => {
       });
 
       it('should hash appropriately', async () => {
-        const resolution = new Resolution();
+        const resolution = new Resolution({blockchain: {ens: {url: secretInfuraLink()}}});
         expect(resolution.ens.namehash('alice.eth')).toBe(
           '0x787192fc5378cc32aa956ddfdedbf26b24e8d78e40109add0eea2c1a012c3dec',
         );
@@ -458,7 +461,7 @@ describe('ENS', () => {
 
       describe('.domain invalid format', () => {
         it('starts with -', async () => {
-          const resolution = new Resolution();
+          const resolution = new Resolution({blockchain: {ens: {url: secretInfuraLink()}}});
           expect(resolution.ens.isSupportedDomain('-hello.eth')).toEqual(false);
           expectResolutionErrorCode(
             () => resolution.namehash('-hello.eth'),
@@ -467,7 +470,7 @@ describe('ENS', () => {
         });
 
         it('ends with -', async () => {
-          const resolution = new Resolution();
+          const resolution = new Resolution({blockchain: {ens: {url: secretInfuraLink()}}});
           expect(resolution.isSupportedDomain('hello-.eth')).toEqual(false);
           expectResolutionErrorCode(
             () => resolution.namehash('hello-.eth'),
@@ -476,7 +479,7 @@ describe('ENS', () => {
         });
 
         it('starts and ends with -', async () => {
-          const resolution = new Resolution();
+          const resolution = new Resolution({blockchain: {ens: {url: secretInfuraLink()}}});
           expect(resolution.isSupportedDomain('-hello-.eth')).toEqual(false);
           expectResolutionErrorCode(
             () => resolution.namehash('-hello-.eth'),
@@ -488,7 +491,7 @@ describe('ENS', () => {
 
     describe('.childhash', () => {
       it('tests childhash functionality', () => {
-        const ens = new Resolution().ens;
+        const ens = new Resolution({blockchain: {ens: {url: secretInfuraLink()}}}).ens;
         const domain = 'hello.world.eth';
         const namehash = ens.namehash(domain);
         const childhash = ens.childhash(ens.namehash('world.eth'), 'hello');
@@ -496,7 +499,7 @@ describe('ENS', () => {
       });
 
       it('checks root eth domain', () => {
-        const ens = new Resolution().ens;
+        const ens = new Resolution({blockchain: {ens: {url: secretInfuraLink()}}}).ens;
         const rootHash =
           '0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae';
         expect(ens.namehash('eth')).toBe(rootHash);
@@ -509,7 +512,7 @@ describe('ENS', () => {
       });
 
       it('checks childhash multi level domain', () => {
-        const ens = new Resolution().ens;
+        const ens = new Resolution({blockchain: {ens: {url: secretInfuraLink()}}}).ens;
         const domain = 'ich.ni.san.yon.hello.world.eth';
         const namehash = ens.namehash(domain);
         const childhash = ens.childhash(
@@ -523,7 +526,7 @@ describe('ENS', () => {
 
   describe('metadata', () => {
     it('should return a valid ipfsHash', async () => {
-      const resolution = new Resolution();
+      const resolution = new Resolution({blockchain: {ens: {url: secretInfuraLink()}}});
       const eyes = mockAsyncMethods(resolution.ens, {
         getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
         callMethod:
@@ -536,7 +539,7 @@ describe('ENS', () => {
 
     //todo(johny) find some domains with url property set
     it('should return appropriate httpUrl', async () => {
-      const resolution = new Resolution();
+      const resolution = new Resolution({blockchain: {ens: {url: secretInfuraLink()}}});
       const httpUrlPromise = resolution.httpUrl('matthewgould.eth');
       await expectResolutionErrorCode(
         httpUrlPromise,
@@ -545,7 +548,7 @@ describe('ENS', () => {
     });
 
     it('should return resolution error for not finding the email', async () => {
-      const resolution = new Resolution();
+      const resolution = new Resolution({blockchain: {ens: {url: secretInfuraLink()}}});
       const eyes = mockAsyncMethods(resolution.ens, {getResolver:'0x5FfC014343cd971B7eb70732021E26C35B744cc4', callMethod: '' });
       const emailPromise = resolution.email('matthewgould.eth');
       expectSpyToBeCalled(eyes);

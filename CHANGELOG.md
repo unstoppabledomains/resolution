@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 1.0.17
+* Fixed a bug with cns throws RecordNotFound instead of ResolutionErrorCode.UnregisteredDomain in Cns#address
+* Added a way to connect Infura API secret key from .env files (should be INFURA=<SECRET KEY>)
+
 ## 1.0.16
 * Resolution#childhash(parent: NodeHash, label: string) -> method to return a childhash
 

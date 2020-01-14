@@ -2,6 +2,7 @@ import nock from 'nock';
 import {Dictionary } from '../types';
 import {ResolutionError} from '../index';
 import mockData from '../testData/mockData.json';
+import Resolution from '../Resolution';
 
 export const MainnetUrl = 'https://mainnet.infura.io';
 export const ZilliqaUrl = 'https://api.zilliqa.com';
@@ -75,3 +76,17 @@ export function mockAPICalls(testName: string, url = MainnetUrl) {
     }
   });
 };
+
+/**
+ * @internal
+ * returns either a standard mainnet infura url 
+ * or the one with attached INFURA SECRET key from
+ * INFURA env variable if any
+ */
+export function secretInfuraLink():string {
+  const secret = process.env.INFURA;
+  let url = 'https://mainnet.infura.io';
+  if (secret)
+    url = `https://mainnet.infura.io/v3/${secret}`;
+  return url;
+}
