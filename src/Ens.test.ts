@@ -441,38 +441,49 @@ describe('ENS', () => {
 
   describe('.Hashing', () => {
     describe('.namehash', () => {
-      it("supports root node", async () => {
+      it('supports root node', async () => {
         const ens = new Resolution().ens;
         expect(ens.isSupportedDomain('eth')).toEqual(true);
-        expect(ens.namehash('eth')).toEqual('0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae');
+        expect(ens.namehash('eth')).toEqual(
+          '0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae',
+        );
       });
 
       it('should hash appropriately', async () => {
         const resolution = new Resolution();
-        expect(resolution.ens.namehash('alice.eth'))
-          .toBe('0x787192fc5378cc32aa956ddfdedbf26b24e8d78e40109add0eea2c1a012c3dec');
+        expect(resolution.ens.namehash('alice.eth')).toBe(
+          '0x787192fc5378cc32aa956ddfdedbf26b24e8d78e40109add0eea2c1a012c3dec',
+        );
       });
 
       describe('.domain invalid format', () => {
         it('starts with -', async () => {
           const resolution = new Resolution();
           expect(resolution.ens.isSupportedDomain('-hello.eth')).toEqual(false);
-          expectResolutionErrorCode(() => resolution.namehash('-hello.eth'), ResolutionErrorCode.UnsupportedDomain);
+          expectResolutionErrorCode(
+            () => resolution.namehash('-hello.eth'),
+            ResolutionErrorCode.UnsupportedDomain,
+          );
         });
 
         it('ends with -', async () => {
           const resolution = new Resolution();
           expect(resolution.isSupportedDomain('hello-.eth')).toEqual(false);
-          expectResolutionErrorCode(() => resolution.namehash('hello-.eth'), ResolutionErrorCode.UnsupportedDomain);
+          expectResolutionErrorCode(
+            () => resolution.namehash('hello-.eth'),
+            ResolutionErrorCode.UnsupportedDomain,
+          );
         });
 
         it('starts and ends with -', async () => {
           const resolution = new Resolution();
           expect(resolution.isSupportedDomain('-hello-.eth')).toEqual(false);
-          expectResolutionErrorCode(() => resolution.namehash('-hello-.eth'), ResolutionErrorCode.UnsupportedDomain);
+          expectResolutionErrorCode(
+            () => resolution.namehash('-hello-.eth'),
+            ResolutionErrorCode.UnsupportedDomain,
+          );
         });
       });
-
     });
 
     describe('.childhash', () => {
@@ -480,22 +491,31 @@ describe('ENS', () => {
         const ens = new Resolution().ens;
         const domain = 'hello.world.eth';
         const namehash = ens.namehash(domain);
-        const childhash = ens.childhash(ens.namehash("world.eth"), "hello");
+        const childhash = ens.childhash(ens.namehash('world.eth'), 'hello');
         expect(childhash).toBe(namehash);
       });
 
       it('checks root eth domain', () => {
         const ens = new Resolution().ens;
-        const rootHash ='0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae';
+        const rootHash =
+          '0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae';
         expect(ens.namehash('eth')).toBe(rootHash);
-        expect(ens.childhash('0000000000000000000000000000000000000000000000000000000000000000', 'eth')).toBe(rootHash);
+        expect(
+          ens.childhash(
+            '0000000000000000000000000000000000000000000000000000000000000000',
+            'eth',
+          ),
+        ).toBe(rootHash);
       });
 
       it('checks childhash multi level domain', () => {
         const ens = new Resolution().ens;
         const domain = 'ich.ni.san.yon.hello.world.eth';
         const namehash = ens.namehash(domain);
-        const childhash = ens.childhash(ens.namehash("ni.san.yon.hello.world.eth"), "ich");
+        const childhash = ens.childhash(
+          ens.namehash('ni.san.yon.hello.world.eth'),
+          'ich',
+        );
         expect(childhash).toBe(namehash);
       });
     });
@@ -504,8 +524,14 @@ describe('ENS', () => {
   describe('metadata', () => {
     it('should return a valid ipfsHash', async () => {
       const resolution = new Resolution();
+      const eyes = mockAsyncMethods(resolution.ens, {
+        getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+        callMethod:
+          '0xe3010170122058cf8d62a59dff0d7aa81492b66d262f27a8a684767238209243ad0309ecff5e',
+      });
       const ipfsHash = await resolution.ipfsHash('almonit.eth');
-      expect(ipfsHash).toBe('QmV3RLU7X2QBaBJ7vdkYJPtiYVTdfWaQD6RetzFUzmrJf3');
+      expectSpyToBeCalled(eyes);
+      expect(ipfsHash).toBe('QmUKL9VYzSvM9bSZQPgExtALCrRhK2VLFNjzsXLNRcbaGM');
     });
 
     //todo(johny) find some domains with url property set
