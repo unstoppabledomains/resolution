@@ -546,7 +546,9 @@ describe('ENS', () => {
 
     it('should return resolution error for not finding the email', async () => {
       const resolution = new Resolution();
+      const eyes = mockAsyncMethods(resolution.ens, {getResolver:'0x5FfC014343cd971B7eb70732021E26C35B744cc4', callMethod: '' });
       const emailPromise = resolution.email('matthewgould.eth');
+      expectSpyToBeCalled(eyes);
       await expectResolutionErrorCode(
         emailPromise,
         ResolutionErrorCode.RecordNotFound,

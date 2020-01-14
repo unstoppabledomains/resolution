@@ -259,7 +259,9 @@ describe('CNS', () => {
 
     it('should resolve with httpUrl stored on cns', async () => {
       const resolution = new Resolution();
+      const eyes = mockAsyncMethods(resolution.cns, { getResolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D', getRecord: '0x033dc48b5db4ca62861643e9d2c411d9eb6d1975@gmail.com' })
       const httpUrl = await resolution.httpUrl(domain);
+      expectSpyToBeCalled(eyes);
       expect(httpUrl).toBe(
         '0x033dc48b5db4ca62861643e9d2c411d9eb6d1975@gmail.com',
       );
