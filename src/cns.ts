@@ -5,7 +5,7 @@ import {
   RegistryMap,
   ResolutionResponse,
   isNullAddress,
-  nodeHash
+  nodeHash,
 } from './types';
 import { default as resolverInterface } from './cns/contract/resolver';
 import { default as cnsInterface } from './cns/contract/registry';
@@ -135,13 +135,16 @@ export default class Cns extends EthereumNamingService {
     return hash(domain);
   }
 
-
   /**
    * Returns the childhash
    * @param parent - nodehash of a parent
    * @param label - child
    */
-  childhash(parent: nodeHash, label: string, options: {prefix: boolean} = {prefix: true}): nodeHash {
+  childhash(
+    parent: nodeHash,
+    label: string,
+    options: { prefix: boolean } = { prefix: true },
+  ): nodeHash {
     return childhash(parent, label, options);
   }
 
@@ -151,8 +154,7 @@ export default class Cns extends EthereumNamingService {
       ResolutionErrorCode.RecordNotFound,
       this.callMethod(this.registryContract, 'resolverOf', [tokenId]),
     );
-  }
-
+  };
 
   /** @internal */
   async owner(tokenId: nodeHash): Promise<string> {
@@ -227,7 +229,7 @@ export default class Cns extends EthereumNamingService {
     const ownerPromise = this.owner(tokenId);
     const resolver: string = await this.getResolver(tokenId);
     if (!resolver || isNullAddress(resolver)) {
-      this.throwOwnershipError(domain, ownerPromise);
+      await this.throwOwnershipError(domain, ownerPromise);
     }
     const resolverContract = this.buildContract(resolverInterface, resolver);
     const ttl = await this.getTtl(resolverContract, 'get', ['ttl', tokenId]);
