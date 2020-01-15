@@ -132,7 +132,7 @@ describe('ENS', () => {
   });
 
   it('resolves name with resolver but without an owner', async () => {
-    const ens = new Ens();
+    const ens = new Ens({url: secretInfuraLink()});
     const eyes = mockAsyncMethods(ens, {
       getOwner: NullAddress[1],
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
@@ -285,7 +285,7 @@ describe('ENS', () => {
   });
 
   it('checks ens multicoin support #1', async () => {
-    const ens = new Ens();
+    const ens = new Ens({url: secretInfuraLink()});
     const eyes = mockAsyncMethods(ens, {
       getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
@@ -297,7 +297,7 @@ describe('ENS', () => {
   });
 
   it('checks ens multicoin support #2', async () => {
-    const ens = new Ens();
+    const ens = new Ens({url: secretInfuraLink()});
     const eyes = mockAsyncMethods(ens, {
       getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
@@ -309,7 +309,7 @@ describe('ENS', () => {
   });
 
   it('checks ens multicoin support #3', async () => {
-    const ens = new Ens();
+    const ens = new Ens({url: secretInfuraLink()});
     const eyes = mockAsyncMethods(ens, {
       getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
@@ -321,7 +321,7 @@ describe('ENS', () => {
   });
 
   it('checks ens multicoin support #4', async () => {
-    const ens = new Ens();
+    const ens = new Ens({url: secretInfuraLink()});
     const eyes = mockAsyncMethods(ens, {
       getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
@@ -333,7 +333,7 @@ describe('ENS', () => {
   });
 
   it('checks ens multicoin support #5', async () => {
-    const ens = new Ens();
+    const ens = new Ens({url: secretInfuraLink()});
     const eyes = mockAsyncMethods(ens, {
       getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
@@ -345,7 +345,7 @@ describe('ENS', () => {
   });
 
   it('checks ens multicoin support #6', async () => {
-    const ens = new Ens();
+    const ens = new Ens({url: secretInfuraLink()});
     const eyes = mockAsyncMethods(ens, {
       getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
@@ -358,7 +358,7 @@ describe('ENS', () => {
   });
 
   it('checks ens multicoin support #7', async () => {
-    const ens = new Ens();
+    const ens = new Ens({url: secretInfuraLink()});
     const eyes = mockAsyncMethods(ens, {
       getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
@@ -370,7 +370,7 @@ describe('ENS', () => {
   });
 
   it('checks ens multicoin support #8', async () => {
-    const ens = new Ens();
+    const ens = new Ens({url: secretInfuraLink()});
     const eyes = mockAsyncMethods(ens, {
       getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
