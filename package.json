@@ -21,7 +21,8 @@
     "docs:clone": "[ -d ./docs ] || git clone --branch gh-pages git@github.com:unstoppabledomains/resolution.git docs",
     "docs:generate": "yarn run typedoc --out \"./docs/v$npm_package_version\"",
     "docs:readme": "./docs-readme.sh",
-    "docs:deploy": "./deploy-docs.sh"
+    "docs:deploy": "./deploy-docs.sh",
+    "analyze": "webpack-cli"
   },
   "files": [
     "build"
@@ -48,7 +49,10 @@
     "prettier": "^1.17.0",
     "ts-jest": "^24.0.2",
     "typedoc": "^0.15.0",
-    "typescript": "^3.6.3"
+    "typescript": "^3.6.3",
+    "webpack": "^4.41.5",
+    "webpack-bundle-analyzer": "^3.6.0",
+    "webpack-cli": "^3.3.10"
   },
   "prettier": {
     "trailingComma": "all",
@@ -63,10 +67,16 @@
   "dependencies": {
     "@ensdomains/address-encoder": "^0.1.2",
     "bip44-constants": "^8.0.4",
+    "bn.js": "^5.1.1",
     "content-hash": "^2.5.2",
     "eth-ens-namehash": "^2.0.8",
+    "ethers": "^4.0.43",
+    "hash.js": "^1.1.7",
     "idna-uts46-hx": "^3.2.2",
+    "js-sha3": "^0.8.0",
     "keccak256": "^1.0.0",
-    "node-fetch": "^2.6.0"
+    "lodash": "^4.17.15",
+    "node-fetch": "^2.6.0",
+    "ts-loader": "^6.2.1"
   }
 }

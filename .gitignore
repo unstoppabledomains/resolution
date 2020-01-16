@@ -8,3 +8,4 @@ tmp
 docs
 docs/index.html
 .env
+stats.json
