@@ -188,7 +188,7 @@ export default class Cns extends EthereumNamingService {
   private getTtl = async (
     contract: Contract,
     methodname: string,
-    params: any[],
+    params: string[],
   ): Promise<string> => await this.callMethod(contract, methodname, params);
 
   /** @internal */
