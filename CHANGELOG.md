@@ -1,5 +1,8 @@
 ## Unreleased
 
+## 1.0.18
+* Removed unused ethers.js 
+
 ## 1.0.17
 * Fixed a bug with cns throws RecordNotFound instead of ResolutionErrorCode.UnregisteredDomain in Cns#address
 * Added a way to connect Infura API secret key from .env files (should be INFURA=<SECRET KEY>)
