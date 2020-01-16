@@ -52,7 +52,8 @@
     "typescript": "^3.6.3",
     "webpack": "^4.41.5",
     "webpack-bundle-analyzer": "^3.6.0",
-    "webpack-cli": "^3.3.10"
+    "webpack-cli": "^3.3.10",
+    "ts-loader": "^6.2.1"
   },
   "prettier": {
     "trailingComma": "all",
@@ -77,6 +78,5 @@
     "keccak256": "^1.0.0",
     "lodash": "^4.17.15",
     "node-fetch": "^2.6.0",
-    "ts-loader": "^6.2.1"
   }
 }
