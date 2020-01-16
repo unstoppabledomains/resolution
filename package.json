@@ -65,7 +65,6 @@
     "bip44-constants": "^8.0.4",
     "content-hash": "^2.5.2",
     "eth-ens-namehash": "^2.0.8",
-    "ethers": "^4.0.39",
     "idna-uts46-hx": "^3.2.2",
     "keccak256": "^1.0.0",
     "node-fetch": "^2.6.0"
