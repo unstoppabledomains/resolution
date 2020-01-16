@@ -171,7 +171,7 @@ export abstract class EthereumNamingService extends NamingService {
   protected async callMethod(
     contract: Contract,
     methodname: string,
-    params: any,
+    params: string[],
   ): Promise<any> {
     try {
       return await contract.fetchMethod(methodname, params);
