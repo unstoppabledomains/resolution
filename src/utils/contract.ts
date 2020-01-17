@@ -34,7 +34,9 @@ export default class Contract extends BaseConnection {
         param.name === method &&
         param.inputs.length === args.length
     );
+    
     const encodedInput = this.encodeInput(methodDescription, args);
+    console.log({encodedInput, name: methodDescription.name});
     const response = await this.fetchData(encodedInput);
     if (response.error)
       throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, { method: this.name })
@@ -46,18 +48,25 @@ export default class Contract extends BaseConnection {
   private decodeOutput(methodDescription, data):string {
     const output = Buffer.from(data.replace('0x', ''), 'hex');
     const outputTypes = methodDescription.outputs.map((output: { type: string; }) => output.type);
-    let newDecoded = abi.rawDecode(outputTypes, output)[0];
-
-    if (newDecoded && outputTypes[0] === 'address' || outputTypes[0] === 'bytes') {
-      return '0x' + newDecoded.toString('hex');
-    } else {
-      return newDecoded.toString();
+    console.log(methodDescription);
+    console.log({output: output.toString('hex'), outputTypes, name: methodDescription.name});
+    try {
+      let newDecoded = abi.rawDecode(outputTypes, output)[0];
+      if (newDecoded && outputTypes[0] === 'address' || outputTypes[0] === 'bytes') {
+        return '0x' + newDecoded.toString('hex');
+      } else {
+        return newDecoded.toString();
+      }
+    }catch(err) {
+      console.log(err);
+      return null;
     }
   }
 
   private encodeInput(methodDescription, args):string {
     const functionName: string = methodDescription.name;
     const functionInputTypes: string[] = methodDescription.inputs.map((input: { type: string; }) => input.type);
+    console.log(`${functionName}(${functionInputTypes})`);
     const methodID = '0x' + abi.methodID(functionName, functionInputTypes).toString('hex');
     return methodID + abi.rawEncode(functionInputTypes, args).toString('hex');
   }
