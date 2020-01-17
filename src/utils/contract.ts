@@ -1,10 +1,7 @@
 import BaseConnection from "../baseConnection";
-import {defaultAbiCoder as AbiCoder} from 'ethers/utils/abi-coder';
-import keccak256  from "keccak256";
+import abi from 'ethereumjs-abi';
 import ResolutionError, { ResolutionErrorCode } from "../resolutionError";
 import { isNullAddress, NamingServiceName } from "../types";
-
-type FourBytes = string;
 
 /** @internal */
 export default class Contract extends BaseConnection {
@@ -37,29 +34,32 @@ export default class Contract extends BaseConnection {
         param.name === method &&
         param.inputs.length === args.length
     );
-    const functionName: string = methodDescription.name;
-    const functionInputTypes: [string] = methodDescription.inputs.map(input => input.type);
-    const methodSignature: string = `${functionName}(${functionInputTypes.join(',')})`;
-    const initialBytes: FourBytes = this.fourBytesHash(methodSignature);
-    const dataParam: string = initialBytes + AbiCoder.encode(methodDescription.inputs, args).replace('0x', '');
-    const response = await this.fetchData(dataParam);
-    if (response.error) {
-      throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {method: this.name})
-    }
+    const encodedInput = this.encodeInput(methodDescription, args);
+    const response = await this.fetchData(encodedInput);
+    if (response.error)
+      throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, { method: this.name })
     if (isNullAddress(response.result))
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound,{recordName: method, domain: args[0] } );
-    return AbiCoder.decode( methodDescription.outputs , response.result )[0];
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, { recordName: method, domain: args[0] });
+    return this.decodeOutput(methodDescription, response.result);
   }
 
+  private decodeOutput(methodDescription, data):string {
+    const output = Buffer.from(data.replace('0x', ''), 'hex');
+    const outputTypes = methodDescription.outputs.map((output: { type: string; }) => output.type);
+    let newDecoded = abi.rawDecode(outputTypes, output)[0];
 
-    /**
-   * This method is used to get the first 4 bytes of keccak256 hash of contract method signature.
-   * required to make an appropriate read call to eth
-   * @param method - method signature to hash
-   * @returns a string that consist with 0x and 4 bytes in hex.
-   */
-  private fourBytesHash(method: string): FourBytes {
-    return '0x' + keccak256(method).toString('hex').slice(0,8);
+    if (newDecoded && outputTypes[0] === 'address' || outputTypes[0] === 'bytes') {
+      return '0x' + newDecoded.toString('hex');
+    } else {
+      return newDecoded.toString();
+    }
+  }
+
+  private encodeInput(methodDescription, args):string {
+    const functionName: string = methodDescription.name;
+    const functionInputTypes: string[] = methodDescription.inputs.map((input: { type: string; }) => input.type);
+    const methodID = '0x' + abi.methodID(functionName, functionInputTypes).toString('hex');
+    return methodID + abi.rawEncode(functionInputTypes, args).toString('hex');
   }
 
   private async fetchData(data: string): Promise<any> {
