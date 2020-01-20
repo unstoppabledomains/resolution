@@ -68,7 +68,6 @@
     "@ensdomains/address-encoder": "0.1.2",
     "bip44-constants": "8.0.5",
     "content-hash": "2.5.2",
-    "ethereumjs-abi": "0.6.8",
     "hash.js": "1.1.7",
     "js-sha3": "0.8.0",
     "node-fetch": "2.6.0"
