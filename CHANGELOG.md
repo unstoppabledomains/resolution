@@ -1,5 +1,13 @@
 ## Unreleased
 
+## 1.0.19
+* Included the AbiEncoder from [ethers-js](https://github.com/ethers-io/ethers.js/blob/b288ad9ba791073df2768c580abe9173c6b851f6/src.ts/utils/abi-coder.ts)
+* removed folowing packages
+* * "eth-ens-namehash",
+
+## 1.0.18
+* Removed unused ethers.js 
+
 ## 1.0.17
 * Fixed a bug with cns throws RecordNotFound instead of ResolutionErrorCode.UnregisteredDomain in Cns#address
 * Added a way to connect Infura API secret key from .env files (should be INFURA=<SECRET KEY>)

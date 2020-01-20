@@ -9,3 +9,4 @@ docs
 docs/index.html
 .env
 stats.json
+dist/

@@ -29,9 +29,9 @@ describe('ENS', () => {
 
   it('resolves .eth name using blockchain', async () => {
     const resolution = new Resolution({
-      blockchain: { ens: true },
+      blockchain: { ens: {url: secretInfuraLink() } },
     });
-    expect(resolution.ens.url).toBe('https://mainnet.infura.io');
+    expect(resolution.ens.url).toBe(secretInfuraLink());
     expect(resolution.ens.network).toEqual('mainnet');
 
     const eyes = mockAsyncMethods(resolution.ens, {
@@ -50,7 +50,7 @@ describe('ENS', () => {
   });
 
   it('reverses address to ENS domain', async () => {
-    const ens = new Ens(MainnetUrl);
+    const ens = new Ens(secretInfuraLink());
     const eyes = mockAsyncMethods(ens, {
       resolverCallToName: 'adrian.argent.xyz',
       getResolver: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
@@ -64,7 +64,7 @@ describe('ENS', () => {
   });
 
   it('reverses address to ENS domain null', async () => {
-    const ens = new Ens(MainnetUrl);
+    const ens = new Ens(secretInfuraLink());
     const spy = mockAsyncMethod(ens, 'getResolver', NullAddress[1]);
     const result = await ens.reverse(
       '0x112234455c3a32fd11230c42e7bccd4a84e02010',
@@ -76,7 +76,7 @@ describe('ENS', () => {
 
   it('resolves .xyz name using ENS blockchain', async () => {
     const resolution = new Resolution({
-      blockchain: { ens: MainnetUrl },
+      blockchain: { ens: secretInfuraLink() },
     });
 
     const eyes = mockAsyncMethods(resolution.ens, {
@@ -92,7 +92,7 @@ describe('ENS', () => {
 
   it('resolves .luxe name using ENS blockchain', async () => {
     const resolution = new Resolution({
-      blockchain: { ens: MainnetUrl },
+      blockchain: { ens: secretInfuraLink() },
     });
 
     const eyes = mockAsyncMethods(resolution.ens, {
@@ -108,7 +108,7 @@ describe('ENS', () => {
 
   it('resolves .luxe name using ENS blockchain with safe null return', async () => {
     const resolution = new Resolution({
-      blockchain: { ens: MainnetUrl },
+      blockchain: { ens: secretInfuraLink() },
     });
 
     const ownerEye = mockAsyncMethod(
@@ -123,7 +123,7 @@ describe('ENS', () => {
 
   it('resolves .luxe name using ENS blockchain with thrown error', async () => {
     const resolution = new Resolution({
-      blockchain: { ens: MainnetUrl },
+      blockchain: { ens: secretInfuraLink() },
     });
     await expectResolutionErrorCode(
       resolution.addressOrThrow('something.luxe', 'ETH'),
@@ -170,10 +170,10 @@ describe('ENS', () => {
 
   it('checks normalizeSource ens (object) #1', async () => {
     const resolution = new Resolution({
-      blockchain: { ens: { url: 'https://mainnet.infura.io' } },
+      blockchain: { ens: { url: secretInfuraLink() } },
     });
     expect(resolution.ens.network).toBe('mainnet');
-    expect(resolution.ens.url).toBe('https://mainnet.infura.io');
+    expect(resolution.ens.url).toBe(secretInfuraLink());
   });
 
   it('checks normalizeSource ens (object) #2', async () => {
