@@ -1,4 +1,4 @@
-import sha3 from './sha3'
+import sha3 from '../utils/sha3';
 
 export const namehash = (name = '', { parent = null, prefix = true } = {}) => {
   parent = parent || '0000000000000000000000000000000000000000000000000000000000000000'
