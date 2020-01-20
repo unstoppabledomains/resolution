@@ -38,7 +38,6 @@
   },
   "homepage": "https://github.com/unstoppabledomains/resolution.git#readme",
   "devDependencies": {
-    "@types/ethereumjs-abi": "^0.6.3",
     "@types/jest": "24.0.23",
     "@types/node": "11.15.3",
     "@types/node-fetch": "2.5.4",

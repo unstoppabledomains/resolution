@@ -3,9 +3,6 @@
 ## 1.0.19
 * Included the AbiEncoder from [ethers-js](https://github.com/ethers-io/ethers.js/blob/b288ad9ba791073df2768c580abe9173c6b851f6/src.ts/utils/abi-coder.ts)
 * removed folowing packages
-* * "keccak256": "^1.0.0",
-* * "lodash": "^4.17.15",
-* * "bn.js",
 * * "eth-ens-namehash",
 
 ## 1.0.18
