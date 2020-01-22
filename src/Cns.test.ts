@@ -78,6 +78,15 @@ describe('CNS', () => {
     expect(addr).toBe('zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj');
   });
 
+  it('should return a valid resolver address', async () => {
+    const resolverAddress = await resolution.cns.resolver('brad.crypto');
+    expect(resolverAddress).toBe('0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D');
+  });
+
+  it('should not find a resolver address', async () => {
+    await expectResolutionErrorCode(resolution.cns.resolver('empty.crypto'), ResolutionErrorCode.UnregisteredDomain);
+  });
+
   describe('.Crypto', () => {
     it(`checks the BCH address on ${labelDomain}`, async () => {
       const eyes = mockCryptoCalls(
