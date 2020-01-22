@@ -224,6 +224,11 @@ export default class Ens extends EthereumNamingService {
     return hash(domain);
   }
 
+  /**
+   * Returns the resolver address of a domain if exists
+   * @param domain - domain name
+   * @throws ResolutionError with codes UnregisteredDomain or UnspecifiedResolver
+   */
   async resolver(domain: string): Promise<string> {
     const nodeHash = this.namehash(domain);
     const ownerPromise = this.owner(domain);

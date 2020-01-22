@@ -148,6 +148,11 @@ export default class Cns extends EthereumNamingService {
     return childhash(parent, label, options);
   }
 
+   /**
+   * Returns the resolver address of a domain if exists
+   * @param domain - domain name
+   * @throws ResolutionError with codes UnregisteredDomain or UnspecifiedResolver
+   */
   async resolver(domain:string): Promise<string> {
     const tokenId = this.namehash(domain);
     const ownerPromise = this.owner(tokenId);
