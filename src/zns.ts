@@ -222,7 +222,9 @@ export default class Zns extends NamingService {
    *  - UnspecifiedResolver if there is no resolver for such a domain
    */
   async resolver(domain: string): Promise<string> {
-    const [ownerAddress, resolverAddress] = await this.getRecordsAddresses(domain);
+    const recordsAddresses =  await this.getRecordsAddresses(domain);
+    if (!recordsAddresses) throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {domain: domain});
+    const [ownerAddress, resolverAddress] = recordsAddresses;
     if (!ownerAddress) throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {domain: domain});
     if (!resolverAddress || isNullAddress(resolverAddress)) throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {domain: domain});
     return resolverAddress;

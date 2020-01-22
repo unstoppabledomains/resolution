@@ -293,6 +293,24 @@ describe('ZNS', () => {
         },
       });
     });
+
+    it('should return a valid resolver address', async () => {
+      const spies = mockAsyncMethods(resolution.zns, {
+        "getRecordsAddresses": [ 'zil194qcjskuuxh6qtg8xw3qqrr3kdc6dtq8ct6j9s',
+           '0xdac22230adfe4601f00631eae92df6d77f054891' ]
+      });
+      const resolverAddress = await resolution.zns.resolver('brad.zil');
+      expectSpyToBeCalled(spies)
+      expect(resolverAddress).toBe('0xdac22230adfe4601f00631eae92df6d77f054891');
+    });
+
+    it('should not find a resolverAddress', async () => {
+      const spies = mockAsyncMethods(resolution.zns, {
+        "getRecordsAddresses": undefined
+      });
+      await expectResolutionErrorCode(resolution.zns.resolver('sopmethingveryweirdthatnoonewilltakeever.zil'), ResolutionErrorCode.UnregisteredDomain);
+      expectSpyToBeCalled(spies);
+    });
   });
 
   describe('.isSupportedDomain', () => {
