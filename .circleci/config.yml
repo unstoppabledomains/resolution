@@ -108,7 +108,10 @@ workflows:
   version: 2
   build:
     jobs:
-      - build-node10
-      - build-node11
-      - build-node12
+      - build-node10:
+          context: Secrets
+      - build-node11:
+          context: Secrets
+      - build-node12:
+          context: Secrets
 
