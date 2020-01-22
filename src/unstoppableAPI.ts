@@ -148,8 +148,16 @@ export default class Udapi extends NamingService {
     }
   }
 
+  /**
+   * Returns naming service name
+   * @param domain - domain name
+   */  
   serviceName(domain: string): NamingServiceName {
     return this.findMethodOrThrow(domain).name;
+  }
+
+  async resolver(domain: string): Promise<string> {
+    return await this.findMethodOrThrow(domain).resolver(domain);
   }
 
   /** @internal */
