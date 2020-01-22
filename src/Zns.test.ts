@@ -8,7 +8,7 @@ import {
   mockAsyncMethods,
 } from './utils/testHelpers';
 
-let resolution:Resolution;
+let resolution: Resolution;
 beforeEach(() => {
   jest.restoreAllMocks();
   resolution = new Resolution();
@@ -20,23 +20,23 @@ describe('ZNS', () => {
       expect(resolution.zns.network).toBe('mainnet');
       expect(resolution.zns.url).toBe('https://api.zilliqa.com');
     });
-  
+
     it('checks normalizeSource zns (boolean - false)', async () => {
       const resolution = new Resolution({ blockchain: { zns: false } });
       expect(resolution.zns).toBeUndefined();
     });
-  
+
     it('checks normalizeSource zns (string)', async () => {
       expect(resolution.zns.network).toBe('mainnet');
       expect(resolution.zns.url).toBe('https://api.zilliqa.com');
     });
-  
+
     it('checks normalizeSource zns wrong string', async () => {
       expect(
         () => new Resolution({ blockchain: { zns: 'https://wrongurl.com' } }),
       ).toThrowError('Unspecified network in Resolution ZNS configuration');
     });
-  
+
     it('checks normalizeSource zns (object) #1', async () => {
       const resolution = new Resolution({
         blockchain: { zns: { url: 'https://api.zilliqa.com' } },
@@ -44,7 +44,7 @@ describe('ZNS', () => {
       expect(resolution.zns.network).toBe('mainnet');
       expect(resolution.zns.url).toBe('https://api.zilliqa.com');
     });
-  
+
     it('checks normalizeSource zns (object) #2', async () => {
       const resolution = new Resolution({
         blockchain: { zns: { network: 333 } },
@@ -53,7 +53,7 @@ describe('ZNS', () => {
       expect(resolution.zns.network).toBe('testnet');
       expect(resolution.zns.registryAddress).toBeUndefined();
     });
-  
+
     it('checks normalizeSource zns (object) #3', async () => {
       const resolution = new Resolution({
         blockchain: { zns: { url: 'https://api.zilliqa.com' } },
@@ -61,7 +61,7 @@ describe('ZNS', () => {
       expect(resolution.zns.network).toBe('mainnet');
       expect(resolution.zns.url).toBe('https://api.zilliqa.com');
     });
-  
+
     it('checks normalizeSource zns (object) #4', async () => {
       const resolution = new Resolution({
         blockchain: { zns: { url: 'https://api.zilliqa.com', network: 1 } },
@@ -69,29 +69,29 @@ describe('ZNS', () => {
       expect(resolution.zns.network).toBe('mainnet');
       expect(resolution.zns.url).toBe('https://api.zilliqa.com');
     });
-  
+
     it('checks normalizeSource zns (object) #5', async () => {
       const resolution = new Resolution({
         blockchain: { zns: { url: 'https://api.zilliqa.com', network: 333 } },
       });
-  
+
       expect(resolution.zns.url).toBe('https://api.zilliqa.com');
       expect(resolution.zns.network).toBe('testnet');
       expect(resolution.zns.registryAddress).toBeUndefined();
     });
-  
+
     it('checks normalizeSource zns (object) #6', async () => {
       expect(
         () => new Resolution({ blockchain: { zns: { network: 42 } } }),
       ).toThrowError('Unspecified network in Resolution ZNS configuration');
     });
-  
+
     it('checks normalizeSource zns (object) #7', async () => {
       expect(
         () => new Resolution({ blockchain: { zns: { network: 'invalid' } } }),
       ).toThrowError('Unspecified url in Resolution ZNS configuration');
     });
-  
+
     it('checks normalizeSource zns (object) #8', async () => {
       const resolution = new Resolution({
         blockchain: { zns: { network: 'mainnet' } },
@@ -99,17 +99,17 @@ describe('ZNS', () => {
       expect(resolution.zns.network).toBe('mainnet');
       expect(resolution.zns.url).toBe('https://api.zilliqa.com');
     });
-  
+
     it('checks normalizeSource zns (object) #9', async () => {
       const resolution = new Resolution({
         blockchain: { zns: { network: 'testnet' } },
       });
-  
+
       expect(resolution.zns.network).toBe('testnet');
       expect(resolution.zns.url).toBe('https://dev-api.zilliqa.com');
       expect(resolution.zns.registryAddress).toBeUndefined();
     });
-  
+
     it('checks normalizeSource zns (object) #10', async () => {
       const resolution = new Resolution({
         blockchain: {
@@ -122,20 +122,20 @@ describe('ZNS', () => {
       );
       expect(resolution.zns.url).toBe('https://api.zilliqa.com');
     });
-  
+
     it('checks normalizeSource zns (object) #11', async () => {
       const resolution = new Resolution({
         blockchain: {
           zns: { registry: '0xabcffff1231586348194fcabbeff1231240234fc' },
         },
       });
-  
+
       expect(resolution.zns.network).toBe('mainnet');
       expect(resolution.zns.url).toBe('https://api.zilliqa.com');
       expect(resolution.zns.registryAddress).toBe(
         'zil1408llufrzkrrfqv5lj4malcjxyjqyd8urd7xz6',
       );
-    });  
+    });
   });
 
   describe('.Resolve', () => {
@@ -152,7 +152,7 @@ describe('ZNS', () => {
       expect(result.meta.type).toEqual('ZNS');
       expect(result.meta.ttl).toEqual(0);
     });
-  
+
     it('resolves unclaimed domain using blockchain', async () => {
       const spyes = mockAsyncMethods(resolution.zns, {
         "getRecordsAddresses": undefined,
@@ -162,16 +162,18 @@ describe('ZNS', () => {
       expect(address).toEqual(null);
       expect(await resolution.owner('test.zil')).toEqual(null);
     });
-    
+
     it('resolves domain using blockchain #2', async () => {
       const spyes = mockAsyncMethods(resolution.zns, {
-        "getRecordsAddresses": [ 'zil1zzpjwyp2nu29pcv3sh04qxq9x5l45vke0hrwec',
-        '0x3f329078d95f043fd902d5c3ea2fbce0b3fca003' ],
-        "getResolverRecords": { 'crypto.BURST.address': 'BURST-R7KK-SBSY-FENX-AWYMW',
-        'crypto.ZIL.address': 'zil1zzpjwyp2nu29pcv3sh04qxq9x5l45vke0hrwes',
-        'ipfs.html.value': 'mtwirsqawjuoloq2gvtyug2tc3jbf5htm2zeo4rsknfiv3fdp46a',
-        'whois.email.value': 'rleinbox@gmail.com',
-        'whois.for_sale.value': 'true' }
+        "getRecordsAddresses": ['zil1zzpjwyp2nu29pcv3sh04qxq9x5l45vke0hrwec',
+          '0x3f329078d95f043fd902d5c3ea2fbce0b3fca003'],
+        "getResolverRecords": {
+          'crypto.BURST.address': 'BURST-R7KK-SBSY-FENX-AWYMW',
+          'crypto.ZIL.address': 'zil1zzpjwyp2nu29pcv3sh04qxq9x5l45vke0hrwes',
+          'ipfs.html.value': 'mtwirsqawjuoloq2gvtyug2tc3jbf5htm2zeo4rsknfiv3fdp46a',
+          'whois.email.value': 'rleinbox@gmail.com',
+          'whois.for_sale.value': 'true'
+        }
       })
       const result = await resolution.resolve('test-manage-one.zil');
       expectSpyToBeCalled(spyes);
@@ -188,7 +190,7 @@ describe('ZNS', () => {
         'zil194qcjskuuxh6qtg8xw3qqrr3kdc6dtq8ct6j9s',
         '0xdac22230adfe4601f00631eae92df6d77f054891',
       ]);
-  
+
       const secondEye = mockAsyncMethod(resolution.zns, 'getResolverRecords', {
         'crypto.BCH.address': 'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6',
         'crypto.BTC.address': '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB',
@@ -202,7 +204,7 @@ describe('ZNS', () => {
         'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
         'ipfs.redirect_domain.value': 'www.unstoppabledomains.com',
       });
-  
+
       const result = await resolution.zns.Resolution('brad.zil');
       expectSpyToBeCalled([eye, secondEye]);
       expect(result).toEqual({
@@ -225,13 +227,13 @@ describe('ZNS', () => {
         },
       });
     });
-  
+
     it('should resolve with Resolution key setuped #2', async () => {
       const eye = mockAsyncMethod(resolution.zns, 'getRecordsAddresses', [
         'zil1f6vyj5hgvll3xtx5kuxd8ucn66x9zxmkp34agy',
         '0xa9b1d3647e4deb9ce4e601c2c9e0a2fdf2d7415a',
       ]);
-  
+
       const secondEye = mockAsyncMethod(resolution.zns, 'getResolverRecords', {
         'ipfs.html.hash': 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
         'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu',
@@ -239,7 +241,7 @@ describe('ZNS', () => {
         'whois.email.value': 'matt+test@unstoppabledomains.com',
         'whois.for_sale.value': 'true',
       });
-  
+
       const result = await resolution.zns.Resolution('ergergergerg.zil');
       expectSpyToBeCalled([eye, secondEye]);
       expect(result).toEqual({
@@ -256,19 +258,29 @@ describe('ZNS', () => {
         },
       });
     });
-  
+
     it('should resolve with Resolution key setuped #3', async () => {
       const zns = resolution.zns;
-  
+
       expect(zns).toBeDefined();
       const result = await zns.Resolution('invalid.domain');
       expect(result).toEqual({});
     });
-    
+
     it('should resolve with Resolution key setuped #4', async () => {
       const zns = resolution.zns;
+      const spies = mockAsyncMethods(zns, {
+        "getRecordsAddresses": ['zil1tqcrcg50emead2pp6p37p0hnupkswpnlwpnm3r',
+          '0x6aec0e4bb2c6fa4acacdaa3f3d871db5e2e1c0ea'],
+          "getContractField": { 'crypto.BTC.address': '17LV6fxL8b1pJomn5zoDR3ZCnbt88ehGBf',
+          'crypto.ETH.address': '0x0ed6180ef7c638064b9b17ff53ba76ec7077dd95',
+          'crypto.LTC.address': 'MTbeoMfWqEZaaZVG1yE1ENoxVGNmMAxoEj',
+          'whois.email.value': 'jordanb_970@hotmail.com',
+          'whois.for_sale.value': 'true' }
+      });
       expect(zns).toBeDefined();
       const result = await zns.Resolution('mcafee2020.zil');
+      expectSpyToBeCalled(spies);
       expect(result).toEqual({
         crypto: {
           BTC: { address: '17LV6fxL8b1pJomn5zoDR3ZCnbt88ehGBf' },
