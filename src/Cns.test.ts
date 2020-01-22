@@ -68,88 +68,6 @@ describe('CNS', () => {
     expect(ipfs_redirect_domain).toBe('www.unstoppabledomains.com');
   });
 
-  it(`checks the BCH address on ${labelDomain}`, async () => {
-    const eyes = mockCryptoCalls(
-      resolution.cns,
-      'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6',
-    );
-    const addr = await resolution.cns.address(labelDomain, 'BCH');
-    expectSpyToBeCalled(eyes);
-    expect(addr).toBe('qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6');
-  });
-
-  it(`checks the BTC address on ${labelDomain}`, async () => {
-    const eyes = mockCryptoCalls(
-      resolution.cns,
-      '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB',
-    );
-    const addr = await resolution.cns.address(labelDomain, 'BTC');
-    expectSpyToBeCalled(eyes);
-    expect(addr).toBe('1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB');
-  });
-
-  it(`checks the DASH address on ${labelDomain}`, async () => {
-    const eyes = mockCryptoCalls(
-      resolution.cns,
-      'XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j',
-    );
-    const addr = await resolution.cns.address(labelDomain, 'DASH');
-    expectSpyToBeCalled(eyes);
-    expect(addr).toBe('XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j');
-  });
-
-  it(`checks the ETH address on ${labelDomain}`, async () => {
-    const eyes = mockCryptoCalls(
-      resolution.cns,
-      '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
-    );
-    const addr = await resolution.cns.address(labelDomain, 'ETH');
-    expectSpyToBeCalled(eyes);
-    expect(addr).toBe('0x45b31e01AA6f42F0549aD482BE81635ED3149abb');
-  });
-
-  it(`checks the LTC address on ${labelDomain}`, async () => {
-    const eyes = mockCryptoCalls(
-      resolution.cns,
-      'LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL',
-    );
-    const addr = await resolution.cns.address(labelDomain, 'LTC');
-    expectSpyToBeCalled(eyes);
-    expect(addr).toBe('LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL');
-  });
-
-  it(`checks the XMR address on ${labelDomain}`, async () => {
-    const eyes = mockCryptoCalls(
-      resolution.cns,
-      '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d',
-    );
-    const addr = await resolution.cns.address(labelDomain, 'XMR');
-    expectSpyToBeCalled(eyes);
-    expect(addr).toBe(
-      '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d',
-    );
-  });
-
-  it(`checks the ZEC address on ${labelDomain}`, async () => {
-    const eyes = mockCryptoCalls(
-      resolution.cns,
-      't1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV',
-    );
-    const addr = await resolution.cns.address(labelDomain, 'ZEC');
-    expectSpyToBeCalled(eyes);
-    expect(addr).toBe('t1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV');
-  });
-
-  it(`checks the ZIL address on ${labelDomain}`, async () => {
-    const eyes = mockCryptoCalls(
-      resolution.cns,
-      'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
-    );
-    const addr = await resolution.cns.address(labelDomain, 'ZIL');
-    expectSpyToBeCalled(eyes);
-    expect(addr).toBe('zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj');
-  });
-
   it('checks it from resolution main object', async () => {
     const eyes = mockCryptoCalls(
       resolution.cns,
@@ -158,6 +76,90 @@ describe('CNS', () => {
     const addr = await resolution.address(labelDomain, 'ZIL');
     expectSpyToBeCalled(eyes);
     expect(addr).toBe('zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj');
+  });
+
+  describe('.Crypto', () => {
+    it(`checks the BCH address on ${labelDomain}`, async () => {
+      const eyes = mockCryptoCalls(
+        resolution.cns,
+        'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6',
+      );
+      const addr = await resolution.cns.address(labelDomain, 'BCH');
+      expectSpyToBeCalled(eyes);
+      expect(addr).toBe('qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6');
+    });
+  
+    it(`checks the BTC address on ${labelDomain}`, async () => {
+      const eyes = mockCryptoCalls(
+        resolution.cns,
+        '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB',
+      );
+      const addr = await resolution.cns.address(labelDomain, 'BTC');
+      expectSpyToBeCalled(eyes);
+      expect(addr).toBe('1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB');
+    });
+  
+    it(`checks the DASH address on ${labelDomain}`, async () => {
+      const eyes = mockCryptoCalls(
+        resolution.cns,
+        'XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j',
+      );
+      const addr = await resolution.cns.address(labelDomain, 'DASH');
+      expectSpyToBeCalled(eyes);
+      expect(addr).toBe('XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j');
+    });
+  
+    it(`checks the ETH address on ${labelDomain}`, async () => {
+      const eyes = mockCryptoCalls(
+        resolution.cns,
+        '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
+      );
+      const addr = await resolution.cns.address(labelDomain, 'ETH');
+      expectSpyToBeCalled(eyes);
+      expect(addr).toBe('0x45b31e01AA6f42F0549aD482BE81635ED3149abb');
+    });
+  
+    it(`checks the LTC address on ${labelDomain}`, async () => {
+      const eyes = mockCryptoCalls(
+        resolution.cns,
+        'LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL',
+      );
+      const addr = await resolution.cns.address(labelDomain, 'LTC');
+      expectSpyToBeCalled(eyes);
+      expect(addr).toBe('LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL');
+    });
+  
+    it(`checks the XMR address on ${labelDomain}`, async () => {
+      const eyes = mockCryptoCalls(
+        resolution.cns,
+        '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d',
+      );
+      const addr = await resolution.cns.address(labelDomain, 'XMR');
+      expectSpyToBeCalled(eyes);
+      expect(addr).toBe(
+        '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d',
+      );
+    });
+  
+    it(`checks the ZEC address on ${labelDomain}`, async () => {
+      const eyes = mockCryptoCalls(
+        resolution.cns,
+        't1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV',
+      );
+      const addr = await resolution.cns.address(labelDomain, 'ZEC');
+      expectSpyToBeCalled(eyes);
+      expect(addr).toBe('t1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV');
+    });
+  
+    it(`checks the ZIL address on ${labelDomain}`, async () => {
+      const eyes = mockCryptoCalls(
+        resolution.cns,
+        'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
+      );
+      const addr = await resolution.cns.address(labelDomain, 'ZIL');
+      expectSpyToBeCalled(eyes);
+      expect(addr).toBe('zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj');
+    });  
   });
 
   describe('.Hashing', () => {
