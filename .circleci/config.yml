@@ -1,7 +1,3 @@
-# Javascript Node CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-javascript/ for more details
-#      
 version: 2
 jobs:
   build-node10:
@@ -103,12 +99,14 @@ jobs:
       # run tests!
       - run: yarn test
     
-
 workflows:
   version: 2
   build:
     jobs:
-      - build-node10
-      - build-node11
-      - build-node12
+      - build-node10:
+          context: Secrets
+      - build-node11:
+          context: Secrets
+      - build-node12:
+          context: Secrets
 
