@@ -84,7 +84,10 @@ describe('CNS', () => {
   });
 
   it('should not find a resolver address', async () => {
-    await expectResolutionErrorCode(resolution.cns.resolver('empty.crypto'), ResolutionErrorCode.UnregisteredDomain);
+    await expectResolutionErrorCode(
+      resolution.cns.resolver('empty.crypto'),
+      ResolutionErrorCode.UnregisteredDomain,
+    );
   });
 
   describe('.Crypto', () => {
@@ -97,7 +100,7 @@ describe('CNS', () => {
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6');
     });
-  
+
     it(`checks the BTC address on ${labelDomain}`, async () => {
       const eyes = mockCryptoCalls(
         resolution.cns,
@@ -107,7 +110,7 @@ describe('CNS', () => {
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB');
     });
-  
+
     it(`checks the DASH address on ${labelDomain}`, async () => {
       const eyes = mockCryptoCalls(
         resolution.cns,
@@ -117,7 +120,7 @@ describe('CNS', () => {
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j');
     });
-  
+
     it(`checks the ETH address on ${labelDomain}`, async () => {
       const eyes = mockCryptoCalls(
         resolution.cns,
@@ -127,7 +130,7 @@ describe('CNS', () => {
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('0x45b31e01AA6f42F0549aD482BE81635ED3149abb');
     });
-  
+
     it(`checks the LTC address on ${labelDomain}`, async () => {
       const eyes = mockCryptoCalls(
         resolution.cns,
@@ -137,7 +140,7 @@ describe('CNS', () => {
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL');
     });
-  
+
     it(`checks the XMR address on ${labelDomain}`, async () => {
       const eyes = mockCryptoCalls(
         resolution.cns,
@@ -149,7 +152,7 @@ describe('CNS', () => {
         '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d',
       );
     });
-  
+
     it(`checks the ZEC address on ${labelDomain}`, async () => {
       const eyes = mockCryptoCalls(
         resolution.cns,
@@ -159,7 +162,7 @@ describe('CNS', () => {
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('t1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV');
     });
-  
+
     it(`checks the ZIL address on ${labelDomain}`, async () => {
       const eyes = mockCryptoCalls(
         resolution.cns,
@@ -168,7 +171,7 @@ describe('CNS', () => {
       const addr = await resolution.cns.address(labelDomain, 'ZIL');
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj');
-    });  
+    });
   });
 
   describe('.Hashing', () => {
@@ -204,8 +207,6 @@ describe('CNS', () => {
           '0x90cc1963ff09ce95ee2dbb3830df4f2115da9756e087a50283b3e65f6ffe2a4e',
         );
       });
-
-      
     });
     describe('.Childhash', () => {
       it('checks root crypto domain', () => {
@@ -225,10 +226,7 @@ describe('CNS', () => {
         const cns = resolution.cns;
         const domain = 'hello.world.crypto';
         const namehash = cns.namehash(domain);
-        const childhash = cns.childhash(
-          cns.namehash('world.crypto'),
-          'hello',
-        );
+        const childhash = cns.childhash(cns.namehash('world.crypto'), 'hello');
         expect(namehash).toBe(childhash);
       });
 

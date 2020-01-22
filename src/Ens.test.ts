@@ -33,7 +33,7 @@ describe('ENS', () => {
 
   it('resolves .eth name using blockchain', async () => {
     const resolution = new Resolution({
-      blockchain: { ens: {url: secretInfuraLink() } },
+      blockchain: { ens: { url: secretInfuraLink() } },
     });
     expect(resolution.ens.url).toBe(secretInfuraLink());
     expect(resolution.ens.network).toEqual('mainnet');
@@ -420,11 +420,16 @@ describe('ENS', () => {
 
     it('should return correct resolver address', async () => {
       const resolverAddress = await resolution.resolver('almonit.eth');
-      expect(resolverAddress).toBe('0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8');
+      expect(resolverAddress).toBe(
+        '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      );
     });
 
     it('should not find a resolver address', async () => {
-      await expectResolutionErrorCode(resolution.resolver('empty.eth'), ResolutionErrorCode.UnspecifiedResolver);
+      await expectResolutionErrorCode(
+        resolution.resolver('empty.eth'),
+        ResolutionErrorCode.UnspecifiedResolver,
+      );
     });
   });
 
@@ -474,7 +479,10 @@ describe('ENS', () => {
       it('tests childhash functionality', () => {
         const domain = 'hello.world.eth';
         const namehash = resolution.ens.namehash(domain);
-        const childhash = resolution.ens.childhash(resolution.ens.namehash('world.eth'), 'hello');
+        const childhash = resolution.ens.childhash(
+          resolution.ens.namehash('world.eth'),
+          'hello',
+        );
         expect(childhash).toBe(namehash);
       });
 

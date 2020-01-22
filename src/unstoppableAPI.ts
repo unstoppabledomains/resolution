@@ -151,7 +151,8 @@ export default class Udapi extends NamingService {
   /**
    * Returns naming service name
    * @param domain - domain name
-   */  
+   */
+
   serviceName(domain: string): NamingServiceName {
     return this.findMethodOrThrow(domain).name;
   }

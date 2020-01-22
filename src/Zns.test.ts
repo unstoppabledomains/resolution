@@ -155,8 +155,8 @@ describe('ZNS', () => {
 
     it('resolves unclaimed domain using blockchain', async () => {
       const spyes = mockAsyncMethods(resolution.zns, {
-        "getRecordsAddresses": undefined,
-      })
+        getRecordsAddresses: undefined,
+      });
       const address = await resolution.address('test.zil', 'ETH');
       expectSpyToBeCalled(spyes);
       expect(address).toEqual(null);
@@ -165,19 +165,25 @@ describe('ZNS', () => {
 
     it('resolves domain using blockchain #2', async () => {
       const spyes = mockAsyncMethods(resolution.zns, {
-        "getRecordsAddresses": ['zil1zzpjwyp2nu29pcv3sh04qxq9x5l45vke0hrwec',
-          '0x3f329078d95f043fd902d5c3ea2fbce0b3fca003'],
-        "getResolverRecords": {
+        getRecordsAddresses: [
+          'zil1zzpjwyp2nu29pcv3sh04qxq9x5l45vke0hrwec',
+          '0x3f329078d95f043fd902d5c3ea2fbce0b3fca003',
+        ],
+        getResolverRecords: {
           'crypto.BURST.address': 'BURST-R7KK-SBSY-FENX-AWYMW',
           'crypto.ZIL.address': 'zil1zzpjwyp2nu29pcv3sh04qxq9x5l45vke0hrwes',
-          'ipfs.html.value': 'mtwirsqawjuoloq2gvtyug2tc3jbf5htm2zeo4rsknfiv3fdp46a',
+          'ipfs.html.value':
+            'mtwirsqawjuoloq2gvtyug2tc3jbf5htm2zeo4rsknfiv3fdp46a',
           'whois.email.value': 'rleinbox@gmail.com',
-          'whois.for_sale.value': 'true'
-        }
-      })
+          'whois.for_sale.value': 'true',
+        },
+      });
       const result = await resolution.resolve('test-manage-one.zil');
       expectSpyToBeCalled(spyes);
-      expect(result.addresses).toEqual({ BURST: 'BURST-R7KK-SBSY-FENX-AWYMW', ZIL: 'zil1zzpjwyp2nu29pcv3sh04qxq9x5l45vke0hrwes' });
+      expect(result.addresses).toEqual({
+        BURST: 'BURST-R7KK-SBSY-FENX-AWYMW',
+        ZIL: 'zil1zzpjwyp2nu29pcv3sh04qxq9x5l45vke0hrwes',
+      });
       expect(result.meta).toEqual({
         owner: 'zil1zzpjwyp2nu29pcv3sh04qxq9x5l45vke0hrwec',
         type: 'ZNS',
@@ -270,13 +276,17 @@ describe('ZNS', () => {
     it('should resolve with Resolution key setuped #4', async () => {
       const zns = resolution.zns;
       const spies = mockAsyncMethods(zns, {
-        "getRecordsAddresses": ['zil1tqcrcg50emead2pp6p37p0hnupkswpnlwpnm3r',
-          '0x6aec0e4bb2c6fa4acacdaa3f3d871db5e2e1c0ea'],
-          "getContractField": { 'crypto.BTC.address': '17LV6fxL8b1pJomn5zoDR3ZCnbt88ehGBf',
+        getRecordsAddresses: [
+          'zil1tqcrcg50emead2pp6p37p0hnupkswpnlwpnm3r',
+          '0x6aec0e4bb2c6fa4acacdaa3f3d871db5e2e1c0ea',
+        ],
+        getContractField: {
+          'crypto.BTC.address': '17LV6fxL8b1pJomn5zoDR3ZCnbt88ehGBf',
           'crypto.ETH.address': '0x0ed6180ef7c638064b9b17ff53ba76ec7077dd95',
           'crypto.LTC.address': 'MTbeoMfWqEZaaZVG1yE1ENoxVGNmMAxoEj',
           'whois.email.value': 'jordanb_970@hotmail.com',
-          'whois.for_sale.value': 'true' }
+          'whois.for_sale.value': 'true',
+        },
       });
       expect(zns).toBeDefined();
       const result = await zns.Resolution('mcafee2020.zil');
@@ -296,19 +306,26 @@ describe('ZNS', () => {
 
     it('should return a valid resolver address', async () => {
       const spies = mockAsyncMethods(resolution.zns, {
-        "getRecordsAddresses": [ 'zil194qcjskuuxh6qtg8xw3qqrr3kdc6dtq8ct6j9s',
-           '0xdac22230adfe4601f00631eae92df6d77f054891' ]
+        getRecordsAddresses: [
+          'zil194qcjskuuxh6qtg8xw3qqrr3kdc6dtq8ct6j9s',
+          '0xdac22230adfe4601f00631eae92df6d77f054891',
+        ],
       });
       const resolverAddress = await resolution.zns.resolver('brad.zil');
-      expectSpyToBeCalled(spies)
-      expect(resolverAddress).toBe('0xdac22230adfe4601f00631eae92df6d77f054891');
+      expectSpyToBeCalled(spies);
+      expect(resolverAddress).toBe(
+        '0xdac22230adfe4601f00631eae92df6d77f054891',
+      );
     });
 
     it('should not find a resolverAddress', async () => {
       const spies = mockAsyncMethods(resolution.zns, {
-        "getRecordsAddresses": undefined
+        getRecordsAddresses: undefined,
       });
-      await expectResolutionErrorCode(resolution.zns.resolver('sopmethingveryweirdthatnoonewilltakeever.zil'), ResolutionErrorCode.UnregisteredDomain);
+      await expectResolutionErrorCode(
+        resolution.zns.resolver('sopmethingveryweirdthatnoonewilltakeever.zil'),
+        ResolutionErrorCode.UnregisteredDomain,
+      );
       expectSpyToBeCalled(spies);
     });
   });
