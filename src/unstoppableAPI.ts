@@ -158,8 +158,7 @@ export default class Udapi extends NamingService {
   }
 
   async resolver(domain: string): Promise<string> {
-    //todo: fix it with the call to out api instead of direct blockchain call when such endpoint will be available
-    return await this.findMethodOrThrow(domain).resolver(domain);
+    throw new Error('Method not implemented.');
   }
 
   /** @internal */
