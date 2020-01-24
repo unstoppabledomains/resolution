@@ -148,23 +148,8 @@ export default class Cns extends EthereumNamingService {
     return childhash(parent, label, options);
   }
 
-  /**
-   * Returns the resolver address of a domain if exists
-   * @param domain - domain name
-   * @throws ResolutionError with codes UnregisteredDomain or UnspecifiedResolver
-   */
-  async resolver(domain: string): Promise<string> {
-    const tokenId = this.namehash(domain);
-    const ownerPromise = this.owner(tokenId);
-    const resolverAddress: string = await this.getResolver(tokenId);
-    if (!resolverAddress || isNullAddress(resolverAddress)) {
-      await this.throwOwnershipError(domain, ownerPromise);
-    }
-    return resolverAddress;
-  }
-
   /** @internal */
-  private getResolver = async (tokenId: nodeHash): Promise<string> => {
+  protected getResolver = async (tokenId: nodeHash): Promise<string> => {
     return await this.ignoreResolutionError(
       ResolutionErrorCode.RecordNotFound,
       this.callMethod(this.registryContract, 'resolverOf', [tokenId]),
@@ -172,7 +157,8 @@ export default class Cns extends EthereumNamingService {
   };
 
   /** @internal */
-  async owner(tokenId: nodeHash): Promise<string> {
+  async owner(domain: string): Promise<string> {
+    const tokenId = this.namehash(domain);
     return await this.callMethod(this.registryContract, 'ownerOf', [tokenId]);
   }
 
@@ -241,7 +227,7 @@ export default class Cns extends EthereumNamingService {
     domain: string,
   ): Promise<[string, string, number, string]> {
     const tokenId = this.namehash(domain);
-    const ownerPromise = this.owner(tokenId);
+    const ownerPromise = this.owner(domain);
     const resolver: string = await this.getResolver(tokenId);
     if (!resolver || isNullAddress(resolver)) {
       await this.throwOwnershipError(domain, ownerPromise);

@@ -224,20 +224,6 @@ export default class Ens extends EthereumNamingService {
     return hash(domain);
   }
 
-  /**
-   * Returns the resolver address of a domain if exists
-   * @param domain - domain name
-   * @throws ResolutionError with codes UnregisteredDomain or UnspecifiedResolver
-   */
-  async resolver(domain: string): Promise<string> {
-    const nodeHash = this.namehash(domain);
-    const ownerPromise = this.owner(domain);
-    const resolverAddress = await this.getResolver(nodeHash);
-    if (!resolverAddress || isNullAddress(resolverAddress))
-      await this.throwOwnershipError(domain, ownerPromise);
-    return resolverAddress;
-  }
-
   private async getContentHash(domain: string): Promise<string> {
     const nodeHash = this.namehash(domain);
     const resolverContract = await this.getResolverContract(domain);
@@ -305,7 +291,7 @@ export default class Ens extends EthereumNamingService {
   /**
    * This was done to make automated tests more configurable
    */
-  private async getResolver(nodeHash) {
+  protected async getResolver(nodeHash) {
     return await this.ignoreResolutionError(
       ResolutionErrorCode.RecordNotFound,
       this.callMethod(this.registryContract, 'resolver', [nodeHash]),

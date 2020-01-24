@@ -223,15 +223,11 @@ export default class Zns extends NamingService {
    */
   async resolver(domain: string): Promise<string> {
     const recordsAddresses = await this.getRecordsAddresses(domain);
-    if (!recordsAddresses)
+    if (!recordsAddresses || !recordsAddresses[0])
       throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
         domain: domain,
       });
-    const [ownerAddress, resolverAddress] = recordsAddresses;
-    if (!ownerAddress)
-      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-        domain: domain,
-      });
+    const [_, resolverAddress] = recordsAddresses;
     if (!resolverAddress || isNullAddress(resolverAddress))
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
         domain: domain,
