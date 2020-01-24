@@ -11,6 +11,7 @@ import {
 import Zns from './zns';
 import Ens from './ens';
 import Cns from './cns';
+import pckg from './package.json';
 
 export default class Udapi extends NamingService {
   readonly name = 'UDAPI';
@@ -25,7 +26,7 @@ export default class Udapi extends NamingService {
     const DefaultUserAgent = this.isNode()
       ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'
       : navigator.userAgent;
-    const version = '1.0.9';
+    const version = pckg.version;
     const CustomUserAgent = `${DefaultUserAgent} Resolution/${version}`;
     this.headers = { 'X-user-agent': CustomUserAgent };
   }
