@@ -157,6 +157,10 @@ export default class Udapi extends NamingService {
     return this.findMethodOrThrow(domain).name;
   }
 
+  /**
+   * Not implemented for this naming service
+   * @param domain 
+   */
   async resolver(domain: string): Promise<string> {
     throw new Error('Method not implemented.');
   }
