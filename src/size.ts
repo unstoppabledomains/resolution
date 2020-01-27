@@ -59,8 +59,13 @@ class SizeChecker {
     const color: Color = this.sizeLimit >= this.totalSize ? Color.FgGreen : Color.FgRed;
     this.log(`Total Size: ${this.totalSize / 1000} KB`, color);
     if (color == Color.FgRed)
-      throw new Error('Package size is out of limit');
+      return this.fail();
   };
+
+  private fail() {
+    this.log(`Size limit was exceeded ${this.totalSize / 1000} KB >= ${this.sizeLimit / 1000} KB`, Color.FgRed);
+    return 1;
+  }
 
   private log(data: any, color: Color) {
     if (this.verbose) {
