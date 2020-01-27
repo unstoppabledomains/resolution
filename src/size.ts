@@ -74,4 +74,4 @@ class SizeChecker {
   }
 }
 
-new SizeChecker(true, 30).main();
+new SizeChecker(true, 30).main().then(result => result);
