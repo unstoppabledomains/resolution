@@ -12,7 +12,7 @@
     "release:minor": "yarn build && yarn test && yarn publish --minor && yarn docs && yarn docs:deploy && yarn release:tag",
     "release:major": "yarn build && yarn test && yarn publish --major && yarn docs && yarn docs:deploy && yarn release:tag",
     "release:tag": "git push origin v$npm_package_version",
-    "test": "jest",
+    "test": "jest && yarn size",
     "start": "npm run build:live",
     "build": "tsc -p .",
     "format": "prettier --semi --write -l **/*.{js,json,ts}",
@@ -22,7 +22,8 @@
     "docs:generate": "yarn run typedoc --out \"./docs/v$npm_package_version\"",
     "docs:readme": "./docs-readme.sh",
     "docs:deploy": "./deploy-docs.sh",
-    "analyze": "webpack-cli"
+    "analyze": "webpack-cli",
+    "size": "ts-node ./src/size.ts"
   },
   "files": [
     "build"
