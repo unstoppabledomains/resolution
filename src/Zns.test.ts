@@ -7,6 +7,7 @@ import {
   expectResolutionErrorCode,
   mockAsyncMethods,
 } from './utils/testHelpers';
+import { NullAddress } from './types';
 
 let resolution: Resolution;
 beforeEach(() => {
@@ -328,6 +329,31 @@ describe('ZNS', () => {
       );
       expectSpyToBeCalled(spies);
     });
+
+    it('should have a zero resolver hahaha', async () => {
+      const spies = mockAsyncMethods(resolution.zns, {
+        getRecordsAddresses: [ 'zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz',
+        NullAddress[1] ]
+      });
+      await expectResolutionErrorCode(
+        resolution.zns.resolver('uihui12d.zil'),
+        ResolutionErrorCode.UnspecifiedResolver
+      );
+      expectSpyToBeCalled(spies);
+    });
+
+    it('should have a zero resolver 2', async () => {
+      const spies = mockAsyncMethods(resolution.zns, {
+        getRecordsAddresses: [ 'zil10scu59zrf8fr6gyw5vnwcz43hg7rvah747pz5h',
+        NullAddress[1] ]
+      });
+      await expectResolutionErrorCode(
+        resolution.zns.resolver('paulalcock.zil'),
+        ResolutionErrorCode.UnspecifiedResolver
+      );
+      expectSpyToBeCalled(spies);
+    });
+
   });
 
   describe('.isSupportedDomain', () => {

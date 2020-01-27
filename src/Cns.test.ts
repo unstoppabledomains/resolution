@@ -90,6 +90,13 @@ describe('CNS', () => {
     );
   });
 
+  it('should throw ResolutionError.UnspecifiedResolver', async () => {
+    await expectResolutionErrorCode(
+      resolution.cns.resolver('pandorapay.crypto'),
+      ResolutionErrorCode.UnspecifiedResolver
+    );
+  });
+
   describe('.Crypto', () => {
     it(`checks the BCH address on ${labelDomain}`, async () => {
       const eyes = mockCryptoCalls(
