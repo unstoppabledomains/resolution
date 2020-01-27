@@ -32,6 +32,7 @@ export default abstract class NamingService extends BaseConnection {
   abstract ipfsHash(domain: string): Promise<string>;
   abstract email(domain: string): Promise<string>;
   abstract httpUrl(domain: string): Promise<string>;
+  abstract resolver(domain: string): Promise<string>;
 
   serviceName(domain: string): NamingServiceName {
     return this.name as NamingServiceName;
@@ -75,6 +76,7 @@ export abstract class EthereumNamingService extends NamingService {
   readonly name: NamingServiceName;
   abstract registryAddress?: string;
   abstract url: string;
+  protected abstract getResolver(id: string): Promise<string>;
   protected registryContract: Contract;
   /** @internal */
   readonly NetworkIdMap: NetworkIdMap = {
@@ -94,6 +96,20 @@ export abstract class EthereumNamingService extends NamingService {
   };
 
   readonly NetworkNameMap = invert(this.NetworkIdMap);
+
+  /**
+    * Returns the resolver address of a domain if exists
+    * @param domain - domain name
+    * @throws ResolutionError with codes UnregisteredDomain or UnspecifiedResolver
+  */
+  async resolver(domain: string): Promise<string> {
+    const nodeHash = this.namehash(domain);
+    const ownerPromise = this.owner(domain);
+    const resolverAddress = await this.getResolver(nodeHash);
+    if (!resolverAddress || isNullAddress(resolverAddress))
+      await this.throwOwnershipError(domain, ownerPromise);
+    return resolverAddress;
+  }
 
   /**
    * Look up for network from url provided

@@ -291,7 +291,7 @@ export default class Ens extends EthereumNamingService {
   /**
    * This was done to make automated tests more configurable
    */
-  private async getResolver(nodeHash) {
+  protected async getResolver(nodeHash) {
     return await this.ignoreResolutionError(
       ResolutionErrorCode.RecordNotFound,
       this.callMethod(this.registryContract, 'resolver', [nodeHash]),

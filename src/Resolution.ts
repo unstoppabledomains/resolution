@@ -165,6 +165,10 @@ export default class Resolution {
     return await method.address(domain, currencyTicker);
   }
 
+  async resolver(domain: string): Promise<string> {
+    return await this.getNamingMethodOrThrow(domain).resolver(domain);
+  }
+
   /**
    * Owner of the domain
    * @param domain - domain name

@@ -68,12 +68,9 @@
     "bip44-constants": "8.0.5",
     "bn.js": "^5.1.1",
     "content-hash": "2.5.2",
-    "ethers": "^4.0.43",
     "hash.js": "1.1.7",
     "idna-uts46-hx": "^3.2.2",
     "js-sha3": "0.8.0",
-    "keccak256": "^1.0.0",
-    "lodash": "^4.17.15",
     "node-fetch": "2.6.0"
   }
 }
