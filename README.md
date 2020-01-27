@@ -1,5 +1,7 @@
 # Resolution
 
+[![CircleCI](https://circleci.com/gh/unstoppabledomains/resolution.svg?style=svg)](https://circleci.com/gh/unstoppabledomains/resolution)
+
 A library for interacting with blockchain domain names.
 
 You can use Resolution in a `<script>` tag from a
