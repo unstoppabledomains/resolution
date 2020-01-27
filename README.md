@@ -1,6 +1,6 @@
 # Resolution
 
-[![CircleCI](https://circleci.com/gh/unstoppabledomains/resolution.svg?style=svg)](https://circleci.com/gh/unstoppabledomains/resolution)
+[![CircleCI](https://circleci.com/gh/unstoppabledomains/resolution.svg?style=shield)](https://circleci.com/gh/unstoppabledomains/resolution)
 [![Bundle Size Minified](https://img.shields.io/bundlephobia/min/@unstoppabledomains/resolution.svg)](https://bundlephobia.com/result?p=@unstoppabledomains/resolution)
 [![Bundle Size Minified Zipped](https://img.shields.io/bundlephobia/minzip/@unstoppabledomains/resolution.svg)](https://bundlephobia.com/result?p=@unstoppabledomains/resolution)
 
