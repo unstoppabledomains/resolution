@@ -69,7 +69,6 @@ jobs:
       # run tests!
       - run: yarn test
     
-
   build-node12:
     docker:
       - image: circleci/node:12.12.0
@@ -98,7 +97,38 @@ jobs:
 
       # run tests!
       - run: yarn test
-    
+  
+  size-check:
+    docker:
+      - image: circleci/node:12.12.0
+    steps:
+      - run:
+          name: 'Node version 12'
+          command: node --version
+      - checkout:
+          name: Checking out the code
+      # Download and cache dependencies
+      - restore_cache:
+          name: Restore Yarn Package Cache
+          keys:
+            - npm-deps-{{ .Branch }}-{{ checksum "package.json" }}
+            - npm-deps-{{ .Branch }}-
+            - npm-deps-
+      - run:
+          name: Install Dependencies
+          command: yarn install 
+      - save_cache:
+          name: Save Yarn Package Cache
+          key: npm-deps-{{ .Branch }}-{{ checksum "package.json" }}
+          paths:
+            - ~/.cache/yarn
+      # run tests!
+      - run: 
+          name: sizeCheck
+          command: |
+            set -e
+            yarn size
+
 workflows:
   version: 2
   build:
@@ -109,4 +139,5 @@ workflows:
           context: Secrets
       - build-node12:
           context: Secrets
+      - size-check
 

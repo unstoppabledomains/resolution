@@ -1,4 +1,5 @@
 ## Unreleased
+* Added size check for the package with limit 500.00 KB
 
 ## 1.0.20
 * Added Resolution#resolver(domain:string): Promise<string>
