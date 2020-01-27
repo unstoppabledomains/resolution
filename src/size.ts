@@ -37,6 +37,11 @@ class SizeChecker {
   readonly sizeLimit: number;
   private totalSize: number;
 
+  /**
+   * 
+   * @param verbose show the logs
+   * @param sizeLimit size limit in bytes
+   */
   constructor(verbose?: boolean, sizeLimit?: number) {
     this.baseurl = "https://bundlephobia.com/api/size?package=";
     this.totalSize = 0;
@@ -80,4 +85,4 @@ class SizeChecker {
   }
 }
 
-new SizeChecker(true, 30).main();
+new SizeChecker(true, 500000).main();
