@@ -65,12 +65,12 @@ class SizeChecker {
 
   private success() {
     this.log(`Size limit is ok! `, Color.FgGreen);
-    return 0;
+    process.exit(0);
   }
 
   private fail() {
     this.log(`Size limit was exceeded ${this.totalSize / 1000} KB >= ${this.sizeLimit / 1000} KB`, Color.FgRed);
-    return 1;
+    process.exit(1);
   }
 
   private log(data: any, color: Color) {
@@ -80,4 +80,4 @@ class SizeChecker {
   }
 }
 
-new SizeChecker(true, 30).main().then((result) => { return result });
+new SizeChecker(true, 30).main();
