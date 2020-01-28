@@ -38,7 +38,7 @@ class SizeChecker {
   private totalSize: number;
 
   /**
-   * 
+   *
    * @param verbose show the logs
    * @param sizeLimit size limit in bytes
    */
@@ -47,13 +47,13 @@ class SizeChecker {
     this.totalSize = 0;
     this.dependecies = pckg.dependencies;
     this.verbose = verbose || false;
-    this.sizeLimit = sizeLimit || 500000;
+    this.sizeLimit = sizeLimit || 500 * 1024;
   }
 
   async fetchSize(packageName: string, packageVersion: string) {
     const url = `${this.baseurl}${packageName}@${packageVersion}`;
     const response = await fetch(url).then(res => res.json());
-    this.log(`${response.name} --> ${response.size / 1000} KB`, Color.FgBlue);
+    this.log(`${response.name} --> ${this.toKB(response.size)} KB`, Color.FgBlue);
     return response.size;
   }
 
@@ -62,7 +62,7 @@ class SizeChecker {
       this.totalSize += await this.fetchSize(packageName, packageVersion);
     };
     const color: Color = this.sizeLimit >= this.totalSize ? Color.FgGreen : Color.FgRed;
-    this.log(`Total Size: ${this.totalSize / 1000} KB`, color);
+    this.log(`Total Size: ${this.toKB(this.totalSize)} KB`, color);
     if (color == Color.FgRed)
       return this.fail();
     return this.success();
@@ -74,8 +74,11 @@ class SizeChecker {
   }
 
   private fail() {
-    this.log(`Size limit was exceeded ${this.totalSize / 1000} KB >= ${this.sizeLimit / 1000} KB`, Color.FgRed);
+    this.log(`Size limit was exceeded ${this.toKB(this.totalSize)} KB >= ${this.toKB(this.sizeLimit)} KB`, Color.FgRed);
     process.exit(1);
+  }
+  private toKB(value: number) {
+    return Math.round(value / 1024)
   }
 
   private log(data: any, color: Color) {
@@ -85,4 +88,4 @@ class SizeChecker {
   }
 }
 
-new SizeChecker(true, 500000).main();
+new SizeChecker(true).main();
