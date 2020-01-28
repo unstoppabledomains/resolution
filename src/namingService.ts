@@ -8,7 +8,6 @@ import {
   ResolutionResponse,
   isNullAddress,
 } from './types';
-import { default as hash } from './ens/namehash';
 import ResolutionError, { ResolutionErrorCode } from './resolutionError';
 import BaseConnection from './baseConnection';
 import { invert } from './utils';

@@ -91,10 +91,15 @@ describe('CNS', () => {
   });
 
   it('should throw ResolutionError.UnspecifiedResolver', async () => {
+    const spies = mockAsyncMethods(resolution.cns, {
+      getResolver: undefined,
+      owner: 'someowneraddress'
+    });
     await expectResolutionErrorCode(
       resolution.cns.resolver('pandorapay.crypto'),
       ResolutionErrorCode.UnspecifiedResolver
     );
+    expectSpyToBeCalled(spies);
   });
 
   describe('.Crypto', () => {
