@@ -1,6 +1,6 @@
 {
   "name": "@unstoppabledomains/resolution",
-  "version": "1.0.20",
+  "version": "1.0.21",
   "description": "Domain Resolution for blockchain domains",
   "main": "./build/index.js",
   "directories": {
@@ -8,9 +8,10 @@
   },
   "types": "./build/index.d.ts",
   "scripts": {
-    "release": "yarn build && yarn test && yarn size && git push && yarn publish --patch && yarn docs && yarn docs:deploy && yarn release:tag",
-    "release:minor": "yarn build && yarn test && yarn size && yarn publish --minor && yarn docs && yarn docs:deploy && yarn release:tag",
-    "release:major": "yarn build && yarn test && yarn size && yarn publish --major && yarn docs && yarn docs:deploy && yarn release:tag",
+    "release": "RELEASE=patch yarn release:run",
+    "release:minor": "RELEASE=minor yarn release:run",
+    "release:major": "RELEASE=major yarn release:run",
+    "release:run": "yarn build && yarn size && yarn publish --$RELEASE && yarn docs && yarn docs:deploy && yarn release:tag",
     "release:tag": "git push origin v$npm_package_version",
     "test": "jest",
     "start": "npm run build:live",
