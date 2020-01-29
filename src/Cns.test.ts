@@ -1,4 +1,4 @@
-import Resolution from '.';
+import Resolution from './index';
 import {
   mockAsyncMethods,
   expectSpyToBeCalled,

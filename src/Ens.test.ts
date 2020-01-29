@@ -1,5 +1,5 @@
 import nock from 'nock';
-import Resolution, { ResolutionErrorCode, ResolutionError } from '.';
+import Resolution, { ResolutionErrorCode, ResolutionError } from './index';
 import Ens from './ens';
 import { NullAddress } from './types';
 import {

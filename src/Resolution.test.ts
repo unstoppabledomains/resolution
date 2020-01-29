@@ -1,5 +1,5 @@
 import nock from 'nock';
-import Resolution, { ResolutionErrorCode } from '.';
+import Resolution, { ResolutionErrorCode } from './index';
 import { UnclaimedDomainResponse, NamingServiceName } from './types';
 import { expectResolutionErrorCode, mockAsyncMethod, expectSpyToBeCalled, mockAsyncMethods } from './utils/testHelpers';
 

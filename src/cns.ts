@@ -10,7 +10,7 @@ import {
 import { default as resolverInterface } from './cns/contract/resolver';
 import { default as cnsInterface } from './cns/contract/registry';
 import { default as hash, childhash } from './cns/namehash';
-import { ResolutionError } from '.';
+import ResolutionError from './resolutionError';
 import { ResolutionErrorCode } from './resolutionError';
 import Contract from './utils/contract';
 

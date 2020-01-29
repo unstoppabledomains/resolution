@@ -1,4 +1,4 @@
-import { ResolutionError, ResolutionErrorCode } from '../../.';
+import { ResolutionError, ResolutionErrorCode } from '../../resolutionError';
 import { default as newResolver } from './newResolver';
 import { default as oldResolver } from './oldResolver';
 import { EthCoinIndex, NamingServiceName } from '../../types';
