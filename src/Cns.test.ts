@@ -7,6 +7,7 @@ import {
 } from './utils/testHelpers';
 import { ResolutionErrorCode } from './resolutionError';
 import dotenv from 'dotenv';
+import { NullAddress } from './types';
 
 dotenv.config();
 const labelDomain = 'reseller-test-braden-6.crypto';
@@ -49,10 +50,14 @@ describe('CNS', () => {
   });
 
   it('Should return NoRecord Resolution error', async () => {
+    const spies = mockAsyncMethods(resolution.cns, {
+      getResolver: undefined
+    });
     await expectResolutionErrorCode(
       resolution.cns.record(labelDomain, 'No.such.record'),
       ResolutionErrorCode.RecordNotFound,
     );
+    expectSpyToBeCalled(spies);
   });
 
   it('checks the ipfs redirect_domain record', async () => {
@@ -79,15 +84,24 @@ describe('CNS', () => {
   });
 
   it('should return a valid resolver address', async () => {
+    const spies = mockAsyncMethods(resolution.cns, {
+      getResolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D'
+    });
     const resolverAddress = await resolution.cns.resolver('brad.crypto');
+    expectSpyToBeCalled(spies);
     expect(resolverAddress).toBe('0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D');
   });
 
   it('should not find a resolver address', async () => {
+    const spies = mockAsyncMethods(resolution.cns, {
+      getResolver: undefined,
+      owner: NullAddress[1]
+    });
     await expectResolutionErrorCode(
       resolution.cns.resolver('empty.crypto'),
       ResolutionErrorCode.UnregisteredDomain,
     );
+    expectSpyToBeCalled(spies);
   });
 
   it('should throw ResolutionError.UnspecifiedResolver', async () => {
@@ -258,7 +272,11 @@ describe('CNS', () => {
   describe('.Metadata', () => {
     const domain = 'reseller-test-ryan019.crypto';
     it('should resolve with ipfs stored on cns', async () => {
+      const spies = mockAsyncMethods(resolution.cns, {
+        getRecord: '0x033dc48b5db4ca62861643e9d2c411d9eb6d1975@gmail.com' 
+      });
       const ipfsHash = await resolution.ipfsHash(domain);
+      expectSpyToBeCalled(spies);
       expect(ipfsHash).toBe(
         '0x033dc48b5db4ca62861643e9d2c411d9eb6d1975@gmail.com',
       );

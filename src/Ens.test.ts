@@ -112,10 +112,15 @@ describe('ENS', () => {
   });
 
   it('resolves .luxe name using ENS blockchain with thrown error', async () => {
+    const spies = mockAsyncMethods(resolution.ens, {
+      getResolver: undefined
+    });
+
     await expectResolutionErrorCode(
       resolution.addressOrThrow('something.luxe', 'ETH'),
       ResolutionErrorCode.UnregisteredDomain,
     );
+    expectSpyToBeCalled(spies);
   });
 
   it('resolves name with resolver but without an owner', async () => {
