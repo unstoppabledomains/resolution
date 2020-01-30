@@ -354,7 +354,7 @@ describe('ZNS', () => {
       expectSpyToBeCalled(spies);
     });
 
-    it.only('should resolve with UnspecifiedCurriency', async () => {
+    it('should resolve with UnspecifiedCurriency', async () => {
       const spies = mockAsyncMethods(resolution.zns, {
         getRecordsAddresses: [ 'zil1thd3le9wdl3ashy7h4j4dm8slm8grausdm4nyr',
         '0x2410f1f18062b9e6f03246ba126f1f02605b1837' ],
