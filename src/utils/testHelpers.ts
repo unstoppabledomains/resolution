@@ -78,7 +78,7 @@ export function mockAPICalls(testName: string, url = MainnetUrl) {
 
 /**
  * @internal
- * returns either a standard mainnet infura url 
+ * returns either a standard mainnet infura url
  * or the one with attached INFURA SECRET key from
  * INFURA env variable if any
  */

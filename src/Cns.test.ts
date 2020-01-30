@@ -25,8 +25,6 @@ const mockCryptoCalls = (
 ): jest.SpyInstance<any, unknown[]>[] => {
   const eyes = mockAsyncMethods(object, {
     getResolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
-    owner: '0x1a5363ca3ceef73b1544732e3264f6d600cf678e',
-    getTtl: '0',
     getRecord: mockAddress,
   });
   return eyes;
@@ -273,7 +271,7 @@ describe('CNS', () => {
     const domain = 'reseller-test-ryan019.crypto';
     it('should resolve with ipfs stored on cns', async () => {
       const spies = mockAsyncMethods(resolution.cns, {
-        getRecord: '0x033dc48b5db4ca62861643e9d2c411d9eb6d1975@gmail.com' 
+        getRecord: '0x033dc48b5db4ca62861643e9d2c411d9eb6d1975@gmail.com'
       });
       const ipfsHash = await resolution.ipfsHash(domain);
       expectSpyToBeCalled(spies);

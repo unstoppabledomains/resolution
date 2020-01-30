@@ -92,10 +92,10 @@ export default class Cns extends EthereumNamingService {
    * @returns - A promise that resolves in a string
    */
   async address(domain: string, currencyTicker: string): Promise<string> {
-    const [tokenId, _, __, resolver] = await this.getResolutionMeta(domain);
+    const resolver = await this.getResolver(domain);
     const addr: string = await this.fetchAddress(
       resolver,
-      tokenId,
+      this.namehash(domain),
       currencyTicker,
     );
     if (!addr)
@@ -217,23 +217,5 @@ export default class Cns extends EthereumNamingService {
     params: any[],
   ): Promise<any> {
     return await this.callMethod(contract, methodname, params);
-  }
-
-  /**
-   * @param domain
-   * @retuns Promise that resolves to [tokenId, owner, ttl, resolver]
-   */
-  private async getResolutionMeta(
-    domain: string,
-  ): Promise<[string, string, number, string]> {
-    const tokenId = this.namehash(domain);
-    const ownerPromise = this.owner(domain);
-    const resolver: string = await this.getResolver(tokenId);
-    if (!resolver || isNullAddress(resolver)) {
-      await this.throwOwnershipError(domain, ownerPromise);
-    }
-    const resolverContract = this.buildContract(resolverInterface, resolver);
-    const ttl = await this.getTtl(resolverContract, 'get', ['ttl', tokenId]);
-    return [tokenId, await ownerPromise, parseInt(ttl) || 0, resolver];
   }
 }
