@@ -1,4 +1,8 @@
 ## Unreleased
+* Updated ens registry address according to https://github.com/ensdomains/ens/security/advisories/GHSA-8f9f-pc5v-9r5h
+* Removed test extension from ens resolvable tld's
+
+## 1.0.22
 * Added size check for the package with limit 500.00 KB
 
 ## 1.0.20
