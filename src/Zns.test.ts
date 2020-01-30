@@ -332,8 +332,8 @@ describe('ZNS', () => {
 
     it('should have a zero resolver hahaha', async () => {
       const spies = mockAsyncMethods(resolution.zns, {
-        getRecordsAddresses: [ 'zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz',
-        NullAddress[1] ]
+        getRecordsAddresses: ['zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz',
+          NullAddress[1]]
       });
       await expectResolutionErrorCode(
         resolution.zns.resolver('uihui12d.zil'),
@@ -344,8 +344,8 @@ describe('ZNS', () => {
 
     it('should have a zero resolver 2', async () => {
       const spies = mockAsyncMethods(resolution.zns, {
-        getRecordsAddresses: [ 'zil10scu59zrf8fr6gyw5vnwcz43hg7rvah747pz5h',
-        NullAddress[1] ]
+        getRecordsAddresses: ['zil10scu59zrf8fr6gyw5vnwcz43hg7rvah747pz5h',
+          NullAddress[1]]
       });
       await expectResolutionErrorCode(
         resolution.zns.resolver('paulalcock.zil'),
@@ -354,6 +354,18 @@ describe('ZNS', () => {
       expectSpyToBeCalled(spies);
     });
 
+    it.only('should resolve with UnspecifiedCurriency', async () => {
+      const spies = mockAsyncMethods(resolution.zns, {
+        getRecordsAddresses: [ 'zil1thd3le9wdl3ashy7h4j4dm8slm8grausdm4nyr',
+        '0x2410f1f18062b9e6f03246ba126f1f02605b1837' ],
+        getResolverRecords:  { 'whois.email.value': 'alain974@protonmail.com',
+        'whois.for_sale.value': 'true' }
+      });
+      await expectResolutionErrorCode(
+        resolution.addressOrThrow('macron2022.zil', 'btc'), ResolutionErrorCode.UnspecifiedCurrency,
+      );
+      expectSpyToBeCalled(spies);
+    })
   });
 
   describe('.isSupportedDomain', () => {
