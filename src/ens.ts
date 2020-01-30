@@ -70,7 +70,7 @@ export default class Ens extends EthereumNamingService {
     return (
       domain === 'eth' ||
       (domain.indexOf('.') > 0 &&
-        /^[^-]*[^-]*\.(eth|luxe|xyz|test)$/.test(domain))
+        /^[^-]*[^-]*\.(eth|luxe|xyz)$/.test(domain))
     );
   }
 
