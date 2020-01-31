@@ -1,4 +1,6 @@
 ## Unreleased
+
+## 1.0.21
 * Updated ens registry address according to https://github.com/ensdomains/ens/security/advisories/GHSA-8f9f-pc5v-9r5h
 * Removed test extension from ens resolvable tld's
 
