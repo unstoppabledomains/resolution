@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 1.0.24
+* Bug fix, namehash the domain before asking for a resolver on cns.
+* Bug fix, ignore the resolutionErrorCode.RecordNotFound when looking up the crypto address.
+
 ## 1.0.23
 * Updated ens registry address according to https://github.com/ensdomains/ens/security/advisories/GHSA-8f9f-pc5v-9r5h
 * Removed test extension from ens resolvable tld's

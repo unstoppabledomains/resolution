@@ -92,12 +92,13 @@ export default class Cns extends EthereumNamingService {
    * @returns - A promise that resolves in a string
    */
   async address(domain: string, currencyTicker: string): Promise<string> {
-    const resolver = await this.getResolver(domain);
-    const addr: string = await this.fetchAddress(
+    const tokenId = this.namehash(domain);
+    const resolver = await this.getResolver(tokenId);
+    const addr: string = await this.ignoreResolutionError(ResolutionErrorCode.RecordNotFound, this.fetchAddress(
       resolver,
       this.namehash(domain),
       currencyTicker,
-    );
+    ));
     if (!addr)
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
         domain,
