@@ -72,7 +72,6 @@
     "bn.js": "^5.1.1",
     "content-hash": "^2.5.2",
     "hash.js": "^1.1.7",
-    "idna-uts46-hx": "^3.2.2",
     "js-sha3": "^0.8.0",
     "node-fetch": "^2.6.0"
   }
