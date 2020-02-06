@@ -53,7 +53,7 @@ class SizeChecker {
   async fetchSize(packageName: string, packageVersion: string) {
     const url = `${this.baseurl}${packageName}@${packageVersion}`;
     const response = await fetch(url).then(res => res.json());
-    this.log(`${response.name} --> ${this.toKB(response.size)} KB`, Color.FgBlue);
+    this.log(`${response.name} @ ${packageVersion} --> ${this.toKB(response.size)} KB`, Color.FgBlue);
     return response.size;
   }
 
