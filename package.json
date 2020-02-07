@@ -24,7 +24,7 @@
     "docs:readme": "./docs-readme.sh",
     "docs:deploy": "./deploy-docs.sh",
     "analyze": "webpack-cli",
-    "size": "yarn run sizecheck -p ./package.json -l 500 -v"
+    "size": "yarn run sizecheck -p ./package.json -l 20 -v"
   },
   "files": [
     "build"
