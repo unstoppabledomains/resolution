@@ -1,5 +1,6 @@
 ## Unreleased
 * Using flexible dependacies instead of locked versions
+* Moved sizecheck to a separate dev dependacy
 
 ## 1.0.24
 * Bug fix, namehash the domain before asking for a resolver on cns.
