@@ -21,6 +21,7 @@ import Contract from './utils/contract';
  */
 export default abstract class NamingService extends BaseConnection {
   readonly name: ResolutionMethod;
+  protected web3Provider:any;
   abstract isSupportedDomain(domain: string): boolean;
   abstract isSupportedNetwork(): boolean;
   abstract namehash(domain: string): string;
@@ -32,6 +33,18 @@ export default abstract class NamingService extends BaseConnection {
   abstract email(domain: string): Promise<string>;
   abstract httpUrl(domain: string): Promise<string>;
   abstract resolver(domain: string): Promise<string>;
+
+  constructor(web3Provider?: any) {
+    super();
+    if (this.isValidProvider(web3Provider))
+      this.web3Provider = web3Provider;
+  }
+
+  private isValidProvider(web3Provider:any) {
+    if (web3Provider && !web3Provider.sendAsync)
+      throw new Error('web3Provider has not implemented sendAsync method');
+    return true;
+  }
 
   serviceName(domain: string): NamingServiceName {
     return this.name as NamingServiceName;
@@ -205,7 +218,7 @@ export abstract class EthereumNamingService extends NamingService {
   }
 
   protected buildContract(abi, address) {
-    return new Contract(this.name, this.url, abi, address);
+    return new Contract(this.name, this.url, abi, address, this.web3Provider);
   }
 
   protected async throwOwnershipError(domain, ownerPromise?: Promise<string>) {

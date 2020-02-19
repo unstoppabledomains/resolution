@@ -12,17 +12,19 @@ export default class Contract extends BaseConnection {
   readonly address: string;
   readonly url: string;
   readonly name: NamingServiceName;
+  readonly web3Provider: any;
 
   /**
    * @param contractInterface JSON-RPC interface of smartContract
    * @param address Contract's address
    */
-  constructor(name: NamingServiceName, url: string, contractInterface, address: string) {
+  constructor(name: NamingServiceName, url: string, contractInterface, address: string, web3Provider?: any) {
     super();
     this.name = name;
     this.url = url;
     this.contractInterface = contractInterface;
     this.address = address;
+    this.web3Provider = web3Provider;
   }
 
   /**
@@ -67,19 +69,24 @@ export default class Contract extends BaseConnection {
   }
 
   private async fetchData(data: string): Promise<any> {
+    const params =  [{
+        data,
+        to: this.address
+      },
+      "latest"
+    ];
+    if (this.web3Provider) {
+      return await this.web3Provider
+        .sendAsync('eth_call', params)
+        .then(resp => resp.json());
+    }
     const response = await this.fetch(this.url, {
       method: 'POST',
       body: JSON.stringify({
         jsonrpc: "2.0",
         id: 1,
         method: "eth_call",
-        params: [
-          {
-            data,
-            to: this.address
-          },
-          "latest"
-        ],
+        params
       }),
       headers: {
         'Content-Type': 'application/json',

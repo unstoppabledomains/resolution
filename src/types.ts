@@ -101,6 +101,7 @@ export type Blockchain =
       ens?: NamingServiceSource;
       zns?: NamingServiceSource;
       cns?: NamingServiceSource;
+      web3Provider?: any;
     };
 
 export type API = {

@@ -25,6 +25,7 @@ import NamingService from './namingService';
  */
 export default class Resolution {
   readonly blockchain: Blockchain | boolean;
+  readonly web3Provider: any;
   /** @internal */
   readonly ens?: Ens;
   /** @internal */
