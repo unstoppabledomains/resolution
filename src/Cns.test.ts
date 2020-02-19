@@ -281,7 +281,11 @@ describe('CNS', () => {
     });
 
     it('should resolve with email stored on cns', async () => {
+      const spies = mockAsyncMethods(resolution.cns, {
+        getRecord: '0x033dc48b5db4ca62861643e9d2c411d9eb6d1975@gmail.com' 
+      });
       const email = await resolution.email(domain);
+      expectSpyToBeCalled(spies);
       expect(email).toBe(
         '0x033dc48b5db4ca62861643e9d2c411d9eb6d1975@gmail.com',
       );

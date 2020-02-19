@@ -424,9 +424,13 @@ describe('ENS', () => {
     });
 
     it('should return correct resolver address', async () => {
+      const spies = mockAsyncMethods(resolution.ens, {
+        getResolver: "0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41"
+      });
       const resolverAddress = await resolution.resolver('almonit.eth');
+      expectSpyToBeCalled(spies);
       expect(resolverAddress).toBe(
-        '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+        '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
       );
     });
 
