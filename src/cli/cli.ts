@@ -1,32 +1,4 @@
 #!/usr/bin/env node
-// import comander from 'commander';
-// import pckg from '../package.json';
-
-// /**
-//  * Usage
-//  * 
-//  * 
-//  */
-
-// const cli = comander
-//   .version(pckg.version)
-//   .description("Command line tool for domain resolution")
-//   .command('resolve <string>[domain]', {isDefault: true})
-//     .description('Resolves the given domain')
-//     .option('-c, --currency <string>', 'specify the currency interested')
-//     .option('-e, --email', 'request an email')
-//     .option('-i, --ipfs', 'get IpfsHash')
-//     .option('-e, --email', 'get email')
-//     .option('-a, --address', 'get cryptoAddress')
-//     .option('-r, --resolver', 'get resolver')
-//     .action((domain, options) => {
-//       console.log(`resolving ${domain} with options:`, options);
-//     })
-
-
-// comander.parseAsync(process.argv);
-
-
 import program from 'commander';
 import pckg from '../package.json';
 import Resolution from '../Resolution.js';
