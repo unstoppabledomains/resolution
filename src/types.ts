@@ -108,6 +108,10 @@ export type API = {
   url: string;
 };
 
+export interface Provider {
+  sendAsync
+}
+
 export const DefaultAPI: API = {
   url: UDApiDefaultUrl,
 };

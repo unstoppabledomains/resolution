@@ -6,6 +6,7 @@ import {
   ResolutionResponse,
   isNullAddress,
   nodeHash,
+  Provider,
 } from './types';
 import { default as resolverInterface } from './cns/contract/resolver';
 import { default as cnsInterface } from './cns/contract/registry';
@@ -38,7 +39,7 @@ export default class Cns extends EthereumNamingService {
    * @param source - if specified as a string will be used as main url, if omited then defaults are used
    * @throws ConfigurationError - when either network or url is setup incorrectly
    */
-  constructor(source: NamingServiceSource = true, web3Provider?: any) {
+  constructor(source: NamingServiceSource = true, web3Provider?: Provider) {
     super(web3Provider);
     source = this.normalizeSource(source);
     this.network = source.network as string;

@@ -2,7 +2,7 @@ import BaseConnection from "../baseConnection";
 import { defaultAbiCoder as AbiCoder } from './abicoder';
 var keccak256 = require('js-sha3').keccak_256;
 import ResolutionError, { ResolutionErrorCode } from "../resolutionError";
-import { isNullAddress, NamingServiceName } from "../types";
+import { isNullAddress, NamingServiceName, Provider } from "../types";
 
 type FourBytes = string;
 
@@ -12,13 +12,13 @@ export default class Contract extends BaseConnection {
   readonly address: string;
   readonly url: string;
   readonly name: NamingServiceName;
-  readonly web3Provider: any;
+  readonly web3Provider: Provider;
 
   /**
    * @param contractInterface JSON-RPC interface of smartContract
    * @param address Contract's address
    */
-  constructor(name: NamingServiceName, url: string, contractInterface, address: string, web3Provider?: any) {
+  constructor(name: NamingServiceName, url: string, contractInterface, address: string, web3Provider?: Provider) {
     super();
     this.name = name;
     this.url = url;

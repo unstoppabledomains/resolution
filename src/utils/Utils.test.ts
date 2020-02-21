@@ -1,4 +1,6 @@
 import { set, invert } from './index';
+import {ethers, getDefaultProvider} from 'ethers';
+import Resolution from '../Resolution';
 
 describe('Lodash', () => {
   describe('set', () => {
@@ -29,4 +31,13 @@ describe('Lodash', () => {
       'http://localhost:4201': 'localnet'
     });
   })
-})
+});
+
+describe('Contract', () => {
+  it('should work with ethers provider', async () => {
+    const provider = getDefaultProvider('mainnet');
+    const resolution = new Resolution({blockchain: {web3Provider: provider}});
+    const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
+    console.log({"brad.crypto => ": ethAddress});
+  });
+});

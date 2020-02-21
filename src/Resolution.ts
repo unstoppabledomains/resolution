@@ -58,13 +58,13 @@ export default class Resolution {
         blockchain.cns = true;
       }
       if (blockchain.ens) {
-        this.ens = new Ens(blockchain.ens);
+        this.ens = new Ens(blockchain.ens, blockchain.web3Provider);
       }
       if (blockchain.zns) {
         this.zns = new Zns(blockchain.zns);
       }
       if (blockchain.cns) {
-        this.cns = new Cns(blockchain.cns);
+        this.cns = new Cns(blockchain.cns, blockchain.web3Provider);
       }
     } else {
       this.api = new Udapi(api.url);
