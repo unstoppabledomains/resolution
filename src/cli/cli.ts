@@ -20,7 +20,6 @@ async function tryInfo(method, response, name?: string,) {
 
 program
   .version(pckg.version)
-  .description('resolution [command] [options]')
     
 program
   .command('resolve <domain>')
