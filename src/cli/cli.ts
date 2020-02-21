@@ -31,7 +31,7 @@ program
   .option('-r, --resolver', 'get resolver')
   .action(async (domain, options) => {
     const response = {};
-    const resolutionProcess = [];
+    const resolutionProcess: Promise<boolean>[] = [];
     if (options.ipfs) resolutionProcess.push(tryInfo(() => resolution.ipfsHash(domain), response, 'ipfs'));
     if (options.email) resolutionProcess.push(tryInfo(() => resolution.email(domain), response, 'email'));
     if (options.address) resolutionProcess.push(tryInfo(() => resolution.addressOrThrow(domain, options.address), response, `address<${options.address}>`));
