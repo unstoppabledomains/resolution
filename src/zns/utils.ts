@@ -42,7 +42,7 @@ function convertBits (
 ) {
   let acc = 0;
   let bits = 0;
-  const ret = [];
+  const ret:number[] = [];
   const maxv = (1 << toWidth) - 1;
   // tslint:disable-next-line
   for (let p = 0; p < data.length; ++p) {
@@ -70,7 +70,7 @@ function convertBits (
 };
 
 function hrpExpand (hrp: string): Buffer {
-  const ret = [];
+  const ret: any[] = [];
   let p;
   for (p = 0; p < hrp.length; ++p) {
     ret.push(hrp.charCodeAt(p) >> 5);
@@ -105,7 +105,7 @@ function createChecksum(hrp: string, data: Buffer) {
   ]);
   // var values = hrpExpand(hrp).concat(data).concat([0, 0, 0, 0, 0, 0]);
   const mod = polymod(values) ^ 1;
-  const ret = [];
+  const ret: any[] = [];
   for (let p = 0; p < 6; ++p) {
     ret.push((mod >> (5 * (5 - p))) & 31);
   }
@@ -151,7 +151,7 @@ function decode (bechString: string) {
     return null;
   }
   const hrp = bechString.substring(0, pos);
-  const data = [];
+  const data: number[] = [];
   for (p = pos + 1; p < bechString.length; ++p) {
     const d = CHARSET.indexOf(bechString.charAt(p));
     if (d === -1) {

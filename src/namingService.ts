@@ -25,9 +25,9 @@ export default abstract class NamingService extends BaseConnection {
   abstract isSupportedNetwork(): boolean;
   abstract namehash(domain: string): string;
   abstract address(domain: string, currencyTicker: string): Promise<string>;
-  abstract owner(domain: string): Promise<string>;
+  abstract owner(domain: string): Promise<string | null>;
   abstract record(domain: string, key: string): Promise<string>;
-  abstract resolve(domain: string): Promise<ResolutionResponse>;
+  abstract resolve(domain: string): Promise<ResolutionResponse | null>;
   abstract ipfsHash(domain: string): Promise<string>;
   abstract email(domain: string): Promise<string>;
   abstract httpUrl(domain: string): Promise<string>;
@@ -117,7 +117,7 @@ export abstract class EthereumNamingService extends NamingService {
    *  - mainnet
    *  - testnet
    */
-  private networkFromUrl(url: string): string {
+  private networkFromUrl(url: string): string | undefined {
     for (const key in this.NetworkNameMap) {
       if (!this.NetworkNameMap.hasOwnProperty(key)) continue;
       if (url.indexOf(key) >= 0) return key;
@@ -208,7 +208,7 @@ export abstract class EthereumNamingService extends NamingService {
     return new Contract(this.name, this.url, abi, address);
   }
 
-  protected async throwOwnershipError(domain, ownerPromise?: Promise<string>) {
+  protected async throwOwnershipError(domain, ownerPromise?: Promise<string | null>) {
     const owner = ownerPromise ? await ownerPromise : await this.owner(domain);
     if (!owner || isNullAddress(owner))
       throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {

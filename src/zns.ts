@@ -63,7 +63,7 @@ export default class Zns extends NamingService {
     super();
     source = this.normalizeSource(source);
     this.network = source.network as string;
-    this.url = source.url;
+    this.url = source.url as string;
     if (!this.network) {
       throw new Error('Unspecified network in Resolution ZNS configuration');
     }
@@ -119,11 +119,11 @@ export default class Zns extends NamingService {
    */
   async address(domain: string, currencyTicker: string): Promise<string> {
     const data = await this.resolve(domain);
-    if (!data.meta.owner || isNullAddress(data.meta.owner))
+    if (!data!.meta.owner || isNullAddress(data!.meta.owner))
       throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
         domain,
       });
-    const address = data.addresses[currencyTicker.toUpperCase()];
+    const address = data!.addresses[currencyTicker.toUpperCase()];
     if (!address)
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
         domain,
@@ -138,7 +138,7 @@ export default class Zns extends NamingService {
    * @returns An owner address of the domain
    */
   async owner(domain: string): Promise<string | null> {
-    return (await this.resolve(domain)).meta.owner;
+    return (await this.resolve(domain))!.meta.owner;
   }
 
   /**
@@ -178,7 +178,7 @@ export default class Zns extends NamingService {
    * @returns ZNS resolver records in an plain key-value format
    */
   async records(domain: string): Promise<Dictionary<string>> {
-    return await this.getResolverRecords(await this.resolverAddress(domain));
+    return await this.getResolverRecords((await this.resolverAddress(domain))!);
   }
 
   /**
@@ -186,7 +186,7 @@ export default class Zns extends NamingService {
    */
   isSupportedDomain(domain: string): boolean {
     const tokens = domain.split('.');
-    return tokens.length && tokens[tokens.length - 1] === 'zil';
+    return (tokens.length && tokens[tokens.length - 1] === 'zil' ) as boolean;
   }
 
   /**
@@ -295,7 +295,7 @@ export default class Zns extends NamingService {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork())
       return undefined;
     const registryRecord = await this.getContractMapValue(
-      this.registryAddress,
+      this.registryAddress!,
       'records',
       namehash(domain),
     );

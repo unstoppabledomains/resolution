@@ -11,7 +11,8 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "stripInternal": true
+    "stripInternal": true,
+    "strictNullChecks": true
   },
   "typedocOptions": {
     "mode": "file",
