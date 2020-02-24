@@ -170,7 +170,7 @@ export class BigNumber implements Hexable {
         return _bnify(this).isZero();
     }
 
-    toNumber(): number {
+    toNumber(): number | null {
         try {
             return _bnify(this).toNumber();
         } catch (error) {

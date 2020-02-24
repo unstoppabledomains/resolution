@@ -26,13 +26,13 @@ import NamingService from './namingService';
 export default class Resolution {
   readonly blockchain: Blockchain | boolean;
   /** @internal */
-  readonly ens?: Ens;
+  readonly ens: Ens;
   /** @internal */
-  readonly zns?: Zns;
+  readonly zns: Zns;
   /** @internal */
-  readonly cns?: Cns;
+  readonly cns: Cns;
   /** @internal */
-  readonly api?: Udapi;
+  readonly api: Udapi;
 
   /**
    * Resolution constructor
@@ -186,7 +186,7 @@ export default class Resolution {
    * @param currencyTicker - currency ticker like BTC, ETH, ZIL
    * @returns Domain name attached to this address
    */
-  async reverse(address: string, currencyTicker: string): Promise<string> {
+  async reverse(address: string, currencyTicker: string): Promise<string | null> {
     return await this.ens.reverse(address, currencyTicker);
   }
 
@@ -256,8 +256,8 @@ export default class Resolution {
    * Used internally to get the right method (ens or zns)
    * @param domain - domain name
    */
-  private getNamingMethod(domain: string): NamingService | undefined {
-    const methods: (Ens | Zns | Udapi | Cns)[] = this.blockchain
+  private getNamingMethod(domain: string): NamingService {
+    const methods: (Ens | Zns | Udapi | Cns | undefined)[] = this.blockchain
       ? [this.ens, this.zns, this.cns]
       : [this.api];
     const method = methods.find(
