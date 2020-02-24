@@ -10,7 +10,7 @@ import {
   Bip44Constants,
   isNullAddress,
   nodeHash,
-  Provider,
+  Web3Provider,
 } from './types';
 import { EthereumNamingService } from './namingService';
 import { ResolutionError, ResolutionErrorCode } from './index';
@@ -41,7 +41,7 @@ export default class Ens extends EthereumNamingService {
    * @param source - if specified as a string will be used as main url, if omited then defaults are used
    * @throws ConfigurationError - when either network or url is setup incorrectly
    */
-  constructor(source: NamingServiceSource = true, web3Provider?: Provider) {
+  constructor(source: NamingServiceSource = true, web3Provider?: Web3Provider) {
     super(web3Provider);
     source = this.normalizeSource(source);
     this.network = <string>source.network;
@@ -70,8 +70,7 @@ export default class Ens extends EthereumNamingService {
   isSupportedDomain(domain: string): boolean {
     return (
       domain === 'eth' ||
-      (domain.indexOf('.') > 0 &&
-        /^[^-]*[^-]*\.(eth|luxe|xyz)$/.test(domain))
+      (domain.indexOf('.') > 0 && /^[^-]*[^-]*\.(eth|luxe|xyz)$/.test(domain))
     );
   }
 

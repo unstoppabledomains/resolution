@@ -7,7 +7,7 @@ import {
   BlockhanNetworkUrlMap,
   ResolutionResponse,
   isNullAddress,
-  Provider,
+  Web3Provider,
 } from './types';
 import ResolutionError, { ResolutionErrorCode } from './resolutionError';
 import BaseConnection from './baseConnection';
@@ -22,7 +22,7 @@ import Contract from './utils/contract';
  */
 export default abstract class NamingService extends BaseConnection {
   readonly name: ResolutionMethod;
-  protected web3Provider?: Provider;
+  protected web3Provider?: Web3Provider;
   abstract isSupportedDomain(domain: string): boolean;
   abstract isSupportedNetwork(): boolean;
   abstract namehash(domain: string): string;
@@ -35,7 +35,7 @@ export default abstract class NamingService extends BaseConnection {
   abstract httpUrl(domain: string): Promise<string>;
   abstract resolver(domain: string): Promise<string>;
 
-  constructor(web3Provider?: Provider) {
+  constructor(web3Provider?: Web3Provider) {
     super();
     this.web3Provider = web3Provider;
   }
@@ -104,10 +104,10 @@ export abstract class EthereumNamingService extends NamingService {
   readonly NetworkNameMap = invert(this.NetworkIdMap);
 
   /**
-    * Returns the resolver address of a domain if exists
-    * @param domain - domain name
-    * @throws ResolutionError with codes UnregisteredDomain or UnspecifiedResolver
-  */
+   * Returns the resolver address of a domain if exists
+   * @param domain - domain name
+   * @throws ResolutionError with codes UnregisteredDomain or UnspecifiedResolver
+   */
   async resolver(domain: string): Promise<string> {
     const nodeHash = this.namehash(domain);
     const ownerPromise = this.owner(domain);
@@ -212,7 +212,13 @@ export abstract class EthereumNamingService extends NamingService {
   }
 
   protected buildContract(abi, address) {
-    return new Contract(this.name, this.url, abi, address, this.web3Provider);
+    return new Contract(
+      this.name,
+      this.url,
+      abi,
+      address,
+      this.web3Provider,
+    );
   }
 
   protected async throwOwnershipError(domain, ownerPromise?: Promise<string>) {
