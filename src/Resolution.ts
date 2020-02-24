@@ -10,6 +10,7 @@ import {
   API,
   nodeHash,
   NamingServiceName,
+  Provider,
 } from './types';
 import ResolutionError, { ResolutionErrorCode } from './resolutionError';
 import NamingService from './namingService';
@@ -58,13 +59,13 @@ export default class Resolution {
         blockchain.cns = true;
       }
       if (blockchain.ens) {
-        this.ens = new Ens(blockchain.ens, blockchain.web3Provider);
+        this.ens = new Ens(blockchain.ens, blockchain.web3Provider as Provider);
       }
       if (blockchain.zns) {
         this.zns = new Zns(blockchain.zns);
       }
       if (blockchain.cns) {
-        this.cns = new Cns(blockchain.cns, blockchain.web3Provider);
+        this.cns = new Cns(blockchain.cns, blockchain.web3Provider as Provider);
       }
     } else {
       this.api = new Udapi(api.url);
