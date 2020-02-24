@@ -18,6 +18,7 @@
     "release:tag": "git push origin v$npm_package_version",
     "test": "jest",
     "start": "npm run build:live",
+    "dev": "yarn build && ./build/cli/cli.js",
     "build": "tsc -p .",
     "postbuild": "chmod +x ./build/cli/cli.js",
     "format": "prettier --semi --write -l **/*.{js,json,ts}",

@@ -24,7 +24,26 @@ function commaSeparatedList(value, dummyPrevious) {
 
 program
   .version(pckg.version)
-    
+  .description('resolution cli exports main usage of @unstoppabledomains/resolution library')
+
+program
+  .command('service [domain]')
+  .alias('ser')
+  .option('-q, --quiet', 'output only the result')
+  .description('Returns you a service name from the domain')
+  .action(async (domain, options) => {
+    try {
+      const serviceName = resolution.serviceName(domain);
+      if (options.quiet) {
+        console.log(serviceName);
+        return ;
+      }
+      console.log(`${domain} => ${serviceName}`);
+    }catch(err) {
+      console.error('Wrong input');
+    }
+  });
+  
 program
   .command('resolve <domain>')
   .alias('res')
