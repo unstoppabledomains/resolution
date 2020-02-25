@@ -62,6 +62,6 @@ describe('Contract', () => {
       blockchain: { web3Provider: provider },
     });
     const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
-    console.log({ 'brad.crypto => ': ethAddress });
+    expect(ethAddress).toBe('0x45b31e01AA6f42F0549aD482BE81635ED3149abb');
   });
 });
