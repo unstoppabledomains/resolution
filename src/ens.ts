@@ -344,7 +344,7 @@ export default class Ens extends EthereumNamingService {
       coinType != EthCoinIndex
         ? await this.callMethod(resolverContract, 'addr', [nodeHash, coinType])
         : await this.callMethod(resolverContract, 'addr', [nodeHash]);
-    if (!addr) return null;
+    if (!addr || addr === '0x') return null;
     const data = Buffer.from(addr.replace('0x', ''), 'hex');
     return formatsByCoinType[coinType].encoder(data);
   }

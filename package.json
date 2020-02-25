@@ -24,7 +24,7 @@
     "docs:readme": "./docs-readme.sh",
     "docs:deploy": "./deploy-docs.sh",
     "analyze": "webpack-cli",
-    "size": "ts-node ./src/size.ts"
+    "size": "yarn run sizecheck -p ./package.json -l 500 -v"
   },
   "files": [
     "build"
@@ -43,6 +43,7 @@
     "@types/jest": "24.0.23",
     "@types/node": "11.15.3",
     "@types/node-fetch": "2.5.4",
+    "@unstoppabledomains/sizecheck": "^4.0.0",
     "dotenv": "8.2.0",
     "jest": "24.9.0",
     "nock": "10.0.6",

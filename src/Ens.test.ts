@@ -422,7 +422,21 @@ describe('ENS', () => {
         },
       });
     });
+    it('resolve to null for empty .eth record', async () => {
+      const resolution = new Resolution({
+        blockchain: { ens: { url: secretInfuraLink() } },
+      });
+      expect(resolution.ens.url).toBe(secretInfuraLink());
+      expect(resolution.ens.network).toEqual('mainnet');
 
+      const eyes = mockAsyncMethods(resolution.ens, {
+        getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
+        getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      });
+
+      expect(await resolution.address('qwdqwd.eth', 'XRP')).toEqual(null);
+      expectSpyToBeCalled(eyes);
+    });
     it('should return correct resolver address', async () => {
       const spies = mockAsyncMethods(resolution.ens, {
         getResolver: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
