@@ -212,13 +212,7 @@ export abstract class EthereumNamingService extends NamingService {
   }
 
   protected buildContract(abi, address) {
-    return new Contract(
-      this.name,
-      this.url,
-      abi,
-      address,
-      this.web3Provider,
-    );
+    return new Contract(this.name, this.url, abi, address, this.web3Provider);
   }
 
   protected async throwOwnershipError(domain, ownerPromise?: Promise<string>) {

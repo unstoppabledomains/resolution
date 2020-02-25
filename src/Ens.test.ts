@@ -113,7 +113,7 @@ describe('ENS', () => {
 
   it('resolves .luxe name using ENS blockchain with thrown error', async () => {
     const spies = mockAsyncMethods(resolution.ens, {
-      getResolver: undefined
+      getResolver: undefined,
     });
 
     await expectResolutionErrorCode(
@@ -425,7 +425,7 @@ describe('ENS', () => {
 
     it('should return correct resolver address', async () => {
       const spies = mockAsyncMethods(resolution.ens, {
-        getResolver: "0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41"
+        getResolver: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
       });
       const resolverAddress = await resolution.resolver('almonit.eth');
       expectSpyToBeCalled(spies);

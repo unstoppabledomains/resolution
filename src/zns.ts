@@ -93,10 +93,10 @@ export default class Zns extends NamingService {
       await this.getResolverRecords(resolverAddress),
     );
     const addresses = {};
-    if (Resolution.crypto) 
-    Object.entries(Resolution.crypto).map(
-      ([key, v]) => (addresses[key] = v.address),
-    );
+    if (Resolution.crypto)
+      Object.entries(Resolution.crypto).map(
+        ([key, v]) => (addresses[key] = v.address),
+      );
     return {
       addresses,
       meta: {
