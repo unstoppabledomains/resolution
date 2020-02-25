@@ -1,4 +1,6 @@
-import nodeFetch from 'node-fetch';
+// import nodeFetch from 'node-fetch';
+import nodeFetch from 'isomorphic-fetch';
+
 
 export default abstract class BaseConnection {
   /** @internal */

@@ -40,6 +40,7 @@
   },
   "homepage": "https://github.com/unstoppabledomains/resolution.git#readme",
   "devDependencies": {
+    "@types/isomorphic-fetch": "^0.0.35",
     "@types/jest": "24.0.23",
     "@types/node": "11.15.3",
     "@types/node-fetch": "2.5.4",
@@ -73,7 +74,7 @@
     "bn.js": "^5.1.1",
     "content-hash": "^2.5.2",
     "hash.js": "^1.1.7",
-    "js-sha3": "^0.8.0",
-    "node-fetch": "^2.6.0"
+    "isomorphic-fetch": "^2.2.1",
+    "js-sha3": "^0.8.0"
   }
 }
