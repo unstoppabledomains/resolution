@@ -10,6 +10,7 @@ import {
   API,
   nodeHash,
   NamingServiceName,
+  Web3Provider,
 } from './types';
 import ResolutionError, { ResolutionErrorCode } from './resolutionError';
 import NamingService from './namingService';
@@ -25,6 +26,7 @@ import NamingService from './namingService';
  */
 export default class Resolution {
   readonly blockchain: Blockchain | boolean;
+  readonly web3Provider?: Web3Provider;
   /** @internal */
   readonly ens: Ens;
   /** @internal */
@@ -57,13 +59,19 @@ export default class Resolution {
         blockchain.cns = true;
       }
       if (blockchain.ens) {
-        this.ens = new Ens(blockchain.ens);
+        this.ens = new Ens(
+          blockchain.ens,
+          blockchain.web3Provider as Web3Provider,
+        );
       }
       if (blockchain.zns) {
         this.zns = new Zns(blockchain.zns);
       }
       if (blockchain.cns) {
-        this.cns = new Cns(blockchain.cns);
+        this.cns = new Cns(
+          blockchain.cns,
+          blockchain.web3Provider as Web3Provider,
+        );
       }
     } else {
       this.api = new Udapi(api.url);

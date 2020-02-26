@@ -1,7 +1,10 @@
 ## Unreleased
 * Using flexible dependacies instead of locked versions
 * Moved sizecheck to a separate dev dependacy 
+* Moved sizecheck to a separate dev dependacy
+* Added web3Provider Support [#57]
 * Moved from node-fetch to isomorphic-fetch due to [#56]
+
 
 ## 1.0.24
 * Bug fix, namehash the domain before asking for a resolver on cns.
