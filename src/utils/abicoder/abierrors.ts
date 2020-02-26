@@ -63,7 +63,7 @@ let _censorErrors = false;
 
 
 // @TODO: Enum
-export function throwError(message: string, code: string, params: any): never {
+export function throwError(message: string, code: string | null, params: any): never {
     if (_censorErrors) {
         throw new Error('unknown error');
     }

@@ -76,7 +76,7 @@ export type ResolutionResponse = {
     [key: string]: string;
   };
   meta: {
-    owner: string;
+    owner: string | null;
     type: string; //available domain
     ttl: number;
   };
@@ -101,7 +101,7 @@ export type Blockchain =
       ens?: NamingServiceSource;
       zns?: NamingServiceSource;
       cns?: NamingServiceSource;
-      web3Provider?: any;
+      web3Provider?: Web3Provider;
     };
 
 export type API = {

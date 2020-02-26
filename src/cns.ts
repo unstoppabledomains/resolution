@@ -43,7 +43,7 @@ export default class Cns extends EthereumNamingService {
     super(web3Provider);
     source = this.normalizeSource(source);
     this.network = source.network as string;
-    this.url = source.url;
+    this.url = source.url as string;
     if (!this.network) {
       throw new Error('Unspecified network in Resolution CNS configuration');
     }
@@ -115,7 +115,7 @@ export default class Cns extends EthereumNamingService {
   private async fetchAddress(
     resolver: string,
     tokenId: nodeHash,
-    coinName?: string,
+    coinName: string,
   ): Promise<string> {
     const resolverContract = this.buildContract(resolverInterface, resolver);
     const addrKey = `crypto.${coinName.toUpperCase()}.address`;

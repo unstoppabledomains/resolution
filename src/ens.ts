@@ -45,7 +45,7 @@ export default class Ens extends EthereumNamingService {
     super(web3Provider);
     source = this.normalizeSource(source);
     this.network = <string>source.network;
-    this.url = source.url;
+    this.url = source.url as string;
     if (!this.network) {
       throw new Error('Unspecified network in Resolution ENS configuration');
     }
@@ -93,7 +93,7 @@ export default class Ens extends EthereumNamingService {
    * @param currencyTicker - currency ticker like BTC, ETH, ZIL
    * @returns Domain name attached to this address
    */
-  async reverse(address: string, currencyTicker: string): Promise<string> {
+  async reverse(address: string, currencyTicker: string): Promise<string | null> {
     if (currencyTicker != 'ETH') {
       throw new Error(`Ens doesn't support any currency other than ETH`);
     }
@@ -171,7 +171,7 @@ export default class Ens extends EthereumNamingService {
     const address = await this.fetchAddress(resolver, nodeHash, EthCoinIndex);
     return {
       addresses: {
-        ETH: address,
+        ETH: address!,
       },
       meta: {
         owner,
@@ -224,7 +224,7 @@ export default class Ens extends EthereumNamingService {
     return hash(domain);
   }
 
-  private async getContentHash(domain: string): Promise<string> {
+  private async getContentHash(domain: string): Promise<string | undefined> {
     const nodeHash = this.namehash(domain);
     const resolverContract = await this.getResolverContract(domain);
     const contentHashEncoded = await this.callMethod(
@@ -346,7 +346,7 @@ export default class Ens extends EthereumNamingService {
         : await this.callMethod(resolverContract, 'addr', [nodeHash]);
     if (!addr || addr === '0x') return null;
     const data = Buffer.from(addr.replace('0x', ''), 'hex');
-    return formatsByCoinType[coinType].encoder(data);
+    return formatsByCoinType[coinType!].encoder(data);
   }
 
   private async fetchAddress(resolver, nodeHash, coin) {
