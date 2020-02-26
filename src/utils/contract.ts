@@ -12,7 +12,7 @@ export default class Contract extends BaseConnection {
   readonly address: string;
   readonly url: string;
   readonly name: NamingServiceName;
-  readonly web3Provider: Web3Provider;
+  readonly web3Provider?: Web3Provider;
 
   /**
    * @param contractInterface JSON-RPC interface of smartContract
