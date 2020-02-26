@@ -2,7 +2,7 @@ import * as errors from './abierrors';
 
 const HexCharacters: string = '0123456789abcdef';
 
-export type Arrayish = string | ArrayLike<number>;
+export type Arrayish = string | ArrayLike<number> | null;
 export interface Hexable {
   toHexString(): string;
 }
@@ -78,9 +78,9 @@ export function hexlify(value: Arrayish | Hexable | number): string {
   }
 
   if (isArrayish(value)) {
-      var result = [];
-      for (var i = 0; i < value.length; i++) {
-           var v = value[i];
+      var result: string[] = [];
+      for (var i = 0; i < value!.length; i++) {
+           var v = value![i];
            result.push(HexCharacters[(v & 0xf0) >> 4] + HexCharacters[v & 0x0f]);
       }
       return '0x' + result.join('');
@@ -91,8 +91,6 @@ export function hexlify(value: Arrayish | Hexable | number): string {
 }
 
 function addSlice(array: Uint8Array): Uint8Array {
-    if (array.slice) { return array; }
-
     array.slice = function() {
         var args = Array.prototype.slice.call(arguments);
         return addSlice(new Uint8Array(Array.prototype.slice.apply(array, args)));
@@ -101,23 +99,26 @@ function addSlice(array: Uint8Array): Uint8Array {
     return array;
 }
 
-export function padZeros(value: Arrayish, length: number): Uint8Array {
+export function padZeros(value: Arrayish, length: number): Uint8Array | undefined {
     value = arrayify(value);
+    if (value){
+        if (length < value.length) { throw new Error('cannot pad'); }
 
-    if (length < value.length) { throw new Error('cannot pad'); }
-
-    var result = new Uint8Array(length);
-    result.set(value, length - value.length);
-    return addSlice(result);
+        var result = new Uint8Array(length);
+        result.set(value, length - value.length);
+        return addSlice(result);
+    }
 }
 
 export function concat(objects: Array<Arrayish>): Uint8Array {
-    var arrays = [];
+    var arrays: Uint8Array[] = [];
     var length = 0;
     for (var i = 0; i < objects.length; i++) {
         var object = arrayify(objects[i])
-        arrays.push(object);
-        length += object.length;
+        if (object) {
+            arrays.push(object);
+            length += object.length;
+        }
     }
 
     var result = new Uint8Array(length);
@@ -139,7 +140,7 @@ export function isHexString(value: any, length?: number): boolean {
   return true;
 }
 
-export function arrayify(value: Arrayish | Hexable): Uint8Array {
+export function arrayify(value: Arrayish | Hexable): Uint8Array | null {
     if (value == null) {
         errors.throwError('cannot convert null value to array', errors.INVALID_ARGUMENT, { arg: 'value', value: value });
     }
@@ -162,7 +163,7 @@ export function arrayify(value: Arrayish | Hexable): Uint8Array {
         value = value.substring(2);
         if (value.length % 2) { value = '0' + value; }
 
-        var result = [];
+        var result: number[] = [];
         for (var i = 0; i < value.length; i += 2) {
             result.push(parseInt(value.substr(i, 2), 16));
         }

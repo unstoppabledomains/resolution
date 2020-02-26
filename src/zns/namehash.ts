@@ -1,6 +1,8 @@
 import sha3 from '../utils/sha3';
 
-export const namehash = (name = '', { parent = null, prefix = true } = {}) => {
+export const namehash = (name = '', 
+  { parent, prefix }
+  : {parent?: string, prefix?: boolean} = {prefix: true}) => {
   parent = parent || '0000000000000000000000000000000000000000000000000000000000000000'
   const address = [parent]
     .concat(
