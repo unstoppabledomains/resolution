@@ -101,11 +101,16 @@ export type Blockchain =
       ens?: NamingServiceSource;
       zns?: NamingServiceSource;
       cns?: NamingServiceSource;
+      web3Provider?: Web3Provider;
     };
 
 export type API = {
   url: string;
 };
+
+export interface Web3Provider {
+  sendAsync: (method: string, params: any) => Promise<any>;
+}
 
 export const DefaultAPI: API = {
   url: UDApiDefaultUrl,

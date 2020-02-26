@@ -49,7 +49,7 @@ describe('CNS', () => {
 
   it('Should return NoRecord Resolution error', async () => {
     const spies = mockAsyncMethods(resolution.cns, {
-      getResolver: undefined
+      getResolver: undefined,
     });
     await expectResolutionErrorCode(
       resolution.cns.record(labelDomain, 'No.such.record'),
@@ -83,7 +83,7 @@ describe('CNS', () => {
 
   it('should return a valid resolver address', async () => {
     const spies = mockAsyncMethods(resolution.cns, {
-      getResolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D'
+      getResolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
     });
     const resolverAddress = await resolution.cns.resolver('brad.crypto');
     expectSpyToBeCalled(spies);
@@ -93,7 +93,7 @@ describe('CNS', () => {
   it('should not find a resolver address', async () => {
     const spies = mockAsyncMethods(resolution.cns, {
       getResolver: undefined,
-      owner: NullAddress[1]
+      owner: NullAddress[1],
     });
     await expectResolutionErrorCode(
       resolution.cns.resolver('empty.crypto'),
@@ -105,11 +105,11 @@ describe('CNS', () => {
   it('should throw ResolutionError.UnspecifiedResolver', async () => {
     const spies = mockAsyncMethods(resolution.cns, {
       getResolver: undefined,
-      owner: 'someowneraddress'
+      owner: 'someowneraddress',
     });
     await expectResolutionErrorCode(
       resolution.cns.resolver('pandorapay.crypto'),
-      ResolutionErrorCode.UnspecifiedResolver
+      ResolutionErrorCode.UnspecifiedResolver,
     );
     expectSpyToBeCalled(spies);
   });
@@ -271,7 +271,7 @@ describe('CNS', () => {
     const domain = 'reseller-test-ryan019.crypto';
     it('should resolve with ipfs stored on cns', async () => {
       const spies = mockAsyncMethods(resolution.cns, {
-        getRecord: '0x033dc48b5db4ca62861643e9d2c411d9eb6d1975@gmail.com'
+        getRecord: '0x033dc48b5db4ca62861643e9d2c411d9eb6d1975@gmail.com',
       });
       const ipfsHash = await resolution.ipfsHash(domain);
       expectSpyToBeCalled(spies);
