@@ -24,7 +24,7 @@ export function toUtf8Bytes(str: string, form: UnicodeNormalizationForm = Unicod
       str = str.normalize(form);
   }
 
-  var result = [];
+  var result: number[] = [];
   for (var i = 0; i < str.length; i++) {
       var c = str.charCodeAt(i);
 
@@ -57,13 +57,13 @@ export function toUtf8Bytes(str: string, form: UnicodeNormalizationForm = Unicod
       }
   }
 
-  return arrayify(result);
+  return arrayify(result)!;
 };
 
 
 // http://stackoverflow.com/questions/13356493/decode-utf-8-with-javascript#13691499
 export function toUtf8String(bytes: Arrayish, ignoreErrors?: boolean): string {
-  bytes = arrayify(bytes);
+  bytes = arrayify(bytes)!;
 
   let result = '';
   let i = 0;
@@ -79,8 +79,8 @@ export function toUtf8String(bytes: Arrayish, ignoreErrors?: boolean): string {
       }
 
       // Multibyte; how many bytes left for this character?
-      let extraLength = null;
-      let overlongMask = null;
+      let extraLength;
+      let overlongMask;
 
       // 110x xxxx 10xx xxxx
       if ((c & 0xe0) === 0xc0) {
@@ -120,7 +120,7 @@ export function toUtf8String(bytes: Arrayish, ignoreErrors?: boolean): string {
       }
 
       // Remove the length prefix from the char
-      let res = c & ((1 << (8 - extraLength - 1)) - 1);
+      let res: number | null = c & ((1 << (8 - extraLength - 1)) - 1);
 
       for (let j = 0; j < extraLength; j++) {
           var nextChar = bytes[i];

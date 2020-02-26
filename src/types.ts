@@ -76,7 +76,7 @@ export type ResolutionResponse = {
     [key: string]: string;
   };
   meta: {
-    owner: string;
+    owner: string | null;
     type: string; //available domain
     ttl: number;
   };

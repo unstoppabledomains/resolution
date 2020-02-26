@@ -1,7 +1,7 @@
 var sha3 = require('js-sha3').keccak_256
 import {nodeHash} from '../types';
 
-export default function (domain: string, { parent = null, prefix = true } = {}): nodeHash {
+export default function (domain: string, { parent, prefix }: {parent?: string, prefix?: boolean} = {prefix: true}): nodeHash {
   parent = parent || '0000000000000000000000000000000000000000000000000000000000000000';
   // domain = normalize(domain);
   const assembledHash = [parent].concat(

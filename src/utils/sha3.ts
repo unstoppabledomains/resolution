@@ -4,7 +4,7 @@ export default (
   message,
   {
     hexPrefix = true,
-    inputEnc = null,
+    inputEnc,
     outputEnc = 'hex',
   }: {hexPrefix?: boolean; inputEnc?: 'hex'; outputEnc?: 'hex'} = {},
 ) =>

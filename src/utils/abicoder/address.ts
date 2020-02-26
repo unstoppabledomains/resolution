@@ -55,7 +55,7 @@ function getChecksumAddress(address: string): string {
   for (let i = 0; i < 40; i++) {
       hashed[i] = chars[i].charCodeAt(0);
   }
-  hashed = arrayify('0x' + keccak256(hashed));
+  hashed = arrayify('0x' + keccak256(hashed)) as Uint8Array;
 
   for (var i = 0; i < 40; i += 2) {
       if ((hashed[i >> 1] >> 4) >= 8) {
@@ -71,7 +71,7 @@ function getChecksumAddress(address: string): string {
 
 
 export function getAddress(address: string): string {
-  var result = null;
+  var result: string | null = null;
 
   if (typeof(address) !== 'string') {
       errors.throwError('invalid address', errors.INVALID_ARGUMENT, { arg: 'address', value: address });
@@ -98,7 +98,7 @@ export function getAddress(address: string): string {
       }
 
       result = (new BN(address.substring(4), 36)).toString(16);
-      while (result.length < 40) { result = '0' + result; }
+      while (result!.length < 40) { result = '0' + result; }
       result = getChecksumAddress('0x' + result);
 
   } else {

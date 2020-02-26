@@ -31,7 +31,6 @@ export function resolveProperties(object: any): Promise<any> {
             promises.push(
                 value.then((value) => {
                     result[key] = value;
-                    return null;
                 })
             );
         } else {
