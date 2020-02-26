@@ -6,6 +6,7 @@ import {
   ResolutionResponse,
   isNullAddress,
   nodeHash,
+  Web3Provider,
 } from './types';
 import { default as resolverInterface } from './cns/contract/resolver';
 import { default as cnsInterface } from './cns/contract/registry';
@@ -38,8 +39,8 @@ export default class Cns extends EthereumNamingService {
    * @param source - if specified as a string will be used as main url, if omited then defaults are used
    * @throws ConfigurationError - when either network or url is setup incorrectly
    */
-  constructor(source: NamingServiceSource = true) {
-    super();
+  constructor(source: NamingServiceSource = true, web3Provider?: Web3Provider) {
+    super(web3Provider);
     source = this.normalizeSource(source);
     this.network = source.network as string;
     this.url = source.url as string;
@@ -94,11 +95,10 @@ export default class Cns extends EthereumNamingService {
   async address(domain: string, currencyTicker: string): Promise<string> {
     const tokenId = this.namehash(domain);
     const resolver = await this.getResolver(tokenId);
-    const addr: string | undefined = await this.ignoreResolutionError(ResolutionErrorCode.RecordNotFound, this.fetchAddress(
-      resolver,
-      this.namehash(domain),
-      currencyTicker,
-    ));
+    const addr: string | undefined = await this.ignoreResolutionError(
+      ResolutionErrorCode.RecordNotFound,
+      this.fetchAddress(resolver, this.namehash(domain), currencyTicker),
+    );
     if (!addr)
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
         domain,
