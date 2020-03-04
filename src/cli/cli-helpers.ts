@@ -21,9 +21,9 @@ export function signedInfuraLink(key: string): string {
 }
 
 export function getEtheriumUrl(): string {
-	if (process.env.INFURA) return signedInfuraLink(process.env.INFURA);
-	if (process.env.RESOLUTION_URL) return signedInfuraLink(process.env.RESOLUTION_URL);
-	throw new Error('neither INFURA nor RESOLUTION_URL enviroment variables are se');
+	if (process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID) return signedInfuraLink(process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID);
+	if (process.env.UNSTOPPABLE_RESOLUTION_URL) return signedInfuraLink(process.env.UNSTOPPABLE_RESOLUTION_URL);
+	throw new Error('neither UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID nor UNSTOPPABLE_RESOLUTION_URL enviroment variables are se');
 }
 
 export function buildResolutionPackage() {

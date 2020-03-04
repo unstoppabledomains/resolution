@@ -2,70 +2,42 @@
 import program from 'commander';
 import pckg from '../package.json';
 import { buildResolutionPackage, commaSeparatedList, tryInfo } from './cli-helpers.js';
+import dotenv from 'dotenv';
 
-program
-	.version(pckg.version)
-	.description('resolution cli exports main usage of @unstoppabledomains/resolution library');
+dotenv.config();
+(async () => {
 
-program
-.command('doctor')
-.description('checks the setup for resolution cli')
-.action(() => {
-  const enviromentStatus = {
-    INFURA: !!process.env.INFURA,
-    RESOLUTION_URL: !!process.env.RESOLUTION_URL
-  };
-  console.log('Enviroment variables status');
-  console.log(enviromentStatus);
-  console.log('Reminder RESOLUTION_URL overides INFURA key');
-});
+	program
+		.version(pckg.version)
+		.requiredOption('-d, --domain <domain>', 'domain you wish to resolve')
+		.option('-s, --service', 'returns you a service name from the domain')
+		.option('-i, --ipfs', 'get IpfsHash')
+		.option('-e, --email', 'get email')
+		.option('-r, --resolver', 'get resolver address')	
+		.option('-c, --currencies <currencies>', 'comma separated list of currency tickers', commaSeparatedList)
+		.description('resolution cli exports main usage of @unstoppabledomains/resolution library');
+	
+	program.parse(process.argv)
 
-program
-	.command('service [domain]')
-	.alias('ser')
-	.option('-q, --quiet', 'output only the result')
-	.description('Returns you a service name from the domain')
-	.action(async (domain, options) => {
-		try {
-			const resolution = buildResolutionPackage();
-			const serviceName = resolution.serviceName(domain);
-			if (options.quiet) {
-				console.log(serviceName);
-				return;
-			}
-			console.log(`${domain} => ${serviceName}`);
-		} catch (err) {
-			console.error('Wrong input');
-		}
-	});
-
-program
-	.command('resolve <domain>')
-	.alias('res')
-	.description('resolves the domain')
-	.option('-i, --ipfs', 'get IpfsHash')
-	.option('-e, --email', 'get email')
-	.option('-a, --addresses <items>', 'comma separated list', commaSeparatedList)
-	.option('-r, --resolver', 'get resolver')
-	.action(async (domain, options) => {
-		const resolution = buildResolutionPackage();
-		const response = {};
-		const resolutionProcess: Promise<boolean>[] = [];
-		if (options.ipfs)
-			resolutionProcess.push(tryInfo(async () => await resolution.ipfsHash(domain), response, 'ipfs'));
-		if (options.email)
-			resolutionProcess.push(tryInfo(async () => await resolution.email(domain), response, 'email'));
-		if (options.addresses) {
-			options.addresses.forEach(async (ticker) => {
-				resolutionProcess.push(
-					tryInfo(async () => await resolution.addressOrThrow(domain, ticker), response, ticker)
-				);
-			});
-		}
-		if (options.resolver)
-			resolutionProcess.push(tryInfo(async () => await resolution.resolver(domain), response, 'resolver'));
-		await Promise.all(resolutionProcess);
-		console.log(response);
-	});
-
-program.parse(process.argv);
+	const resolution = buildResolutionPackage();
+	const response = {};
+	const domain = program.domain;
+	const resolutionProcess: Promise<boolean>[] = [];
+	if (program.ipfs)
+		resolutionProcess.push(tryInfo(async () => await resolution.ipfsHash(domain), response, 'ipfs'));
+	if (program.email)
+		resolutionProcess.push(tryInfo(async () => await resolution.email(domain), response, 'email'));
+	if (program.currencies) {
+		program.currencies.forEach(async (currency) => {
+			resolutionProcess.push(
+				tryInfo(async () => await resolution.addressOrThrow(domain, currency), response, currency)
+			);
+		});
+	}
+	if (program.resolver)
+		resolutionProcess.push(tryInfo(async () => await resolution.resolver(domain), response, 'resolver'));
+	if (program.service)
+		resolutionProcess.push(tryInfo(async () => resolution.serviceName(domain), response, 'service'));
+	await Promise.all(resolutionProcess);
+	console.log(response);
+})();	
