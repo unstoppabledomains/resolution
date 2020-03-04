@@ -28,13 +28,13 @@ export default class Resolution {
   readonly blockchain: Blockchain | boolean;
   readonly web3Provider?: Web3Provider;
   /** @internal */
-  readonly ens: Ens;
+  readonly ens?: Ens;
   /** @internal */
-  readonly zns: Zns;
+  readonly zns?: Zns;
   /** @internal */
-  readonly cns: Cns;
+  readonly cns?: Cns;
   /** @internal */
-  readonly api: Udapi;
+  readonly api?: Udapi;
 
   /**
    * Resolution constructor
@@ -195,7 +195,8 @@ export default class Resolution {
    * @returns Domain name attached to this address
    */
   async reverse(address: string, currencyTicker: string): Promise<string | null> {
-    return await this.ens.reverse(address, currencyTicker);
+    if (!this.checkIfSet(NamingServiceName.ENS)) return null;
+    return await this.ens!.reverse(address, currencyTicker);
   }
 
   /**
@@ -218,14 +219,17 @@ export default class Resolution {
     parent: nodeHash,
     label: string,
     method: NamingServiceName,
-  ): nodeHash {
+  ): nodeHash | null {
     switch (method) {
       case NamingServiceName.ENS:
-        return this.ens.childhash(parent, label);
+        if (!this.checkIfSet(NamingServiceName.ENS)) return null;
+        return this.ens!.childhash(parent, label);
       case NamingServiceName.CNS:
-        return this.cns.childhash(parent, label);
+        if (!this.checkIfSet(NamingServiceName.CNS)) return null;
+        return this.cns!.childhash(parent, label);
       case NamingServiceName.ZNS:
-        return this.zns.childhash(parent, label);
+        if (!this.checkIfSet(NamingServiceName.ZNS)) return null;
+        return this.zns!.childhash(parent, label);
       default:
         throw new Error('Incorrect method is provided');
     }
@@ -281,6 +285,11 @@ export default class Resolution {
         domain,
       });
     return method;
+  }
+
+  private checkIfSet(blockchain: NamingServiceName):boolean {
+    if (!this[blockchain.toLowerCase()]) throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {method: NamingServiceName[blockchain]})
+    return true;
   }
 }
 

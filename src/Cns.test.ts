@@ -6,10 +6,8 @@ import {
   secretInfuraLink,
 } from './utils/testHelpers';
 import { ResolutionErrorCode } from './resolutionError';
-import dotenv from 'dotenv';
 import { NullAddress } from './types';
 
-dotenv.config();
 const labelDomain = 'reseller-test-braden-6.crypto';
 let resolution: Resolution;
 beforeEach(() => {

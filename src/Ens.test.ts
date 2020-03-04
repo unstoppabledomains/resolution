@@ -9,9 +9,6 @@ import {
   expectResolutionErrorCode,
   secretInfuraLink,
 } from './utils/testHelpers';
-import dotenv from 'dotenv';
-
-dotenv.config();
 let resolution: Resolution;
 
 beforeEach(() => {
@@ -414,7 +411,7 @@ describe('ENS', () => {
       const result = await resolution.resolve('matthewgould.eth');
       expectSpyToBeCalled(eyes);
       expect(result).toStrictEqual({
-        addresses: { ETH: null },
+        addresses: { },
         meta: {
           owner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
           type: 'ENS',

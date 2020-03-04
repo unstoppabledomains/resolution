@@ -80,10 +80,10 @@ export function mockAPICalls(testName: string, url = MainnetUrl) {
  * @internal
  * returns either a standard mainnet infura url
  * or the one with attached INFURA SECRET key from
- * INFURA env variable if any
+ * UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID env variable if any
  */
 export function secretInfuraLink():string {
-  const secret = process.env.INFURA;
+  const secret = process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID;
   let url = 'https://mainnet.infura.io';
   if (secret)
     url = `https://mainnet.infura.io/v3/${secret}`;
