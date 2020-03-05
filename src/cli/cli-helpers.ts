@@ -1,5 +1,6 @@
 import Resolution from "../Resolution";
 import * as fs from 'fs';
+import { stringify } from "querystring";
 
 export async function tryInfo(method, response, name: string): Promise<boolean> {
 	const field = name;
@@ -14,7 +15,7 @@ export async function tryInfo(method, response, name: string): Promise<boolean> 
 }
 
 export function commaSeparatedList(value, dummyPrevious) {
-	return value.split(',');
+	return value.split(',').map((v:string) => v.toUpperCase());
 }
 
 export function signedInfuraLink(key: string): string {
