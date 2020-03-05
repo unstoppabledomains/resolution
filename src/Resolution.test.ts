@@ -205,9 +205,9 @@ describe('Resolution', () => {
       it('checks childhash multi level domain', () => {
         const cns = new Resolution().cns;
         const domain = 'ich.ni.san.yon.hello.world.crypto';
-        const namehash = cns.namehash(domain);
-        const childhash = cns.childhash(
-          cns.namehash('ni.san.yon.hello.world.crypto'),
+        const namehash = cns!.namehash(domain);
+        const childhash = cns!.childhash(
+          cns!.namehash('ni.san.yon.hello.world.crypto'),
           'ich',
         );
         expect(childhash).toBe(namehash);

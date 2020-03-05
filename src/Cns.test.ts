@@ -31,8 +31,8 @@ const mockCryptoCalls = (
 describe('CNS', () => {
   it('should define the default cns contract', () => {
     expect(resolution.cns).toBeDefined();
-    expect(resolution.cns.network).toBe('mainnet');
-    expect(resolution.cns.url).toBe(secretInfuraLink());
+    expect(resolution.cns!.network).toBe('mainnet');
+    expect(resolution.cns!.url).toBe(secretInfuraLink());
   });
 
   it('checks the IPFS hash record', async () => {
@@ -40,7 +40,7 @@ describe('CNS', () => {
       getResolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
       getRecord: 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
     });
-    const ipfs_hash = await resolution.cns.record(labelDomain, 'ipfs.html2');
+    const ipfs_hash = await resolution.cns!.record(labelDomain, 'ipfs.html2');
     expectSpyToBeCalled(eyes);
     expect(ipfs_hash).toBe('QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK');
   });
@@ -50,7 +50,7 @@ describe('CNS', () => {
       getResolver: undefined,
     });
     await expectResolutionErrorCode(
-      resolution.cns.record(labelDomain, 'No.such.record'),
+      resolution.cns!.record(labelDomain, 'No.such.record'),
       ResolutionErrorCode.RecordNotFound,
     );
     expectSpyToBeCalled(spies);
@@ -61,7 +61,7 @@ describe('CNS', () => {
       getResolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
       getRecord: 'www.unstoppabledomains.com',
     });
-    const ipfs_redirect_domain = await resolution.cns.record(
+    const ipfs_redirect_domain = await resolution.cns!.record(
       labelDomain,
       'ipfs.redirect_domain',
     );
@@ -83,7 +83,7 @@ describe('CNS', () => {
     const spies = mockAsyncMethods(resolution.cns, {
       getResolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
     });
-    const resolverAddress = await resolution.cns.resolver('brad.crypto');
+    const resolverAddress = await resolution.cns!.resolver('brad.crypto');
     expectSpyToBeCalled(spies);
     expect(resolverAddress).toBe('0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D');
   });
@@ -94,7 +94,7 @@ describe('CNS', () => {
       owner: NullAddress[1],
     });
     await expectResolutionErrorCode(
-      resolution.cns.resolver('empty.crypto'),
+      resolution.cns!.resolver('empty.crypto'),
       ResolutionErrorCode.UnregisteredDomain,
     );
     expectSpyToBeCalled(spies);
@@ -106,7 +106,7 @@ describe('CNS', () => {
       owner: 'someowneraddress',
     });
     await expectResolutionErrorCode(
-      resolution.cns.resolver('pandorapay.crypto'),
+      resolution.cns!.resolver('pandorapay.crypto'),
       ResolutionErrorCode.UnspecifiedResolver,
     );
     expectSpyToBeCalled(spies);
@@ -118,7 +118,7 @@ describe('CNS', () => {
         resolution.cns,
         'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6',
       );
-      const addr = await resolution.cns.address(labelDomain, 'BCH');
+      const addr = await resolution.cns!.address(labelDomain, 'BCH');
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6');
     });
@@ -128,7 +128,7 @@ describe('CNS', () => {
         resolution.cns,
         '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB',
       );
-      const addr = await resolution.cns.address(labelDomain, 'BTC');
+      const addr = await resolution.cns!.address(labelDomain, 'BTC');
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB');
     });
@@ -138,7 +138,7 @@ describe('CNS', () => {
         resolution.cns,
         'XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j',
       );
-      const addr = await resolution.cns.address(labelDomain, 'DASH');
+      const addr = await resolution.cns!.address(labelDomain, 'DASH');
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j');
     });
@@ -148,7 +148,7 @@ describe('CNS', () => {
         resolution.cns,
         '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
       );
-      const addr = await resolution.cns.address(labelDomain, 'ETH');
+      const addr = await resolution.cns!.address(labelDomain, 'ETH');
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('0x45b31e01AA6f42F0549aD482BE81635ED3149abb');
     });
@@ -158,7 +158,7 @@ describe('CNS', () => {
         resolution.cns,
         'LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL',
       );
-      const addr = await resolution.cns.address(labelDomain, 'LTC');
+      const addr = await resolution.cns!.address(labelDomain, 'LTC');
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL');
     });
@@ -168,7 +168,7 @@ describe('CNS', () => {
         resolution.cns,
         '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d',
       );
-      const addr = await resolution.cns.address(labelDomain, 'XMR');
+      const addr = await resolution.cns!.address(labelDomain, 'XMR');
       expectSpyToBeCalled(eyes);
       expect(addr).toBe(
         '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d',
@@ -180,7 +180,7 @@ describe('CNS', () => {
         resolution.cns,
         't1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV',
       );
-      const addr = await resolution.cns.address(labelDomain, 'ZEC');
+      const addr = await resolution.cns!.address(labelDomain, 'ZEC');
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('t1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV');
     });
@@ -190,7 +190,7 @@ describe('CNS', () => {
         resolution.cns,
         'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
       );
-      const addr = await resolution.cns.address(labelDomain, 'ZIL');
+      const addr = await resolution.cns!.address(labelDomain, 'ZIL');
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj');
     });
@@ -200,32 +200,32 @@ describe('CNS', () => {
     describe('.Namehash', () => {
       it('supports root node', async () => {
         const cns = resolution.cns;
-        expect(cns.isSupportedDomain('crypto')).toEqual(true);
-        expect(cns.namehash('crypto')).toEqual(
+        expect(cns!.isSupportedDomain('crypto')).toEqual(true);
+        expect(cns!.namehash('crypto')).toEqual(
           '0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f',
         );
       });
 
       it('starts with -', async () => {
         const cns = resolution.cns;
-        expect(cns.isSupportedDomain('-hello.crypto')).toEqual(true);
-        expect(cns.namehash('-hello.crypto')).toBe(
+        expect(cns!.isSupportedDomain('-hello.crypto')).toEqual(true);
+        expect(cns!.namehash('-hello.crypto')).toBe(
           '0xc4ad028bcae9b201104e15f872d3e85b182939b06829f75a128275177f2ff9b2',
         );
       });
 
       it('ends with -', async () => {
         const cns = resolution.cns;
-        expect(cns.isSupportedDomain('hello-.crypto')).toEqual(true);
-        expect(cns.namehash('hello-.crypto')).toBe(
+        expect(cns!.isSupportedDomain('hello-.crypto')).toEqual(true);
+        expect(cns!.namehash('hello-.crypto')).toBe(
           '0x82eaa6ef14e438940bfd7747e0e4c4fec42af20cee28ddd0a7d79f52b1c59b72',
         );
       });
 
       it('starts and ends with -', async () => {
         const cns = resolution.cns;
-        expect(cns.isSupportedDomain('-hello-.crypto')).toEqual(true);
-        expect(cns.namehash('-hello-.crypto')).toBe(
+        expect(cns!.isSupportedDomain('-hello-.crypto')).toEqual(true);
+        expect(cns!.namehash('-hello-.crypto')).toBe(
           '0x90cc1963ff09ce95ee2dbb3830df4f2115da9756e087a50283b3e65f6ffe2a4e',
         );
       });
@@ -235,9 +235,9 @@ describe('CNS', () => {
         const cns = resolution.cns;
         const rootHash =
           '0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f';
-        expect(cns.namehash('crypto')).toBe(rootHash);
+        expect(cns!.namehash('crypto')).toBe(rootHash);
         expect(
-          cns.childhash(
+          cns!.childhash(
             '0000000000000000000000000000000000000000000000000000000000000000',
             'crypto',
           ),
@@ -247,17 +247,17 @@ describe('CNS', () => {
       it('checks the childhash functionality', () => {
         const cns = resolution.cns;
         const domain = 'hello.world.crypto';
-        const namehash = cns.namehash(domain);
-        const childhash = cns.childhash(cns.namehash('world.crypto'), 'hello');
+        const namehash = cns!.namehash(domain);
+        const childhash = cns!.childhash(cns!.namehash('world.crypto'), 'hello');
         expect(namehash).toBe(childhash);
       });
 
       it('checks childhash multi level domain', () => {
         const cns = resolution.cns;
         const domain = 'ich.ni.san.yon.hello.world.crypto';
-        const namehash = cns.namehash(domain);
-        const childhash = cns.childhash(
-          cns.namehash('ni.san.yon.hello.world.crypto'),
+        const namehash = cns!.namehash(domain);
+        const childhash = cns!.childhash(
+          cns!.namehash('ni.san.yon.hello.world.crypto'),
           'ich',
         );
         expect(childhash).toBe(namehash);

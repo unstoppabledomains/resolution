@@ -18,8 +18,8 @@ beforeEach(() => {
 describe('ZNS', () => {
   describe('.NormalizeSource', () => {
     it('checks normalizeSource zns (boolean)', async () => {
-      expect(resolution.zns.network).toBe('mainnet');
-      expect(resolution.zns.url).toBe('https://api.zilliqa.com');
+      expect(resolution.zns!.network).toBe('mainnet');
+      expect(resolution.zns!.url).toBe('https://api.zilliqa.com');
     });
 
     it('checks normalizeSource zns (boolean - false)', async () => {
@@ -28,8 +28,8 @@ describe('ZNS', () => {
     });
 
     it('checks normalizeSource zns (string)', async () => {
-      expect(resolution.zns.network).toBe('mainnet');
-      expect(resolution.zns.url).toBe('https://api.zilliqa.com');
+      expect(resolution.zns!.network).toBe('mainnet');
+      expect(resolution.zns!.url).toBe('https://api.zilliqa.com');
     });
 
     it('checks normalizeSource zns wrong string', async () => {
@@ -42,33 +42,33 @@ describe('ZNS', () => {
       const resolution = new Resolution({
         blockchain: { zns: { url: 'https://api.zilliqa.com' } },
       });
-      expect(resolution.zns.network).toBe('mainnet');
-      expect(resolution.zns.url).toBe('https://api.zilliqa.com');
+      expect(resolution.zns!.network).toBe('mainnet');
+      expect(resolution.zns!.url).toBe('https://api.zilliqa.com');
     });
 
     it('checks normalizeSource zns (object) #2', async () => {
       const resolution = new Resolution({
         blockchain: { zns: { network: 333 } },
       });
-      expect(resolution.zns.url).toBe('https://dev-api.zilliqa.com');
-      expect(resolution.zns.network).toBe('testnet');
-      expect(resolution.zns.registryAddress).toBeUndefined();
+      expect(resolution.zns!.url).toBe('https://dev-api.zilliqa.com');
+      expect(resolution.zns!.network).toBe('testnet');
+      expect(resolution.zns!.registryAddress).toBeUndefined();
     });
 
     it('checks normalizeSource zns (object) #3', async () => {
       const resolution = new Resolution({
         blockchain: { zns: { url: 'https://api.zilliqa.com' } },
       });
-      expect(resolution.zns.network).toBe('mainnet');
-      expect(resolution.zns.url).toBe('https://api.zilliqa.com');
+      expect(resolution.zns!.network).toBe('mainnet');
+      expect(resolution.zns!.url).toBe('https://api.zilliqa.com');
     });
 
     it('checks normalizeSource zns (object) #4', async () => {
       const resolution = new Resolution({
         blockchain: { zns: { url: 'https://api.zilliqa.com', network: 1 } },
       });
-      expect(resolution.zns.network).toBe('mainnet');
-      expect(resolution.zns.url).toBe('https://api.zilliqa.com');
+      expect(resolution.zns!.network).toBe('mainnet');
+      expect(resolution.zns!.url).toBe('https://api.zilliqa.com');
     });
 
     it('checks normalizeSource zns (object) #5', async () => {
@@ -76,9 +76,9 @@ describe('ZNS', () => {
         blockchain: { zns: { url: 'https://api.zilliqa.com', network: 333 } },
       });
 
-      expect(resolution.zns.url).toBe('https://api.zilliqa.com');
-      expect(resolution.zns.network).toBe('testnet');
-      expect(resolution.zns.registryAddress).toBeUndefined();
+      expect(resolution.zns!.url).toBe('https://api.zilliqa.com');
+      expect(resolution.zns!.network).toBe('testnet');
+      expect(resolution.zns!.registryAddress).toBeUndefined();
     });
 
     it('checks normalizeSource zns (object) #6', async () => {
@@ -97,8 +97,8 @@ describe('ZNS', () => {
       const resolution = new Resolution({
         blockchain: { zns: { network: 'mainnet' } },
       });
-      expect(resolution.zns.network).toBe('mainnet');
-      expect(resolution.zns.url).toBe('https://api.zilliqa.com');
+      expect(resolution.zns!.network).toBe('mainnet');
+      expect(resolution.zns!.url).toBe('https://api.zilliqa.com');
     });
 
     it('checks normalizeSource zns (object) #9', async () => {
@@ -106,9 +106,9 @@ describe('ZNS', () => {
         blockchain: { zns: { network: 'testnet' } },
       });
 
-      expect(resolution.zns.network).toBe('testnet');
-      expect(resolution.zns.url).toBe('https://dev-api.zilliqa.com');
-      expect(resolution.zns.registryAddress).toBeUndefined();
+      expect(resolution.zns!.network).toBe('testnet');
+      expect(resolution.zns!.url).toBe('https://dev-api.zilliqa.com');
+      expect(resolution.zns!.registryAddress).toBeUndefined();
     });
 
     it('checks normalizeSource zns (object) #10', async () => {
@@ -117,11 +117,11 @@ describe('ZNS', () => {
           zns: { registry: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz' },
         },
       });
-      expect(resolution.zns.network).toBe('mainnet');
-      expect(resolution.zns.registryAddress).toBe(
+      expect(resolution.zns!.network).toBe('mainnet');
+      expect(resolution.zns!.registryAddress).toBe(
         'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
       );
-      expect(resolution.zns.url).toBe('https://api.zilliqa.com');
+      expect(resolution.zns!.url).toBe('https://api.zilliqa.com');
     });
 
     it('checks normalizeSource zns (object) #11', async () => {
@@ -131,9 +131,9 @@ describe('ZNS', () => {
         },
       });
 
-      expect(resolution.zns.network).toBe('mainnet');
-      expect(resolution.zns.url).toBe('https://api.zilliqa.com');
-      expect(resolution.zns.registryAddress).toBe(
+      expect(resolution.zns!.network).toBe('mainnet');
+      expect(resolution.zns!.url).toBe('https://api.zilliqa.com');
+      expect(resolution.zns!.registryAddress).toBe(
         'zil1408llufrzkrrfqv5lj4malcjxyjqyd8urd7xz6',
       );
     });
@@ -212,7 +212,7 @@ describe('ZNS', () => {
         'ipfs.redirect_domain.value': 'www.unstoppabledomains.com',
       });
 
-      const result = await resolution.zns.Resolution('brad.zil');
+      const result = await resolution.zns!.Resolution('brad.zil');
       expectSpyToBeCalled([eye, secondEye]);
       expect(result).toEqual({
         crypto: {
@@ -249,7 +249,7 @@ describe('ZNS', () => {
         'whois.for_sale.value': 'true',
       });
 
-      const result = await resolution.zns.Resolution('ergergergerg.zil');
+      const result = await resolution.zns!.Resolution('ergergergerg.zil');
       expectSpyToBeCalled([eye, secondEye]);
       expect(result).toEqual({
         ipfs: {
@@ -270,7 +270,7 @@ describe('ZNS', () => {
       const zns = resolution.zns;
 
       expect(zns).toBeDefined();
-      const result = await zns.Resolution('invalid.domain');
+      const result = await zns!.Resolution('invalid.domain');
       expect(result).toEqual({});
     });
 
@@ -290,7 +290,7 @@ describe('ZNS', () => {
         },
       });
       expect(zns).toBeDefined();
-      const result = await zns.Resolution('mcafee2020.zil');
+      const result = await zns!.Resolution('mcafee2020.zil');
       expectSpyToBeCalled(spies);
       expect(result).toEqual({
         crypto: {
@@ -312,7 +312,7 @@ describe('ZNS', () => {
           '0xdac22230adfe4601f00631eae92df6d77f054891',
         ],
       });
-      const resolverAddress = await resolution.zns.resolver('brad.zil');
+      const resolverAddress = await resolution.zns!.resolver('brad.zil');
       expectSpyToBeCalled(spies);
       expect(resolverAddress).toBe(
         '0xdac22230adfe4601f00631eae92df6d77f054891',
@@ -324,7 +324,7 @@ describe('ZNS', () => {
         getRecordsAddresses: undefined,
       });
       await expectResolutionErrorCode(
-        resolution.zns.resolver('sopmethingveryweirdthatnoonewilltakeever.zil'),
+        resolution.zns!.resolver('sopmethingveryweirdthatnoonewilltakeever.zil'),
         ResolutionErrorCode.UnregisteredDomain,
       );
       expectSpyToBeCalled(spies);
@@ -338,7 +338,7 @@ describe('ZNS', () => {
         ],
       });
       await expectResolutionErrorCode(
-        resolution.zns.resolver('uihui12d.zil'),
+        resolution.zns!.resolver('uihui12d.zil'),
         ResolutionErrorCode.UnspecifiedResolver,
       );
       expectSpyToBeCalled(spies);
@@ -352,7 +352,7 @@ describe('ZNS', () => {
         ],
       });
       await expectResolutionErrorCode(
-        resolution.zns.resolver('paulalcock.zil'),
+        resolution.zns!.resolver('paulalcock.zil'),
         ResolutionErrorCode.UnspecifiedResolver,
       );
       expectSpyToBeCalled(spies);
@@ -400,20 +400,20 @@ describe('ZNS', () => {
   describe('.Hashing', () => {
     describe('.Namehash', () => {
       it('supports standard domain', () => {
-        expect(resolution.zns.namehash('ny.zil')).toEqual(
+        expect(resolution.zns!.namehash('ny.zil')).toEqual(
           '0xd45bcb80c1ca68da09082d7618280839a1102446b639b294d07e9a1692ec241f',
         );
       });
 
       it('supports root "zil" domain', () => {
-        expect(resolution.zns.namehash('zil')).toEqual(
+        expect(resolution.zns!.namehash('zil')).toEqual(
           '0x9915d0456b878862e822e2361da37232f626a2e47505c8795134a95d36138ed3',
         );
       });
 
       it('raises ResoltuionError when domain is not supported', () => {
         expectResolutionErrorCode(
-          () => resolution.zns.namehash('hello.world'),
+          () => resolution.zns!.namehash('hello.world'),
           ResolutionErrorCode.UnsupportedDomain,
         );
       });
@@ -422,8 +422,8 @@ describe('ZNS', () => {
       it('checks childhash', () => {
         const zns = resolution.zns;
         const domain = 'hello.world.zil';
-        const namehash = zns.namehash(domain);
-        const childhash = zns.childhash(zns.namehash('world.zil'), 'hello');
+        const namehash = zns!.namehash(domain);
+        const childhash = zns!.childhash(zns!.namehash('world.zil'), 'hello');
         expect(namehash).toBe(childhash);
       });
 
@@ -431,9 +431,9 @@ describe('ZNS', () => {
         const zns = resolution.zns;
         const rootHash =
           '0x9915d0456b878862e822e2361da37232f626a2e47505c8795134a95d36138ed3';
-        expect(zns.namehash('zil')).toBe(rootHash);
+        expect(zns!.namehash('zil')).toBe(rootHash);
         expect(
-          zns.childhash(
+          zns!.childhash(
             '0000000000000000000000000000000000000000000000000000000000000000',
             'zil',
           ),
@@ -443,9 +443,9 @@ describe('ZNS', () => {
       it('checks childhash multi level domain', () => {
         const zns = resolution.zns;
         const domain = 'ich.ni.san.yon.hello.world.zil';
-        const namehash = zns.namehash(domain);
-        const childhash = zns.childhash(
-          zns.namehash('ni.san.yon.hello.world.zil'),
+        const namehash = zns!.namehash(domain);
+        const childhash = zns!.childhash(
+          zns!.namehash('ni.san.yon.hello.world.zil'),
           'ich',
         );
         expect(childhash).toBe(namehash);

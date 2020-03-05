@@ -24,16 +24,16 @@ describe('ENS', () => {
     const resolution = new Resolution({
       blockchain: { ens: { network: 'mainnet' } },
     });
-    expect(resolution.ens.url).toBe('https://mainnet.infura.io');
-    expect(resolution.ens.network).toEqual('mainnet');
+    expect(resolution.ens!.url).toBe('https://mainnet.infura.io');
+    expect(resolution.ens!.network).toEqual('mainnet');
   });
 
   it('resolves .eth name using blockchain', async () => {
     const resolution = new Resolution({
       blockchain: { ens: { url: secretInfuraLink() } },
     });
-    expect(resolution.ens.url).toBe(secretInfuraLink());
-    expect(resolution.ens.network).toEqual('mainnet');
+    expect(resolution.ens!.url).toBe(secretInfuraLink());
+    expect(resolution.ens!.network).toEqual('mainnet');
 
     const eyes = mockAsyncMethods(resolution.ens, {
       getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
@@ -55,7 +55,7 @@ describe('ENS', () => {
       resolverCallToName: 'adrian.argent.xyz',
       getResolver: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
     });
-    const result = await resolution.ens.reverse(
+    const result = await resolution.ens!.reverse(
       '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
       'ETH',
     );
@@ -65,7 +65,7 @@ describe('ENS', () => {
 
   it('reverses address to ENS domain null', async () => {
     const spy = mockAsyncMethod(resolution.ens, 'getResolver', NullAddress[1]);
-    const result = await resolution.ens.reverse(
+    const result = await resolution.ens!.reverse(
       '0x112234455c3a32fd11230c42e7bccd4a84e02010',
       'ETH',
     );
@@ -126,7 +126,7 @@ describe('ENS', () => {
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x76a9144620b70031f0e9437e374a2100934fba4911046088ac',
     });
-    const doge = await resolution.ens.address('testthing.eth', 'DOGE');
+    const doge = await resolution.ens!.address('testthing.eth', 'DOGE');
     expectSpyToBeCalled(eyes);
     expect(doge).toBe('DBXu2kgc3xtvCUWFcxFE3r9hEYgmuaaCyD');
   });
@@ -145,8 +145,8 @@ describe('ENS', () => {
 
   it('checks normalizeSource ens (boolean)', async () => {
     const resolution = new Resolution({ blockchain: { ens: true } });
-    expect(resolution.ens.network).toBe('mainnet');
-    expect(resolution.ens.url).toBe('https://mainnet.infura.io');
+    expect(resolution.ens!.network).toBe('mainnet');
+    expect(resolution.ens!.url).toBe('https://mainnet.infura.io');
   });
 
   it('checks normalizeSource ens (boolean - false)', async () => {
@@ -157,15 +157,15 @@ describe('ENS', () => {
   });
 
   it('checks normalizeSource ens (object) #1', async () => {
-    expect(resolution.ens.network).toBe('mainnet');
-    expect(resolution.ens.url).toBe(secretInfuraLink());
+    expect(resolution.ens!.network).toBe('mainnet');
+    expect(resolution.ens!.url).toBe(secretInfuraLink());
   });
 
   it('checks normalizeSource ens (object) #2', async () => {
     const resolution = new Resolution({ blockchain: { ens: { network: 3 } } });
-    expect(resolution.ens.network).toBe('ropsten');
-    expect(resolution.ens.url).toBe('https://ropsten.infura.io');
-    expect(resolution.ens.registryAddress).toBe(
+    expect(resolution.ens!.network).toBe('ropsten');
+    expect(resolution.ens!.url).toBe('https://ropsten.infura.io');
+    expect(resolution.ens!.registryAddress).toBe(
       '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
     );
   });
@@ -174,17 +174,17 @@ describe('ENS', () => {
     const resolution = new Resolution({
       blockchain: { ens: { url: 'https://rinkeby.infura.io' } },
     });
-    expect(resolution.ens.network).toBe('rinkeby');
-    expect(resolution.ens.url).toBe('https://rinkeby.infura.io');
+    expect(resolution.ens!.network).toBe('rinkeby');
+    expect(resolution.ens!.url).toBe('https://rinkeby.infura.io');
   });
 
   it('checks normalizeSource ens (object) #4', async () => {
     const resolution = new Resolution({
       blockchain: { ens: { url: 'https://goerli.infura.io', network: 5 } },
     });
-    expect(resolution.ens.network).toBe('goerli');
-    expect(resolution.ens.url).toBe('https://goerli.infura.io');
-    expect(resolution.ens.registryAddress).toBeUndefined();
+    expect(resolution.ens!.network).toBe('goerli');
+    expect(resolution.ens!.url).toBe('https://goerli.infura.io');
+    expect(resolution.ens!.registryAddress).toBeUndefined();
   });
 
   it('checks normalizeSource ens (object) #6', async () => {
@@ -203,16 +203,16 @@ describe('ENS', () => {
     const resolution = new Resolution({
       blockchain: { ens: { network: 'mainnet' } },
     });
-    expect(resolution.ens.network).toBe('mainnet');
-    expect(resolution.ens.url).toBe('https://mainnet.infura.io');
+    expect(resolution.ens!.network).toBe('mainnet');
+    expect(resolution.ens!.url).toBe('https://mainnet.infura.io');
   });
 
   it('checks normalizeSource ens (object) #9', async () => {
     const resolution = new Resolution({
       blockchain: { ens: { network: 'kovan' } },
     });
-    expect(resolution.ens.network).toBe('kovan');
-    expect(resolution.ens.url).toBe('https://kovan.infura.io');
+    expect(resolution.ens!.network).toBe('kovan');
+    expect(resolution.ens!.url).toBe('https://kovan.infura.io');
   });
 
   it('checks normalizeSource ens (object) #10', async () => {
@@ -221,9 +221,9 @@ describe('ENS', () => {
         ens: { registry: '0x314159265dd8dbb310642f98f50c066173c1259b' },
       },
     });
-    expect(resolution.ens.network).toBe('mainnet');
-    expect(resolution.ens.url).toBe('https://mainnet.infura.io');
-    expect(resolution.ens.registryAddress).toBe(
+    expect(resolution.ens!.network).toBe('mainnet');
+    expect(resolution.ens!.url).toBe('https://mainnet.infura.io');
+    expect(resolution.ens!.registryAddress).toBe(
       '0x314159265dd8dbb310642f98f50c066173c1259b',
     );
   });
@@ -237,9 +237,9 @@ describe('ENS', () => {
         },
       },
     });
-    expect(resolution.ens.network).toBe('ropsten');
-    expect(resolution.ens.url).toBe('https://ropsten.infura.io');
-    expect(resolution.ens.registryAddress).toBe(
+    expect(resolution.ens!.network).toBe('ropsten');
+    expect(resolution.ens!.url).toBe('https://ropsten.infura.io');
+    expect(resolution.ens!.registryAddress).toBe(
       '0x112234455c3a32fd11230c42e7bccd4a84e02010',
     );
   });
@@ -251,9 +251,9 @@ describe('ENS', () => {
       },
     });
 
-    expect(resolution.ens.network).toBe('mainnet');
-    expect(resolution.ens.url).toBe('https://mainnet.infura.io');
-    expect(resolution.ens.registryAddress).toBe(
+    expect(resolution.ens!.network).toBe('mainnet');
+    expect(resolution.ens!.url).toBe('https://mainnet.infura.io');
+    expect(resolution.ens!.registryAddress).toBe(
       '0xabcffff1231586348194fcabbeff1231240234fc',
     );
   });
@@ -264,9 +264,9 @@ describe('ENS', () => {
         ens: { network: 'custom', url: 'https://custom.notinfura.io' },
       },
     });
-    expect(resolution.ens.network).toBe('custom');
-    expect(resolution.ens.url).toBe('https://custom.notinfura.io');
-    expect(resolution.ens.registryAddress).toBeUndefined();
+    expect(resolution.ens!.network).toBe('custom');
+    expect(resolution.ens!.url).toBe('https://custom.notinfura.io');
+    expect(resolution.ens!.registryAddress).toBeUndefined();
   });
 
   it('checks ens multicoin support #1', async () => {
@@ -275,7 +275,7 @@ describe('ENS', () => {
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x76a9144620b70031f0e9437e374a2100934fba4911046088ac',
     });
-    const doge = await resolution.ens.address('testthing.eth', 'DOGE');
+    const doge = await resolution.ens!.address('testthing.eth', 'DOGE');
     expectSpyToBeCalled(eyes);
     expect(doge).toBe('DBXu2kgc3xtvCUWFcxFE3r9hEYgmuaaCyD');
   });
@@ -286,7 +286,7 @@ describe('ENS', () => {
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0xa914e8604d28ef5d2a7caafe8741e5dd4816b7cb19ea87',
     });
-    const ltc = await resolution.ens.address('testthing.eth', 'LTC');
+    const ltc = await resolution.ens!.address('testthing.eth', 'LTC');
     expectSpyToBeCalled(eyes);
     expect(ltc).toBe('MV5rN5EcX1imDS2gEh5jPJXeiW5QN8YrK3');
   });
@@ -297,7 +297,7 @@ describe('ENS', () => {
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x314159265dd8dbb310642f98f50c066173c1259b',
     });
-    const eth = await resolution.ens.address('testthing.eth', 'ETH');
+    const eth = await resolution.ens!.address('testthing.eth', 'ETH');
     expectSpyToBeCalled(eyes);
     expect(eth).toBe('0x314159265dD8dbb310642f98f50C066173C1259b');
   });
@@ -308,7 +308,7 @@ describe('ENS', () => {
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x314159265dd8dbb310642f98f50c066173c1259b',
     });
-    const etc = await resolution.ens.address('testthing.eth', 'etc');
+    const etc = await resolution.ens!.address('testthing.eth', 'etc');
     expectSpyToBeCalled(eyes);
     expect(etc).toBe('0x314159265dD8dbb310642f98f50C066173C1259b');
   });
@@ -319,7 +319,7 @@ describe('ENS', () => {
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x314159265dd8dbb310642f98f50c066173c1259b',
     });
-    const rsk = await resolution.ens.address('testthing.eth', 'rsk');
+    const rsk = await resolution.ens!.address('testthing.eth', 'rsk');
     expectSpyToBeCalled(eyes);
     expect(rsk).toBe('0x314159265dD8DbB310642F98f50C066173c1259B');
   });
@@ -331,7 +331,7 @@ describe('ENS', () => {
       callMethod:
         '0x05444b4e9c06f24296074f7bc48f92a97916c6dc5ea9000000000000000000',
     });
-    const xrp = await resolution.ens.address('testthing.eth', 'xrp');
+    const xrp = await resolution.ens!.address('testthing.eth', 'xrp');
     expectSpyToBeCalled(eyes);
     expect(xrp).toBe('X7qvLs7gSnNoKvZzNWUT2e8st17QPY64PPe7zriLNuJszeg');
   });
@@ -342,7 +342,7 @@ describe('ENS', () => {
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x76a91476a04053bda0a88bda5177b86a15c3b29f55987388ac',
     });
-    const bch = await resolution.ens.address('testthing.eth', 'bch');
+    const bch = await resolution.ens!.address('testthing.eth', 'bch');
     expectSpyToBeCalled(eyes);
     expect(bch).toBe('bitcoincash:qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a');
   });
@@ -354,7 +354,7 @@ describe('ENS', () => {
       callMethod:
         '0x5128751e76e8199196d454941c45d1b3a323f1433bd6751e76e8199196d454941c45d1b3a323f1433bd6',
     });
-    const btc = await resolution.ens.address('testthing.eth', 'BTC');
+    const btc = await resolution.ens!.address('testthing.eth', 'BTC');
     expectSpyToBeCalled(eyes);
     expect(btc).toBe(
       'bc1pw508d6qejxtdg4y5r3zarvary0c5xw7kw508d6qejxtdg4y5r3zarvary0c5xw7k7grplx',
@@ -423,8 +423,8 @@ describe('ENS', () => {
       const resolution = new Resolution({
         blockchain: { ens: { url: secretInfuraLink() } },
       });
-      expect(resolution.ens.url).toBe(secretInfuraLink());
-      expect(resolution.ens.network).toEqual('mainnet');
+      expect(resolution.ens!.url).toBe(secretInfuraLink());
+      expect(resolution.ens!.network).toEqual('mainnet');
 
       const eyes = mockAsyncMethods(resolution.ens, {
         getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
@@ -456,21 +456,21 @@ describe('ENS', () => {
   describe('.Hashing', () => {
     describe('.namehash', () => {
       it('supports root node', async () => {
-        expect(resolution.ens.isSupportedDomain('eth')).toEqual(true);
-        expect(resolution.ens.namehash('eth')).toEqual(
+        expect(resolution.ens!.isSupportedDomain('eth')).toEqual(true);
+        expect(resolution.ens!.namehash('eth')).toEqual(
           '0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae',
         );
       });
 
       it('should hash appropriately', async () => {
-        expect(resolution.ens.namehash('alice.eth')).toBe(
+        expect(resolution.ens!.namehash('alice.eth')).toBe(
           '0x787192fc5378cc32aa956ddfdedbf26b24e8d78e40109add0eea2c1a012c3dec',
         );
       });
 
       describe('.domain invalid format', () => {
         it('starts with -', async () => {
-          expect(resolution.ens.isSupportedDomain('-hello.eth')).toEqual(false);
+          expect(resolution.ens!.isSupportedDomain('-hello.eth')).toEqual(false);
           await expectResolutionErrorCode(
             () => resolution.namehash('-hello.eth'),
             ResolutionErrorCode.UnsupportedDomain,
@@ -498,9 +498,9 @@ describe('ENS', () => {
     describe('.childhash', () => {
       it('tests childhash functionality', () => {
         const domain = 'hello.world.eth';
-        const namehash = resolution.ens.namehash(domain);
-        const childhash = resolution.ens.childhash(
-          resolution.ens.namehash('world.eth'),
+        const namehash = resolution.ens!.namehash(domain);
+        const childhash = resolution.ens!.childhash(
+          resolution.ens!.namehash('world.eth'),
           'hello',
         );
         expect(childhash).toBe(namehash);
@@ -509,9 +509,9 @@ describe('ENS', () => {
       it('checks root eth domain', () => {
         const rootHash =
           '0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae';
-        expect(resolution.ens.namehash('eth')).toBe(rootHash);
+        expect(resolution.ens!.namehash('eth')).toBe(rootHash);
         expect(
-          resolution.ens.childhash(
+          resolution.ens!.childhash(
             '0000000000000000000000000000000000000000000000000000000000000000',
             'eth',
           ),
@@ -520,9 +520,9 @@ describe('ENS', () => {
 
       it('checks childhash multi level domain', () => {
         const domain = 'ich.ni.san.yon.hello.world.eth';
-        const namehash = resolution.ens.namehash(domain);
-        const childhash = resolution.ens.childhash(
-          resolution.ens.namehash('ni.san.yon.hello.world.eth'),
+        const namehash = resolution.ens!.namehash(domain);
+        const childhash = resolution.ens!.childhash(
+          resolution.ens!.namehash('ni.san.yon.hello.world.eth'),
           'ich',
         );
         expect(childhash).toBe(namehash);
