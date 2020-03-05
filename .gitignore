@@ -11,3 +11,4 @@ docs/index.html
 stats.json
 dist/
 package-lock.json
+.resolution

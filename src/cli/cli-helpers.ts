@@ -1,6 +1,5 @@
 import Resolution from "../Resolution";
 import * as fs from 'fs';
-import { stringify } from "querystring";
 
 export async function tryInfo(method, response, name: string): Promise<boolean> {
 	const field = name;
