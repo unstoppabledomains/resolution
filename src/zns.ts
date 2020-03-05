@@ -119,7 +119,7 @@ export default class Zns extends NamingService {
    */
   async address(domain: string, currencyTicker: string): Promise<string> {
     const data = await this.resolve(domain);
-    if (!data!.meta.owner || isNullAddress(data!.meta.owner))
+    if ((data && !data.meta.owner )|| isNullAddress(data!.meta.owner))
       throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
         domain,
       });
@@ -138,7 +138,8 @@ export default class Zns extends NamingService {
    * @returns An owner address of the domain
    */
   async owner(domain: string): Promise<string | null> {
-    return (await this.resolve(domain))!.meta.owner;
+    const data = await this.resolve(domain);
+    return data ? data.meta.owner : null;
   }
 
   /**
@@ -186,7 +187,7 @@ export default class Zns extends NamingService {
    */
   isSupportedDomain(domain: string): boolean {
     const tokens = domain.split('.');
-    return (tokens.length && tokens[tokens.length - 1] === 'zil' ) as boolean;
+    return (!!tokens.length && tokens[tokens.length - 1] === 'zil' );
   }
 
   /**

@@ -73,7 +73,7 @@ export type ResolutionResponse = {
     for_sale?: boolean;
   };
   addresses: {
-    [key: string]: string;
+    [key: string]: string | undefined;
   };
   meta: {
     owner: string | null;
@@ -136,7 +136,8 @@ export enum NullAddress {
   '0x0000000000000000000000000000000000000000000000000000000000000000',
 }
 
-export function isNullAddress(key: string): boolean {
+export function isNullAddress(key: string | null): boolean {
+  if (!key) return true;
   return Object.values(NullAddress).includes(key);
 }
 

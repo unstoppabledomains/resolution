@@ -169,16 +169,16 @@ export default class Ens extends EthereumNamingService {
     var [owner, ttl, resolver] = await this.getResolutionInfo(domain);
     if (isNullAddress(owner)) owner = null;
     const address = await this.fetchAddress(resolver, nodeHash, EthCoinIndex);
-    return {
-      addresses: {
-        ETH: address!,
-      },
+    const resolution = {
       meta: {
         owner,
         type: this.name,
-        ttl: Number(ttl),
+        ttl: Number(ttl)
       },
+      addresses: {}
     };
+    if (address) resolution.addresses = { ETH: address }
+    return resolution;
   }
 
   /**
@@ -332,7 +332,7 @@ export default class Ens extends EthereumNamingService {
     return coin;
   }
 
-  private async fetchAddressOrThrow(resolver, nodeHash, coinType?: number) {
+  private async fetchAddressOrThrow(resolver, nodeHash, coinType: number) {
     if (!resolver || isNullAddress(resolver)) {
       return null;
     }
@@ -346,14 +346,14 @@ export default class Ens extends EthereumNamingService {
         : await this.callMethod(resolverContract, 'addr', [nodeHash]);
     if (!addr || addr === '0x') return null;
     const data = Buffer.from(addr.replace('0x', ''), 'hex');
-    return formatsByCoinType[coinType!].encoder(data);
+    return formatsByCoinType[coinType].encoder(data);
   }
 
-  private async fetchAddress(resolver, nodeHash, coin) {
+  private async fetchAddress(resolver, nodeHash, coin = EthCoinIndex) {
     return (
       (await this.ignoreResolutionError(
         ResolutionErrorCode.RecordNotFound,
-        this.fetchAddressOrThrow(resolver, nodeHash, EthCoinIndex),
+        this.fetchAddressOrThrow(resolver, nodeHash, coin),
       )) || null
     );
   }
