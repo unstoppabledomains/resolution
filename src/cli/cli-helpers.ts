@@ -1,4 +1,5 @@
 import Resolution from "../Resolution";
+import * as fs from 'fs';
 
 export async function tryInfo(method, response, name: string): Promise<boolean> {
 	const field = name;
@@ -21,9 +22,16 @@ export function signedInfuraLink(key: string): string {
 }
 
 export function getEtheriumUrl(): string {
-	if (process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID) return signedInfuraLink(process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID);
-	if (process.env.UNSTOPPABLE_RESOLUTION_URL) return signedInfuraLink(process.env.UNSTOPPABLE_RESOLUTION_URL);
-	throw new Error('neither UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID nor UNSTOPPABLE_RESOLUTION_URL enviroment variables are se');
+	//try to get them from config files
+	const configObject = getConfig();
+	if (!configObject) {
+		if (process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID) return signedInfuraLink(process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID);
+		if (process.env.UNSTOPPABLE_RESOLUTION_URL) return signedInfuraLink(process.env.UNSTOPPABLE_RESOLUTION_URL);
+	} else {
+		if (configObject.type === 'infura') return signedInfuraLink(configObject.value);
+		if (configObject.type === "url") return "url";
+	}
+	throw new Error('Couldn\'t find any configurate\n\tUse -C to configurate the library');
 }
 
 export function buildResolutionPackage() {
@@ -33,4 +41,19 @@ export function buildResolutionPackage() {
 			cns: getEtheriumUrl()
 		}
 	});
+}
+
+export function parseConfig(value:string, dummyPrevious) {
+	const words = value.split(':')
+	return {type: words[0], value: words[1]};
+}
+
+export function storeConfig(type: "infura" | "url", value: string) {
+	fs.writeFile('.resolution', `${type}=${value}`, () => console.log(`${type}=${value} record stored`));
+}
+
+export function getConfig() {
+	const config = fs.readFileSync(`.resolution`).toString().split('=');
+	if (config[0] === "infura" || config[0] === "url")
+		return {type: config[0], value:config[1]}
 }
