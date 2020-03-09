@@ -411,7 +411,7 @@ describe('ENS', () => {
       const result = await resolution.resolve('matthewgould.eth');
       expectSpyToBeCalled(eyes);
       expect(result).toStrictEqual({
-        addresses: { },
+        addresses: {},
         meta: {
           owner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
           type: 'ENS',
@@ -470,7 +470,9 @@ describe('ENS', () => {
 
       describe('.domain invalid format', () => {
         it('starts with -', async () => {
-          expect(resolution.ens!.isSupportedDomain('-hello.eth')).toEqual(false);
+          expect(resolution.ens!.isSupportedDomain('-hello.eth')).toEqual(
+            false,
+          );
           await expectResolutionErrorCode(
             () => resolution.namehash('-hello.eth'),
             ResolutionErrorCode.UnsupportedDomain,

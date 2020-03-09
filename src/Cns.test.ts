@@ -248,7 +248,10 @@ describe('CNS', () => {
         const cns = resolution.cns;
         const domain = 'hello.world.crypto';
         const namehash = cns!.namehash(domain);
-        const childhash = cns!.childhash(cns!.namehash('world.crypto'), 'hello');
+        const childhash = cns!.childhash(
+          cns!.namehash('world.crypto'),
+          'hello',
+        );
         expect(namehash).toBe(childhash);
       });
 
@@ -281,7 +284,7 @@ describe('CNS', () => {
     it('should resolve with email stored on cns', async () => {
       const spies = mockAsyncMethods(resolution.cns, {
         getResolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
-        getRecord: '0x033dc48b5db4ca62861643e9d2c411d9eb6d1975@gmail.com' 
+        getRecord: '0x033dc48b5db4ca62861643e9d2c411d9eb6d1975@gmail.com',
       });
       const email = await resolution.email(domain);
       expectSpyToBeCalled(spies);

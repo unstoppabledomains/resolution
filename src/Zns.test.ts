@@ -324,7 +324,9 @@ describe('ZNS', () => {
         getRecordsAddresses: undefined,
       });
       await expectResolutionErrorCode(
-        resolution.zns!.resolver('sopmethingveryweirdthatnoonewilltakeever.zil'),
+        resolution.zns!.resolver(
+          'sopmethingveryweirdthatnoonewilltakeever.zil',
+        ),
         ResolutionErrorCode.UnregisteredDomain,
       );
       expectSpyToBeCalled(spies);

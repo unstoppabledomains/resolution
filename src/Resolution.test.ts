@@ -23,10 +23,9 @@ describe('Resolution', () => {
     const resolution = Resolution.infura(infura!);
     expect(resolution.ens).toBeDefined();
     expect(resolution.ens!.url).toBe(`https://mainnet.infura.com/v3/${infura}`);
-  
+
     expect(resolution.cns).toBeDefined();
     expect(resolution.cns!.url).toBe(`https://mainnet.infura.com/v3/${infura}`);
-  
   });
 
   it('should get a configured with provider resolution instance', async () => {
@@ -46,7 +45,7 @@ describe('Resolution', () => {
     const resolution = Resolution.provider(provider);
     const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
     expect(ethAddress).toBe('0x45b31e01AA6f42F0549aD482BE81635ED3149abb');
-  })
+  });
 
   it('checks Resolution#addressOrThrow error #1', async () => {
     const resolution = new Resolution();
@@ -272,4 +271,3 @@ describe('Resolution', () => {
     });
   });
 });
-

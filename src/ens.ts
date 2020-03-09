@@ -93,7 +93,10 @@ export default class Ens extends EthereumNamingService {
    * @param currencyTicker - currency ticker like BTC, ETH, ZIL
    * @returns Domain name attached to this address
    */
-  async reverse(address: string, currencyTicker: string): Promise<string | null> {
+  async reverse(
+    address: string,
+    currencyTicker: string,
+  ): Promise<string | null> {
     if (currencyTicker != 'ETH') {
       throw new Error(`Ens doesn't support any currency other than ETH`);
     }
@@ -173,11 +176,11 @@ export default class Ens extends EthereumNamingService {
       meta: {
         owner,
         type: this.name,
-        ttl: Number(ttl)
+        ttl: Number(ttl),
       },
-      addresses: {}
+      addresses: {},
     };
-    if (address) resolution.addresses = { ETH: address }
+    if (address) resolution.addresses = { ETH: address };
     return resolution;
   }
 

@@ -87,8 +87,8 @@ export default class Resolution {
     return new this({
       blockchain: {
         ens: { url: signedInfuraLink(infura), network: 'mainnet' },
-        cns: { url: signedInfuraLink(infura), network: 'mainnet' }
-      }
+        cns: { url: signedInfuraLink(infura), network: 'mainnet' },
+      },
     });
   }
 
@@ -97,7 +97,7 @@ export default class Resolution {
    * @param provider - any provider with sendAsync function impelmented
    */
   static provider(provider: Web3Provider): Resolution {
-    return new this({blockchain: {web3Provider: provider}});
+    return new this({ blockchain: { web3Provider: provider } });
   }
 
   /**
@@ -105,7 +105,7 @@ export default class Resolution {
    * @param provider - any jsonRPCprovider will work as long as it's prototype has send(method, params): Promise<any> method
    */
   static jsonRPCprovider(provider): Resolution {
-    return new this({blockchain: {web3Provider: provider.send}})
+    return new this({ blockchain: { web3Provider: provider.send } });
   }
 
   /**
@@ -224,7 +224,10 @@ export default class Resolution {
    * @param currencyTicker - currency ticker like BTC, ETH, ZIL
    * @returns Domain name attached to this address
    */
-  async reverse(address: string, currencyTicker: string): Promise<string | null> {
+  async reverse(
+    address: string,
+    currencyTicker: string,
+  ): Promise<string | null> {
     if (!this.checkIfSet(NamingServiceName.ENS)) return null;
     return await this.ens!.reverse(address, currencyTicker);
   }
@@ -317,8 +320,11 @@ export default class Resolution {
     return method;
   }
 
-  private checkIfSet(blockchain: NamingServiceName):boolean {
-    if (!this[blockchain.toLowerCase()]) throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {method: NamingServiceName[blockchain]})
+  private checkIfSet(blockchain: NamingServiceName): boolean {
+    if (!this[blockchain.toLowerCase()])
+      throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
+        method: NamingServiceName[blockchain],
+      });
     return true;
   }
 }
