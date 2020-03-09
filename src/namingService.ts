@@ -215,7 +215,10 @@ export abstract class EthereumNamingService extends NamingService {
     return new Contract(this.name, this.url, abi, address, this.web3Provider);
   }
 
-  protected async throwOwnershipError(domain, ownerPromise?: Promise<string | null>) {
+  protected async throwOwnershipError(
+    domain,
+    ownerPromise?: Promise<string | null>,
+  ) {
     const owner = ownerPromise ? await ownerPromise : await this.owner(domain);
     if (!owner || isNullAddress(owner))
       throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
