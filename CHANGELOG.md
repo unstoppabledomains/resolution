@@ -1,3 +1,6 @@
+## 1.2.0
+ * Added a command line interface
+
 ## 1.1.0
 * Using flexible dependacies instead of locked versions
 * Moved sizecheck to a separate dev dependacy
