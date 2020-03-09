@@ -20,7 +20,9 @@
     "start": "npm run build:live",
     "dev": "yarn build && ./build/cli/cli.js",
     "build": "tsc -p .",
-    "postbuild": "chmod +x ./build/cli/cli.js",
+    "build:symlink": "ln -sf $(PWD)/build/cli/cli.js  /usr/local/bin/resolution",
+    "build:permissions": "chmod +x ./build/cli/cli.js",
+    "postbuild": "yarn build:symlink && yarn build:permissions",
     "format": "prettier --semi --write -l **/*.{js,json,ts}",
     "build:live": "nodemon --watch 'src/**/*.ts' --exec yarn build",
     "docs": "yarn docs:clone && yarn docs:generate && yarn docs:readme",
@@ -29,8 +31,7 @@
     "docs:readme": "./docs-readme.sh",
     "docs:deploy": "./deploy-docs.sh",
     "analyze": "webpack-cli",
-    "size": "yarn run sizecheck -p ./package.json -l 500 -v",
-    "postinstall": "yarn size"
+    "size": "yarn run sizecheck -p ./package.json -l 500 -v"
   },
   "files": [
     "build"
@@ -46,12 +47,10 @@
   },
   "homepage": "https://github.com/unstoppabledomains/resolution.git#readme",
   "devDependencies": {
-    "@types/commander": "^2.12.2",
     "@types/jest": "24.0.23",
     "@types/node": "11.15.3",
     "@types/node-fetch": "2.5.4",
     "@unstoppabledomains/sizecheck": "^4.0.0",
-    "dotenv": "8.2.0",
     "jest": "24.9.0",
     "nock": "10.0.6",
     "prettier": "1.19.1",
@@ -80,6 +79,7 @@
     "bn.js": "^5.1.1",
     "commander": "^4.1.1",
     "content-hash": "^2.5.2",
+    "dotenv": "^8.2.0",
     "hash.js": "^1.1.7",
     "js-sha3": "^0.8.0",
     "node-fetch": "^2.6.0"

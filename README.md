@@ -23,12 +23,15 @@ You can use Resolution in a `<script>` tag from a
 
 # CLI
 
-You should be able to install the library as global dependacy and use the command line tool resolution
+Once you have installed the repo use yarn build to install all of the dependacies and cli tool. It will create a symnlink into /usr/local/bin/resolution and set up the permissions to run the file as executable. 
 
 Before you have started to use the library please configure it with -C flag.  In order to use the ens or cns resolution you will need to provide either an INFURA project ID or a custom node url via -C.
 
 ```
 resolution -C infura:12312313....
+
+or 
+resolution -C url:https://...
 ```
 
 You can find all of the options for resolution cli within -h, --help flag. 
@@ -37,5 +40,7 @@ Example:
 ```
 resolution -iers -c eth,btc,DODGE,unknown -d brad.zil
 ```
+
+## Note
 
 When resolution hits an error it returns the error code instead of throwing. So if you see something like RECORD_NOT_FOUND you know exactly that record was not found for this query.

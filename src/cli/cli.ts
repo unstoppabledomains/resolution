@@ -2,9 +2,7 @@
 import program from 'commander';
 import pckg from '../package.json';
 import { buildResolutionPackage, commaSeparatedList, tryInfo, storeConfig, parseConfig } from './cli-helpers.js';
-import dotenv from 'dotenv';
 
-dotenv.config();
 (async () => {
 	program
 		.version(pckg.version)
