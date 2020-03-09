@@ -3,10 +3,11 @@ import Resolution, { ResolutionErrorCode } from './index';
 import { UnclaimedDomainResponse, NamingServiceName } from './types';
 import {
   expectResolutionErrorCode,
-  mockAsyncMethod,
   expectSpyToBeCalled,
   mockAsyncMethods,
+  secretInfuraLink,
 } from './utils/testHelpers';
+import nodeFetch from 'node-fetch';
 
 beforeEach(() => {
   nock.cleanAll();
@@ -14,6 +15,39 @@ beforeEach(() => {
 });
 
 describe('Resolution', () => {
+  it('should get a valid resolution instance', async () => {
+    const infura = process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID;
+    if (!infura) {
+      console.warn('infura id is not set');
+    }
+    const resolution = Resolution.infura(infura!);
+    expect(resolution.ens).toBeDefined();
+    expect(resolution.ens!.url).toBe(`https://mainnet.infura.com/v3/${infura}`);
+  
+    expect(resolution.cns).toBeDefined();
+    expect(resolution.cns!.url).toBe(`https://mainnet.infura.com/v3/${infura}`);
+  
+  });
+
+  it('should get a configured with provider resolution instance', async () => {
+    const provider = {
+      sendAsync: (method: string, params: any) => {
+        return nodeFetch(secretInfuraLink(), {
+          method: 'POST',
+          body: JSON.stringify({
+            method,
+            params,
+            jsonrpc: '2.0',
+            id: 1,
+          }),
+        });
+      },
+    };
+    const resolution = Resolution.provider(provider);
+    const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
+    expect(ethAddress).toBe('0x45b31e01AA6f42F0549aD482BE81635ED3149abb');
+  })
+
   it('checks Resolution#addressOrThrow error #1', async () => {
     const resolution = new Resolution();
     await expectResolutionErrorCode(
@@ -203,7 +237,7 @@ describe('Resolution', () => {
       });
 
       it('checks childhash multi level domain', () => {
-        const cns = new Resolution().cns;
+        const cns = new Resolution().cns!;
         const domain = 'ich.ni.san.yon.hello.world.crypto';
         const namehash = cns!.namehash(domain);
         const childhash = cns!.childhash(
@@ -214,4 +248,28 @@ describe('Resolution', () => {
       });
     });
   });
+
+  describe('Providers', () => {
+    it('should work with custom provider', async () => {
+      const provider = {
+        sendAsync: (method: string, params: any) => {
+          return nodeFetch(secretInfuraLink(), {
+            method: 'POST',
+            body: JSON.stringify({
+              method,
+              params,
+              jsonrpc: '2.0',
+              id: 1,
+            }),
+          });
+        },
+      };
+      const resolution = new Resolution({
+        blockchain: { web3Provider: provider },
+      });
+      const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
+      expect(ethAddress).toBe('0x45b31e01AA6f42F0549aD482BE81635ED3149abb');
+    });
+  });
 });
+

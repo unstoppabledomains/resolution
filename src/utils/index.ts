@@ -29,3 +29,7 @@ export function invert(object) {
   }
   return returnee;
 }
+
+export function signedInfuraLink(infura: string): string {
+  return `https://mainnet.infura.com/v3/${infura}`;
+}

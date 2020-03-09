@@ -14,6 +14,7 @@ import {
 } from './types';
 import ResolutionError, { ResolutionErrorCode } from './resolutionError';
 import NamingService from './namingService';
+import { signedInfuraLink } from './utils';
 
 /**
  * Blockchain domain Resolution library - Resolution.
@@ -76,6 +77,35 @@ export default class Resolution {
     } else {
       this.api = new Udapi(api.url);
     }
+  }
+
+  /**
+   * Creates a resolution with configured infura id for ens and cns
+   * @param infura infura project id
+   */
+  static infura(infura: string): Resolution {
+    return new this({
+      blockchain: {
+        ens: { url: signedInfuraLink(infura), network: 'mainnet' },
+        cns: { url: signedInfuraLink(infura), network: 'mainnet' }
+      }
+    });
+  }
+
+  /**
+   * Creates a resolution instance with configured provider
+   * @param provider - any provider with sendAsync function impelmented
+   */
+  static provider(provider: Web3Provider): Resolution {
+    return new this({blockchain: {web3Provider: provider}});
+  }
+
+  /**
+   * Creates a resolution instance from configured jsonRPCProvider
+   * @param provider - any jsonRPCprovider will work as long as it's prototype has send(method, params): Promise<any> method
+   */
+  static jsonRPCprovider(provider): Resolution {
+    return new this({blockchain: {web3Provider: provider.send}})
   }
 
   /**

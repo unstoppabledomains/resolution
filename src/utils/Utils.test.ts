@@ -43,25 +43,3 @@ describe('Lodash', () => {
     });
   });
 });
-describe('Contract', () => {
-  it('should work with ethers provider', async () => {
-    const provider = {
-      sendAsync: (method: string, params: any) => {
-        return nodeFetch(secretInfuraLink(), {
-          method: 'POST',
-          body: JSON.stringify({
-            method,
-            params,
-            jsonrpc: '2.0',
-            id: 1,
-          }),
-        });
-      },
-    };
-    const resolution = new Resolution({
-      blockchain: { web3Provider: provider },
-    });
-    const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
-    expect(ethAddress).toBe('0x45b31e01AA6f42F0549aD482BE81635ED3149abb');
-  });
-});
