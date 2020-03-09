@@ -101,11 +101,11 @@ export default class Resolution {
   }
 
   /**
-   * Creates a resolution instance with configured web3 provider
-   * @param web3 - web3 object with currentProvider set
+   * Creates a resolution instance from configured jsonRPCProvider
+   * @param provider - any jsonRPCprovider will work as long as it's prototype has send(method, params): Promise<any> method
    */
-  static web3(web3): Resolution {
-    return new this({blockchain: {web3Provider: web3.currentProvider.send}})
+  static jsonRPCprovider(provider): Resolution {
+    return new this({blockchain: {web3Provider: provider.send}})
   }
 
   /**
