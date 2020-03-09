@@ -10,3 +10,5 @@ docs/index.html
 .env
 stats.json
 dist/
+package-lock.json
+.resolution
