@@ -16,7 +16,7 @@ Supported domain zones:
 - .eth
 
 
-[API Referrence](https://unstoppabledomains.github.io/-unstoppabledomains-resolution/)
+[API Referrence](https://unstoppabledomains.github.io/resolution/)
 [Documentation](https://docs.unstoppabledomains.com/#tag/Resolution)
 
 You can use Resolution in a `<script>` tag from a
