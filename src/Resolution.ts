@@ -101,6 +101,14 @@ export default class Resolution {
   }
 
   /**
+   * Creates a resolution instance with configured web3 provider
+   * @param web3 - web3 object with currentProvider set
+   */
+  static web3(web3): Resolution {
+    return new this({blockchain: {web3Provider: web3.currentProvider.send}})
+  }
+
+  /**
    * Resolves the given domain
    * @async
    * @param domain - domain name to be resolved
