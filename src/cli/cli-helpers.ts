@@ -53,7 +53,11 @@ export function storeConfig(type: "infura" | "url", value: string) {
 }
 
 export function getConfig() {
-	const config = fs.readFileSync(`.resolution`).toString().split('=');
-	if (config[0] === "infura" || config[0] === "url")
-		return {type: config[0], value:config[1]}
+	try {
+		const config = fs.readFileSync(`.resolution`).toString().split('=');
+		if (config[0] === "infura" || config[0] === "url")
+			return {type: config[0], value:config[1]}
+	}catch(err) {
+		throw new Error('Resolution library is not configured. Please use resolution -C and configure it either with infura project id or node url for lookup. Resolution -h for more details')
+	}
 }
