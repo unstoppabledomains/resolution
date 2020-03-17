@@ -1,4 +1,4 @@
-import hash from 'hash.js'
+import hash from 'hash.js';
 
 export default (
   message,
@@ -6,9 +6,10 @@ export default (
     hexPrefix = true,
     inputEnc,
     outputEnc = 'hex',
-  }: {hexPrefix?: boolean; inputEnc?: 'hex'; outputEnc?: 'hex'} = {},
+  }: { hexPrefix?: boolean; inputEnc?: 'hex'; outputEnc?: 'hex' } = {},
 ) =>
   (hexPrefix ? '0x' : '') +
-  hash.sha256()
+  hash
+    .sha256()
     .update(message, inputEnc)
-    .digest(outputEnc)
+    .digest(outputEnc);

@@ -1,6 +1,6 @@
 import nock from 'nock';
-import {Dictionary } from '../types';
-import {ResolutionError} from '../index';
+import { Dictionary } from '../types';
+import { ResolutionError } from '../index';
 import mockData from '../testData/mockData.json';
 
 export const MainnetUrl = 'https://mainnet.infura.io';
@@ -17,21 +17,21 @@ export function mockAsyncMethod(object: any, method: string, value) {
     }
   }
   return spy;
-};
+}
 
 export function mockAsyncMethods(object: any, methods: Dictionary<any>) {
   return Object.entries(methods).map(method =>
     mockAsyncMethod(object, method[0], method[1]),
   );
-};
+}
 
-export function expectSpyToBeCalled (spies: any[]) {
+export function expectSpyToBeCalled(spies: any[]) {
   if (!process.env.LIVE) {
     spies.forEach(spy => expect(spy).toBeCalled());
   }
-};
+}
 
-export async function expectResolutionErrorCode (
+export async function expectResolutionErrorCode(
   callback: Promise<any> | Function,
   code: string,
 ) {
@@ -49,7 +49,7 @@ export async function expectResolutionErrorCode (
     }
   }
   expect(true).toBeFalsy();
-};
+}
 
 export function mockAPICalls(testName: string, url = MainnetUrl) {
   if (process.env.LIVE) {
@@ -74,7 +74,7 @@ export function mockAPICalls(testName: string, url = MainnetUrl) {
       }
     }
   });
-};
+}
 
 /**
  * @internal
@@ -82,10 +82,9 @@ export function mockAPICalls(testName: string, url = MainnetUrl) {
  * or the one with attached INFURA SECRET key from
  * UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID env variable if any
  */
-export function secretInfuraLink():string {
+export function secretInfuraLink(): string {
   const secret = process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID;
   let url = 'https://mainnet.infura.io';
-  if (secret)
-    url = `https://mainnet.infura.io/v3/${secret}`;
+  if (secret) url = `https://mainnet.infura.io/v3/${secret}`;
   return url;
 }

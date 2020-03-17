@@ -391,4 +391,4 @@ export default [
     stateMutability: 'pure',
     type: 'function',
   },
-]
+];

@@ -11,13 +11,13 @@ const GENERATOR = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3];
 const HRP = 'zil';
 const tHRP = 'tzil';
 
-function isByteString (str: string, len: number) {
+function isByteString(str: string, len: number) {
   return !!str.replace('0x', '').match(`^[0-9a-fA-F]{${len}}$`);
-};
+}
 
-function isAddress (address: string) {
+function isAddress(address: string) {
   return isByteString(address, 40);
-};
+}
 
 /**
  * convertBits
@@ -34,7 +34,7 @@ function isAddress (address: string) {
  * @param {boolean} pad
  * @returns {Buffer|null}
  */
-function convertBits (
+function convertBits(
   data: Buffer,
   fromWidth: number,
   toWidth: number,
@@ -42,7 +42,7 @@ function convertBits (
 ) {
   let acc = 0;
   let bits = 0;
-  const ret:number[] = [];
+  const ret: number[] = [];
   const maxv = (1 << toWidth) - 1;
   // tslint:disable-next-line
   for (let p = 0; p < data.length; ++p) {
@@ -67,9 +67,9 @@ function convertBits (
   }
 
   return Buffer.from(ret);
-};
+}
 
-function hrpExpand (hrp: string): Buffer {
+function hrpExpand(hrp: string): Buffer {
   const ret: any[] = [];
   let p;
   for (p = 0; p < hrp.length; ++p) {
@@ -80,9 +80,9 @@ function hrpExpand (hrp: string): Buffer {
     ret.push(hrp.charCodeAt(p) & 31);
   }
   return Buffer.from(ret);
-};
+}
 
-function polymod (values: Buffer): number {
+function polymod(values: Buffer): number {
   let chk = 1;
   // tslint:disable-next-line
   for (let p = 0; p < values.length; ++p) {
@@ -95,7 +95,7 @@ function polymod (values: Buffer): number {
     }
   }
   return chk;
-};
+}
 
 function createChecksum(hrp: string, data: Buffer) {
   const values = Buffer.concat([
@@ -112,7 +112,6 @@ function createChecksum(hrp: string, data: Buffer) {
   return Buffer.from(ret);
 }
 
-
 function verifyChecksum(hrp: string, data: Buffer) {
   return polymod(Buffer.concat([hrpExpand(hrp), data])) === 1;
 }
@@ -125,9 +124,9 @@ function encode(hrp: string, data: Buffer) {
     ret += CHARSET.charAt(combined[p]);
   }
   return ret;
-};
+}
 
-function decode (bechString: string) {
+function decode(bechString: string) {
   let p;
   let hasLower = false;
   let hasUpper = false;
@@ -165,7 +164,7 @@ function decode (bechString: string) {
   }
 
   return { hrp, data: Buffer.from(data.slice(0, data.length - 6)) };
-};
+}
 
 /**
  * toChecksumAddress
@@ -185,7 +184,7 @@ export const toChecksumAddress = (address: string): string => {
     .sha256()
     .update(address, 'hex')
     .digest('hex');
-  const v = new BN(hash as unknown as string, 'hex', 'be');
+  const v = new BN((hash as unknown) as string, 'hex', 'be');
   let ret = '0x';
 
   for (let i = 0; i < address.length; i++) {
@@ -201,7 +200,6 @@ export const toChecksumAddress = (address: string): string => {
   return ret;
 };
 
-
 /**
  * toBech32Address
  *
@@ -214,7 +212,7 @@ export const toChecksumAddress = (address: string): string => {
  * @param {string} 20 byte canonical address
  * @returns {string} 38 char bech32 encoded zilliqa address
  */
-export function toBech32Address (
+export function toBech32Address(
   address: string,
   testnet: boolean = false,
 ): string {
@@ -233,7 +231,7 @@ export function toBech32Address (
   }
 
   return encode(testnet ? tHRP : HRP, addrBz);
-};
+}
 
 /**
  * fromBech32Address
@@ -241,7 +239,7 @@ export function toBech32Address (
  * @param {string} address - a valid Zilliqa bech32 address
  * @returns {string} a canonical 20-byte Ethereum-style address
  */
-export function fromBech32Address (
+export function fromBech32Address(
   address: string,
   testnet: boolean = false,
 ): string {
@@ -265,4 +263,4 @@ export function fromBech32Address (
   }
 
   return toChecksumAddress(buf.toString('hex'));
-};
+}
