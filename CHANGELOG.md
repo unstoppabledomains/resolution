@@ -1,3 +1,6 @@
+## 1.3.0
+ * Add support for .kred domains on ENS
+
 ## 1.2.0
  * Added a command line interface
 
