@@ -48,7 +48,7 @@ export async function expectResolutionErrorCode(
       throw error;
     }
   }
-  expect(true).toBeFalsy();
+  fail("Expected resolution error to be thrown but wasn't");
 }
 
 export function mockAPICalls(testName: string, url = MainnetUrl) {
