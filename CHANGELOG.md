@@ -1,8 +1,11 @@
+## Unreleased
+* fixed command line interface configuration with url
+
 ## 1.3.0
- * Add support for .kred domains on ENS
+* Add support for .kred domains on ENS
 
 ## 1.2.0
- * Added a command line interface
+* Added a command line interface
 
 ## 1.1.0
 * Using flexible dependacies instead of locked versions

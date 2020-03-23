@@ -34,14 +34,14 @@ export function getEtheriumUrl(): string {
         process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID,
       );
     if (process.env.UNSTOPPABLE_RESOLUTION_URL)
-      return signedInfuraLink(process.env.UNSTOPPABLE_RESOLUTION_URL);
+      return process.env.UNSTOPPABLE_RESOLUTION_URL;
   } else {
     if (configObject.type === 'infura')
       return signedInfuraLink(configObject.value);
-    if (configObject.type === 'url') return 'url';
+    if (configObject.type === 'url') return configObject.value;
   }
   throw new Error(
-    "Couldn't find any configurate\n\tUse -C to configurate the library",
+    "Couldn't find any configurations\n\tUse -C to configurate the library",
   );
 }
 
@@ -56,7 +56,7 @@ export function buildResolutionPackage() {
 
 export function parseConfig(value: string, dummyPrevious) {
   const words = value.split(':');
-  return { type: words[0], value: words[1] };
+  return { type: words[0], value: words.slice(1).join(':')};
 }
 
 export function storeConfig(type: 'infura' | 'url', value: string) {
