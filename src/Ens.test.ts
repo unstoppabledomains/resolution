@@ -98,8 +98,13 @@ describe('ENS', () => {
   });
 
   it('resolves .kred name using ENS blockchain', async () => {
+    const eyes = mockAsyncMethods(resolution.ens, {
+      getResolver: "0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8",
+      callMethod: "0x96184444629F3489c4dE199871E6F99568229d8f"
+    });
     const result = await resolution.address('brantly.kred', 'ETH');
-    expect(result).toEqual('0x8E217c639099F85F3CA3B5ACF032f7232c32F188');
+    expectSpyToBeCalled(eyes);
+    expect(result).toEqual('0x96184444629F3489c4dE199871E6F99568229d8f');
   });
 
   it('resolves .luxe name using ENS blockchain with safe null return', async () => {
