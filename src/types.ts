@@ -73,7 +73,7 @@ export type ResolutionResponse = {
     for_sale?: boolean;
   };
   addresses: {
-    [key: string]: string | undefined;
+    [key: string]: string;
   };
   meta: {
     owner: string | null;
