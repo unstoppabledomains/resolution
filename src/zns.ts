@@ -89,20 +89,20 @@ export default class Zns extends NamingService {
     const recordAddresses = await this.getRecordsAddresses(domain);
     if (!recordAddresses) return UnclaimedDomainResponse;
     const [ownerAddress, resolverAddress] = recordAddresses;
-    const Resolution = this.structureResolverRecords(
+    const resolution = this.structureResolverRecords(
       await this.getResolverRecords(resolverAddress),
     );
-    const addresses = {};
-    if (Resolution.crypto)
-      Object.entries(Resolution.crypto).map(
-        ([key, v]) => (addresses[key] = v.address),
+    const addresses: Record<string, string> = {};
+    if (resolution.crypto)
+      Object.entries(resolution.crypto).map(
+        ([key, v]) => (v.address && (addresses[key] = v.address)),
       );
     return {
       addresses,
       meta: {
         owner: ownerAddress || null,
         type: this.name,
-        ttl: parseInt(Resolution.ttl as string) || 0,
+        ttl: parseInt(resolution.ttl as string) || 0,
       },
     };
   }
