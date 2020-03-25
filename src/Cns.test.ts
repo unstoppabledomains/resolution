@@ -8,6 +8,13 @@ import {
 import { ResolutionErrorCode } from './resolutionError';
 import { NullAddress } from './types';
 
+try {
+  const dotenv = require('dotenv');
+  dotenv.config();
+} catch(err) {
+  console.warn('dotenv is not installed');
+}
+
 const labelDomain = 'reseller-test-braden-6.crypto';
 let resolution: Resolution;
 beforeEach(() => {

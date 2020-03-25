@@ -11,6 +11,13 @@ import {
 } from './utils/testHelpers';
 let resolution: Resolution;
 
+try {
+  const dotenv = require('dotenv');
+  dotenv.config();
+} catch(err) {
+  console.warn('dotenv is not installed');
+}
+
 beforeEach(() => {
   nock.cleanAll();
   jest.restoreAllMocks();

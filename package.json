@@ -46,6 +46,9 @@
     "url": "https://github.com/unstoppabledomains/resolution.git"
   },
   "homepage": "https://github.com/unstoppabledomains/resolution.git#readme",
+  "optionalDependencies": {
+    "dotenv": "^8.2.0"
+  },
   "devDependencies": {
     "@types/jest": "24.0.23",
     "@types/node": "11.15.3",
@@ -79,7 +82,6 @@
     "bn.js": "^5.1.1",
     "commander": "^4.1.1",
     "content-hash": "^2.5.2",
-    "dotenv": "^8.2.0",
     "hash.js": "^1.1.7",
     "js-sha3": "^0.8.0",
     "node-fetch": "^2.6.0"

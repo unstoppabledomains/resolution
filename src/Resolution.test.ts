@@ -9,6 +9,13 @@ import {
 } from './utils/testHelpers';
 import nodeFetch from 'node-fetch';
 
+try {
+  const dotenv = require('dotenv');
+  dotenv.config();
+} catch(err) {
+  console.warn('dotenv is not installed');
+}
+
 beforeEach(() => {
   nock.cleanAll();
   jest.restoreAllMocks();
