@@ -379,21 +379,25 @@ describe('ENS', () => {
   });
 
   it('checks UnsupportedCurrency error', async () => {
+    const eyes = mockAsyncMethods(resolution.ens, {
+      getResolver: "0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8"
+    });
     await expectResolutionErrorCode(
-      new Resolution({
-        blockchain: { ens: { url: secretInfuraLink() } },
-      }).addressOrThrow('testthing.eth', 'bnb'),
+      resolution.addressOrThrow('testthing.eth', 'bnb'),
       ResolutionErrorCode.UnsupportedCurrency,
     );
+    expectSpyToBeCalled(eyes);
   });
 
   it('checks UnsupportedCurrency error', async () => {
+    const eyes = mockAsyncMethods(resolution.ens, {
+      getResolver: "0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8"
+    })
     await expectResolutionErrorCode(
-      new Resolution({
-        blockchain: { ens: { url: secretInfuraLink() } },
-      }).addressOrThrow('testthing.eth', 'UNREALTICKER'),
+      resolution.addressOrThrow('testthing.eth', 'UNREALTICKER'),
       ResolutionErrorCode.UnsupportedCurrency,
     );
+    expectSpyToBeCalled(eyes);
   });
 
   describe('.resolve', () => {
@@ -436,10 +440,8 @@ describe('ENS', () => {
         },
       });
     });
+
     it('resolve to null for empty .eth record', async () => {
-      const resolution = new Resolution({
-        blockchain: { ens: { url: secretInfuraLink() } },
-      });
       expect(resolution.ens!.url).toBe(secretInfuraLink());
       expect(resolution.ens!.network).toEqual('mainnet');
 
@@ -451,6 +453,7 @@ describe('ENS', () => {
       expect(await resolution.address('qwdqwd.eth', 'XRP')).toEqual(null);
       expectSpyToBeCalled(eyes);
     });
+
     it('should return correct resolver address', async () => {
       const spies = mockAsyncMethods(resolution.ens, {
         getResolver: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
@@ -463,10 +466,14 @@ describe('ENS', () => {
     });
 
     it('should not find a resolver address', async () => {
+      const spies = mockAsyncMethods(resolution.ens, {
+        getResolver: undefined
+      });
       await expectResolutionErrorCode(
         resolution.resolver('empty.eth'),
         ResolutionErrorCode.UnspecifiedResolver,
       );
+      expectSpyToBeCalled(spies);
     });
   });
 
@@ -563,11 +570,16 @@ describe('ENS', () => {
 
     //todo(johny) find some domains with url property set
     it('should not find an appropriate httpUrl', async () => {
+      const eyes = mockAsyncMethods(resolution.ens, {
+        getResolver: "0x5FfC014343cd971B7eb70732021E26C35B744cc4",
+        callMethod: ""
+      })
       const httpUrlPromise = resolution.httpUrl('matthewgould.eth');
       await expectResolutionErrorCode(
         httpUrlPromise,
         ResolutionErrorCode.RecordNotFound,
-      );
+        );
+      expectSpyToBeCalled(eyes);
     });
 
     it('should return resolution error for not finding the email', async () => {

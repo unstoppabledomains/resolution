@@ -237,6 +237,7 @@ describe('CNS', () => {
         );
       });
     });
+
     describe('.Childhash', () => {
       it('checks root crypto domain', () => {
         const cns = resolution.cns;
@@ -279,6 +280,7 @@ describe('CNS', () => {
     const domain = 'reseller-test-ryan019.crypto';
     it('should resolve with ipfs stored on cns', async () => {
       const spies = mockAsyncMethods(resolution.cns, {
+        getResolver: undefined,
         getRecord: '0x033dc48b5db4ca62861643e9d2c411d9eb6d1975@gmail.com',
       });
       const ipfsHash = await resolution.ipfsHash(domain);
