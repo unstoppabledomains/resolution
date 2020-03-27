@@ -12,7 +12,7 @@ import nodeFetch from 'node-fetch';
 try {
   const dotenv = require('dotenv');
   dotenv.config();
-} catch(err) {
+} catch (err) {
   console.warn('dotenv is not installed');
 }
 

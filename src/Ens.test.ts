@@ -14,7 +14,7 @@ let resolution: Resolution;
 try {
   const dotenv = require('dotenv');
   dotenv.config();
-} catch(err) {
+} catch (err) {
   console.warn('dotenv is not installed');
 }
 
@@ -106,8 +106,8 @@ describe('ENS', () => {
 
   it('resolves .kred name using ENS blockchain', async () => {
     const eyes = mockAsyncMethods(resolution.ens, {
-      getResolver: "0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8",
-      callMethod: "0x96184444629F3489c4dE199871E6F99568229d8f"
+      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      callMethod: '0x96184444629F3489c4dE199871E6F99568229d8f',
     });
     const result = await resolution.address('brantly.kred', 'ETH');
     expectSpyToBeCalled(eyes);
@@ -380,7 +380,7 @@ describe('ENS', () => {
 
   it('checks UnsupportedCurrency error', async () => {
     const eyes = mockAsyncMethods(resolution.ens, {
-      getResolver: "0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8"
+      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
     });
     await expectResolutionErrorCode(
       resolution.addressOrThrow('testthing.eth', 'bnb'),
@@ -391,8 +391,8 @@ describe('ENS', () => {
 
   it('checks UnsupportedCurrency error', async () => {
     const eyes = mockAsyncMethods(resolution.ens, {
-      getResolver: "0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8"
-    })
+      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+    });
     await expectResolutionErrorCode(
       resolution.addressOrThrow('testthing.eth', 'UNREALTICKER'),
       ResolutionErrorCode.UnsupportedCurrency,
@@ -467,7 +467,7 @@ describe('ENS', () => {
 
     it('should not find a resolver address', async () => {
       const spies = mockAsyncMethods(resolution.ens, {
-        getResolver: undefined
+        getResolver: undefined,
       });
       await expectResolutionErrorCode(
         resolution.resolver('empty.eth'),
@@ -571,14 +571,14 @@ describe('ENS', () => {
     //todo(johny) find some domains with url property set
     it('should not find an appropriate httpUrl', async () => {
       const eyes = mockAsyncMethods(resolution.ens, {
-        getResolver: "0x5FfC014343cd971B7eb70732021E26C35B744cc4",
-        callMethod: ""
-      })
+        getResolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
+        callMethod: '',
+      });
       const httpUrlPromise = resolution.httpUrl('matthewgould.eth');
       await expectResolutionErrorCode(
         httpUrlPromise,
         ResolutionErrorCode.RecordNotFound,
-        );
+      );
       expectSpyToBeCalled(eyes);
     });
 

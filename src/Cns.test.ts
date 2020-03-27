@@ -11,7 +11,7 @@ import { NullAddress } from './types';
 try {
   const dotenv = require('dotenv');
   dotenv.config();
-} catch(err) {
+} catch (err) {
   console.warn('dotenv is not installed');
 }
 

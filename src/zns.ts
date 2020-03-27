@@ -95,7 +95,7 @@ export default class Zns extends NamingService {
     const addresses: Record<string, string> = {};
     if (resolution.crypto)
       Object.entries(resolution.crypto).map(
-        ([key, v]) => (v.address && (addresses[key] = v.address)),
+        ([key, v]) => v.address && (addresses[key] = v.address),
       );
     return {
       addresses,
@@ -187,7 +187,11 @@ export default class Zns extends NamingService {
    */
   isSupportedDomain(domain: string): boolean {
     const tokens = domain.split('.');
-    return !!tokens.length && tokens[tokens.length - 1] === 'zil' && tokens.every(v => !!v.length);
+    return (
+      !!tokens.length &&
+      tokens[tokens.length - 1] === 'zil' &&
+      tokens.every(v => !!v.length)
+    );
   }
 
   /**

@@ -71,7 +71,8 @@ export default class Ens extends EthereumNamingService {
     return (
       domain === 'eth' ||
       (domain.indexOf('.') > 0 &&
-        /^[^-]*[^-]*\.(eth|luxe|xyz|kred)$/.test(domain) && domain.split(".").every(v => !!v.length))
+        /^[^-]*[^-]*\.(eth|luxe|xyz|kred)$/.test(domain) &&
+        domain.split('.').every(v => !!v.length))
     );
   }
 

@@ -420,7 +420,7 @@ describe('ZNS', () => {
         );
       });
     });
-    
+
     describe('.Childhash', () => {
       it('checks childhash', () => {
         const zns = resolution.zns;
