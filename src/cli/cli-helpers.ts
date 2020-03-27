@@ -54,7 +54,7 @@ export function buildResolutionPackage() {
   });
 }
 
-export function parseConfig(value: string, dummyPrevious) {
+export function parseConfig(value: string) {
   const words = value.split(':');
   return { type: words[0], value: words.slice(1).join(':')};
 }

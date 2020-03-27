@@ -11,6 +11,7 @@ import {
 
 (async () => {
   program
+    .storeOptionsAsProperties(false)
     .version(pckg.version)
     .option(
       '-c, --currencies <currencies>',
@@ -21,11 +22,12 @@ import {
       '-C, --config <option>',
       `option in format <key>:<value>\n\tkey can be either \"infura\" or \"url\"`,
       parseConfig,
-    )
-    .option('-i, --ipfs', 'get IpfsHash')
-    .option('-e, --email', 'get email')
-    .option('-r, --resolver', 'get resolver address')
+      )
     .option('-s, --service', 'returns you a service name from the domain')
+    .option('-i, --ipfs', 'get IpfsHash')
+    .option('-r, --resolver', 'get resolver address')
+    .option('-e, --email', 'get email')
+    .option('-n, --namehash', `returns domain's namehash`)
     .option('-d, --domain <domain>', 'domain you wish to resolve')
     .description(
       'resolution cli exports main usage of @unstoppabledomains/resolution library',
@@ -33,25 +35,34 @@ import {
 
   program.parse(process.argv);
 
-  if (program.config) {
-    const { type, value } = program.config;
+  const options = program.opts();
+  
+  if (options.config) {
+    const { type, value } = options.config;
     if (type == 'infura' || type == 'url') storeConfig(type, value);
+    delete options.config;
   }
-  if (!program.domain) return;
+
+  if (!options.domain) return;
+
+  const { domain } = options;
+  delete options.domain;
+
   const resolution = buildResolutionPackage();
   const response = {};
-  const domain = program.domain;
+  
+  const commandTable = {
+    ipfs: () => tryInfo(async () => await resolution.ipfsHash(domain), response, 'ipfs'),
+    email: () => tryInfo(async () => await resolution.email(domain), response, 'email'),
+    resolver: () => tryInfo(async () => await resolution.resolver(domain), response, 'resolver'),
+    service: () => tryInfo(() => resolution.serviceName(domain), response, 'service'),
+    namehash: () => tryInfo(() => resolution.namehash(domain), response, 'namehash')
+  };
+
   const resolutionProcess: Promise<boolean>[] = [];
-  if (program.ipfs)
-    resolutionProcess.push(
-      tryInfo(async () => await resolution.ipfsHash(domain), response, 'ipfs'),
-    );
-  if (program.email)
-    resolutionProcess.push(
-      tryInfo(async () => await resolution.email(domain), response, 'email'),
-    );
-  if (program.currencies) {
-    program.currencies.forEach(async currency => {
+  // Execute resolution for each currency
+  if (options.currencies) {
+    options.currencies.forEach(async (currency:string) => {
       resolutionProcess.push(
         tryInfo(
           async () => await resolution.addressOrThrow(domain, currency),
@@ -60,19 +71,11 @@ import {
         ),
       );
     });
+    delete options.currencies;
   }
-  if (program.resolver)
-    resolutionProcess.push(
-      tryInfo(
-        async () => await resolution.resolver(domain),
-        response,
-        'resolver',
-      ),
-    );
-  if (program.service)
-    resolutionProcess.push(
-      tryInfo(async () => resolution.serviceName(domain), response, 'service'),
-    );
+  // Execute the rest of options
+  Object.keys(options).forEach(option => resolutionProcess.push(commandTable[option]()));
+
   await Promise.all(resolutionProcess);
   console.log(response);
 })();
