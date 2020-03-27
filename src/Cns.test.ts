@@ -236,6 +236,18 @@ describe('CNS', () => {
           '0x90cc1963ff09ce95ee2dbb3830df4f2115da9756e087a50283b3e65f6ffe2a4e',
         );
       });
+
+      it('should throw UnregisteredDomain', async () => {
+        const eyes = mockAsyncMethods(resolution.cns, {
+          getResolver: undefined,
+          owner: '0x0000000000000000000000000000000000000000'
+        });
+        await expectResolutionErrorCode(
+          resolution.cns!.address('unregistered.crypto', "ETH"),
+          ResolutionErrorCode.UnregisteredDomain
+        );
+        expectSpyToBeCalled(eyes);
+      })
     });
 
     describe('.Childhash', () => {

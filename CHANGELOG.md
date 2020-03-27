@@ -1,4 +1,9 @@
 ## Unreleased
+
+## 1.3.4
+* Fixed wrong ResolutionErrorCode for unregistered .crypto domain in method cns#address
+
+## 1.3.3
 * CLI -n, --namehash flag
 * CLI -m, --meta flag, shortcut for -siren flags
 * Updated README
