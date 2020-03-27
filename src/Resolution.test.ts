@@ -156,7 +156,7 @@ describe('Resolution', () => {
     );
   });
 
-  it.only('should be invalid domain 3', async () => {
+  it('should be invalid domain 3', async () => {
     const cnsInvalidDomain = 'hello..crypto';
     const ensInvalidDomain = 'hello..eth';
     const znsInvalidDomain = 'hello..zil';
