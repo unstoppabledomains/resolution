@@ -16,20 +16,19 @@ Supported domain zones:
 
 
 [API Referrence](https://unstoppabledomains.github.io/resolution/)
-[Documentation](https://docs.unstoppabledomains.com/#tag/Resolution)
+[Documentation](https://docs.unstoppabledomains.com/#tag/npm_library)
 
 You can use Resolution in a `<script>` tag from a
 [CDN](https://unpkg.com/browse/@unstoppabledomains/resolution/build/index.js), or as the `Resolution`
 
 # CLI
 
-Once you have installed the repo use yarn build to install all of the dependacies and cli tool. It will create a symnlink into /usr/local/bin/resolution and set up the permissions to run the file as executable. 
+Once you have cloned the repo use yarn build to install all of the dependacies and cli tool. It will create a symlink into /usr/local/bin/resolution and set up the permissions to run the file as executable. 
 
-Before you have started to use the library please configure it with -C flag.  In order to use the ens or cns resolution you will need to provide either an INFURA project ID or a custom node url via -C.
+Before you have started to use the CLI please configure it with -C flag.  In order to use the ens or cns resolution you will need to provide either an INFURA project ID or a custom node url via -C.
 
 ```
 resolution -C infura:12312313....
-
 or 
 resolution -C url:https://...
 ```
@@ -38,7 +37,7 @@ You can find all of the options for resolution cli within -h, --help flag.
 
 Example:
 ```
-resolution -iers -c eth,btc,DODGE,unknown -d brad.zil
+resolution -mc eth,btc,DODGE,unknown -d brad.zil
 ```
 
 ## Note

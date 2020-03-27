@@ -28,6 +28,7 @@ import {
     .option('-r, --resolver', 'get resolver address')
     .option('-e, --email', 'get email')
     .option('-n, --namehash', `returns domain's namehash`)
+    .option('-m, --meta', 'shortcut for all meta data options (-siren)')
     .option('-d, --domain <domain>', 'domain you wish to resolve')
     .description(
       'resolution cli exports main usage of @unstoppabledomains/resolution library',
@@ -36,7 +37,15 @@ import {
   program.parse(process.argv);
 
   const options = program.opts();
-  
+  if (options.meta) {
+    options.service = true;
+    options.ipfs = true;
+    options.resolver = true;
+    options.email = true;
+    options.namehash = true;
+    delete options.meta;
+  }
+
   if (options.config) {
     const { type, value } = options.config;
     if (type == 'infura' || type == 'url') storeConfig(type, value);

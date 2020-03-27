@@ -1,5 +1,7 @@
 ## Unreleased
 * CLI -n, --namehash flag
+* CLI -m, --meta flag, shortcut for -siren flags
+* Updated README
 
 ## 1.3.2
 * domains like "hello..crypto", "hello..eth", "hello..zil" should throw ResolutionErrorCode.UnsupportedDomain
