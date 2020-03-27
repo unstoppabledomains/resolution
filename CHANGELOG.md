@@ -1,4 +1,9 @@
 ## Unreleased
+
+## 1.3.2
+* domains like "hello..crypto", "hello..eth", "hello..zil" should throw ResolutionErrorCode.UnsupportedDomain
+
+## 1.3.1
 * fixed command line interface configuration with url
 
 ## 1.3.0

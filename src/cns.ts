@@ -69,7 +69,7 @@ export default class Cns extends EthereumNamingService {
   isSupportedDomain(domain: string): boolean {
     return (
       domain === 'crypto' ||
-      (domain.indexOf('.') > 0 && /^.{1,}\.(crypto)$/.test(domain))
+      (domain.indexOf('.') > 0 && /^.{1,}\.(crypto)$/.test(domain) && domain.split(".").every(v => !!v.length))
     );
   }
 

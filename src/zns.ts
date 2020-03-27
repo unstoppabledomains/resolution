@@ -187,7 +187,7 @@ export default class Zns extends NamingService {
    */
   isSupportedDomain(domain: string): boolean {
     const tokens = domain.split('.');
-    return !!tokens.length && tokens[tokens.length - 1] === 'zil';
+    return !!tokens.length && tokens[tokens.length - 1] === 'zil' && tokens.every(v => !!v.length);
   }
 
   /**

@@ -156,6 +156,25 @@ describe('Resolution', () => {
     );
   });
 
+  it.only('should be invalid domain 3', async () => {
+    const cnsInvalidDomain = 'hello..crypto';
+    const ensInvalidDomain = 'hello..eth';
+    const znsInvalidDomain = 'hello..zil';
+    const resolution = new Resolution();
+    await expectResolutionErrorCode(
+      () => resolution.namehash(cnsInvalidDomain),
+      ResolutionErrorCode.UnsupportedDomain,
+    );
+    await expectResolutionErrorCode(
+      () => resolution.namehash(ensInvalidDomain),
+      ResolutionErrorCode.UnsupportedDomain,
+    );
+    await expectResolutionErrorCode(
+      () => resolution.namehash(znsInvalidDomain),
+      ResolutionErrorCode.UnsupportedDomain,
+    );
+  });
+
   describe('serviceName', () => {
     it('checks ens service name', () => {
       const resolution = new Resolution();
@@ -217,6 +236,7 @@ describe('Resolution', () => {
       expect(serviceName).toBe('CNS');
     });
   });
+
   describe('isValidHash', () => {
     it('works', async () => {
       const resolution = new Resolution();
