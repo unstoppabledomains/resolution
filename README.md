@@ -13,6 +13,9 @@ Supported domain zones:
 - .crypto 
 - .zil
 - .eth
+- .kred
+- .xyz
+- .luxe
 
 
 [API Referrence](https://unstoppabledomains.github.io/resolution/)
