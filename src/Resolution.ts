@@ -115,6 +115,7 @@ export default class Resolution {
    * @returns A promise that resolves in an object
    */
   async resolve(domain: string): Promise<ResolutionResponse> {
+    domain = this.prepareDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
     const result = await method.resolve(domain);
     return result || UnclaimedDomainResponse;
@@ -131,6 +132,7 @@ export default class Resolution {
     domain: string,
     currencyTicker: string,
   ): Promise<string | null> {
+    domain = this.prepareDomain(domain);
     try {
       return await this.addressOrThrow(domain, currencyTicker);
     } catch (error) {
@@ -148,6 +150,7 @@ export default class Resolution {
    * @throws ResolutionError
    */
   async ipfsHash(domain: string): Promise<string> {
+    domain = this.prepareDomain(domain);
     return await this.getNamingMethodOrThrow(domain).ipfsHash(domain);
   }
 
@@ -156,6 +159,7 @@ export default class Resolution {
    * @param domain - domain name
    */
   async httpUrl(domain: string): Promise<string> {
+    domain = this.prepareDomain(domain);
     return await this.getNamingMethodOrThrow(domain).httpUrl(domain);
   }
 
@@ -183,6 +187,7 @@ export default class Resolution {
    * @returns A Promise that resolves in an email address configured for this domain whois
    */
   async email(domain: string): Promise<string> {
+    domain = this.prepareDomain(domain);
     return await this.getNamingMethodOrThrow(domain).email(domain);
   }
 
@@ -199,11 +204,13 @@ export default class Resolution {
     domain: string,
     currencyTicker: string,
   ): Promise<string> {
+    domain = this.prepareDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
     return await method.address(domain, currencyTicker);
   }
 
   async resolver(domain: string): Promise<string> {
+    domain = this.prepareDomain(domain);
     return await this.getNamingMethodOrThrow(domain).resolver(domain);
   }
 
@@ -213,6 +220,7 @@ export default class Resolution {
    * @returns An owner address of the domain
    */
   async owner(domain: string): Promise<string | null> {
+    domain = this.prepareDomain(domain);
     const method = this.getNamingMethod(domain);
     return (await method.owner(domain)) || null;
   }
@@ -239,6 +247,7 @@ export default class Resolution {
    * @throws ResolutionError with UnsupportedDomain error code if domain extension is unknown
    */
   namehash(domain: string): string {
+    domain = this.prepareDomain(domain);
     return this.getNamingMethodOrThrow(domain).namehash(domain);
   }
 
@@ -273,6 +282,7 @@ export default class Resolution {
    * @param hash - hash obtained from the blockchain
    */
   isValidHash(domain: string, hash: string): boolean {
+    domain = this.prepareDomain(domain);
     return this.namehash(domain) === hash;
   }
 
@@ -281,6 +291,7 @@ export default class Resolution {
    * @param domain - domain name to be checked
    */
   isSupportedDomain(domain: string): boolean {
+    domain = this.prepareDomain(domain);
     return !!this.getNamingMethod(domain);
   }
 
@@ -289,11 +300,13 @@ export default class Resolution {
    * @param domain - domain name to be checked
    */
   isSupportedDomainInNetwork(domain: string): boolean {
+    domain = this.prepareDomain(domain);
     const method = this.getNamingMethod(domain);
     return method && method.isSupportedNetwork();
   }
 
   serviceName(domain: string): NamingServiceName {
+    domain = this.prepareDomain(domain);
     return this.getNamingMethodOrThrow(domain).serviceName(domain);
   }
 
@@ -302,6 +315,7 @@ export default class Resolution {
    * @param domain - domain name
    */
   private getNamingMethod(domain: string): NamingService {
+    domain = this.prepareDomain(domain);
     const methods: (Ens | Zns | Udapi | Cns | undefined)[] = this.blockchain
       ? [this.ens, this.zns, this.cns]
       : [this.api];
@@ -312,6 +326,7 @@ export default class Resolution {
   }
 
   private getNamingMethodOrThrow(domain: string) {
+    domain = this.prepareDomain(domain);
     const method = this.getNamingMethod(domain);
     if (!method)
       throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
@@ -326,6 +341,10 @@ export default class Resolution {
         method: NamingServiceName[blockchain],
       });
     return true;
+  }
+
+  private prepareDomain(domain: string): string {
+    return domain ? domain.trim().toLowerCase() : "";
   }
 }
 
