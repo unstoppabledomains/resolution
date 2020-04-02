@@ -1,5 +1,9 @@
 ## Unreleased
 
+## 1.3.5
+* Fixed CLI config file persistent location issue
+* All domains are trimmed and lowercased before proceed with the direct lookup
+
 ## 1.3.4
 * Fixed wrong ResolutionErrorCode for unregistered .crypto domain in method cns#address
 

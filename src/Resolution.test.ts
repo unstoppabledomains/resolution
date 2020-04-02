@@ -175,6 +175,17 @@ describe('Resolution', () => {
     );
   });
 
+  it(`domains "brad.crypto" and "Brad.crypto" should return the same results`, async () => {
+    const resolution = new Resolution({blockchain: { cns: { url: secretInfuraLink() } }});
+    const eyes = mockAsyncMethods(resolution.cns, { getResolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
+    getRecord: "0x45b31e01AA6f42F0549aD482BE81635ED3149abb",});
+    const capital = await resolution.addressOrThrow('Brad.crypto', 'eth');
+    expectSpyToBeCalled(eyes);
+    const lower = await resolution.addressOrThrow('brad.crypto', 'eth');
+    expectSpyToBeCalled(eyes);
+    expect(capital).toStrictEqual(lower);
+  });
+
   describe('serviceName', () => {
     it('checks ens service name', () => {
       const resolution = new Resolution();
