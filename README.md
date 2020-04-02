@@ -1,7 +1,8 @@
-[Current Version v1.3.4](https://unstoppabledomains.github.io/resolution//v1.3.4/)
+[Current Version v1.3.5](https://unstoppabledomains.github.io/resolution//v1.3.5/)
 
 ## Older Versions
 
+* [v1.3.4](https://unstoppabledomains.github.io/resolution//v1.3.4/)
 * [v1.3.3](https://unstoppabledomains.github.io/resolution//v1.3.3/)
 * [v1.3.2](https://unstoppabledomains.github.io/resolution//v1.3.2/)
 * [v1.3.1](https://unstoppabledomains.github.io/resolution//v1.3.1/)
