@@ -60,7 +60,7 @@ export function parseConfig(value: string) {
 }
 
 export function storeConfig(type: 'infura' | 'url', value: string) {
-  fs.writeFile('.resolution', `${type}=${value}`, () =>
+  fs.writeFile(`${process.env.HOME}/.resolution`, `${type}=${value}`, () =>
     console.log(`${type}=${value} record stored`),
   );
 }
@@ -68,7 +68,7 @@ export function storeConfig(type: 'infura' | 'url', value: string) {
 export function getConfig() {
   try {
     const config = fs
-      .readFileSync(`.resolution`)
+      .readFileSync(`${process.env.HOME}/.resolution`)
       .toString()
       .split('=');
     if (config[0] === 'infura' || config[0] === 'url')
