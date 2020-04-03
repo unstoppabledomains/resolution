@@ -28,6 +28,7 @@ import {
     .option('-r, --resolver', 'get resolver address')
     .option('-e, --email', 'get email')
     .option('-n, --namehash', `returns domain's namehash`)
+    .option('-o, --owner', `returns domain's owner`)
     .option('-m, --meta', 'shortcut for all meta data options (-siren)')
     .option('-d, --domain <domain>', 'domain you wish to resolve')
     .description(
@@ -43,6 +44,7 @@ import {
     options.resolver = true;
     options.email = true;
     options.namehash = true;
+    options.owner = true;
     delete options.meta;
   }
 
@@ -65,7 +67,8 @@ import {
     email: () => tryInfo(async () => await resolution.email(domain), response, 'email'),
     resolver: () => tryInfo(async () => await resolution.resolver(domain), response, 'resolver'),
     service: () => tryInfo(() => resolution.serviceName(domain), response, 'service'),
-    namehash: () => tryInfo(() => resolution.namehash(domain), response, 'namehash')
+    namehash: () => tryInfo(() => resolution.namehash(domain), response, 'namehash'),
+    owner: () => tryInfo(async () => await resolution.owner(domain), response, 'owner')
   };
 
   const resolutionProcess: Promise<boolean>[] = [];

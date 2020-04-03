@@ -1,5 +1,8 @@
 ## Unreleased
 
+## 1.3.6
+* Add -o, --owner flag to CLI. Flag resolves in owner address.
+
 ## 1.3.5
 * Fixed CLI config file persistent location issue
 * All domains are trimmed and lowercased before proceed with the direct lookup
