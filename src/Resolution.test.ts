@@ -51,7 +51,7 @@ describe('Resolution', () => {
     };
     const resolution = Resolution.provider(provider);
     const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
-    expect(ethAddress).toBe('0x45b31e01AA6f42F0549aD482BE81635ED3149abb');
+    expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
   });
 
   it('checks Resolution#addressOrThrow error #1', async () => {
@@ -305,7 +305,7 @@ describe('Resolution', () => {
         blockchain: { web3Provider: provider },
       });
       const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
-      expect(ethAddress).toBe('0x45b31e01AA6f42F0549aD482BE81635ED3149abb');
+      expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
     });
   });
 });
