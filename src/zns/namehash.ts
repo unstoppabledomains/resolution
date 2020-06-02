@@ -1,4 +1,4 @@
-import sha3 from '../utils/sha3';
+import sha256 from '../utils/sha256';
 
 export const namehash = (
   name = '',
@@ -24,7 +24,7 @@ export const childhash = (
   options: { prefix: boolean } = { prefix: true },
 ) => {
   parent = parent.replace(/^0x/, '');
-  return sha3(parent + sha3(child, { hexPrefix: false }), {
+  return sha256(parent + sha256(child, { hexPrefix: false }), {
     hexPrefix: options.prefix,
     inputEnc: 'hex',
   });

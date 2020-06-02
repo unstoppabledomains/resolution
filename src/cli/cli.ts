@@ -32,6 +32,7 @@ import {
     .option('-g, --gundb', `returns gundb chat id`)
     .option('-m, --meta', 'shortcut for all meta data options (-siren)')
     .option('-d, --domain <domain>', 'domain you wish to resolve')
+    .option('-k, --recordKey <recordkey>', 'custom domain record')
     .description(
       'resolution cli exports main usage of @unstoppabledomains/resolution library',
     );
@@ -71,7 +72,8 @@ import {
     service: () => tryInfo(() => resolution.serviceName(domain), response, 'service'),
     namehash: () => tryInfo(() => resolution.namehash(domain), response, 'namehash'),
     owner: () => tryInfo(async () => await resolution.owner(domain), response, 'owner'),
-    gundb: () => tryInfo(async () => await resolution.chatId(domain), response, 'gundb')
+    gundb: () => tryInfo(async () => await resolution.chatId(domain), response, 'gundb'),
+    recordKey: () => tryInfo(async () => await resolution.record(domain, options.recordKey), response, options.recordKey)
   };
 
   const resolutionProcess: Promise<boolean>[] = [];

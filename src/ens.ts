@@ -16,11 +16,7 @@ import { EthereumNamingService } from './namingService';
 import { ResolutionError, ResolutionErrorCode } from './index';
 import Contract from './utils/contract';
 import contentHash from 'content-hash';
-
-const RegistryMap = {
-  mainnet: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
-  ropsten: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
-};
+import EnsNetworkMap from 'ethereum-ens-network-map';
 
 /**
  * Class to support connection with Ethereum naming service
@@ -54,7 +50,7 @@ export default class Ens extends EthereumNamingService {
     }
     this.registryAddress = source.registry
       ? source.registry
-      : RegistryMap[this.network];
+      : EnsNetworkMap[this.NetworkNameMap[this.network]];
     if (this.registryAddress) {
       this.registryContract = this.buildContract(
         ensInterface,

@@ -89,9 +89,9 @@ export abstract class EthereumNamingService extends NamingService {
   readonly NetworkIdMap: NetworkIdMap = {
     1: 'mainnet',
     3: 'ropsten',
-    4: 'kovan',
-    42: 'rinkeby',
+    4: 'rinkeby',
     5: 'goerli',
+    42: 'kovan',
   };
 
   readonly UrlMap: BlockhanNetworkUrlMap = {

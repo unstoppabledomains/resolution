@@ -155,7 +155,7 @@ describe('ENS', () => {
   });
 
   it('checks if the network is supported(false)', async () => {
-    const ens = new Ens({ network: 5 });
+    const ens = new Ens({ network: 42 });
     const answer = ens.isSupportedNetwork();
     expect(answer).toBe(false);
   });
@@ -167,9 +167,9 @@ describe('ENS', () => {
   });
 
   it('checks normalizeSource ens (boolean - false)', async () => {
-    const ens = new Ens({ network: 5 });
-    expect(ens.network).toBe('goerli');
-    expect(ens.url).toBe('https://goerli.infura.io');
+    const ens = new Ens({ network: 42 });
+    expect(ens.network).toBe('kovan');
+    expect(ens.url).toBe('https://kovan.infura.io');
     expect(ens.isSupportedNetwork()).toBeFalsy();
   });
 
@@ -201,7 +201,7 @@ describe('ENS', () => {
     });
     expect(resolution.ens!.network).toBe('goerli');
     expect(resolution.ens!.url).toBe('https://goerli.infura.io');
-    expect(resolution.ens!.registryAddress).toBeUndefined();
+    expect(resolution.ens!.registryAddress).toBe('0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e');
   });
 
   it('checks normalizeSource ens (object) #6', async () => {
