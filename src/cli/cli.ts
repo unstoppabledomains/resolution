@@ -31,6 +31,7 @@ import {
     .option('-o, --owner', `returns domain's owner`)
     .option('-m, --meta', 'shortcut for all meta data options (-siren)')
     .option('-d, --domain <domain>', 'domain you wish to resolve')
+    .option('-k, --recordKey <recordkey>', 'custom domain record')
     .description(
       'resolution cli exports main usage of @unstoppabledomains/resolution library',
     );
@@ -68,7 +69,8 @@ import {
     resolver: () => tryInfo(async () => await resolution.resolver(domain), response, 'resolver'),
     service: () => tryInfo(() => resolution.serviceName(domain), response, 'service'),
     namehash: () => tryInfo(() => resolution.namehash(domain), response, 'namehash'),
-    owner: () => tryInfo(async () => await resolution.owner(domain), response, 'owner')
+    owner: () => tryInfo(async () => await resolution.owner(domain), response, 'owner'),
+    recordKey: () => tryInfo(async () => await resolution.record(domain, options.recordKey), response, options.recordKey)
   };
 
   const resolutionProcess: Promise<boolean>[] = [];

@@ -1,4 +1,5 @@
 ## Unreleased
+* resolve custom records
 
 ## 1.3.6
 * Add -o, --owner flag to CLI. Flag resolves in owner address.
