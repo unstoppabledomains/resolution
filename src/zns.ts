@@ -163,6 +163,10 @@ export default class Zns extends NamingService {
     return await this.getRecordOrThrow(domain, 'whois.email.value');
   }
 
+  async chatId(domain: string): Promise<string> {
+    return await this.getRecordOrThrow(domain, 'gundb.username.value');
+  }
+
   /**
    * Resolves a specific field from domain's record
    * @param domain - domain name

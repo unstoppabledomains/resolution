@@ -215,6 +215,10 @@ export default class Ens extends EthereumNamingService {
     return email;
   }
 
+  async chatId(domain: string): Promise<string> {
+    throw new Error('Method is not implemented');
+  }
+
   /**
    * Produces ENS namehash
    * @param domain - domain to be hashed

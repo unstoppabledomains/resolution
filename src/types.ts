@@ -72,6 +72,9 @@ export type ResolutionResponse = {
     email?: string;
     for_sale?: boolean;
   };
+  gundb?: {
+    username?: string; 
+  },
   addresses: {
     [key: string]: string;
   };

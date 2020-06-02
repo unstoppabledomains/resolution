@@ -29,6 +29,7 @@ import {
     .option('-e, --email', 'get email')
     .option('-n, --namehash', `returns domain's namehash`)
     .option('-o, --owner', `returns domain's owner`)
+    .option('-g, --gundb', `returns gundb chat id`)
     .option('-m, --meta', 'shortcut for all meta data options (-siren)')
     .option('-d, --domain <domain>', 'domain you wish to resolve')
     .option('-k, --recordKey <recordkey>', 'custom domain record')
@@ -46,6 +47,7 @@ import {
     options.email = true;
     options.namehash = true;
     options.owner = true;
+    options.gundb = true;
     delete options.meta;
   }
 
@@ -70,6 +72,7 @@ import {
     service: () => tryInfo(() => resolution.serviceName(domain), response, 'service'),
     namehash: () => tryInfo(() => resolution.namehash(domain), response, 'namehash'),
     owner: () => tryInfo(async () => await resolution.owner(domain), response, 'owner'),
+    gundb: () => tryInfo(async () => await resolution.chatId(domain), response, 'gundb'),
     recordKey: () => tryInfo(async () => await resolution.record(domain, options.recordKey), response, options.recordKey)
   };
 

@@ -1,5 +1,10 @@
 ## Unreleased
-* resolve custom records
+
+## 1.4.0
+* Resolve custom records
+* Resolution#chatId -> get a gundb chat id from domain's record
+* Add kovan address of crypto registry
+* Add support of more networks for ENS
 
 ## 1.3.6
 * Add -o, --owner flag to CLI. Flag resolves in owner address.
