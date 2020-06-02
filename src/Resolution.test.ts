@@ -35,25 +35,6 @@ describe('Resolution', () => {
     expect(resolution.cns!.url).toBe(`https://mainnet.infura.com/v3/${infura}`);
   });
 
-  it('should get a configured with provider resolution instance', async () => {
-    const provider = {
-      sendAsync: (method: string, params: any) => {
-        return nodeFetch(secretInfuraLink(), {
-          method: 'POST',
-          body: JSON.stringify({
-            method,
-            params,
-            jsonrpc: '2.0',
-            id: 1,
-          }),
-        });
-      },
-    };
-    const resolution = Resolution.provider(provider);
-    const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
-    expect(ethAddress).toBe('0x45b31e01AA6f42F0549aD482BE81635ED3149abb');
-  });
-
   it('checks Resolution#addressOrThrow error #1', async () => {
     const resolution = new Resolution();
     await expectResolutionErrorCode(
@@ -186,6 +167,22 @@ describe('Resolution', () => {
     expect(capital).toStrictEqual(lower);
   });
 
+  it('should resolve gundb chat id', async () => {
+    const resolution = new Resolution({blockchain: {cns: {url: secretInfuraLink() } }});
+    const eyes = mockAsyncMethods(resolution.cns, {
+      getResolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+      getRecord: '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c'
+    });
+    const gundb = await resolution.chatId("homecakes.crypto");
+    expectSpyToBeCalled(eyes);
+    expect(gundb).toBe("0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c");
+  });
+
+  it('should throw recordNotFound for chatId', async () => {
+    const resolution = new Resolution({blockchain: {cns: {url: secretInfuraLink()}}});
+    expectResolutionErrorCode(resolution.chatId("homecakes2.crypto"), ResolutionErrorCode.RecordNotFound);
+  });
+
   describe('serviceName', () => {
     it('checks ens service name', () => {
       const resolution = new Resolution();
@@ -304,8 +301,37 @@ describe('Resolution', () => {
       const resolution = new Resolution({
         blockchain: { web3Provider: provider },
       });
+      const eyes = mockAsyncMethods(resolution.cns, {
+        getResolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
+        getRecord: '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8'
+      });
       const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
-      expect(ethAddress).toBe('0x45b31e01AA6f42F0549aD482BE81635ED3149abb');
+      expectSpyToBeCalled(eyes);
+      expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
+    });
+
+    it('should get a configured with provider resolution instance', async () => {
+      const provider = {
+        sendAsync: (method: string, params: any) => {
+          return nodeFetch(secretInfuraLink(), {
+            method: 'POST',
+            body: JSON.stringify({
+              method,
+              params,
+              jsonrpc: '2.0',
+              id: 1,
+            }),
+          });
+        },
+      };
+      const resolution = Resolution.provider(provider);
+      const eyes = mockAsyncMethods(resolution.cns, {
+        getResolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
+        getRecord: '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8'
+      });
+      const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
+      expectSpyToBeCalled(eyes);
+      expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
     });
   });
 });

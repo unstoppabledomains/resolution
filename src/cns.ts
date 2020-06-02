@@ -186,6 +186,14 @@ export default class Cns extends EthereumNamingService {
   }
 
   /**
+   * resolves a gun db userId attached to the domain
+   * @param domain - domain name
+   */
+  async chatId(domain: string): Promise<string> {
+    return await this.record(domain, 'gundb.username.value');
+  }
+  
+  /**
    * resolves an httpUrl stored on domain
    * @param domain - domain name
    */

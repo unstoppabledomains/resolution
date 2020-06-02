@@ -86,6 +86,22 @@ export default class Udapi extends NamingService {
   }
 
   /**
+   * Returns the gundb chat id of the domain
+   * @param domain - domain name
+   * @throws ResolutionError with code RecordNotFound
+   * @returns A gundb chatId configured for a domain 
+   */
+  async chatId(domain:string): Promise<string> {
+    const resolution = await this.resolve(domain);
+    if (!resolution || !resolution.gundb || !resolution.gundb.username)
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+        recordName: 'Gundb chatId',
+        domain: domain
+      });
+    return resolution.gundb.username;
+  }
+
+  /**
    * Resolves ipfshash from domain
    * @param domain - domain name
    * @throws ResolutionError.RecordNotFound if not found

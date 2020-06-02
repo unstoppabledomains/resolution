@@ -34,6 +34,7 @@ export default abstract class NamingService extends BaseConnection {
   abstract email(domain: string): Promise<string>;
   abstract httpUrl(domain: string): Promise<string>;
   abstract resolver(domain: string): Promise<string>;
+  abstract chatId(domain: string): Promise<string>;
 
   constructor(web3Provider?: Web3Provider) {
     super();

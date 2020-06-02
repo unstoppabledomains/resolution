@@ -29,6 +29,7 @@ import {
     .option('-e, --email', 'get email')
     .option('-n, --namehash', `returns domain's namehash`)
     .option('-o, --owner', `returns domain's owner`)
+    .option('-g, --gundb', `returns gundb chat id`)
     .option('-m, --meta', 'shortcut for all meta data options (-siren)')
     .option('-d, --domain <domain>', 'domain you wish to resolve')
     .description(
@@ -45,6 +46,7 @@ import {
     options.email = true;
     options.namehash = true;
     options.owner = true;
+    options.gundb = true;
     delete options.meta;
   }
 
@@ -68,7 +70,8 @@ import {
     resolver: () => tryInfo(async () => await resolution.resolver(domain), response, 'resolver'),
     service: () => tryInfo(() => resolution.serviceName(domain), response, 'service'),
     namehash: () => tryInfo(() => resolution.namehash(domain), response, 'namehash'),
-    owner: () => tryInfo(async () => await resolution.owner(domain), response, 'owner')
+    owner: () => tryInfo(async () => await resolution.owner(domain), response, 'owner'),
+    gundb: () => tryInfo(async () => await resolution.chatId(domain), response, 'gundb')
   };
 
   const resolutionProcess: Promise<boolean>[] = [];
