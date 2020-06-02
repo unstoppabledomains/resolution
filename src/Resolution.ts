@@ -221,8 +221,20 @@ export default class Resolution {
    */
   async owner(domain: string): Promise<string | null> {
     domain = this.prepareDomain(domain);
-    const method = this.getNamingMethod(domain);
+    const method = this.getNamingMethodOrThrow(domain);
     return (await method.owner(domain)) || null;
+  }
+
+  /**
+   * Custom key for the domain
+   * @param domain - domain name
+   * @param recordKey - key from resolver contract
+   * This method is not implemented for ens domains
+   */
+  async record(domain: string, recordKey: string): Promise<string> {
+    domain = this.prepareDomain(domain);
+    const method = this.getNamingMethodOrThrow(domain);
+    return await method.record(domain, recordKey);
   }
 
   /**
