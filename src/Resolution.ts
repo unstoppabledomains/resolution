@@ -229,6 +229,7 @@ export default class Resolution {
    * Custom key for the domain
    * @param domain - domain name
    * @param recordKey - key from resolver contract
+   * This method is not implemented for ens domains
    */
   async record(domain: string, recordKey: string): Promise<string> {
     domain = this.prepareDomain(domain);
