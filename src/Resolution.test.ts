@@ -51,7 +51,7 @@ describe('Resolution', () => {
     };
     const resolution = Resolution.provider(provider);
     const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
-    expect(ethAddress).toBe("0x8aaD44321A86b170879d7A244c1e8d360c99DdA8");
+    expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
   });
 
   it('should resolve a custom record', async () => {
@@ -331,7 +331,7 @@ describe('Resolution', () => {
         blockchain: { web3Provider: provider },
       });
       const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
-      expect(ethAddress).toBe("0x8aaD44321A86b170879d7A244c1e8d360c99DdA8");
+      expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
     });
   });
 });

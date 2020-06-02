@@ -82,6 +82,7 @@
     "bn.js": "^5.1.1",
     "commander": "^4.1.1",
     "content-hash": "^2.5.2",
+    "ethereum-ens-network-map": "^1.0.2",
     "hash.js": "^1.1.7",
     "js-sha3": "^0.8.0",
     "node-fetch": "^2.6.0"
