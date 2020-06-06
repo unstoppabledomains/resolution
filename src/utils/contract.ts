@@ -2,7 +2,7 @@ import BaseConnection from '../baseConnection';
 import { defaultAbiCoder as AbiCoder } from './abicoder';
 var keccak256 = require('js-sha3').keccak_256;
 import ResolutionError, { ResolutionErrorCode } from '../resolutionError';
-import { isNullAddress, NamingServiceName, Web3Provider } from '../types';
+import { isNullAddress, NamingServiceName, Web3Provider, JsonRpcResponse } from '../types';
 
 type FourBytes = string;
 
@@ -101,9 +101,7 @@ export default class Contract extends BaseConnection {
       'latest',
     ];
     if (this.web3Provider) {
-      return await this.web3Provider
-        .sendAsync('eth_call', params)
-        .then(resp => resp.json());
+      return await this.fetchDataViaProvider(params);
     }
     const response = await this.fetch(this.url, {
       method: 'POST',
@@ -118,5 +116,26 @@ export default class Contract extends BaseConnection {
       },
     });
     return await response.json();
+  }
+
+  private async fetchDataViaProvider(params) {
+    switch (this.web3Provider!.providerType) {
+      case "ethers":
+        return await this.web3Provider!
+          .sendAsync('eth_call', params)
+          .then(resp => resp.json()); 
+      case "web3steam":
+        return this.web3Provider!.sendAsync({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'eth_call',
+          params,
+        }, (error: Error | null, result?: JsonRpcResponse) => {
+          if (error != null) throw error;
+          return result;
+        });
+      default:
+        break;
+    }
   }
 }

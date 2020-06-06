@@ -59,6 +59,9 @@ export default class Resolution {
       if (blockchain.cns === undefined) {
         blockchain.cns = true;
       }
+      if (blockchain.web3Provider !== undefined) {
+        blockchain.web3Provider.providerType = blockchain.providerType || 'ethers';
+      }
       if (blockchain.ens) {
         this.ens = new Ens(
           blockchain.ens,

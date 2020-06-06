@@ -105,6 +105,7 @@ export type Blockchain =
       zns?: NamingServiceSource;
       cns?: NamingServiceSource;
       web3Provider?: Web3Provider;
+      providerType?: ProviderType;
     };
 
 export type API = {
@@ -112,8 +113,25 @@ export type API = {
 };
 
 export interface Web3Provider {
-  sendAsync: (method: string, params: any) => Promise<any>;
+  sendAsync: any;
+  providerType?: ProviderType;
 }
+
+export interface JsonRpcPayload {
+  jsonrpc: string;
+  method: string;
+  params: any[];
+  id?: string | number;
+}
+
+export interface JsonRpcResponse {
+    jsonrpc: string;
+    id: number;
+    result?: any;
+    error?: string;
+}
+
+export type ProviderType = "web3steam" | "ethers";
 
 export const DefaultAPI: API = {
   url: UDApiDefaultUrl,
