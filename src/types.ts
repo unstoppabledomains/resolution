@@ -115,6 +115,7 @@ export type API = {
 export interface Web3Provider {
   sendAsync: any;
   providerType?: ProviderType;
+  send?(payload: JsonRpcPayload, callback: (error: Error | null, result?: JsonRpcResponse) => void): void;
 }
 
 export interface JsonRpcPayload {
@@ -131,7 +132,7 @@ export interface JsonRpcResponse {
     error?: string;
 }
 
-export type ProviderType = "web3steam" | "ethers";
+export type ProviderType = "web3" | "ethers";
 
 export const DefaultAPI: API = {
   url: UDApiDefaultUrl,

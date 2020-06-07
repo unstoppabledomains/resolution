@@ -2,7 +2,7 @@ import BaseConnection from '../baseConnection';
 import { defaultAbiCoder as AbiCoder } from './abicoder';
 var keccak256 = require('js-sha3').keccak_256;
 import ResolutionError, { ResolutionErrorCode } from '../resolutionError';
-import { isNullAddress, NamingServiceName, Web3Provider, JsonRpcResponse } from '../types';
+import { isNullAddress, NamingServiceName, Web3Provider, JsonRpcResponse, ProviderType } from '../types';
 
 type FourBytes = string;
 
@@ -13,6 +13,7 @@ export default class Contract extends BaseConnection {
   readonly url: string;
   readonly name: NamingServiceName;
   readonly web3Provider?: Web3Provider;
+  readonly providerType?: ProviderType;
 
   /**
    * @param contractInterface JSON-RPC interface of smartContract
@@ -24,6 +25,7 @@ export default class Contract extends BaseConnection {
     contractInterface,
     address: string,
     web3Provider?: Web3Provider,
+    providerType?: ProviderType
   ) {
     super();
     this.name = name;
@@ -31,6 +33,7 @@ export default class Contract extends BaseConnection {
     this.contractInterface = contractInterface;
     this.address = address;
     this.web3Provider = web3Provider;
+    this.providerType = providerType;    
   }
 
   /**
@@ -119,23 +122,35 @@ export default class Contract extends BaseConnection {
   }
 
   private async fetchDataViaProvider(params) {
-    switch (this.web3Provider!.providerType) {
+    switch (this.providerType) {
       case "ethers":
         return await this.web3Provider!
           .sendAsync('eth_call', params)
           .then(resp => resp.json()); 
-      case "web3steam":
-        return this.web3Provider!.sendAsync({
-          jsonrpc: '2.0',
-          id: 1,
-          method: 'eth_call',
-          params,
-        }, (error: Error | null, result?: JsonRpcResponse) => {
-          if (error != null) throw error;
-          return result;
-        });
+      case "web3":
+        try {
+          return this.web3Provider?.sendAsync({
+            jsonrpc: '2.0',
+            id: 1,
+            method: 'eth_call',
+            params,
+          }, this.fetchCallback);
+        } catch(error) {
+          // Fallback to .send method for an older provider
+          return this.web3Provider?.send!({
+            jsonrpc: '2.0',
+            id: 1,
+            method: 'eth_call',
+            params,
+          },this.fetchCallback);
+        }
       default:
         break;
     }
+  }
+
+  private async fetchCallback(error: Error | null, result?: JsonRpcResponse) {
+    if (error != null) throw error;
+            return result;
   }
 }

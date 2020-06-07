@@ -11,6 +11,7 @@ import {
   isNullAddress,
   nodeHash,
   Web3Provider,
+  ProviderType,
 } from './types';
 import { EthereumNamingService } from './namingService';
 import { ResolutionError, ResolutionErrorCode } from './index';
@@ -37,8 +38,8 @@ export default class Ens extends EthereumNamingService {
    * @param source - if specified as a string will be used as main url, if omited then defaults are used
    * @throws ConfigurationError - when either network or url is setup incorrectly
    */
-  constructor(source: NamingServiceSource = true, web3Provider?: Web3Provider) {
-    super(web3Provider);
+  constructor(source: NamingServiceSource = true, web3Provider?: Web3Provider, providerType?: ProviderType) {
+    super(web3Provider, providerType);
     source = this.normalizeSource(source);
     this.network = <string>source.network;
     this.url = source.url as string;

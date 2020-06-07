@@ -11,6 +11,7 @@ import {
   nodeHash,
   NamingServiceName,
   Web3Provider,
+  ProviderType,
 } from './types';
 import ResolutionError, { ResolutionErrorCode } from './resolutionError';
 import NamingService from './namingService';
@@ -59,13 +60,11 @@ export default class Resolution {
       if (blockchain.cns === undefined) {
         blockchain.cns = true;
       }
-      if (blockchain.web3Provider !== undefined) {
-        blockchain.web3Provider.providerType = blockchain.providerType || 'ethers';
-      }
       if (blockchain.ens) {
         this.ens = new Ens(
           blockchain.ens,
           blockchain.web3Provider as Web3Provider,
+          blockchain.providerType
         );
       }
       if (blockchain.zns) {
@@ -75,6 +74,7 @@ export default class Resolution {
         this.cns = new Cns(
           blockchain.cns,
           blockchain.web3Provider as Web3Provider,
+          blockchain.providerType
         );
       }
     } else {
@@ -99,16 +99,16 @@ export default class Resolution {
    * Creates a resolution instance with configured provider
    * @param provider - any provider with sendAsync function impelmented
    */
-  static provider(provider: Web3Provider): Resolution {
-    return new this({ blockchain: { web3Provider: provider } });
+  static provider(provider: Web3Provider, providerType: ProviderType): Resolution {
+    return new this({ blockchain: { web3Provider: provider, providerType: providerType } });
   }
 
   /**
    * Creates a resolution instance from configured jsonRPCProvider
    * @param provider - any jsonRPCprovider will work as long as it's prototype has send(method, params): Promise<any> method
    */
-  static jsonRPCprovider(provider): Resolution {
-    return new this({ blockchain: { web3Provider: provider.send } });
+  static jsonRPCprovider(provider, providerType: ProviderType): Resolution {
+    return new this({ blockchain: { web3Provider: provider.send, providerType: providerType } });
   }
 
   /**
