@@ -115,6 +115,25 @@ export interface Web3Provider {
   sendAsync: (method: string, params: any) => Promise<any>;
 }
 
+export interface JsonRpcPayload {
+  jsonrpc: string;
+  method: string;
+  params: any[];
+  id?: string | number;
+}
+
+export interface JsonRpcResponse {
+  jsonrpc: string;
+  id: number;
+  result?: any;
+  error?: string;
+}
+
+export interface AbstractProvider {
+  sendAsync?: (payload: JsonRpcPayload, callback: (error: Error | null, result?: JsonRpcResponse) => void) => void;
+  send?: (payload: JsonRpcPayload, callback: (error: Error | null, result?: JsonRpcResponse) => void) => void;
+}
+
 export const DefaultAPI: API = {
   url: UDApiDefaultUrl,
 };

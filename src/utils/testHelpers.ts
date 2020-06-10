@@ -82,9 +82,8 @@ export function mockAPICalls(testName: string, url = MainnetUrl) {
  * or the one with attached INFURA SECRET key from
  * UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID env variable if any
  */
-export function secretInfuraLink(): string {
+export function secretInfuraLink(options: {wss: boolean} = {wss: false}): string {
   const secret = process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID;
-  let url = 'https://mainnet.infura.io';
-  if (secret) url = `https://mainnet.infura.io/v3/${secret}`;
-  return url;
+  let url = options.wss ? 'wss://mainnet.infura.io/ws/v3' :'https://mainnet.infura.io/v3';
+  return secret ? `${url}/${secret}` : url;
 }

@@ -11,6 +11,8 @@ import {
   nodeHash,
   NamingServiceName,
   Web3Provider,
+  AbstractProvider,
+  JsonRpcResponse,
 } from './types';
 import ResolutionError, { ResolutionErrorCode } from './resolutionError';
 import NamingService from './namingService';
@@ -106,6 +108,33 @@ export default class Resolution {
    */
   static jsonRPCprovider(provider): Resolution {
     return new this({ blockchain: { web3Provider: provider.send } });
+  }
+
+  /**
+   * Creates a resolution instance from AbstractProvider
+   * @param provider - callback base provider
+   */
+  static fromWeb3Provider(provider: AbstractProvider): Resolution {
+    const customProvider: Web3Provider = {
+      sendAsync: (method, params) => new Promise((resolve, reject) => {
+        if (provider.sendAsync != undefined) {
+          provider.sendAsync(
+            { jsonrpc: '2.0', method, params, id: 1 },
+            (error: Error | null, result: JsonRpcResponse) => {
+              if (error) reject(error);
+              resolve(result);
+            });
+        } else if (provider.send != undefined) {
+         provider.send(
+          { jsonrpc: '2.0', method, params, id: 1 },
+          (error: Error | null, result: JsonRpcResponse) => {
+            if (error) reject(error);
+            resolve(result);
+          });
+        } else throw new ResolutionError(ResolutionErrorCode.IncorectProvider);
+       })
+      };
+    return this.provider(customProvider);
   }
 
   /**
