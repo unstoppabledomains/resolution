@@ -96,7 +96,6 @@ export function secretInfuraLink(options: InfuraProtocolOptions = InfuraProtocol
   return secret ? `${url}/${secret}` : url;
 }
 
-
 export enum InfuraProtocolOptions {
   "http", "wss"
 };
