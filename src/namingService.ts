@@ -7,7 +7,7 @@ import {
   BlockhanNetworkUrlMap,
   ResolutionResponse,
   isNullAddress,
-  Web3Provider,
+  Provider,
 } from './types';
 import ResolutionError, { ResolutionErrorCode } from './resolutionError';
 import BaseConnection from './baseConnection';
@@ -22,7 +22,7 @@ import Contract from './utils/contract';
  */
 export default abstract class NamingService extends BaseConnection {
   readonly name: ResolutionMethod;
-  protected web3Provider?: Web3Provider;
+  protected provider?: Provider;
   abstract isSupportedDomain(domain: string): boolean;
   abstract isSupportedNetwork(): boolean;
   abstract namehash(domain: string): string;
@@ -36,9 +36,9 @@ export default abstract class NamingService extends BaseConnection {
   abstract resolver(domain: string): Promise<string>;
   abstract chatId(domain: string): Promise<string>;
 
-  constructor(web3Provider?: Web3Provider) {
+  constructor(provider?: Provider) {
     super();
-    this.web3Provider = web3Provider;
+    this.provider = provider;
   }
 
   serviceName(domain: string): NamingServiceName {
@@ -213,7 +213,7 @@ export abstract class EthereumNamingService extends NamingService {
   }
 
   protected buildContract(abi, address) {
-    return new Contract(this.name, this.url, abi, address, this.web3Provider);
+    return new Contract(this.name, this.url, abi, address, this.provider);
   }
 
   protected async throwOwnershipError(

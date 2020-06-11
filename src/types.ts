@@ -104,14 +104,15 @@ export type Blockchain =
       ens?: NamingServiceSource;
       zns?: NamingServiceSource;
       cns?: NamingServiceSource;
-      web3Provider?: Web3Provider;
+      web3Provider?: Provider;
+      provider?: Provider;
     };
 
 export type API = {
   url: string;
 };
 
-export interface Web3Provider {
+export interface Provider {
   sendAsync: (method: string, params: any) => Promise<any>;
 }
 

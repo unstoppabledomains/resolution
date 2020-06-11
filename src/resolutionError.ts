@@ -50,7 +50,7 @@ const HandlersByCode = {
     recordName: string;
     domain: string;
   }) => `No ${params.recordName} record found for ${params.domain}`,
-  [ResolutionErrorCode.IncorectProvider]: (params: {}) => "Provider doesn't have sendAsync or send function."
+  [ResolutionErrorCode.IncorectProvider]: (params: {}) => "Provider doesn't implement sendAsync or send method"
 };
 
 /**

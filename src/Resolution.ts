@@ -10,9 +10,9 @@ import {
   API,
   nodeHash,
   NamingServiceName,
-  Web3Provider,
   AbstractProvider,
   JsonRpcResponse,
+  Provider,
 } from './types';
 import ResolutionError, { ResolutionErrorCode } from './resolutionError';
 import NamingService from './namingService';
@@ -26,10 +26,10 @@ import { signedInfuraLink } from './utils';
  * let domain = brad.zil
  * let Resolution = Resolution.address(domain);
  * ```
+ * Blockchain.web3Provider is deprecated in favor of Blockchain.provider
  */
 export default class Resolution {
   readonly blockchain: Blockchain | boolean;
-  readonly web3Provider?: Web3Provider;
   /** @internal */
   readonly ens?: Ens;
   /** @internal */
@@ -64,7 +64,7 @@ export default class Resolution {
       if (blockchain.ens) {
         this.ens = new Ens(
           blockchain.ens,
-          blockchain.web3Provider as Web3Provider,
+          blockchain.provider || blockchain.web3Provider,
         );
       }
       if (blockchain.zns) {
@@ -73,7 +73,7 @@ export default class Resolution {
       if (blockchain.cns) {
         this.cns = new Cns(
           blockchain.cns,
-          blockchain.web3Provider as Web3Provider,
+          blockchain.provider || blockchain.web3Provider,
         );
       }
     } else {
@@ -98,8 +98,8 @@ export default class Resolution {
    * Creates a resolution instance with configured provider
    * @param provider - any provider with sendAsync function impelmented
    */
-  static provider(provider: Web3Provider): Resolution {
-    return new this({ blockchain: { web3Provider: provider } });
+  static provider(provider: Provider): Resolution {
+    return new this({ blockchain: { provider: provider } });
   }
 
   /**
@@ -107,24 +107,33 @@ export default class Resolution {
    * @param provider - any jsonRPCprovider will work as long as it's prototype has send(method, params): Promise<any> method
    */
   static jsonRPCprovider(provider): Resolution {
-    return new this({ blockchain: { web3Provider: provider.send } });
+    return new this({ blockchain: { provider: provider.send } });
+  }
+
+  /**
+   * Replica of Resolution#proivder made for convenience
+   * @param provider 
+   */
+  static fromEthersProvider(provider: Provider): Resolution {
+    return this.provider(provider);
   }
 
   /**
    * Creates a resolution instance from AbstractProvider
    * @param provider - callback base provider
+   * @throws ResolutionErrorCode.IncorectProvider
    */
   static fromWeb3Provider(provider: AbstractProvider): Resolution {
-    const customProvider: Web3Provider = {
+    const customProvider: Provider = {
       sendAsync: (method, params) => new Promise((resolve, reject) => {
-        if (provider.sendAsync != undefined) {
+        if (provider.sendAsync !== undefined) {
           provider.sendAsync(
             { jsonrpc: '2.0', method, params, id: 1 },
             (error: Error | null, result: JsonRpcResponse) => {
               if (error) reject(error);
               resolve(result);
             });
-        } else if (provider.send != undefined) {
+        } else if (provider.send !== undefined) {
          provider.send(
           { jsonrpc: '2.0', method, params, id: 1 },
           (error: Error | null, result: JsonRpcResponse) => {
@@ -251,6 +260,10 @@ export default class Resolution {
     return await method.address(domain, currencyTicker);
   }
 
+  /**
+   * Returns the resolver address for a specific domain
+   * @param domain - domain to look for
+   */
   async resolver(domain: string): Promise<string> {
     domain = this.prepareDomain(domain);
     return await this.getNamingMethodOrThrow(domain).resolver(domain);
@@ -330,6 +343,7 @@ export default class Resolution {
         throw new Error('Incorrect method is provided');
     }
   }
+
   /**
    * Checks weather the domain name matches the hash
    * @param domain - domain name to check againt
@@ -359,6 +373,10 @@ export default class Resolution {
     return method && method.isSupportedNetwork();
   }
 
+  /**
+   * Returns the name of the service for a domain ENS | CNS | ZNS
+   * @param domain - domain name to look for
+   */
   serviceName(domain: string): NamingServiceName {
     domain = this.prepareDomain(domain);
     return this.getNamingMethodOrThrow(domain).serviceName(domain);

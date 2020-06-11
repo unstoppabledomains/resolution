@@ -2,7 +2,7 @@ import BaseConnection from '../baseConnection';
 import { defaultAbiCoder as AbiCoder } from './abicoder';
 var keccak256 = require('js-sha3').keccak_256;
 import ResolutionError, { ResolutionErrorCode } from '../resolutionError';
-import { isNullAddress, NamingServiceName, Web3Provider } from '../types';
+import { isNullAddress, NamingServiceName, Provider } from '../types';
 
 type FourBytes = string;
 
@@ -12,7 +12,7 @@ export default class Contract extends BaseConnection {
   readonly address: string;
   readonly url: string;
   readonly name: NamingServiceName;
-  readonly web3Provider?: Web3Provider;
+  readonly provider?: Provider;
 
   /**
    * @param contractInterface JSON-RPC interface of smartContract
@@ -23,14 +23,14 @@ export default class Contract extends BaseConnection {
     url: string,
     contractInterface,
     address: string,
-    web3Provider?: Web3Provider,
+    provider?: Provider,
   ) {
     super();
     this.name = name;
     this.url = url;
     this.contractInterface = contractInterface;
     this.address = address;
-    this.web3Provider = web3Provider;
+    this.provider = provider;
   }
 
   /**
@@ -100,8 +100,8 @@ export default class Contract extends BaseConnection {
       },
       'latest',
     ];
-    if (this.web3Provider) {
-      return await this.web3Provider
+    if (this.provider) {
+      return await this.provider
         .sendAsync('eth_call', params)
         .then(resp => resp.json());
     }
