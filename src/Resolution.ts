@@ -140,7 +140,7 @@ export default class Resolution {
             if (error) reject(error);
             resolve(result);
           });
-        } else throw new ResolutionError(ResolutionErrorCode.IncorectProvider);
+        } else throw new ResolutionError(ResolutionErrorCode.IncorrectProvider);
        })
       };
     return this.provider(customProvider);

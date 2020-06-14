@@ -8,7 +8,7 @@ import {
   expectSpyToBeCalled,
   mockAsyncMethods,
   secretInfuraLink,
-  InfuraProtocolOptions,
+  InfuraProtocol,
 } from './utils/testHelpers';
 import nodeFetch from 'node-fetch';
 
@@ -376,7 +376,7 @@ describe('Resolution', () => {
     });
 
     it('should work with webSocketProvider', async () => {
-      const provider = new Web3WsProvider(secretInfuraLink(InfuraProtocolOptions.wss));
+      const provider = new Web3WsProvider(secretInfuraLink(InfuraProtocol.wss));
       const resolution = Resolution.fromWeb3Provider(provider);
       const eyes = mockAsyncMethods(resolution.cns, {
         getResolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',

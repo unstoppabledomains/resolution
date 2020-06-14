@@ -116,6 +116,13 @@ export interface Provider {
   sendAsync: (method: string, params: any) => Promise<any>;
 }
 
+/**
+ * @deprecated
+ */
+export interface Web3Provider {
+  sendAsync: (method: string, params: any) => Promise<any>; 
+}
+
 export interface JsonRpcPayload {
   jsonrpc: string;
   method: string;

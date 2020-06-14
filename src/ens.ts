@@ -35,6 +35,7 @@ export default class Ens extends EthereumNamingService {
   /**
    * Source object describing the network naming service operates on
    * @param source - if specified as a string will be used as main url, if omited then defaults are used
+   * @param provider - EthersJS provider, an object that implemented sendAsync(method, params) functionality
    * @throws ConfigurationError - when either network or url is setup incorrectly
    */
   constructor(source: NamingServiceSource = true, provider?: Provider) {
