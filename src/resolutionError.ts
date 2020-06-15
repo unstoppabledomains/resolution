@@ -18,7 +18,7 @@ export enum ResolutionErrorCode {
   UnsupportedCurrency = 'UnsupportedCurrency',
   IncorrectResolverInterface = 'IncorrectResolverInterface',
   RecordNotFound = 'RecordNotFound',
-  IncorrectProvider = 'IncorrectProvider'
+  IncorrectProvider = 'IncorrectProvider',
 }
 
 /**
