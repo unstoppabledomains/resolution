@@ -1,8 +1,8 @@
 import nock from 'nock';
 import Resolution, { ResolutionErrorCode } from './index';
 import { UnclaimedDomainResponse, NamingServiceName } from './types';
-var Web3WsProvider = require('web3-providers-ws');
-var Web3HttpProvider = require('web3-providers-http');
+const Web3WsProvider = require('web3-providers-ws');
+const Web3HttpProvider = require('web3-providers-http');
 import {
   expectResolutionErrorCode,
   expectSpyToBeCalled,
