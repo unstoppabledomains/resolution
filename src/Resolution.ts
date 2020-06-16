@@ -13,6 +13,7 @@ import {
   AbstractProvider,
   JsonRpcResponse,
   Provider,
+  OldAbstractProvider,
 } from './types';
 import ResolutionError, { ResolutionErrorCode } from './resolutionError';
 import NamingService from './namingService';
@@ -123,17 +124,17 @@ export default class Resolution {
    * @param provider - callback base provider
    * @throws ResolutionErrorCode.IncorectProvider
    */
-  static fromWeb3Provider(provider: AbstractProvider): Resolution {
+  static fromWeb3Provider(provider: AbstractProvider | OldAbstractProvider): Resolution {
     const customProvider: Provider = {
       sendAsync: (method, params) => new Promise((resolve, reject) => {
-        if (provider.sendAsync !== undefined) {
+        if (this.isNewProvider(provider)) {
           provider.sendAsync(
             { jsonrpc: '2.0', method, params, id: 1 },
             (error: Error | null, result: JsonRpcResponse) => {
               if (error) reject(error);
               resolve(result);
             });
-        } else if (provider.send !== undefined) {
+        } else if (this.isOldProvider(provider)) {
          provider.send(
           { jsonrpc: '2.0', method, params, id: 1 },
           (error: Error | null, result: JsonRpcResponse) => {
@@ -417,6 +418,14 @@ export default class Resolution {
 
   private prepareDomain(domain: string): string {
     return domain ? domain.trim().toLowerCase() : "";
+  }
+
+  private static isNewProvider(provider: AbstractProvider | OldAbstractProvider): provider is AbstractProvider {
+    return (provider as any).sendAsync !== undefined;
+  }
+
+  private static isOldProvider(provider: AbstractProvider | OldAbstractProvider): provider is OldAbstractProvider {
+    return (provider as any).send !== undefined;
   }
 }
 

@@ -99,7 +99,7 @@ export default class Contract extends BaseConnection {
         to: this.address,
       },
       'latest',
-    ];
+    ] as const;
     if (this.provider) {
       return await this.provider
         .sendAsync('eth_call', params)
