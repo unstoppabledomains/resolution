@@ -366,25 +366,25 @@ describe('Resolution', () => {
     it('should work with web3HttpProvider', async () => {
       const provider = new Web3HttpProvider(secretInfuraLink());
       const resolution = Resolution.fromWeb3Provider(provider);
-      const eyes = mockAsyncMethods(resolution.cns, {
-        getResolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
-        getRecord: '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8'
-      });
+      // const eyes = mockAsyncMethods(resolution.cns, {
+      //   getResolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
+      //   getRecord: '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8'
+      // });
       const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
-      expectSpyToBeCalled(eyes);
+      // expectSpyToBeCalled(eyes);
       expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
     });
 
     it('should work with webSocketProvider', async () => {
       const provider = new Web3WsProvider(secretInfuraLink(InfuraProtocol.wss));
       const resolution = Resolution.fromWeb3Provider(provider);
-      const eyes = mockAsyncMethods(resolution.cns, {
-        getResolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
-        getRecord: '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8'
-      });
+      // const eyes = mockAsyncMethods(resolution.cns, {
+      //   getResolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
+      //   getRecord: '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8'
+      // });
       const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
       provider.disconnect(1000, "end of test");
-      expectSpyToBeCalled(eyes);
+      // expectSpyToBeCalled(eyes);
       expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8'); 
     });
   });
