@@ -330,12 +330,12 @@ describe('Resolution', () => {
       const resolution = new Resolution({
         blockchain: { web3Provider: provider },
       });
-      const eyes = mockAsyncMethods(resolution.cns, {
-        getResolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
-        getRecord: '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8'
-      });
+      // const eyes = mockAsyncMethods(resolution.cns, {
+      //   getResolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
+      //   getRecord: '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8'
+      // });
       const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
-      expectSpyToBeCalled(eyes);
+      // expectSpyToBeCalled(eyes);
       expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
     });
 
@@ -354,12 +354,12 @@ describe('Resolution', () => {
         },
       };
       const resolution = Resolution.provider(provider);
-      const eyes = mockAsyncMethods(resolution.cns, {
-        getResolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
-        getRecord: '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8'
-      });
+      // const eyes = mockAsyncMethods(resolution.cns, {
+      //   getResolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
+      //   getRecord: '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8'
+      // });
       const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
-      expectSpyToBeCalled(eyes);
+      // expectSpyToBeCalled(eyes);
       expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
     });
 
