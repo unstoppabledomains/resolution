@@ -108,7 +108,7 @@ export default class Resolution {
    * @param provider - any jsonRPCprovider will work as long as it's prototype has send(method, params): Promise<any> method
    */
   static jsonRPCprovider(provider): Resolution {
-    return new this({ blockchain: { provider: provider.send } });
+    return new this({ blockchain: { provider: {sendAsync: provider.send} } });
   }
 
   /**
@@ -132,14 +132,15 @@ export default class Resolution {
             { jsonrpc: '2.0', method, params, id: 1 },
             (error: Error | null, result: JsonRpcResponse) => {
               if (error) reject(error);
-              resolve(result);
+              resolve({
+                json: () => result});
             });
         } else if (this.isOldProvider(provider)) {
          provider.send(
           { jsonrpc: '2.0', method, params, id: 1 },
           (error: Error | null, result: JsonRpcResponse) => {
             if (error) reject(error);
-            resolve(result);
+            resolve({json: () => result});
           });
         } else throw new ResolutionError(ResolutionErrorCode.IncorrectProvider);
        })

@@ -145,7 +145,7 @@ export interface AbstractProvider {
 }
 
 export interface OldAbstractProvider {
-  send: (payload: JsonRpcPayload, callback: (error: Error | null, result?: JsonRpcResponse) => void) => void;
+  send: ProviderMethod
 }
 
 export const DefaultAPI: API = {
