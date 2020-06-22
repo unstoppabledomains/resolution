@@ -32,7 +32,9 @@ export default class Cns extends EthereumNamingService {
   /** @internal */
   readonly RegistryMap: RegistryMap = {
     mainnet: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe',
-    kovan: '0x22c2738cdA28C5598b1a68Fb1C89567c2364936F', // for internal testing
+    // Testnet contracts are used for internal testing only.
+    ropsten: '0xd55bbcee17b47db40588ff9e2ca90404b095acd5',
+    kovan: '0x22c2738cdA28C5598b1a68Fb1C89567c2364936F',
   };
 
   /**
@@ -193,7 +195,7 @@ export default class Cns extends EthereumNamingService {
   async chatId(domain: string): Promise<string> {
     return await this.record(domain, 'gundb.username.value');
   }
-  
+
   /**
    * resolves an httpUrl stored on domain
    * @param domain - domain name
