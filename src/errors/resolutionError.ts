@@ -1,4 +1,4 @@
-import { ResolutionMethod } from './types';
+import { ResolutionMethod } from '../types';
 /** Alias for Resolution error handler function */
 type ResolutionErrorHandler = (error: ResolutionErrorOptions) => string;
 /** Explains Resolution Error options */
@@ -18,7 +18,6 @@ export enum ResolutionErrorCode {
   UnsupportedCurrency = 'UnsupportedCurrency',
   IncorrectResolverInterface = 'IncorrectResolverInterface',
   RecordNotFound = 'RecordNotFound',
-  IncorrectProvider = 'IncorrectProvider',
 }
 
 /**
@@ -50,7 +49,6 @@ const HandlersByCode = {
     recordName: string;
     domain: string;
   }) => `No ${params.recordName} record found for ${params.domain}`,
-  [ResolutionErrorCode.IncorrectProvider]: (params: {}) => "Provider doesn't implement sendAsync or send method"
 };
 
 /**

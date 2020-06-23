@@ -18,6 +18,7 @@ import {
 } from './types';
 import { ResolutionError, ResolutionErrorCode } from './index';
 import NamingService from './namingService';
+import ConfigurationError, { ConfigurationErrorCode } from './errors/configurationError';
 
 const DefaultSource = 'https://api.zilliqa.com';
 
@@ -65,10 +66,11 @@ export default class Zns extends NamingService {
     this.network = source.network as string;
     this.url = source.url as string;
     if (!this.network) {
-      throw new Error('Unspecified network in Resolution ZNS configuration');
+      throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedNetwork, {method: NamingServiceName.ZNS})
+      
     }
     if (!this.url) {
-      throw new Error('Unspecified url in Resolution ZNS configuration');
+      throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedUrl, {method: NamingServiceName.ZNS})
     }
     this.registryAddress = source.registry
       ? source.registry

@@ -1,4 +1,6 @@
 ## Unreleased
+* Added web3 providers supports such as http and ws protocols
+* Introduced ConfigurationError which handles all error that were made cause of falty configurations
 
 ## 1.4.0
 * Resolve custom records

@@ -11,8 +11,8 @@ import {
 import { default as resolverInterface } from './cns/contract/resolver';
 import { default as cnsInterface } from './cns/contract/registry';
 import { default as hash, childhash } from './cns/namehash';
-import ResolutionError from './resolutionError';
-import { ResolutionErrorCode } from './resolutionError';
+import ResolutionError from './errors/resolutionError';
+import { ResolutionErrorCode } from './errors/resolutionError';
 import Contract from './utils/contract';
 
 /**

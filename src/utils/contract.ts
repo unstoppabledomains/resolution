@@ -1,7 +1,7 @@
 import BaseConnection from '../baseConnection';
 import { defaultAbiCoder as AbiCoder } from './abicoder';
 var keccak256 = require('js-sha3').keccak_256;
-import ResolutionError, { ResolutionErrorCode } from '../resolutionError';
+import ResolutionError, { ResolutionErrorCode } from '../errors/resolutionError';
 import { isNullAddress, NamingServiceName, Provider } from '../types';
 
 type FourBytes = string;

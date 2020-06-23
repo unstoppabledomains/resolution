@@ -5,7 +5,7 @@ import {
   expectResolutionErrorCode,
   secretInfuraLink,
 } from './utils/testHelpers';
-import { ResolutionErrorCode } from './resolutionError';
+import { ResolutionErrorCode } from './errors/resolutionError';
 import { NullAddress } from './types';
 
 try {

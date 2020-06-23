@@ -9,7 +9,7 @@ import {
   isNullAddress,
   Provider,
 } from './types';
-import ResolutionError, { ResolutionErrorCode } from './resolutionError';
+import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import BaseConnection from './baseConnection';
 import { invert } from './utils';
 import Contract from './utils/contract';

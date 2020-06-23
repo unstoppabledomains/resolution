@@ -15,9 +15,10 @@ import {
   Provider,
   OldAbstractProvider,
 } from './types';
-import ResolutionError, { ResolutionErrorCode } from './resolutionError';
+import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import NamingService from './namingService';
 import { signedInfuraLink } from './utils';
+import ConfigurationError, { ConfigurationErrorCode } from './errors/configurationError';
 
 /**
  * Blockchain domain Resolution library - Resolution.
@@ -142,7 +143,7 @@ export default class Resolution {
             if (error) reject(error);
             resolve({json: () => result});
           });
-        } else throw new ResolutionError(ResolutionErrorCode.IncorrectProvider);
+        } else throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
        })
       };
     return this.provider(customProvider);

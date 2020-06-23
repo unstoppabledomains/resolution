@@ -1,5 +1,6 @@
 import Resolution from '../Resolution';
 import * as fs from 'fs';
+import ConfigurationError, { ConfigurationErrorCode } from '../errors/configurationError';
 
 export async function tryInfo(
   method,
@@ -40,9 +41,7 @@ export function getEtheriumUrl(): string {
       return signedInfuraLink(configObject.value);
     if (configObject.type === 'url') return configObject.value;
   }
-  throw new Error(
-    "Couldn't find any configurations\n\tUse -C to configurate the library",
-  );
+  throw new ConfigurationError(ConfigurationErrorCode.MissingProviderConfigurations);
 }
 
 export function buildResolutionPackage() {
@@ -74,8 +73,6 @@ export function getConfig() {
     if (config[0] === 'infura' || config[0] === 'url')
       return { type: config[0], value: config[1] };
   } catch (err) {
-    throw new Error(
-      'Resolution library is not configured. Please use resolution -C and configure it either with infura project id or node url for lookup. Resolution -h for more details',
-    );
+    throw new ConfigurationError(ConfigurationErrorCode.MissingProviderConfigurations);
   }
 }
