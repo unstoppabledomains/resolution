@@ -89,16 +89,12 @@ export default class Udapi extends NamingService {
    * Returns the gundb chat id of the domain
    * @param domain - domain name
    * @throws ResolutionError with code RecordNotFound
-   * @returns A gundb chatId configured for a domain 
+   * @returns A gundb chatId configured for a domain
    */
   async chatId(domain:string): Promise<string> {
     const resolution = await this.resolve(domain);
-    if (!resolution || !resolution.gundb || !resolution.gundb.username)
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-        recordName: 'Gundb chatId',
-        domain: domain
-      });
-    return resolution.gundb.username;
+    const value = resolution?.gundb?.username;
+    return this.ensureRecordPresence(domain, 'Gundb chatId', value);
   }
 
   /**
@@ -108,12 +104,8 @@ export default class Udapi extends NamingService {
    */
   async ipfsHash(domain: string): Promise<string> {
     const answer = await this.resolve(domain);
-    if (!answer || !answer.ipfs || !answer.ipfs.html)
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-        recordName: 'IPFS hash',
-        domain: domain,
-      });
-    return answer.ipfs.html;
+    const value = answer?.ipfs?.html;
+    return this.ensureRecordPresence(domain, 'IPFS hash', value);
   }
 
   /**
@@ -123,12 +115,8 @@ export default class Udapi extends NamingService {
    */
   async email(domain: string): Promise<string> {
     const answer = await this.resolve(domain);
-    if (!answer || !answer.whois || !answer.whois.email)
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-        recordName: 'email',
-        domain: domain,
-      });
-    return answer.whois.email;
+    const value = answer?.whois?.email;
+    return this.ensureRecordPresence(domain, 'email', value);
   }
 
   /**
@@ -138,12 +126,8 @@ export default class Udapi extends NamingService {
    */
   async httpUrl(domain: string): Promise<string> {
     const answer = await this.resolve(domain);
-    if (!answer || !answer.ipfs || !answer.ipfs.redirect_domain)
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-        recordName: 'httpUrl',
-        domain: domain,
-      });
-    return answer.ipfs.redirect_domain;
+    const value = answer?.ipfs?.redirect_domain;
+    return this.ensureRecordPresence(domain, 'httpUrl', value);
   }
 
   /**

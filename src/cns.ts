@@ -213,19 +213,13 @@ export default class Cns extends EthereumNamingService {
   /** @internal */
   async record(domain: string, key: string): Promise<string> {
     const tokenId = this.namehash(domain);
-    const resolver: string = await this.resolver(domain);
-    const resolverContract = resolver && this.buildContract(resolverInterface, resolver);
-    const record: string | undefined = resolverContract && await this.getRecord(resolverContract, 'get', [
+    const resolver = await this.resolver(domain);
+    const resolverContract = this.buildContract(resolverInterface, resolver);
+    const record = await this.getRecord(resolverContract, 'get', [
       key,
       tokenId,
     ]);
-    // Wrong Record checks
-    if (!record || isNullAddress(record))
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-        recordName: key,
-        domain: domain,
-      });
-    return record;
+    return this.ensureRecordPresence(domain, key, record);
   }
 
   /** This is done to make testwriting easy */

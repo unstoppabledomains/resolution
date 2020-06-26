@@ -77,6 +77,16 @@ export default abstract class NamingService extends BaseConnection {
   protected isResolutionError(error: any, code?: ResolutionErrorCode): boolean {
     return error instanceof ResolutionError && (!code || error.code === code);
   }
+
+  protected ensureRecordPresence(domain: string, key: string, value: string | undefined | null): string {
+    if (value) {
+      return value;
+    }
+    throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+      recordName: key,
+      domain: domain,
+    });
+  }
 }
 
 export abstract class EthereumNamingService extends NamingService {

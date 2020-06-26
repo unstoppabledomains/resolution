@@ -186,12 +186,7 @@ export default class Ens extends EthereumNamingService {
    */
   async ipfsHash(domain: string): Promise<string> {
     const hash = await this.getContentHash(domain);
-    if (!hash)
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-        recordName: 'IPFS hash',
-        domain: domain,
-      });
-    return hash;
+    return this.ensureRecordPresence(domain, 'IPFS hash', hash)
   }
 
   /**
@@ -243,12 +238,7 @@ export default class Ens extends EthereumNamingService {
   private async getTextRecord(resolver: Contract, domain, key) {
     const nodeHash = this.namehash(domain);
     const record = await this.callMethod(resolver, 'text', [nodeHash, key]);
-    if (!record)
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-        recordName: key,
-        domain: domain,
-      });
-    return record;
+    return this.ensureRecordPresence(domain, key, record);
   }
 
   private async getResolverContract(domain: string): Promise<Contract> {
