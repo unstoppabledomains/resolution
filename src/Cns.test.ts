@@ -54,7 +54,8 @@ describe('CNS', () => {
 
   it('Should return NoRecord Resolution error', async () => {
     const spies = mockAsyncMethods(resolution.cns, {
-      getResolver: undefined,
+      getResolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
+      getRecord: undefined,
     });
     await expectResolutionErrorCode(
       resolution.record(domain, 'No.such.record'),

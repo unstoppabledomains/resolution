@@ -213,7 +213,7 @@ export default class Cns extends EthereumNamingService {
   /** @internal */
   async record(domain: string, key: string): Promise<string> {
     const tokenId = this.namehash(domain);
-    const resolver: string = await this.getResolver(tokenId);
+    const resolver: string = await this.resolver(domain);
     const resolverContract = resolver && this.buildContract(resolverInterface, resolver);
     const record: string | undefined = resolverContract && await this.getRecord(resolverContract, 'get', [
       key,

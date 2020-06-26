@@ -205,9 +205,10 @@ describe('Resolution', () => {
   it('should throw recordNotFound for chatId', async () => {
     const resolution = new Resolution({blockchain: {cns: {url: secretInfuraLink()}}});
     const eyes = mockAsyncMethods(resolution.cns, {
+      owner: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
       getResolver: undefined,
     });
-    await expectResolutionErrorCode(resolution.chatId("homecakes2.crypto"), ResolutionErrorCode.RecordNotFound);
+    await expectResolutionErrorCode(resolution.chatId("homecakes2.crypto"), ResolutionErrorCode.UnspecifiedResolver);
   });
 
   describe('serviceName', () => {
