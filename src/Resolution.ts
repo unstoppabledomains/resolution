@@ -14,11 +14,15 @@ import {
   JsonRpcResponse,
   Provider,
   OldAbstractProvider,
+  RequestArguments,
+  ExternalProvider,
 } from './types';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import NamingService from './namingService';
 import { signedInfuraLink } from './utils';
-import ConfigurationError, { ConfigurationErrorCode } from './errors/configurationError';
+import ConfigurationError, {
+  ConfigurationErrorCode,
+} from './errors/configurationError';
 
 /**
  * Blockchain domain Resolution library - Resolution.
@@ -109,44 +113,108 @@ export default class Resolution {
    * @param provider - any jsonRPCprovider will work as long as it's prototype has send(method, params): Promise<any> method
    */
   static jsonRPCprovider(provider): Resolution {
-    return new this({ blockchain: { provider: {sendAsync: provider.send} } });
+    const providerWrapper: Provider = {
+      call: async (method, params) => {
+        try {
+          const result = await provider.send(method, params);
+          return { result };
+        } catch (error) {
+          return { error };
+        }
+      },
+    };
+    return this.provider(providerWrapper);
   }
 
   /**
-   * Replica of Resolution#proivder made for convenience
-   * @param provider 
+   * Create a resolution instance from web3 0.x version provider
+   * @param provider - an 0.x version provider from web3 ( must implement sendAsync(payload, callback) )
+   * see https://github.com/ethereum/web3.js/blob/0.20.7/lib/web3/httpprovider.js#L116
    */
-  static fromEthersProvider(provider: Provider): Resolution {
-    return this.provider(provider);
-  }
-
-  /**
-   * Creates a resolution instance from AbstractProvider
-   * @param provider - callback base provider
-   * @throws ResolutionErrorCode.IncorectProvider
-   */
-  static fromWeb3Provider(provider: AbstractProvider | OldAbstractProvider): Resolution {
-    const customProvider: Provider = {
-      sendAsync: (method, params) => new Promise((resolve, reject) => {
-        if (this.isNewProvider(provider)) {
+  static fromWeb3Version0Provider(provider: OldAbstractProvider): Resolution {
+    const providerWrapper: Provider = {
+      call: (method, params) =>
+        new Promise((resolve, reject) => {
           provider.sendAsync(
             { jsonrpc: '2.0', method, params, id: 1 },
             (error: Error | null, result: JsonRpcResponse) => {
               if (error) reject(error);
-              resolve({
-                json: () => result});
-            });
-        } else if (this.isOldProvider(provider)) {
-         provider.send(
-          { jsonrpc: '2.0', method, params, id: 1 },
-          (error: Error | null, result: JsonRpcResponse) => {
-            if (error) reject(error);
-            resolve({json: () => result});
-          });
-        } else throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
-       })
-      };
-    return this.provider(customProvider);
+              resolve(result);
+            },
+          );
+        }),
+    };
+    return this.provider(providerWrapper);
+  }
+
+  /**
+   * Create a resolution instance from web3 1.x version provider
+   * @param provider - an 1.x version provider from web3 ( must implement send(payload, callback) )
+   * see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-core-helpers/types/index.d.ts#L165
+   */
+  static fromWeb3Version1Provider(provider: AbstractProvider) {
+    const providerWrapper: Provider = {
+      call: (method, params) =>
+        new Promise((resolve, reject) => {
+          provider.send(
+            { jsonrpc: '2.0', method, params, id: 1 },
+            (error: Error | null, result: JsonRpcResponse) => {
+              if (error) reject(error);
+              resolve(result);
+            },
+          );
+        }),
+    };
+    return this.provider(providerWrapper);
+  }
+
+  /**
+   * This should create an instance of resolution with any EIP-1193 compatable provider.
+   * See this: https://eips.ethereum.org/EIPS/eip-1193
+   * In case if provider doesn't implement request method,
+   * we check for send(payload, callback) method and sendAsync(payload, callback)
+   * @param provider
+   */
+  static fromEIP1193Provider(
+    provider: ExternalProvider | AbstractProvider | OldAbstractProvider,
+  ) {
+    const providerWrapper: Provider = {
+      call: (method, params) =>
+        new Promise(async (resolve, reject) => {
+          if (this.isRequestBasedProvider(provider)) {
+            const request: RequestArguments = {
+              method,
+              params,
+            };
+            try {
+              const result = await provider.request(request);
+              resolve({ result });
+            } catch (error) {
+              reject({ error });
+            }
+          } else if (this.isNewProvider(provider)) {
+            provider.send(
+              { jsonrpc: '2.0', method, params, id: 1 },
+              (error: Error | null, result: JsonRpcResponse) => {
+                if (error) reject(error);
+                resolve(result);
+              },
+            );
+          } else if (this.isOldProvider(provider)) {
+            provider.sendAsync(
+              { jsonrpc: '2.0', method, params, id: 1 },
+              (error: Error | null, result: JsonRpcResponse) => {
+                if (error) reject(error);
+                resolve(result);
+              },
+            );
+          } else
+            throw new ConfigurationError(
+              ConfigurationErrorCode.IncorrectProvider,
+            );
+        }),
+    };
+    this.provider(providerWrapper);
   }
 
   /**
@@ -196,7 +264,6 @@ export default class Resolution {
     const method = this.getNamingMethodOrThrow(domain);
     return await method.chatId(domain);
   }
-
 
   /**
    * Resolves the IPFS hash configured for domain records on ZNS
@@ -419,14 +486,24 @@ export default class Resolution {
   }
 
   private prepareDomain(domain: string): string {
-    return domain ? domain.trim().toLowerCase() : "";
+    return domain ? domain.trim().toLowerCase() : '';
   }
 
-  private static isNewProvider(provider: AbstractProvider | OldAbstractProvider): provider is AbstractProvider {
+  private static isRequestBasedProvider(
+    provider: AbstractProvider | OldAbstractProvider | ExternalProvider,
+  ): provider is ExternalProvider {
+    return (provider as any).request !== undefined;
+  }
+
+  private static isNewProvider(
+    provider: AbstractProvider | OldAbstractProvider,
+  ): provider is AbstractProvider {
     return (provider as any).sendAsync !== undefined;
   }
 
-  private static isOldProvider(provider: AbstractProvider | OldAbstractProvider): provider is OldAbstractProvider {
+  private static isOldProvider(
+    provider: AbstractProvider | OldAbstractProvider,
+  ): provider is OldAbstractProvider {
     return (provider as any).send !== undefined;
   }
 }

@@ -17,7 +17,9 @@ import { ResolutionError, ResolutionErrorCode } from './index';
 import Contract from './utils/contract';
 import contentHash from 'content-hash';
 import EnsNetworkMap from 'ethereum-ens-network-map';
-import ConfigurationError, { ConfigurationErrorCode } from './errors/configurationError';
+import ConfigurationError, {
+  ConfigurationErrorCode,
+} from './errors/configurationError';
 
 /**
  * Class to support connection with Ethereum naming service
@@ -45,10 +47,14 @@ export default class Ens extends EthereumNamingService {
     this.network = <string>source.network;
     this.url = source.url as string;
     if (!this.network) {
-      throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedNetwork, {method: NamingServiceName.ENS})
+      throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedNetwork, {
+        method: NamingServiceName.ENS,
+      });
     }
     if (!this.url) {
-      throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedUrl, {method: NamingServiceName.ENS})
+      throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedUrl, {
+        method: NamingServiceName.ENS,
+      });
     }
     this.registryAddress = source.registry
       ? source.registry

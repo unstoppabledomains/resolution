@@ -102,8 +102,7 @@ export default class Contract extends BaseConnection {
     ] as const;
     if (this.provider) {
       return await this.provider
-      .sendAsync('eth_call', params)
-      .then(resp => resp.json());
+      .call('eth_call', params);
     }
     const response = await this.fetch(this.url, {
       method: 'POST',

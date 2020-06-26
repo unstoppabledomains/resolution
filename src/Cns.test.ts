@@ -240,14 +240,14 @@ describe('CNS', () => {
       it('should throw UnregisteredDomain', async () => {
         const eyes = mockAsyncMethods(resolution.cns, {
           getResolver: undefined,
-          owner: '0x0000000000000000000000000000000000000000'
+          owner: '0x0000000000000000000000000000000000000000',
         });
         await expectResolutionErrorCode(
-          resolution.cns!.address('unregistered.crypto', "ETH"),
-          ResolutionErrorCode.UnregisteredDomain
+          resolution.cns!.address('unregistered.crypto', 'ETH'),
+          ResolutionErrorCode.UnregisteredDomain,
         );
         expectSpyToBeCalled(eyes);
-      })
+      });
     });
 
     describe('.Childhash', () => {

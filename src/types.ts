@@ -73,8 +73,8 @@ export type ResolutionResponse = {
     for_sale?: boolean;
   };
   gundb?: {
-    username?: string; 
-  },
+    username?: string;
+  };
   addresses: {
     [key: string]: string;
   };
@@ -111,12 +111,23 @@ export type Blockchain =
 export type API = {
   url: string;
 };
-type ProviderParams = readonly [{
-  [record:string]:string
-} | string, string];
+type ProviderParams = readonly [
+  (
+    | {
+        [record: string]: string;
+      }
+    | string
+  ),
+  string,
+];
+
+export interface RequestArguments {
+  method: string;
+  params?: unknown[] | object;
+}
 
 export interface Provider {
-  sendAsync: (method: string, params: ProviderParams) => Promise<any>;
+  call: (method: string, params: ProviderParams) => Promise<any>;
 }
 
 /**
@@ -138,14 +149,21 @@ export interface JsonRpcResponse {
   error?: string;
 }
 
-type ProviderMethod = (payload: JsonRpcPayload, callback: (error: Error | null, result?: JsonRpcResponse) => void) => void;
-
-export interface AbstractProvider {
-  sendAsync: ProviderMethod, 
-}
+type ProviderMethod = (
+  payload: JsonRpcPayload,
+  callback: (error: Error | null, result?: JsonRpcResponse) => void,
+) => void;
 
 export interface OldAbstractProvider {
-  send: ProviderMethod
+  sendAsync: ProviderMethod;
+}
+
+export interface AbstractProvider {
+  send: ProviderMethod;
+}
+
+export interface ExternalProvider {
+  request: (request: RequestArguments) => Promise<any>;
 }
 
 export const DefaultAPI: API = {
