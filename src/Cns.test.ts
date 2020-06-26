@@ -15,7 +15,7 @@ try {
   console.warn('dotenv is not installed');
 }
 
-const labelDomain = 'reseller-test-braden-6.crypto';
+const domain = 'reseller-test-braden-6.crypto';
 let resolution: Resolution;
 beforeEach(() => {
   jest.restoreAllMocks();
@@ -47,9 +47,9 @@ describe('CNS', () => {
       getResolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
       getRecord: 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
     });
-    const ipfs_hash = await resolution.cns!.record(labelDomain, 'ipfs.html2');
+    const ipfsHash = await resolution.cns!.record(domain, 'ipfs.html2');
     expectSpyToBeCalled(eyes);
-    expect(ipfs_hash).toBe('QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK');
+    expect(ipfsHash).toBe('QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK');
   });
 
   it('Should return NoRecord Resolution error', async () => {
@@ -57,7 +57,7 @@ describe('CNS', () => {
       getResolver: undefined,
     });
     await expectResolutionErrorCode(
-      resolution.cns!.record(labelDomain, 'No.such.record'),
+      resolution.record(domain, 'No.such.record'),
       ResolutionErrorCode.RecordNotFound,
     );
     expectSpyToBeCalled(spies);
@@ -69,7 +69,7 @@ describe('CNS', () => {
       getRecord: 'www.unstoppabledomains.com',
     });
     const ipfs_redirect_domain = await resolution.cns!.record(
-      labelDomain,
+      domain,
       'ipfs.redirect_domain',
     );
     expectSpyToBeCalled(eyes);
@@ -81,7 +81,7 @@ describe('CNS', () => {
       resolution.cns,
       'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
     );
-    const addr = await resolution.address(labelDomain, 'ZIL');
+    const addr = await resolution.address(domain, 'ZIL');
     expectSpyToBeCalled(eyes);
     expect(addr).toBe('zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj');
   });
@@ -120,84 +120,84 @@ describe('CNS', () => {
   });
 
   describe('.Crypto', () => {
-    it(`checks the BCH address on ${labelDomain}`, async () => {
+    it(`checks the BCH address on ${domain}`, async () => {
       const eyes = mockCryptoCalls(
         resolution.cns,
         'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6',
       );
-      const addr = await resolution.cns!.address(labelDomain, 'BCH');
+      const addr = await resolution.cns!.address(domain, 'BCH');
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6');
     });
 
-    it(`checks the BTC address on ${labelDomain}`, async () => {
+    it(`checks the BTC address on ${domain}`, async () => {
       const eyes = mockCryptoCalls(
         resolution.cns,
         '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB',
       );
-      const addr = await resolution.cns!.address(labelDomain, 'BTC');
+      const addr = await resolution.cns!.address(domain, 'BTC');
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB');
     });
 
-    it(`checks the DASH address on ${labelDomain}`, async () => {
+    it(`checks the DASH address on ${domain}`, async () => {
       const eyes = mockCryptoCalls(
         resolution.cns,
         'XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j',
       );
-      const addr = await resolution.cns!.address(labelDomain, 'DASH');
+      const addr = await resolution.cns!.address(domain, 'DASH');
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j');
     });
 
-    it(`checks the ETH address on ${labelDomain}`, async () => {
+    it(`checks the ETH address on ${domain}`, async () => {
       const eyes = mockCryptoCalls(
         resolution.cns,
         '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
       );
-      const addr = await resolution.cns!.address(labelDomain, 'ETH');
+      const addr = await resolution.cns!.address(domain, 'ETH');
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('0x45b31e01AA6f42F0549aD482BE81635ED3149abb');
     });
 
-    it(`checks the LTC address on ${labelDomain}`, async () => {
+    it(`checks the LTC address on ${domain}`, async () => {
       const eyes = mockCryptoCalls(
         resolution.cns,
         'LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL',
       );
-      const addr = await resolution.cns!.address(labelDomain, 'LTC');
+      const addr = await resolution.cns!.address(domain, 'LTC');
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL');
     });
 
-    it(`checks the XMR address on ${labelDomain}`, async () => {
+    it(`checks the XMR address on ${domain}`, async () => {
       const eyes = mockCryptoCalls(
         resolution.cns,
         '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d',
       );
-      const addr = await resolution.cns!.address(labelDomain, 'XMR');
+      const addr = await resolution.cns!.address(domain, 'XMR');
       expectSpyToBeCalled(eyes);
       expect(addr).toBe(
         '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d',
       );
     });
 
-    it(`checks the ZEC address on ${labelDomain}`, async () => {
+    it(`checks the ZEC address on ${domain}`, async () => {
       const eyes = mockCryptoCalls(
         resolution.cns,
         't1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV',
       );
-      const addr = await resolution.cns!.address(labelDomain, 'ZEC');
+      const addr = await resolution.cns!.address(domain, 'ZEC');
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('t1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV');
     });
 
-    it(`checks the ZIL address on ${labelDomain}`, async () => {
+    it(`checks the ZIL address on ${domain}`, async () => {
       const eyes = mockCryptoCalls(
         resolution.cns,
         'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
       );
-      const addr = await resolution.cns!.address(labelDomain, 'ZIL');
+      const addr = await resolution.cns!.address(domain, 'ZIL');
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj');
     });
@@ -292,7 +292,7 @@ describe('CNS', () => {
     const domain = 'reseller-test-ryan019.crypto';
     it('should resolve with ipfs stored on cns', async () => {
       const spies = mockAsyncMethods(resolution.cns, {
-        getResolver: undefined,
+        getResolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
         getRecord: '0x033dc48b5db4ca62861643e9d2c411d9eb6d1975@gmail.com',
       });
       const ipfsHash = await resolution.ipfsHash(domain);

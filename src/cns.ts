@@ -193,7 +193,7 @@ export default class Cns extends EthereumNamingService {
   async chatId(domain: string): Promise<string> {
     return await this.record(domain, 'gundb.username.value');
   }
-  
+
   /**
    * resolves an httpUrl stored on domain
    * @param domain - domain name
@@ -212,8 +212,8 @@ export default class Cns extends EthereumNamingService {
   async record(domain: string, key: string): Promise<string> {
     const tokenId = this.namehash(domain);
     const resolver: string = await this.getResolver(tokenId);
-    const resolverContract = this.buildContract(resolverInterface, resolver);
-    const record: string = await this.getRecord(resolverContract, 'get', [
+    const resolverContract = resolver && this.buildContract(resolverInterface, resolver);
+    const record: string | undefined = resolverContract && await this.getRecord(resolverContract, 'get', [
       key,
       tokenId,
     ]);
