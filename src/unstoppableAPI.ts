@@ -13,6 +13,7 @@ import Ens from './ens';
 import Cns from './cns';
 import pckg from './package.json';
 
+/** @internal */
 export default class Udapi extends NamingService {
   readonly name = 'UDAPI';
   private url: string;

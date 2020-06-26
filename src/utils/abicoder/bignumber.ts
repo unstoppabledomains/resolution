@@ -51,6 +51,7 @@ function _bnify(value: BigNumber): BN {
 
 export type BigNumberish = BigNumber | string | number | Arrayish;
 
+/** @internal */
 export class BigNumber implements Hexable {
   private readonly _hex: string;
 

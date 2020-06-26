@@ -15,15 +15,7 @@ import ResolutionError from './resolutionError';
 import { ResolutionErrorCode } from './resolutionError';
 import Contract from './utils/contract';
 
-/**
- * Class to support connection with Crypto naming service
- * @param network - network string such as
- * - mainnet
- * - ropsten
- * @param url - main api url such as
- * - https://mainnet.infura.io
- * @param registryAddress - address for a registry contract
- */
+/** @internal */
 export default class Cns extends EthereumNamingService {
   readonly name = NamingServiceName.CNS;
   readonly network: string;

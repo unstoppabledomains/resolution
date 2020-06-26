@@ -14,12 +14,7 @@ import BaseConnection from './baseConnection';
 import { invert } from './utils';
 import Contract from './utils/contract';
 
-/**
- * Abstract class for different Naming Service supports like
- * - ENS
- * - ZNS
- *
- */
+/** @internal */
 export default abstract class NamingService extends BaseConnection {
   readonly name: ResolutionMethod;
   protected web3Provider?: Web3Provider;
@@ -89,6 +84,7 @@ export default abstract class NamingService extends BaseConnection {
   }
 }
 
+/** @internal */
 export abstract class EthereumNamingService extends NamingService {
   readonly name: NamingServiceName;
   abstract registryAddress?: string;

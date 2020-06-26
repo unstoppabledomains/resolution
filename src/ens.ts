@@ -18,15 +18,7 @@ import Contract from './utils/contract';
 import contentHash from 'content-hash';
 import EnsNetworkMap from 'ethereum-ens-network-map';
 
-/**
- * Class to support connection with Ethereum naming service
- * @param network - network string such as
- * - mainnet
- * - ropsten
- * @param url - main api url such as
- * - https://mainnet.infura.io
- * @param registryAddress - address for a registry contract
- */
+/** @internal */
 export default class Ens extends EthereumNamingService {
   readonly name = NamingServiceName.ENS;
   readonly network: string;

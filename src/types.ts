@@ -27,32 +27,17 @@ export enum NamingServiceName {
 
 export type ResolutionMethod = NamingServiceName | 'UDAPI';
 
-/**
- * EnsNetworkIdMap
- * type represending the map between network number and network name
- * @typedef
- */
+/** @internal */
 export type EnsNetworkIdMap = {
   [key: number]: string;
 };
 
-/**
- * BlockcahinNetworkUrlMap
- * type representing a map between network name such as
- *  - mainnet
- *  - ropsten
- * and a corresponding url
- * @typede
- */
-
+/** @internal */
 export interface BlockhanNetworkUrlMap {
   [key: string]: string;
 }
 
-/**
- * RegistryMap
- * type represending the map between network name and registry address for specific NamingService
- */
+/** @internal */
 export interface RegistryMap {
   [key: string]: string;
 }
@@ -73,7 +58,7 @@ export type ResolutionResponse = {
     for_sale?: boolean;
   };
   gundb?: {
-    username?: string; 
+    username?: string;
   },
   addresses: {
     [key: string]: string;
@@ -85,10 +70,7 @@ export type ResolutionResponse = {
   };
 };
 
-/**
- * @internal
- * Used internally to map network number to a string
- */
+/** @internal */
 export type NetworkIdMap = {
   [key: number]: string;
 };
@@ -133,6 +115,7 @@ export type Bip44Constants = [number, string, string];
 export type owner = string;
 export type ttl = string;
 export type nodeHash = string;
+/** @internal */
 export enum NullAddress {
   '0x',
   '0x0000000000000000000000000000000000000000',
