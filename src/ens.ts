@@ -260,8 +260,11 @@ export default class Ens extends EthereumNamingService {
     const nodeHash = this.namehash(domain);
     const ownerPromise = this.owner(domain);
     const resolverAddress = await this.getResolver(nodeHash);
-    if (!resolverAddress || isNullAddress(resolverAddress))
+    if (!resolverAddress || isNullAddress(resolverAddress)) {
       await this.throwOwnershipError(domain, ownerPromise);
+    } else {
+      ownerPromise.catch(() => {})
+    }
     const resolverContract = this.buildContract(
       resolverInterface(resolverAddress),
       resolverAddress,

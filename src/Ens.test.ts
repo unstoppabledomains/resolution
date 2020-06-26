@@ -128,6 +128,7 @@ describe('ENS', () => {
   it('resolves .luxe name using ENS blockchain with thrown error', async () => {
     const spies = mockAsyncMethods(resolution.ens, {
       getResolver: undefined,
+      getOwner: undefined,
     });
 
     await expectResolutionErrorCode(
@@ -468,6 +469,7 @@ describe('ENS', () => {
     it('should not find a resolver address', async () => {
       const spies = mockAsyncMethods(resolution.ens, {
         getResolver: undefined,
+        getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
       });
       await expectResolutionErrorCode(
         resolution.resolver('empty.eth'),
