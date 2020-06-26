@@ -113,8 +113,13 @@ export abstract class EthereumNamingService extends NamingService {
     const nodeHash = this.namehash(domain);
     const ownerPromise = this.owner(domain);
     const resolverAddress = await this.getResolver(nodeHash);
-    if (!resolverAddress || isNullAddress(resolverAddress))
+    if (!resolverAddress || isNullAddress(resolverAddress)) {
       await this.throwOwnershipError(domain, ownerPromise);
+    } else {
+      // We don't care about this promise anymore
+      // Ensure it doesn't generate a warning if it rejects
+      ownerPromise.catch(() => {})
+    }
     return resolverAddress;
   }
 
