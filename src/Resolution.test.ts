@@ -183,7 +183,6 @@ describe('Resolution', () => {
     const eyes = mockAsyncMethods(resolution.cns, {
       getResolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
       getRecord: "0x45b31e01AA6f42F0549aD482BE81635ED3149abb",
-      owner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
     });
     const capital = await resolution.addressOrThrow('Brad.crypto', 'eth');
     expectSpyToBeCalled(eyes);

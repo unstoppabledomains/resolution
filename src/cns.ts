@@ -101,6 +101,8 @@ export default class Cns extends EthereumNamingService {
     const resolver = await this.getResolver(tokenId);
     if (!resolver || isNullAddress(resolver)) {
       await this.throwOwnershipError(domain, ownerPromise);
+    } else {
+      ownerPromise.catch(() => {})
     }
     const addr: string | undefined = await this.ignoreResolutionError(
       ResolutionErrorCode.RecordNotFound,
