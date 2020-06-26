@@ -1190,6 +1190,7 @@ function getParamCoder(coerceFunc: CoerceFunc, param: ParamType): Coder | null {
   return null;
 }
 
+/** @internal */
 export class AbiCoder {
   readonly coerceFunc: CoerceFunc;
   constructor(coerceFunc?: CoerceFunc) {

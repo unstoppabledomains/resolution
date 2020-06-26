@@ -21,15 +21,7 @@ import ConfigurationError, {
   ConfigurationErrorCode,
 } from './errors/configurationError';
 
-/**
- * Class to support connection with Ethereum naming service
- * @param network - network string such as
- * - mainnet
- * - ropsten
- * @param url - main api url such as
- * - https://mainnet.infura.io
- * @param registryAddress - address for a registry contract
- */
+/** @internal */
 export default class Ens extends EthereumNamingService {
   readonly name = NamingServiceName.ENS;
   readonly network: string;
