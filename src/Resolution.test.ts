@@ -33,16 +33,12 @@ beforeEach(() => {
 
 describe('Resolution', () => {
   it('should get a valid resolution instance', async () => {
-    const infura = process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID;
-    if (!infura) {
-      console.warn('infura id is not set');
-    }
-    const resolution = Resolution.infura(infura!);
+    const resolution = Resolution.infura('api-key');
     expect(resolution.ens).toBeDefined();
-    expect(resolution.ens!.url).toBe(`https://mainnet.infura.com/v3/${infura}`);
+    expect(resolution.ens!.url).toBe(`https://mainnet.infura.com/v3/api-key`);
 
     expect(resolution.cns).toBeDefined();
-    expect(resolution.cns!.url).toBe(`https://mainnet.infura.com/v3/${infura}`);
+    expect(resolution.cns!.url).toBe(`https://mainnet.infura.com/v3/api-key`);
   });
 
   it('should resolve a custom record', async () => {
@@ -72,8 +68,13 @@ describe('Resolution', () => {
       getRecord: '',
     });
     await expectResolutionErrorCode(
+<<<<<<< HEAD
       resolution.record('homecakes.crypto', customWrongRecord),
       ResolutionErrorCode.RecordNotFound,
+=======
+      resolution.record("homecakes.crypto", customWrongRecord),
+      ResolutionErrorCode.RecordNotFound
+>>>>>>> master
     );
     expectSpyToBeCalled(eyes);
   });
@@ -200,12 +201,10 @@ describe('Resolution', () => {
   });
 
   it(`domains "brad.crypto" and "Brad.crypto" should return the same results`, async () => {
-    const resolution = new Resolution({
-      blockchain: { cns: { url: secretInfuraLink() } },
-    });
+    const resolution = new Resolution({blockchain: { cns: { url: secretInfuraLink() } }});
     const eyes = mockAsyncMethods(resolution.cns, {
       getResolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
-      getRecord: '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
+      getRecord: "0x45b31e01AA6f42F0549aD482BE81635ED3149abb",
     });
     const capital = await resolution.addressOrThrow('Brad.crypto', 'eth');
     expectSpyToBeCalled(eyes);
@@ -231,13 +230,12 @@ describe('Resolution', () => {
   });
 
   it('should throw recordNotFound for chatId', async () => {
-    const resolution = new Resolution({
-      blockchain: { cns: { url: secretInfuraLink() } },
+    const resolution = new Resolution({blockchain: {cns: {url: secretInfuraLink()}}});
+    const eyes = mockAsyncMethods(resolution.cns, {
+      owner: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
+      getResolver: undefined,
     });
-    expectResolutionErrorCode(
-      resolution.chatId('homecakes2.crypto'),
-      ResolutionErrorCode.RecordNotFound,
-    );
+    await expectResolutionErrorCode(resolution.chatId("homecakes2.crypto"), ResolutionErrorCode.UnspecifiedResolver);
   });
 
   describe('serviceName', () => {

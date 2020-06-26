@@ -135,11 +135,9 @@ export default class Ens extends EthereumNamingService {
    */
   async address(domain: string, currencyTicker: string): Promise<string> {
     const nodeHash = this.namehash(domain);
-    const ownerPromise = this.owner(domain);
-    const resolver = await this.getResolver(nodeHash);
-    if (!resolver || isNullAddress(resolver))
-      await this.throwOwnershipError(domain, ownerPromise);
+    const resolver = await this.resolver(domain);
     const coinType = this.getCoinType(currencyTicker.toUpperCase());
+
     var addr = await this.fetchAddressOrThrow(resolver, nodeHash, coinType);
     if (!addr)
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
@@ -196,12 +194,7 @@ export default class Ens extends EthereumNamingService {
    */
   async ipfsHash(domain: string): Promise<string> {
     const hash = await this.getContentHash(domain);
-    if (!hash)
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-        recordName: 'IPFS hash',
-        domain: domain,
-      });
-    return hash;
+    return this.ensureRecordPresence(domain, 'IPFS hash', hash)
   }
 
   /**
@@ -253,25 +246,15 @@ export default class Ens extends EthereumNamingService {
   private async getTextRecord(resolver: Contract, domain, key) {
     const nodeHash = this.namehash(domain);
     const record = await this.callMethod(resolver, 'text', [nodeHash, key]);
-    if (!record)
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-        recordName: key,
-        domain: domain,
-      });
-    return record;
+    return this.ensureRecordPresence(domain, key, record);
   }
 
   private async getResolverContract(domain: string): Promise<Contract> {
-    const nodeHash = this.namehash(domain);
-    const ownerPromise = this.owner(domain);
-    const resolverAddress = await this.getResolver(nodeHash);
-    if (!resolverAddress || isNullAddress(resolverAddress))
-      await this.throwOwnershipError(domain, ownerPromise);
-    const resolverContract = this.buildContract(
+    const resolverAddress = await this.resolver(domain);
+    return this.buildContract(
       resolverInterface(resolverAddress),
       resolverAddress,
     );
-    return resolverContract;
   }
 
   /**

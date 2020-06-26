@@ -77,6 +77,16 @@ export default abstract class NamingService extends BaseConnection {
   protected isResolutionError(error: any, code?: ResolutionErrorCode): boolean {
     return error instanceof ResolutionError && (!code || error.code === code);
   }
+
+  protected ensureRecordPresence(domain: string, key: string, value: string | undefined | null): string {
+    if (value) {
+      return value;
+    }
+    throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+      recordName: key,
+      domain: domain,
+    });
+  }
 }
 
 export abstract class EthereumNamingService extends NamingService {
@@ -113,8 +123,13 @@ export abstract class EthereumNamingService extends NamingService {
     const nodeHash = this.namehash(domain);
     const ownerPromise = this.owner(domain);
     const resolverAddress = await this.getResolver(nodeHash);
-    if (!resolverAddress || isNullAddress(resolverAddress))
+    if (!resolverAddress || isNullAddress(resolverAddress)) {
       await this.throwOwnershipError(domain, ownerPromise);
+    } else {
+      // We don't care about this promise anymore
+      // Ensure it doesn't generate a warning if it rejects
+      ownerPromise.catch(() => {})
+    }
     return resolverAddress;
   }
 

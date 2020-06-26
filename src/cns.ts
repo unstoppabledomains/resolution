@@ -101,6 +101,8 @@ export default class Cns extends EthereumNamingService {
     const resolver = await this.getResolver(tokenId);
     if (!resolver || isNullAddress(resolver)) {
       await this.throwOwnershipError(domain, ownerPromise);
+    } else {
+      ownerPromise.catch(() => {})
     }
     const addr: string | undefined = await this.ignoreResolutionError(
       ResolutionErrorCode.RecordNotFound,
@@ -211,19 +213,13 @@ export default class Cns extends EthereumNamingService {
   /** @internal */
   async record(domain: string, key: string): Promise<string> {
     const tokenId = this.namehash(domain);
-    const resolver: string = await this.getResolver(tokenId);
+    const resolver = await this.resolver(domain);
     const resolverContract = this.buildContract(resolverInterface, resolver);
-    const record: string = await this.getRecord(resolverContract, 'get', [
+    const record = await this.getRecord(resolverContract, 'get', [
       key,
       tokenId,
     ]);
-    // Wrong Record checks
-    if (!record || isNullAddress(record))
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-        recordName: key,
-        domain: domain,
-      });
-    return record;
+    return this.ensureRecordPresence(domain, key, record);
   }
 
   /** This is done to make testwriting easy */
