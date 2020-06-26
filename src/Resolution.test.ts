@@ -23,16 +23,12 @@ beforeEach(() => {
 
 describe('Resolution', () => {
   it('should get a valid resolution instance', async () => {
-    const infura = process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID;
-    if (!infura) {
-      console.warn('infura id is not set');
-    }
-    const resolution = Resolution.infura(infura!);
+    const resolution = Resolution.infura('api-key');
     expect(resolution.ens).toBeDefined();
-    expect(resolution.ens!.url).toBe(`https://mainnet.infura.com/v3/${infura}`);
+    expect(resolution.ens!.url).toBe(`https://mainnet.infura.com/v3/api-key`);
 
     expect(resolution.cns).toBeDefined();
-    expect(resolution.cns!.url).toBe(`https://mainnet.infura.com/v3/${infura}`);
+    expect(resolution.cns!.url).toBe(`https://mainnet.infura.com/v3/api-key`);
   });
 
   it('should resolve a custom record', async () => {
@@ -55,7 +51,7 @@ describe('Resolution', () => {
       getRecord: ''
     });
     await expectResolutionErrorCode(
-      resolution.record("homecakes.crypto", customWrongRecord), 
+      resolution.record("homecakes.crypto", customWrongRecord),
       ResolutionErrorCode.RecordNotFound
     );
     expectSpyToBeCalled(eyes);
