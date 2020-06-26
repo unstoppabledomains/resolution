@@ -68,13 +68,8 @@ describe('Resolution', () => {
       getRecord: '',
     });
     await expectResolutionErrorCode(
-<<<<<<< HEAD
       resolution.record('homecakes.crypto', customWrongRecord),
       ResolutionErrorCode.RecordNotFound,
-=======
-      resolution.record("homecakes.crypto", customWrongRecord),
-      ResolutionErrorCode.RecordNotFound
->>>>>>> master
     );
     expectSpyToBeCalled(eyes);
   });
