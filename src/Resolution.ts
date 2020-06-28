@@ -171,6 +171,25 @@ export default class Resolution {
   }
 
   /**
+   * Creates instance of resolution from ethers provider
+   * @param provider - Ethers provider
+   */
+  static fromEthersProvider(provider) {
+    if (provider.call === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
+    const providerWrapper: Provider = {
+      request: (request: RequestArguments) => new Promise(async (resolve, reject) => {
+         try {
+           const result = await provider.call(request.params![0]);
+           resolve({result});
+         } catch(error) {
+           reject({error})
+         }
+      })
+    }
+    return this.provider(providerWrapper);
+  }
+
+  /**
    * Resolves the given domain
    * @async
    * @param domain - domain name to be resolved

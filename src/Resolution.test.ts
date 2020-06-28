@@ -5,7 +5,7 @@ import {
   NamingServiceName,
   RequestArguments,
 } from './types';
-import { JsonRpcProvider } from '@ethersproject/providers';
+import { JsonRpcProvider, getDefaultProvider } from '@ethersproject/providers';
 const Web3WsProvider = require('web3-providers-ws');
 const Web3HttpProvider = require('web3-providers-http');
 
@@ -411,5 +411,20 @@ describe('Resolution', () => {
       expect(provider.send).toBeCalledTimes(3);
       expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
     });
+
+    it('should work with ethersProvider', async () => {
+      const provider = getDefaultProvider("mainnet");
+
+      provider.call = jest.fn()
+      .mockImplementationOnce((transaction) => '0x0000000000000000000000008aad44321a86b170879d7a244c1e8d360c99dda8')
+      .mockImplementationOnce((transaction) => '0x000000000000000000000000b66dce2da6afaaa98f2013446dbcb0f4b0ab2842')
+      .mockImplementationOnce((transaction) => '0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002a30783861614434343332314138366231373038373964374132343463316538643336306339394464413800000000000000000000000000000000000000000000'
+      );
+
+      const resolution = Resolution.fromEthersProvider(provider);
+      const ethAddress = await resolution.addressOrThrow('brad.crypto', 'eth');
+      expect(provider.call).toBeCalledTimes(3);
+      expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
+    })
   });
 });
