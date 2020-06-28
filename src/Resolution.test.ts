@@ -16,7 +16,6 @@ import {
   secretInfuraLink,
   InfuraProtocol,
 } from './utils/testHelpers';
-import nodeFetch from 'node-fetch';
 
 try {
   const dotenv = require('dotenv');
@@ -195,7 +194,7 @@ describe('Resolution', () => {
   });
 
   it(`domains "brad.crypto" and "Brad.crypto" should return the same results`, async () => {
-    const resolution = new Resolution({blockchain: { cns: { url: secretInfuraLink() } }});
+    const resolution = new Resolution({ blockchain: { cns: { url: secretInfuraLink() } } });
     const eyes = mockAsyncMethods(resolution.cns, {
       getResolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
       getRecord: "0x45b31e01AA6f42F0549aD482BE81635ED3149abb",
@@ -224,7 +223,7 @@ describe('Resolution', () => {
   });
 
   it('should throw recordNotFound for chatId', async () => {
-    const resolution = new Resolution({blockchain: {cns: {url: secretInfuraLink()}}});
+    const resolution = new Resolution({ blockchain: { cns: { url: secretInfuraLink() } } });
     const eyes = mockAsyncMethods(resolution.cns, {
       owner: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
       getResolver: undefined,
@@ -332,30 +331,66 @@ describe('Resolution', () => {
     });
   });
 
-  describe.only('Providers', () => {
+  describe('Providers', () => {
     it('should work with web3HttpProvider', async () => {
       const provider = new Web3HttpProvider(secretInfuraLink());
-      const resolution = Resolution.fromWeb3Version1Provider(provider);
+      // mock the send function with different implementations (each should call callback right away with different answers)
+      provider.send = jest.fn().mockImplementationOnce((payload, callback) => {
+        callback(undefined, {
+          jsonrpc: '2.0',
+          id: 1,
+          result: '0x0000000000000000000000008aad44321a86b170879d7a244c1e8d360c99dda8'
+        });
+      }).mockImplementationOnce((payload, callback) => {
+        callback(undefined, {
+          jsonrpc: '2.0',
+          id: 1,
+          result: '0x000000000000000000000000b66dce2da6afaaa98f2013446dbcb0f4b0ab2842'
+        });
+      }).mockImplementationOnce((payload, callback) => {
+        callback(undefined, {
+          jsonrpc: '2.0',
+          id: 1,
+          result: '0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002a30783861614434343332314138366231373038373964374132343463316538643336306339394464413800000000000000000000000000000000000000000000'
+        });
+      })
 
-      // const eyes = mockAsyncMethods(resolution.cns, {
-      //   getResolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
-      //   getRecord: '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8'
-      // });
+      const resolution = Resolution.fromWeb3Version1Provider(provider);
       const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
-      // expectSpyToBeCalled(eyes);
+
+      //expect each mock to be called at least once.
+      expect(provider.send).toBeCalledTimes(3);
       expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
     });
 
     it('should work with webSocketProvider', async () => {
       const provider = new Web3WsProvider(secretInfuraLink(InfuraProtocol.wss));
+      provider.send = jest.fn().mockImplementationOnce((payload, callback) => {
+        callback(undefined, {
+          jsonrpc: '2.0',
+          id: 1,
+          result: '0x0000000000000000000000008aad44321a86b170879d7a244c1e8d360c99dda8'
+        });
+      }).mockImplementationOnce((payload, callback) => {
+        callback(undefined, {
+          jsonrpc: '2.0',
+          id: 1,
+          result: '0x000000000000000000000000b66dce2da6afaaa98f2013446dbcb0f4b0ab2842'
+        });
+      }).mockImplementationOnce((payload, callback) => {
+        callback(undefined, {
+          jsonrpc: '2.0',
+          id: 1,
+          result: '0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002a30783861614434343332314138366231373038373964374132343463316538643336306339394464413800000000000000000000000000000000000000000000'
+        });
+      })
+
       const resolution = Resolution.fromWeb3Version1Provider(provider);
-      // const eyes = mockAsyncMethods(resolution.cns, {
-      //   getResolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
-      //   getRecord: '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8'
-      // });
       const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
+
       provider.disconnect(1000, 'end of test');
-      // expectSpyToBeCalled(eyes);
+      //expect each mock to be called at least once
+      expect(provider.send).toBeCalledTimes(3);
       expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
     });
 
@@ -363,10 +398,17 @@ describe('Resolution', () => {
       const provider = new JsonRpcProvider(
         secretInfuraLink(InfuraProtocol.http),
         'mainnet',
-      );
-      const resolution = Resolution.jsonRPCprovider(provider);
+      ) as any;
 
+      provider.send = jest.fn()
+        .mockImplementationOnce((method, params) => '0x0000000000000000000000008aad44321a86b170879d7a244c1e8d360c99dda8')
+        .mockImplementationOnce((method, params) => '0x000000000000000000000000b66dce2da6afaaa98f2013446dbcb0f4b0ab2842')
+        .mockImplementationOnce((method, params) => '0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002a30783861614434343332314138366231373038373964374132343463316538643336306339394464413800000000000000000000000000000000000000000000'
+        );
+
+      const resolution = Resolution.jsonRPCprovider(provider);
       const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
+      expect(provider.send).toBeCalledTimes(3);
       expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
     });
   });

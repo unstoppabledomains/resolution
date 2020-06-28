@@ -105,8 +105,11 @@ export default class Contract extends BaseConnection {
         method: 'eth_call',
         params
       };
-      return await this.provider
+      const result = await this.provider
       .request(request);
+      const util = require('util')
+      // console.log(util.inspect({providerReturns: result, calledWith: {method: 'eth_call', params}},{depth: null}));
+      return result;
     }
     const response = await this.fetch(this.url, {
       method: 'POST',
