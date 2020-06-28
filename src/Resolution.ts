@@ -10,12 +10,11 @@ import {
   API,
   nodeHash,
   NamingServiceName,
-  AbstractProvider,
+  Web3Version0Provider,
+  Web3Version1Provider,
   JsonRpcResponse,
   Provider,
   RequestArguments,
-  EIP1193Provider,
-  OldWeb3Provider,
 } from './types';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import NamingService from './namingService';
@@ -28,7 +27,7 @@ import ConfigurationError, {
  * Blockchain domain Resolution library - Resolution.
  * @example
  * ```
- * let Resolution = new Resolution({blockchain: {ens: {url: 'https://mainnet.infura.io', network: 'mainnet'}}});
+ * let Resolution = new Resolution({blockchain: {ens: {url: 'https://mainnet.infura.io/v3/<projectId>', network: 'mainnet'}}});
  * let domain = brad.zil
  * let Resolution = Resolution.address(domain);
  * ```
@@ -102,7 +101,7 @@ export default class Resolution {
 
   /**
    * Creates a resolution instance with configured provider
-   * @param provider - any provider with sendAsync function impelmented
+   * @param provider - any provider compatable with EIP-1193 (https://eips.ethereum.org/EIPS/eip-1193)
    */
   static provider(provider: Provider): Resolution {
     return new this({ blockchain: { provider: provider } });
@@ -132,7 +131,7 @@ export default class Resolution {
    * @param provider - an 0.x version provider from web3 ( must implement sendAsync(payload, callback) )
    * see https://github.com/ethereum/web3.js/blob/0.20.7/lib/web3/httpprovider.js#L116
    */
-  static fromWeb3Version0Provider(provider: OldWeb3Provider): Resolution {
+  static fromWeb3Version0Provider(provider: Web3Version0Provider): Resolution {
     if (provider.sendAsync === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
     const providerWrapper: Provider = {
       request: (request: RequestArguments) =>
@@ -154,7 +153,7 @@ export default class Resolution {
    * @param provider - an 1.x version provider from web3 ( must implement send(payload, callback) )
    * see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-core-helpers/types/index.d.ts#L165
    */
-  static fromWeb3Version1Provider(provider: AbstractProvider) {
+  static fromWeb3Version1Provider(provider: Web3Version1Provider) {
     if (provider.send === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
     const providerWrapper: Provider = {
       request: (request: RequestArguments) => 
@@ -169,17 +168,6 @@ export default class Resolution {
         }),
     };
     return this.provider(providerWrapper);
-  }
-
-  /**
-   * This should create an instance of resolution with any EIP-1193 compatable provider.
-   * See this: https://eips.ethereum.org/EIPS/eip-1193
-   * @param provider
-   */
-  static fromEIP1193Provider(
-    provider: EIP1193Provider,
-  ) {
-    this.provider(provider);
   }
 
   /**

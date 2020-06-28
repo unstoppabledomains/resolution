@@ -100,12 +100,11 @@ export default class Contract extends BaseConnection {
       },
       'latest',
     ] as const;
-    const request: RequestArguments = {
-      method: 'eth_call',
-      params
-    };
-
     if (this.provider) {
+      const request: RequestArguments = {
+        method: 'eth_call',
+        params
+      };
       return await this.provider
       .request(request);
     }

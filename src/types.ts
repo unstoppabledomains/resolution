@@ -137,11 +137,11 @@ type ProviderMethod = (
   callback: (error: Error | null, result?: JsonRpcResponse) => void,
 ) => void;
 
-export interface OldWeb3Provider {
+export interface Web3Version0Provider {
   sendAsync: ProviderMethod;
 }
 
-export interface AbstractProvider {
+export interface Web3Version1Provider {
   send: ProviderMethod;
 }
 
