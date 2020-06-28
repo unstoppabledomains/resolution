@@ -111,6 +111,7 @@ export type Blockchain =
 export type API = {
   url: string;
 };
+
 type ProviderParams = readonly [
   (
     | {
@@ -123,11 +124,11 @@ type ProviderParams = readonly [
 
 export interface RequestArguments {
   method: string;
-  params?: unknown[] | object;
+  params?: ProviderParams;
 }
 
 export interface Provider {
-  call: (method: string, params: ProviderParams) => Promise<any>;
+  request: (request: RequestArguments) => Promise<any>;
 }
 
 /**
@@ -138,7 +139,7 @@ export type Web3Provider = Provider;
 export interface JsonRpcPayload {
   jsonrpc: string;
   method: string;
-  params: ProviderParams;
+  params?: ProviderParams;
   id?: string | number;
 }
 
@@ -154,7 +155,7 @@ type ProviderMethod = (
   callback: (error: Error | null, result?: JsonRpcResponse) => void,
 ) => void;
 
-export interface OldAbstractProvider {
+export interface OldWeb3Provider {
   sendAsync: ProviderMethod;
 }
 
@@ -162,7 +163,7 @@ export interface AbstractProvider {
   send: ProviderMethod;
 }
 
-export interface ExternalProvider {
+export interface EIP1193Provider {
   request: (request: RequestArguments) => Promise<any>;
 }
 

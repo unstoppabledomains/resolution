@@ -3,7 +3,6 @@ import Resolution, { ResolutionErrorCode } from './index';
 import {
   UnclaimedDomainResponse,
   NamingServiceName,
-  ExternalProvider,
   RequestArguments,
 } from './types';
 import { JsonRpcProvider } from '@ethersproject/providers';
@@ -340,7 +339,7 @@ describe('Resolution', () => {
     });
   });
 
-  describe('Providers', () => {
+  describe.only('Providers', () => {
     it('should work with web3HttpProvider', async () => {
       const provider = new Web3HttpProvider(secretInfuraLink());
       const resolution = Resolution.fromWeb3Version1Provider(provider);

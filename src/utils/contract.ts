@@ -2,7 +2,7 @@ import BaseConnection from '../baseConnection';
 import { defaultAbiCoder as AbiCoder } from './abicoder';
 var keccak256 = require('js-sha3').keccak_256;
 import ResolutionError, { ResolutionErrorCode } from '../errors/resolutionError';
-import { isNullAddress, NamingServiceName, Provider } from '../types';
+import { isNullAddress, NamingServiceName, Provider, RequestArguments } from '../types';
 
 type FourBytes = string;
 
@@ -100,9 +100,14 @@ export default class Contract extends BaseConnection {
       },
       'latest',
     ] as const;
+    const request: RequestArguments = {
+      method: 'eth_call',
+      params
+    };
+
     if (this.provider) {
       return await this.provider
-      .call('eth_call', params);
+      .request(request);
     }
     const response = await this.fetch(this.url, {
       method: 'POST',

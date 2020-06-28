@@ -13,9 +13,9 @@ import {
   AbstractProvider,
   JsonRpcResponse,
   Provider,
-  OldAbstractProvider,
   RequestArguments,
-  ExternalProvider,
+  EIP1193Provider,
+  OldWeb3Provider,
 } from './types';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import NamingService from './namingService';
@@ -113,10 +113,11 @@ export default class Resolution {
    * @param provider - any jsonRPCprovider will work as long as it's prototype has send(method, params): Promise<any> method
    */
   static jsonRPCprovider(provider): Resolution {
+    if (provider.send === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
     const providerWrapper: Provider = {
-      call: async (method, params) => {
+      request: async (request: RequestArguments) => {
         try {
-          const result = await provider.send(method, params);
+          const result = await provider.send(request.method, request.params);
           return { result };
         } catch (error) {
           return { error };
@@ -131,12 +132,13 @@ export default class Resolution {
    * @param provider - an 0.x version provider from web3 ( must implement sendAsync(payload, callback) )
    * see https://github.com/ethereum/web3.js/blob/0.20.7/lib/web3/httpprovider.js#L116
    */
-  static fromWeb3Version0Provider(provider: OldAbstractProvider): Resolution {
+  static fromWeb3Version0Provider(provider: OldWeb3Provider): Resolution {
+    if (provider.sendAsync === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
     const providerWrapper: Provider = {
-      call: (method, params) =>
+      request: (request: RequestArguments) =>
         new Promise((resolve, reject) => {
           provider.sendAsync(
-            { jsonrpc: '2.0', method, params, id: 1 },
+            { jsonrpc: '2.0', method: request.method, params: request.params, id: 1 },
             (error: Error | null, result: JsonRpcResponse) => {
               if (error) reject(error);
               resolve(result);
@@ -153,11 +155,12 @@ export default class Resolution {
    * see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-core-helpers/types/index.d.ts#L165
    */
   static fromWeb3Version1Provider(provider: AbstractProvider) {
+    if (provider.send === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
     const providerWrapper: Provider = {
-      call: (method, params) =>
+      request: (request: RequestArguments) => 
         new Promise((resolve, reject) => {
           provider.send(
-            { jsonrpc: '2.0', method, params, id: 1 },
+            { jsonrpc: '2.0', method: request.method, params: request.params, id: 1 },
             (error: Error | null, result: JsonRpcResponse) => {
               if (error) reject(error);
               resolve(result);
@@ -171,50 +174,12 @@ export default class Resolution {
   /**
    * This should create an instance of resolution with any EIP-1193 compatable provider.
    * See this: https://eips.ethereum.org/EIPS/eip-1193
-   * In case if provider doesn't implement request method,
-   * we check for send(payload, callback) method and sendAsync(payload, callback)
    * @param provider
    */
   static fromEIP1193Provider(
-    provider: ExternalProvider | AbstractProvider | OldAbstractProvider,
+    provider: EIP1193Provider,
   ) {
-    const providerWrapper: Provider = {
-      call: (method, params) =>
-        new Promise(async (resolve, reject) => {
-          if (this.isRequestBasedProvider(provider)) {
-            const request: RequestArguments = {
-              method,
-              params,
-            };
-            try {
-              const result = await provider.request(request);
-              resolve({ result });
-            } catch (error) {
-              reject({ error });
-            }
-          } else if (this.isNewProvider(provider)) {
-            provider.send(
-              { jsonrpc: '2.0', method, params, id: 1 },
-              (error: Error | null, result: JsonRpcResponse) => {
-                if (error) reject(error);
-                resolve(result);
-              },
-            );
-          } else if (this.isOldProvider(provider)) {
-            provider.sendAsync(
-              { jsonrpc: '2.0', method, params, id: 1 },
-              (error: Error | null, result: JsonRpcResponse) => {
-                if (error) reject(error);
-                resolve(result);
-              },
-            );
-          } else
-            throw new ConfigurationError(
-              ConfigurationErrorCode.IncorrectProvider,
-            );
-        }),
-    };
-    this.provider(providerWrapper);
+    this.provider(provider);
   }
 
   /**
@@ -487,24 +452,6 @@ export default class Resolution {
 
   private prepareDomain(domain: string): string {
     return domain ? domain.trim().toLowerCase() : '';
-  }
-
-  private static isRequestBasedProvider(
-    provider: AbstractProvider | OldAbstractProvider | ExternalProvider,
-  ): provider is ExternalProvider {
-    return (provider as any).request !== undefined;
-  }
-
-  private static isNewProvider(
-    provider: AbstractProvider | OldAbstractProvider,
-  ): provider is AbstractProvider {
-    return (provider as any).sendAsync !== undefined;
-  }
-
-  private static isOldProvider(
-    provider: AbstractProvider | OldAbstractProvider,
-  ): provider is OldAbstractProvider {
-    return (provider as any).send !== undefined;
   }
 }
 
