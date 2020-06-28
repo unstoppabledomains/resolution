@@ -413,8 +413,8 @@ describe('ZNS', () => {
         );
       });
 
-      it('raises ResoltuionError when domain is not supported', () => {
-        expectResolutionErrorCode(
+      it('raises ResoltuionError when domain is not supported', async () => {
+        await expectResolutionErrorCode(
           () => resolution.zns!.namehash('hello.world'),
           ResolutionErrorCode.UnsupportedDomain,
         );

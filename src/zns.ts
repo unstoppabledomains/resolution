@@ -42,15 +42,7 @@ const UrlMap = {
 
 const UrlNetworkMap = (url: string) => invert(UrlMap)[url];
 
-/**
- * Class to support connection with Zilliqa naming service
- * @param network - network string such as
- * - mainnet
- * - ropsten
- * @param url - main api url such as
- * - https://mainnet.infura.io
- * @param registryAddress - address for a registry contract
- */
+/** @internal */
 export default class Zns extends NamingService {
   readonly name = NamingServiceName.ZNS;
   readonly network: string;
@@ -289,20 +281,7 @@ export default class Zns extends NamingService {
     field: string,
   ): Promise<string> {
     const records = await this.records(domain);
-    return this.getRecordFieldOrThrow(domain, records, field);
-  }
-
-  private getRecordFieldOrThrow(
-    domain: string,
-    records: Dictionary<string>,
-    field: string,
-  ): string {
-    if (!records || !records[field])
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-        domain,
-        recordName: field,
-      });
-    return records[field];
+    return this.ensureRecordPresence(domain, field, records[field]);
   }
 
   private async getRecordsAddresses(

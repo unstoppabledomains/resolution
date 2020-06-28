@@ -15,15 +15,7 @@ import ResolutionError from './errors/resolutionError';
 import { ResolutionErrorCode } from './errors/resolutionError';
 import Contract from './utils/contract';
 
-/**
- * Class to support connection with Crypto naming service
- * @param network - network string such as
- * - mainnet
- * - ropsten
- * @param url - main api url such as
- * - https://mainnet.infura.io
- * @param registryAddress - address for a registry contract
- */
+/** @internal */
 export default class Cns extends EthereumNamingService {
   readonly name = NamingServiceName.CNS;
   readonly network: string;
@@ -101,6 +93,8 @@ export default class Cns extends EthereumNamingService {
     const resolver = await this.getResolver(tokenId);
     if (!resolver || isNullAddress(resolver)) {
       await this.throwOwnershipError(domain, ownerPromise);
+    } else {
+      ownerPromise.catch(() => {})
     }
     const addr: string | undefined = await this.ignoreResolutionError(
       ResolutionErrorCode.RecordNotFound,
@@ -211,19 +205,13 @@ export default class Cns extends EthereumNamingService {
   /** @internal */
   async record(domain: string, key: string): Promise<string> {
     const tokenId = this.namehash(domain);
-    const resolver: string = await this.getResolver(tokenId);
+    const resolver = await this.resolver(domain);
     const resolverContract = this.buildContract(resolverInterface, resolver);
-    const record: string = await this.getRecord(resolverContract, 'get', [
+    const record = await this.getRecord(resolverContract, 'get', [
       key,
       tokenId,
     ]);
-    // Wrong Record checks
-    if (!record || isNullAddress(record))
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-        recordName: key,
-        domain: domain,
-      });
-    return record;
+    return this.ensureRecordPresence(domain, key, record);
   }
 
   /** This is done to make testwriting easy */
