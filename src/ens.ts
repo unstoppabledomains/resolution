@@ -186,22 +186,30 @@ export default class Ens extends EthereumNamingService {
    * @param domain - domain name
    */
   async httpUrl(domain: string): Promise<string> {
-    const resolver = await this.getResolverContract(domain);
-    const httpUrl = await this.getTextRecord(resolver, domain, 'url');
-    return httpUrl;
+    return await this.getTextRecord( domain, 'url');
   }
   /**
    * resolves an email stored on domain
    * @param domain - domain name
    */
   async email(domain: string): Promise<string> {
-    const resolver = await this.getResolverContract(domain);
-    const email = await this.getTextRecord(resolver, domain, 'email');
-    return email;
+    return await this.getTextRecord( domain, 'email');
   }
 
+  /**
+   * resolves a gun db chat id stored on domain
+   * @param domain - domain name
+   */
   async chatId(domain: string): Promise<string> {
-    throw new Error('Method is not implemented');
+    return await this.getTextRecord(domain, 'gundb_username');
+  }
+
+  /**
+   * resolves a gundb public key stored on domain
+   * @param domain - domain name
+   */
+  async chatpk(domain: string): Promise<string> {
+    return await this.getTextRecord(domain, 'gundb_public_key');
   }
 
   /**
@@ -227,8 +235,9 @@ export default class Ens extends EthereumNamingService {
     return contentHash.decode(contentHashEncoded);
   }
 
-  private async getTextRecord(resolver: Contract, domain, key) {
+  private async getTextRecord(domain, key) {
     const nodeHash = this.namehash(domain);
+    const resolver = await this.getResolverContract(domain);
     const record = await this.callMethod(resolver, 'text', [nodeHash, key]);
     return this.ensureRecordPresence(domain, key, record);
   }

@@ -59,6 +59,7 @@ export type ResolutionResponse = {
   };
   gundb?: {
     username?: string;
+    public_key?: string;
   },
   addresses: {
     [key: string]: string;
