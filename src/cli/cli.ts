@@ -72,8 +72,14 @@ import {
     service: () => tryInfo(() => resolution.serviceName(domain), response, 'service'),
     namehash: () => tryInfo(() => resolution.namehash(domain), response, 'namehash'),
     owner: () => tryInfo(async () => await resolution.owner(domain), response, 'owner'),
-    gundb: () => tryInfo(async () => await resolution.chatId(domain), response, 'gundb'),
-    recordKey: () => tryInfo(async () => await resolution.record(domain, options.recordKey), response, options.recordKey)
+    gundb: () => tryInfo(async () => {
+      const result = {};
+      result['id'] = await resolution.chatId(domain);
+      result['public_key'] = await resolution.chatPk(domain);
+      return result;
+    }, response, 'gundb'),
+    recordKey: () => tryInfo(async () => await resolution.record(domain, options.recordKey), response, options.recordKey),
+    gunPk: () => tryInfo(async () => await resolution.chatPk(domain), response, 'gundbPk')
   };
 
   const resolutionProcess: Promise<boolean>[] = [];

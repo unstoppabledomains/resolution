@@ -156,6 +156,18 @@ export default class Resolution {
     return await method.chatId(domain);
   }
 
+  /**
+   * Resolve a gundb public key from the domain record
+   * @param domain - domain name to be resolved
+   * @throws ResolutionError with code RecordNotFound
+   * @returns a promise that resolves in gundb public key
+   */
+  async chatPk(domain: string): Promise<string> {
+    domain = this.prepareDomain(domain);
+    const method = this.getNamingMethodOrThrow(domain);
+    return await method.chatpk(domain);
+  }
+
 
   /**
    * Resolves the IPFS hash configured for domain records on ZNS

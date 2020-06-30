@@ -329,5 +329,35 @@ describe('CNS', () => {
         '0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f',
       );
     });
+
+    it('should resolve with the gundb chatId stored on cns', async () => {
+      const eyes = mockAsyncMethods(resolution.cns, {
+        getResolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
+        getRecord: '0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c',
+      });
+      const chatId = await resolution.chatId('brad.crypto');
+      expectSpyToBeCalled(eyes);
+      expect(chatId).toBe('0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c');
+    });
+
+    it('should resolve with the gundb public key stored on cns', async () => {
+      const eyes = mockAsyncMethods(resolution.cns,{
+        getResolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
+        getRecord: 'pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI'
+      });
+      const publicKey = await resolution.chatPk('brad.crypto');
+      expectSpyToBeCalled(eyes);
+      expect(publicKey).toBe('pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI');
+    });
+
+    it('should error out for gundb chatId and public key stored on cns', async () => {
+      const eyes = mockAsyncMethods(resolution.cns, {
+        getResolver:'0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+        getRecord: undefined
+      });
+      await expectResolutionErrorCode(resolution.cns!.chatpk('homecakes.crypto'), ResolutionErrorCode.RecordNotFound)
+      expectSpyToBeCalled(eyes);
+    });
+
   });
 });
