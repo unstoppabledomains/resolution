@@ -201,7 +201,7 @@ export default class Ens extends EthereumNamingService {
    * @param domain - domain name
    */
   async chatId(domain: string): Promise<string> {
-    return await this.getTextRecord(domain, 'gundb.username.value');
+    return await this.getTextRecord(domain, 'gundb_username');
   }
 
   /**
@@ -209,7 +209,7 @@ export default class Ens extends EthereumNamingService {
    * @param domain - domain name
    */
   async chatpk(domain: string): Promise<string> {
-    return await this.getTextRecord(domain, 'gundb.public_key.value');
+    return await this.getTextRecord(domain, 'gundb_public_key');
   }
 
   /**

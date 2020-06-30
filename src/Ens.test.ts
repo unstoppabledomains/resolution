@@ -596,5 +596,51 @@ describe('ENS', () => {
         ResolutionErrorCode.RecordNotFound,
       );
     });
+
+    it('should resolve gundb id and public key', async () => {
+      const eyes = mockAsyncMethods(resolution.ens, {
+        getResolver: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
+        callMethod: '0x7e1d12f34e038a2bda3d5f6ee0809d72f668c357d9e64fd7f622513f06ea652146ab5fdee35dc4ce77f1c089fd74972691fccd48130306d9eafcc6e1437d1ab21b',
+      })
+      const chatId = await resolution.chatId('crunk.eth').catch((err) => err.code);
+      expectSpyToBeCalled(eyes);
+      expect(chatId).toBe('0x7e1d12f34e038a2bda3d5f6ee0809d72f668c357d9e64fd7f622513f06ea652146ab5fdee35dc4ce77f1c089fd74972691fccd48130306d9eafcc6e1437d1ab21b');            
+    });
+
+    it('should resolve gundb public key', async () => {
+      const eyes = mockAsyncMethods(resolution.ens, {
+        getResolver: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
+        callMethod: 'yxbMDgFrzemQEcDwJYccE_TDbGmRL_iqZ2JhQxYi2s8.nBEAyMfM2ZBtOf2C-GHe3zEn42Q1vrfPAVqNzgGhXvQ',
+      });
+      const publicKey = await  resolution.chatPk('crunk.eth').catch((err) => err.code);
+      expectSpyToBeCalled(eyes);
+      expect(publicKey).toBe('yxbMDgFrzemQEcDwJYccE_TDbGmRL_iqZ2JhQxYi2s8.nBEAyMfM2ZBtOf2C-GHe3zEn42Q1vrfPAVqNzgGhXvQ');
+    });
+
+    it('should return resolution error for not finding the gundb chat id', async () => {
+      const eyes = mockAsyncMethods(resolution.ens, {
+        getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+        callMethod: undefined,
+      });
+      const emailPromise = resolution.chatId('test.eth');
+      expectSpyToBeCalled(eyes);
+      await expectResolutionErrorCode(
+        emailPromise,
+        ResolutionErrorCode.RecordNotFound,
+      );
+    });
+
+    it('should return resolution error for not finding the gundb publicKey', async () => {
+      const eyes = mockAsyncMethods(resolution.ens, {
+        getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+        callMethod: undefined,
+      });
+      const emailPromise = resolution.chatPk('test.eth');
+      expectSpyToBeCalled(eyes);
+      await expectResolutionErrorCode(
+        emailPromise,
+        ResolutionErrorCode.RecordNotFound,
+      );
+    });
   });
 });

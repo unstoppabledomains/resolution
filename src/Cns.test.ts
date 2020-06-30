@@ -350,7 +350,7 @@ describe('CNS', () => {
       expect(publicKey).toBe('pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI');
     });
 
-    it('should error out for gundb chatId and public key stored on cns', async () => {
+    it('should error out for gundb public key stored on cns', async () => {
       const eyes = mockAsyncMethods(resolution.cns, {
         getResolver:'0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
         getRecord: undefined
@@ -359,5 +359,13 @@ describe('CNS', () => {
       expectSpyToBeCalled(eyes);
     });
 
+    it('should error out for gundb chatId stored on cns', async () => {
+      const eyes = mockAsyncMethods(resolution.cns, {
+        getResolver:'0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+        getRecord: undefined
+      });
+      await expectResolutionErrorCode(resolution.cns!.chatId('homecakes.crypto'), ResolutionErrorCode.RecordNotFound)
+      expectSpyToBeCalled(eyes);
+    });
   });
 });
