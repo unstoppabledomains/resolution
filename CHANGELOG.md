@@ -1,5 +1,8 @@
 ## Unreleased
 
+## 1.5.1
+* fixing the version 
+
 ## 1.4.1
 * Resolution#chatPk -> get a gundb public key from domain's record
 * Fix the bug with Resolution#chatId for ens domains
