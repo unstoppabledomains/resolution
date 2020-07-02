@@ -140,7 +140,11 @@ export default class Resolution {
             { jsonrpc: '2.0', method: request.method, params: request.params, id: 1 },
             (error: Error | null, result: JsonRpcResponse) => {
               if (error) reject(error);
-              resolve(result);
+              if (result.error) {
+                reject(new Error(result.error))
+
+              }
+              resolve(result.result);
             },
           );
         }),
@@ -151,12 +155,13 @@ export default class Resolution {
   /**
    * Create a resolution instance from web3 1.x version provider
    * @param provider - an 1.x version provider from web3 ( must implement send(payload, callback) )
-   * see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-core-helpers/types/index.d.ts#L165
+   * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-core-helpers/types/index.d.ts#L165
+   * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-providers-http/src/index.js#L95
    */
   static fromWeb3Version1Provider(provider: Web3Version1Provider) {
     if (provider.send === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
     const providerWrapper: Provider = {
-      request: (request: RequestArguments) => 
+      request: (request: RequestArguments) =>
         new Promise((resolve, reject) => {
           provider.send(
             { jsonrpc: '2.0', method: request.method, params: request.params, id: 1 },
