@@ -173,7 +173,8 @@ export default class Resolution {
   /**
    * Creates instance of resolution from ethers provider
    * @param provider - Ethers provider
-   * @see https://docs.ethers.io/ethers.js/v5-beta/api-providers.html#contract-execution
+   * @see https://github.com/ethers-io/ethers.js/blob/v4-legacy/providers/abstract-provider.d.ts#L91
+   * @see https://github.com/ethers-io/ethers.js/blob/v5.0.4/packages/abstract-provider/src.ts/index.ts#L224
    */
   static fromEthersProvider(provider) {
     if (provider.call === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
