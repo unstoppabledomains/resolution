@@ -435,7 +435,7 @@ describe('Resolution', () => {
         secretInfuraLink(InfuraProtocol.http),
         'mainnet',
       );
-      const resolution = Resolution.jsonRPCprovider(provider);
+      const resolution = Resolution.fromEthersJsonRpcProvider(provider);
       const eye = jest.spyOn(provider, "send")
         .mockImplementation((method, params) => {
           if (method !== "eth_call") throw new Error(`got unexpected method ${method}`);

@@ -103,7 +103,7 @@ export default class Resolution {
    * Creates a resolution instance with configured provider
    * @param provider - any provider compatable with EIP-1193 (https://eips.ethereum.org/EIPS/eip-1193)
    */
-  static provider(provider: Provider): Resolution {
+  static fromProvider(provider: Provider): Resolution {
     return new this({ blockchain: { provider: provider } });
   }
 
@@ -112,14 +112,14 @@ export default class Resolution {
    * @param provider - any jsonRPCprovider will work as long as it's prototype has send(method, params): Promise<any> method
    * @see https://docs.ethers.io/ethers.js/v5-beta/api-providers.html#jsonrpcprovider-inherits-from-provider
    */
-  static jsonRPCprovider(provider): Resolution {
+  static fromEthersJsonRpcProvider(provider): Resolution {
     if (provider.send === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
     const providerWrapper: Provider = {
       request: async (request: RequestArguments) => { 
         return await provider.send(request.method, request.params)
       }
     };
-    return this.provider(providerWrapper);
+    return this.fromProvider(providerWrapper);
   }
 
   /**
@@ -142,7 +142,7 @@ export default class Resolution {
           );
         }),
     };
-    return this.provider(providerWrapper);
+    return this.fromProvider(providerWrapper);
   }
 
   /**
@@ -166,7 +166,7 @@ export default class Resolution {
           );
         }),
     };
-    return this.provider(providerWrapper);
+    return this.fromProvider(providerWrapper);
   }
 
   /**
@@ -179,7 +179,7 @@ export default class Resolution {
     const providerWrapper: Provider = {
       request: async (request: RequestArguments) => await provider.call(request.params![0])
     }
-    return this.provider(providerWrapper);
+    return this.fromProvider(providerWrapper);
   }
 
   /**
