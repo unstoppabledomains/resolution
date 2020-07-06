@@ -99,6 +99,18 @@ export default class Udapi extends NamingService {
   }
 
   /**
+   * Returns the gundb chat public key of the domain
+   * @param domain - domain name
+   * @throws ResolutionError with code RecordNotFound
+   * @returns a gundb public key configured for a domain
+   */
+  async chatpk(domain: string): Promise<string> {
+    const resolution = await this.resolve(domain);
+    const pk = resolution?.gundb?.public_key;
+    return this.ensureRecordPresence(domain, 'Gundb publick key', pk);
+  }
+
+  /**
    * Resolves ipfshash from domain
    * @param domain - domain name
    * @throws ResolutionError.RecordNotFound if not found
