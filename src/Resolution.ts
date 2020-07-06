@@ -101,7 +101,7 @@ export default class Resolution {
 
   /**
    * Creates a resolution instance with configured provider
-   * @param provider - any provider compatable with EIP-1193 (https://eips.ethereum.org/EIPS/eip-1193)
+   * @param provider - any provider compatible with EIP-1193 (https://eips.ethereum.org/EIPS/eip-1193)
    */
   static fromProvider(provider: Provider): Resolution {
     return new this({ blockchain: { provider: provider } });
