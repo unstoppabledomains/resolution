@@ -94,7 +94,7 @@ export type API = {
   url: string;
 };
 
-type ProviderParams = readonly [
+export type ProviderParams = readonly [
   (
     | {
         [record: string]: string;

@@ -110,11 +110,14 @@ export default class Resolution {
   /**
    * Creates a resolution instance from configured jsonRPCProvider
    * @param provider - any jsonRPCprovider will work as long as it's prototype has send(method, params): Promise<any> method
+   * @see https://docs.ethers.io/ethers.js/v5-beta/api-providers.html#jsonrpcprovider-inherits-from-provider
    */
   static jsonRPCprovider(provider): Resolution {
     if (provider.send === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
     const providerWrapper: Provider = {
-      request: async (request: RequestArguments) => await provider.send(request.method, request.params)
+      request: async (request: RequestArguments) => { 
+        return await provider.send(request.method, request.params)
+      }
     };
     return this.provider(providerWrapper);
   }
@@ -133,9 +136,7 @@ export default class Resolution {
             { jsonrpc: '2.0', method: request.method, params: request.params, id: 1 },
             (error: Error | null, result: JsonRpcResponse) => {
               if (error) reject(error);
-              if (result.error) {
-                reject(new Error(result.error))
-              }
+              if (result.error) reject(new Error(result.error))
               resolve(result.result);
             },
           );
@@ -171,6 +172,7 @@ export default class Resolution {
   /**
    * Creates instance of resolution from ethers provider
    * @param provider - Ethers provider
+   * @see https://docs.ethers.io/ethers.js/v5-beta/api-providers.html#contract-execution
    */
   static fromEthersProvider(provider) {
     if (provider.call === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);

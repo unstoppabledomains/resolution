@@ -50,7 +50,7 @@ export default class Contract extends BaseConnection {
         throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
           method: this.name,
         });
-      }
+      } else throw error;
     });
     if (isNullAddress(response))
       throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {

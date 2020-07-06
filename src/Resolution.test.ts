@@ -4,6 +4,8 @@ import {
   UnclaimedDomainResponse,
   NamingServiceName,
   RequestArguments,
+  ProviderParams,
+  JsonRpcPayload
 } from './types';
 import { JsonRpcProvider, getDefaultProvider } from '@ethersproject/providers';
 const Web3WsProvider = require('web3-providers-ws');
@@ -335,95 +337,155 @@ describe('Resolution', () => {
     it('should work with web3HttpProvider', async () => {
       const provider = new Web3HttpProvider(secretInfuraLink());
       // mock the send function with different implementations (each should call callback right away with different answers)
-      provider.send = jest.fn().mockImplementationOnce((payload, callback) => {
-        callback(undefined, {
-          jsonrpc: '2.0',
-          id: 1,
-          result: '0x0000000000000000000000008aad44321a86b170879d7a244c1e8d360c99dda8'
+      const eye = jest.spyOn(provider, "send")
+        .mockImplementation((payload: JsonRpcPayload, callback: any) => {
+          if (
+            payload.params![0]['data'] === '0xb3f9e4cb756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9' &&
+            payload.params![0]['to'] === '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe'
+          ) {
+            callback(undefined, {
+              jsonrpc: '2.0',
+              id: 1,
+              result: '0x000000000000000000000000b66dce2da6afaaa98f2013446dbcb0f4b0ab2842'
+            });
+            return;
+          }
+          else if (
+            payload.params![0]['data'] === '0x6352211e756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9' &&
+            payload.params![0]['to'] === '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe'
+          ) {
+            callback(undefined, {
+              jsonrpc: '2.0',
+              id: 1,
+              result: '0x0000000000000000000000008aad44321a86b170879d7a244c1e8d360c99dda8'
+            });
+            return;
+          }
+          else if (
+            payload.params![0]['data'] === '0x1be5e7ed0000000000000000000000000000000000000000000000000000000000000040756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9000000000000000000000000000000000000000000000000000000000000001263727970746f2e4554482e616464726573730000000000000000000000000000' &&
+            payload.params![0]['to'] === '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842'
+          ) {
+            callback(undefined, {
+              jsonrpc: '2.0',
+              id: 1,
+              result: '0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002a30783861614434343332314138366231373038373964374132343463316538643336306339394464413800000000000000000000000000000000000000000000'
+            });
+            return;
+          }
+          throw new Error(`got unexpected params ${JSON.stringify(payload)}`);
         });
-      }).mockImplementationOnce((payload, callback) => {
-        callback(undefined, {
-          jsonrpc: '2.0',
-          id: 1,
-          result: '0x000000000000000000000000b66dce2da6afaaa98f2013446dbcb0f4b0ab2842'
-        });
-      }).mockImplementationOnce((payload, callback) => {
-        callback(undefined, {
-          jsonrpc: '2.0',
-          id: 1,
-          result: '0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002a30783861614434343332314138366231373038373964374132343463316538643336306339394464413800000000000000000000000000000000000000000000'
-        });
-      })
-
       const resolution = Resolution.fromWeb3Version1Provider(provider);
       const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
 
       //expect each mock to be called at least once.
-      expect(provider.send).toBeCalledTimes(3);
+      expectSpyToBeCalled([eye]);
       expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
     });
 
     it('should work with webSocketProvider', async () => {
       const provider = new Web3WsProvider(secretInfuraLink(InfuraProtocol.wss));
-      provider.send = jest.fn().mockImplementationOnce((payload, callback) => {
-        callback(undefined, {
-          jsonrpc: '2.0',
-          id: 1,
-          result: '0x0000000000000000000000008aad44321a86b170879d7a244c1e8d360c99dda8'
+      const eye = jest.spyOn(provider, "send")
+        .mockImplementation((payload: JsonRpcPayload, callback: any) => {
+          if (
+            payload.params![0]['data'] === '0xb3f9e4cb756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9' &&
+            payload.params![0]['to'] === '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe'
+          ) {
+            callback(undefined, {
+              jsonrpc: '2.0',
+              id: 1,
+              result: '0x000000000000000000000000b66dce2da6afaaa98f2013446dbcb0f4b0ab2842'
+            });
+            return;
+          }
+          else if (
+            payload.params![0]['data'] === '0x6352211e756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9' &&
+            payload.params![0]['to'] === '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe'
+          ) {
+            callback(undefined, {
+              jsonrpc: '2.0',
+              id: 1,
+              result: '0x0000000000000000000000008aad44321a86b170879d7a244c1e8d360c99dda8'
+            });
+            return;
+          }
+          else if (
+            payload.params![0]['data'] === '0x1be5e7ed0000000000000000000000000000000000000000000000000000000000000040756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9000000000000000000000000000000000000000000000000000000000000001263727970746f2e4554482e616464726573730000000000000000000000000000' &&
+            payload.params![0]['to'] === '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842'
+          ) {
+            callback(undefined, {
+              jsonrpc: '2.0',
+              id: 1,
+              result: '0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002a30783861614434343332314138366231373038373964374132343463316538643336306339394464413800000000000000000000000000000000000000000000'
+            });
+            return;
+          }
+          throw new Error(`got unexpected params ${JSON.stringify(payload)}`);
         });
-      }).mockImplementationOnce((payload, callback) => {
-        callback(undefined, {
-          jsonrpc: '2.0',
-          id: 1,
-          result: '0x000000000000000000000000b66dce2da6afaaa98f2013446dbcb0f4b0ab2842'
-        });
-      }).mockImplementationOnce((payload, callback) => {
-        callback(undefined, {
-          jsonrpc: '2.0',
-          id: 1,
-          result: '0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002a30783861614434343332314138366231373038373964374132343463316538643336306339394464413800000000000000000000000000000000000000000000'
-        });
-      })
 
       const resolution = Resolution.fromWeb3Version1Provider(provider);
       const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
-
       provider.disconnect(1000, 'end of test');
-      //expect each mock to be called at least once
-      expect(provider.send).toBeCalledTimes(3);
+      expectSpyToBeCalled([eye]);
       expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
     });
 
+    // should we try to use https://github.com/timkindberg/jest-when to make it look more elegant?
     it('should work for jsonrpc provider', async () => {
       const provider = new JsonRpcProvider(
         secretInfuraLink(InfuraProtocol.http),
         'mainnet',
-      ) as any;
-
-      provider.send = jest.fn()
-        .mockImplementationOnce((method, params) => '0x0000000000000000000000008aad44321a86b170879d7a244c1e8d360c99dda8')
-        .mockImplementationOnce((method, params) => '0x000000000000000000000000b66dce2da6afaaa98f2013446dbcb0f4b0ab2842')
-        .mockImplementationOnce((method, params) => '0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002a30783861614434343332314138366231373038373964374132343463316538643336306339394464413800000000000000000000000000000000000000000000'
-        );
-
+      );
       const resolution = Resolution.jsonRPCprovider(provider);
+      const eye = jest.spyOn(provider, "send")
+        .mockImplementation((method, params) => {
+          if (method !== "eth_call") throw new Error(`got unexpected method ${method}`);
+          if (
+            params[0]['data'] === '0xb3f9e4cb756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9' &&
+            params[0]['to'] === '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe'
+          )
+            return Promise.resolve('0x000000000000000000000000b66dce2da6afaaa98f2013446dbcb0f4b0ab2842');
+          else if (
+            params[0]['data'] === '0x6352211e756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9' &&
+            params[0]['to'] === '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe'
+          )
+            return Promise.resolve('0x0000000000000000000000008aad44321a86b170879d7a244c1e8d360c99dda8');
+          else if (
+            params[0]['data'] === '0x1be5e7ed0000000000000000000000000000000000000000000000000000000000000040756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9000000000000000000000000000000000000000000000000000000000000001263727970746f2e4554482e616464726573730000000000000000000000000000' &&
+            params[0]['to'] === '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842'
+          )
+            return Promise.resolve('0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002a30783861614434343332314138366231373038373964374132343463316538643336306339394464413800000000000000000000000000000000000000000000');
+          throw new Error(`got unexpected params ${JSON.stringify(params)}`);
+        });
       const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
-      expect(provider.send).toBeCalledTimes(3);
+      expectSpyToBeCalled([eye]);
       expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
     });
 
-    it.only('should work with ethersProvider', async () => {
+    it('should work with ethersProvider', async () => {
       const provider = getDefaultProvider("mainnet");
 
-      provider.call = jest.fn()
-      .mockImplementationOnce((transaction) => '0x0000000000000000000000008aad44321a86b170879d7a244c1e8d360c99dda8')
-      .mockImplementationOnce((transaction) => '0x000000000000000000000000b66dce2da6afaaa98f2013446dbcb0f4b0ab2842')
-      .mockImplementationOnce((transaction) => '0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002a30783861614434343332314138366231373038373964374132343463316538643336306339394464413800000000000000000000000000000000000000000000'
-      );
-
+      const eye = jest.spyOn(provider, "call")
+        .mockImplementation((transaction) => {
+          if (
+            transaction['data'] === '0xb3f9e4cb756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9' &&
+            transaction['to'] === '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe'
+          )
+            return Promise.resolve('0x000000000000000000000000b66dce2da6afaaa98f2013446dbcb0f4b0ab2842');
+          else if (
+            transaction['data'] === '0x6352211e756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9' &&
+            transaction['to'] === '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe'
+          )
+            return Promise.resolve('0x0000000000000000000000008aad44321a86b170879d7a244c1e8d360c99dda8');
+          else if (
+            transaction['data'] === '0x1be5e7ed0000000000000000000000000000000000000000000000000000000000000040756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9000000000000000000000000000000000000000000000000000000000000001263727970746f2e4554482e616464726573730000000000000000000000000000' &&
+            transaction['to'] === '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842'
+          )
+            return Promise.resolve('0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002a30783861614434343332314138366231373038373964374132343463316538643336306339394464413800000000000000000000000000000000000000000000');
+          throw new Error(`got unexpected params ${JSON.stringify(transaction)}`);
+        });
       const resolution = Resolution.fromEthersProvider(provider);
       const ethAddress = await resolution.addressOrThrow('brad.crypto', 'eth');
-      expect(provider.call).toBeCalledTimes(3);
+      expectSpyToBeCalled([eye]);
       expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
     })
   });
