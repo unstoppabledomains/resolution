@@ -412,7 +412,7 @@ describe('Resolution', () => {
       expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
     });
 
-    it('should work with ethersProvider', async () => {
+    it.only('should work with ethersProvider', async () => {
       const provider = getDefaultProvider("mainnet");
 
       provider.call = jest.fn()

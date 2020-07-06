@@ -3,6 +3,7 @@ import { defaultAbiCoder as AbiCoder } from './abicoder';
 var keccak256 = require('js-sha3').keccak_256;
 import ResolutionError, { ResolutionErrorCode } from '../errors/resolutionError';
 import { isNullAddress, NamingServiceName, Provider, RequestArguments } from '../types';
+import { FetchError } from 'node-fetch';
 
 type FourBytes = string;
 
@@ -44,20 +45,21 @@ export default class Contract extends BaseConnection {
       param => param.name === method && param.inputs.length === args.length,
     );
     const inputParam = this.encodeInput(methodDescription, args);
-    const response = await this.fetchData(inputParam);
-    if (response.error) {
-      throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
-        method: this.name,
-      });
-    }
-    if (isNullAddress(response.result))
+    const response = await this.fetchData(inputParam).catch((error) => {
+      if (error instanceof FetchError) {
+        throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
+          method: this.name,
+        });
+      }
+    });
+    if (isNullAddress(response))
       throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
         recordName: method,
         domain: args[0],
       });
     const decoded = AbiCoder.decode(
       methodDescription.outputs,
-      response.result,
+      response,
     )[0];
     return decoded;
   }
@@ -120,6 +122,7 @@ export default class Contract extends BaseConnection {
         'Content-Type': 'application/json',
       },
     });
-    return await response.json();
+    const responsejson =  await response.json();
+    return responsejson.result;
   }
 }

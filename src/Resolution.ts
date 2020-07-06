@@ -114,14 +114,7 @@ export default class Resolution {
   static jsonRPCprovider(provider): Resolution {
     if (provider.send === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
     const providerWrapper: Provider = {
-      request: async (request: RequestArguments) => {
-        try {
-          const result = await provider.send(request.method, request.params);
-          return { result };
-        } catch (error) {
-          return { error };
-        }
-      },
+      request: async (request: RequestArguments) => await provider.send(request.method, request.params)
     };
     return this.provider(providerWrapper);
   }
@@ -129,7 +122,7 @@ export default class Resolution {
   /**
    * Create a resolution instance from web3 0.x version provider
    * @param provider - an 0.x version provider from web3 ( must implement sendAsync(payload, callback) )
-   * see https://github.com/ethereum/web3.js/blob/0.20.7/lib/web3/httpprovider.js#L116
+   * @see https://github.com/ethereum/web3.js/blob/0.20.7/lib/web3/httpprovider.js#L116
    */
   static fromWeb3Version0Provider(provider: Web3Version0Provider): Resolution {
     if (provider.sendAsync === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
@@ -142,7 +135,6 @@ export default class Resolution {
               if (error) reject(error);
               if (result.error) {
                 reject(new Error(result.error))
-
               }
               resolve(result.result);
             },
@@ -167,7 +159,8 @@ export default class Resolution {
             { jsonrpc: '2.0', method: request.method, params: request.params, id: 1 },
             (error: Error | null, result: JsonRpcResponse) => {
               if (error) reject(error);
-              resolve(result);
+              if (result.error) reject(new Error(result.error))
+              resolve(result.result);
             },
           );
         }),
@@ -182,14 +175,7 @@ export default class Resolution {
   static fromEthersProvider(provider) {
     if (provider.call === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
     const providerWrapper: Provider = {
-      request: (request: RequestArguments) => new Promise(async (resolve, reject) => {
-         try {
-           const result = await provider.call(request.params![0]);
-           resolve({result});
-         } catch(error) {
-           reject({error})
-         }
-      })
+      request: async (request: RequestArguments) => await provider.call(request.params![0])
     }
     return this.provider(providerWrapper);
   }
