@@ -145,10 +145,6 @@ export interface Web3Version1Provider {
   send: ProviderMethod;
 }
 
-export interface EIP1193Provider {
-  request: (request: RequestArguments) => Promise<any>;
-}
-
 export const DefaultAPI: API = {
   url: UDApiDefaultUrl,
 };
