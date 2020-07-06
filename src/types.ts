@@ -110,8 +110,11 @@ export interface RequestArguments {
   params?: ProviderParams;
 }
 
+/**
+ * @see https://eips.ethereum.org/EIPS/eip-1193
+ */
 export interface Provider {
-  request: (request: RequestArguments) => Promise<any>;
+  request: (request: RequestArguments) => Promise<unknown>;
 }
 
 /**

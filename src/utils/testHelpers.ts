@@ -1,4 +1,5 @@
 import nock from 'nock';
+import _ from 'lodash';
 import { Dictionary } from '../types';
 import { ResolutionError } from '../index';
 import mockData from '../testData/mockData.json';
@@ -86,7 +87,7 @@ export function secretInfuraLink(infuraProtocol: InfuraProtocol = InfuraProtocol
   const secret = process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID;
   const protocolMap = {
     [InfuraProtocol.http]:'https://mainnet.infura.io/v3',
-    [InfuraProtocol.wss]:'wss://mainnet.infura.io/ws/v3' 
+    [InfuraProtocol.wss]:'wss://mainnet.infura.io/ws/v3'
   };
   const url = `${protocolMap[infuraProtocol]}/${secret}`;
   return url;
@@ -95,3 +96,12 @@ export function secretInfuraLink(infuraProtocol: InfuraProtocol = InfuraProtocol
 export enum InfuraProtocol {
   "http", "wss"
 };
+
+export const caseMock = <T, U>(params: T, cases: readonly (readonly [T, U])[]): U => {
+  for (const [variant, result] of cases) {
+    if (_.isEqual(params, variant)) {
+      return result;
+    }
+  }
+  throw new Error(`got unexpected params ${JSON.stringify(params)}`);
+}

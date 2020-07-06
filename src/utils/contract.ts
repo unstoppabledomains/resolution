@@ -51,7 +51,7 @@ export default class Contract extends BaseConnection {
           method: this.name,
         });
       } else throw error;
-    });
+    }) as string | null;
     if (isNullAddress(response))
       throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
         recordName: method,
@@ -94,7 +94,7 @@ export default class Contract extends BaseConnection {
     );
   }
 
-  private async fetchData(data: string): Promise<any> {
+  private async fetchData(data: string): Promise<unknown> {
     const params = [
       {
         data,

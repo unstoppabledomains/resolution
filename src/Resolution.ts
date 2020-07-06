@@ -101,7 +101,8 @@ export default class Resolution {
 
   /**
    * Creates a resolution instance with configured provider
-   * @param provider - any provider compatible with EIP-1193 (https://eips.ethereum.org/EIPS/eip-1193)
+   * @param provider - any provider compatible with EIP-1193
+   * @see https://eips.ethereum.org/EIPS/eip-1193
    */
   static fromProvider(provider: Provider): Resolution {
     return new this({ blockchain: { provider: provider } });
@@ -115,7 +116,7 @@ export default class Resolution {
   static fromEthersJsonRpcProvider(provider): Resolution {
     if (provider.send === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
     const providerWrapper: Provider = {
-      request: async (request: RequestArguments) => { 
+      request: async (request: RequestArguments) => {
         return await provider.send(request.method, request.params)
       }
     };
