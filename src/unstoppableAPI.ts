@@ -180,7 +180,7 @@ export default class Udapi extends NamingService {
   }
 
   /** @internal */
-  protected normalizeSource(source: NamingServiceSource): SourceDefinition {
+  protected normalizeSource(source): SourceDefinition {
     throw new Error('Method not implemented.');
   }
 

@@ -11,6 +11,7 @@ import {
   isNullAddress,
   nodeHash,
   Provider,
+  SourceDefinition,
 } from './types';
 import { EthereumNamingService } from './namingService';
 import { ResolutionError, ResolutionErrorCode } from './index';
@@ -33,7 +34,7 @@ export default class Ens extends EthereumNamingService {
    * @param provider - EthersJS provider, an object that implemented sendAsync(method, params) functionality
    * @throws ConfigurationError - when either network or url is setup incorrectly
    */
-  constructor(source: NamingServiceSource = true, provider?: Provider) {
+  constructor(source: SourceDefinition = {}, provider?: Provider) {
     super(provider);
     source = this.normalizeSource(source);
     this.network = <string>source.network;

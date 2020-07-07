@@ -16,6 +16,8 @@ import {
   Provider,
   RequestArguments,
   ProviderParams,
+  NamingServiceSource,
+  SourceDefinition,
 } from './types';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import NamingService from './namingService';
@@ -55,34 +57,22 @@ export default class Resolution {
   }: { blockchain?: Blockchain | boolean; api?: API } = {}) {
     this.blockchain = !!blockchain;
     if (blockchain) {
-      if (blockchain == true) {
+      if (blockchain === true) {
         blockchain = {};
       }
       const provider = this.normalizeProvider(blockchain);
+      const ens = this.normalizeSource(blockchain.ens);
+      const zns = this.normalizeSource(blockchain.zns);
+      const cns = this.normalizeSource(blockchain.cns);
 
-      if (blockchain.ens === undefined) {
-        blockchain.ens = true;
+      if (ens) {
+        this.ens = new Ens(ens, provider);
       }
-      if (blockchain.zns === undefined) {
-        blockchain.zns = true;
+      if (zns) {
+        this.zns = new Zns(zns);
       }
-      if (blockchain.cns === undefined) {
-        blockchain.cns = true;
-      }
-      if (blockchain.ens) {
-        this.ens = new Ens(
-          blockchain.ens,
-          provider,
-        );
-      }
-      if (blockchain.zns) {
-        this.zns = new Zns(blockchain.zns);
-      }
-      if (blockchain.cns) {
-        this.cns = new Cns(
-          blockchain.cns,
-          provider,
-        );
+      if (cns) {
+        this.cns = new Cns(cns, provider);
       }
     } else {
       this.api = new Udapi(api.url);
@@ -481,6 +471,24 @@ export default class Resolution {
       console.warn('Usage of `web3Provider` option is deprecated. Use `provider` instead');
     }
     return config.provider || config.web3Provider;
+  }
+
+  private normalizeSource(source: NamingServiceSource | undefined): SourceDefinition | undefined {
+    switch (typeof source) {
+      case 'undefined': {
+        return {}
+      }
+      case 'boolean': {
+        return source ? {} : undefined;
+      }
+      case 'string': {
+        return { url: source };
+      }
+      case 'object': {
+        return source;
+      }
+    }
+    throw new Error('Unsupported configuration')
   }
 }
 

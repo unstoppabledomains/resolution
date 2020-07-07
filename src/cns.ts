@@ -32,7 +32,7 @@ export default class Cns extends EthereumNamingService {
    * @param source - if specified as a string will be used as main url, if omited then defaults are used
    * @throws ConfigurationError - when either network or url is setup incorrectly
    */
-  constructor(source: NamingServiceSource = true, provider?: Provider) {
+  constructor(source: NamingServiceSource = {}, provider?: Provider) {
     super(provider);
     source = this.normalizeSource(source);
     this.network = source.network as string;

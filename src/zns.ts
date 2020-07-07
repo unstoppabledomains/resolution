@@ -54,7 +54,7 @@ export default class Zns extends NamingService {
    * @param source - if specified as a string will be used as main url, if omitted then defaults are used
    * @throws ConfigurationError - when either network or url is setup incorrectly
    */
-  constructor(source: string | boolean | SourceDefinition = true) {
+  constructor(source: SourceDefinition = {}) {
     super();
     source = this.normalizeSource(source);
     this.network = source.network as string;
@@ -249,35 +249,22 @@ export default class Zns extends NamingService {
   }
 
   /** @internal */
-  protected normalizeSource(source: NamingServiceSource): SourceDefinition {
-    switch (typeof source) {
-      case 'boolean': {
-        return { url: DefaultSource, network: 'mainnet' };
-      }
-      case 'string': {
-        return {
-          url: source as string,
-          network: UrlNetworkMap(source),
-        };
-      }
-      case 'object': {
-        source = { ...source };
-        if (typeof source.network == 'number') {
-          source.network = NetworkIdMap[source.network];
-        }
-        if (source.registry) {
-          source.network = source.network ? source.network : 'mainnet';
-          source.url = source.url ? source.url : DefaultSource;
-        }
-        if (source.network && !source.url) {
-          source.url = UrlMap[source.network];
-        }
-        if (source.url && !source.network) {
-          source.network = UrlNetworkMap(source.url);
-        }
-        return source;
-      }
+  protected normalizeSource(source: SourceDefinition | undefined): SourceDefinition {
+    source = source && Object.keys(source).length ? {...source } : {network: 'mainnet'};
+    if (typeof source.network == 'number') {
+      source.network = NetworkIdMap[source.network];
     }
+    if (source.registry) {
+      source.network = source.network ? source.network : 'mainnet';
+      source.url = source.url ? source.url : DefaultSource;
+    }
+    if (source.network && !source.url) {
+      source.url = UrlMap[source.network];
+    }
+    if (source.url && !source.network) {
+      source.network = UrlNetworkMap(source.url);
+    }
+    return source;
   }
 
   private async getRecordOrThrow(

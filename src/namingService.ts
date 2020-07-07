@@ -42,7 +42,7 @@ export default abstract class NamingService extends BaseConnection {
   }
 
   protected abstract normalizeSource(
-    source: NamingServiceSource,
+    source: SourceDefinition | undefined,
   ): SourceDefinition;
 
   protected ensureSupportedDomain(domain: string): void {
@@ -150,44 +150,28 @@ export abstract class EthereumNamingService extends NamingService {
    * @param source
    * @returns
    */
-  protected normalizeSource(source: NamingServiceSource): SourceDefinition {
-    switch (typeof source) {
-      case 'boolean': {
-        return {
-          url: this.UrlMap['mainnet'],
-          network: this.networkFromUrl(this.UrlMap['mainnet']),
-        };
-      }
-      case 'string': {
-        return {
-          url: source as string,
-          network: this.networkFromUrl(source as string),
-        };
-      }
-      case 'object': {
-        source = { ...source };
-        if (typeof source.network == 'number') {
-          source.network = this.NetworkIdMap[source.network];
-        }
-        if (source.registry) {
-          source.network = source.network ? source.network : 'mainnet';
-          source.url = source.url
-            ? source.url
-            : `https://${source.network}.infura.io`;
-        }
-        if (
-          source.network &&
-          !source.url &&
-          this.NetworkNameMap.hasOwnProperty(source.network)
-        ) {
-          source.url = `https://${source.network}.infura.io`;
-        }
-        if (source.url && !source.network) {
-          source.network = this.networkFromUrl(source.url);
-        }
-        return source;
-      }
+  protected normalizeSource(source): SourceDefinition {
+    source = source && Object.keys(source).length ? {...source } : {network: 'mainnet'};
+    if (typeof source.network == 'number') {
+      source.network = this.NetworkIdMap[source.network];
     }
+    if (source.registry) {
+      source.network = source.network ? source.network : 'mainnet';
+      source.url = source.url
+        ? source.url
+        : `https://${source.network}.infura.io`;
+    }
+    if (
+      source.network &&
+      !source.url &&
+      this.NetworkNameMap.hasOwnProperty(source.network)
+    ) {
+      source.url = `https://${source.network}.infura.io`;
+    }
+    if (source.url && !source.network) {
+      source.network = this.networkFromUrl(source.url);
+    }
+    return source;
   }
 
   /**
