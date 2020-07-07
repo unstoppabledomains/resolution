@@ -366,9 +366,9 @@ describe('Resolution', () => {
       const provider = new (Web3HttpProvider as any)(secretInfuraLink()) as Web3HttpProvider.HttpProvider;
       // mock the send function with different implementations (each should call callback right away with different answers)
       const eye = jest.spyOn(provider, "send")
-        .mockImplementation((payload: JsonRpcPayload, callback: any) => {
+        .mockImplementation((payload: JsonRpcPayload, callback) => {
           const result = caseMock(payload.params![0], RpcProviderTestCases)
-          callback(undefined, {
+          callback && callback(null, {
             jsonrpc: '2.0',
             id: 1,
             result,
@@ -387,9 +387,9 @@ describe('Resolution', () => {
       // We still prefer everything to be statically typed on our end for better mocking
       const provider = new (Web3WsProvider as any)(secretInfuraLink(InfuraProtocol.wss)) as Web3WsProvider.WebsocketProvider;
       const eye = jest.spyOn(provider, "send")
-        .mockImplementation((payload: JsonRpcPayload, callback: any) => {
+        .mockImplementation((payload, callback) => {
           const result = caseMock(payload.params![0], RpcProviderTestCases)
-          callback(undefined, {
+          callback(null, {
             jsonrpc: '2.0',
             id: 1,
             result,
