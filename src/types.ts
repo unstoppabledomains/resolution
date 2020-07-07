@@ -114,10 +114,13 @@ export interface Provider {
  */
 export type Web3Provider = Provider;
 
+/**
+ * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-core-helpers/types/index.d.ts#L216
+ */
 export interface JsonRpcPayload {
   jsonrpc: string;
   method: string;
-  params?: ProviderParams;
+  params: any[];
   id?: string | number;
 }
 

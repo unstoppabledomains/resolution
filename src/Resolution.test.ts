@@ -5,11 +5,11 @@ import {
   NamingServiceName,
   RequestArguments,
   ProviderParams,
-  JsonRpcPayload
+  JsonRpcPayload,
 } from './types';
 import { JsonRpcProvider, getDefaultProvider } from '@ethersproject/providers';
-const Web3WsProvider = require('web3-providers-ws');
-const Web3HttpProvider = require('web3-providers-http');
+import Web3HttpProvider from 'web3-providers-http';
+import Web3WsProvider from 'web3-providers-ws';
 
 import {
   expectResolutionErrorCode,
@@ -361,7 +361,9 @@ describe('Resolution', () => {
     ] as const;
 
     it('should work with web3HttpProvider', async () => {
-      const provider = new Web3HttpProvider(secretInfuraLink());
+      // web3-providers-http has problems with type definitions
+      // We still prefer everything to be statically typed on our end for better mocking
+      const provider = new (Web3HttpProvider as any)(secretInfuraLink()) as Web3HttpProvider.HttpProvider;
       // mock the send function with different implementations (each should call callback right away with different answers)
       const eye = jest.spyOn(provider, "send")
         .mockImplementation((payload: JsonRpcPayload, callback: any) => {
@@ -381,7 +383,9 @@ describe('Resolution', () => {
     });
 
     it('should work with webSocketProvider', async () => {
-      const provider = new Web3WsProvider(secretInfuraLink(InfuraProtocol.wss));
+      // web3-providers-ws has problems with type definitions
+      // We still prefer everything to be statically typed on our end for better mocking
+      const provider = new (Web3WsProvider as any)(secretInfuraLink(InfuraProtocol.wss)) as Web3WsProvider.WebsocketProvider;
       const eye = jest.spyOn(provider, "send")
         .mockImplementation((payload: JsonRpcPayload, callback: any) => {
           const result = caseMock(payload.params![0], RpcProviderTestCases)

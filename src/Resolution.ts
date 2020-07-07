@@ -15,6 +15,7 @@ import {
   JsonRpcResponse,
   Provider,
   RequestArguments,
+  ProviderParams,
 } from './types';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import NamingService from './namingService';
@@ -134,7 +135,7 @@ export default class Resolution {
       request: (request: RequestArguments) =>
         new Promise((resolve, reject) => {
           provider.sendAsync(
-            { jsonrpc: '2.0', method: request.method, params: request.params, id: 1 },
+            { jsonrpc: '2.0', method: request.method, params: this.normalizeParamsForWeb3(request.params), id: 1 },
             (error: Error | null, result: JsonRpcResponse) => {
               if (error) reject(error);
               if (result.error) reject(new Error(result.error))
@@ -158,7 +159,7 @@ export default class Resolution {
       request: (request: RequestArguments) =>
         new Promise((resolve, reject) => {
           provider.send(
-            { jsonrpc: '2.0', method: request.method, params: request.params, id: 1 },
+            { jsonrpc: '2.0', method: request.method, params: this.normalizeParamsForWeb3(request.params), id: 1 },
             (error: Error | null, result: JsonRpcResponse) => {
               if (error) reject(error);
               if (result.error) reject(new Error(result.error))
@@ -432,10 +433,14 @@ export default class Resolution {
     return this.getNamingMethodOrThrow(domain).serviceName(domain);
   }
 
-  /**
-   * Used internally to get the right method (ens or zns)
-   * @param domain - domain name
-   */
+  protected static normalizeParamsForWeb3(params: ProviderParams = []): unknown[] {
+    if (params instanceof Array) {
+      return params;
+    } else {
+      return [params];
+    }
+  }
+
   private getNamingMethod(domain: string): NamingService {
     domain = this.prepareDomain(domain);
     const methods: (Ens | Zns | Udapi | Cns | undefined)[] = this.blockchain
