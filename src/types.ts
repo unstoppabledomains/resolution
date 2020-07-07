@@ -81,15 +81,13 @@ export const UDApiDefaultUrl = 'https://unstoppabledomains.com/api/v1';
 /**
  * Main configurational object for Resolution instance
  */
-export type Blockchain =
-  | boolean
-  | {
-      ens?: NamingServiceSource;
-      zns?: NamingServiceSource;
-      cns?: NamingServiceSource;
-      web3Provider?: Provider;
-      provider?: Provider;
-    };
+export type Blockchain = {
+  ens?: NamingServiceSource;
+  zns?: NamingServiceSource;
+  cns?: NamingServiceSource;
+  web3Provider?: Provider;
+  provider?: Provider;
+};
 
 export type API = {
   url: string;

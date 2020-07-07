@@ -52,12 +52,14 @@ export default class Resolution {
   constructor({
     blockchain = true,
     api = DefaultAPI,
-  }: { blockchain?: Blockchain; api?: API } = {}) {
+  }: { blockchain?: Blockchain | boolean; api?: API } = {}) {
     this.blockchain = !!blockchain;
     if (blockchain) {
       if (blockchain == true) {
         blockchain = {};
       }
+      const provider = this.normalizeProvider(blockchain);
+
       if (blockchain.ens === undefined) {
         blockchain.ens = true;
       }
@@ -70,7 +72,7 @@ export default class Resolution {
       if (blockchain.ens) {
         this.ens = new Ens(
           blockchain.ens,
-          blockchain.provider || blockchain.web3Provider,
+          provider,
         );
       }
       if (blockchain.zns) {
@@ -79,7 +81,7 @@ export default class Resolution {
       if (blockchain.cns) {
         this.cns = new Cns(
           blockchain.cns,
-          blockchain.provider || blockchain.web3Provider,
+          provider,
         );
       }
     } else {
@@ -472,6 +474,13 @@ export default class Resolution {
 
   private prepareDomain(domain: string): string {
     return domain ? domain.trim().toLowerCase() : '';
+  }
+
+  private normalizeProvider(config: Blockchain): Provider | undefined {
+    if (config.web3Provider) {
+      console.warn('Usage of `web3Provider` option is deprecated. Use `provider` instead');
+    }
+    return config.provider || config.web3Provider;
   }
 }
 
