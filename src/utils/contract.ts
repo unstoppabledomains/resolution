@@ -11,7 +11,7 @@ type FourBytes = string;
 export default class Contract extends BaseConnection {
   readonly contractInterface: [any];
   readonly address: string;
-  readonly url: string;
+  readonly url: string | undefined;
   readonly name: NamingServiceName;
   readonly provider?: Provider;
 
@@ -21,7 +21,7 @@ export default class Contract extends BaseConnection {
    */
   constructor(
     name: NamingServiceName,
-    url: string,
+    url: string | undefined,
     contractInterface,
     address: string,
     provider?: Provider,

@@ -15,15 +15,12 @@ import pckg from './package.json';
 
 /** @internal */
 export default class Udapi extends NamingService {
-  readonly name = 'UDAPI';
-  private url: string;
   private headers: {
     [key: string]: string;
   };
 
-  constructor(url: string) {
-    super();
-    this.url = url;
+  constructor(options: {url: string}) {
+    super(options, 'UDAPI');
     const DefaultUserAgent = this.isNode()
       ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'
       : navigator.userAgent;
@@ -168,7 +165,7 @@ export default class Udapi extends NamingService {
    */
 
   serviceName(domain: string): NamingServiceName {
-    return this.findMethodOrThrow(domain).name;
+    return this.findMethodOrThrow(domain).name as NamingServiceName;
   }
 
   /**
@@ -179,9 +176,8 @@ export default class Udapi extends NamingService {
     throw new Error('Method not implemented.');
   }
 
-  /** @internal */
   protected normalizeSource(source): SourceDefinition {
-    throw new Error('Method not implemented.');
+    return {network: 'mainnet', ...source};
   }
 
   private findMethod(domain: string) {

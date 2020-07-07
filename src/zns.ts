@@ -44,34 +44,15 @@ const UrlNetworkMap = (url: string) => invert(UrlMap)[url];
 
 /** @internal */
 export default class Zns extends NamingService {
-  readonly name = NamingServiceName.ZNS;
-  readonly network: string;
-  readonly url: string;
   readonly registryAddress?: string;
 
-  /**
-   * Source object describing the network naming service operates on
-   * @param source - if specified as a string will be used as main url, if omitted then defaults are used
-   * @throws ConfigurationError - when either network or url is setup incorrectly
-   */
   constructor(source: SourceDefinition = {}) {
-    super();
+    super(source, NamingServiceName.ZNS);
+
     source = this.normalizeSource(source);
-    this.network = source.network as string;
-    this.url = source.url as string;
-    if (!this.network) {
-      throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedNetwork, {
-        method: NamingServiceName.ZNS,
-      });
-    }
-    if (!this.url) {
-      throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedUrl, {
-        method: NamingServiceName.ZNS,
-      });
-    }
     this.registryAddress = source.registry
       ? source.registry
-      : RegistryMap[this.network];
+      : RegistryMap[this.network || 'mainnet'];
     if (this.registryAddress) {
       this.registryAddress = this.registryAddress.startsWith('0x')
         ? toBech32Address(this.registryAddress)
@@ -250,7 +231,7 @@ export default class Zns extends NamingService {
 
   /** @internal */
   protected normalizeSource(source: SourceDefinition | undefined): SourceDefinition {
-    source = source && Object.keys(source).length ? {...source } : {network: 'mainnet'};
+    source = this.isEmptyConfig(source) ? {network: 'mainnet'} : {...source };
     if (typeof source.network == 'number') {
       source.network = NetworkIdMap[source.network];
     }
@@ -324,19 +305,25 @@ export default class Zns extends NamingService {
     field: string,
     keys: string[] = [],
   ): Promise<any> {
-    const response = await this.fetch(this.url, {
-      method: 'POST',
-      body: JSON.stringify({
-        id: '1',
-        jsonrpc: '2.0',
-        method: 'GetSmartContractSubState',
-        params: [contractAddress.replace('0x', ''), field, keys],
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).then(res => res.json());
-    return response.result;
+    const params = [contractAddress.replace('0x', ''), field, keys];
+    const method = 'GetSmartContractSubState';
+    if (this.provider) {
+      return await this.provider.request({method, params})
+    } else {
+      const response = await this.fetch(this.url, {
+        method: 'POST',
+        body: JSON.stringify({
+          id: '1',
+          jsonrpc: '2.0',
+          method,
+          params,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }).then(res => res.json());
+      return response.result;
+    }
   }
 
   private async getContractField(

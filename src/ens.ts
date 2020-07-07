@@ -25,8 +25,6 @@ import ConfigurationError, {
 /** @internal */
 export default class Ens extends EthereumNamingService {
   readonly name = NamingServiceName.ENS;
-  readonly network: string;
-  readonly url: string;
   readonly registryAddress?: string;
   /**
    * Source object describing the network naming service operates on
@@ -34,24 +32,12 @@ export default class Ens extends EthereumNamingService {
    * @param provider - EthersJS provider, an object that implemented sendAsync(method, params) functionality
    * @throws ConfigurationError - when either network or url is setup incorrectly
    */
-  constructor(source: SourceDefinition = {}, provider?: Provider) {
-    super(provider);
+  constructor(source: SourceDefinition = {}) {
+    super(source, NamingServiceName.ENS);
     source = this.normalizeSource(source);
-    this.network = <string>source.network;
-    this.url = source.url as string;
-    if (!this.network) {
-      throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedNetwork, {
-        method: NamingServiceName.ENS,
-      });
-    }
-    if (!this.url) {
-      throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedUrl, {
-        method: NamingServiceName.ENS,
-      });
-    }
     this.registryAddress = source.registry
       ? source.registry
-      : EnsNetworkMap[this.NetworkNameMap[this.network]];
+      : EnsNetworkMap[EthereumNamingService.NetworkNameMap[this.network || 'mainnet']];
     if (this.registryAddress) {
       this.registryContract = this.buildContract(
         ensInterface,

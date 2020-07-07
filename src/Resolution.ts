@@ -25,6 +25,7 @@ import { signedInfuraLink } from './utils';
 import ConfigurationError, {
   ConfigurationErrorCode,
 } from './errors/configurationError';
+import { WebsocketProvider } from 'web3-providers-ws';
 
 /**
  * Blockchain domain Resolution library - Resolution.
@@ -34,7 +35,6 @@ import ConfigurationError, {
  * let domain = brad.zil
  * let Resolution = Resolution.address(domain);
  * ```
- * Blockchain.web3Provider is deprecated in favor of Blockchain.provider
  */
 export default class Resolution {
   readonly blockchain: Blockchain | boolean;
@@ -60,22 +60,25 @@ export default class Resolution {
       if (blockchain === true) {
         blockchain = {};
       }
-      const provider = this.normalizeProvider(blockchain);
-      const ens = this.normalizeSource(blockchain.ens);
+      const web3provider = blockchain.web3Provider;
+      if (web3provider) {
+        console.warn('Usage of `web3Provider` option is deprecated. Use `provider` option instead for each individual blockchain');
+      }
+      const ens = this.normalizeSource(blockchain.ens, web3provider);
       const zns = this.normalizeSource(blockchain.zns);
-      const cns = this.normalizeSource(blockchain.cns);
+      const cns = this.normalizeSource(blockchain.cns, web3provider);
 
       if (ens) {
-        this.ens = new Ens(ens, provider);
+        this.ens = new Ens(ens);
       }
       if (zns) {
         this.zns = new Zns(zns);
       }
       if (cns) {
-        this.cns = new Cns(cns, provider);
+        this.cns = new Cns(cns);
       }
     } else {
-      this.api = new Udapi(api.url);
+      this.api = new Udapi(api);
     }
   }
 
@@ -97,8 +100,8 @@ export default class Resolution {
    * @param provider - any provider compatible with EIP-1193
    * @see https://eips.ethereum.org/EIPS/eip-1193
    */
-  static fromProvider(provider: Provider): Resolution {
-    return new this({ blockchain: { provider: provider } });
+  static fromEipEthProvider(provider: Provider): Resolution {
+    return new this({ blockchain: { zns: true, ens: {provider}, cns: {provider} } });
   }
 
   /**
@@ -108,12 +111,11 @@ export default class Resolution {
    */
   static fromEthersJsonRpcProvider(provider): Resolution {
     if (provider.send === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
-    const providerWrapper: Provider = {
+    return this.fromEipEthProvider({
       request: async (request: RequestArguments) => {
         return await provider.send(request.method, request.params)
       }
-    };
-    return this.fromProvider(providerWrapper);
+    });
   }
 
   /**
@@ -123,7 +125,7 @@ export default class Resolution {
    */
   static fromWeb3Version0Provider(provider: Web3Version0Provider): Resolution {
     if (provider.sendAsync === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
-    const providerWrapper: Provider = {
+    return this.fromEipEthProvider({
       request: (request: RequestArguments) =>
         new Promise((resolve, reject) => {
           provider.sendAsync(
@@ -135,8 +137,7 @@ export default class Resolution {
             },
           );
         }),
-    };
-    return this.fromProvider(providerWrapper);
+    });
   }
 
   /**
@@ -147,7 +148,7 @@ export default class Resolution {
    */
   static fromWeb3Version1Provider(provider: Web3Version1Provider) {
     if (provider.send === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
-    const providerWrapper: Provider = {
+    return this.fromEipEthProvider({
       request: (request: RequestArguments) =>
         new Promise((resolve, reject) => {
           provider.send(
@@ -159,8 +160,7 @@ export default class Resolution {
             },
           );
         }),
-    };
-    return this.fromProvider(providerWrapper);
+    });
   }
 
   /**
@@ -171,10 +171,9 @@ export default class Resolution {
    */
   static fromEthersProvider(provider) {
     if (provider.call === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
-    const providerWrapper: Provider = {
+    return this.fromEipEthProvider({
       request: async (request: RequestArguments) => await provider.call(request.params![0])
-    }
-    return this.fromProvider(providerWrapper);
+    });
   }
 
   /**
@@ -466,26 +465,19 @@ export default class Resolution {
     return domain ? domain.trim().toLowerCase() : '';
   }
 
-  private normalizeProvider(config: Blockchain): Provider | undefined {
-    if (config.web3Provider) {
-      console.warn('Usage of `web3Provider` option is deprecated. Use `provider` instead');
-    }
-    return config.provider || config.web3Provider;
-  }
-
-  private normalizeSource(source: NamingServiceSource | undefined): SourceDefinition | undefined {
+  private normalizeSource(source: NamingServiceSource | undefined, provider?: Provider): SourceDefinition | false {
     switch (typeof source) {
       case 'undefined': {
-        return {}
+        return {provider}
       }
       case 'boolean': {
-        return source ? {} : undefined;
+        return source ? {provider} : false;
       }
       case 'string': {
         return { url: source };
       }
       case 'object': {
-        return source;
+        return {provider, ...source};
       }
     }
     throw new Error('Unsupported configuration')

@@ -11,7 +11,9 @@ export interface SourceDefinition {
   url?: string;
   network?: string | number;
   registry?: string;
+  provider?: Provider;
 }
+
 
 /**
  * NamingServiceSource
@@ -87,7 +89,6 @@ export type Blockchain = {
   zns?: NamingServiceSource;
   cns?: NamingServiceSource;
   web3Provider?: Provider;
-  provider?: Provider;
 };
 
 export type API = {
