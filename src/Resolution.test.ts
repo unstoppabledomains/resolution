@@ -429,7 +429,7 @@ describe('Resolution', () => {
     });
 
     it('should work with old provider', async () => {
-      const provider = new oldWeb3Provider(secretInfuraLink(InfuraProtocol.http), 5000, null, null, []);
+      const provider = new oldWeb3Provider(secretInfuraLink(InfuraProtocol.http), 5000, null, null, null);
       const eye = jest.spyOn(provider, "sendAsync")
         .mockImplementation((payload: JsonRpcPayload, callback: any) => {
           const result = caseMock(payload.params![0], RpcProviderTestCases)
