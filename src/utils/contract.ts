@@ -101,7 +101,7 @@ export default class Contract extends BaseConnection {
         to: this.address,
       },
       'latest',
-    ] as const;
+    ];
     if (this.provider) {
       const request: RequestArguments = {
         method: 'eth_call',

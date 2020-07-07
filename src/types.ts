@@ -95,15 +95,7 @@ export type API = {
   url: string;
 };
 
-export type ProviderParams = readonly [
-  (
-    | {
-        [record: string]: string;
-      }
-    | string
-  ),
-  string,
-];
+export type ProviderParams = unknown[] | object;
 
 export interface RequestArguments {
   method: string;

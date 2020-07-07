@@ -3,7 +3,9 @@ import _ from 'lodash';
 import { Dictionary } from '../types';
 import { ResolutionError } from '../index';
 import mockData from '../testData/mockData.json';
+import {default as HttpProvider} from './oldProvider/oldHttpProvider';
 
+export {HttpProvider as oldWeb3Provider};
 export const MainnetUrl = 'https://mainnet.infura.io';
 export const ZilliqaUrl = 'https://api.zilliqa.com';
 export const DefaultUrl = 'https://unstoppabledomains.com/api/v1';

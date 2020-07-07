@@ -17,6 +17,7 @@ import {
   mockAsyncMethods,
   secretInfuraLink,
   InfuraProtocol,
+  oldWeb3Provider,
   caseMock,
 } from './utils/testHelpers';
 
@@ -364,7 +365,7 @@ describe('Resolution', () => {
       // mock the send function with different implementations (each should call callback right away with different answers)
       const eye = jest.spyOn(provider, "send")
         .mockImplementation((payload: JsonRpcPayload, callback: any) => {
-          const result =  caseMock(payload.params![0], RpcProviderTestCases)
+          const result = caseMock(payload.params![0], RpcProviderTestCases)
           callback(undefined, {
             jsonrpc: '2.0',
             id: 1,
@@ -379,12 +380,11 @@ describe('Resolution', () => {
       expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
     });
 
-
     it('should work with webSocketProvider', async () => {
       const provider = new Web3WsProvider(secretInfuraLink(InfuraProtocol.wss));
       const eye = jest.spyOn(provider, "send")
         .mockImplementation((payload: JsonRpcPayload, callback: any) => {
-          const result =  caseMock(payload.params![0], RpcProviderTestCases)
+          const result = caseMock(payload.params![0], RpcProviderTestCases)
           callback(undefined, {
             jsonrpc: '2.0',
             id: 1,
@@ -399,7 +399,6 @@ describe('Resolution', () => {
       expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
     });
 
-    // should we try to use https://github.com/timkindberg/jest-when to make it look more elegant?
     it('should work for jsonrpc provider', async () => {
       const provider = new JsonRpcProvider(
         secretInfuraLink(InfuraProtocol.http),
@@ -427,6 +426,23 @@ describe('Resolution', () => {
       const ethAddress = await resolution.addressOrThrow('brad.crypto', 'eth');
       expectSpyToBeCalled([eye]);
       expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
-    })
+    });
+
+    it('should work with old provider', async () => {
+      const provider = new oldWeb3Provider(secretInfuraLink(InfuraProtocol.http), 5000, null, null, []);
+      const eye = jest.spyOn(provider, "sendAsync")
+        .mockImplementation((payload: JsonRpcPayload, callback: any) => {
+          const result = caseMock(payload.params![0], RpcProviderTestCases)
+          callback(undefined, {
+            jsonrpc: '2.0',
+            id: 1,
+            result,
+          });
+        });
+      const resolution = Resolution.fromWeb3Version0Provider(provider);
+      const ethAddress = await resolution.addressOrThrow('brad.crypto', 'eth');
+      expectSpyToBeCalled([eye]);
+      expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
+    });
   });
 });
