@@ -362,7 +362,7 @@ export default class Resolution {
     return method as NamingService;
   }
 
-  private getNamingMethodOrThrow(domain: string) {
+  private getNamingMethodOrThrow(domain: string): NamingService {
     domain = this.prepareDomain(domain);
     const method = this.getNamingMethod(domain);
     if (!method)
