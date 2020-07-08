@@ -50,11 +50,11 @@ describe('CNS', () => {
   it('checks the record by key', async () => {
     const eyes = mockAsyncMethods(resolution.cns, {
       getResolver: '0xa1cac442be6673c49f8e74ffc7c4fd746f3cbd0d',
-      getRecord: 'QmdM1hZFzNTdrbyUSPEBVjNHaQk9kKkXFeRZtB1nnBcSVX',
+      getRecord: 'QmVJ26hBrwwNAPVmLavEFXDUunNDXeFSeMPmHuPxKe6dJv',
     });
-    const ipfsHash = await resolution.record(domain, 'ipfs.html.value');
+    const ipfsHash = await resolution.record(DomainWithIpfsRecords, 'ipfs.html.value');
     expectSpyToBeCalled(eyes);
-    expect(ipfsHash).toBe('QmdM1hZFzNTdrbyUSPEBVjNHaQk9kKkXFeRZtB1nnBcSVX');
+    expect(ipfsHash).toBe('QmVJ26hBrwwNAPVmLavEFXDUunNDXeFSeMPmHuPxKe6dJv');
   });
 
   it('Should return NoRecord Resolution error', async () => {
@@ -63,7 +63,7 @@ describe('CNS', () => {
       getRecord: undefined,
     });
     await expectResolutionErrorCode(
-      resolution.record(domain, 'No.such.record'),
+      resolution.record(DomainWithoutRecords, 'No.such.record'),
       ResolutionErrorCode.RecordNotFound,
     );
     expectSpyToBeCalled(spies);
