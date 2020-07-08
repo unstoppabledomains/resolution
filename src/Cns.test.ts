@@ -6,7 +6,7 @@ import {
   secretInfuraLink,
 } from './utils/testHelpers';
 import { ResolutionErrorCode } from './resolutionError';
-import { NullAddress } from './types';
+import { NullAddress, NamingServiceName } from './types';
 
 try {
   const dotenv = require('dotenv');
@@ -15,7 +15,7 @@ try {
   console.warn('dotenv is not installed');
 }
 
-const domain = 'reseller-test-braden-6.crypto';
+const domain = 'reseller-test-mago0.crypto';
 let resolution: Resolution;
 beforeEach(() => {
   jest.restoreAllMocks();
@@ -29,7 +29,7 @@ const mockCryptoCalls = (
   mockAddress: string,
 ): jest.SpyInstance<any, unknown[]>[] => {
   const eyes = mockAsyncMethods(object, {
-    getResolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
+    getResolver: '0xa1cac442be6673c49f8e74ffc7c4fd746f3cbd0d',
     getRecord: mockAddress,
   });
   return eyes;
@@ -42,19 +42,19 @@ describe('CNS', () => {
     expect(resolution.cns!.url).toBe(secretInfuraLink());
   });
 
-  it('checks the IPFS hash record', async () => {
+  it('checks the record by key', async () => {
     const eyes = mockAsyncMethods(resolution.cns, {
-      getResolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
-      getRecord: 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
+      getResolver: '0xa1cac442be6673c49f8e74ffc7c4fd746f3cbd0d',
+      getRecord: 'QmdM1hZFzNTdrbyUSPEBVjNHaQk9kKkXFeRZtB1nnBcSVX',
     });
-    const ipfsHash = await resolution.cns!.record(domain, 'ipfs.html2');
+    const ipfsHash = await resolution.record(domain, 'ipfs.html.value');
     expectSpyToBeCalled(eyes);
-    expect(ipfsHash).toBe('QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK');
+    expect(ipfsHash).toBe('QmdM1hZFzNTdrbyUSPEBVjNHaQk9kKkXFeRZtB1nnBcSVX');
   });
 
   it('Should return NoRecord Resolution error', async () => {
     const spies = mockAsyncMethods(resolution.cns, {
-      getResolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
+      getResolver: '0xa1cac442be6673c49f8e74ffc7c4fd746f3cbd0d',
       getRecord: undefined,
     });
     await expectResolutionErrorCode(
@@ -62,19 +62,6 @@ describe('CNS', () => {
       ResolutionErrorCode.RecordNotFound,
     );
     expectSpyToBeCalled(spies);
-  });
-
-  it('checks the ipfs redirect_domain record', async () => {
-    const eyes = mockAsyncMethods(resolution.cns, {
-      getResolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
-      getRecord: 'www.unstoppabledomains.com',
-    });
-    const ipfs_redirect_domain = await resolution.cns!.record(
-      domain,
-      'ipfs.redirect_domain',
-    );
-    expectSpyToBeCalled(eyes);
-    expect(ipfs_redirect_domain).toBe('www.unstoppabledomains.com');
   });
 
   it('checks it from resolution main object', async () => {
@@ -91,7 +78,7 @@ describe('CNS', () => {
     const spies = mockAsyncMethods(resolution.cns, {
       getResolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
     });
-    const resolverAddress = await resolution.cns!.resolver('brad.crypto');
+    const resolverAddress = await resolution.resolver('brad.crypto');
     expectSpyToBeCalled(spies);
     expect(resolverAddress).toBe('0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D');
   });
@@ -102,7 +89,7 @@ describe('CNS', () => {
       owner: NullAddress[1],
     });
     await expectResolutionErrorCode(
-      resolution.cns!.resolver('empty.crypto'),
+      resolution.resolver('empty.crypto'),
       ResolutionErrorCode.UnregisteredDomain,
     );
     expectSpyToBeCalled(spies);
@@ -114,7 +101,7 @@ describe('CNS', () => {
       owner: 'someowneraddress',
     });
     await expectResolutionErrorCode(
-      resolution.cns!.resolver('pandorapay.crypto'),
+      resolution.resolver('pandorapay.crypto'),
       ResolutionErrorCode.UnspecifiedResolver,
     );
     expectSpyToBeCalled(spies);
@@ -124,11 +111,11 @@ describe('CNS', () => {
     it(`checks the BCH address on ${domain}`, async () => {
       const eyes = mockCryptoCalls(
         resolution.cns,
-        'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6',
+        'qzx048ez005q4yhphqu2pylpfc3hy88zzu4lu6q9j8',
       );
-      const addr = await resolution.cns!.address(domain, 'BCH');
+      const addr = await resolution.address(domain, 'BCH');
       expectSpyToBeCalled(eyes);
-      expect(addr).toBe('qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6');
+      expect(addr).toBe('qzx048ez005q4yhphqu2pylpfc3hy88zzu4lu6q9j8');
     });
 
     it(`checks the BTC address on ${domain}`, async () => {
@@ -136,7 +123,7 @@ describe('CNS', () => {
         resolution.cns,
         '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB',
       );
-      const addr = await resolution.cns!.address(domain, 'BTC');
+      const addr = await resolution.address(domain, 'BTC');
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB');
     });
@@ -146,7 +133,7 @@ describe('CNS', () => {
         resolution.cns,
         'XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j',
       );
-      const addr = await resolution.cns!.address(domain, 'DASH');
+      const addr = await resolution.address(domain, 'DASH');
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j');
     });
@@ -156,7 +143,7 @@ describe('CNS', () => {
         resolution.cns,
         '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
       );
-      const addr = await resolution.cns!.address(domain, 'ETH');
+      const addr = await resolution.address(domain, 'ETH');
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('0x45b31e01AA6f42F0549aD482BE81635ED3149abb');
     });
@@ -166,7 +153,7 @@ describe('CNS', () => {
         resolution.cns,
         'LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL',
       );
-      const addr = await resolution.cns!.address(domain, 'LTC');
+      const addr = await resolution.address(domain, 'LTC');
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL');
     });
@@ -176,7 +163,7 @@ describe('CNS', () => {
         resolution.cns,
         '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d',
       );
-      const addr = await resolution.cns!.address(domain, 'XMR');
+      const addr = await resolution.address(domain, 'XMR');
       expectSpyToBeCalled(eyes);
       expect(addr).toBe(
         '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d',
@@ -188,7 +175,7 @@ describe('CNS', () => {
         resolution.cns,
         't1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV',
       );
-      const addr = await resolution.cns!.address(domain, 'ZEC');
+      const addr = await resolution.address(domain, 'ZEC');
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('t1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV');
     });
@@ -198,7 +185,7 @@ describe('CNS', () => {
         resolution.cns,
         'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
       );
-      const addr = await resolution.cns!.address(domain, 'ZIL');
+      const addr = await resolution.address(domain, 'ZIL');
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj');
     });
@@ -207,33 +194,33 @@ describe('CNS', () => {
   describe('.Hashing', () => {
     describe('.Namehash', () => {
       it('supports root node', async () => {
-        const cns = resolution.cns;
-        expect(cns!.isSupportedDomain('crypto')).toEqual(true);
-        expect(cns!.namehash('crypto')).toEqual(
+        const cns = resolution;
+        expect(resolution.isSupportedDomain('crypto')).toEqual(true);
+        expect(resolution.namehash('crypto')).toEqual(
           '0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f',
         );
       });
 
       it('starts with -', async () => {
-        const cns = resolution.cns;
-        expect(cns!.isSupportedDomain('-hello.crypto')).toEqual(true);
-        expect(cns!.namehash('-hello.crypto')).toBe(
+        const cns = resolution;
+        expect(resolution.isSupportedDomain('-hello.crypto')).toEqual(true);
+        expect(resolution.namehash('-hello.crypto')).toBe(
           '0xc4ad028bcae9b201104e15f872d3e85b182939b06829f75a128275177f2ff9b2',
         );
       });
 
       it('ends with -', async () => {
-        const cns = resolution.cns;
-        expect(cns!.isSupportedDomain('hello-.crypto')).toEqual(true);
-        expect(cns!.namehash('hello-.crypto')).toBe(
+        const cns = resolution;
+        expect(resolution.isSupportedDomain('hello-.crypto')).toEqual(true);
+        expect(resolution.namehash('hello-.crypto')).toBe(
           '0x82eaa6ef14e438940bfd7747e0e4c4fec42af20cee28ddd0a7d79f52b1c59b72',
         );
       });
 
       it('starts and ends with -', async () => {
         const cns = resolution.cns;
-        expect(cns!.isSupportedDomain('-hello-.crypto')).toEqual(true);
-        expect(cns!.namehash('-hello-.crypto')).toBe(
+        expect(resolution.isSupportedDomain('-hello-.crypto')).toEqual(true);
+        expect(resolution.namehash('-hello-.crypto')).toBe(
           '0x90cc1963ff09ce95ee2dbb3830df4f2115da9756e087a50283b3e65f6ffe2a4e',
         );
       });
@@ -256,11 +243,12 @@ describe('CNS', () => {
         const cns = resolution.cns;
         const rootHash =
           '0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f';
-        expect(cns!.namehash('crypto')).toBe(rootHash);
+        expect(resolution.namehash('crypto')).toBe(rootHash);
         expect(
-          cns!.childhash(
+          resolution.childhash(
             '0000000000000000000000000000000000000000000000000000000000000000',
             'crypto',
+            NamingServiceName.CNS,
           ),
         ).toBe(rootHash);
       });
@@ -268,10 +256,11 @@ describe('CNS', () => {
       it('checks the childhash functionality', () => {
         const cns = resolution.cns;
         const domain = 'hello.world.crypto';
-        const namehash = cns!.namehash(domain);
-        const childhash = cns!.childhash(
-          cns!.namehash('world.crypto'),
+        const namehash = resolution.namehash(domain);
+        const childhash = resolution.childhash(
+          resolution.namehash('world.crypto'),
           'hello',
+          NamingServiceName.CNS,
         );
         expect(namehash).toBe(childhash);
       });
@@ -279,10 +268,11 @@ describe('CNS', () => {
       it('checks childhash multi level domain', () => {
         const cns = resolution.cns;
         const domain = 'ich.ni.san.yon.hello.world.crypto';
-        const namehash = cns!.namehash(domain);
-        const childhash = cns!.childhash(
-          cns!.namehash('ni.san.yon.hello.world.crypto'),
+        const namehash = resolution.namehash(domain);
+        const childhash = resolution.childhash(
+          resolution.namehash('ni.san.yon.hello.world.crypto'),
           'ich',
+          NamingServiceName.CNS,
         );
         expect(childhash).toBe(namehash);
       });
@@ -294,12 +284,12 @@ describe('CNS', () => {
     it('should resolve with ipfs stored on cns', async () => {
       const spies = mockAsyncMethods(resolution.cns, {
         getResolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
-        getRecord: '0x033dc48b5db4ca62861643e9d2c411d9eb6d1975@gmail.com',
+        getRecord: 'QmdM1hZFzNTdrbyUSPEBVjNHaQk9kKkXFeRZtB1nnBcSVX',
       });
       const ipfsHash = await resolution.ipfsHash(domain);
       expectSpyToBeCalled(spies);
       expect(ipfsHash).toBe(
-        '0x033dc48b5db4ca62861643e9d2c411d9eb6d1975@gmail.com',
+        'QmdM1hZFzNTdrbyUSPEBVjNHaQk9kKkXFeRZtB1nnBcSVX',
       );
     });
 
@@ -355,7 +345,7 @@ describe('CNS', () => {
         getResolver:'0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
         getRecord: undefined
       });
-      await expectResolutionErrorCode(resolution.cns!.chatpk('homecakes.crypto'), ResolutionErrorCode.RecordNotFound)
+      await expectResolutionErrorCode(resolution.chatPk('homecakes.crypto'), ResolutionErrorCode.RecordNotFound)
       expectSpyToBeCalled(eyes);
     });
 
@@ -364,7 +354,7 @@ describe('CNS', () => {
         getResolver:'0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
         getRecord: undefined
       });
-      await expectResolutionErrorCode(resolution.cns!.chatId('homecakes.crypto'), ResolutionErrorCode.RecordNotFound)
+      await expectResolutionErrorCode(resolution.chatId('homecakes.crypto'), ResolutionErrorCode.RecordNotFound)
       expectSpyToBeCalled(eyes);
     });
   });
