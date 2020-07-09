@@ -7,6 +7,13 @@ import {
 } from './utils/testHelpers';
 import { ResolutionErrorCode } from './resolutionError';
 import { NullAddress, NamingServiceName } from './types';
+import {
+  CryptoDomainWithAdaBchAddresses,
+  CryptoDomainWithEmail,
+  CryptoDomainWithEmptyResolver,
+  CryptoDomainWithoutResolver,
+  CryptoDomainWithIpfsRecords,
+} from './utils/testHelpers';
 
 try {
   const dotenv = require('dotenv');
@@ -14,12 +21,6 @@ try {
 } catch (err) {
   console.warn('dotenv is not installed');
 }
-
-const CryptoDomainWithoutResolver = 'reseller-test-paul1.crypto';
-const CryptoDomainWithEmptyResolver = 'reseller-test-mago017.crypto'
-const CryptoDomainWithIpfsRecords = 'reseller-test-paul019.crypto'
-const CryptoDomainWithEmail = 'reseller-test-paul019.crypto'
-const CryptoDomainWithAdaBchAddresses = 'reseller-test-mago0.crypto';
 
 let resolution: Resolution;
 beforeEach(() => {
@@ -260,6 +261,15 @@ describe('CNS', () => {
       const chatId = await resolution.chatId('brad.crypto');
       expectSpyToBeCalled(eyes);
       expect(chatId).toBe('0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c');
+    });
+
+    it('should throw UnspecifiedResolver for chatId', async () => {
+      const resolution = new Resolution({blockchain: {cns: {url: secretInfuraLink()}}});
+      const eyes = mockAsyncMethods(resolution.cns, {
+        owner: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
+        getResolver: undefined,
+      });
+      await expectResolutionErrorCode(resolution.chatId(CryptoDomainWithoutResolver), ResolutionErrorCode.UnspecifiedResolver);
     });
 
     it('should resolve with the gundb public key stored on cns', async () => {

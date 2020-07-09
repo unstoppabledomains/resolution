@@ -31,32 +31,6 @@ describe('Resolution', () => {
     expect(resolution.cns!.url).toBe(`https://mainnet.infura.com/v3/api-key`);
   });
 
-  it('should resolve a custom record', async () => {
-    const resolution = new Resolution({blockchain: {cns: {url: secretInfuraLink()}}});
-    const customRecord = 'gundb.username.value';
-    const eyes = mockAsyncMethods(resolution.cns, {
-      getResolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
-      getRecord: '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c'
-    });
-    const value = await resolution.record("homecakes.crypto", customRecord);
-    expectSpyToBeCalled(eyes);
-    expect(value).toBe('0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c');
-  });
-
-  it('should error with recordNoFound for custom record', async () => {
-    const resolution = new Resolution({blockchain: {cns: {url: secretInfuraLink()}}});
-    const customWrongRecord = 'noSuchRecordEver';
-    const eyes = mockAsyncMethods(resolution.cns, {
-      getResolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
-      getRecord: ''
-    });
-    await expectResolutionErrorCode(
-      resolution.record("homecakes.crypto", customWrongRecord),
-      ResolutionErrorCode.RecordNotFound
-    );
-    expectSpyToBeCalled(eyes);
-  })
-
   it('checks Resolution#addressOrThrow error #1', async () => {
     const resolution = new Resolution();
     await expectResolutionErrorCode(
@@ -200,15 +174,6 @@ describe('Resolution', () => {
     const gundb = await resolution.chatId("homecakes.crypto");
     expectSpyToBeCalled(eyes);
     expect(gundb).toBe("0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c");
-  });
-
-  it('should throw recordNotFound for chatId', async () => {
-    const resolution = new Resolution({blockchain: {cns: {url: secretInfuraLink()}}});
-    const eyes = mockAsyncMethods(resolution.cns, {
-      owner: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
-      getResolver: undefined,
-    });
-    await expectResolutionErrorCode(resolution.chatId("homecakes2.crypto"), ResolutionErrorCode.UnspecifiedResolver);
   });
 
   describe('serviceName', () => {
