@@ -164,7 +164,7 @@ export default class Ens extends EthereumNamingService {
       meta: {
         owner,
         type: this.name,
-        ttl: Number(ttl),
+        ttl: Number(ttl || 0),
       },
       addresses: {},
     };

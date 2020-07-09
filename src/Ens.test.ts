@@ -8,6 +8,7 @@ import {
   expectSpyToBeCalled,
   expectResolutionErrorCode,
   secretInfuraLink,
+  pendingInLive,
 } from './utils/testHelpers';
 let resolution: Resolution;
 
@@ -58,6 +59,7 @@ describe('ENS', () => {
   });
 
   it('reverses address to ENS domain', async () => {
+    pendingInLive();
     const eyes = mockAsyncMethods(resolution.ens, {
       resolverCallToName: 'adrian.argent.xyz',
       getResolver: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
@@ -604,7 +606,7 @@ describe('ENS', () => {
       })
       const chatId = await resolution.chatId('crunk.eth').catch((err) => err.code);
       expectSpyToBeCalled(eyes);
-      expect(chatId).toBe('0x7e1d12f34e038a2bda3d5f6ee0809d72f668c357d9e64fd7f622513f06ea652146ab5fdee35dc4ce77f1c089fd74972691fccd48130306d9eafcc6e1437d1ab21b');            
+      expect(chatId).toBe('0x7e1d12f34e038a2bda3d5f6ee0809d72f668c357d9e64fd7f622513f06ea652146ab5fdee35dc4ce77f1c089fd74972691fccd48130306d9eafcc6e1437d1ab21b');
     });
 
     it('should resolve gundb public key', async () => {
