@@ -424,6 +424,7 @@ describe('ENS', () => {
     });
 
     it('returns undefined address', async () => {
+      pendingInLive();
       const eyes = mockAsyncMethods(resolution.ens, {
         getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
         getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
@@ -563,13 +564,13 @@ describe('ENS', () => {
   describe('.Metadata', () => {
     it('should return a valid ipfsHash', async () => {
       const eyes = mockAsyncMethods(resolution.ens, {
-        getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+        getResolver: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
         callMethod:
-          '0xe3010170122058cf8d62a59dff0d7aa81492b66d262f27a8a684767238209243ad0309ecff5e',
+          '0xe30101701220a31243a98ade931ac3f6e5ddb3dc91b1b9eceb564dbf5b4b2bdc712d8a421309'
       });
       const ipfsHash = await resolution.ipfsHash('almonit.eth');
       expectSpyToBeCalled(eyes);
-      expect(ipfsHash).toBe('QmUKL9VYzSvM9bSZQPgExtALCrRhK2VLFNjzsXLNRcbaGM');
+      expect(ipfsHash).toBe('QmZKDKMi6vrevJvMZiuRR1r2tkQivLabkWxMpHr1QFQ3VJ');
     });
 
     //todo(johny) find some domains with url property set
