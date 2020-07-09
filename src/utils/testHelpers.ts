@@ -36,13 +36,12 @@ export async function expectResolutionErrorCode(
   code: string,
 ) {
   try {
-    if (callback instanceof Promise) {
-      await callback;
-    } else {
-      callback();
+    if (callback instanceof Function) {
+      callback = callback();
     }
+    await callback;
   } catch (error) {
-    if (error instanceof ResolutionError) {
+    if (error instanceof ResolutionError && error.code === code) {
       return expect(error.code).toEqual(code);
     } else {
       throw error;
