@@ -8,6 +8,7 @@ import {
   ResolutionResponse,
   isNullAddress,
   Web3Provider,
+  nodeHash,
 } from './types';
 import ResolutionError, { ResolutionErrorCode } from './resolutionError';
 import BaseConnection from './baseConnection';
@@ -31,6 +32,7 @@ export default abstract class NamingService extends BaseConnection {
   abstract resolver(domain: string): Promise<string>;
   abstract chatId(domain: string): Promise<string>;
   abstract chatpk(domain: string): Promise<string>;
+  abstract childhash(parent: nodeHash, label: string): nodeHash;
 
   constructor(web3Provider?: Web3Provider) {
     super();

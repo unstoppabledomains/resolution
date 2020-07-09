@@ -189,8 +189,7 @@ describe('CNS', () => {
 
       it('checks the childhash functionality', () => {
         const cns = resolution.cns;
-        const domain = 'hello.world.crypto';
-        const namehash = resolution.namehash(domain);
+        const namehash = resolution.namehash('hello.world.crypto');
         const childhash = resolution.childhash(
           resolution.namehash('world.crypto'),
           'hello',
@@ -201,10 +200,12 @@ describe('CNS', () => {
 
       it('checks childhash multi level domain', () => {
         const cns = resolution.cns;
-        const domain = 'ich.ni.san.yon.hello.world.crypto';
+        const label = 'ich';
+        const parent = 'ni.san.yon.hello.world.crypto'
+        const domain = `${label}.${parent}`;
         const namehash = resolution.namehash(domain);
         const childhash = resolution.childhash(
-          resolution.namehash('ni.san.yon.hello.world.crypto'),
+          resolution.namehash(parent),
           'ich',
           NamingServiceName.CNS,
         );

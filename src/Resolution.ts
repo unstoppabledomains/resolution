@@ -273,8 +273,7 @@ export default class Resolution {
     address: string,
     currencyTicker: string,
   ): Promise<string | null> {
-    if (!this.checkIfSet(NamingServiceName.ENS)) return null;
-    return await this.ens!.reverse(address, currencyTicker);
+    return (this.findNamingService(NamingServiceName.ENS) as Ens).reverse(address, currencyTicker);
   }
 
   /**
@@ -298,21 +297,10 @@ export default class Resolution {
     parent: nodeHash,
     label: string,
     method: NamingServiceName,
-  ): nodeHash | null {
-    switch (method) {
-      case NamingServiceName.ENS:
-        if (!this.checkIfSet(NamingServiceName.ENS)) return null;
-        return this.ens!.childhash(parent, label);
-      case NamingServiceName.CNS:
-        if (!this.checkIfSet(NamingServiceName.CNS)) return null;
-        return this.cns!.childhash(parent, label);
-      case NamingServiceName.ZNS:
-        if (!this.checkIfSet(NamingServiceName.ZNS)) return null;
-        return this.zns!.childhash(parent, label);
-      default:
-        throw new Error('Incorrect method is provided');
-    }
+  ): nodeHash {
+    return this.findNamingService(method).childhash(parent, label);
   }
+
   /**
    * Checks weather the domain name matches the hash
    * @param domain - domain name to check againt
@@ -339,7 +327,7 @@ export default class Resolution {
   isSupportedDomainInNetwork(domain: string): boolean {
     domain = this.prepareDomain(domain);
     const method = this.getNamingMethod(domain);
-    return method && method.isSupportedNetwork();
+    return !!method && method.isSupportedNetwork();
   }
 
   serviceName(domain: string): NamingServiceName {
@@ -347,19 +335,17 @@ export default class Resolution {
     return this.getNamingMethodOrThrow(domain).serviceName(domain);
   }
 
-  /**
-   * Used internally to get the right method (ens or zns)
-   * @param domain - domain name
-   */
-  private getNamingMethod(domain: string): NamingService {
+  private getNamingMethod(domain: string): NamingService | undefined {
     domain = this.prepareDomain(domain);
-    const methods: (Ens | Zns | Udapi | Cns | undefined)[] = this.blockchain
-      ? [this.ens, this.zns, this.cns]
-      : [this.api];
-    const method = methods.find(
-      method => method && method.isSupportedDomain(domain),
+    return this.getResolutionMethods().find(
+      method => method.isSupportedDomain(domain),
     );
-    return method as NamingService;
+  }
+
+  private getResolutionMethods(): NamingService[] {
+    return (this.blockchain
+      ? [this.ens, this.zns, this.cns] as NamingService[]
+      : [this.api] as NamingService[]).filter(v => v);
   }
 
   private getNamingMethodOrThrow(domain: string): NamingService {
@@ -372,12 +358,13 @@ export default class Resolution {
     return method;
   }
 
-  private checkIfSet(blockchain: NamingServiceName): boolean {
-    if (!this[blockchain.toLowerCase()])
+  private findNamingService(name: NamingServiceName): NamingService {
+    const service = this.getResolutionMethods().find(m => m.name === name)
+    if (!service)
       throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
-        method: NamingServiceName[blockchain],
+        method: name,
       });
-    return true;
+    return service;
   }
 
   private prepareDomain(domain: string): string {
