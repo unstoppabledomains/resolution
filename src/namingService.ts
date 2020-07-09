@@ -8,6 +8,7 @@ import {
   ResolutionResponse,
   isNullAddress,
   Provider,
+  nodeHash,
 } from './types';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import BaseConnection from './baseConnection';
@@ -34,6 +35,7 @@ export default abstract class NamingService extends BaseConnection {
   abstract resolver(domain: string): Promise<string>;
   abstract chatId(domain: string): Promise<string>;
   abstract chatpk(domain: string): Promise<string>;
+  abstract childhash(parent: nodeHash, label: string): nodeHash;
 
   constructor(source: SourceDefinition, name: ResolutionMethod) {
     super();
