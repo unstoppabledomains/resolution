@@ -31,8 +31,18 @@ export function mockAsyncMethods(object: any, methods: Dictionary<any>) {
   );
 }
 
+export function isLive() {
+  return !!process.env.LIVE
+}
+
+export function pendingInLive() {
+  if (isLive()) {
+    pending("Disabled in LIVE mode")
+  }
+}
+
 export function expectSpyToBeCalled(spies: any[]) {
-  if (!process.env.LIVE) {
+  if (!isLive()) {
     spies.forEach(spy => expect(spy).toBeCalled());
   }
 }
@@ -57,7 +67,7 @@ export async function expectResolutionErrorCode(
 }
 
 export function mockAPICalls(testName: string, url = MainnetUrl) {
-  if (process.env.LIVE) {
+  if (isLive()) {
     return;
   }
   const mcdt = mockData as any;
