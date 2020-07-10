@@ -162,24 +162,17 @@ export default class Udapi extends NamingService {
     }
   }
 
-  /**
-   * Returns naming service name
-   * @param domain - domain name
-   */
+  childhash(parent: string, label: string): never {
+    throw new Error('Unsupported method whe using UD Resolution API')
+  }
 
   serviceName(domain: string): NamingServiceName {
     return this.findMethodOrThrow(domain).name;
   }
-
-  /**
-   * Not implemented for this naming service
-   * @param domain
-   */
   async resolver(domain: string): Promise<string> {
     throw new Error('Method not implemented.');
   }
 
-  /** @internal */
   protected normalizeSource(source: NamingServiceSource): SourceDefinition {
     throw new Error('Method not implemented.');
   }

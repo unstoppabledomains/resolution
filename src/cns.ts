@@ -1,4 +1,4 @@
-import { EthereumNamingService } from './namingService';
+import { EthereumNamingService } from './EthereumNamingService';
 import {
   NamingServiceSource,
   NamingServiceName,
