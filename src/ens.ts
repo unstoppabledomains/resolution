@@ -13,7 +13,7 @@ import {
   Provider,
   SourceDefinition,
 } from './types';
-import { EthereumNamingService } from './namingService';
+import { EthereumNamingService } from './EthereumNamingService';
 import { ResolutionError, ResolutionErrorCode } from './index';
 import Contract from './utils/contract';
 import contentHash from 'content-hash';
