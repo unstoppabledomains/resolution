@@ -50,20 +50,29 @@ export function expectSpyToBeCalled(spies: any[]) {
 export async function expectResolutionErrorCode(
   callback: Promise<any> | Function,
   code: string,
-) {
-  try {
-    if (callback instanceof Function) {
-      callback = callback();
-    }
-    await callback;
-  } catch (error) {
-    if (error instanceof ResolutionError && error.code === code) {
-      return expect(error.code).toEqual(code);
-    } else {
-      throw error;
-    }
+): Promise<void> {
+  if (callback instanceof Function) {
+    callback = new Promise((resolve, reject) => {
+      const result = (callback as Function)();
+      if (result instanceof Promise) {
+        result.then(resolve, reject)
+      } else {
+        resolve();
+      }
+    });
   }
-  fail("Expected resolution error to be thrown but wasn't");
+
+  return callback.then(
+    () => fail("Expected resolution error to be thrown but wasn't"),
+    (error) => {
+      if (error instanceof ResolutionError && error.code === code) {
+        return expect(error.code).toEqual(code);
+      } else {
+        throw error;
+      }
+
+    }
+  );
 }
 
 export function mockAPICalls(testName: string, url = MainnetUrl) {

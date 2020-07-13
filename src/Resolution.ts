@@ -277,9 +277,9 @@ export default class Resolution {
   }
 
   /**
-   * Produce a namehash from supported naming service
-   * @param domain - domain name to be hashed
-   * @returns Namehash either for ENS or ZNS
+   * Produces a namehash from supported naming service in hex format with 0x prefix.
+   * ERC721 token id in case of Ethereum based naming service like ENS or CNS.
+   * @param domain - domain name to be converted
    * @throws ResolutionError with UnsupportedDomain error code if domain extension is unknown
    */
   namehash(domain: string): string {

@@ -165,6 +165,7 @@ describe('CNS', () => {
           getResolver: undefined,
           owner: '0x0000000000000000000000000000000000000000'
         });
+
         await expectResolutionErrorCode(
           resolution.cns!.address('unregistered.crypto', "ETH"),
           ResolutionErrorCode.UnregisteredDomain
