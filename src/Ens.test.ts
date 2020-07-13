@@ -579,9 +579,8 @@ describe('ENS', () => {
         getResolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
         callMethod: '',
       });
-      const httpUrlPromise = resolution.httpUrl('matthewgould.eth');
       await expectResolutionErrorCode(
-        httpUrlPromise,
+        resolution.httpUrl('matthewgould.eth'),
         ResolutionErrorCode.RecordNotFound,
       );
       expectSpyToBeCalled(eyes);

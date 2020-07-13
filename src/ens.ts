@@ -1,5 +1,5 @@
 import { default as ensInterface } from './ens/contract/ens';
-import { default as resolverInterface } from './ens/contract/resolver';
+import { default as resolverInterface, OldResolverAddresses } from './ens/contract/resolver';
 import { default as hash, childhash } from './ens/namehash';
 import { formatsByCoinType } from '@ensdomains/address-encoder';
 import {
@@ -242,10 +242,10 @@ export default class Ens extends EthereumNamingService {
     return this.ensureRecordPresence(domain, key, record);
   }
 
-  private async getResolverContract(domain: string): Promise<Contract> {
+  private async getResolverContract(domain: string, coinType?: number): Promise<Contract> {
     const resolverAddress = await this.resolver(domain);
     return this.buildContract(
-      resolverInterface(resolverAddress),
+      resolverInterface(resolverAddress, coinType),
       resolverAddress,
     );
   }
@@ -321,8 +321,8 @@ export default class Ens extends EthereumNamingService {
     return coin;
   }
 
-  private async fetchAddressOrThrow(resolver, nodeHash, coinType: number) {
-    if (!resolver || isNullAddress(resolver)) {
+  private async fetchAddressOrThrow(resolver: string, nodeHash, coinType: number) {
+    if (isNullAddress(resolver)) {
       return null;
     }
     const resolverContract = this.buildContract(
@@ -330,7 +330,7 @@ export default class Ens extends EthereumNamingService {
       resolver,
     );
     const addr: string =
-      coinType != EthCoinIndex
+      coinType !== EthCoinIndex
         ? await this.callMethod(resolverContract, 'addr', [nodeHash, coinType])
         : await this.callMethod(resolverContract, 'addr', [nodeHash]);
     if (!addr || addr === '0x') return null;
@@ -338,7 +338,7 @@ export default class Ens extends EthereumNamingService {
     return formatsByCoinType[coinType].encoder(data);
   }
 
-  private async fetchAddress(resolver, nodeHash, coin = EthCoinIndex) {
+  private async fetchAddress(resolver, nodeHash, coin) {
     return (
       (await this.ignoreResolutionError(
         ResolutionErrorCode.RecordNotFound,

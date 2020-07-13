@@ -124,7 +124,7 @@ export enum NullAddresses {
   '0x0000000000000000000000000000000000000000000000000000000000000000',
 }
 
-export function isNullAddress(key: string | null | undefined): boolean {
+export function isNullAddress(key: string | null | undefined): key is string {
   if (!key) return true;
   return Object.values(NullAddresses).includes(key);
 }
