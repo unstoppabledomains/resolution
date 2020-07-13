@@ -116,16 +116,17 @@ export type Bip44Constants = [number, string, string];
 export type owner = string;
 export type ttl = string;
 export type nodeHash = string;
+export const NullAddress = '0x0000000000000000000000000000000000000000';
 /** @internal */
-export enum NullAddress {
+export enum NullAddresses {
   '0x',
   '0x0000000000000000000000000000000000000000',
   '0x0000000000000000000000000000000000000000000000000000000000000000',
 }
 
-export function isNullAddress(key: string | null): boolean {
+export function isNullAddress(key: string | null | undefined): boolean {
   if (!key) return true;
-  return Object.values(NullAddress).includes(key);
+  return Object.values(NullAddresses).includes(key);
 }
 
 export const EthCoinIndex = 60;

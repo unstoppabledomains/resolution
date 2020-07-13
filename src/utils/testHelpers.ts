@@ -57,7 +57,7 @@ export async function expectResolutionErrorCode(
       if (result instanceof Promise) {
         result.then(resolve, reject)
       } else {
-        resolve();
+        resolve(result);
       }
     });
   }
@@ -70,7 +70,6 @@ export async function expectResolutionErrorCode(
       } else {
         throw error;
       }
-
     }
   );
 }

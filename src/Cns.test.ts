@@ -82,7 +82,7 @@ describe('CNS', () => {
   it('should not find a resolver address', async () => {
     const spies = mockAsyncMethods(resolution.cns, {
       getResolver: undefined,
-      owner: NullAddress[1],
+      owner: NullAddress,
     });
     await expectResolutionErrorCode(
       resolution.resolver('unknown-unknown-938388383.crypto'),

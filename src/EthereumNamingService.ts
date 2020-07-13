@@ -159,7 +159,7 @@ export abstract class EthereumNamingService extends NamingService {
     ownerPromise?: Promise<string | null>,
   ) {
     const owner = ownerPromise ? await ownerPromise : await this.owner(domain);
-    if (!owner || isNullAddress(owner))
+    if (isNullAddress(owner))
       throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
         domain,
       });

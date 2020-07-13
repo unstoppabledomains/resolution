@@ -73,7 +73,7 @@ describe('ENS', () => {
   });
 
   it('reverses address to ENS domain null', async () => {
-    const spy = mockAsyncMethod(resolution.ens, 'getResolver', NullAddress[1]);
+    const spy = mockAsyncMethod(resolution.ens, 'getResolver', NullAddress);
     const result = await resolution.ens!.reverse(
       '0x112234455c3a32fd11230c42e7bccd4a84e02010',
       'ETH',
@@ -120,7 +120,7 @@ describe('ENS', () => {
     const ownerEye = mockAsyncMethod(
       resolution.ens,
       'getOwner',
-      NullAddress[1],
+      NullAddress,
     );
     const result = await resolution.address('something.luxe', 'ETH');
     expectSpyToBeCalled([ownerEye]);
@@ -142,7 +142,7 @@ describe('ENS', () => {
 
   it('resolves name with resolver but without an owner', async () => {
     const eyes = mockAsyncMethods(resolution.ens, {
-      getOwner: NullAddress[1],
+      getOwner: NullAddress,
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x76a9144620b70031f0e9437e374a2100934fba4911046088ac',
     });

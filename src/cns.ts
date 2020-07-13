@@ -7,6 +7,7 @@ import {
   isNullAddress,
   nodeHash,
   Web3Provider,
+  NullAddress,
 } from './types';
 import { default as resolverInterface } from './cns/contract/resolver';
 import { default as cnsInterface } from './cns/contract/registry';
@@ -91,7 +92,7 @@ export default class Cns extends EthereumNamingService {
     const tokenId = this.namehash(domain);
     const ownerPromise = this.owner(domain);
     const resolver = await this.getResolver(tokenId);
-    if (!resolver || isNullAddress(resolver)) {
+    if (isNullAddress(resolver)) {
       await this.throwOwnershipError(domain, ownerPromise);
     } else {
       ownerPromise.catch(() => {})
