@@ -336,7 +336,7 @@ describe('ZNS', () => {
       const spies = mockAsyncMethods(resolution.zns, {
         getRecordsAddresses: [
           'zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz',
-          NullAddress[1],
+          NullAddress,
         ],
       });
       await expectResolutionErrorCode(
@@ -350,7 +350,7 @@ describe('ZNS', () => {
       const spies = mockAsyncMethods(resolution.zns, {
         getRecordsAddresses: [
           'zil10scu59zrf8fr6gyw5vnwcz43hg7rvah747pz5h',
-          NullAddress[1],
+          NullAddress,
         ],
       });
       await expectResolutionErrorCode(

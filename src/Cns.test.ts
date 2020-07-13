@@ -82,7 +82,7 @@ describe('CNS', () => {
   it('should not find a resolver address', async () => {
     const spies = mockAsyncMethods(resolution.cns, {
       getResolver: undefined,
-      owner: NullAddress[1],
+      owner: NullAddress,
     });
     await expectResolutionErrorCode(
       resolution.resolver('unknown-unknown-938388383.crypto'),
@@ -165,6 +165,7 @@ describe('CNS', () => {
           getResolver: undefined,
           owner: '0x0000000000000000000000000000000000000000',
         });
+
         await expectResolutionErrorCode(
           resolution.cns!.address('unregistered.crypto', 'ETH'),
           ResolutionErrorCode.UnregisteredDomain,
