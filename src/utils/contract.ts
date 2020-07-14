@@ -1,5 +1,4 @@
 import BaseConnection from '../baseConnection';
-import {hexDataSlice} from '@ethersproject/bytes';
 import { Interface, JsonFragment } from '@ethersproject/abi';
 import ResolutionError, { ResolutionErrorCode } from '../resolutionError';
 import { isNullAddress, NamingServiceName, Web3Provider } from '../types';
