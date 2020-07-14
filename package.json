@@ -78,6 +78,7 @@
   },
   "dependencies": {
     "@ensdomains/address-encoder": ">=0.1.6",
+    "@ethersproject/abi": "^5.0.1",
     "bip44-constants": "^8.0.5",
     "bn.js": "^5.1.1",
     "commander": "^4.1.1",

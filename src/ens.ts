@@ -306,7 +306,6 @@ export default class Ens extends EthereumNamingService {
     ]);
   }
 
-  /** @internal */
   protected getCoinType(currencyTicker: string): number {
     const constants: Bip44Constants[] = require('bip44-constants');
     const coin = constants.findIndex(
@@ -333,7 +332,7 @@ export default class Ens extends EthereumNamingService {
       coinType !== EthCoinIndex
         ? await this.callMethod(resolverContract, 'addr', [nodeHash, coinType])
         : await this.callMethod(resolverContract, 'addr', [nodeHash]);
-    if (!addr || addr === '0x') return null;
+    if (isNullAddress(addr)) return null;
     const data = Buffer.from(addr.replace('0x', ''), 'hex');
     return formatsByCoinType[coinType].encoder(data);
   }

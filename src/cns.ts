@@ -162,7 +162,14 @@ export default class Cns extends EthereumNamingService {
   /** @internal */
   async owner(domain: string): Promise<string> {
     const tokenId = this.namehash(domain);
-    return await this.callMethod(this.registryContract, 'ownerOf', [tokenId]);
+    try {
+      return await this.callMethod(this.registryContract, 'ownerOf', [tokenId]);
+    } catch(error) {
+      if (error.reason === 'ERC721: owner query for nonexistent token') {
+        return NullAddress;
+      }
+      throw error;
+    }
   }
 
   /**
