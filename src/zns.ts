@@ -111,7 +111,7 @@ export default class Zns extends NamingService {
    */
   async address(domain: string, currencyTicker: string): Promise<string> {
     const data = await this.resolve(domain);
-    if ((data && !data.meta.owner) || isNullAddress(data!.meta.owner))
+    if (isNullAddress(data?.meta?.owner))
       throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
         domain,
       });
@@ -234,7 +234,7 @@ export default class Zns extends NamingService {
         domain: domain,
       });
     const [_, resolverAddress] = recordsAddresses;
-    if (!resolverAddress || isNullAddress(resolverAddress))
+    if (isNullAddress(resolverAddress))
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
         domain: domain,
       });
@@ -305,7 +305,7 @@ export default class Zns extends NamingService {
   private async getResolverRecords(
     resolverAddress: string,
   ): Promise<ZnsResolution> {
-    if (!resolverAddress || isNullAddress(resolverAddress)) {
+    if (isNullAddress(resolverAddress)) {
       return {};
     }
     const resolver = toChecksumAddress(resolverAddress);
