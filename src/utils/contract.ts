@@ -1,50 +1,41 @@
 import BaseConnection from '../baseConnection';
-import { defaultAbiCoder as AbiCoder } from './abicoder';
-var keccak256 = require('js-sha3').keccak_256;
-import ResolutionError, { ResolutionErrorCode } from '../errors/resolutionError';
-import { isNullAddress, NamingServiceName, Provider, RequestArguments } from '../types';
 import { FetchError } from 'node-fetch';
+import ResolutionError, { ResolutionErrorCode } from '../errors/resolutionError';
+import { Interface, JsonFragment } from '@ethersproject/abi';
+import { isNullAddress, NamingServiceName, Provider, RequestArguments } from '../types';
 
 type FourBytes = string;
 
 /** @internal */
 export default class Contract extends BaseConnection {
-  readonly contractInterface: [any];
+  readonly abi: JsonFragment[];
+  readonly coder: Interface;
   readonly address: string;
   readonly url: string | undefined;
   readonly name: NamingServiceName;
   readonly provider?: Provider;
 
-  /**
-   * @param contractInterface JSON-RPC interface of smartContract
-   * @param address Contract's address
-   */
   constructor(
     name: NamingServiceName,
     url: string | undefined,
-    contractInterface,
+    abi,
     address: string,
     provider?: Provider,
   ) {
     super();
     this.name = name;
     this.url = url;
-    this.contractInterface = contractInterface;
+    this.abi = abi;
     this.address = address;
     this.provider = provider;
+    this.coder = new Interface(this.abi);
   }
 
-  /**
-   * Used to fetch a Contract method
-   * @param method - method name
-   * @param args - method args
-   * @async
-   */
   async fetchMethod(method: string, args: string[]): Promise<any> {
-    const methodDescription = this.contractInterface.find(
-      param => param.name === method && param.inputs.length === args.length,
-    );
-    const inputParam = this.encodeInput(methodDescription, args);
+    const inputParam = this.coder.encodeFunctionData(
+      method,
+      args,
+    )
     const response = await this.fetchData(inputParam).catch((error) => {
       if (error instanceof FetchError) {
         throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
@@ -57,41 +48,7 @@ export default class Contract extends BaseConnection {
         recordName: method,
         domain: args[0],
       });
-    const decoded = AbiCoder.decode(
-      methodDescription.outputs,
-      response,
-    )[0];
-    return decoded;
-  }
-
-  /**
-   * This method is used to get the first 4 bytes of keccak256 hash of contract method signature.
-   * required to make an appropriate read call to eth
-   * @param method - method signature to hash
-   * @returns a string that consist with 0x and 4 bytes in hex.
-   */
-  private fourBytesHash(method: string): FourBytes {
-    return (
-      '0x' +
-      keccak256(method)
-        .toString('hex')
-        .slice(0, 8)
-    );
-  }
-
-  private encodeInput(methodDescription, args): string {
-    const functionName: string = methodDescription.name;
-    const functionInputTypes: [string] = methodDescription.inputs.map(
-      input => input.type,
-    );
-    const methodSignature: string = `${functionName}(${functionInputTypes.join(
-      ',',
-    )})`;
-    const initialBytes: FourBytes = this.fourBytesHash(methodSignature);
-    return (
-      initialBytes +
-      AbiCoder.encode(methodDescription.inputs, args).replace('0x', '')
-    );
+    return this.coder.decodeFunctionResult(method, response)[0]
   }
 
   private async fetchData(data: string): Promise<unknown> {

@@ -1,8 +1,11 @@
 ## Unreleased
+
 * Added web3 providers supports such as http and ws protocols
 * Introduced ConfigurationError which handles all error that were made cause of falty configurations
+* Use [@ethersproject/abi](https://www.npmjs.com/package/@ethersproject/abi) instead of its own ABI encoder
 
 ## 1.5.1
+
 * fixing the version 
 
 ## 1.4.1
