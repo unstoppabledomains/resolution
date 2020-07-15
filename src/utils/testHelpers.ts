@@ -16,7 +16,9 @@ export const CryptoDomainWithAdaBchAddresses = 'reseller-test-mago0.crypto';
 export function mockAsyncMethod(object: any, method: string, value) {
   const spy = jest.spyOn(object, method);
   if (!process.env.LIVE) {
-    if (value instanceof Error) {
+    if (value instanceof Function) {
+      return spy.mockImplementation(value)
+    } else if (value instanceof Error) {
       return spy.mockRejectedValue(value);
     } else {
       return spy.mockResolvedValue(value);

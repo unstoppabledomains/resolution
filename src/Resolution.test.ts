@@ -19,6 +19,7 @@ import {
   secretInfuraLink,
   InfuraProtocol,
   caseMock,
+  mockAsyncMethod,
 } from './utils/testHelpers';
 
 try {
@@ -323,15 +324,14 @@ describe('Resolution', () => {
       // We still prefer everything to be statically typed on our end for better mocking
       const provider = new (Web3HttpProvider as any)(secretInfuraLink()) as Web3HttpProvider.HttpProvider;
       // mock the send function with different implementations (each should call callback right away with different answers)
-      const eye = jest.spyOn(provider, "send")
-        .mockImplementation((payload: JsonRpcPayload, callback) => {
-          const result = caseMock(payload.params![0], RpcProviderTestCases)
-          callback && callback(null, {
-            jsonrpc: '2.0',
-            id: 1,
-            result,
-          });
+      const eye = mockAsyncMethod(provider, "send", (payload: JsonRpcPayload, callback) => {
+        const result = caseMock(payload.params![0], RpcProviderTestCases)
+        callback && callback(null, {
+          jsonrpc: '2.0',
+          id: 1,
+          result,
         });
+      });
       const resolution = Resolution.fromWeb3Version1Provider(provider);
       const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
 
@@ -344,15 +344,14 @@ describe('Resolution', () => {
       // web3-providers-ws has problems with type definitions
       // We still prefer everything to be statically typed on our end for better mocking
       const provider = new (Web3WsProvider as any)(secretInfuraLink(InfuraProtocol.wss)) as Web3WsProvider.WebsocketProvider;
-      const eye = jest.spyOn(provider, "send")
-        .mockImplementation((payload, callback) => {
-          const result = caseMock(payload.params![0], RpcProviderTestCases)
-          callback(null, {
-            jsonrpc: '2.0',
-            id: 1,
-            result,
-          });
+      const eye = mockAsyncMethod(provider, "send", (payload, callback) => {
+        const result = caseMock(payload.params![0], RpcProviderTestCases)
+        callback(null, {
+          jsonrpc: '2.0',
+          id: 1,
+          result,
         });
+      });
 
       const resolution = Resolution.fromWeb3Version1Provider(provider);
       const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
@@ -367,11 +366,10 @@ describe('Resolution', () => {
         'mainnet',
       );
       const resolution = Resolution.fromEthersJsonRpcProvider(provider);
-      const eye = jest.spyOn(provider, "send")
-        .mockImplementation((method, params) => {
-          if (method !== "eth_call") throw new Error(`got unexpected method ${method}`);
-          return Promise.resolve(caseMock(params[0], RpcProviderTestCases))
-        });
+      const eye = mockAsyncMethod(provider, "send", (method, params) => {
+        if (method !== "eth_call") throw new Error(`got unexpected method ${method}`);
+        return Promise.resolve(caseMock(params[0], RpcProviderTestCases))
+      });
       const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
       expectSpyToBeCalled([eye]);
       expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
@@ -380,10 +378,9 @@ describe('Resolution', () => {
     it('should work with ethersProvider', async () => {
       const provider = getDefaultProvider("mainnet");
 
-      const eye = jest.spyOn(provider, "call")
-        .mockImplementation(
-          params => Promise.resolve(caseMock(params, RpcProviderTestCases))
-        );
+      const eye = mockAsyncMethod(provider, "call",
+        params => Promise.resolve(caseMock(params, RpcProviderTestCases))
+      );
       const resolution = Resolution.fromEthersProvider(provider);
       const ethAddress = await resolution.addressOrThrow('brad.crypto', 'eth');
       expectSpyToBeCalled([eye]);
@@ -392,15 +389,14 @@ describe('Resolution', () => {
 
     it('should work with web3@0.2.7 provider', async () => {
       const provider = new Web3V027Provider(secretInfuraLink(InfuraProtocol.http), 5000, null, null, null);
-      const eye = jest.spyOn(provider, "sendAsync")
-        .mockImplementation((payload: JsonRpcPayload, callback: any) => {
-          const result = caseMock(payload.params![0], RpcProviderTestCases)
-          callback(undefined, {
-            jsonrpc: '2.0',
-            id: 1,
-            result,
-          });
+      const eye = mockAsyncMethod(provider, "sendAsync", (payload: JsonRpcPayload, callback: any) => {
+        const result = caseMock(payload.params![0], RpcProviderTestCases)
+        callback(undefined, {
+          jsonrpc: '2.0',
+          id: 1,
+          result,
         });
+      });
       const resolution = Resolution.fromWeb3Version0Provider(provider);
       const ethAddress = await resolution.addressOrThrow('brad.crypto', 'eth');
       expectSpyToBeCalled([eye]);
