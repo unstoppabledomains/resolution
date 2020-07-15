@@ -1,6 +1,6 @@
 ## Unreleased
 
-* Added web3 providers supports such as http and ws protocols
+* Added support of web3.js and ethers.js providers
 * Introduced ConfigurationError which handles all error that were made cause of falty configurations
 * Use [@ethersproject/abi](https://www.npmjs.com/package/@ethersproject/abi) instead of its own ABI encoder
 
