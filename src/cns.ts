@@ -35,7 +35,7 @@ export default class Cns extends EthereumNamingService {
     source = this.normalizeSource(source);
     this.registryAddress = source.registry
       ? source.registry
-      : this.RegistryMap[this.network || 'mainnet'];
+      : this.RegistryMap[this.network];
     if (this.registryAddress) {
       this.registryContract = this.buildContract(
         cnsInterface,

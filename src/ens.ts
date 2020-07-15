@@ -37,7 +37,7 @@ export default class Ens extends EthereumNamingService {
     source = this.normalizeSource(source);
     this.registryAddress = source.registry
       ? source.registry
-      : EnsNetworkMap[EthereumNamingService.NetworkNameMap[this.network || 'mainnet']];
+      : EnsNetworkMap[EthereumNamingService.NetworkNameMap[this.network]];
     if (this.registryAddress) {
       this.registryContract = this.buildContract(
         ensInterface,

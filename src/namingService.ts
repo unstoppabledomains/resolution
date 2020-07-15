@@ -15,7 +15,7 @@ import {
 /** @internal */
 export default abstract class NamingService extends BaseConnection {
   readonly name: ResolutionMethod;
-  readonly network: string | undefined;
+  readonly network: string;
   readonly url: string | undefined;
   protected provider?: Provider;
   abstract isSupportedDomain(domain: string): boolean;

@@ -52,7 +52,7 @@ export default class Zns extends NamingService {
     source = this.normalizeSource(source);
     this.registryAddress = source.registry
       ? source.registry
-      : RegistryMap[this.network || 'mainnet'];
+      : RegistryMap[this.network];
     if (this.registryAddress) {
       this.registryAddress = this.registryAddress.startsWith('0x')
         ? toBech32Address(this.registryAddress)

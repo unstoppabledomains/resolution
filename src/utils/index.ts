@@ -30,6 +30,6 @@ export function invert(object) {
   return returnee;
 }
 
-export function signedInfuraLink(infura: string): string {
-  return `https://mainnet.infura.com/v3/${infura}`;
+export function signedInfuraLink(infura: string, network: string = 'mainnet'): string {
+  return `https://${network}.infura.com/v3/${infura}`;
 }

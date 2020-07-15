@@ -85,12 +85,13 @@ export default class Resolution {
   /**
    * Creates a resolution with configured infura id for ens and cns
    * @param infura infura project id
+   * @param network ethereum network name
    */
-  static infura(infura: string): Resolution {
+  static infura(infura: string, network: string = 'mainnet'): Resolution {
     return new this({
       blockchain: {
-        ens: { url: signedInfuraLink(infura), network: 'mainnet' },
-        cns: { url: signedInfuraLink(infura), network: 'mainnet' },
+        ens: { url: signedInfuraLink(infura, network), network },
+        cns: { url: signedInfuraLink(infura, network), network },
       },
     });
   }
