@@ -106,8 +106,4 @@ export default abstract class NamingService extends BaseConnection {
       });
     }
   }
-
-  protected isEmptyConfig(source: SourceDefinition | undefined): boolean {
-    return !source || !Object.values(source).find(v => v);
-  }
 }
