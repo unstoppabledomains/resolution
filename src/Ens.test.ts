@@ -212,7 +212,7 @@ describe('ENS', () => {
   it('checks normalizeSource ens (object) #6', async () => {
     expect(
       () => new Resolution({ blockchain: { ens: { network: 7543 } } }),
-    ).toThrowError('Unspecified network in Resolution ENS configuration');
+    ).toThrowError('Unspecified url in Resolution ENS configuration');
   });
 
   it('checks normalizeSource ens (object) #7', async () => {

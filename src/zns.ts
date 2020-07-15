@@ -229,21 +229,14 @@ export default class Zns extends NamingService {
     return resolverAddress;
   }
 
-  /** @internal */
   protected normalizeSource(source: SourceDefinition | undefined): SourceDefinition {
-    source = this.isEmptyConfig(source) ? {network: 'mainnet'} : {...source };
+    source = {...source};
     if (typeof source.network == 'number') {
-      source.network = NetworkIdMap[source.network];
+      source.network = NetworkIdMap[source.network] || source.network;
     }
-    if (source.registry) {
-      source.network = source.network ? source.network : 'mainnet';
-      source.url = source.url ? source.url : DefaultSource;
-    }
-    if (source.network && !source.url) {
-      source.url = UrlMap[source.network];
-    }
-    if (source.url && !source.network) {
-      source.network = UrlNetworkMap(source.url);
+    source.network = source.network || (source.url && UrlNetworkMap[source.url]) || 'mainnet';
+    if (!source.provider) {
+      source.url = source.url || (typeof source.network === 'string' && UrlMap[source.network]);
     }
     return source;
   }

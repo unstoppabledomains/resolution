@@ -62,39 +62,24 @@ export abstract class EthereumNamingService extends NamingService {
    *  - mainnet
    *  - testnet
    */
-  private networkFromUrl(url: string): string | undefined {
+  private networkFromUrl(url: string | undefined): string | undefined {
+    if (!url) {
+      return undefined;
+    }
     for (const key in EthereumNamingService.NetworkNameMap) {
       if (!EthereumNamingService.NetworkNameMap.hasOwnProperty(key)) continue;
       if (url.indexOf(key) >= 0) return key;
     }
   }
 
-  /**
-   * Normalizes the source object based on type
-   * @internal
-   * @param source
-   * @returns
-   */
-  protected normalizeSource(source): SourceDefinition {
-    source = this.isEmptyConfig(source) ? {network: 'mainnet'} : {...source };
+  protected normalizeSource(source: SourceDefinition): SourceDefinition {
+    source = {...source };
     if (typeof source.network == 'number') {
-      source.network = EthereumNamingService.NetworkIdMap[source.network];
+      source.network = EthereumNamingService.NetworkIdMap[source.network] || source.network;
     }
-    if (source.registry) {
-      source.network = source.network ? source.network : 'mainnet';
-      source.url = source.url
-        ? source.url
-        : `https://${source.network}.infura.io`;
-    }
-    if (
-      source.network &&
-      !source.url &&
-      EthereumNamingService.NetworkNameMap.hasOwnProperty(source.network)
-    ) {
-      source.url = `https://${source.network}.infura.io`;
-    }
-    if (source.url && !source.network) {
-      source.network = this.networkFromUrl(source.url);
+    source.network = source.network || this.networkFromUrl(source.url) || 'mainnet';
+    if (!source.provider) {
+      source.url = source.url || EthereumNamingService.UrlMap[source.network];
     }
     return source;
   }

@@ -95,7 +95,7 @@ export default abstract class NamingService extends BaseConnection {
   }
 
   protected ensureConfigured(): void {
-    if (!this.network && !this.provider) {
+    if (!this.network) {
       throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedNetwork, {
         method: this.name,
       });
