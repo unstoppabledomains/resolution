@@ -1,6 +1,9 @@
 ## Unreleased
 
+* Use [@ethersproject/abi](https://www.npmjs.com/package/@ethersproject/abi) instead of its own ABI encoder
+
 ## 1.5.1
+
 * fixing the version 
 
 ## 1.4.1
