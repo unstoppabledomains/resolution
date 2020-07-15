@@ -1,6 +1,6 @@
 {
   "name": "@unstoppabledomains/resolution",
-  "version": "1.5.1",
+  "version": "1.5.2-beta.0",
   "description": "Domain Resolution for blockchain domains",
   "main": "./build/index.js",
   "directories": {
@@ -78,8 +78,9 @@
   },
   "dependencies": {
     "@ensdomains/address-encoder": ">=0.1.6",
+    "@ethersproject/abi": "^5.0.1",
     "bip44-constants": "^8.0.5",
-    "bn.js": "^5.1.1",
+    "bn.js": "^4.4.0",
     "commander": "^4.1.1",
     "content-hash": "^2.5.2",
     "ethereum-ens-network-map": "^1.0.2",

@@ -62,7 +62,7 @@ export default class Udapi extends NamingService {
    */
   async address(domain: string, currencyTicker: string): Promise<string> {
     const data = await this.resolve(domain);
-    if (!data.meta.owner || isNullAddress(data.meta.owner))
+    if (isNullAddress(data.meta.owner))
       throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
         domain,
       });
