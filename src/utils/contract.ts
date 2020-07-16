@@ -1,30 +1,19 @@
-import BaseConnection from '../baseConnection';
-import { FetchError } from 'node-fetch';
 import ResolutionError, { ResolutionErrorCode } from '../errors/resolutionError';
 import { Interface, JsonFragment } from '@ethersproject/abi';
 import { isNullAddress, NamingServiceName, Provider, RequestArguments } from '../types';
 
-type FourBytes = string;
-
 /** @internal */
-export default class Contract extends BaseConnection {
+export default class Contract {
   readonly abi: JsonFragment[];
   readonly coder: Interface;
   readonly address: string;
-  readonly url: string | undefined;
-  readonly name: NamingServiceName;
-  readonly provider?: Provider;
+  readonly provider: Provider;
 
   constructor(
-    name: NamingServiceName,
-    url: string | undefined,
     abi,
     address: string,
-    provider?: Provider,
+    provider: Provider,
   ) {
-    super();
-    this.name = name;
-    this.url = url;
     this.abi = abi;
     this.address = address;
     this.provider = provider;
@@ -36,13 +25,7 @@ export default class Contract extends BaseConnection {
       method,
       args,
     )
-    const response = await this.fetchData(inputParam).catch((error) => {
-      if (error instanceof FetchError) {
-        throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
-          method: this.name,
-        });
-      } else throw error;
-    }) as string | null;
+    const response = await this.fetchData(inputParam) as string | null;
     if (isNullAddress(response))
       throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
         recordName: method,
@@ -59,27 +42,10 @@ export default class Contract extends BaseConnection {
       },
       'latest',
     ];
-    if (this.provider) {
-      const request: RequestArguments = {
-        method: 'eth_call',
-        params
-      };
-      return await this.provider
-      .request(request);
-    }
-    const response = await this.fetch(this.url, {
-      method: 'POST',
-      body: JSON.stringify({
-        jsonrpc: '2.0',
-        id: 1,
-        method: 'eth_call',
-        params,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    const responsejson =  await response.json();
-    return responsejson.result;
+    const request: RequestArguments = {
+      method: 'eth_call',
+      params
+    };
+    return await this.provider.request(request);
   }
 }

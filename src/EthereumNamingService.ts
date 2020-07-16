@@ -10,6 +10,7 @@ import {
 } from './types';
 import { invert } from './utils';
 import Contract from './utils/contract';
+import FetchProvider from './FetchProvider';
 
 /** @internal */
 export abstract class EthereumNamingService extends NamingService {
@@ -119,7 +120,7 @@ export abstract class EthereumNamingService extends NamingService {
   }
 
   protected buildContract(abi, address) {
-    return new Contract(this.name, this.url, abi, address, this.provider);
+    return new Contract(abi, address, this.provider || new FetchProvider(this.name, this.url!));
   }
 
   protected async throwOwnershipError(
