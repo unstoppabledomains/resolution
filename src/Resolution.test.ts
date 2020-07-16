@@ -10,7 +10,7 @@ import {
 import { JsonRpcProvider, getDefaultProvider } from '@ethersproject/providers';
 import Web3HttpProvider from 'web3-providers-http';
 import Web3WsProvider from 'web3-providers-ws';
-import Web3V027Provider from 'web3-0.2.7/lib/web3/httpprovider';
+import Web3V027Provider from 'web3-0.20.7/lib/web3/httpprovider';
 
 import {
   expectResolutionErrorCode,
@@ -387,7 +387,7 @@ describe('Resolution', () => {
       expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
     });
 
-    it('should work with web3@0.2.7 provider', async () => {
+    it('should work with web3@0.20.7 provider', async () => {
       const provider = new Web3V027Provider(secretInfuraLink(InfuraProtocol.http), 5000, null, null, null);
       const eye = mockAsyncMethod(provider, "sendAsync", (payload: JsonRpcPayload, callback: any) => {
         const result = caseMock(payload.params![0], RpcProviderTestCases)
