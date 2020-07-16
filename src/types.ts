@@ -135,6 +135,10 @@ type ProviderMethod = (
   callback: (error: Error | null, result?: JsonRpcResponse) => void,
 ) => void;
 
+export interface EthersRpcProvider {
+  send(method: string, params: Array<any>): Promise<any>;
+};
+
 export interface Web3Version0Provider {
   sendAsync: ProviderMethod;
 }

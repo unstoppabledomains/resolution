@@ -18,6 +18,7 @@ import {
   ProviderParams,
   NamingServiceSource,
   SourceDefinition,
+  EthersRpcProvider,
 } from './types';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import NamingService from './namingService';
@@ -109,12 +110,13 @@ export default class Resolution {
    * Creates a resolution instance from configured jsonRPCProvider
    * @param provider - any jsonRPCprovider will work as long as it's prototype has send(method, params): Promise<any> method
    * @see https://docs.ethers.io/ethers.js/v5-beta/api-providers.html#jsonrpcprovider-inherits-from-provider
+   * @see https://github.com/ethers-io/ethers.js/blob/master/packages/providers/src.ts/json-rpc-provider.ts
    */
-  static fromEthersJsonRpcProvider(provider): Resolution {
+  static fromEthersJsonRpcProvider(provider: EthersRpcProvider): Resolution {
     if (provider.send === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
     return this.fromEip1193Provider({
       request: async (request: RequestArguments) => {
-        return await provider.send(request.method, request.params)
+        return await provider.send(request.method, this.wrapArray(request.params))
       }
     });
   }
@@ -130,7 +132,7 @@ export default class Resolution {
       request: (request: RequestArguments) =>
         new Promise((resolve, reject) => {
           provider.sendAsync(
-            { jsonrpc: '2.0', method: request.method, params: this.normalizeParamsForWeb3(request.params), id: 1 },
+            { jsonrpc: '2.0', method: request.method, params: this.wrapArray(request.params), id: 1 },
             (error: Error | null, result: JsonRpcResponse) => {
               if (error) reject(error);
               if (result.error) reject(new Error(result.error))
@@ -153,7 +155,7 @@ export default class Resolution {
       request: (request: RequestArguments) =>
         new Promise((resolve, reject) => {
           provider.send(
-            { jsonrpc: '2.0', method: request.method, params: this.normalizeParamsForWeb3(request.params), id: 1 },
+            { jsonrpc: '2.0', method: request.method, params: this.wrapArray(request.params), id: 1 },
             (error: Error | null, result: JsonRpcResponse) => {
               if (error) reject(error);
               if (result.error) reject(new Error(result.error))
@@ -412,12 +414,8 @@ export default class Resolution {
     return this.getNamingMethodOrThrow(domain).serviceName(domain);
   }
 
-  protected static normalizeParamsForWeb3(params: ProviderParams = []): unknown[] {
-    if (params instanceof Array) {
-      return params;
-    } else {
-      return [params];
-    }
+  protected static wrapArray(params: ProviderParams = []): unknown[] {
+    return params instanceof Array ? params : [params];
   }
 
   private getNamingMethod(domain: string): NamingService | undefined {
