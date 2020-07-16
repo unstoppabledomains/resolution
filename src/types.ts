@@ -7,7 +7,6 @@ export type Dictionary<T> = { [k: string]: T };
  * @property {string | number} [network] - blockchain network
  */
 export interface SourceDefinition {
-  enabled?: boolean;
   url?: string;
   network?: string | number;
   registry?: string;

@@ -101,7 +101,7 @@ export default class Resolution {
    * @param provider - any provider compatible with EIP-1193
    * @see https://eips.ethereum.org/EIPS/eip-1193
    */
-  static fromEipEthProvider(provider: Provider): Resolution {
+  static fromEip1193Provider(provider: Provider): Resolution {
     return new this({ blockchain: { zns: true, ens: {provider}, cns: {provider} } });
   }
 
@@ -112,7 +112,7 @@ export default class Resolution {
    */
   static fromEthersJsonRpcProvider(provider): Resolution {
     if (provider.send === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
-    return this.fromEipEthProvider({
+    return this.fromEip1193Provider({
       request: async (request: RequestArguments) => {
         return await provider.send(request.method, request.params)
       }
@@ -126,7 +126,7 @@ export default class Resolution {
    */
   static fromWeb3Version0Provider(provider: Web3Version0Provider): Resolution {
     if (provider.sendAsync === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
-    return this.fromEipEthProvider({
+    return this.fromEip1193Provider({
       request: (request: RequestArguments) =>
         new Promise((resolve, reject) => {
           provider.sendAsync(
@@ -149,7 +149,7 @@ export default class Resolution {
    */
   static fromWeb3Version1Provider(provider: Web3Version1Provider) {
     if (provider.send === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
-    return this.fromEipEthProvider({
+    return this.fromEip1193Provider({
       request: (request: RequestArguments) =>
         new Promise((resolve, reject) => {
           provider.send(
@@ -172,7 +172,7 @@ export default class Resolution {
    */
   static fromEthersProvider(provider) {
     if (provider.call === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
-    return this.fromEipEthProvider({
+    return this.fromEip1193Provider({
       request: async (request: RequestArguments) => await provider.call(request.params![0])
     });
   }
