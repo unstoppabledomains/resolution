@@ -130,8 +130,24 @@ type ProviderMethod = (
   callback: (error: Error | null, result?: JsonRpcResponse) => void,
 ) => void;
 
-export interface EthersRpcProvider {
-  send(method: string, params: Array<any>): Promise<any>;
+export type TransactionRequest = {
+    to?: unknown,
+    from?: unknown,
+    nonce?: unknown,
+
+    gasLimit?: unknown,
+    gasPrice?: unknown,
+
+    data?: unknown,
+    value?: unknown,
+    chainId?: unknown,
+}
+
+/**
+ * @see https://github.com/ethers-io/ethers.js/blob/v5.0.4/packages/abstract-provider/src.ts/index.ts#L224
+ */
+export interface EthersProvider {
+  call(transaction: TransactionRequest, blockTag?: never): Promise<string>;
 };
 
 export interface Web3Version0Provider {

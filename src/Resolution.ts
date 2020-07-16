@@ -18,7 +18,7 @@ import {
   ProviderParams,
   NamingServiceSource,
   SourceDefinition,
-  EthersRpcProvider,
+  EthersProvider,
 } from './types';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import NamingService from './namingService';
@@ -107,21 +107,6 @@ export default class Resolution {
   }
 
   /**
-   * Creates a resolution instance from configured jsonRPCProvider
-   * @param provider - any jsonRPCprovider will work as long as it's prototype has send(method, params): Promise<any> method
-   * @see https://docs.ethers.io/ethers.js/v5-beta/api-providers.html#jsonrpcprovider-inherits-from-provider
-   * @see https://github.com/ethers-io/ethers.js/blob/master/packages/providers/src.ts/json-rpc-provider.ts
-   */
-  static fromEthersJsonRpcProvider(provider: EthersRpcProvider): Resolution {
-    if (provider.send === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
-    return this.fromEip1193Provider({
-      request: async (request: RequestArguments) => {
-        return await provider.send(request.method, this.wrapArray(request.params))
-      }
-    });
-  }
-
-  /**
    * Create a resolution instance from web3 0.x version provider
    * @param provider - an 0.x version provider from web3 ( must implement sendAsync(payload, callback) )
    * @see https://github.com/ethereum/web3.js/blob/0.20.7/lib/web3/httpprovider.js#L116
@@ -149,7 +134,7 @@ export default class Resolution {
    * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-core-helpers/types/index.d.ts#L165
    * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-providers-http/src/index.js#L95
    */
-  static fromWeb3Version1Provider(provider: Web3Version1Provider) {
+  static fromWeb3Version1Provider(provider: Web3Version1Provider): Resolution {
     if (provider.send === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
     return this.fromEip1193Provider({
       request: (request: RequestArguments) =>
@@ -167,12 +152,15 @@ export default class Resolution {
   }
 
   /**
-   * Creates instance of resolution from ethers provider
-   * @param provider - Ethers provider
+   * Creates instance of resolution from provider that
+   * implements Ethers Provider#call interface
+   * @param provider - provider object
    * @see https://github.com/ethers-io/ethers.js/blob/v4-legacy/providers/abstract-provider.d.ts#L91
    * @see https://github.com/ethers-io/ethers.js/blob/v5.0.4/packages/abstract-provider/src.ts/index.ts#L224
+   * @see https://docs.ethers.io/ethers.js/v5-beta/api-providers.html#jsonrpcprovider-inherits-from-provider
+   * @see https://github.com/ethers-io/ethers.js/blob/master/packages/providers/src.ts/json-rpc-provider.ts
    */
-  static fromEthersProvider(provider) {
+  static fromEthersProvider(provider: EthersProvider): Resolution {
     if (provider.call === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
     return this.fromEip1193Provider({
       request: async (request: RequestArguments) => await provider.call(request.params![0])
@@ -414,7 +402,7 @@ export default class Resolution {
     return this.getNamingMethodOrThrow(domain).serviceName(domain);
   }
 
-  protected static wrapArray(params: ProviderParams = []): unknown[] {
+  protected static wrapArray<T>(params: T | T[] = []): T[] {
     return params instanceof Array ? params : [params];
   }
 

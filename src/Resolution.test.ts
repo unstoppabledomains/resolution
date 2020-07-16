@@ -360,22 +360,21 @@ describe('Resolution', () => {
       expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
     });
 
-    it('should work for jsonrpc provider', async () => {
+    it('should work for ethers jsonrpc provider', async () => {
       const provider = new JsonRpcProvider(
         secretInfuraLink(InfuraProtocol.http),
         'mainnet',
       );
-      const resolution = Resolution.fromEthersJsonRpcProvider(provider);
-      const eye = mockAsyncMethod(provider, "send", (method, params) => {
-        if (method !== "eth_call") throw new Error(`got unexpected method ${method}`);
-        return Promise.resolve(caseMock(params[0], RpcProviderTestCases))
-      });
+      const resolution = Resolution.fromEthersProvider(provider);
+      const eye = mockAsyncMethod(provider, "call",
+        params => Promise.resolve(caseMock(params, RpcProviderTestCases))
+      );
       const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
       expectSpyToBeCalled([eye]);
       expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
     });
 
-    it('should work with ethersProvider', async () => {
+    it('should work with ethers default provider', async () => {
       const provider = getDefaultProvider("mainnet");
 
       const eye = mockAsyncMethod(provider, "call",
