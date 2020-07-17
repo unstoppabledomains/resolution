@@ -20,9 +20,18 @@ import { signedInfuraLink } from './utils';
  * Blockchain domain Resolution library - Resolution.
  * @example
  * ```
- * let Resolution = new Resolution({blockchain: {ens: {url: 'https://mainnet.infura.io', network: 'mainnet'}}});
- * let domain = brad.zil
- * let Resolution = Resolution.address(domain);
+ * import Resolution from '@unstoppabledomains/resolution';
+ * 
+ * let resolution = new Resolution({ blockchain: {
+ *        ens: {
+ *           url: "https://mainnet.infura.io/v3/12351245223",
+ *           network: "mainnet"
+ *        }
+ *      }
+ *   });
+ *
+ * let domain = "brad.zil";
+ * resolution.address(domain, "eth").then(addr => console.log(addr));;
  * ```
  */
 export default class Resolution {
@@ -234,6 +243,10 @@ export default class Resolution {
     return await method.address(domain, currencyTicker);
   }
 
+  /**
+   * Resolves resolver contract address of a domain
+   * @param domain - domain name
+   */
   async resolver(domain: string): Promise<string> {
     domain = this.prepareDomain(domain);
     return await this.getNamingMethodOrThrow(domain).resolver(domain);
