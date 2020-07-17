@@ -1,15 +1,15 @@
 import nodeFetch, {FetchError} from 'node-fetch';
 import BaseConnection from './baseConnection';
-import { Provider, RequestArguments, NamingServiceName } from './types';
+import { Provider, RequestArguments, ResolutionMethod } from './types';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 
 /** @internal */
 export default class FetchProvider extends BaseConnection implements Provider {
 
   readonly url: string;
-  readonly name: NamingServiceName;
+  readonly name: ResolutionMethod;
 
-  constructor(name: NamingServiceName, url: string) {
+  constructor(name: ResolutionMethod, url: string) {
     super();
     this.url = url;
     this.name = name;
@@ -21,7 +21,7 @@ export default class FetchProvider extends BaseConnection implements Provider {
         method: 'POST',
         body: JSON.stringify({
           jsonrpc: '2.0',
-          id: 1,
+          id: '1',
           method: args.method,
           params: args.params || [],
         }),

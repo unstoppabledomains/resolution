@@ -21,6 +21,7 @@ import NamingService from './namingService';
 import ConfigurationError, {
   ConfigurationErrorCode,
 } from './errors/configurationError';
+import FetchProvider from './FetchProvider';
 
 const DefaultSource = 'https://api.zilliqa.com';
 
@@ -300,23 +301,8 @@ export default class Zns extends NamingService {
   ): Promise<any> {
     const params = [contractAddress.replace('0x', ''), field, keys];
     const method = 'GetSmartContractSubState';
-    if (this.provider) {
-      return await this.provider.request({method, params})
-    } else {
-      const response = await this.fetch(this.url, {
-        method: 'POST',
-        body: JSON.stringify({
-          id: '1',
-          jsonrpc: '2.0',
-          method,
-          params,
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }).then(res => res.json());
-      return response.result;
-    }
+    const provider = this.provider || new FetchProvider(this.name, this.url!);
+    return await provider.request({method, params})
   }
 
   private async getContractField(
@@ -324,19 +310,11 @@ export default class Zns extends NamingService {
     field: string,
     keys: string[] = [],
   ): Promise<any> {
-    try {
-      const contractAddr = contractAddress.startsWith('zil1')
-        ? fromBech32Address(contractAddress)
-        : contractAddress;
-      let result = (await this.fetchSubState(contractAddr, field, keys)) || {};
-      return result[field];
-    } catch (err) {
-      if (err.name == 'FetchError')
-        throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
-          method: NamingServiceName.ZNS,
-        });
-      else throw err;
-    }
+    const contractAddr = contractAddress.startsWith('zil1')
+    ? fromBech32Address(contractAddress)
+    : contractAddress;
+    let result = (await this.fetchSubState(contractAddr, field, keys)) || {};
+    return result[field];
   }
 
   private async getContractMapValue(
