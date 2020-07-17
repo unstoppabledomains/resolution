@@ -1,32 +1,22 @@
-import BaseConnection from '../baseConnection';
+import ResolutionError, { ResolutionErrorCode } from '../errors/resolutionError';
 import { Interface, JsonFragment } from '@ethersproject/abi';
-import ResolutionError, { ResolutionErrorCode } from '../resolutionError';
-import { isNullAddress, NamingServiceName, Web3Provider } from '../types';
-
-type FourBytes = string;
+import { isNullAddress, NamingServiceName, Provider, RequestArguments } from '../types';
 
 /** @internal */
-export default class Contract extends BaseConnection {
+export default class Contract {
   readonly abi: JsonFragment[];
   readonly coder: Interface;
   readonly address: string;
-  readonly url: string;
-  readonly name: NamingServiceName;
-  readonly web3Provider?: Web3Provider;
+  readonly provider: Provider;
 
   constructor(
-    name: NamingServiceName,
-    url: string,
     abi,
     address: string,
-    web3Provider?: Web3Provider,
+    provider: Provider,
   ) {
-    super();
-    this.name = name;
-    this.url = url;
     this.abi = abi;
     this.address = address;
-    this.web3Provider = web3Provider;
+    this.provider = provider;
     this.coder = new Interface(this.abi);
   }
 
@@ -35,22 +25,16 @@ export default class Contract extends BaseConnection {
       method,
       args,
     )
-    const response = await this.fetchData(inputParam);
-    if (response.error) {
-      throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
-        method: this.name,
-      });
-    }
-    if (isNullAddress(response.result))
+    const response = await this.fetchData(inputParam) as string | null;
+    if (isNullAddress(response))
       throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
         recordName: method,
         domain: args[0],
       });
-    const {result} = response
-    return this.coder.decodeFunctionResult(method, result)[0]
+    return this.coder.decodeFunctionResult(method, response)[0]
   }
 
-  private async fetchData(data: string): Promise<any> {
+  private async fetchData(data: string): Promise<unknown> {
     const params = [
       {
         data,
@@ -58,23 +42,10 @@ export default class Contract extends BaseConnection {
       },
       'latest',
     ];
-    if (this.web3Provider) {
-      return await this.web3Provider
-        .sendAsync('eth_call', params)
-        .then(resp => resp.json());
-    }
-    const response = await this.fetch(this.url, {
-      method: 'POST',
-      body: JSON.stringify({
-        jsonrpc: '2.0',
-        id: 1,
-        method: 'eth_call',
-        params,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    return await response.json();
+    const request: RequestArguments = {
+      method: 'eth_call',
+      params
+    };
+    return await this.provider.request(request);
   }
 }

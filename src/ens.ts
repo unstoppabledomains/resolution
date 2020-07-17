@@ -10,39 +10,34 @@ import {
   Bip44Constants,
   isNullAddress,
   nodeHash,
-  Web3Provider,
+  Provider,
+  SourceDefinition,
 } from './types';
 import { EthereumNamingService } from './EthereumNamingService';
 import { ResolutionError, ResolutionErrorCode } from './index';
 import Contract from './utils/contract';
 import contentHash from 'content-hash';
 import EnsNetworkMap from 'ethereum-ens-network-map';
+import ConfigurationError, {
+  ConfigurationErrorCode,
+} from './errors/configurationError';
 
 /** @internal */
 export default class Ens extends EthereumNamingService {
   readonly name = NamingServiceName.ENS;
-  readonly network: string;
-  readonly url: string;
   readonly registryAddress?: string;
   /**
    * Source object describing the network naming service operates on
    * @param source - if specified as a string will be used as main url, if omited then defaults are used
+   * @param provider - EthersJS provider, an object that implemented sendAsync(method, params) functionality
    * @throws ConfigurationError - when either network or url is setup incorrectly
    */
-  constructor(source: NamingServiceSource = true, web3Provider?: Web3Provider) {
-    super(web3Provider);
+  constructor(source: SourceDefinition = {}) {
+    super(source, NamingServiceName.ENS);
     source = this.normalizeSource(source);
-    this.network = <string>source.network;
-    this.url = source.url as string;
-    if (!this.network) {
-      throw new Error('Unspecified network in Resolution ENS configuration');
-    }
-    if (!this.url) {
-      throw new Error('Unspecified url in Resolution ENS configuration');
-    }
     this.registryAddress = source.registry
       ? source.registry
-      : EnsNetworkMap[this.NetworkNameMap[this.network]];
+      : EnsNetworkMap[EthereumNamingService.NetworkNameMap[this.network]];
     if (this.registryAddress) {
       this.registryContract = this.buildContract(
         ensInterface,

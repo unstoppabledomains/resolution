@@ -1,19 +1,23 @@
 import BaseConnection from './baseConnection';
-import ResolutionError, { ResolutionErrorCode } from './resolutionError';
+import ConfigurationError, {
+  ConfigurationErrorCode,
+} from './errors/configurationError';
+import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import {
   NamingServiceName,
-  NamingServiceSource,
   nodeHash,
+  Provider,
   ResolutionMethod,
   ResolutionResponse,
   SourceDefinition,
-  Web3Provider,
 } from './types';
 
 /** @internal */
 export default abstract class NamingService extends BaseConnection {
   readonly name: ResolutionMethod;
-  protected web3Provider?: Web3Provider;
+  readonly network: string;
+  readonly url: string | undefined;
+  protected provider?: Provider;
   abstract isSupportedDomain(domain: string): boolean;
   abstract isSupportedNetwork(): boolean;
   abstract namehash(domain: string): string;
@@ -29,9 +33,14 @@ export default abstract class NamingService extends BaseConnection {
   abstract chatpk(domain: string): Promise<string>;
   abstract childhash(parent: nodeHash, label: string): nodeHash;
 
-  constructor(web3Provider?: Web3Provider) {
+  constructor(source: SourceDefinition, name: ResolutionMethod) {
     super();
-    this.web3Provider = web3Provider;
+    source = this.normalizeSource(source);
+    this.name = name;
+    this.provider = source.provider;
+    this.url = source.url as string;
+    this.network = source.network as string;
+    this.ensureConfigured();
   }
 
   serviceName(domain: string): NamingServiceName {
@@ -39,7 +48,7 @@ export default abstract class NamingService extends BaseConnection {
   }
 
   protected abstract normalizeSource(
-    source: NamingServiceSource,
+    source: SourceDefinition | undefined,
   ): SourceDefinition;
 
   protected ensureSupportedDomain(domain: string): void {
@@ -83,5 +92,18 @@ export default abstract class NamingService extends BaseConnection {
       recordName: key,
       domain: domain,
     });
+  }
+
+  protected ensureConfigured(): void {
+    if (!this.network) {
+      throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedNetwork, {
+        method: this.name,
+      });
+    }
+    if (!this.url && !this.provider) {
+      throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedUrl, {
+        method: this.name,
+      });
+    }
   }
 }

@@ -20,8 +20,8 @@
     {
       "METHOD": "POST",
       "REQUEST": {
-        "id": "1",
         "jsonrpc": "2.0",
+        "id": "1",
         "method": "GetSmartContractSubState",
         "params": [
           "9611c53BE6d1b32058b2747bdeCECed7e1216793",
@@ -49,8 +49,8 @@
     {
       "METHOD": "POST",
       "REQUEST": {
-        "id": "1",
         "jsonrpc": "2.0",
+        "id": "1",
         "method": "GetSmartContractSubState",
         "params": ["B17C35e557a8c13a730696C92D716A58421e36cA", "records", []]
       },

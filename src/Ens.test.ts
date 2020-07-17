@@ -204,13 +204,15 @@ describe('ENS', () => {
     });
     expect(resolution.ens!.network).toBe('goerli');
     expect(resolution.ens!.url).toBe('https://goerli.infura.io');
-    expect(resolution.ens!.registryAddress).toBe('0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e');
+    expect(resolution.ens!.registryAddress).toBe(
+      '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
+    );
   });
 
   it('checks normalizeSource ens (object) #6', async () => {
     expect(
       () => new Resolution({ blockchain: { ens: { network: 7543 } } }),
-    ).toThrowError('Unspecified network in Resolution ENS configuration');
+    ).toThrowError('Unspecified url in Resolution ENS configuration');
   });
 
   it('checks normalizeSource ens (object) #7', async () => {

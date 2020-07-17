@@ -10,7 +10,9 @@ export interface SourceDefinition {
   url?: string;
   network?: string | number;
   registry?: string;
+  provider?: Provider;
 }
+
 
 /**
  * NamingServiceSource
@@ -81,21 +83,79 @@ export const UDApiDefaultUrl = 'https://unstoppabledomains.com/api/v1';
 /**
  * Main configurational object for Resolution instance
  */
-export type Blockchain =
-  | boolean
-  | {
-      ens?: NamingServiceSource;
-      zns?: NamingServiceSource;
-      cns?: NamingServiceSource;
-      web3Provider?: Web3Provider;
-    };
+export type Blockchain = {
+  ens?: NamingServiceSource;
+  zns?: NamingServiceSource;
+  cns?: NamingServiceSource;
+  web3Provider?: Provider;
+};
 
 export type API = {
   url: string;
 };
 
-export interface Web3Provider {
-  sendAsync: (method: string, params: any) => Promise<any>;
+export type ProviderParams = unknown[] | object;
+
+export interface RequestArguments {
+  method: string;
+  params?: ProviderParams;
+}
+
+/**
+ * @see https://eips.ethereum.org/EIPS/eip-1193
+ */
+export interface Provider {
+  request: (request: RequestArguments) => Promise<unknown>;
+}
+
+/**
+ * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-core-helpers/types/index.d.ts#L216
+ */
+export interface JsonRpcPayload {
+  jsonrpc: string;
+  method: string;
+  params: any[];
+  id?: string | number;
+}
+
+export interface JsonRpcResponse {
+  jsonrpc: string;
+  id: number;
+  result?: any;
+  error?: string;
+}
+
+type ProviderMethod = (
+  payload: JsonRpcPayload,
+  callback: (error: Error | null, result?: JsonRpcResponse) => void,
+) => void;
+
+export type TransactionRequest = {
+    to?: unknown,
+    from?: unknown,
+    nonce?: unknown,
+
+    gasLimit?: unknown,
+    gasPrice?: unknown,
+
+    data?: unknown,
+    value?: unknown,
+    chainId?: unknown,
+}
+
+/**
+ * @see https://github.com/ethers-io/ethers.js/blob/v5.0.4/packages/abstract-provider/src.ts/index.ts#L224
+ */
+export interface EthersProvider {
+  call(transaction: TransactionRequest, blockTag?: never): Promise<string>;
+};
+
+export interface Web3Version0Provider {
+  sendAsync: ProviderMethod;
+}
+
+export interface Web3Version1Provider {
+  send: ProviderMethod;
 }
 
 export const DefaultAPI: API = {

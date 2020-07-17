@@ -1,4 +1,4 @@
-import { ResolutionMethod } from './types';
+import { ResolutionMethod } from '../types';
 /** Alias for Resolution error handler function */
 type ResolutionErrorHandler = (error: ResolutionErrorOptions) => string;
 /** Explains Resolution Error options */

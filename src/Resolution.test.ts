@@ -1,13 +1,26 @@
 import nock from 'nock';
 import Resolution, { ResolutionErrorCode } from './index';
-import { UnclaimedDomainResponse, NamingServiceName } from './types';
+import {
+  UnclaimedDomainResponse,
+  NamingServiceName,
+  RequestArguments,
+  ProviderParams,
+  JsonRpcPayload,
+} from './types';
+import { JsonRpcProvider, getDefaultProvider } from '@ethersproject/providers';
+import Web3HttpProvider from 'web3-providers-http';
+import Web3WsProvider from 'web3-providers-ws';
+import Web3V027Provider from 'web3-0.20.7/lib/web3/httpprovider';
+
 import {
   expectResolutionErrorCode,
   expectSpyToBeCalled,
   mockAsyncMethods,
   secretInfuraLink,
+  InfuraProtocol,
+  caseMock,
+  mockAsyncMethod,
 } from './utils/testHelpers';
-import nodeFetch from 'node-fetch';
 
 try {
   const dotenv = require('dotenv');
@@ -153,7 +166,7 @@ describe('Resolution', () => {
   });
 
   it(`domains "brad.crypto" and "Brad.crypto" should return the same results`, async () => {
-    const resolution = new Resolution({blockchain: { cns: { url: secretInfuraLink() } }});
+    const resolution = new Resolution({ blockchain: { cns: { url: secretInfuraLink() } } });
     const eyes = mockAsyncMethods(resolution.cns, {
       getResolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
       getRecord: "0x45b31e01AA6f42F0549aD482BE81635ED3149abb",
@@ -166,14 +179,19 @@ describe('Resolution', () => {
   });
 
   it('should resolve gundb chat id', async () => {
-    const resolution = new Resolution({blockchain: {cns: {url: secretInfuraLink() } }});
+    const resolution = new Resolution({
+      blockchain: { cns: { url: secretInfuraLink() } },
+    });
     const eyes = mockAsyncMethods(resolution.cns, {
       getResolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
-      getRecord: '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c'
+      getRecord:
+        '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c',
     });
-    const gundb = await resolution.chatId("homecakes.crypto");
+    const gundb = await resolution.chatId('homecakes.crypto');
     expectSpyToBeCalled(eyes);
-    expect(gundb).toBe("0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c");
+    expect(gundb).toBe(
+      '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c',
+    );
   });
 
   describe('serviceName', () => {
@@ -277,53 +295,110 @@ describe('Resolution', () => {
   });
 
   describe('Providers', () => {
-    it('should work with custom provider', async () => {
-      const provider = {
-        sendAsync: (method: string, params: any) => {
-          return nodeFetch(secretInfuraLink(), {
-            method: 'POST',
-            body: JSON.stringify({
-              method,
-              params,
-              jsonrpc: '2.0',
-              id: 1,
-            }),
-          });
+
+    const RpcProviderTestCases = [
+      [
+        {
+          data: '0xb3f9e4cb756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9',
+          to: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe'
         },
-      };
-      const resolution = new Resolution({
-        blockchain: { web3Provider: provider },
+        '0x000000000000000000000000b66dce2da6afaaa98f2013446dbcb0f4b0ab2842'
+      ],
+      [
+        {
+          data: '0x6352211e756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9',
+          to: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe'
+        },
+        '0x000000000000000000000000b66dce2da6afaaa98f2013446dbcb0f4b0ab2842'
+      ],
+      [
+        {
+          data: '0x1be5e7ed0000000000000000000000000000000000000000000000000000000000000040756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9000000000000000000000000000000000000000000000000000000000000001263727970746f2e4554482e616464726573730000000000000000000000000000',
+          to: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842'
+        },
+        '0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002a30783861614434343332314138366231373038373964374132343463316538643336306339394464413800000000000000000000000000000000000000000000'],
+    ] as const;
+
+    it('should work with web3HttpProvider', async () => {
+      // web3-providers-http has problems with type definitions
+      // We still prefer everything to be statically typed on our end for better mocking
+      const provider = new (Web3HttpProvider as any)(secretInfuraLink()) as Web3HttpProvider.HttpProvider;
+      // mock the send function with different implementations (each should call callback right away with different answers)
+      const eye = mockAsyncMethod(provider, "send", (payload: JsonRpcPayload, callback) => {
+        const result = caseMock(payload.params![0], RpcProviderTestCases)
+        callback && callback(null, {
+          jsonrpc: '2.0',
+          id: 1,
+          result,
+        });
       });
-      const eyes = mockAsyncMethods(resolution.cns, {
-        getResolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
-        getRecord: '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8'
-      });
+      const resolution = Resolution.fromWeb3Version1Provider(provider);
       const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
-      expectSpyToBeCalled(eyes);
+
+      //expect each mock to be called at least once.
+      expectSpyToBeCalled([eye]);
       expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
     });
 
-    it('should get a configured with provider resolution instance', async () => {
-      const provider = {
-        sendAsync: (method: string, params: any) => {
-          return nodeFetch(secretInfuraLink(), {
-            method: 'POST',
-            body: JSON.stringify({
-              method,
-              params,
-              jsonrpc: '2.0',
-              id: 1,
-            }),
-          });
-        },
-      };
-      const resolution = Resolution.provider(provider);
-      const eyes = mockAsyncMethods(resolution.cns, {
-        getResolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
-        getRecord: '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8'
+    it('should work with webSocketProvider', async () => {
+      // web3-providers-ws has problems with type definitions
+      // We still prefer everything to be statically typed on our end for better mocking
+      const provider = new (Web3WsProvider as any)(secretInfuraLink(InfuraProtocol.wss)) as Web3WsProvider.WebsocketProvider;
+      const eye = mockAsyncMethod(provider, "send", (payload, callback) => {
+        const result = caseMock(payload.params![0], RpcProviderTestCases)
+        callback(null, {
+          jsonrpc: '2.0',
+          id: 1,
+          result,
+        });
       });
+
+      const resolution = Resolution.fromWeb3Version1Provider(provider);
       const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
-      expectSpyToBeCalled(eyes);
+      provider.disconnect(1000, 'end of test');
+      expectSpyToBeCalled([eye]);
+      expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
+    });
+
+    it('should work for ethers jsonrpc provider', async () => {
+      const provider = new JsonRpcProvider(
+        secretInfuraLink(InfuraProtocol.http),
+        'mainnet',
+      );
+      const resolution = Resolution.fromEthersProvider(provider);
+      const eye = mockAsyncMethod(provider, "call",
+        params => Promise.resolve(caseMock(params, RpcProviderTestCases))
+      );
+      const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
+      expectSpyToBeCalled([eye]);
+      expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
+    });
+
+    it('should work with ethers default provider', async () => {
+      const provider = getDefaultProvider("mainnet");
+
+      const eye = mockAsyncMethod(provider, "call",
+        params => Promise.resolve(caseMock(params, RpcProviderTestCases))
+      );
+      const resolution = Resolution.fromEthersProvider(provider);
+      const ethAddress = await resolution.addressOrThrow('brad.crypto', 'eth');
+      expectSpyToBeCalled([eye]);
+      expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
+    });
+
+    it('should work with web3@0.20.7 provider', async () => {
+      const provider = new Web3V027Provider(secretInfuraLink(InfuraProtocol.http), 5000, null, null, null);
+      const eye = mockAsyncMethod(provider, "sendAsync", (payload: JsonRpcPayload, callback: any) => {
+        const result = caseMock(payload.params![0], RpcProviderTestCases)
+        callback(undefined, {
+          jsonrpc: '2.0',
+          id: 1,
+          result,
+        });
+      });
+      const resolution = Resolution.fromWeb3Version0Provider(provider);
+      const ethAddress = await resolution.addressOrThrow('brad.crypto', 'eth');
+      expectSpyToBeCalled([eye]);
       expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
     });
   });
