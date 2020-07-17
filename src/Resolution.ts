@@ -163,7 +163,11 @@ export default class Resolution {
   static fromEthersProvider(provider: EthersProvider): Resolution {
     if (provider.call === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
     return this.fromEip1193Provider({
-      request: async (request: RequestArguments) => await provider.call(request.params![0])
+      request: async (request: RequestArguments) => {
+        if (request.method !== 'eth_call') {
+          throw new Error(`Unsupported provider method ${request.method}`)
+        }
+        return await provider.call(request.params![0])}
     });
   }
 
