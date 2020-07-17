@@ -18,6 +18,10 @@ import {
 } from './types';
 import { ResolutionError, ResolutionErrorCode } from './index';
 import NamingService from './namingService';
+import ConfigurationError, {
+  ConfigurationErrorCode,
+} from './errors/configurationError';
+import FetchProvider from './FetchProvider';
 
 const DefaultSource = 'https://api.zilliqa.com';
 
@@ -41,27 +45,12 @@ const UrlNetworkMap = (url: string) => invert(UrlMap)[url];
 
 /** @internal */
 export default class Zns extends NamingService {
-  readonly name = NamingServiceName.ZNS;
-  readonly network: string;
-  readonly url: string;
   readonly registryAddress?: string;
 
-  /**
-   * Source object describing the network naming service operates on
-   * @param source - if specified as a string will be used as main url, if omitted then defaults are used
-   * @throws ConfigurationError - when either network or url is setup incorrectly
-   */
-  constructor(source: string | boolean | SourceDefinition = true) {
-    super();
+  constructor(source: SourceDefinition = {}) {
+    super(source, NamingServiceName.ZNS);
+
     source = this.normalizeSource(source);
-    this.network = source.network as string;
-    this.url = source.url as string;
-    if (!this.network) {
-      throw new Error('Unspecified network in Resolution ZNS configuration');
-    }
-    if (!this.url) {
-      throw new Error('Unspecified url in Resolution ZNS configuration');
-    }
     this.registryAddress = source.registry
       ? source.registry
       : RegistryMap[this.network];
@@ -241,36 +230,16 @@ export default class Zns extends NamingService {
     return resolverAddress;
   }
 
-  /** @internal */
-  protected normalizeSource(source: NamingServiceSource): SourceDefinition {
-    switch (typeof source) {
-      case 'boolean': {
-        return { url: DefaultSource, network: 'mainnet' };
-      }
-      case 'string': {
-        return {
-          url: source as string,
-          network: UrlNetworkMap(source),
-        };
-      }
-      case 'object': {
-        source = { ...source };
-        if (typeof source.network == 'number') {
-          source.network = NetworkIdMap[source.network];
-        }
-        if (source.registry) {
-          source.network = source.network ? source.network : 'mainnet';
-          source.url = source.url ? source.url : DefaultSource;
-        }
-        if (source.network && !source.url) {
-          source.url = UrlMap[source.network];
-        }
-        if (source.url && !source.network) {
-          source.network = UrlNetworkMap(source.url);
-        }
-        return source;
-      }
+  protected normalizeSource(source: SourceDefinition | undefined): SourceDefinition {
+    source = {...source};
+    if (typeof source.network == 'number') {
+      source.network = NetworkIdMap[source.network] || source.network;
     }
+    source.network = source.network || (source.url && UrlNetworkMap[source.url]) || 'mainnet';
+    if (!source.provider) {
+      source.url = source.url || (typeof source.network === 'string' && UrlMap[source.network]);
+    }
+    return source;
   }
 
   private async getRecordOrThrow(
@@ -330,19 +299,10 @@ export default class Zns extends NamingService {
     field: string,
     keys: string[] = [],
   ): Promise<any> {
-    const response = await this.fetch(this.url, {
-      method: 'POST',
-      body: JSON.stringify({
-        id: '1',
-        jsonrpc: '2.0',
-        method: 'GetSmartContractSubState',
-        params: [contractAddress.replace('0x', ''), field, keys],
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).then(res => res.json());
-    return response.result;
+    const params = [contractAddress.replace('0x', ''), field, keys];
+    const method = 'GetSmartContractSubState';
+    const provider = this.provider || new FetchProvider(this.name, this.url!);
+    return await provider.request({method, params})
   }
 
   private async getContractField(
@@ -350,19 +310,11 @@ export default class Zns extends NamingService {
     field: string,
     keys: string[] = [],
   ): Promise<any> {
-    try {
-      const contractAddr = contractAddress.startsWith('zil1')
-        ? fromBech32Address(contractAddress)
-        : contractAddress;
-      let result = (await this.fetchSubState(contractAddr, field, keys)) || {};
-      return result[field];
-    } catch (err) {
-      if (err.name == 'FetchError')
-        throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
-          method: NamingServiceName.ZNS,
-        });
-      else throw err;
-    }
+    const contractAddr = contractAddress.startsWith('zil1')
+    ? fromBech32Address(contractAddress)
+    : contractAddress;
+    let result = (await this.fetchSubState(contractAddr, field, keys)) || {};
+    return result[field];
   }
 
   private async getContractMapValue(

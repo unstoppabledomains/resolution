@@ -1,26 +1,23 @@
 import { EthereumNamingService } from './EthereumNamingService';
 import {
-  NamingServiceSource,
   NamingServiceName,
   RegistryMap,
   ResolutionResponse,
   isNullAddress,
   nodeHash,
-  Web3Provider,
+  Provider,
+  SourceDefinition,
   NullAddress,
 } from './types';
 import { default as resolverInterface } from './cns/contract/resolver';
 import { default as cnsInterface } from './cns/contract/registry';
 import { default as hash, childhash } from './cns/namehash';
-import ResolutionError from './resolutionError';
-import { ResolutionErrorCode } from './resolutionError';
+import ResolutionError from './errors/resolutionError';
+import { ResolutionErrorCode } from './errors/resolutionError';
 import Contract from './utils/contract';
 
 /** @internal */
 export default class Cns extends EthereumNamingService {
-  readonly name = NamingServiceName.CNS;
-  readonly network: string;
-  readonly url: string;
   readonly registryAddress?: string;
   /** @internal */
   readonly RegistryMap: RegistryMap = {
@@ -33,17 +30,9 @@ export default class Cns extends EthereumNamingService {
    * @param source - if specified as a string will be used as main url, if omited then defaults are used
    * @throws ConfigurationError - when either network or url is setup incorrectly
    */
-  constructor(source: NamingServiceSource = true, web3Provider?: Web3Provider) {
-    super(web3Provider);
+  constructor(source: SourceDefinition = {}) {
+    super(source, NamingServiceName.CNS);
     source = this.normalizeSource(source);
-    this.network = source.network as string;
-    this.url = source.url as string;
-    if (!this.network) {
-      throw new Error('Unspecified network in Resolution CNS configuration');
-    }
-    if (!this.url) {
-      throw new Error('Unspecified url in Resolution CNS configuration');
-    }
     this.registryAddress = source.registry
       ? source.registry
       : this.RegistryMap[this.network];

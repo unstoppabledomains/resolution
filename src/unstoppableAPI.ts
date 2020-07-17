@@ -15,15 +15,12 @@ import pckg from './package.json';
 
 /** @internal */
 export default class Udapi extends NamingService {
-  readonly name = 'UDAPI';
-  private url: string;
   private headers: {
     [key: string]: string;
   };
 
-  constructor(url: string) {
-    super();
-    this.url = url;
+  constructor(options: {url: string}) {
+    super(options, 'UDAPI');
     const DefaultUserAgent = this.isNode()
       ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'
       : navigator.userAgent;
@@ -92,7 +89,7 @@ export default class Udapi extends NamingService {
    * @throws ResolutionError with code RecordNotFound
    * @returns A gundb chatId configured for a domain
    */
-  async chatId(domain:string): Promise<string> {
+  async chatId(domain: string): Promise<string> {
     const resolution = await this.resolve(domain);
     const value = resolution?.gundb?.username;
     return this.ensureRecordPresence(domain, 'Gundb chatId', value);
@@ -167,14 +164,14 @@ export default class Udapi extends NamingService {
   }
 
   serviceName(domain: string): NamingServiceName {
-    return this.findMethodOrThrow(domain).name;
+    return this.findMethodOrThrow(domain).name as NamingServiceName;
   }
   async resolver(domain: string): Promise<string> {
     throw new Error('Method not implemented.');
   }
 
-  protected normalizeSource(source: NamingServiceSource): SourceDefinition {
-    throw new Error('Method not implemented.');
+  protected normalizeSource(source): SourceDefinition {
+    return {network: 'mainnet', ...source};
   }
 
   private findMethod(domain: string) {

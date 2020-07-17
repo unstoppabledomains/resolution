@@ -1,8 +1,8 @@
 import nock from 'nock';
+import _ from 'lodash';
 import { Dictionary } from '../types';
 import { ResolutionError } from '../index';
 import mockData from '../testData/mockData.json';
-
 export const MainnetUrl = 'https://mainnet.infura.io';
 export const ZilliqaUrl = 'https://api.zilliqa.com';
 export const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
@@ -16,7 +16,9 @@ export const CryptoDomainWithAdaBchAddresses = 'reseller-test-mago0.crypto';
 export function mockAsyncMethod(object: any, method: string, value) {
   const spy = jest.spyOn(object, method);
   if (!process.env.LIVE) {
-    if (value instanceof Error) {
+    if (value instanceof Function) {
+      return spy.mockImplementation(value)
+    } else if (value instanceof Error) {
       return spy.mockRejectedValue(value);
     } else {
       return spy.mockResolvedValue(value);
@@ -105,9 +107,25 @@ export function mockAPICalls(testName: string, url = MainnetUrl) {
  * or the one with attached INFURA SECRET key from
  * UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID env variable if any
  */
-export function secretInfuraLink(): string {
+export function secretInfuraLink(infuraProtocol: InfuraProtocol = InfuraProtocol.http): string {
   const secret = process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID;
-  let url = 'https://mainnet.infura.io';
-  if (secret) url = `https://mainnet.infura.io/v3/${secret}`;
+  const protocolMap = {
+    [InfuraProtocol.http]:'https://mainnet.infura.io/v3',
+    [InfuraProtocol.wss]:'wss://mainnet.infura.io/ws/v3'
+  };
+  const url = `${protocolMap[infuraProtocol]}/${secret}`;
   return url;
+}
+
+export enum InfuraProtocol {
+  "http", "wss"
+};
+
+export const caseMock = <T, U>(params: T, cases: readonly (readonly [T, U])[]): U => {
+  for (const [variant, result] of cases) {
+    if (_.isEqual(params, variant)) {
+      return result;
+    }
+  }
+  throw new Error(`got unexpected params ${JSON.stringify(params)}`);
 }

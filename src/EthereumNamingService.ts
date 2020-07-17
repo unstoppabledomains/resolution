@@ -1,5 +1,5 @@
 import NamingService from './namingService';
-import ResolutionError, { ResolutionErrorCode } from './resolutionError';
+import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import {
   BlockhanNetworkUrlMap,
   isNullAddress,
@@ -10,16 +10,16 @@ import {
 } from './types';
 import { invert } from './utils';
 import Contract from './utils/contract';
+import FetchProvider from './FetchProvider';
 
 /** @internal */
 export abstract class EthereumNamingService extends NamingService {
   readonly name: NamingServiceName;
   abstract registryAddress?: string;
-  abstract url: string;
   protected abstract getResolver(id: string): Promise<string>;
   protected registryContract: Contract;
   /** @internal */
-  readonly NetworkIdMap: NetworkIdMap = {
+  static readonly NetworkIdMap: NetworkIdMap = {
     1: 'mainnet',
     3: 'ropsten',
     4: 'rinkeby',
@@ -27,7 +27,7 @@ export abstract class EthereumNamingService extends NamingService {
     42: 'kovan',
   };
 
-  readonly UrlMap: BlockhanNetworkUrlMap = {
+  static readonly UrlMap: BlockhanNetworkUrlMap = {
     mainnet: 'https://mainnet.infura.io',
     ropsten: 'https://ropsten.infura.io',
     kovan: 'https://kovan.infura.io',
@@ -35,7 +35,7 @@ export abstract class EthereumNamingService extends NamingService {
     goerli: 'https://goerli.infura.io',
   };
 
-  readonly NetworkNameMap = invert(this.NetworkIdMap);
+  static readonly NetworkNameMap = invert(EthereumNamingService.NetworkIdMap);
 
   /**
    * Returns the resolver address of a domain if exists
@@ -51,7 +51,7 @@ export abstract class EthereumNamingService extends NamingService {
     } else {
       // We don't care about this promise anymore
       // Ensure it doesn't generate a warning if it rejects
-      ownerPromise.catch(() => {});
+      ownerPromise.catch(() => {})
     }
     return resolverAddress;
   }
@@ -63,57 +63,26 @@ export abstract class EthereumNamingService extends NamingService {
    *  - mainnet
    *  - testnet
    */
-  private networkFromUrl(url: string): string | undefined {
-    for (const key in this.NetworkNameMap) {
-      if (!this.NetworkNameMap.hasOwnProperty(key)) continue;
+  private networkFromUrl(url: string | undefined): string | undefined {
+    if (!url) {
+      return undefined;
+    }
+    for (const key in EthereumNamingService.NetworkNameMap) {
+      if (!EthereumNamingService.NetworkNameMap.hasOwnProperty(key)) continue;
       if (url.indexOf(key) >= 0) return key;
     }
   }
 
-  /**
-   * Normalizes the source object based on type
-   * @internal
-   * @param source
-   * @returns
-   */
-  protected normalizeSource(source: NamingServiceSource): SourceDefinition {
-    switch (typeof source) {
-      case 'boolean': {
-        return {
-          url: this.UrlMap['mainnet'],
-          network: this.networkFromUrl(this.UrlMap['mainnet']),
-        };
-      }
-      case 'string': {
-        return {
-          url: source as string,
-          network: this.networkFromUrl(source as string),
-        };
-      }
-      case 'object': {
-        source = { ...source };
-        if (typeof source.network == 'number') {
-          source.network = this.NetworkIdMap[source.network];
-        }
-        if (source.registry) {
-          source.network = source.network ? source.network : 'mainnet';
-          source.url = source.url
-            ? source.url
-            : `https://${source.network}.infura.io`;
-        }
-        if (
-          source.network &&
-          !source.url &&
-          this.NetworkNameMap.hasOwnProperty(source.network)
-        ) {
-          source.url = `https://${source.network}.infura.io`;
-        }
-        if (source.url && !source.network) {
-          source.network = this.networkFromUrl(source.url);
-        }
-        return source;
-      }
+  protected normalizeSource(source: SourceDefinition): SourceDefinition {
+    source = {...source };
+    if (typeof source.network == 'number') {
+      source.network = EthereumNamingService.NetworkIdMap[source.network] || source.network;
     }
+    source.network = source.network || this.networkFromUrl(source.url) || 'mainnet';
+    if (!source.provider) {
+      source.url = source.url || EthereumNamingService.UrlMap[source.network];
+    }
+    return source;
   }
 
   /**
@@ -151,7 +120,7 @@ export abstract class EthereumNamingService extends NamingService {
   }
 
   protected buildContract(abi, address) {
-    return new Contract(this.name, this.url, abi, address, this.web3Provider);
+    return new Contract(abi, address, this.provider || new FetchProvider(this.name, this.url!));
   }
 
   protected async throwOwnershipError(

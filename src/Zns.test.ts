@@ -32,10 +32,10 @@ describe('ZNS', () => {
       expect(resolution.zns!.url).toBe('https://api.zilliqa.com');
     });
 
-    it('checks normalizeSource zns wrong string', async () => {
-      expect(
-        () => new Resolution({ blockchain: { zns: 'https://wrongurl.com' } }),
-      ).toThrowError('Unspecified network in Resolution ZNS configuration');
+    it('checks normalizeSource zns unknown url', async () => {
+      const r = new Resolution({ blockchain: { zns: 'https://unknownurl.com' } });
+      expect(r.zns!.network).toEqual('mainnet');
+      expect(r.zns!.url).toEqual('https://unknownurl.com');
     });
 
     it('checks normalizeSource zns (object) #1', async () => {
@@ -84,7 +84,7 @@ describe('ZNS', () => {
     it('checks normalizeSource zns (object) #6', async () => {
       expect(
         () => new Resolution({ blockchain: { zns: { network: 42 } } }),
-      ).toThrowError('Unspecified network in Resolution ZNS configuration');
+      ).toThrowError('Unspecified url in Resolution ZNS configuration');
     });
 
     it('checks normalizeSource zns (object) #7', async () => {
