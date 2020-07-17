@@ -4,7 +4,6 @@ import {
   BlockhanNetworkUrlMap,
   isNullAddress,
   NamingServiceName,
-  NamingServiceSource,
   NetworkIdMap,
   SourceDefinition,
 } from './types';

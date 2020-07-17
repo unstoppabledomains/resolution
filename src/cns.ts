@@ -5,7 +5,6 @@ import {
   ResolutionResponse,
   isNullAddress,
   nodeHash,
-  Provider,
   SourceDefinition,
   NullAddress,
 } from './types';

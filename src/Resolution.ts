@@ -15,7 +15,6 @@ import {
   JsonRpcResponse,
   Provider,
   RequestArguments,
-  ProviderParams,
   NamingServiceSource,
   SourceDefinition,
   EthersProvider,
@@ -26,7 +25,6 @@ import { signedInfuraLink } from './utils';
 import ConfigurationError, {
   ConfigurationErrorCode,
 } from './errors/configurationError';
-import { WebsocketProvider } from 'web3-providers-ws';
 
 /**
  * Blockchain domain Resolution library - Resolution.

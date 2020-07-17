@@ -1,7 +1,4 @@
 import { set, invert } from './index';
-import { secretInfuraLink } from './testHelpers';
-import Resolution from '../Resolution';
-import nodeFetch from 'node-fetch';
 
 describe('Lodash', () => {
   describe('set', () => {

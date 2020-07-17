@@ -3,7 +3,6 @@ import { ResolutionError, ResolutionErrorCode } from './index';
 import NamingService from './namingService';
 import {
   ResolutionResponse,
-  NamingServiceSource,
   NamingServiceName,
   SourceDefinition,
   isNullAddress,

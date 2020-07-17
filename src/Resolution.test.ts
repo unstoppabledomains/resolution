@@ -3,8 +3,6 @@ import Resolution, { ResolutionErrorCode } from './index';
 import {
   UnclaimedDomainResponse,
   NamingServiceName,
-  RequestArguments,
-  ProviderParams,
   JsonRpcPayload,
 } from './types';
 import { JsonRpcProvider, getDefaultProvider } from '@ethersproject/providers';

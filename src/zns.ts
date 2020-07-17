@@ -11,16 +11,12 @@ import {
   SourceDefinition,
   UnclaimedDomainResponse,
   ZnsResolution,
-  NamingServiceSource,
   NamingServiceName,
   isNullAddress,
   nodeHash,
 } from './types';
 import { ResolutionError, ResolutionErrorCode } from './index';
 import NamingService from './namingService';
-import ConfigurationError, {
-  ConfigurationErrorCode,
-} from './errors/configurationError';
 import FetchProvider from './FetchProvider';
 
 const DefaultSource = 'https://api.zilliqa.com';

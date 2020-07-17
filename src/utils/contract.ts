@@ -1,6 +1,6 @@
 import ResolutionError, { ResolutionErrorCode } from '../errors/resolutionError';
 import { Interface, JsonFragment } from '@ethersproject/abi';
-import { isNullAddress, NamingServiceName, Provider, RequestArguments } from '../types';
+import { isNullAddress, Provider, RequestArguments } from '../types';
 
 /** @internal */
 export default class Contract {
