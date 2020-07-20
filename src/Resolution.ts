@@ -12,9 +12,7 @@ import {
   NamingServiceName,
   Web3Version0Provider,
   Web3Version1Provider,
-  JsonRpcResponse,
   Provider,
-  RequestArguments,
   NamingServiceSource,
   SourceDefinition,
   EthersProvider,
@@ -22,16 +20,14 @@ import {
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import NamingService from './namingService';
 import { signedInfuraLink } from './utils';
-import ConfigurationError, {
-  ConfigurationErrorCode,
-} from './errors/configurationError';
+import { Eip1993Factories } from './utils/Eip1993Factories';
 
 /**
  * Blockchain domain Resolution library - Resolution.
  * @example
  * ```
  * import Resolution from '@unstoppabledomains/resolution';
- * 
+ *
  * let resolution = new Resolution({ blockchain: {
  *        ens: {
  *           url: "https://mainnet.infura.io/v3/12351245223",
@@ -70,7 +66,9 @@ export default class Resolution {
       }
       const web3provider = blockchain.web3Provider;
       if (web3provider) {
-        console.warn('Usage of `web3Provider` option is deprecated. Use `provider` option instead for each individual blockchain');
+        console.warn(
+          'Usage of `web3Provider` option is deprecated. Use `provider` option instead for each individual blockchain',
+        );
       }
       const ens = this.normalizeSource(blockchain.ens, web3provider);
       const zns = this.normalizeSource(blockchain.zns);
@@ -110,7 +108,9 @@ export default class Resolution {
    * @see https://eips.ethereum.org/EIPS/eip-1193
    */
   static fromEip1193Provider(provider: Provider): Resolution {
-    return new this({ blockchain: { zns: true, ens: {provider}, cns: {provider} } });
+    return new this({
+      blockchain: { zns: true, ens: { provider }, cns: { provider } },
+    });
   }
 
   /**
@@ -119,20 +119,7 @@ export default class Resolution {
    * @see https://github.com/ethereum/web3.js/blob/0.20.7/lib/web3/httpprovider.js#L116
    */
   static fromWeb3Version0Provider(provider: Web3Version0Provider): Resolution {
-    if (provider.sendAsync === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
-    return this.fromEip1193Provider({
-      request: (request: RequestArguments) =>
-        new Promise((resolve, reject) => {
-          provider.sendAsync(
-            { jsonrpc: '2.0', method: request.method, params: this.wrapArray(request.params), id: 1 },
-            (error: Error | null, result: JsonRpcResponse) => {
-              if (error) reject(error);
-              if (result.error) reject(new Error(result.error))
-              resolve(result.result);
-            },
-          );
-        }),
-    });
+    return this.fromEip1193Provider(Eip1993Factories.fromWeb3Version0Provider(provider));
   }
 
   /**
@@ -142,25 +129,12 @@ export default class Resolution {
    * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-providers-http/src/index.js#L95
    */
   static fromWeb3Version1Provider(provider: Web3Version1Provider): Resolution {
-    if (provider.send === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
-    return this.fromEip1193Provider({
-      request: (request: RequestArguments) =>
-        new Promise((resolve, reject) => {
-          provider.send(
-            { jsonrpc: '2.0', method: request.method, params: this.wrapArray(request.params), id: 1 },
-            (error: Error | null, result: JsonRpcResponse) => {
-              if (error) reject(error);
-              if (result.error) reject(new Error(result.error))
-              resolve(result.result);
-            },
-          );
-        }),
-    });
+    return this.fromEip1193Provider(Eip1993Factories.fromWeb3Version1Provider(provider));
   }
 
   /**
-   * Creates instance of resolution from provider that
-   * implements Ethers Provider#call interface
+   * Creates instance of resolution from provider that implements Ethers Provider#call interface.
+   * This wrapper support only `eth_call` method for now, which is enough for all the current Resolution functionality
    * @param provider - provider object
    * @see https://github.com/ethers-io/ethers.js/blob/v4-legacy/providers/abstract-provider.d.ts#L91
    * @see https://github.com/ethers-io/ethers.js/blob/v5.0.4/packages/abstract-provider/src.ts/index.ts#L224
@@ -168,14 +142,7 @@ export default class Resolution {
    * @see https://github.com/ethers-io/ethers.js/blob/master/packages/providers/src.ts/json-rpc-provider.ts
    */
   static fromEthersProvider(provider: EthersProvider): Resolution {
-    if (provider.call === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
-    return this.fromEip1193Provider({
-      request: async (request: RequestArguments) => {
-        if (request.method !== 'eth_call') {
-          throw new Error(`Unsupported provider method ${request.method}`)
-        }
-        return await provider.call(request.params![0])}
-    });
+    return this.fromEip1193Provider(Eip1993Factories.fromEthersProvider(provider));
   }
 
   /**
@@ -237,7 +204,6 @@ export default class Resolution {
     const method = this.getNamingMethodOrThrow(domain);
     return await method.chatpk(domain);
   }
-
 
   /**
    * Resolves the IPFS hash configured for domain records on ZNS
@@ -411,10 +377,6 @@ export default class Resolution {
   serviceName(domain: string): NamingServiceName {
     domain = this.prepareDomain(domain);
     return this.getNamingMethodOrThrow(domain).serviceName(domain);
-  }
-
-  protected static wrapArray<T>(params: T | T[] = []): T[] {
-    return params instanceof Array ? params : [params];
   }
 
   private getNamingMethod(domain: string): NamingService | undefined {
