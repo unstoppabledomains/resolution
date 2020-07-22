@@ -13,7 +13,6 @@ export interface SourceDefinition {
   provider?: Provider;
 }
 
-
 /**
  * NamingServiceSource
  * just an alias
@@ -62,7 +61,7 @@ export type ResolutionResponse = {
   gundb?: {
     username?: string;
     public_key?: string;
-  },
+  };
   addresses: {
     [key: string]: string;
   };
@@ -148,7 +147,7 @@ export type TransactionRequest = {
  */
 export interface EthersProvider {
   call(transaction: TransactionRequest, blockTag?: never): Promise<string>;
-};
+}
 
 export interface Web3Version0Provider {
   sendAsync: ProviderMethod;
