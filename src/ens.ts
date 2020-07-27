@@ -21,12 +21,7 @@ import EnsNetworkMap from 'ethereum-ens-network-map';
 export default class Ens extends EthereumNamingService {
   readonly name = NamingServiceName.ENS;
   readonly registryAddress?: string;
-  /**
-   * Source object describing the network naming service operates on
-   * @param source - if specified as a string will be used as main url, if omited then defaults are used
-   * @param provider - EthersJS provider, an object that implemented sendAsync(method, params) functionality
-   * @throws ConfigurationError - when either network or url is setup incorrectly
-   */
+
   constructor(source: SourceDefinition = {}) {
     super(source, NamingServiceName.ENS);
     source = this.normalizeSource(source);
@@ -97,16 +92,6 @@ export default class Ens extends EthereumNamingService {
     return await this.resolverCallToName(resolverContract, nodeHash);
   }
 
-  /**
-   * Resolves domain to a specific cryptoAddress
-   * @param domain - domain name to be resolved
-   * @param currencyTicker - specific currency ticker such as
-   *  - ZIL
-   *  - BTC
-   *  - ETH
-   * @returns A promise that resolves in a string
-   * @throws ResolutionError
-   */
   async address(domain: string, currencyTicker: string): Promise<string> {
     const nodeHash = this.namehash(domain);
     const resolver = await this.resolver(domain);

@@ -82,67 +82,36 @@ export default class Udapi extends NamingService {
     return owner.startsWith('zil1') ? owner : toBech32Address(owner);
   }
 
-  /**
-   * Returns the gundb chat id of the domain
-   * @param domain - domain name
-   * @throws ResolutionError with code RecordNotFound
-   * @returns A gundb chatId configured for a domain
-   */
   async chatId(domain: string): Promise<string> {
     const resolution = await this.resolve(domain);
     const value = resolution?.gundb?.username;
     return this.ensureRecordPresence(domain, 'Gundb chatId', value);
   }
 
-  /**
-   * Returns the gundb chat public key of the domain
-   * @param domain - domain name
-   * @throws ResolutionError with code RecordNotFound
-   * @returns a gundb public key configured for a domain
-   */
   async chatpk(domain: string): Promise<string> {
     const resolution = await this.resolve(domain);
     const pk = resolution?.gundb?.public_key;
     return this.ensureRecordPresence(domain, 'Gundb publick key', pk);
   }
 
-  /**
-   * Resolves ipfshash from domain
-   * @param domain - domain name
-   * @throws ResolutionError.RecordNotFound if not found
-   */
   async ipfsHash(domain: string): Promise<string> {
     const answer = await this.resolve(domain);
     const value = answer?.ipfs?.html;
     return this.ensureRecordPresence(domain, 'IPFS hash', value);
   }
 
-  /**
-   * Resolves email from domain
-   * @param domain - domain name
-   * @throws ResolutionError.RecordNotFound if not found
-   */
   async email(domain: string): Promise<string> {
     const answer = await this.resolve(domain);
     const value = answer?.whois?.email;
     return this.ensureRecordPresence(domain, 'email', value);
   }
 
-  /**
-   * Resolves httpUrl from domain
-   * @param domain - domain name
-   * @throws ResolutionError.RecordNotFound if not found
-   */
   async httpUrl(domain: string): Promise<string> {
     const answer = await this.resolve(domain);
     const value = answer?.ipfs?.redirect_domain;
     return this.ensureRecordPresence(domain, 'httpUrl', value);
   }
 
-  /**
-   * Resolves the domain name via UD API mirror
-   * @param domain - domain name to be resolved
-   */
   async resolve(domain: string): Promise<ResolutionResponse> {
     try {
       const response = await this.fetch(`${this.url}/${domain}`, {

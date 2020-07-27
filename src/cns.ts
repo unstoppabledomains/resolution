@@ -24,11 +24,6 @@ export default class Cns extends EthereumNamingService {
     kovan: '0x22c2738cdA28C5598b1a68Fb1C89567c2364936F', // for internal testing
   };
 
-  /**
-   * Source object describing the network naming service operates on
-   * @param source - if specified as a string will be used as main url, if omited then defaults are used
-   * @throws ConfigurationError - when either network or url is setup incorrectly
-   */
   constructor(source: SourceDefinition = {}) {
     super(source, NamingServiceName.CNS);
     source = this.normalizeSource(source);
@@ -43,11 +38,6 @@ export default class Cns extends EthereumNamingService {
     }
   }
 
-  /**
-   * Checks if the domain is in valid format
-   * @param domain - domain name to be checked
-   * @returns
-   */
   isSupportedDomain(domain: string): boolean {
     return (
       domain === 'crypto' ||

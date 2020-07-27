@@ -183,7 +183,7 @@ export default class Resolution {
   /**
    * Resolve a chat id from the domain record
    * @param domain - domain name to be resolved
-   * @throws ResolutionError with code RecordNotFound
+   * @throws [[ResolutionError]]
    * @returns A promise that resolves in chatId
    */
   async chatId(domain: string): Promise<string> {
@@ -195,7 +195,7 @@ export default class Resolution {
   /**
    * Resolve a gundb public key from the domain record
    * @param domain - domain name to be resolved
-   * @throws ResolutionError with code RecordNotFound
+   * @throws [[ResolutionError]]
    * @returns a promise that resolves in gundb public key
    */
   async chatPk(domain: string): Promise<string> {
@@ -207,7 +207,7 @@ export default class Resolution {
   /**
    * Resolves the IPFS hash configured for domain records on ZNS
    * @param domain - domain name
-   * @throws ResolutionError
+   * @throws [[ResolutionError]]
    */
   async ipfsHash(domain: string): Promise<string> {
     domain = this.prepareDomain(domain);
@@ -227,7 +227,7 @@ export default class Resolution {
    * Resolves the ipfs redirect url for a supported domain records
    * @deprecated use Resolution#httpUrl instead
    * @param domain - domain name
-   * @throws ResolutionError
+   * @throws [[ResolutionError]]
    * @returns A Promise that resolves in redirect url
    */
   async ipfsRedirect(domain: string): Promise<string> {
@@ -243,7 +243,7 @@ export default class Resolution {
   /**
    * Resolves the ipfs email field from whois configurations
    * @param domain - domain name
-   * @throws ResolutionError
+   * @throws [[ResolutionError]]
    * @returns A Promise that resolves in an email address configured for this domain whois
    */
   async email(domain: string): Promise<string> {
@@ -258,7 +258,7 @@ export default class Resolution {
    *  - ZIL
    *  - BTC
    *  - ETH
-   * @throws ResolutionError if address is not found
+   * @throws [[ResolutionError]] if address is not found
    */
   async addressOrThrow(
     domain: string,
@@ -317,7 +317,7 @@ export default class Resolution {
    * @returns Produces a namehash from supported naming service in hex format with 0x prefix.
    * Corresponds to ERC721 token id in case of Ethereum based naming service like ENS or CNS.
    * @param domain - domain name to be converted
-   * @throws ResolutionError with UnsupportedDomain error code if domain extension is unknown
+   * @throws [[ResolutionError]] with UnsupportedDomain error code if domain extension is unknown
    */
   namehash(domain: string): string {
     domain = this.prepareDomain(domain);

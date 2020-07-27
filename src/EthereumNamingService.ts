@@ -36,11 +36,6 @@ export abstract class EthereumNamingService extends NamingService {
 
   static readonly NetworkNameMap = invert(EthereumNamingService.NetworkIdMap);
 
-  /**
-   * Returns the resolver address of a domain if exists
-   * @param domain - domain name
-   * @throws ResolutionError with codes UnregisteredDomain or UnspecifiedResolver
-   */
   async resolver(domain: string): Promise<string> {
     const nodeHash = this.namehash(domain);
     const ownerPromise = this.owner(domain);
@@ -92,11 +87,6 @@ export abstract class EthereumNamingService extends NamingService {
     return this.registryAddress != null;
   }
 
-  /**
-   * Internal wrapper for ens method. Used to throw an error when ens is down
-   *  @param method - method to be called
-   *  @throws ResolutionError -> When blockchain is down
-   */
   protected async callMethod(
     contract: Contract,
     methodname: string,

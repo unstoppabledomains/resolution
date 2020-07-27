@@ -84,16 +84,6 @@ export default class Zns extends NamingService {
     };
   }
 
-  /**
-   * Resolves domain name to a particular crypto address associated with it
-   * @param domain - domain name to be resolved
-   * @param currencyTicker - specific currency ticker such as
-   *  - ZIL
-   *  - BTC
-   *  - ETH
-   * @returns A promise that resolves in a string
-   * @throws ResolutionError
-   */
   async address(domain: string, currencyTicker: string): Promise<string> {
     const data = await this.resolve(domain);
     if (isNullAddress(data?.meta?.owner))
@@ -196,22 +186,10 @@ export default class Zns extends NamingService {
     return namehash(domain);
   }
 
-  /**
-   * Returns the childhash
-   * @param parent - nodehash of a parent
-   * @param label - child
-   */
   childhash(parent: nodeHash, label: string): string {
     return childhash(parent, label);
   }
 
-  /**
-   * get the resolver address from domain
-   * @param domain - domain name
-   * @throws ResolutionError with codes
-   *  - UnregisteredDomain if there is no owner for such a domain
-   *  - UnspecifiedResolver if there is no resolver for such a domain
-   */
   async resolver(domain: string): Promise<string> {
     const recordsAddresses = await this.getRecordsAddresses(domain);
     if (!recordsAddresses || !recordsAddresses[0])
