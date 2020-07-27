@@ -16,4 +16,4 @@ fi
 echo "deploying the docs"
 $git add '.'
 $git commit -m "v$npm_package_version"
-$git push origin --force 
+$git push origin

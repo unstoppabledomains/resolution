@@ -26,7 +26,7 @@
     "format": "prettier --semi --write -l **/*.{js,json,ts}",
     "build:live": "nodemon --watch 'src/**/*.ts' --exec yarn build",
     "docs": "yarn docs:clone && yarn docs:generate && yarn docs:readme",
-    "docs:clone": "[ -d ./docs ] || git clone --branch gh-pages git@github.com:unstoppabledomains/resolution.git docs",
+    "docs:clone": "([ -d ./docs ] || git clone --branch gh-pages git@github.com:unstoppabledomains/resolution.git docs) && git -C ./docs pull",
     "docs:generate": "yarn run typedoc --out \"./docs/v$npm_package_version\"",
     "docs:readme": "./docs-readme.sh",
     "docs:deploy": "./deploy-docs.sh",
