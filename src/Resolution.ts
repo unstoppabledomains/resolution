@@ -41,7 +41,10 @@ import { Eip1993Factories } from './utils/Eip1993Factories';
  * ```
  */
 export default class Resolution {
-  readonly blockchain: Blockchain | boolean;
+  /**
+   * @returns true if weather resolution library is configured to use blockchain for resolution.
+   */
+  readonly blockchain: boolean;
   /** @internal */
   readonly ens?: Ens;
   /** @internal */
@@ -51,10 +54,6 @@ export default class Resolution {
   /** @internal */
   readonly api?: Udapi;
 
-  /**
-   * Resolution constructor
-   * @property blockchain - main configuration object
-   */
   constructor({
     blockchain = true,
     api = DefaultAPI,
@@ -226,7 +225,7 @@ export default class Resolution {
 
   /**
    * Resolves the ipfs redirect url for a supported domain records
-   * @deprecated - use Resolution#httpUrl instead
+   * @deprecated use Resolution#httpUrl instead
    * @param domain - domain name
    * @throws ResolutionError
    * @returns A Promise that resolves in redirect url
@@ -253,9 +252,9 @@ export default class Resolution {
   }
 
   /**
-   * Resolves given domain to a specific currency address or throws an error
-   * @param domain - domain name
-   * @param currencyTicker - currency ticker such as
+   * @returns A specific currency address or throws an error
+   * @param domain domain name
+   * @param currencyTicker currency ticker such as
    *  - ZIL
    *  - BTC
    *  - ETH
@@ -271,7 +270,7 @@ export default class Resolution {
   }
 
   /**
-   * Returns the resolver address for a specific domain
+   * @returns the resolver address for a specific domain
    * @param domain - domain to look for
    */
   async resolver(domain: string): Promise<string> {
@@ -280,7 +279,6 @@ export default class Resolution {
   }
 
   /**
-   * Owner of the domain
    * @param domain - domain name
    * @returns An owner address of the domain
    */
@@ -291,10 +289,9 @@ export default class Resolution {
   }
 
   /**
-   * Custom key for the domain
    * @param domain - domain name
-   * @param recordKey - key from resolver contract
-   * This method is not implemented for ens domains
+   * @param recordKey - a name of a record to be resolved
+   * @returns A record value promise for a given record name
    */
   async record(domain: string, recordKey: string): Promise<string> {
     domain = this.prepareDomain(domain);
@@ -317,8 +314,8 @@ export default class Resolution {
   }
 
   /**
-   * Produces a namehash from supported naming service in hex format with 0x prefix.
-   * ERC721 token id in case of Ethereum based naming service like ENS or CNS.
+   * @returns Produces a namehash from supported naming service in hex format with 0x prefix.
+   * Corresponds to ERC721 token id in case of Ethereum based naming service like ENS or CNS.
    * @param domain - domain name to be converted
    * @throws ResolutionError with UnsupportedDomain error code if domain extension is unknown
    */
@@ -329,9 +326,9 @@ export default class Resolution {
 
   /**
    * returns a childhash for specific namingService
-   * @param parent -> hash for parent
-   * @param label -> hash for label
-   * @param method -> "ENS", "CNS" or "ZNS"
+   * @param parent hash for parent
+   * @param label hash for label
+   * @param method "ENS", "CNS" or "ZNS"
    */
   childhash(
     parent: nodeHash,
@@ -352,7 +349,9 @@ export default class Resolution {
   }
 
   /**
-   * Checks if the domain is in valid format
+   * Checks if the domain name is valid according to naming service rules
+   * for valid domain names.
+   * Example: ENS doesn't allow domains that start from '-' symbol.
    * @param domain - domain name to be checked
    */
   isSupportedDomain(domain: string): boolean {
