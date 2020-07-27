@@ -9,7 +9,7 @@ import {
   expectResolutionErrorCode,
   secretInfuraLink,
   pendingInLive,
-} from './utils/testHelpers';
+} from './tests/helpers';
 let resolution: Resolution;
 
 try {

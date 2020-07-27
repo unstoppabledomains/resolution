@@ -6,7 +6,7 @@ import {
   mockAPICalls,
   mockAsyncMethod,
   expectSpyToBeCalled,
-} from './utils/testHelpers';
+} from './tests/helpers';
 
 beforeEach(() => {
   nock.cleanAll();

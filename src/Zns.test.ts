@@ -6,7 +6,7 @@ import {
   mockAPICalls,
   expectResolutionErrorCode,
   mockAsyncMethods,
-} from './utils/testHelpers';
+} from './tests/helpers';
 import { NullAddress } from './types';
 
 let resolution: Resolution;

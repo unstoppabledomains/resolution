@@ -2,7 +2,7 @@ import nock from 'nock';
 import _ from 'lodash';
 import { Dictionary } from '../types';
 import { ResolutionError } from '../index';
-import mockData from '../testData/mockData.json';
+import mockData from './mockData.json';
 export const MainnetUrl = 'https://mainnet.infura.io';
 export const ZilliqaUrl = 'https://api.zilliqa.com';
 export const DefaultUrl = 'https://unstoppabledomains.com/api/v1';

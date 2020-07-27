@@ -1,10 +1,4 @@
 import Resolution from './index';
-import {
-  mockAsyncMethods,
-  expectSpyToBeCalled,
-  expectResolutionErrorCode,
-  secretInfuraLink,
-} from './utils/testHelpers';
 import { ResolutionErrorCode } from './errors/resolutionError';
 import { NullAddress, NamingServiceName } from './types';
 import {
@@ -13,7 +7,11 @@ import {
   CryptoDomainWithEmptyResolver,
   CryptoDomainWithoutResolver,
   CryptoDomainWithIpfsRecords,
-} from './utils/testHelpers';
+  mockAsyncMethods,
+  expectSpyToBeCalled,
+  expectResolutionErrorCode,
+  secretInfuraLink,
+} from './tests/helpers';
 
 try {
   const dotenv = require('dotenv');

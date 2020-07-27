@@ -14,7 +14,7 @@
     "stripInternal": true,
     "strictNullChecks": true
   },
-  "exclude": ["node_modules", "tmp", "**/*.test.ts", "build"],
+  "exclude": ["node_modules", "tmp", "**/*.test.ts", "build", "src/tests"],
   "typedocOptions": {
     "mode": "file",
     "module": "commonjs",

@@ -18,7 +18,7 @@ import {
   InfuraProtocol,
   caseMock,
   mockAsyncMethod,
-} from './utils/testHelpers';
+} from './tests/helpers';
 
 try {
   const dotenv = require('dotenv');
