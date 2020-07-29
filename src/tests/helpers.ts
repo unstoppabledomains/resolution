@@ -3,6 +3,7 @@ import _ from 'lodash';
 import { Dictionary } from '../types';
 import { ResolutionError } from '../index';
 import mockData from './mockData.json';
+import ConfigurationError from '../errors/configurationError';
 export const MainnetUrl = 'https://mainnet.infura.io';
 export const ZilliqaUrl = 'https://api.zilliqa.com';
 export const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
@@ -67,7 +68,7 @@ export async function expectResolutionErrorCode(
   return callback.then(
     () => fail("Expected resolution error to be thrown but wasn't"),
     (error) => {
-      if (error instanceof ResolutionError && error.code === code) {
+      if (error instanceof ResolutionError || ConfigurationError && error.code === code) {
         return expect(error.code).toEqual(code);
       } else {
         throw error;
@@ -88,13 +89,13 @@ export function mockAPICalls(testName: string, url = MainnetUrl) {
       case 'POST': {
         nock(url)
           // .log()
-          .post('/', JSON.stringify(REQUEST))
+          .post('/', JSON.stringify(REQUEST), undefined)
           .reply(200, JSON.stringify(RESPONSE));
       }
       default: {
         nock(url)
           // .log()
-          .get(REQUEST as string)
+          .get(REQUEST as string, undefined, undefined)
           .reply(200, RESPONSE);
       }
     }
@@ -103,21 +104,23 @@ export function mockAPICalls(testName: string, url = MainnetUrl) {
 
 /**
  * @internal
- * returns either a standard mainnet infura url
+ * returns either a standard mainnet linkpool url
+ * @see https://docs.linkpool.io/docs/rpc_main
  * or the one with attached INFURA SECRET key from
  * UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID env variable if any
  */
-export function secretInfuraLink(infuraProtocol: InfuraProtocol = InfuraProtocol.http): string {
+export function secretInfuraLink(providerProtocol: ProviderProtocol = ProviderProtocol.http): string {
   const secret = process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID;
   const protocolMap = {
-    [InfuraProtocol.http]:'https://mainnet.infura.io/v3',
-    [InfuraProtocol.wss]:'wss://mainnet.infura.io/ws/v3'
+    [ProviderProtocol.http]:'https://mainnet.infura.io/v3',
+    [ProviderProtocol.wss]:'wss://mainnet.infura.io/ws/v3'
   };
-  const url = `${protocolMap[infuraProtocol]}/${secret}`;
+  let url = secret ? `${protocolMap[providerProtocol]}/${secret}` : 'https://main-rpc.linkpool.io';
+  if (!secret && providerProtocol === ProviderProtocol.wss) url = "wss://main-rpc.linkpool.io/ws";
   return url;
 }
 
-export enum InfuraProtocol {
+export enum ProviderProtocol {
   "http", "wss"
 };
 

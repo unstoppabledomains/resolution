@@ -15,7 +15,7 @@ import {
   expectSpyToBeCalled,
   mockAsyncMethods,
   secretInfuraLink,
-  InfuraProtocol,
+  ProviderProtocol,
   caseMock,
   mockAsyncMethod,
 } from './tests/helpers';
@@ -26,6 +26,10 @@ try {
 } catch (err) {
   console.warn('dotenv is not installed');
 }
+
+// Live test are failing because default blockchain provider linkpool is very slow. 
+// Had to increase timeout for async operations from 5 to 12 seconds
+jest.setTimeout(12000);
 
 beforeEach(() => {
   nock.cleanAll();
@@ -341,7 +345,7 @@ describe('Resolution', () => {
     it('should work with webSocketProvider', async () => {
       // web3-providers-ws has problems with type definitions
       // We still prefer everything to be statically typed on our end for better mocking
-      const provider = new (Web3WsProvider as any)(secretInfuraLink(InfuraProtocol.wss)) as Web3WsProvider.WebsocketProvider;
+      const provider = new (Web3WsProvider as any)(secretInfuraLink(ProviderProtocol.wss)) as Web3WsProvider.WebsocketProvider;
       const eye = mockAsyncMethod(provider, "send", (payload, callback) => {
         const result = caseMock(payload.params![0], RpcProviderTestCases)
         callback(null, {
@@ -360,7 +364,7 @@ describe('Resolution', () => {
 
     it('should work for ethers jsonrpc provider', async () => {
       const provider = new JsonRpcProvider(
-        secretInfuraLink(InfuraProtocol.http),
+        secretInfuraLink(ProviderProtocol.http),
         'mainnet',
       );
       const resolution = Resolution.fromEthersProvider(provider);
@@ -385,7 +389,7 @@ describe('Resolution', () => {
     });
 
     it('should work with web3@0.20.7 provider', async () => {
-      const provider = new Web3V027Provider(secretInfuraLink(InfuraProtocol.http), 5000, null, null, null);
+      const provider = new Web3V027Provider(secretInfuraLink(ProviderProtocol.http), 5000, null, null, null);
       const eye = mockAsyncMethod(provider, "sendAsync", (payload: JsonRpcPayload, callback: any) => {
         const result = caseMock(payload.params![0], RpcProviderTestCases)
         callback(undefined, {
