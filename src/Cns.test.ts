@@ -107,6 +107,17 @@ describe('CNS', () => {
   });
 
   describe('.Crypto', () => {
+    it.only('should work without any configs', async () => {
+      resolution = new Resolution();
+      const eyes = mockCryptoCalls(
+        resolution.cns,
+        '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
+      );
+      const address = await resolution.address('brad.crypto', 'eth');
+      expectSpyToBeCalled(eyes);
+      expect(address).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
+    })
+
     it(`checks the BCH address on ${CryptoDomainWithAdaBchAddresses}`, async () => {
       const eyes = mockCryptoCalls(
         resolution.cns,
