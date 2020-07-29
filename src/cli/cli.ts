@@ -66,7 +66,12 @@ import {
   const response = {};
   
   const commandTable = {
-    ipfs: () => tryInfo(async () => await resolution.ipfsHash(domain), response, 'ipfs'),
+    ipfs: () => tryInfo(async () => {
+      const result = {};
+      result['ipfsHash'] = await resolution.ipfsHash(domain).catch(err => err.code);
+      result['redirect_url'] = await resolution.httpUrl(domain).catch(err => err.code);
+      return result;
+    }, response, 'ipfs'),
     email: () => tryInfo(async () => await resolution.email(domain), response, 'email'),
     resolver: () => tryInfo(async () => await resolution.resolver(domain), response, 'resolver'),
     service: () => tryInfo(() => resolution.serviceName(domain), response, 'service'),

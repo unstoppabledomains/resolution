@@ -69,6 +69,7 @@ export function getConfig() {
   } catch (err) {
     if (err.code === "ENOENT") {
       console.warn('Configuration file was not found. Default blockchain provider: "https://main-rpc.linkpool.io/" is being used');
+      console.warn('To configure a different provider use -C flag ')
     }
     return {type: "unknown", value: ""};
   }
