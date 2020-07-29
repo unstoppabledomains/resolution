@@ -107,7 +107,7 @@ describe('CNS', () => {
   });
 
   describe('.Crypto', () => {
-    it.only('should work without any configs', async () => {
+    it('should work without any configs', async () => {
       resolution = new Resolution();
       const eyes = mockCryptoCalls(
         resolution.cns,
