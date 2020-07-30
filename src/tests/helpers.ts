@@ -115,7 +115,7 @@ export function protocolLink(providerProtocol: ProviderProtocol = ProviderProtoc
     [ProviderProtocol.http]: secret ? `https://mainnet.infura.io/v3/${secret}`  : 'https://main-rpc.linkpool.io',
     [ProviderProtocol.wss]:    secret ? `wss://mainnet.infura.io/ws/v3/${secret}` : "wss://main-rpc.linkpool.io/ws"
  };
-  const url = `${protocolMap[providerProtocol]}`;
+  const url = protocolMap[providerProtocol];
   return url;
 }
 
