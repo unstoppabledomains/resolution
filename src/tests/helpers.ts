@@ -68,7 +68,7 @@ export async function expectResolutionErrorCode(
   return callback.then(
     () => fail("Expected resolution error to be thrown but wasn't"),
     (error) => {
-      if (error instanceof ResolutionError || ConfigurationError && error.code === code) {
+      if (error instanceof ResolutionError || error instanceof ConfigurationError && error.code === code) {
         return expect(error.code).toEqual(code);
       } else {
         throw error;
