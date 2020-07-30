@@ -29,9 +29,9 @@ export abstract class EthereumNamingService extends NamingService {
   static readonly UrlMap: BlockhanNetworkUrlMap = {
     mainnet: 'https://main-rpc.linkpool.io',
     ropsten: 'https://ropsten-rpc.linkpool.io',
-    rinkeby: '', 
-    goerli: '', 
-    kovan: '', 
+    rinkeby: undefined, 
+    goerli: undefined, 
+    kovan: undefined, 
   };
 
   static readonly NetworkNameMap = invert(EthereumNamingService.NetworkIdMap);
