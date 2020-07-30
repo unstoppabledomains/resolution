@@ -20,11 +20,6 @@ try {
   console.warn('dotenv is not installed');
 }
 
-// Live test are failing because default blockchain provider linkpool is very slow. 
-// Had to increase timeout for async operations from 5 to 12 seconds
-jest.setTimeout(12000);
-
-
 beforeEach(() => {
   nock.cleanAll();
   jest.restoreAllMocks();
