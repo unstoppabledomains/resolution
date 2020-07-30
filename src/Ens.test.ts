@@ -7,7 +7,7 @@ import {
   mockAsyncMethods,
   expectSpyToBeCalled,
   expectResolutionErrorCode,
-  secretInfuraLink,
+  protocolLink,
   pendingInLive,
 } from './tests/helpers';
 import ConfigurationError, { ConfigurationErrorCode } from './errors/configurationError';
@@ -29,7 +29,7 @@ beforeEach(() => {
   nock.cleanAll();
   jest.restoreAllMocks();
   resolution = new Resolution({
-    blockchain: { ens: { url: secretInfuraLink() } },
+    blockchain: { ens: { url: protocolLink() } },
   });
 });
 
@@ -44,9 +44,9 @@ describe('ENS', () => {
 
   it('resolves .eth name using blockchain', async () => {
     const resolution = new Resolution({
-      blockchain: { ens: { url: secretInfuraLink() } },
+      blockchain: { ens: { url: protocolLink() } },
     });
-    expect(resolution.ens!.url).toBe(secretInfuraLink());
+    expect(resolution.ens!.url).toBe(protocolLink());
     expect(resolution.ens!.network).toEqual('mainnet');
 
     const eyes = mockAsyncMethods(resolution.ens, {
@@ -175,7 +175,7 @@ describe('ENS', () => {
 
   it('checks normalizeSource ens (object) #1', async () => {
     expect(resolution.ens!.network).toBe('mainnet');
-    expect(resolution.ens!.url).toBe(secretInfuraLink());
+    expect(resolution.ens!.url).toBe(protocolLink());
   });
 
   it('checks normalizeSource ens (object) #2', async () => {
@@ -441,7 +441,7 @@ describe('ENS', () => {
     });
 
     it('resolve to null for empty .eth record', async () => {
-      expect(resolution.ens!.url).toBe(secretInfuraLink());
+      expect(resolution.ens!.url).toBe(protocolLink());
       expect(resolution.ens!.network).toEqual('mainnet');
 
       const eyes = mockAsyncMethods(resolution.ens, {

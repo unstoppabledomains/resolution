@@ -10,7 +10,7 @@ import {
   mockAsyncMethods,
   expectSpyToBeCalled,
   expectResolutionErrorCode,
-  secretInfuraLink,
+  protocolLink,
 } from './tests/helpers';
 
 try {
@@ -29,7 +29,7 @@ jest.setTimeout(12000);
 beforeEach(() => {
   jest.restoreAllMocks();
   resolution = new Resolution({
-    blockchain: { cns: { url: secretInfuraLink() } },
+    blockchain: { cns: { url: protocolLink() } },
   });
 });
 
@@ -48,7 +48,7 @@ describe('CNS', () => {
   it('should define the default cns contract', () => {
     expect(resolution.cns).toBeDefined();
     expect(resolution.cns!.network).toBe('mainnet');
-    expect(resolution.cns!.url).toBe(secretInfuraLink());
+    expect(resolution.cns!.url).toBe(protocolLink());
   });
 
   it('checks the record by key', async () => {
@@ -279,7 +279,7 @@ describe('CNS', () => {
     });
 
     it('should throw UnspecifiedResolver for chatId', async () => {
-      const resolution = new Resolution({blockchain: {cns: {url: secretInfuraLink()}}});
+      const resolution = new Resolution({blockchain: {cns: {url: protocolLink()}}});
       const eyes = mockAsyncMethods(resolution.cns, {
         owner: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
         getResolver: undefined,

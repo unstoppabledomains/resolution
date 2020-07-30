@@ -109,7 +109,7 @@ export function mockAPICalls(testName: string, url = MainnetUrl) {
  * or the one with attached INFURA SECRET key from
  * UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID env variable if any
  */
-export function secretInfuraLink(providerProtocol: ProviderProtocol = ProviderProtocol.http): string {
+export function protocolLink(providerProtocol: ProviderProtocol = ProviderProtocol.http): string {
   const secret = process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID;
   const protocolMap = {
     [ProviderProtocol.http]:'https://mainnet.infura.io/v3',
