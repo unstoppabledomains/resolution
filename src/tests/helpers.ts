@@ -112,11 +112,10 @@ export function mockAPICalls(testName: string, url = MainnetUrl) {
 export function protocolLink(providerProtocol: ProviderProtocol = ProviderProtocol.http): string {
   const secret = process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID;
   const protocolMap = {
-    [ProviderProtocol.http]:'https://mainnet.infura.io/v3',
-    [ProviderProtocol.wss]:'wss://mainnet.infura.io/ws/v3'
-  };
-  let url = secret ? `${protocolMap[providerProtocol]}/${secret}` : 'https://main-rpc.linkpool.io';
-  if (!secret && providerProtocol === ProviderProtocol.wss) url = "wss://main-rpc.linkpool.io/ws";
+    [ProviderProtocol.http]: secret ? `https://mainnet.infura.io/v3/${secret}`  : 'https://main-rpc.linkpool.io',
+    [ProviderProtocol.wss]:    secret ? `wss://mainnet.infura.io/ws/v3/${secret}` : "wss://main-rpc.linkpool.io/ws"
+ };
+  const url = `${protocolMap[providerProtocol]}`;
   return url;
 }
 
