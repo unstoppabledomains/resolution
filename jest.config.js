@@ -8,4 +8,5 @@ module.exports = {
       diagnostics: false,
     },
   },
+  testTimeout: 12000,
 };

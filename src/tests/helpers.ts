@@ -1,8 +1,9 @@
 import nock from 'nock';
 import _ from 'lodash';
 import { Dictionary } from '../types';
-import { ResolutionError } from '../index';
 import mockData from './mockData.json';
+import ResolutionError, { ResolutionErrorCode } from '../errors/resolutionError';
+import ConfigurationError, { ConfigurationErrorCode } from '../errors/configurationError';
 export const MainnetUrl = 'https://mainnet.infura.io';
 export const ZilliqaUrl = 'https://api.zilliqa.com';
 export const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
@@ -51,7 +52,22 @@ export function expectSpyToBeCalled(spies: any[]) {
 
 export async function expectResolutionErrorCode(
   callback: Promise<any> | Function,
+  code: ResolutionErrorCode
+): Promise<void> {
+  return expectError(callback, code, ResolutionError)
+}
+
+export async function expectConfigurationErrorCode(
+  callback: Promise<any> | Function,
+  code: ConfigurationErrorCode
+): Promise<void> {
+  return expectError(callback, code, ConfigurationError)
+}
+
+async function expectError(
+  callback: Promise<any> | Function,
   code: string,
+  klass: typeof ResolutionError | typeof ConfigurationError
 ): Promise<void> {
   if (callback instanceof Function) {
     callback = new Promise((resolve, reject) => {
@@ -65,12 +81,12 @@ export async function expectResolutionErrorCode(
   }
 
   return callback.then(
-    () => fail("Expected resolution error to be thrown but wasn't"),
+    () => fail(`Expected ${klass.name} to be thrown but wasn't`),
     (error) => {
-      if (error instanceof ResolutionError && error.code === code) {
+      if (error instanceof klass) {
         return expect(error.code).toEqual(code);
       } else {
-        throw error;
+        fail(error);
       }
     }
   );
@@ -88,13 +104,13 @@ export function mockAPICalls(testName: string, url = MainnetUrl) {
       case 'POST': {
         nock(url)
           // .log()
-          .post('/', JSON.stringify(REQUEST))
+          .post('/', JSON.stringify(REQUEST), undefined)
           .reply(200, JSON.stringify(RESPONSE));
       }
       default: {
         nock(url)
           // .log()
-          .get(REQUEST as string)
+          .get(REQUEST as string, undefined, undefined)
           .reply(200, RESPONSE);
       }
     }
@@ -103,21 +119,22 @@ export function mockAPICalls(testName: string, url = MainnetUrl) {
 
 /**
  * @internal
- * returns either a standard mainnet infura url
+ * returns either a standard mainnet linkpool url
+ * @see https://docs.linkpool.io/docs/rpc_main
  * or the one with attached INFURA SECRET key from
  * UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID env variable if any
  */
-export function secretInfuraLink(infuraProtocol: InfuraProtocol = InfuraProtocol.http): string {
+export function protocolLink(providerProtocol: ProviderProtocol = ProviderProtocol.http): string {
   const secret = process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID;
   const protocolMap = {
-    [InfuraProtocol.http]:'https://mainnet.infura.io/v3',
-    [InfuraProtocol.wss]:'wss://mainnet.infura.io/ws/v3'
-  };
-  const url = `${protocolMap[infuraProtocol]}/${secret}`;
+    [ProviderProtocol.http]: secret ? `https://mainnet.infura.io/v3/${secret}` : 'https://main-rpc.linkpool.io',
+    [ProviderProtocol.wss]: secret ? `wss://mainnet.infura.io/ws/v3/${secret}` : 'wss://main-rpc.linkpool.io/ws',
+ };
+  const url = protocolMap[providerProtocol];
   return url;
 }
 
-export enum InfuraProtocol {
+export enum ProviderProtocol {
   "http", "wss"
 };
 

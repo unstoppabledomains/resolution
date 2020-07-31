@@ -26,22 +26,17 @@ export function signedInfuraLink(key: string): string {
   return `https://mainnet.infura.io/v3/${key}`;
 }
 
+
+const configObject = getConfig();
 export function getEtheriumUrl(): string {
-  //try to get them from config files
-  const configObject = getConfig();
-  if (!configObject) {
-    if (process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID)
-      return signedInfuraLink(
-        process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID,
-      );
-    if (process.env.UNSTOPPABLE_RESOLUTION_URL)
-      return process.env.UNSTOPPABLE_RESOLUTION_URL;
-  } else {
-    if (configObject.type === 'infura')
+  switch (configObject.type) {
+    case "infura":
       return signedInfuraLink(configObject.value);
-    if (configObject.type === 'url') return configObject.value;
-  }
-  throw new ConfigurationError(ConfigurationErrorCode.MissingProviderConfigurations);
+    case "url":
+      return configObject.value;
+    default:
+      return "https://main-rpc.linkpool.io/";
+  } 
 }
 
 export function buildResolutionPackage() {
@@ -70,9 +65,13 @@ export function getConfig() {
       .readFileSync(`${process.env.HOME}/.resolution`)
       .toString()
       .split('=');
-    if (config[0] === 'infura' || config[0] === 'url')
-      return { type: config[0], value: config[1] };
+    return { type: config[0], value: config[1] };
   } catch (err) {
-    throw new ConfigurationError(ConfigurationErrorCode.MissingProviderConfigurations);
+    if (err.code === "ENOENT") {
+      console.warn('Configuration file was not found. Default blockchain provider: "https://main-rpc.linkpool.io/" is being used');
+      console.warn('This RPC is limited to 2,000 calls per 5 minutes. If that is exceeded, then the source IP address is blocked.')
+      console.warn('To configure a different provider use -C flag ')
+    }
+    return {type: "unknown", value: ""};
   }
 }

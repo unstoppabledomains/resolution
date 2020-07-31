@@ -14,8 +14,8 @@ import {
   expectResolutionErrorCode,
   expectSpyToBeCalled,
   mockAsyncMethods,
-  secretInfuraLink,
-  InfuraProtocol,
+  protocolLink,
+  ProviderProtocol,
   caseMock,
   mockAsyncMethod,
 } from './tests/helpers';
@@ -164,7 +164,7 @@ describe('Resolution', () => {
   });
 
   it(`domains "brad.crypto" and "Brad.crypto" should return the same results`, async () => {
-    const resolution = new Resolution({ blockchain: { cns: { url: secretInfuraLink() } } });
+    const resolution = new Resolution({ blockchain: { cns: { url: protocolLink() } } });
     const eyes = mockAsyncMethods(resolution.cns, {
       getResolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
       getRecord: "0x45b31e01AA6f42F0549aD482BE81635ED3149abb",
@@ -178,7 +178,7 @@ describe('Resolution', () => {
 
   it('should resolve gundb chat id', async () => {
     const resolution = new Resolution({
-      blockchain: { cns: { url: secretInfuraLink() } },
+      blockchain: { cns: { url: protocolLink() } },
     });
     const eyes = mockAsyncMethods(resolution.cns, {
       getResolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
@@ -320,7 +320,7 @@ describe('Resolution', () => {
     it('should work with web3HttpProvider', async () => {
       // web3-providers-http has problems with type definitions
       // We still prefer everything to be statically typed on our end for better mocking
-      const provider = new (Web3HttpProvider as any)(secretInfuraLink()) as Web3HttpProvider.HttpProvider;
+      const provider = new (Web3HttpProvider as any)(protocolLink()) as Web3HttpProvider.HttpProvider;
       // mock the send function with different implementations (each should call callback right away with different answers)
       const eye = mockAsyncMethod(provider, "send", (payload: JsonRpcPayload, callback) => {
         const result = caseMock(payload.params![0], RpcProviderTestCases)
@@ -341,7 +341,7 @@ describe('Resolution', () => {
     it('should work with webSocketProvider', async () => {
       // web3-providers-ws has problems with type definitions
       // We still prefer everything to be statically typed on our end for better mocking
-      const provider = new (Web3WsProvider as any)(secretInfuraLink(InfuraProtocol.wss)) as Web3WsProvider.WebsocketProvider;
+      const provider = new (Web3WsProvider as any)(protocolLink(ProviderProtocol.wss)) as Web3WsProvider.WebsocketProvider;
       const eye = mockAsyncMethod(provider, "send", (payload, callback) => {
         const result = caseMock(payload.params![0], RpcProviderTestCases)
         callback(null, {
@@ -360,7 +360,7 @@ describe('Resolution', () => {
 
     it('should work for ethers jsonrpc provider', async () => {
       const provider = new JsonRpcProvider(
-        secretInfuraLink(InfuraProtocol.http),
+        protocolLink(ProviderProtocol.http),
         'mainnet',
       );
       const resolution = Resolution.fromEthersProvider(provider);
@@ -385,7 +385,7 @@ describe('Resolution', () => {
     });
 
     it('should work with web3@0.20.7 provider', async () => {
-      const provider = new Web3V027Provider(secretInfuraLink(InfuraProtocol.http), 5000, null, null, null);
+      const provider = new Web3V027Provider(protocolLink(ProviderProtocol.http), 5000, null, null, null);
       const eye = mockAsyncMethod(provider, "sendAsync", (payload: JsonRpcPayload, callback: any) => {
         const result = caseMock(payload.params![0], RpcProviderTestCases)
         callback(undefined, {
