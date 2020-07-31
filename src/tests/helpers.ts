@@ -83,10 +83,12 @@ async function expectError(
   return callback.then(
     () => fail(`Expected ${klass.name} to be thrown but wasn't`),
     (error) => {
-      if (error instanceof klass) {
+      // Redundant code quality check is required
+      // to display stack traces or errors when code is incorrect
+      if (error instanceof klass && error.code === code) {
         return expect(error.code).toEqual(code);
       } else {
-        fail(error);
+        throw error;
       }
     }
   );
