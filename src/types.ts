@@ -35,7 +35,7 @@ export type EnsNetworkIdMap = {
 
 /** @internal */
 export interface BlockhanNetworkUrlMap {
-  [key: string]: string;
+  [key: string]: string | undefined;
 }
 
 /** @internal */
