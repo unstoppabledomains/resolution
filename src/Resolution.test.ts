@@ -11,7 +11,7 @@ import Web3WsProvider from 'web3-providers-ws';
 import Web3V027Provider from 'web3-0.20.7/lib/web3/httpprovider';
 
 import {
-  expectError,
+  expectResolutionErrorCode,
   expectSpyToBeCalled,
   mockAsyncMethods,
   protocolLink,
@@ -44,7 +44,7 @@ describe('Resolution', () => {
 
   it('checks Resolution#addressOrThrow error #1', async () => {
     const resolution = new Resolution();
-    await expectError(
+    await expectResolutionErrorCode(
       resolution.addressOrThrow('sdncdoncvdinvcsdncs.zil', 'ZIL'),
       ResolutionErrorCode.UnregisteredDomain,
     );
@@ -52,7 +52,7 @@ describe('Resolution', () => {
 
   it('checks Resolution#addressOrThrow error #2', async () => {
     const resolution = new Resolution();
-    await expectError(
+    await expectResolutionErrorCode(
       resolution.addressOrThrow('brad.zil', 'INVALID_CURRENCY_SYMBOL'),
       ResolutionErrorCode.UnspecifiedCurrency,
     );
@@ -60,7 +60,7 @@ describe('Resolution', () => {
 
   it('resolves non-existing domain zone with throw', async () => {
     const resolution = new Resolution({ blockchain: true });
-    await expectError(
+    await expectResolutionErrorCode(
       resolution.addressOrThrow('bogdangusiev.qq', 'ZIL'),
       ResolutionErrorCode.UnsupportedDomain,
     );
@@ -86,7 +86,7 @@ describe('Resolution', () => {
 
   it('checks namehash for unsupported domain', async () => {
     const resolution = new Resolution();
-    await expectError(
+    await expectResolutionErrorCode(
       () => resolution.namehash('something.hello.com'),
       ResolutionErrorCode.UnsupportedDomain,
     );
@@ -122,7 +122,7 @@ describe('Resolution', () => {
 
   it('checks error for  email on brad.zil', async () => {
     const resolution = new Resolution();
-    await expectError(
+    await expectResolutionErrorCode(
       resolution.email('brad.zil'),
       ResolutionErrorCode.RecordNotFound,
     );
@@ -130,7 +130,7 @@ describe('Resolution', () => {
 
   it('should be invalid domain', async () => {
     const resolution = new Resolution();
-    await expectError(
+    await expectResolutionErrorCode(
       () => resolution.namehash('-hello.eth'),
       ResolutionErrorCode.UnsupportedDomain,
     );
@@ -138,7 +138,7 @@ describe('Resolution', () => {
 
   it('should be invalid domain 2', async () => {
     const resolution = new Resolution();
-    await expectError(
+    await expectResolutionErrorCode(
       () => resolution.namehash('whatever-.eth'),
       ResolutionErrorCode.UnsupportedDomain,
     );
@@ -149,15 +149,15 @@ describe('Resolution', () => {
     const ensInvalidDomain = 'hello..eth';
     const znsInvalidDomain = 'hello..zil';
     const resolution = new Resolution();
-    await expectError(
+    await expectResolutionErrorCode(
       () => resolution.namehash(cnsInvalidDomain),
       ResolutionErrorCode.UnsupportedDomain,
     );
-    await expectError(
+    await expectResolutionErrorCode(
       () => resolution.namehash(ensInvalidDomain),
       ResolutionErrorCode.UnsupportedDomain,
     );
-    await expectError(
+    await expectResolutionErrorCode(
       () => resolution.namehash(znsInvalidDomain),
       ResolutionErrorCode.UnsupportedDomain,
     );

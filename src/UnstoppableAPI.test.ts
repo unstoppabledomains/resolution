@@ -1,7 +1,7 @@
 import nock from 'nock';
 import Resolution, { ResolutionErrorCode } from './index';
 import {
-  expectError,
+  expectResolutionErrorCode,
   DefaultUrl,
   mockAPICalls,
   mockAsyncMethod,
@@ -38,7 +38,7 @@ describe('Unstoppable API', () => {
     const error = new Error();
     error.name = 'FetchError';
     jest.spyOn(resolution.api as any, 'fetch').mockRejectedValue(error);
-    await expectError(
+    await expectResolutionErrorCode(
       resolution.resolve('hello.zil'),
       ResolutionErrorCode.NamingServiceDown,
     );

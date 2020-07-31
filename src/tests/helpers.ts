@@ -2,7 +2,8 @@ import nock from 'nock';
 import _ from 'lodash';
 import { Dictionary } from '../types';
 import mockData from './mockData.json';
-import ResolutionError from '../errors/resolutionError';
+import ResolutionError, { ResolutionErrorCode } from '../errors/resolutionError';
+import ConfigurationError, { ConfigurationErrorCode } from '../errors/configurationError';
 export const MainnetUrl = 'https://mainnet.infura.io';
 export const ZilliqaUrl = 'https://api.zilliqa.com';
 export const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
@@ -49,10 +50,24 @@ export function expectSpyToBeCalled(spies: any[]) {
   }
 }
 
-export async function expectError(
+export async function expectResolutionErrorCode(
+  callback: Promise<any> | Function,
+  code: ResolutionErrorCode
+): Promise<void> {
+  return expectError(callback, code, ResolutionError)
+}
+
+export async function expectConfigurationErrorCode(
+  callback: Promise<any> | Function,
+  code: ConfigurationErrorCode
+): Promise<void> {
+  return expectError(callback, code, ConfigurationError)
+}
+
+async function expectError(
   callback: Promise<any> | Function,
   code: string,
-  instanceName: string = ResolutionError.name
+  klass: typeof ResolutionError | typeof ConfigurationError
 ): Promise<void> {
   if (callback instanceof Function) {
     callback = new Promise((resolve, reject) => {
@@ -66,9 +81,9 @@ export async function expectError(
   }
 
   return callback.then(
-    () => fail("Expected resolution error to be thrown but wasn't"),
+    () => fail(`Expected ${klass.name} to be thrown but wasn't`),
     (error) => {
-      if (error.constructor.name === instanceName) {
+      if (error instanceof klass) {
         return expect(error.code).toEqual(code);
       } else {
         fail(error);
