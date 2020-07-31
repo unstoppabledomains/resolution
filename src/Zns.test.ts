@@ -4,7 +4,7 @@ import {
   expectSpyToBeCalled,
   ZilliqaUrl,
   mockAPICalls,
-  expectResolutionErrorCode,
+  expectErrorCode,
   mockAsyncMethods,
 } from './tests/helpers';
 import { NullAddress } from './types';
@@ -323,7 +323,7 @@ describe('ZNS', () => {
       const spies = mockAsyncMethods(resolution.zns, {
         getRecordsAddresses: undefined,
       });
-      await expectResolutionErrorCode(
+      await expectErrorCode(
         resolution.zns!.resolver(
           'sopmethingveryweirdthatnoonewilltakeever.zil',
         ),
@@ -339,7 +339,7 @@ describe('ZNS', () => {
           NullAddress,
         ],
       });
-      await expectResolutionErrorCode(
+      await expectErrorCode(
         resolution.zns!.resolver('uihui12d.zil'),
         ResolutionErrorCode.UnspecifiedResolver,
       );
@@ -353,7 +353,7 @@ describe('ZNS', () => {
           NullAddress,
         ],
       });
-      await expectResolutionErrorCode(
+      await expectErrorCode(
         resolution.zns!.resolver('paulalcock.zil'),
         ResolutionErrorCode.UnspecifiedResolver,
       );
@@ -371,7 +371,7 @@ describe('ZNS', () => {
           'whois.for_sale.value': 'true',
         },
       });
-      await expectResolutionErrorCode(
+      await expectErrorCode(
         resolution.addressOrThrow('macron2022.zil', 'btc'),
         ResolutionErrorCode.UnspecifiedCurrency,
       );
@@ -414,7 +414,7 @@ describe('ZNS', () => {
       });
 
       it('raises ResoltuionError when domain is not supported', async () => {
-        await expectResolutionErrorCode(
+        await expectErrorCode(
           () => resolution.zns!.namehash('hello.world'),
           ResolutionErrorCode.UnsupportedDomain,
         );

@@ -1,9 +1,8 @@
 import nock from 'nock';
 import _ from 'lodash';
 import { Dictionary } from '../types';
-import { ResolutionError } from '../index';
 import mockData from './mockData.json';
-import ConfigurationError from '../errors/configurationError';
+import ResolutionError from '../errors/resolutionError';
 export const MainnetUrl = 'https://mainnet.infura.io';
 export const ZilliqaUrl = 'https://api.zilliqa.com';
 export const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
@@ -50,9 +49,10 @@ export function expectSpyToBeCalled(spies: any[]) {
   }
 }
 
-export async function expectResolutionErrorCode(
+export async function expectErrorCode(
   callback: Promise<any> | Function,
   code: string,
+  instanceName: string = ResolutionError.name
 ): Promise<void> {
   if (callback instanceof Function) {
     callback = new Promise((resolve, reject) => {
@@ -68,10 +68,10 @@ export async function expectResolutionErrorCode(
   return callback.then(
     () => fail("Expected resolution error to be thrown but wasn't"),
     (error) => {
-      if (error instanceof ResolutionError || error instanceof ConfigurationError && error.code === code) {
+      if (error.constructor.name === instanceName) {
         return expect(error.code).toEqual(code);
       } else {
-        throw error;
+        fail(error);
       }
     }
   );
