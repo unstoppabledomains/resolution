@@ -2,7 +2,8 @@
 
 * Added support of web3.js and ethers.js providers
 * Throw `ConfigurationError` instead of basic `Error` when Resolution library is configured incorrectly so that it can be targeted within `catch` block.
-* Use [@ethersproject/abi](https://www.npmjs.com/package/@ethersproject/abi) instead of its own ABI encoder
+* Use [@ethersproject/abi](https://www.npmjs.com/package/@ethersproject/abi) instead of custom abi encoder
+* Change default ethereum provider from infura to linkpool #75
 
 ## 1.5.1
 
