@@ -9,7 +9,7 @@ import {
   CryptoDomainWithIpfsRecords,
   mockAsyncMethods,
   expectSpyToBeCalled,
-  expectErrorCode,
+  expectError,
   protocolLink,
 } from './tests/helpers';
 
@@ -62,7 +62,7 @@ describe('CNS', () => {
       getResolver: '0xa1cac442be6673c49f8e74ffc7c4fd746f3cbd0d',
       getRecord: undefined,
     });
-    await expectErrorCode(
+    await expectError(
       resolution.record(CryptoDomainWithEmptyResolver, 'No.such.record'),
       ResolutionErrorCode.RecordNotFound,
     );
@@ -83,7 +83,7 @@ describe('CNS', () => {
       getResolver: undefined,
       owner: NullAddress,
     });
-    await expectErrorCode(
+    await expectError(
       resolution.resolver('unknown-unknown-938388383.crypto'),
       ResolutionErrorCode.UnregisteredDomain,
     );
@@ -95,7 +95,7 @@ describe('CNS', () => {
       getResolver: undefined,
       owner: 'someowneraddress',
     });
-    await expectErrorCode(
+    await expectError(
       resolution.resolver(CryptoDomainWithoutResolver),
       ResolutionErrorCode.UnspecifiedResolver,
     );
@@ -176,7 +176,7 @@ describe('CNS', () => {
           owner: '0x0000000000000000000000000000000000000000',
         });
 
-        await expectErrorCode(
+        await expectError(
           resolution.cns!.address('unregistered.crypto', 'ETH'),
           ResolutionErrorCode.UnregisteredDomain,
         );
@@ -280,7 +280,7 @@ describe('CNS', () => {
         owner: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
         getResolver: undefined,
       });
-      await expectErrorCode(resolution.chatId(CryptoDomainWithoutResolver), ResolutionErrorCode.UnspecifiedResolver);
+      await expectError(resolution.chatId(CryptoDomainWithoutResolver), ResolutionErrorCode.UnspecifiedResolver);
     });
 
     it('should resolve with the gundb public key stored on cns', async () => {
@@ -298,7 +298,7 @@ describe('CNS', () => {
         getResolver:'0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
         getRecord: undefined
       });
-      await expectErrorCode(resolution.chatPk(CryptoDomainWithEmptyResolver), ResolutionErrorCode.RecordNotFound)
+      await expectError(resolution.chatPk(CryptoDomainWithEmptyResolver), ResolutionErrorCode.RecordNotFound)
       expectSpyToBeCalled(eyes);
     });
 
@@ -307,7 +307,7 @@ describe('CNS', () => {
         getResolver:'0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
         getRecord: undefined
       });
-      await expectErrorCode(resolution.chatId(CryptoDomainWithEmptyResolver), ResolutionErrorCode.RecordNotFound)
+      await expectError(resolution.chatId(CryptoDomainWithEmptyResolver), ResolutionErrorCode.RecordNotFound)
       expectSpyToBeCalled(eyes);
     });
   });

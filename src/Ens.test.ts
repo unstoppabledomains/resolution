@@ -6,7 +6,7 @@ import {
   mockAsyncMethod,
   mockAsyncMethods,
   expectSpyToBeCalled,
-  expectErrorCode,
+  expectError,
   protocolLink,
   pendingInLive,
 } from './tests/helpers';
@@ -134,7 +134,7 @@ describe('ENS', () => {
       getOwner: undefined,
     });
 
-    await expectErrorCode(
+    await expectError(
       resolution.addressOrThrow('something.luxe', 'ETH'),
       ResolutionErrorCode.UnregisteredDomain,
     );
@@ -159,7 +159,7 @@ describe('ENS', () => {
   });
 
   it('checks if the network is supported(false)', async () => {
-    expectErrorCode(() => new Ens({ network: 42}), ConfigurationErrorCode.UnspecifiedUrl, ConfigurationError.name);
+    expectError(() => new Ens({ network: 42}), ConfigurationErrorCode.UnspecifiedUrl, ConfigurationError.name);
   });
 
   it('checks normalizeSource ens (boolean)', async () => {
@@ -222,7 +222,7 @@ describe('ENS', () => {
   });
 
   it('checks normalizeSource ens (object) #9', async () => {
-    expectErrorCode(() => new Resolution({  blockchain: { ens: { network: 'kovan' } },}), ConfigurationErrorCode.UnspecifiedUrl, ConfigurationError.name);
+    expectError(() => new Resolution({  blockchain: { ens: { network: 'kovan' } },}), ConfigurationErrorCode.UnspecifiedUrl, ConfigurationError.name);
   });
 
   it('checks normalizeSource ens (object) #10', async () => {
@@ -375,7 +375,7 @@ describe('ENS', () => {
     const eyes = mockAsyncMethods(resolution.ens, {
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
     });
-    await expectErrorCode(
+    await expectError(
       resolution.addressOrThrow('testthing.eth', 'bnb'),
       ResolutionErrorCode.UnsupportedCurrency,
     );
@@ -386,7 +386,7 @@ describe('ENS', () => {
     const eyes = mockAsyncMethods(resolution.ens, {
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
     });
-    await expectErrorCode(
+    await expectError(
       resolution.addressOrThrow('testthing.eth', 'UNREALTICKER'),
       ResolutionErrorCode.UnsupportedCurrency,
     );
@@ -464,7 +464,7 @@ describe('ENS', () => {
         getResolver: undefined,
         getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
       });
-      await expectErrorCode(
+      await expectError(
         resolution.resolver('empty.eth'),
         ResolutionErrorCode.UnspecifiedResolver,
       );
@@ -492,7 +492,7 @@ describe('ENS', () => {
           expect(resolution.ens!.isSupportedDomain('-hello.eth')).toEqual(
             false,
           );
-          await expectErrorCode(
+          await expectError(
             () => resolution.namehash('-hello.eth'),
             ResolutionErrorCode.UnsupportedDomain,
           );
@@ -500,7 +500,7 @@ describe('ENS', () => {
 
         it('ends with -', async () => {
           expect(resolution.isSupportedDomain('hello-.eth')).toEqual(false);
-          await expectErrorCode(
+          await expectError(
             () => resolution.namehash('hello-.eth'),
             ResolutionErrorCode.UnsupportedDomain,
           );
@@ -508,7 +508,7 @@ describe('ENS', () => {
 
         it('starts and ends with -', async () => {
           expect(resolution.isSupportedDomain('-hello-.eth')).toEqual(false);
-          await expectErrorCode(
+          await expectError(
             () => resolution.namehash('-hello-.eth'),
             ResolutionErrorCode.UnsupportedDomain,
           );
@@ -569,7 +569,7 @@ describe('ENS', () => {
         getResolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
         callMethod: '',
       });
-      await expectErrorCode(
+      await expectError(
         resolution.httpUrl('matthewgould.eth'),
         ResolutionErrorCode.RecordNotFound,
       );
@@ -583,7 +583,7 @@ describe('ENS', () => {
       });
       const emailPromise = resolution.email('matthewgould.eth');
       expectSpyToBeCalled(eyes);
-      await expectErrorCode(
+      await expectError(
         emailPromise,
         ResolutionErrorCode.RecordNotFound,
       );
@@ -616,7 +616,7 @@ describe('ENS', () => {
       });
       const emailPromise = resolution.chatId('test.eth');
       expectSpyToBeCalled(eyes);
-      await expectErrorCode(
+      await expectError(
         emailPromise,
         ResolutionErrorCode.RecordNotFound,
       );
@@ -629,7 +629,7 @@ describe('ENS', () => {
       });
       const emailPromise = resolution.chatPk('test.eth');
       expectSpyToBeCalled(eyes);
-      await expectErrorCode(
+      await expectError(
         emailPromise,
         ResolutionErrorCode.RecordNotFound,
       );

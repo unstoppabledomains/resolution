@@ -49,7 +49,7 @@ export function expectSpyToBeCalled(spies: any[]) {
   }
 }
 
-export async function expectErrorCode(
+export async function expectError(
   callback: Promise<any> | Function,
   code: string,
   instanceName: string = ResolutionError.name
@@ -112,8 +112,8 @@ export function mockAPICalls(testName: string, url = MainnetUrl) {
 export function protocolLink(providerProtocol: ProviderProtocol = ProviderProtocol.http): string {
   const secret = process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID;
   const protocolMap = {
-    [ProviderProtocol.http]: secret ? `https://mainnet.infura.io/v3/${secret}`  : 'https://main-rpc.linkpool.io',
-    [ProviderProtocol.wss]:    secret ? `wss://mainnet.infura.io/ws/v3/${secret}` : "wss://main-rpc.linkpool.io/ws"
+    [ProviderProtocol.http]: secret ? `https://mainnet.infura.io/v3/${secret}` : 'https://main-rpc.linkpool.io',
+    [ProviderProtocol.wss]: secret ? `wss://mainnet.infura.io/ws/v3/${secret}` : 'wss://main-rpc.linkpool.io/ws',
  };
   const url = protocolMap[providerProtocol];
   return url;
