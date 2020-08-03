@@ -1,5 +1,7 @@
 ## Unreleased
 
+## 1.6.0
+
 * Added support of web3.js and ethers.js providers
 * Throw `ConfigurationError` instead of basic `Error` when Resolution library is configured incorrectly so that it can be targeted within `catch` block.
 * Use [@ethersproject/abi](https://www.npmjs.com/package/@ethersproject/abi) instead of custom abi encoder
