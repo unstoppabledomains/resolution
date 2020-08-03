@@ -84,7 +84,7 @@ async function expectError(
     () => fail(`Expected ${klass.name} to be thrown but wasn't`),
     (error) => {
       // Redundant code quality check is required
-      // to display stack traces or errors when code is incorrect
+      // to display stack traces when code is incorrect
       if (error instanceof klass && error.code === code) {
         return expect(error.code).toEqual(code);
       } else {
