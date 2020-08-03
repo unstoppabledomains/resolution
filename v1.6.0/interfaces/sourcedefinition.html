@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>JsonRpcResponse | @unstoppabledomains/resolution</title>
+	<title>SourceDefinition | @unstoppabledomains/resolution</title>
 	<meta name="description" content="Documentation for @unstoppabledomains/resolution">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -54,21 +54,36 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="jsonrpcresponse.html">JsonRpcResponse</a>
+					<a href="sourcedefinition.html">SourceDefinition</a>
 				</li>
 			</ul>
-			<h1>Interface JsonRpcResponse</h1>
+			<h1>Interface SourceDefinition</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>SourceDefinition object</p>
+					</div>
+					<dl class="tsd-comment-tags">
+						<dt>property</dt>
+						<dd><p>{string} [url] - main blockchain api url</p>
+						</dd>
+						<dt>property</dt>
+						<dd><p>{string | number} [network] - blockchain network</p>
+						</dd>
+					</dl>
+				</div>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">JsonRpcResponse</span>
+						<span class="target">SourceDefinition</span>
 					</li>
 				</ul>
 			</section>
@@ -79,10 +94,10 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="jsonrpcresponse.html#error" class="tsd-kind-icon">error</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="jsonrpcresponse.html#id" class="tsd-kind-icon">id</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="jsonrpcresponse.html#jsonrpc" class="tsd-kind-icon">jsonrpc</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="jsonrpcresponse.html#result" class="tsd-kind-icon">result</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="sourcedefinition.html#network" class="tsd-kind-icon">network</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="sourcedefinition.html#provider" class="tsd-kind-icon">provider</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="sourcedefinition.html#registry" class="tsd-kind-icon">registry</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="sourcedefinition.html#url" class="tsd-kind-icon">url</a></li>
 							</ul>
 						</section>
 					</div>
@@ -91,42 +106,42 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="error" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> error</h3>
-					<div class="tsd-signature tsd-kind-icon">error<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
+					<a name="network" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> network</h3>
+					<div class="tsd-signature tsd-kind-icon">network<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/6b0e006/src/types.ts#L124">src/types.ts:124</a></li>
+							<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/0cd16e0/src/types.ts#L11">src/types.ts:11</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="id" class="tsd-anchor"></a>
-					<h3>id</h3>
-					<div class="tsd-signature tsd-kind-icon">id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<a name="provider" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> provider</h3>
+					<div class="tsd-signature tsd-kind-icon">provider<span class="tsd-signature-symbol">:</span> <a href="provider.html" class="tsd-signature-type">Provider</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/6b0e006/src/types.ts#L122">src/types.ts:122</a></li>
+							<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/0cd16e0/src/types.ts#L13">src/types.ts:13</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="jsonrpc" class="tsd-anchor"></a>
-					<h3>jsonrpc</h3>
-					<div class="tsd-signature tsd-kind-icon">jsonrpc<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<a name="registry" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> registry</h3>
+					<div class="tsd-signature tsd-kind-icon">registry<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/6b0e006/src/types.ts#L121">src/types.ts:121</a></li>
+							<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/0cd16e0/src/types.ts#L12">src/types.ts:12</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="result" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> result</h3>
-					<div class="tsd-signature tsd-kind-icon">result<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
+					<a name="url" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> url</h3>
+					<div class="tsd-signature tsd-kind-icon">url<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/6b0e006/src/types.ts#L123">src/types.ts:123</a></li>
+							<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/0cd16e0/src/types.ts#L10">src/types.ts:10</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -145,19 +160,19 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface">
-						<a href="jsonrpcresponse.html" class="tsd-kind-icon">Json<wbr>Rpc<wbr>Response</a>
+						<a href="sourcedefinition.html" class="tsd-kind-icon">Source<wbr>Definition</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="jsonrpcresponse.html#error" class="tsd-kind-icon">error</a>
+								<a href="sourcedefinition.html#network" class="tsd-kind-icon">network</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="jsonrpcresponse.html#id" class="tsd-kind-icon">id</a>
+								<a href="sourcedefinition.html#provider" class="tsd-kind-icon">provider</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="jsonrpcresponse.html#jsonrpc" class="tsd-kind-icon">jsonrpc</a>
+								<a href="sourcedefinition.html#registry" class="tsd-kind-icon">registry</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="jsonrpcresponse.html#result" class="tsd-kind-icon">result</a>
+								<a href="sourcedefinition.html#url" class="tsd-kind-icon">url</a>
 							</li>
 						</ul>
 					</li>

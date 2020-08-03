@@ -1,8 +1,9 @@
-[Current Version v1.5.2-beta.0](https://unstoppabledomains.github.io/resolution//v1.5.2-beta.0/)
+[Current Version v1.6.0](https://unstoppabledomains.github.io/resolution//v1.6.0/)
 
 ## Older Versions
 
 * [v1.6.0-beta.0](https://unstoppabledomains.github.io/resolution//v1.6.0-beta.0/)
+* [v1.5.2-beta.0](https://unstoppabledomains.github.io/resolution//v1.5.2-beta.0/)
 * [v1.5.2-beta-0.0](https://unstoppabledomains.github.io/resolution//v1.5.2-beta-0.0/)
 * [v1.4.0](https://unstoppabledomains.github.io/resolution//v1.4.0/)
 * [v1.3.6](https://unstoppabledomains.github.io/resolution//v1.3.6/)
