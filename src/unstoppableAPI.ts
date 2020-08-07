@@ -138,6 +138,10 @@ export default class Udapi extends NamingService {
     throw new Error('Method not implemented.');
   }
 
+  async getAllKeys(domain: string): Promise<any> {
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {method: this.name});
+  }
+
   protected normalizeSource(source): SourceDefinition {
     return {network: 'mainnet', ...source};
   }

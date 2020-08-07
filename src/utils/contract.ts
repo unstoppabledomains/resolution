@@ -1,6 +1,6 @@
 import ResolutionError, { ResolutionErrorCode } from '../errors/resolutionError';
 import { Interface, JsonFragment } from '@ethersproject/abi';
-import { isNullAddress, Provider, RequestArguments } from '../types';
+import { isNullAddress, Provider, RequestArguments, EventData } from '../types';
 
 /** @internal */
 export default class Contract {
@@ -20,7 +20,7 @@ export default class Contract {
     this.coder = new Interface(this.abi);
   }
 
-  async fetchMethod(method: string, args: string[]): Promise<any> {
+  async fetchMethod(method: string, args: any[]): Promise<any> {
     const inputParam = this.coder.encodeFunctionData(
       method,
       args,
@@ -32,6 +32,24 @@ export default class Contract {
         domain: args[0],
       });
     return this.coder.decodeFunctionResult(method, response)[0]
+  }
+
+  async fetchLogs(eventName: string, tokenId: string): Promise<EventData[]> {
+    const topic = this.coder.getEventTopic(eventName);
+    const params = [
+      {
+        fromBlock: "0x960844",
+        toBlock: "latest",
+        address: this.address,
+        topics: [topic, tokenId,]
+      }
+    ]
+    const request: RequestArguments = {
+      method: 'eth_getLogs',
+      params
+    };
+
+  return await this.provider.request(request) as Promise<EventData[]>;
   }
 
   private async fetchData(data: string): Promise<unknown> {

@@ -142,6 +142,18 @@ export type TransactionRequest = {
     chainId?: unknown,
 }
 
+export interface EventData {
+  address: string,
+  blockHash: string,
+  blockNumber: string,
+  data: string,
+  logIndex: string,
+  removed: boolean,
+  topics: string[],
+  transactionHash: string,
+  transactionIndex: string
+};
+
 /**
  * @see https://github.com/ethers-io/ethers.js/blob/v5.0.4/packages/abstract-provider/src.ts/index.ts#L224
  */

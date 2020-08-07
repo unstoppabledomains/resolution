@@ -33,3 +33,8 @@ export function invert(object) {
 export function signedInfuraLink(infura: string, network: string = 'mainnet'): string {
   return `https://${network}.infura.com/v3/${infura}`;
 }
+
+export function isLegacyResolver(resolverAddress: string): boolean {
+  return ['0xa1cac442be6673c49f8e74ffc7c4fd746f3cbd0d',
+  '0x878bc2f3f717766ab69c0a5f9a6144931e61aed3'].includes(resolverAddress.toLowerCase());
+}

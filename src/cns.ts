@@ -14,6 +14,8 @@ import { default as hash, childhash } from './cns/namehash';
 import ResolutionError from './errors/resolutionError';
 import { ResolutionErrorCode } from './errors/resolutionError';
 import Contract from './utils/contract';
+import { isLegacyResolver } from './utils';
+import standartKeys from './utils/standardKeys';
 
 /** @internal */
 export default class Cns extends EthereumNamingService {
@@ -190,6 +192,26 @@ export default class Cns extends EthereumNamingService {
     return await this.record(domain, 'ipfs.redirect_domain.value');
   }
 
+  async getAllKeys(domain: string): Promise<any> {
+    const tokenId = this.namehash(domain);
+    const resolver = await this.getResolver(tokenId);
+    const resolverContract = this.buildContract(resolverInterface, resolver);
+    if (isLegacyResolver(resolver)) {
+      return await this.getStandardKeys(resolverContract, tokenId);
+    }
+    const logs = await resolverContract.fetchLogs('NewKey', tokenId);
+    const keyHashes = logs.map(event => event.topics[2]);
+    return await resolverContract.fetchMethod('getManyByHash', [keyHashes, tokenId]);
+  }
+
+  private async getStandardKeys(resolverContract: Contract, tokenId: string) {
+    const keys = Object.values(standartKeys);
+    const response = await resolverContract.fetchMethod('getMany', [keys, tokenId]);
+    return keys.map((value, index) => {
+      if (response[index]) return value;
+    }).filter(val => val);
+  }
+  
   private getTtl = async (
     contract: Contract,
     methodname: string,

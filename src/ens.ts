@@ -197,6 +197,10 @@ export default class Ens extends EthereumNamingService {
     return hash(domain);
   }
 
+  async getAllKeys(domain: string): Promise<any> {
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {method: this.name});
+  }
+
   private async getContentHash(domain: string): Promise<string | undefined> {
     const nodeHash = this.namehash(domain);
     const resolverContract = await this.getResolverContract(domain);

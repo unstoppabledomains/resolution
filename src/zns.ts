@@ -204,6 +204,10 @@ export default class Zns extends NamingService {
     return resolverAddress;
   }
 
+  async getAllKeys(domain: string): Promise<any> {
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {method: this.name});
+  }
+
   protected normalizeSource(source: SourceDefinition | undefined): SourceDefinition {
     source = {...source};
     if (typeof source.network == 'number') {
