@@ -1,6 +1,7 @@
 import Resolution from '../Resolution';
 import * as fs from 'fs';
 import ConfigurationError, { ConfigurationErrorCode } from '../errors/configurationError';
+import ResolutionError, { ResolutionErrorCode } from '../errors/resolutionError';
 
 export async function tryInfo(
   method,
@@ -13,7 +14,10 @@ export async function tryInfo(
     response[field] = resolvedPromise;
     return true;
   } catch (err) {
-    response[field] = err.code;
+    if (err.code === ResolutionErrorCode.ProviderError) 
+      response[field] = err.message 
+    else
+      response[field] = err.code;
     return false;
   }
 }

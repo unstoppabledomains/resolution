@@ -1,4 +1,5 @@
 import { ResolutionMethod } from '../types';
+import Resolution from '../Resolution';
 /** Alias for Resolution error handler function */
 type ResolutionErrorHandler = (error: ResolutionErrorOptions) => string;
 /** Explains Resolution Error options */
@@ -7,6 +8,7 @@ type ResolutionErrorOptions = {
   domain?: string;
   currencyTicker?: string;
   recordName?: string;
+  providerMessage?: string;
 };
 
 export enum ResolutionErrorCode {
@@ -18,6 +20,8 @@ export enum ResolutionErrorCode {
   UnsupportedCurrency = 'UnsupportedCurrency',
   IncorrectResolverInterface = 'IncorrectResolverInterface',
   RecordNotFound = 'RecordNotFound',
+  ProviderError = 'ProviderError',
+  UnsupportedMethod = 'UnsupportedMethod'
 }
 
 /**
@@ -49,6 +53,12 @@ const HandlersByCode = {
     recordName: string;
     domain: string;
   }) => `No ${params.recordName} record found for ${params.domain}`,
+  [ResolutionErrorCode.ProviderError]: (params: {
+    providerMessage: string;
+  }) => `Provider error: ${params.providerMessage}`,
+  [ResolutionErrorCode.UnsupportedMethod]: (params: {
+    method: ResolutionMethod
+  }) => `This method is not support for ${params.method}`
 };
 
 /**
@@ -73,14 +83,11 @@ export class ResolutionError extends Error {
 
   constructor(code: ResolutionErrorCode, options: ResolutionErrorOptions = {}) {
     const resolutionErrorHandler: ResolutionErrorHandler = HandlersByCode[code];
-    const { domain, method, currencyTicker, recordName } = options;
-    super(
-      resolutionErrorHandler({ domain, method, currencyTicker, recordName }),
-    );
+    super(resolutionErrorHandler(options));
     this.code = code;
-    this.domain = domain;
-    this.method = method;
-    this.currencyTicker = currencyTicker;
+    this.domain = options.domain;
+    this.method = options.method;
+    this.currencyTicker = options.currencyTicker;
     this.name = 'ResolutionError';
     Object.setPrototypeOf(this, ResolutionError.prototype);
   }
