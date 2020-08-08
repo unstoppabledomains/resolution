@@ -293,7 +293,6 @@ describe('Resolution', () => {
   });
 
   describe('Providers', () => {
-
     const RpcProviderTestCases = [
       [
         {
@@ -399,5 +398,15 @@ describe('Resolution', () => {
       expectSpyToBeCalled([eye]);
       expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
     });
+
+    // This doesn't work yet!
+    it.skip('should be able to get logs with ethers default provider', async () => {
+      const provider = getDefaultProvider('mainnet');
+
+      const resolution = Resolution.fromEthersProvider(provider);
+      const resp = await resolution.GetAllKeys("brad.crypto");
+      console.log ("resp", resp);
+    })
+
   });
 });

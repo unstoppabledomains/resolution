@@ -31,7 +31,7 @@ export default class FetchProvider extends BaseConnection implements Provider {
       });
       const json = await response.json();
       if (json.error) { 
-        throw new ResolutionError(ResolutionErrorCode.ProviderError, {providerMessage: json.error.message})
+        throw json.error;
       }
       return json.result;
     } catch(error) {

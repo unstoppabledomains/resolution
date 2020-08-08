@@ -8,7 +8,6 @@ type ResolutionErrorOptions = {
   domain?: string;
   currencyTicker?: string;
   recordName?: string;
-  providerMessage?: string;
 };
 
 export enum ResolutionErrorCode {
@@ -20,7 +19,6 @@ export enum ResolutionErrorCode {
   UnsupportedCurrency = 'UnsupportedCurrency',
   IncorrectResolverInterface = 'IncorrectResolverInterface',
   RecordNotFound = 'RecordNotFound',
-  ProviderError = 'ProviderError',
   UnsupportedMethod = 'UnsupportedMethod'
 }
 
@@ -53,9 +51,6 @@ const HandlersByCode = {
     recordName: string;
     domain: string;
   }) => `No ${params.recordName} record found for ${params.domain}`,
-  [ResolutionErrorCode.ProviderError]: (params: {
-    providerMessage: string;
-  }) => `Provider error: ${params.providerMessage}`,
   [ResolutionErrorCode.UnsupportedMethod]: (params: {
     method: ResolutionMethod
   }) => `This method is not support for ${params.method}`

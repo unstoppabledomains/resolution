@@ -72,11 +72,16 @@ function fromEthersProvider(provider: EthersProvider): Provider {
     if (provider.call === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
     return {
         request: async (request: RequestArguments) => {
-            if (request.method !== 'eth_call') {
-                throw new Error(`Unsupported provider method ${request.method}`)
+            switch (request.method) {
+                case 'eth_call':
+                    return await provider.call(request.params![0]);
+                case 'eth_getLogs':
+                    return await provider.getLogs(request.params![0]);
+                default:
+                    throw new Error(`Unsupported provider method ${request.method}`);
             }
-            return await provider.call(request.params![0])}
-    };
+        }
+    }
 }
 
 function wrapArray<T>(params: T | T[] = []): T[] {

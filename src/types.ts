@@ -159,6 +159,7 @@ export interface EventData {
  */
 export interface EthersProvider {
   call(transaction: TransactionRequest, blockTag?: never): Promise<string>;
+  getLogs(filter): Promise<any>;
 }
 
 export interface Web3Version0Provider {

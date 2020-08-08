@@ -378,6 +378,11 @@ export default class Resolution {
     return this.getNamingMethodOrThrow(domain).serviceName(domain);
   }
 
+  /**
+   * Returns all record keys of the domain.
+   * Currently supports only CNS
+   * @param domain - domain name 
+   */
   async GetAllKeys(domain: string): Promise<any> {
     domain = this.prepareDomain(domain);
     return await this.getNamingMethodOrThrow(domain).getAllKeys(domain);

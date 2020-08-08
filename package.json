@@ -50,7 +50,7 @@
     "dotenv": "^8.2.0"
   },
   "devDependencies": {
-    "@ethersproject/providers": "^5.0.2",
+    "@ethersproject/providers": "^5.0.5",
     "@types/jest": "24.0.23",
     "@types/lodash": "^4.14.158",
     "@types/node": "11.15.3",

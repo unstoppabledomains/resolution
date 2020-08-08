@@ -14,10 +14,9 @@ export async function tryInfo(
     response[field] = resolvedPromise;
     return true;
   } catch (err) {
-    if (err.code === ResolutionErrorCode.ProviderError) 
-      response[field] = err.message 
-    else
-      response[field] = err.code;
+    if (Object.values(ResolutionErrorCode).includes(err.code))
+     response[field] = err.code;
+    else response[field] = err.message
     return false;
   }
 }
