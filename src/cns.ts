@@ -15,7 +15,7 @@ import ResolutionError from './errors/resolutionError';
 import { ResolutionErrorCode } from './errors/resolutionError';
 import Contract from './utils/contract';
 import { isLegacyResolver } from './utils';
-import standartKeys from './utils/standardKeys';
+import standardKeys from './utils/standardKeys';
 
 /** @internal */
 export default class Cns extends EthereumNamingService {
@@ -194,7 +194,7 @@ export default class Cns extends EthereumNamingService {
 
   /**
    * Gets all keys that are setuped in the domain.
-   * If domain has attached one of the legacyResolvers it will look only for a standartKeyLists
+   * If domain has attached one of the legacyResolvers it will look only for a standarDKeyLists
    * to see if they are set. It won't be able to parse the custom keys.
    * @param domain - domain name
    */
@@ -213,7 +213,7 @@ export default class Cns extends EthereumNamingService {
   }
 
   private async getStandardKeys(resolverContract: Contract, tokenId: string) {
-    const keys = Object.values(standartKeys);
+    const keys = Object.values(standardKeys);
     const response = await this.callMethod(resolverContract, 'getMany', [keys, tokenId]);
     return keys.map((value, index) => {
       if (response[index]) return value;
