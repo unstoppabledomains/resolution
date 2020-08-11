@@ -428,9 +428,14 @@ describe('Resolution', () => {
            '0xaca9621d50cc1afadcb2ffea77a72bf89c07b07bd0e573aa994277c213dfdb33',
           logIndex: 127 }
         ]
+      },
+      {
+        request: { 
+          data:'0xb85afd280000000000000000000000000000000000000000000000000000000000000040756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc90000000000000000000000000000000000000000000000000000000000000006aa1f9c71162a941b0b8aaf14a6b55de3f638ebba71265f82cfed7d62fdade8babe5ec5900cbad32d5e6a09d351e30152af0f8a668990e8a069a046cd901a40f36c4ebae0d49853c4d2b717faf94d4f4bbcd5bfe4bf0c8ab3f537e17f1fb0a3dc347aeff9a713930c44e91963f79529d7eff5c81bb36b51efb653a00db64170d654bba09965e442befd44887c2c6b7038f742bb98fbd66e2f2f192ce924f7c23d0daa4091e55cb3648e25d25c59450ef65b5e9909619a703f337b13e395c23c60',
+         to: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842' },
+         response: '0x000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000002a0000000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000c000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000140000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000001c00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000001467756e64622e757365726e616d652e76616c7565000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f697066732e68746d6c2e76616c75650000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001a697066732e72656469726563745f646f6d61696e2e76616c7565000000000000000000000000000000000000000000000000000000000000000000000000001263727970746f2e4554482e616464726573730000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001667756e64622e7075626c69635f6b65792e76616c756500000000000000000000000000000000000000000000000000000000000000000000000000000000001263727970746f2e4254432e616464726573730000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000001e0000000000000000000000000000000000000000000000000000000000000028000000000000000000000000000000000000000000000000000000000000002e00000000000000000000000000000000000000000000000000000000000000360000000000000000000000000000000000000000000000000000000000000008430783839313236323338333265313734663265623166353963633362353837343434643631393337366164356266313030373065393337653064633232623966666232653361653035396536656266373239663837373436623266373165356438386563393963316662336337633439623836313765323532306434373463343865316300000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002e516d6535346f457a526b676f6f4a624344723738767a4b41576376364444455a71526868447944747a67725a5036000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006b68747470733a2f2f6162626665367a3935716f76336434306866366a3330673761756f37616668702e6d7970696e6174612e636c6f75642f697066732f516d6535346f457a526b676f6f4a624344723738767a4b41576376364444455a71526868447944747a67725a5036000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002a3078386161443434333231413836623137303837396437413234346331653864333630633939446441380000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000577071654248616244516443486862646976674e45633734514f2d7838435047587134504b576766497a68592e37574a5235635a467553796831624677783047577a6a6d72696d305435593642703053534b30696d336e49000000000000000000000000000000000000000000000000000000000000000000000000000000002a626331713335396b686e3070686735387867657a797173757561686132387a6b7778303437633063337900000000000000000000000000000000000000000000'
       }
     ];
-
 
     it('should work with web3HttpProvider', async () => {
       // web3-providers-http has problems with type definitions
@@ -518,7 +523,7 @@ describe('Resolution', () => {
     // Had to set quorum 1, to not rely on fallback providers which returns wrong results
     it('should be able to get logs with ethers default provider', async () => {
       const provider = getDefaultProvider('mainnet', { quorum: 1 });
-      
+
       const eye = mockAsyncMethod(provider, "call", params => Promise.resolve(caseMock(params, RpcProviderTestCases)));
       const eye2 = mockAsyncMethod(provider, "getLogs", params => Promise.resolve(caseMock(params, RpcProviderTestCases)));
 
@@ -533,6 +538,95 @@ describe('Resolution', () => {
         'crypto.BTC.address']);
     });
 
+    it('should be able to get logs with web3@0.20.7 provider', async () => {
+      const provider = new Web3V027Provider(protocolLink(ProviderProtocol.http), 5000, null, null, null);
+      const eye = mockAsyncMethod(provider, "sendAsync", (payload: JsonRpcPayload, callback: any) => {
+        const result = caseMock(payload.params![0], RpcProviderTestCases)
+        callback(undefined, {
+          jsonrpc: '2.0',
+          id: 1,
+          result,
+        });
+      });
+      const resolution = Resolution.fromWeb3Version0Provider(provider);
+      const response = await resolution.GetAllKeys('brad.crypto');
+      expectSpyToBeCalled([eye]);
+      expect(response).toMatchObject(['gundb.username.value',
+        'ipfs.html.value',
+        'ipfs.redirect_domain.value',
+        'crypto.ETH.address',
+        'gundb.public_key.value',
+        'crypto.BTC.address'])
+    });
 
+    it('should be able to get logs with jsonProvider', async () => {
+      const provider = new JsonRpcProvider(
+        protocolLink(ProviderProtocol.http),
+        'mainnet',
+      );
+      const resolution = Resolution.fromEthersProvider(provider);
+      const eye = mockAsyncMethod(provider, "call", params => Promise.resolve(caseMock(params, RpcProviderTestCases)));
+      const eye2 = mockAsyncMethod(provider, "getLogs", params => Promise.resolve(caseMock(params, RpcProviderTestCases)));
+
+      const response = await resolution.GetAllKeys('brad.crypto');
+      expectSpyToBeCalled([eye, eye2]);
+      expect(response).toMatchObject(['gundb.username.value',
+      'ipfs.html.value',
+      'ipfs.redirect_domain.value',
+      'crypto.ETH.address',
+      'gundb.public_key.value',
+      'crypto.BTC.address']);
+    });
+
+    it('should be able to get logs with websocket provider', async () => {
+      // web3-providers-ws has problems with type definitions
+      // We still prefer everything to be statically typed on our end for better mocking
+      const provider = new (Web3WsProvider as any)(protocolLink(ProviderProtocol.wss)) as Web3WsProvider.WebsocketProvider;
+      const eye = mockAsyncMethod(provider, "send", (payload, callback) => {
+        const result = caseMock(payload.params![0], RpcProviderTestCases)
+        callback(null, {
+          jsonrpc: '2.0',
+          id: 1,
+          result,
+        });
+      });
+
+      const resolution = Resolution.fromWeb3Version1Provider(provider);
+      const response = await resolution.GetAllKeys('brad.crypto');
+      provider.disconnect(1000, 'end of test');
+      expectSpyToBeCalled([eye]);
+      expect(response).toMatchObject(['gundb.username.value',
+      'ipfs.html.value',
+      'ipfs.redirect_domain.value',
+      'crypto.ETH.address',
+      'gundb.public_key.value',
+      'crypto.BTC.address']);
+    });
+
+    it('should be able to get logs with web3HttpProvider', async () => {
+       // web3-providers-http has problems with type definitions
+      // We still prefer everything to be statically typed on our end for better mocking
+      const provider = new (Web3HttpProvider as any)(protocolLink()) as Web3HttpProvider.HttpProvider;
+      // mock the send function with different implementations (each should call callback right away with different answers)
+      const eye = mockAsyncMethod(provider, "send", (payload: JsonRpcPayload, callback) => {
+        const result = caseMock(payload.params![0], RpcProviderTestCases)
+        callback && callback(null, {
+          jsonrpc: '2.0',
+          id: 1,
+          result,
+        });
+      });
+      const resolution = Resolution.fromWeb3Version1Provider(provider);
+      const response = await resolution.GetAllKeys('brad.crypto');
+
+      //expect each mock to be called at least once.
+      expectSpyToBeCalled([eye]);
+      expect(response).toMatchObject(['gundb.username.value',
+      'ipfs.html.value',
+      'ipfs.redirect_domain.value',
+      'crypto.ETH.address',
+      'gundb.public_key.value',
+      'crypto.BTC.address']);
+    })
   });
 });
