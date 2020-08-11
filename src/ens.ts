@@ -58,7 +58,7 @@ export default class Ens extends EthereumNamingService {
 
   /** @internal */
   record(domain: string, key: string): Promise<string> {
-    throw new Error('Method not implemented.');
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {method: this.name});
   }
 
   /**

@@ -128,14 +128,14 @@ export default class Udapi extends NamingService {
   }
 
   childhash(parent: string, label: string): never {
-    throw new Error('Unsupported method whe using UD Resolution API')
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {method: this.name});
   }
 
   serviceName(domain: string): NamingServiceName {
     return this.findMethodOrThrow(domain).name as NamingServiceName;
   }
   async resolver(domain: string): Promise<string> {
-    throw new Error('Method not implemented.');
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {method: this.name});
   }
 
   async getAllKeys(domain: string): Promise<any> {
