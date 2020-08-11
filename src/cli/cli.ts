@@ -86,7 +86,7 @@ import {
     }, response, 'gundb'),
     recordKey: () => tryInfo(async () => await resolution.record(domain, options.recordKey), response, options.recordKey),
     gunPk: () => tryInfo(async () => await resolution.chatPk(domain), response, 'gundbPk'),
-    jebug: () => tryInfo(async () => await resolution.GetAllKeys(domain), response, 'records')
+    jebug: () => tryInfo(async () => await resolution.getAllKeys(domain), response, 'records')
   };
 
   const resolutionProcess: Promise<boolean>[] = [];

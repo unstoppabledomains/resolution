@@ -383,7 +383,7 @@ export default class Resolution {
    * Currently supports only CNS
    * @param domain - domain name 
    */
-  async GetAllKeys(domain: string): Promise<any> {
+  async getAllKeys(domain: string): Promise<any> {
     domain = this.prepareDomain(domain);
     return await this.getNamingMethodOrThrow(domain).getAllKeys(domain);
   }

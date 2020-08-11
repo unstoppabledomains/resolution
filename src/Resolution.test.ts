@@ -540,7 +540,7 @@ describe('Resolution', () => {
             });
           });
           const resolution = Resolution.fromWeb3Version0Provider(provider);
-          const response = await resolution.GetAllKeys('brad.crypto');
+          const response = await resolution.getAllKeys('brad.crypto');
           expectSpyToBeCalled([eye]);
           expect(response).toMatchObject(['gundb.username.value',
             'ipfs.html.value',
@@ -564,7 +564,7 @@ describe('Resolution', () => {
           });
 
           const resolution = Resolution.fromWeb3Version1Provider(provider);
-          const response = await resolution.GetAllKeys('brad.crypto');
+          const response = await resolution.getAllKeys('brad.crypto');
           provider.disconnect(1000, 'end of test');
           expectSpyToBeCalled([eye]);
           expect(response).toMatchObject(['gundb.username.value',
@@ -589,7 +589,7 @@ describe('Resolution', () => {
             });
           });
           const resolution = Resolution.fromWeb3Version1Provider(provider);
-          const response = await resolution.GetAllKeys('brad.crypto');
+          const response = await resolution.getAllKeys('brad.crypto');
 
           //expect each mock to be called at least once.
           expectSpyToBeCalled([eye]);
@@ -642,7 +642,7 @@ describe('Resolution', () => {
           const eye2 = mockAsyncMethod(provider, "getLogs", params => Promise.resolve(caseMock(params, RpcProviderTestCases)));
 
           const resolution = Resolution.fromEthersProvider(provider);
-          const resp = await resolution.GetAllKeys("brad.crypto");
+          const resp = await resolution.getAllKeys("brad.crypto");
           expectSpyToBeCalled([eye, eye2]);
           expect(resp).toMatchObject(['gundb.username.value',
             'ipfs.html.value',
@@ -661,7 +661,7 @@ describe('Resolution', () => {
           const eye = mockAsyncMethod(provider, "call", params => Promise.resolve(caseMock(params, RpcProviderTestCases)));
           const eye2 = mockAsyncMethod(provider, "getLogs", params => Promise.resolve(caseMock(params, RpcProviderTestCases)));
 
-          const response = await resolution.GetAllKeys('brad.crypto');
+          const response = await resolution.getAllKeys('brad.crypto');
           expectSpyToBeCalled([eye, eye2]);
           expect(response).toMatchObject(['gundb.username.value',
             'ipfs.html.value',
@@ -676,7 +676,7 @@ describe('Resolution', () => {
           const eye = mockAsyncMethod(provider, "call", params => Promise.resolve(caseMock(params, RpcProviderTestCases)));
 
           const resolution = Resolution.fromEthersProvider(provider);
-          const response = await resolution.GetAllKeys('monmouthcounty.crypto');
+          const response = await resolution.getAllKeys('monmouthcounty.crypto');
 
           expectSpyToBeCalled([eye]);
           expect(response).toMatchObject(['crypto.BTC.address',
