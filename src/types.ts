@@ -172,7 +172,7 @@ export interface Filter extends EventFilter {
  */
 export interface EthersProvider {
   call(transaction: TransactionRequest, blockTag?: never): Promise<string>;
-  getLogs(filter: Filter): Promise<RpcProviderLogEntry>;
+  getLogs(filter: Filter): Promise<RpcProviderLogEntry[]>;
 }
 
 export interface Web3Version0Provider {

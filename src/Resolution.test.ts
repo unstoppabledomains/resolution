@@ -468,7 +468,7 @@ describe('Resolution', () => {
     ];
 
     describe('.Web3Providers', () => {
-      
+
       describe('.cryptoResolution', () => {
         it('should work with web3HttpProvider', async () => {
           // web3-providers-http has problems with type definitions
@@ -619,10 +619,10 @@ describe('Resolution', () => {
           expectSpyToBeCalled([eye]);
           expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
         });
-    
+
         it('should work with ethers default provider', async () => {
           const provider = getDefaultProvider("mainnet");
-    
+
           const eye = mockAsyncMethod(provider, "call",
             params => Promise.resolve(caseMock(params, RpcProviderTestCases))
           );
@@ -686,6 +686,21 @@ describe('Resolution', () => {
             'ipfs.html.value',
             'ipfs.redirect_domain.value']);
         });
+
+        it('should return UnspecifiedResolver', async () => {
+          const provider = getDefaultProvider("mainnet");
+          const eye = mockAsyncMethod(provider, "call", params => {
+            if (_.isEqual(params, {
+              data:
+                '0xb3f9e4cb6d8b296e38dfd295f2f4feb9ef2721c48210b7d77c0a08867123d9bd5150cf47',
+              to: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe'
+            })) return "0x";
+            throw new Error(`Got Unexpected params ${JSON.stringify(params)}`);
+          });
+          const resolution = Resolution.fromEthersProvider(provider);
+          expectResolutionErrorCode(resolution.getAllKeys("unregistered.crypto"), ResolutionErrorCode.UnspecifiedResolver);
+          expectSpyToBeCalled([eye]);
+        })
       });
     });
   });

@@ -201,6 +201,7 @@ export default class Cns extends EthereumNamingService {
   async getAllKeys(domain: string): Promise<any> {
     const tokenId = this.namehash(domain);
     const resolver = await this.getResolver(tokenId);
+    if (!resolver) throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {domain})
     const resolverContract = this.buildContract(resolverInterface, resolver);
     if (isLegacyResolver(resolver)) {
       return await this.getStandardKeys(resolverContract, tokenId);
