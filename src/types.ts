@@ -174,6 +174,29 @@ export const DefaultAPI: API = {
   url: UDApiDefaultUrl,
 };
 
+export interface RpcProviderRequestBody {
+  data?: string,
+  to?: string,
+  fromBlock?: string,
+  toBlock?: string,
+  address?: string,
+  topics?: string[]
+}
+
+export interface RpcProviderLogEntry  { 
+  blockNumber: number,
+  blockHash: string,
+  transactionIndex: number,
+  removed: boolean,
+  address: string,
+  data: string,
+  topics: string[],
+  transactionHash: string,
+  logIndex: number 
+};
+
+export type RpcProviderTestCase = {request: RpcProviderRequestBody, response: string | RpcProviderLogEntry[] }[];
+
 /**
  * Default structure of ZnsResolution records
  * @typedef {object} ZnsResolution

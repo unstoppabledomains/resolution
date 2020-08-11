@@ -140,10 +140,10 @@ export enum ProviderProtocol {
   "http", "wss"
 };
 
-export const caseMock = <T, U>(params: T, cases: readonly (readonly [T, U])[]): U => {
-  for (const [variant, result] of cases) {
-    if (_.isEqual(params, variant)) {
-      return result;
+export const caseMock = <T, U>(params: T, cases: { request: T, response: U }[]): U => {
+  for (const {request, response} of cases) {
+    if (_.isEqual(params, request)) {
+      return response;
     }
   }
   throw new Error(`got unexpected params ${JSON.stringify(params)}`);

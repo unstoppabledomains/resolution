@@ -192,6 +192,12 @@ export default class Cns extends EthereumNamingService {
     return await this.record(domain, 'ipfs.redirect_domain.value');
   }
 
+  /**
+   * Gets all keys that are setuped in the domain.
+   * If domain has attached one of the legacyResolvers it will look only for a standartKeyLists
+   * to see if they are set. It won't be able to parse the custom keys.
+   * @param domain - domain name
+   */
   async getAllKeys(domain: string): Promise<any> {
     const tokenId = this.namehash(domain);
     const resolver = await this.getResolver(tokenId);
@@ -201,7 +207,9 @@ export default class Cns extends EthereumNamingService {
     }
     const logs = await resolverContract.fetchLogs('NewKey', tokenId);
     const keyHashes = logs.map(event => event.topics[2]);
-    return await resolverContract.fetchMethod('getManyByHash', [keyHashes, tokenId]);
+    const result = await resolverContract.fetchMethod('getManyByHash', [keyHashes, tokenId]);
+    // console.log({getResolver: resolver, logs, result});
+    return result;
   }
 
   private async getStandardKeys(resolverContract: Contract, tokenId: string) {
