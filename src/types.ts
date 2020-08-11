@@ -154,12 +154,25 @@ export interface EventData {
   transactionIndex: string
 };
 
+
+export interface EventFilter {
+  address?: string;
+  topics?: Array<string | Array<string>>;
+}
+
+export type BlockTag = string | number;
+
+export interface Filter extends EventFilter {
+  fromBlock?: BlockTag,
+  toBlock?: BlockTag,
+}
+
 /**
  * @see https://github.com/ethers-io/ethers.js/blob/v5.0.4/packages/abstract-provider/src.ts/index.ts#L224
  */
 export interface EthersProvider {
   call(transaction: TransactionRequest, blockTag?: never): Promise<string>;
-  getLogs(filter): Promise<any>;
+  getLogs(filter: Filter): Promise<RpcProviderLogEntry>;
 }
 
 export interface Web3Version0Provider {
