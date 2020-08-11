@@ -56,7 +56,7 @@ export default class Cns extends EthereumNamingService {
    * @returns- Returns a promise that resolves in an object
    */
   async resolve(domain: string): Promise<ResolutionResponse> {
-    throw new Error('This method is unsupported for CNS');
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {method: this.name});
   }
 
   /**
