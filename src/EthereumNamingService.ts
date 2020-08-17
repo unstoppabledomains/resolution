@@ -1,4 +1,4 @@
-import NamingService from './namingService';
+import NamingService from './NamingService';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import {
   BlockhanNetworkUrlMap,

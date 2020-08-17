@@ -1,7 +1,7 @@
-import Ens from './ens';
-import Zns from './zns';
-import Cns from './cns';
-import Udapi from './unstoppableAPI';
+import Ens from './Ens';
+import Zns from './Zns';
+import Cns from './Cns';
+import UdApi from './UdApi';
 import {
   Blockchain,
   UnclaimedDomainResponse,
@@ -18,7 +18,7 @@ import {
   EthersProvider,
 } from './types';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
-import NamingService from './namingService';
+import NamingService from './NamingService';
 import { signedInfuraLink } from './utils';
 import { Eip1993Factories } from './utils/Eip1993Factories';
 
@@ -52,7 +52,7 @@ export default class Resolution {
   /** @internal */
   readonly cns?: Cns;
   /** @internal */
-  readonly api?: Udapi;
+  readonly api?: UdApi;
 
   constructor({
     blockchain = true,
@@ -83,7 +83,7 @@ export default class Resolution {
         this.cns = new Cns(cns);
       }
     } else {
-      this.api = new Udapi(api);
+      this.api = new UdApi(api);
     }
   }
 
@@ -325,9 +325,9 @@ export default class Resolution {
   }
 
   /**
-   * returns a childhash for specific namingService
-   * @param parent hash for parent
-   * @param label hash for label
+   * @returns a namehash of a subdomain with name label
+   * @param parent namehash of a parent domain
+   * @param label subdomain name
    * @param method "ENS", "CNS" or "ZNS"
    */
   childhash(

@@ -7,9 +7,9 @@ import {
   SourceDefinition,
   isNullAddress,
 } from './types';
-import Zns from './zns';
-import Ens from './ens';
-import Cns from './cns';
+import Zns from './Zns';
+import Ens from './Ens';
+import Cns from './Cns';
 import pckg from './package.json';
 
 /** @internal */
