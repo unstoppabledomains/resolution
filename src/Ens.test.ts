@@ -557,7 +557,7 @@ describe('ENS', () => {
       const eyes = mockAsyncMethods(resolution.ens, {
         getResolver: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
         callMethod:
-          '0xe30101701220a31243a98ade931ac3f6e5ddb3dc91b1b9eceb564dbf5b4b2bdc712d8a421309'
+          '0xe301017012208723b9b5834fe60801e19af3a3554a6f229dad9cfbb18ce4e80ffc2a457f83aa'
       });
       const ipfsHash = await resolution.ipfsHash('monkybrain.eth');
       expectSpyToBeCalled(eyes);
