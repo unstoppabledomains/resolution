@@ -104,8 +104,6 @@ workflows:
     jobs:
       - build-node10:
           context: Secrets
-      - build-node11:
-          context: Secrets
       - build-node12:
           context: Secrets
       - size-check
