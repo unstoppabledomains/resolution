@@ -1,6 +1,6 @@
 import nock from 'nock';
 import Resolution, { ResolutionErrorCode, ResolutionError } from './index';
-import Ens from './ens';
+import Ens from './Ens';
 import { NullAddress } from './types';
 import {
   mockAsyncMethod,
