@@ -212,7 +212,7 @@ describe('ZNS', () => {
         'ipfs.redirect_domain.value': 'www.unstoppabledomains.com',
       });
 
-      const result = await resolution.zns!.Resolution('brad.zil');
+      const result = await resolution.zns!.resolution('brad.zil');
       expectSpyToBeCalled([eye, secondEye]);
       expect(result).toEqual({
         crypto: {
@@ -249,7 +249,7 @@ describe('ZNS', () => {
         'whois.for_sale.value': 'true',
       });
 
-      const result = await resolution.zns!.Resolution('ergergergerg.zil');
+      const result = await resolution.zns!.resolution('ergergergerg.zil');
       expectSpyToBeCalled([eye, secondEye]);
       expect(result).toEqual({
         ipfs: {
@@ -270,7 +270,7 @@ describe('ZNS', () => {
       const zns = resolution.zns;
 
       expect(zns).toBeDefined();
-      const result = await zns!.Resolution('invalid.domain');
+      const result = await zns!.resolution('invalid.domain');
       expect(result).toEqual({});
     });
 
@@ -290,7 +290,7 @@ describe('ZNS', () => {
         },
       });
       expect(zns).toBeDefined();
-      const result = await zns!.Resolution('mcafee2020.zil');
+      const result = await zns!.resolution('mcafee2020.zil');
       expectSpyToBeCalled(spies);
       expect(result).toEqual({
         crypto: {
@@ -380,7 +380,7 @@ describe('ZNS', () => {
   });
 
   describe('.isSupportedDomain', () => {
-    it("doesn't support zil domain when zns is disabled", () => {
+    it('doesn\'t support zil domain when zns is disabled', () => {
       const resolution = new Resolution({ blockchain: { zns: false } });
       expect(resolution.zns).toBeUndefined();
       expect(resolution.isSupportedDomain('hello.zil')).toBeFalsy();

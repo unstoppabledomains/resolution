@@ -24,14 +24,15 @@ export default class Contract {
     const inputParam = this.coder.encodeFunctionData(
       method,
       args,
-    )
+    );
     const response = await this.fetchData(inputParam) as string | null;
-    if (isNullAddress(response))
+    if (isNullAddress(response)) {
       throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
         recordName: method,
         domain: args[0],
       });
-    return this.coder.decodeFunctionResult(method, response)[0]
+    }
+    return this.coder.decodeFunctionResult(method, response)[0];
   }
 
   private async fetchData(data: string): Promise<unknown> {
@@ -44,7 +45,7 @@ export default class Contract {
     ];
     const request: RequestArguments = {
       method: 'eth_call',
-      params
+      params,
     };
     return await this.provider.request(request);
   }

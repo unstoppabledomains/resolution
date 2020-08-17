@@ -112,7 +112,7 @@ describe('CNS', () => {
       const address = await resolution.address('brad.crypto', 'eth');
       expectSpyToBeCalled(eyes);
       expect(address).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
-    })
+    });
 
     it(`checks the BCH address on ${CryptoDomainWithAdaBchAddresses}`, async () => {
       const eyes = mockCryptoCalls(
@@ -133,7 +133,6 @@ describe('CNS', () => {
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj');
     });
-
   });
 
   describe('.Hashing', () => {
@@ -213,7 +212,7 @@ describe('CNS', () => {
       it('checks childhash multi level domain', () => {
         const cns = resolution.cns;
         const label = 'ich';
-        const parent = 'ni.san.yon.hello.world.crypto'
+        const parent = 'ni.san.yon.hello.world.crypto';
         const domain = `${label}.${parent}`;
         const namehash = resolution.namehash(domain);
         const childhash = resolution.childhash(
@@ -284,9 +283,9 @@ describe('CNS', () => {
     });
 
     it('should resolve with the gundb public key stored on cns', async () => {
-      const eyes = mockAsyncMethods(resolution.cns,{
+      const eyes = mockAsyncMethods(resolution.cns, {
         getResolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
-        getRecord: 'pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI'
+        getRecord: 'pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI',
       });
       const publicKey = await resolution.chatPk('brad.crypto');
       expectSpyToBeCalled(eyes);
@@ -295,19 +294,19 @@ describe('CNS', () => {
 
     it('should error out for gundb public key stored on cns', async () => {
       const eyes = mockAsyncMethods(resolution.cns, {
-        getResolver:'0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
-        getRecord: undefined
+        getResolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+        getRecord: undefined,
       });
-      await expectResolutionErrorCode(resolution.chatPk(CryptoDomainWithEmptyResolver), ResolutionErrorCode.RecordNotFound)
+      await expectResolutionErrorCode(resolution.chatPk(CryptoDomainWithEmptyResolver), ResolutionErrorCode.RecordNotFound);
       expectSpyToBeCalled(eyes);
     });
 
     it('should error out for gundb chatId stored on cns', async () => {
       const eyes = mockAsyncMethods(resolution.cns, {
-        getResolver:'0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
-        getRecord: undefined
+        getResolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+        getRecord: undefined,
       });
-      await expectResolutionErrorCode(resolution.chatId(CryptoDomainWithEmptyResolver), ResolutionErrorCode.RecordNotFound)
+      await expectResolutionErrorCode(resolution.chatId(CryptoDomainWithEmptyResolver), ResolutionErrorCode.RecordNotFound);
       expectSpyToBeCalled(eyes);
     });
   });

@@ -8,7 +8,7 @@ export function set(object, key, value) {
   let current = object;
   const tokens = key.split('.');
   const last = tokens.pop();
-  tokens.forEach(token => {
+  tokens.forEach((token) => {
     current[token] = typeof current[token] == 'object' ? current[token] : {};
     current = current[token];
   });

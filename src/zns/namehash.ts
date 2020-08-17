@@ -12,7 +12,7 @@ export const namehash = (
       name
         .split('.')
         .reverse()
-        .filter(label => label),
+        .filter((label) => label),
     )
     .reduce((parent, label) => childhash(parent, label, { prefix: false }));
   return prefix ? '0x' + address : address;

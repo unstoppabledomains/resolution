@@ -22,7 +22,7 @@ import {
       '-C, --config <option>',
       `option in format <key>:<value>\n\tkey can be either \"infura\" or \"url\"`,
       parseConfig,
-      )
+    )
     .option('-s, --service', 'returns you a service name from the domain')
     .option('-i, --ipfs', 'get IpfsHash')
     .option('-r, --resolver', 'get resolver address')
@@ -64,12 +64,12 @@ import {
 
   const resolution = buildResolutionPackage();
   const response = {};
-  
+
   const commandTable = {
     ipfs: () => tryInfo(async () => {
       const result = {};
-      result['ipfsHash'] = await resolution.ipfsHash(domain).catch(err => err.code);
-      result['redirect_url'] = await resolution.httpUrl(domain).catch(err => err.code);
+      result['ipfsHash'] = await resolution.ipfsHash(domain).catch((err) => err.code);
+      result['redirect_url'] = await resolution.httpUrl(domain).catch((err) => err.code);
       return result;
     }, response, 'ipfs'),
     email: () => tryInfo(async () => await resolution.email(domain), response, 'email'),
@@ -84,7 +84,7 @@ import {
       return result;
     }, response, 'gundb'),
     recordKey: () => tryInfo(async () => await resolution.record(domain, options.recordKey), response, options.recordKey),
-    gunPk: () => tryInfo(async () => await resolution.chatPk(domain), response, 'gundbPk')
+    gunPk: () => tryInfo(async () => await resolution.chatPk(domain), response, 'gundbPk'),
   };
 
   const resolutionProcess: Promise<boolean>[] = [];
@@ -102,7 +102,7 @@ import {
     delete options.currencies;
   }
   // Execute the rest of options
-  Object.keys(options).forEach(option => resolutionProcess.push(commandTable[option]()));
+  Object.keys(options).forEach((option) => resolutionProcess.push(commandTable[option]()));
 
   await Promise.all(resolutionProcess);
   console.log(response);

@@ -381,32 +381,34 @@ export default class Resolution {
   private getNamingMethod(domain: string): NamingService | undefined {
     domain = this.prepareDomain(domain);
     return this.getResolutionMethods().find(
-      method => method.isSupportedDomain(domain),
+      (method) => method.isSupportedDomain(domain),
     );
   }
 
   private getResolutionMethods(): NamingService[] {
-    return (this.blockchain
-      ? [this.ens, this.zns, this.cns] as NamingService[]
-      : [this.api] as NamingService[]).filter(v => v);
+    return (this.blockchain ?
+      [this.ens, this.zns, this.cns] as NamingService[] :
+      [this.api] as NamingService[]).filter((v) => v);
   }
 
   private getNamingMethodOrThrow(domain: string): NamingService {
     domain = this.prepareDomain(domain);
     const method = this.getNamingMethod(domain);
-    if (!method)
+    if (!method) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
         domain,
       });
+    }
     return method;
   }
 
   private findNamingService(name: NamingServiceName): NamingService {
-    const service = this.getResolutionMethods().find(m => m.name === name)
-    if (!service)
+    const service = this.getResolutionMethods().find((m) => m.name === name);
+    if (!service) {
       throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
         method: name,
       });
+    }
     return service;
   }
 
@@ -416,20 +418,20 @@ export default class Resolution {
 
   private normalizeSource(source: NamingServiceSource | undefined, provider?: Provider): SourceDefinition | false {
     switch (typeof source) {
-      case 'undefined': {
-        return {provider}
-      }
-      case 'boolean': {
-        return source ? {provider} : false;
-      }
-      case 'string': {
-        return { url: source };
-      }
-      case 'object': {
-        return {provider, ...source};
-      }
+    case 'undefined': {
+      return {provider};
     }
-    throw new Error('Unsupported configuration')
+    case 'boolean': {
+      return source ? {provider} : false;
+    }
+    case 'string': {
+      return { url: source };
+    }
+    case 'object': {
+      return {provider, ...source};
+    }
+    }
+    throw new Error('Unsupported configuration');
   }
 }
 

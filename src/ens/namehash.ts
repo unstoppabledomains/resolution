@@ -1,4 +1,4 @@
-var sha3 = require('js-sha3').keccak_256;
+const sha3 = require('js-sha3').keccak_256;
 import { nodeHash } from '../types';
 
 export default function(
@@ -14,7 +14,7 @@ export default function(
       domain
         .split('.')
         .reverse()
-        .filter(label => label),
+        .filter((label) => label),
     )
     .reduce((parent, label) => childhash(parent, label, { prefix: false }));
   return prefix ? '0x' + assembledHash : assembledHash;

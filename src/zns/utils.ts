@@ -11,6 +11,7 @@ const GENERATOR = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3];
 const HRP = 'zil';
 const tHRP = 'tzil';
 
+/** @internal */
 function isByteString(str: string, len: number) {
   return !!str.replace('0x', '').match(`^[0-9a-fA-F]{${len}}$`);
 }
@@ -191,9 +192,9 @@ export const toChecksumAddress = (address: string): string => {
     if ('0123456789'.indexOf(address[i]) !== -1) {
       ret += address[i];
     } else {
-      ret += v.and(new BN(2).pow(new BN(255 - 6 * i))).gte(new BN(1))
-        ? address[i].toUpperCase()
-        : address[i].toLowerCase();
+      ret += v.and(new BN(2).pow(new BN(255 - 6 * i))).gte(new BN(1)) ?
+        address[i].toUpperCase() :
+        address[i].toLowerCase();
     }
   }
 

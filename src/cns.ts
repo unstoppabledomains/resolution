@@ -27,9 +27,9 @@ export default class Cns extends EthereumNamingService {
   constructor(source: SourceDefinition = {}) {
     super(source, NamingServiceName.CNS);
     source = this.normalizeSource(source);
-    this.registryAddress = source.registry
-      ? source.registry
-      : this.RegistryMap[this.network];
+    this.registryAddress = source.registry ?
+      source.registry :
+      this.RegistryMap[this.network];
     if (this.registryAddress) {
       this.registryContract = this.buildContract(
         cnsInterface,
@@ -43,7 +43,7 @@ export default class Cns extends EthereumNamingService {
       domain === 'crypto' ||
       (domain.indexOf('.') > 0 &&
         /^.{1,}\.(crypto)$/.test(domain) &&
-        domain.split('.').every(v => !!v.length))
+        domain.split('.').every((v) => !!v.length))
     );
   }
 
@@ -73,17 +73,18 @@ export default class Cns extends EthereumNamingService {
     if (isNullAddress(resolver)) {
       await this.throwOwnershipError(domain, ownerPromise);
     } else {
-      ownerPromise.catch(() => {})
+      ownerPromise.catch(() => {});
     }
     const addr: string | undefined = await this.ignoreResolutionError(
       ResolutionErrorCode.RecordNotFound,
       this.fetchAddress(resolver, this.namehash(domain), currencyTicker),
     );
-    if (!addr)
+    if (!addr) {
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
         domain,
         currencyTicker,
       });
+    }
     return addr;
   }
 
@@ -130,7 +131,7 @@ export default class Cns extends EthereumNamingService {
   }
 
   /** @internal */
-  protected getResolver = async (tokenId: nodeHash): Promise<string> => {
+  protected async getResolver(tokenId: nodeHash): Promise<string> {
     return await this.ignoreResolutionError(
       ResolutionErrorCode.RecordNotFound,
       this.callMethod(this.registryContract, 'resolverOf', [tokenId]),
@@ -142,7 +143,7 @@ export default class Cns extends EthereumNamingService {
     const tokenId = this.namehash(domain);
     try {
       return await this.callMethod(this.registryContract, 'ownerOf', [tokenId]);
-    } catch(error) {
+    } catch (error) {
       if (error.reason === 'ERC721: owner query for nonexistent token') {
         return NullAddress;
       }
@@ -190,11 +191,13 @@ export default class Cns extends EthereumNamingService {
     return await this.record(domain, 'ipfs.redirect_domain.value');
   }
 
-  private getTtl = async (
+  private async getTtl(
     contract: Contract,
     methodname: string,
     params: string[],
-  ): Promise<string> => await this.callMethod(contract, methodname, params);
+  ): Promise<string> {
+    return await this.callMethod(contract, methodname, params);
+  };
 
   /** @internal */
   async record(domain: string, key: string): Promise<string> {

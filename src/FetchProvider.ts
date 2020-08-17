@@ -5,7 +5,6 @@ import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 
 /** @internal */
 export default class FetchProvider extends BaseConnection implements Provider {
-
   readonly url: string;
   readonly name: ResolutionMethod;
 
@@ -31,7 +30,7 @@ export default class FetchProvider extends BaseConnection implements Provider {
       });
       const json = await response.json();
       return json.result;
-    } catch(error) {
+    } catch (error) {
       if (error instanceof FetchError) {
         throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
           method: this.name,

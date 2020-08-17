@@ -28,7 +28,7 @@ export abstract class EthereumNamingService extends NamingService {
 
   static readonly UrlMap: BlockhanNetworkUrlMap = {
     mainnet: 'https://main-rpc.linkpool.io',
-    ropsten: 'https://ropsten-rpc.linkpool.io'
+    ropsten: 'https://ropsten-rpc.linkpool.io',
   };
 
   static readonly NetworkNameMap = invert(EthereumNamingService.NetworkIdMap);
@@ -42,7 +42,7 @@ export abstract class EthereumNamingService extends NamingService {
     } else {
       // We don't care about this promise anymore
       // Ensure it doesn't generate a warning if it rejects
-      ownerPromise.catch(() => {})
+      ownerPromise.catch(() => {});
     }
     return resolverAddress;
   }
@@ -114,10 +114,11 @@ export abstract class EthereumNamingService extends NamingService {
     ownerPromise?: Promise<string | null>,
   ) {
     const owner = ownerPromise ? await ownerPromise : await this.owner(domain);
-    if (isNullAddress(owner))
+    if (isNullAddress(owner)) {
       throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
         domain,
       });
+    }
     throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
       domain,
     });

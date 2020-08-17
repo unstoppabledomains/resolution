@@ -1,6 +1,6 @@
 import { toBech32Address } from './zns/utils';
 import { ResolutionError, ResolutionErrorCode } from './index';
-import NamingService from './namingService';
+import NamingService from './NamingService';
 import {
   ResolutionResponse,
   NamingServiceName,
@@ -20,9 +20,9 @@ export default class Udapi extends NamingService {
 
   constructor(options: {url: string}) {
     super(options, 'UDAPI');
-    const DefaultUserAgent = this.isNode()
-      ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'
-      : navigator.userAgent;
+    const DefaultUserAgent = this.isNode() ?
+      'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)' :
+      navigator.userAgent;
     const version = pckg.version;
     const CustomUserAgent = `${DefaultUserAgent} Resolution/${version}`;
     this.headers = { 'X-user-agent': CustomUserAgent };
@@ -41,10 +41,11 @@ export default class Udapi extends NamingService {
   /** @internal */
   namehash(domain: string): string {
     const method = this.findMethod(domain);
-    if (!method)
+    if (!method) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
         domain,
       });
+    }
     return method.namehash(domain);
   }
 
@@ -58,16 +59,18 @@ export default class Udapi extends NamingService {
    */
   async address(domain: string, currencyTicker: string): Promise<string> {
     const data = await this.resolve(domain);
-    if (isNullAddress(data.meta.owner))
+    if (isNullAddress(data.meta.owner)) {
       throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
         domain,
       });
+    }
     const address = data.addresses[currencyTicker.toUpperCase()];
-    if (!address)
+    if (!address) {
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
         domain,
         currencyTicker,
       });
+    }
     return address;
   }
 
@@ -90,6 +93,7 @@ export default class Udapi extends NamingService {
 
   async chatpk(domain: string): Promise<string> {
     const resolution = await this.resolve(domain);
+    // eslint-disable-next-line camelcase
     const pk = resolution?.gundb?.public_key;
     return this.ensureRecordPresence(domain, 'Gundb publick key', pk);
   }
@@ -108,6 +112,7 @@ export default class Udapi extends NamingService {
 
   async httpUrl(domain: string): Promise<string> {
     const answer = await this.resolve(domain);
+    // eslint-disable-next-line camelcase
     const value = answer?.ipfs?.redirect_domain;
     return this.ensureRecordPresence(domain, 'httpUrl', value);
   }
@@ -128,7 +133,7 @@ export default class Udapi extends NamingService {
   }
 
   childhash(parent: string, label: string): never {
-    throw new Error('Unsupported method whe using UD Resolution API')
+    throw new Error('Unsupported method whe using UD Resolution API');
   }
 
   serviceName(domain: string): NamingServiceName {
@@ -143,17 +148,18 @@ export default class Udapi extends NamingService {
   }
 
   private findMethod(domain: string) {
-    return [new Zns(), new Ens(), new Cns()].find(m =>
+    return [new Zns(), new Ens(), new Cns()].find((m) =>
       m.isSupportedDomain(domain),
     );
   }
 
   private findMethodOrThrow(domain: string) {
     const method = this.findMethod(domain);
-    if (!method)
+    if (!method) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
         domain,
       });
+    }
     return method;
   }
 

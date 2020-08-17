@@ -52,14 +52,17 @@ export interface RegistryMap {
 export type ResolutionResponse = {
   ipfs?: {
     html?: string;
+    // eslint-disable-next-line camelcase
     redirect_domain?: string;
   };
   whois?: {
     email?: string;
+    // eslint-disable-next-line camelcase
     for_sale?: boolean;
   };
   gundb?: {
     username?: string;
+    // eslint-disable-next-line camelcase
     public_key?: string;
   };
   addresses: {
@@ -67,7 +70,7 @@ export type ResolutionResponse = {
   };
   meta: {
     owner: string | null;
-    type: string; //available domain
+    type: string; // available domain
     ttl: number;
   };
 };
@@ -193,7 +196,7 @@ export const EthCoinIndex = 60;
 export const UnclaimedDomainResponse: ResolutionResponse = {
   addresses: {},
   meta: {
-    owner: null, //available domain
+    owner: null, // available domain
     type: '',
     ttl: 0,
   },

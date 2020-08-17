@@ -16,7 +16,7 @@ import {
   nodeHash,
 } from './types';
 import { ResolutionError, ResolutionErrorCode } from './index';
-import NamingService from './namingService';
+import NamingService from './NamingService';
 import FetchProvider from './FetchProvider';
 
 const DefaultSource = 'https://api.zilliqa.com';
@@ -47,13 +47,13 @@ export default class Zns extends NamingService {
     super(source, NamingServiceName.ZNS);
 
     source = this.normalizeSource(source);
-    this.registryAddress = source.registry
-      ? source.registry
-      : RegistryMap[this.network];
+    this.registryAddress = source.registry ?
+      source.registry :
+      RegistryMap[this.network];
     if (this.registryAddress) {
-      this.registryAddress = this.registryAddress.startsWith('0x')
-        ? toBech32Address(this.registryAddress)
-        : this.registryAddress;
+      this.registryAddress = this.registryAddress.startsWith('0x') ?
+        toBech32Address(this.registryAddress) :
+        this.registryAddress;
     }
   }
 
@@ -70,10 +70,11 @@ export default class Zns extends NamingService {
       await this.getResolverRecords(resolverAddress),
     );
     const addresses: Record<string, string> = {};
-    if (resolution.crypto)
+    if (resolution.crypto) {
       Object.entries(resolution.crypto).map(
         ([key, v]) => v.address && (addresses[key] = v.address),
       );
+    }
     return {
       addresses,
       meta: {
@@ -86,16 +87,18 @@ export default class Zns extends NamingService {
 
   async address(domain: string, currencyTicker: string): Promise<string> {
     const data = await this.resolve(domain);
-    if (isNullAddress(data?.meta?.owner))
+    if (isNullAddress(data?.meta?.owner)) {
       throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
         domain,
       });
+    }
     const address = data!.addresses[currencyTicker.toUpperCase()];
-    if (!address)
+    if (!address) {
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
         domain,
         currencyTicker,
       });
+    }
     return address;
   }
 
@@ -114,7 +117,7 @@ export default class Zns extends NamingService {
    * @param domain - domain name to be resolved
    * @returns Everything what is stored on specified domain
    */
-  async Resolution(domain: string): Promise<ZnsResolution> {
+  async resolution(domain: string): Promise<ZnsResolution> {
     return this.structureResolverRecords(await this.records(domain));
   }
 
@@ -165,7 +168,7 @@ export default class Zns extends NamingService {
     return (
       !!tokens.length &&
       tokens[tokens.length - 1] === 'zil' &&
-      tokens.every(v => !!v.length)
+      tokens.every((v) => !!v.length)
     );
   }
 
@@ -192,15 +195,17 @@ export default class Zns extends NamingService {
 
   async resolver(domain: string): Promise<string> {
     const recordsAddresses = await this.getRecordsAddresses(domain);
-    if (!recordsAddresses || !recordsAddresses[0])
+    if (!recordsAddresses || !recordsAddresses[0]) {
       throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
         domain: domain,
       });
+    }
     const [_, resolverAddress] = recordsAddresses;
-    if (isNullAddress(resolverAddress))
+    if (isNullAddress(resolverAddress)) {
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
         domain: domain,
       });
+    }
     return resolverAddress;
   }
 
@@ -227,8 +232,9 @@ export default class Zns extends NamingService {
   private async getRecordsAddresses(
     domain: string,
   ): Promise<[string, string] | undefined> {
-    if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork())
+    if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork()) {
       return undefined;
+    }
     const registryRecord = await this.getContractMapValue(
       this.registryAddress!,
       'records',
@@ -276,7 +282,7 @@ export default class Zns extends NamingService {
     const params = [contractAddress.replace('0x', ''), field, keys];
     const method = 'GetSmartContractSubState';
     const provider = this.provider || new FetchProvider(this.name, this.url!);
-    return await provider.request({method, params})
+    return await provider.request({method, params});
   }
 
   private async getContractField(
@@ -284,10 +290,10 @@ export default class Zns extends NamingService {
     field: string,
     keys: string[] = [],
   ): Promise<any> {
-    const contractAddr = contractAddress.startsWith('zil1')
-    ? fromBech32Address(contractAddress)
-    : contractAddress;
-    let result = (await this.fetchSubState(contractAddr, field, keys)) || {};
+    const contractAddr = contractAddress.startsWith('zil1') ?
+      fromBech32Address(contractAddress) :
+      contractAddress;
+    const result = (await this.fetchSubState(contractAddr, field, keys)) || {};
     return result[field];
   }
 

@@ -167,7 +167,7 @@ describe('Resolution', () => {
     const resolution = new Resolution({ blockchain: { cns: { url: protocolLink() } } });
     const eyes = mockAsyncMethods(resolution.cns, {
       getResolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
-      getRecord: "0x45b31e01AA6f42F0549aD482BE81635ED3149abb",
+      getRecord: '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
     });
     const capital = await resolution.addressOrThrow('Brad.crypto', 'eth');
     expectSpyToBeCalled(eyes);
@@ -293,26 +293,25 @@ describe('Resolution', () => {
   });
 
   describe('Providers', () => {
-
     const RpcProviderTestCases = [
       [
         {
           data: '0xb3f9e4cb756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9',
-          to: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe'
+          to: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe',
         },
-        '0x000000000000000000000000b66dce2da6afaaa98f2013446dbcb0f4b0ab2842'
+        '0x000000000000000000000000b66dce2da6afaaa98f2013446dbcb0f4b0ab2842',
       ],
       [
         {
           data: '0x6352211e756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9',
-          to: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe'
+          to: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe',
         },
-        '0x000000000000000000000000b66dce2da6afaaa98f2013446dbcb0f4b0ab2842'
+        '0x000000000000000000000000b66dce2da6afaaa98f2013446dbcb0f4b0ab2842',
       ],
       [
         {
           data: '0x1be5e7ed0000000000000000000000000000000000000000000000000000000000000040756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9000000000000000000000000000000000000000000000000000000000000001263727970746f2e4554482e616464726573730000000000000000000000000000',
-          to: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842'
+          to: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
         },
         '0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002a30783861614434343332314138366231373038373964374132343463316538643336306339394464413800000000000000000000000000000000000000000000'],
     ] as const;
@@ -322,8 +321,8 @@ describe('Resolution', () => {
       // We still prefer everything to be statically typed on our end for better mocking
       const provider = new (Web3HttpProvider as any)(protocolLink()) as Web3HttpProvider.HttpProvider;
       // mock the send function with different implementations (each should call callback right away with different answers)
-      const eye = mockAsyncMethod(provider, "send", (payload: JsonRpcPayload, callback) => {
-        const result = caseMock(payload.params![0], RpcProviderTestCases)
+      const eye = mockAsyncMethod(provider, 'send', (payload: JsonRpcPayload, callback) => {
+        const result = caseMock(payload.params![0], RpcProviderTestCases);
         callback && callback(null, {
           jsonrpc: '2.0',
           id: 1,
@@ -333,7 +332,7 @@ describe('Resolution', () => {
       const resolution = Resolution.fromWeb3Version1Provider(provider);
       const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
 
-      //expect each mock to be called at least once.
+      // expect each mock to be called at least once.
       expectSpyToBeCalled([eye]);
       expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
     });
@@ -342,8 +341,8 @@ describe('Resolution', () => {
       // web3-providers-ws has problems with type definitions
       // We still prefer everything to be statically typed on our end for better mocking
       const provider = new (Web3WsProvider as any)(protocolLink(ProviderProtocol.wss)) as Web3WsProvider.WebsocketProvider;
-      const eye = mockAsyncMethod(provider, "send", (payload, callback) => {
-        const result = caseMock(payload.params![0], RpcProviderTestCases)
+      const eye = mockAsyncMethod(provider, 'send', (payload, callback) => {
+        const result = caseMock(payload.params![0], RpcProviderTestCases);
         callback(null, {
           jsonrpc: '2.0',
           id: 1,
@@ -364,8 +363,8 @@ describe('Resolution', () => {
         'mainnet',
       );
       const resolution = Resolution.fromEthersProvider(provider);
-      const eye = mockAsyncMethod(provider, "call",
-        params => Promise.resolve(caseMock(params, RpcProviderTestCases))
+      const eye = mockAsyncMethod(provider, 'call',
+        (params) => Promise.resolve(caseMock(params, RpcProviderTestCases)),
       );
       const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
       expectSpyToBeCalled([eye]);
@@ -373,10 +372,10 @@ describe('Resolution', () => {
     });
 
     it('should work with ethers default provider', async () => {
-      const provider = getDefaultProvider("mainnet");
+      const provider = getDefaultProvider('mainnet');
 
-      const eye = mockAsyncMethod(provider, "call",
-        params => Promise.resolve(caseMock(params, RpcProviderTestCases))
+      const eye = mockAsyncMethod(provider, 'call',
+        (params) => Promise.resolve(caseMock(params, RpcProviderTestCases)),
       );
       const resolution = Resolution.fromEthersProvider(provider);
       const ethAddress = await resolution.addressOrThrow('brad.crypto', 'eth');
@@ -386,8 +385,8 @@ describe('Resolution', () => {
 
     it('should work with web3@0.20.7 provider', async () => {
       const provider = new Web3V027Provider(protocolLink(ProviderProtocol.http), 5000, null, null, null);
-      const eye = mockAsyncMethod(provider, "sendAsync", (payload: JsonRpcPayload, callback: any) => {
-        const result = caseMock(payload.params![0], RpcProviderTestCases)
+      const eye = mockAsyncMethod(provider, 'sendAsync', (payload: JsonRpcPayload, callback: any) => {
+        const result = caseMock(payload.params![0], RpcProviderTestCases);
         callback(undefined, {
           jsonrpc: '2.0',
           id: 1,

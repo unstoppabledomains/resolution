@@ -6,7 +6,7 @@ import { EthCoinIndex, NamingServiceName } from '../../types';
 export const OldResolverAddresses = [
   '0x5ffc014343cd971b7eb70732021e26c35b744cc4',
   '0x1da022710df5002339274aadee8d58218e9d6ab5',
-  '0xda1756bb923af5d1a05e277cb1e54f1d0a127890'
+  '0xda1756bb923af5d1a05e277cb1e54f1d0a127890',
 ];
 
 

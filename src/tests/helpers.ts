@@ -9,16 +9,16 @@ export const ZilliqaUrl = 'https://api.zilliqa.com';
 export const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
 
 export const CryptoDomainWithoutResolver = 'reseller-test-paul1.crypto';
-export const CryptoDomainWithEmptyResolver = 'reseller-test-mago017.crypto'
-export const CryptoDomainWithIpfsRecords = 'reseller-test-paul019.crypto'
-export const CryptoDomainWithEmail = 'reseller-test-paul019.crypto'
+export const CryptoDomainWithEmptyResolver = 'reseller-test-mago017.crypto';
+export const CryptoDomainWithIpfsRecords = 'reseller-test-paul019.crypto';
+export const CryptoDomainWithEmail = 'reseller-test-paul019.crypto';
 export const CryptoDomainWithAdaBchAddresses = 'reseller-test-mago0.crypto';
 
 export function mockAsyncMethod(object: any, method: string, value) {
   const spy = jest.spyOn(object, method);
   if (!process.env.LIVE) {
     if (value instanceof Function) {
-      return spy.mockImplementation(value)
+      return spy.mockImplementation(value);
     } else if (value instanceof Error) {
       return spy.mockRejectedValue(value);
     } else {
@@ -29,51 +29,51 @@ export function mockAsyncMethod(object: any, method: string, value) {
 }
 
 export function mockAsyncMethods(object: any, methods: Dictionary<any>) {
-  return Object.entries(methods).map(method =>
+  return Object.entries(methods).map((method) =>
     mockAsyncMethod(object, method[0], method[1]),
   );
 }
 
 export function isLive() {
-  return !!process.env.LIVE
+  return !!process.env.LIVE;
 }
 
 export function pendingInLive() {
   if (isLive()) {
-    pending("Disabled in LIVE mode")
+    pending('Disabled in LIVE mode');
   }
 }
 
 export function expectSpyToBeCalled(spies: any[]) {
   if (!isLive()) {
-    spies.forEach(spy => expect(spy).toBeCalled());
+    spies.forEach((spy) => expect(spy).toBeCalled());
   }
 }
 
 export async function expectResolutionErrorCode(
   callback: Promise<any> | Function,
-  code: ResolutionErrorCode
+  code: ResolutionErrorCode,
 ): Promise<void> {
-  return expectError(callback, code, ResolutionError)
+  return expectError(callback, code, ResolutionError);
 }
 
 export async function expectConfigurationErrorCode(
   callback: Promise<any> | Function,
-  code: ConfigurationErrorCode
+  code: ConfigurationErrorCode,
 ): Promise<void> {
-  return expectError(callback, code, ConfigurationError)
+  return expectError(callback, code, ConfigurationError);
 }
 
 async function expectError(
   callback: Promise<any> | Function,
   code: string,
-  klass: typeof ResolutionError | typeof ConfigurationError
+  klass: typeof ResolutionError | typeof ConfigurationError,
 ): Promise<void> {
   if (callback instanceof Function) {
     callback = new Promise((resolve, reject) => {
       const result = (callback as Function)();
       if (result instanceof Promise) {
-        result.then(resolve, reject)
+        result.then(resolve, reject);
       } else {
         resolve(result);
       }
@@ -90,7 +90,7 @@ async function expectError(
       } else {
         throw error;
       }
-    }
+    },
   );
 }
 
@@ -103,18 +103,18 @@ export function mockAPICalls(testName: string, url = MainnetUrl) {
 
   mockCall.forEach(({ METHOD, REQUEST, RESPONSE }) => {
     switch (METHOD) {
-      case 'POST': {
-        nock(url)
-          // .log()
-          .post('/', JSON.stringify(REQUEST), undefined)
-          .reply(200, JSON.stringify(RESPONSE));
-      }
-      default: {
-        nock(url)
-          // .log()
-          .get(REQUEST as string, undefined, undefined)
-          .reply(200, RESPONSE);
-      }
+    case 'POST': {
+      nock(url)
+        // .log()
+        .post('/', JSON.stringify(REQUEST), undefined)
+        .reply(200, JSON.stringify(RESPONSE));
+    }
+    default: {
+      nock(url)
+        // .log()
+        .get(REQUEST as string, undefined, undefined)
+        .reply(200, RESPONSE);
+    }
     }
   });
 }
@@ -131,13 +131,13 @@ export function protocolLink(providerProtocol: ProviderProtocol = ProviderProtoc
   const protocolMap = {
     [ProviderProtocol.http]: secret ? `https://mainnet.infura.io/v3/${secret}` : 'https://main-rpc.linkpool.io',
     [ProviderProtocol.wss]: secret ? `wss://mainnet.infura.io/ws/v3/${secret}` : 'wss://main-rpc.linkpool.io/ws',
- };
+  };
   const url = protocolMap[providerProtocol];
   return url;
 }
 
 export enum ProviderProtocol {
-  "http", "wss"
+  'http', 'wss'
 };
 
 export const caseMock = <T, U>(params: T, cases: readonly (readonly [T, U])[]): U => {
@@ -147,4 +147,4 @@ export const caseMock = <T, U>(params: T, cases: readonly (readonly [T, U])[]): 
     }
   }
   throw new Error(`got unexpected params ${JSON.stringify(params)}`);
-}
+};

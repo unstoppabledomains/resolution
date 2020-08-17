@@ -76,13 +76,13 @@ export default [
   // This funciton is defined, however there is other version with 2 arguments
   // that we prefer to use all the time to be consistent
   // {
-    // constant: true,
-    // inputs: [{ internalType: 'bytes32', name: 'node', type: 'bytes32' }],
-    // name: 'addr',
-    // outputs: [{ internalType: 'address', name: '', type: 'address' }],
-    // payable: false,
-    // stateMutability: 'view',
-    // type: 'function',
+  // constant: true,
+  // inputs: [{ internalType: 'bytes32', name: 'node', type: 'bytes32' }],
+  // name: 'addr',
+  // outputs: [{ internalType: 'address', name: '', type: 'address' }],
+  // payable: false,
+  // stateMutability: 'view',
+  // type: 'function',
   // },
   {
     constant: false,

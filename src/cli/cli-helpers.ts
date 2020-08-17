@@ -30,13 +30,13 @@ export function signedInfuraLink(key: string): string {
 const configObject = getConfig();
 export function getEtheriumUrl(): string {
   switch (configObject.type) {
-    case "infura":
-      return signedInfuraLink(configObject.value);
-    case "url":
-      return configObject.value;
-    default:
-      return "https://main-rpc.linkpool.io/";
-  } 
+  case 'infura':
+    return signedInfuraLink(configObject.value);
+  case 'url':
+    return configObject.value;
+  default:
+    return 'https://main-rpc.linkpool.io/';
+  }
 }
 
 export function buildResolutionPackage() {
@@ -67,11 +67,11 @@ export function getConfig() {
       .split('=');
     return { type: config[0], value: config[1] };
   } catch (err) {
-    if (err.code === "ENOENT") {
+    if (err.code === 'ENOENT') {
       console.warn('Configuration file was not found. Default blockchain provider: "https://main-rpc.linkpool.io/" is being used');
-      console.warn('This RPC is limited to 2,000 calls per 5 minutes. If that is exceeded, then the source IP address is blocked.')
-      console.warn('To configure a different provider use -C flag ')
+      console.warn('This RPC is limited to 2,000 calls per 5 minutes. If that is exceeded, then the source IP address is blocked.');
+      console.warn('To configure a different provider use -C flag ');
     }
-    return {type: "unknown", value: ""};
+    return {type: 'unknown', value: ''};
   }
 }
