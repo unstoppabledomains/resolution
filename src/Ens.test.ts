@@ -453,7 +453,7 @@ describe('ENS', () => {
       const spies = mockAsyncMethods(resolution.ens, {
         getResolver: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
       });
-      const resolverAddress = await resolution.resolver('almonit.eth');
+      const resolverAddress = await resolution.resolver('monkybrain.eth');
       expectSpyToBeCalled(spies);
       expect(resolverAddress).toBe(
         '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
@@ -559,9 +559,9 @@ describe('ENS', () => {
         callMethod:
           '0xe30101701220a31243a98ade931ac3f6e5ddb3dc91b1b9eceb564dbf5b4b2bdc712d8a421309'
       });
-      const ipfsHash = await resolution.ipfsHash('almonit.eth');
+      const ipfsHash = await resolution.ipfsHash('monkybrain.eth');
       expectSpyToBeCalled(eyes);
-      expect(ipfsHash).toBe('QmZKDKMi6vrevJvMZiuRR1r2tkQivLabkWxMpHr1QFQ3VJ');
+      expect(ipfsHash).toBe('QmXSBLw6VMegqkCHSDBPg7xzfLhUyuRBzTb927KVzKC1vq');
     });
 
     //todo(johny) find some domains with url property set
