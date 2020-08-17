@@ -38,37 +38,6 @@ jobs:
       # run tests!
       - run: yarn test
     
-  build-node11:
-    docker:
-      - image: circleci/node:11
-    steps:
-      - run:
-          name: 'Node version 11'
-          command: node --version
-      
-      - checkout:
-          name: Checking out the code
-      # Download and cache dependencies
-      - restore_cache:
-          name: Restore Yarn Package Cache
-          keys:
-            - npm-deps-{{ .Branch }}-{{ checksum "package.json" }}
-            - npm-deps-{{ .Branch }}-
-            - npm-deps-
-
-      - run:
-          name: Install Dependencies
-          command: yarn install 
-
-      - save_cache:
-          name: Save Yarn Package Cache
-          key: npm-deps-{{ .Branch }}-{{ checksum "package.json" }}
-          paths:
-            - ~/.cache/yarn
-
-      # run tests!
-      - run: yarn test
-    
   build-node12:
     docker:
       - image: circleci/node:12.12.0
