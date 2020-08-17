@@ -1,4 +1,4 @@
-import BaseConnection from './baseConnection';
+import BaseConnection from './BaseConnection';
 import ConfigurationError, {
   ConfigurationErrorCode,
 } from './errors/configurationError';
