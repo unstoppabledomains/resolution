@@ -12,6 +12,7 @@ import {
   expectResolutionErrorCode,
   protocolLink,
 } from './tests/helpers';
+import { EthereumNamingService } from './EthereumNamingService';
 
 try {
   const dotenv = require('dotenv');
@@ -21,12 +22,14 @@ try {
 }
 
 let resolution: Resolution;
+let cnsReader: EthereumNamingService;
 
-beforeEach(() => {
+beforeEach(async () => {
   jest.restoreAllMocks();
   resolution = new Resolution({
     blockchain: { cns: { url: protocolLink() } },
   });
+  cnsReader = await resolution.cns.getService();
 });
 
 const mockCryptoCalls = (
@@ -48,7 +51,7 @@ describe('CNS', () => {
   });
 
   it('checks the record by key', async () => {
-    const eyes = mockAsyncMethods(resolution.cns, {
+    const eyes = mockAsyncMethods(cnsReader, {
       getResolver: '0xa1cac442be6673c49f8e74ffc7c4fd746f3cbd0d',
       getRecord: 'QmVJ26hBrwwNAPVmLavEFXDUunNDXeFSeMPmHuPxKe6dJv',
     });
@@ -58,7 +61,7 @@ describe('CNS', () => {
   });
 
   it('Should return NoRecord Resolution error', async () => {
-    const spies = mockAsyncMethods(resolution.cns, {
+    const spies = mockAsyncMethods(cnsReader, {
       getResolver: '0xa1cac442be6673c49f8e74ffc7c4fd746f3cbd0d',
       getRecord: undefined,
     });
@@ -70,7 +73,7 @@ describe('CNS', () => {
   });
 
   it('should return a valid resolver address', async () => {
-    const spies = mockAsyncMethods(resolution.cns, {
+    const spies = mockAsyncMethods(cnsReader, {
       getResolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
     });
     const resolverAddress = await resolution.resolver(CryptoDomainWithEmptyResolver);
@@ -79,7 +82,7 @@ describe('CNS', () => {
   });
 
   it('should not find a resolver address', async () => {
-    const spies = mockAsyncMethods(resolution.cns, {
+    const spies = mockAsyncMethods(cnsReader, {
       getResolver: undefined,
       owner: NullAddress,
     });
@@ -91,7 +94,7 @@ describe('CNS', () => {
   });
 
   it('should throw ResolutionError.UnspecifiedResolver', async () => {
-    const spies = mockAsyncMethods(resolution.cns, {
+    const spies = mockAsyncMethods(cnsReader, {
       getResolver: undefined,
       owner: 'someowneraddress',
     });
@@ -105,8 +108,9 @@ describe('CNS', () => {
   describe('.Crypto', () => {
     it('should work without any configs', async () => {
       resolution = new Resolution();
+      cnsReader = await resolution.cns.getService();
       const eyes = mockCryptoCalls(
-        resolution.cns,
+        cnsReader,
         '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
       );
       const address = await resolution.address('brad.crypto', 'eth');
@@ -116,7 +120,7 @@ describe('CNS', () => {
 
     it(`checks the BCH address on ${CryptoDomainWithAdaBchAddresses}`, async () => {
       const eyes = mockCryptoCalls(
-        resolution.cns,
+        cnsReader,
         'qzx048ez005q4yhphqu2pylpfc3hy88zzu4lu6q9j8',
       );
       const addr = await resolution.address(CryptoDomainWithAdaBchAddresses, 'BCH');
@@ -126,7 +130,7 @@ describe('CNS', () => {
 
     it(`checks the ADA address on ${CryptoDomainWithAdaBchAddresses}`, async () => {
       const eyes = mockCryptoCalls(
-        resolution.cns,
+        cnsReader,
         'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
       );
       const addr = await resolution.address(CryptoDomainWithAdaBchAddresses, 'ADA');
@@ -138,7 +142,6 @@ describe('CNS', () => {
   describe('.Hashing', () => {
     describe('.Namehash', () => {
       it('supports root node', async () => {
-        const cns = resolution;
         expect(resolution.isSupportedDomain('crypto')).toEqual(true);
         expect(resolution.namehash('crypto')).toEqual(
           '0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f',
@@ -146,7 +149,6 @@ describe('CNS', () => {
       });
 
       it('starts with -', async () => {
-        const cns = resolution;
         expect(resolution.isSupportedDomain('-hello.crypto')).toEqual(true);
         expect(resolution.namehash('-hello.crypto')).toBe(
           '0xc4ad028bcae9b201104e15f872d3e85b182939b06829f75a128275177f2ff9b2',
@@ -154,7 +156,6 @@ describe('CNS', () => {
       });
 
       it('ends with -', async () => {
-        const cns = resolution;
         expect(resolution.isSupportedDomain('hello-.crypto')).toEqual(true);
         expect(resolution.namehash('hello-.crypto')).toBe(
           '0x82eaa6ef14e438940bfd7747e0e4c4fec42af20cee28ddd0a7d79f52b1c59b72',
@@ -162,7 +163,6 @@ describe('CNS', () => {
       });
 
       it('starts and ends with -', async () => {
-        const cns = resolution.cns;
         expect(resolution.isSupportedDomain('-hello-.crypto')).toEqual(true);
         expect(resolution.namehash('-hello-.crypto')).toBe(
           '0x90cc1963ff09ce95ee2dbb3830df4f2115da9756e087a50283b3e65f6ffe2a4e',
@@ -170,7 +170,7 @@ describe('CNS', () => {
       });
 
       it('should throw UnregisteredDomain', async () => {
-        const eyes = mockAsyncMethods(resolution.cns, {
+        const eyes = mockAsyncMethods(cnsReader, {
           getResolver: undefined,
           owner: '0x0000000000000000000000000000000000000000',
         });
@@ -185,7 +185,6 @@ describe('CNS', () => {
 
     describe('.Childhash', () => {
       it('checks root crypto domain', () => {
-        const cns = resolution.cns;
         const rootHash =
           '0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f';
         expect(resolution.namehash('crypto')).toBe(rootHash);
@@ -199,7 +198,6 @@ describe('CNS', () => {
       });
 
       it('checks the childhash functionality', () => {
-        const cns = resolution.cns;
         const namehash = resolution.namehash('hello.world.crypto');
         const childhash = resolution.childhash(
           resolution.namehash('world.crypto'),
@@ -210,7 +208,6 @@ describe('CNS', () => {
       });
 
       it('checks childhash multi level domain', () => {
-        const cns = resolution.cns;
         const label = 'ich';
         const parent = 'ni.san.yon.hello.world.crypto';
         const domain = `${label}.${parent}`;
@@ -226,9 +223,8 @@ describe('CNS', () => {
   });
 
   describe('.Metadata', () => {
-    const domain = 'reseller-test-ryan019.crypto';
     it('should resolve with ipfs stored on cns', async () => {
-      const spies = mockAsyncMethods(resolution.cns, {
+      const spies = mockAsyncMethods(cnsReader, {
         getResolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
         getRecord: 'QmVJ26hBrwwNAPVmLavEFXDUunNDXeFSeMPmHuPxKe6dJv',
       });
@@ -240,7 +236,7 @@ describe('CNS', () => {
     });
 
     it('should resolve with email stored on cns', async () => {
-      const spies = mockAsyncMethods(resolution.cns, {
+      const spies = mockAsyncMethods(cnsReader, {
         getResolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
         getRecord: 'paul@unstoppabledomains.com',
       });
@@ -252,7 +248,7 @@ describe('CNS', () => {
     });
 
     it('should resolve with httpUrl stored on cns', async () => {
-      const eyes = mockAsyncMethods(resolution.cns, {
+      const eyes = mockAsyncMethods(cnsReader, {
         getResolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
         getRecord: 'https://unstoppabledomains.com/',
       });
@@ -264,7 +260,7 @@ describe('CNS', () => {
     });
 
     it('should resolve with the gundb chatId stored on cns', async () => {
-      const eyes = mockAsyncMethods(resolution.cns, {
+      const eyes = mockAsyncMethods(cnsReader, {
         getResolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
         getRecord: '0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c',
       });
@@ -274,8 +270,9 @@ describe('CNS', () => {
     });
 
     it('should throw UnspecifiedResolver for chatId', async () => {
-      const resolution = new Resolution({blockchain: {cns: {url: protocolLink()}}});
-      const eyes = mockAsyncMethods(resolution.cns, {
+      const resolution = new Resolution({ blockchain: { cns: { url: protocolLink() } } });
+      cnsReader = await resolution.cns.getService();
+      const eyes = mockAsyncMethods(cnsReader, {
         owner: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
         getResolver: undefined,
       });
@@ -283,7 +280,7 @@ describe('CNS', () => {
     });
 
     it('should resolve with the gundb public key stored on cns', async () => {
-      const eyes = mockAsyncMethods(resolution.cns, {
+      const eyes = mockAsyncMethods(cnsReader, {
         getResolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
         getRecord: 'pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI',
       });
@@ -293,7 +290,7 @@ describe('CNS', () => {
     });
 
     it('should error out for gundb public key stored on cns', async () => {
-      const eyes = mockAsyncMethods(resolution.cns, {
+      const eyes = mockAsyncMethods(cnsReader, {
         getResolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
         getRecord: undefined,
       });
@@ -302,7 +299,7 @@ describe('CNS', () => {
     });
 
     it('should error out for gundb chatId stored on cns', async () => {
-      const eyes = mockAsyncMethods(resolution.cns, {
+      const eyes = mockAsyncMethods(cnsReader, {
         getResolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
         getRecord: undefined,
       });
