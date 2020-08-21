@@ -9,7 +9,7 @@ import {
 } from '../types';
 import { default as resolverInterface } from './contract/resolver';
 import { default as cnsInterface } from './contract/registry';
-import { default as hash, childhash } from './namehash';
+import { default as hash } from './namehash';
 import ResolutionError from '../errors/resolutionError';
 import { ResolutionErrorCode } from '../errors/resolutionError';
 import Contract from '../utils/contract';
@@ -44,7 +44,7 @@ export default class CnsRegistryReader extends EthereumNamingService {
    * @param domain - domain name to be resolved
    * @returns- Returns a promise that resolves in an object
    */
-  async resolve(domain: string): Promise<ResolutionResponse> {
+  async resolve(_: string): Promise<ResolutionResponse> {
     throw new Error('This method is unsupported for CNS');
   }
 
@@ -113,12 +113,8 @@ export default class CnsRegistryReader extends EthereumNamingService {
    * @param parent - nodehash of a parent
    * @param label - child
    */
-  childhash(
-    parent: nodeHash,
-    label: string,
-    options: { prefix: boolean } = { prefix: true },
-  ): nodeHash {
-    return childhash(parent, label, options);
+  childhash(_: nodeHash, __: string): nodeHash {
+    throw new Error('Method not implemented.');
   }
 
   /** @internal */
@@ -149,11 +145,11 @@ export default class CnsRegistryReader extends EthereumNamingService {
   async ipfsHash(domain: string): Promise<string> {
     return await this.record(domain, 'ipfs.html.value');
   }
+
   /**
    * resolves an email address stored on domain
    * @param domain - domain name
    */
-
   async email(domain: string): Promise<string> {
     return await this.record(domain, 'whois.email.value');
   }
@@ -181,14 +177,6 @@ export default class CnsRegistryReader extends EthereumNamingService {
   async httpUrl(domain: string): Promise<string> {
     return await this.record(domain, 'ipfs.redirect_domain.value');
   }
-
-  private async getTtl(
-    contract: Contract,
-    methodname: string,
-    params: string[],
-  ): Promise<string> {
-    return await this.callMethod(contract, methodname, params);
-  };
 
   /** @internal */
   async record(domain: string, key: string): Promise<string> {

@@ -10,6 +10,7 @@ import { default as hash, childhash } from './cns/namehash';
 import { default as proxyReaderAbi } from './cns/contract/proxyReader';
 import { ResolutionErrorCode } from './errors/resolutionError';
 import CnsRegistryReader from './cns/CnsRegistryReader';
+import CnsProxyReader from './cns/CnsProxyReader';
 
 /** @internal */
 export default class Cns extends EthereumNamingService {
@@ -33,10 +34,15 @@ export default class Cns extends EthereumNamingService {
   }
 
   async getService(): Promise<EthereumNamingService> {
-    if (this.service) {
-      return this.service;
+    if (!this.service) {
+      this.service = await this.isDataReaderSupported() ?
+        new CnsProxyReader(this.source) :
+        new CnsRegistryReader(this.source);
     }
+    return this.service;
+  }
 
+  protected async isDataReaderSupported(): Promise<boolean> {
     try {
       const contract = this.buildContract(proxyReaderAbi, this.registryAddress);
       const isDataReaderSupported = await this.callMethod(contract, 'supportsInterface', ['0x6eabca0d']);
@@ -44,13 +50,10 @@ export default class Cns extends EthereumNamingService {
         throw new Error('Not supported DataReader');
       }
 
-      // TODO: Init ProxyReader
-      this.service = new CnsRegistryReader(this.source);
-    } catch (error) {
-      this.service = new CnsRegistryReader(this.source);
-    }
+      return true;
+    } catch { }
 
-    return this.service;
+    return false;
   }
 
   async resolver(domain: string): Promise<string> {
@@ -73,7 +76,7 @@ export default class Cns extends EthereumNamingService {
    * @param domain - domain name to be resolved
    * @returns- Returns a promise that resolves in an object
    */
-  async resolve(domain: string): Promise<ResolutionResponse> {
+  async resolve(_: string): Promise<ResolutionResponse> {
     throw new Error('This method is unsupported for CNS');
   }
 
@@ -166,7 +169,6 @@ export default class Cns extends EthereumNamingService {
     return service.record(domain, key);
   }
 
-  // TODO: should go through reader
   protected async getResolver(tokenId: string): Promise<string> {
     return await this.ignoreResolutionError(
       ResolutionErrorCode.RecordNotFound,

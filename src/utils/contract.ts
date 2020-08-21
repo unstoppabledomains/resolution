@@ -20,7 +20,7 @@ export default class Contract {
     this.coder = new Interface(this.abi);
   }
 
-  async fetchMethod(method: string, args: string[]): Promise<any> {
+  async fetchMethod(method: string, args: (string|string[])[]): Promise<any> {
     const inputParam = this.coder.encodeFunctionData(
       method,
       args,
@@ -29,7 +29,7 @@ export default class Contract {
     if (isNullAddress(response)) {
       throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
         recordName: method,
-        domain: args[0],
+        domain: args[0].toString(),
       });
     }
     return this.coder.decodeFunctionResult(method, response)[0];
