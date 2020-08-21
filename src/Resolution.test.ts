@@ -165,7 +165,8 @@ describe('Resolution', () => {
 
   it(`domains "brad.crypto" and "Brad.crypto" should return the same results`, async () => {
     const resolution = new Resolution({ blockchain: { cns: { url: protocolLink() } } });
-    const eyes = mockAsyncMethods(resolution.cns, {
+    const cnsService = await resolution.cns.getService();
+    const eyes = mockAsyncMethods(cnsService, {
       getResolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
       getRecord: '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
     });
@@ -180,7 +181,8 @@ describe('Resolution', () => {
     const resolution = new Resolution({
       blockchain: { cns: { url: protocolLink() } },
     });
-    const eyes = mockAsyncMethods(resolution.cns, {
+    const cnsService = await resolution.cns.getService();
+    const eyes = mockAsyncMethods(cnsService, {
       getResolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
       getRecord:
         '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c',
