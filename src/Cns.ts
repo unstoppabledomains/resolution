@@ -17,7 +17,7 @@ export default class Cns extends EthereumNamingService {
   readonly registryAddress?: string;
   /** @internal */
   readonly RegistryMap: RegistryMap = {
-    mainnet: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe',
+    mainnet: '0x7ea9ee21077f84339eda9c80048ec6db678642b1',
     kovan: '0xcf4318918fd18aca9bdc11445c01fbada4b448e3', // for internal testing
   };
 

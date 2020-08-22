@@ -165,6 +165,7 @@ describe('Resolution', () => {
 
   it(`domains "brad.crypto" and "Brad.crypto" should return the same results`, async () => {
     const resolution = new Resolution({ blockchain: { cns: { url: protocolLink() } } });
+    mockAsyncMethods(resolution.cns, { isDataReaderSupported: false });
     const cnsService = await resolution.cns.getService();
     const eyes = mockAsyncMethods(cnsService, {
       getResolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
@@ -178,9 +179,8 @@ describe('Resolution', () => {
   });
 
   it('should resolve gundb chat id', async () => {
-    const resolution = new Resolution({
-      blockchain: { cns: { url: protocolLink() } },
-    });
+    const resolution = new Resolution({ blockchain: { cns: { url: protocolLink() } } });
+    mockAsyncMethods(resolution.cns, { isDataReaderSupported: false });
     const cnsService = await resolution.cns.getService();
     const eyes = mockAsyncMethods(cnsService, {
       getResolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
@@ -299,14 +299,14 @@ describe('Resolution', () => {
       [
         {
           data: '0xb3f9e4cb756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9',
-          to: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe',
+          to: '0x7ea9ee21077f84339eda9c80048ec6db678642b1',
         },
         '0x000000000000000000000000b66dce2da6afaaa98f2013446dbcb0f4b0ab2842',
       ],
       [
         {
           data: '0x6352211e756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9',
-          to: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe',
+          to: '0x7ea9ee21077f84339eda9c80048ec6db678642b1',
         },
         '0x000000000000000000000000b66dce2da6afaaa98f2013446dbcb0f4b0ab2842',
       ],

@@ -29,6 +29,7 @@ beforeEach(async () => {
   resolution = new Resolution({
     blockchain: { cns: { url: protocolLink() } },
   });
+  mockAsyncMethods(resolution.cns, { isDataReaderSupported: false });
   cnsReader = await resolution.cns.getService();
 });
 
@@ -108,6 +109,7 @@ describe('CNS', () => {
   describe('.Crypto', () => {
     it('should work without any configs', async () => {
       resolution = new Resolution();
+      mockAsyncMethods(resolution.cns, { isDataReaderSupported: false });
       cnsReader = await resolution.cns.getService();
       const eyes = mockCryptoCalls(
         cnsReader,
@@ -187,6 +189,7 @@ describe('CNS', () => {
 
       it('should throw UnspecifiedResolver for chatId', async () => {
         const resolution = new Resolution({ blockchain: { cns: { url: protocolLink() } } });
+        mockAsyncMethods(resolution.cns, { isDataReaderSupported: false });
         cnsReader = await resolution.cns.getService();
         const eyes = mockAsyncMethods(cnsReader, {
           owner: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
