@@ -18,6 +18,7 @@
     "release:tag": "git push origin v$npm_package_version",
     "test": "jest",
     "test:live": "LIVE=1 yarn test",
+    "test:live:win": "set LIVE=1&& yarn test",
     "start": "npm run build:live",
     "dev": "yarn build && ./build/cli/cli.js",
     "build": "tsc -p .",

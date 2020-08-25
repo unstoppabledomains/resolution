@@ -164,7 +164,11 @@ describe('Resolution', () => {
   });
 
   it(`domains "brad.crypto" and "Brad.crypto" should return the same results`, async () => {
-    const resolution = new Resolution({ blockchain: { cns: { url: protocolLink() } } });
+    const resolution = new Resolution({
+      blockchain: {
+        cns: { url: protocolLink(), registry: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe' }
+      }
+    });
     mockAsyncMethods(resolution.cns, { isDataReaderSupported: false });
     const cnsService = await resolution.cns.getService();
     const eyes = mockAsyncMethods(cnsService, {
@@ -179,7 +183,11 @@ describe('Resolution', () => {
   });
 
   it('should resolve gundb chat id', async () => {
-    const resolution = new Resolution({ blockchain: { cns: { url: protocolLink() } } });
+    const resolution = new Resolution({
+      blockchain: {
+        cns: { url: protocolLink(), registry: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe' }
+      }
+    });
     mockAsyncMethods(resolution.cns, { isDataReaderSupported: false });
     const cnsService = await resolution.cns.getService();
     const eyes = mockAsyncMethods(cnsService, {

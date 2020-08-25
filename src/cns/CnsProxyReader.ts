@@ -11,14 +11,14 @@ import { default as proxyReaderAbi } from './contract/proxyReader';
 import { default as hash } from './namehash';
 
 type Data = {
-  resolver: string
-  owner: string,
-  values: string[]
+  resolver?: string
+  owner?: string,
+  values?: string[]
 };
 
 /** @internal */
 export default class CnsProxyReader extends EthereumNamingService {
-  registryAddress?: string | undefined;
+  registryAddress?: string;
 
   constructor(source: SourceDefinition = {}) {
     super(source, NamingServiceName.CNS);
@@ -46,8 +46,8 @@ export default class CnsProxyReader extends EthereumNamingService {
 
   async resolver(domain: string): Promise<string> {
     const data = await this.get(domain);
-    this.verify(domain, data);
-    return data.resolver;
+    await this.verify(domain, data);
+    return data.resolver || '';
   }
 
   namehash(domain: string): string {
@@ -56,8 +56,9 @@ export default class CnsProxyReader extends EthereumNamingService {
   }
 
   async address(domain: string, currencyTicker: string): Promise<string> {
-    const data = await this.get(domain, [currencyTicker]);
-    this.verify(domain, data);
+    const key = `crypto.${currencyTicker.toUpperCase()}.address`;
+    const data = await this.get(domain, [key]);
+    await this.verify(domain, data);
 
     const { values } = data;
     const value: string | null = values?.length ? values[0] : null;
@@ -73,8 +74,8 @@ export default class CnsProxyReader extends EthereumNamingService {
 
   async owner(domain: string): Promise<string> {
     try {
-      const { owner } = await this.get(domain);
-      return owner;
+      const owner = await this.getOwner(domain);
+      return owner || '';
     } catch (error) {
       if (error.reason === 'ERC721: owner query for nonexistent token') {
         return NullAddress;
@@ -84,8 +85,8 @@ export default class CnsProxyReader extends EthereumNamingService {
   }
 
   async record(domain: string, key: string): Promise<string> {
-    const data = await this.get(domain);
-    this.verify(domain, data);
+    const data = await this.get(domain, [key]);
+    await this.verify(domain, data);
 
     const { values } = data;
     const value: string | null = values?.length ? values[0] : null;
@@ -122,17 +123,28 @@ export default class CnsProxyReader extends EthereumNamingService {
 
   protected async get(domain: string, keys: string[] = []): Promise<Data> {
     const tokenId = this.namehash(domain);
-    const { resolver, owner, values } =
-      await this.callMethod(this.registryContract, 'getData', [keys, tokenId]);
-    return { resolver, owner, values };
+    try {
+      const [resolver, owner, values] =
+        await this.registryContract.call('getData', [keys, tokenId]) || [];
+      return { resolver, owner, values };
+    } catch {
+      return {};
+    }
   }
 
-  protected verify(domain: string, data: Data) {
-    const { resolver, owner } = data;
+  protected getOwner(domain: string): Promise<string> {
+    const tokenId = this.namehash(domain);
+    return this.registryContract.call('ownerOf', [tokenId]);
+  }
+
+  protected async verify(domain: string, data: Data) {
+    const { resolver } = data;
     if (!isNullAddress(resolver)) {
       return;
     }
 
+    // TODO: temporary call, 'getData' returns empty object, in case of empty resolver.
+    const owner = await this.owner(domain);
     if (isNullAddress(owner)) {
       throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
         domain,
