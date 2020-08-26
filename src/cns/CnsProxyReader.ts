@@ -4,7 +4,7 @@ import FetchProvider from '../FetchProvider';
 import { default as proxyReaderAbi } from './contract/proxyReader';
 import { SourceDefinition, NamingServiceName } from '../types';
 
-export default class ProxyReader implements ICnsReader {
+export default class CnsProxyReader implements ICnsReader {
   readonly proxyAddress?: string;
   readonly proxyContract: Contract;
 

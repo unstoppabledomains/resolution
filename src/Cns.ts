@@ -10,8 +10,8 @@ import {
 import { default as proxyReaderAbi } from './cns/contract/proxyReader';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import ICnsReader, { Data } from './cns/ICnsReader';
-import ProxyReader from './cns/ProxyReader';
-import RegistryReader from './cns/RegistryReader';
+import CnsProxyReader from './cns/CnsProxyReader';
+import CnsRegistryReader from './cns/CnsRegistryReader';
 import Contract from './utils/contract';
 
 /** @internal */
@@ -41,8 +41,8 @@ export default class Cns extends EthereumNamingService {
   async getReader(): Promise<ICnsReader> {
     if (!this.reader) {
       this.reader = await this.isDataReaderSupported() ?
-        new ProxyReader(this.source) :
-        new RegistryReader(this.source);
+        new CnsProxyReader(this.source) :
+        new CnsRegistryReader(this.source);
     }
     return this.reader;
   }

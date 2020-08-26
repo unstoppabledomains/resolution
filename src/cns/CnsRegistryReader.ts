@@ -6,7 +6,7 @@ import FetchProvider from '../FetchProvider';
 import { default as registryAbi } from './contract/registry';
 import { default as resolverAbi } from './contract/resolver';
 
-export default class RegistryReader implements ICnsReader {
+export default class CnsRegistryReader implements ICnsReader {
   readonly registryAddress?: string;
   readonly registryContract: Contract;
   readonly source: SourceDefinition;
@@ -28,7 +28,7 @@ export default class RegistryReader implements ICnsReader {
       return {};
     }
 
-    return this.get(resolver, tokenId, key);
+    return await this.get(resolver, tokenId, key);
   }
 
   async resolver(tokenId: string): Promise<Data> {
