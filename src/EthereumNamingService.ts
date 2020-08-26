@@ -1,3 +1,4 @@
+import { keccak_256 as sha3 } from 'js-sha3';
 import NamingService from './NamingService';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import {
@@ -6,6 +7,7 @@ import {
   NamingServiceName,
   NetworkIdMap,
   SourceDefinition,
+  nodeHash,
 } from './types';
 import { invert } from './utils';
 import Contract from './utils/contract';
@@ -82,6 +84,17 @@ export abstract class EthereumNamingService extends NamingService {
    */
   isSupportedNetwork(): boolean {
     return this.registryAddress != null;
+  }
+
+  childhash(
+    parent: nodeHash,
+    label: string,
+    options: { prefix: boolean } = { prefix: true },
+  ): nodeHash {
+    parent = parent.replace(/^0x/, '');
+    const childHash = sha3(label);
+    const mynode = sha3(Buffer.from(parent + childHash, 'hex'));
+    return (options.prefix ? '0x' : '') + mynode;
   }
 
   protected async callMethod(

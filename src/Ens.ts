@@ -1,6 +1,5 @@
 import { default as ensInterface } from './ens/contract/ens';
 import { default as resolverInterface } from './ens/contract/resolver';
-import { default as hash, childhash } from './ens/namehash';
 import { formatsByCoinType } from '@ensdomains/address-encoder';
 import {
   ResolutionResponse,
@@ -44,7 +43,7 @@ export default class Ens extends EthereumNamingService {
     return (
       domain === 'eth' ||
       (domain.indexOf('.') > 0 &&
-        /^[^-]*[^-]*\.(eth|luxe|xyz|kred)$/.test(domain) &&
+        /^[^-]*[^-]*\.(eth|luxe|xyz|kred|addr\.reverse)$/.test(domain) &&
         domain.split('.').every((v) => !!v.length))
     );
   }
@@ -79,7 +78,7 @@ export default class Ens extends EthereumNamingService {
       address = address.substr(2);
     }
     const reverseAddress = address + '.addr.reverse';
-    const nodeHash = hash(reverseAddress);
+    const nodeHash = this.namehash(reverseAddress);
     const resolverAddress = await this.getResolver(nodeHash);
     if (isNullAddress(resolverAddress)) {
       return null;
@@ -188,16 +187,6 @@ export default class Ens extends EthereumNamingService {
     return await this.getTextRecord(domain, 'gundb_public_key');
   }
 
-  /**
-   * Produces ENS namehash
-   * @param domain - domain to be hashed
-   * @returns ENS namehash of a domain
-   */
-  namehash(domain: string): nodeHash {
-    this.ensureSupportedDomain(domain);
-    return hash(domain);
-  }
-
   private async getContentHash(domain: string): Promise<string | undefined> {
     const nodeHash = this.namehash(domain);
     const resolverContract = await this.getResolverContract(domain);
@@ -224,19 +213,6 @@ export default class Ens extends EthereumNamingService {
       resolverInterface(resolverAddress, coinType),
       resolverAddress,
     );
-  }
-
-  /**
-   * Returns the childhash
-   * @param parent - nodehash of a parent
-   * @param label - child
-   */
-  childhash(
-    parent: nodeHash,
-    label: string,
-    options: { prefix: boolean } = { prefix: true },
-  ): nodeHash {
-    return childhash(parent, label, options);
   }
 
   /**

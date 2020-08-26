@@ -20,7 +20,6 @@ export default abstract class NamingService extends BaseConnection {
   protected provider?: Provider;
   abstract isSupportedDomain(domain: string): boolean;
   abstract isSupportedNetwork(): boolean;
-  abstract namehash(domain: string): string;
   abstract address(domain: string, currencyTicker: string): Promise<string>;
   abstract owner(domain: string): Promise<string | null>;
   abstract record(domain: string, key: string): Promise<string>;
@@ -31,7 +30,7 @@ export default abstract class NamingService extends BaseConnection {
   abstract resolver(domain: string): Promise<string>;
   abstract chatId(domain: string): Promise<string>;
   abstract chatpk(domain: string): Promise<string>;
-  abstract childhash(parent: nodeHash, label: string): nodeHash;
+  abstract childhash(parent: nodeHash, label: string, options?: {prefix: boolean}): nodeHash;
 
   constructor(source: SourceDefinition, name: ResolutionMethod) {
     super();
@@ -45,6 +44,21 @@ export default abstract class NamingService extends BaseConnection {
 
   serviceName(domain: string): NamingServiceName {
     return this.name as NamingServiceName;
+  }
+
+  namehash(domain: string): string {
+    this.ensureSupportedDomain(domain);
+    const parent =
+      '0000000000000000000000000000000000000000000000000000000000000000';
+    const assembledHash = [parent]
+      .concat(
+        domain
+          .split('.')
+          .reverse()
+          .filter((label) => label),
+      )
+      .reduce((parent, label) => this.childhash(parent, label, { prefix: false }));
+    return '0x' + assembledHash;
   }
 
   protected abstract normalizeSource(

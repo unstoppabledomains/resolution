@@ -3,12 +3,10 @@ import {
   NamingServiceName,
   RegistryMap,
   ResolutionResponse,
-  nodeHash,
   SourceDefinition,
   isNullAddress,
   NullAddress,
 } from './types';
-import { default as hash, childhash } from './cns/namehash';
 import { default as proxyReaderAbi } from './cns/contract/proxyReader';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import ICnsReader, { Data } from './cns/ICnsReader';
@@ -118,29 +116,6 @@ export default class Cns extends EthereumNamingService {
     }
 
     return value;
-  }
-
-  /**
-   * Produces CNS namehash
-   * @param domain - domain to be hashed
-   * @returns CNS namehash of a domain
-   */
-  namehash(domain: string): nodeHash {
-    this.ensureSupportedDomain(domain);
-    return hash(domain);
-  }
-
-  /**
-   * Returns the childhash
-   * @param parent - nodehash of a parent
-   * @param label - child
-   */
-  childhash(
-    parent: nodeHash,
-    label: string,
-    options: { prefix: boolean } = { prefix: true },
-  ): nodeHash {
-    return childhash(parent, label, options);
   }
 
   /** @internal */
