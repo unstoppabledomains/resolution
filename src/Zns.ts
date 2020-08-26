@@ -1,9 +1,9 @@
+import sha256 from './utils/sha256';
 import {
   fromBech32Address,
   toBech32Address,
   toChecksumAddress,
 } from './zns/utils';
-import namehash, { childhash } from './zns/namehash';
 import { invert, set } from './utils';
 import {
   Dictionary,
@@ -179,18 +179,16 @@ export default class Zns extends NamingService {
     return this.registryAddress != null;
   }
 
-  /**
-   * Produces ZNS namehash of a domain
-   * @param domain - domain name to be hashed
-   * @returns ZNS namehash
-   */
-  namehash(domain: string): string {
-    this.ensureSupportedDomain(domain);
-    return namehash(domain);
-  }
-
-  childhash(parent: nodeHash, label: string): string {
-    return childhash(parent, label);
+  childhash(
+    parent: nodeHash,
+    label: string,
+    options: { prefix: boolean } = { prefix: true },
+  ): nodeHash {
+    parent = parent.replace(/^0x/, '');
+    return sha256(parent + sha256(label, { hexPrefix: false }), {
+      hexPrefix: options.prefix,
+      inputEnc: 'hex',
+    });
   }
 
   async resolver(domain: string): Promise<string> {
@@ -238,7 +236,7 @@ export default class Zns extends NamingService {
     const registryRecord = await this.getContractMapValue(
       this.registryAddress!,
       'records',
-      namehash(domain),
+      this.namehash(domain),
     );
     if (!registryRecord) return undefined;
     let [ownerAddress, resolverAddress] = registryRecord.arguments as [
