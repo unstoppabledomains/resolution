@@ -35,9 +35,13 @@ export default class Contract {
     return this.coder.decodeFunctionResult(method, response)[0];
   }
 
-  async call(method: string, args: (string | string[])[]): Promise<any> {
+  async call(method: string, args: (string | string[])[]): Promise<ReadonlyArray<any>> {
     const inputParam = this.coder.encodeFunctionData(method, args);
     const response = await this.fetchData(inputParam) as string;
+    if (isNullAddress(response)) {
+      return [];
+    }
+
     return this.coder.decodeFunctionResult(method, response);
   }
 

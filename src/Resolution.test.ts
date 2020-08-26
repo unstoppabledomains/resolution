@@ -166,14 +166,16 @@ describe('Resolution', () => {
   it(`domains "brad.crypto" and "Brad.crypto" should return the same results`, async () => {
     const resolution = new Resolution({
       blockchain: {
-        cns: { url: protocolLink(), registry: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe' }
-      }
+        cns: { url: protocolLink(), registry: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe' },
+      },
     });
     mockAsyncMethods(resolution.cns, { isDataReaderSupported: false });
-    const cnsService = await resolution.cns.getService();
-    const eyes = mockAsyncMethods(cnsService, {
-      getResolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
-      getRecord: '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
+    const reader = await resolution.cns.getReader();
+    const eyes = mockAsyncMethods(reader, {
+      record: {
+        resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
+        values: ['0x45b31e01AA6f42F0549aD482BE81635ED3149abb'],
+      },
     });
     const capital = await resolution.addressOrThrow('Brad.crypto', 'eth');
     expectSpyToBeCalled(eyes);
@@ -185,15 +187,16 @@ describe('Resolution', () => {
   it('should resolve gundb chat id', async () => {
     const resolution = new Resolution({
       blockchain: {
-        cns: { url: protocolLink(), registry: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe' }
-      }
+        cns: { url: protocolLink(), registry: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe' },
+      },
     });
     mockAsyncMethods(resolution.cns, { isDataReaderSupported: false });
-    const cnsService = await resolution.cns.getService();
-    const eyes = mockAsyncMethods(cnsService, {
-      getResolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
-      getRecord:
-        '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c',
+    const reader = await resolution.cns.getReader();
+    const eyes = mockAsyncMethods(reader, {
+      record: {
+        resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+        values: ['0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c'],
+      },
     });
     const gundb = await resolution.chatId('homecakes.crypto');
     expectSpyToBeCalled(eyes);
