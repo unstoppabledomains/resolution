@@ -1,7 +1,7 @@
 import { EthereumNamingService } from './EthereumNamingService';
 import {
   NamingServiceName,
-  RegistryMap,
+  ReaderMap,
   ResolutionResponse,
   SourceDefinition,
   isNullAddress,
@@ -18,7 +18,7 @@ import Contract from './utils/contract';
 export default class Cns extends EthereumNamingService {
   readonly registryAddress?: string;
   /** @internal */
-  readonly RegistryMap: RegistryMap = {
+  readonly ReaderMap: ReaderMap = {
     mainnet: '0x7ea9ee21077f84339eda9c80048ec6db678642b1',
     kovan: '0xcf4318918fd18aca9bdc11445c01fbada4b448e3', // for internal testing
   };
@@ -33,7 +33,7 @@ export default class Cns extends EthereumNamingService {
 
     this.registryAddress = source.registry ?
       source.registry :
-      this.RegistryMap[this.network];
+      this.ReaderMap[this.network];
     this.source = { ...this.normalizeSource(source), registry: this.registryAddress };
     this.contract = this.buildContract(proxyReaderAbi, this.registryAddress);
   }
@@ -41,13 +41,17 @@ export default class Cns extends EthereumNamingService {
   async getReader(): Promise<ICnsReader> {
     if (!this.reader) {
       this.reader = await this.isDataReaderSupported() ?
-        new CnsProxyReader(this.source) :
+        new CnsProxyReader(this.contract) :
         new CnsRegistryReader(this.source);
     }
     return this.reader;
   }
 
   protected async isDataReaderSupported(): Promise<boolean> {
+    if (this.ReaderMap[this.network] === this.contract.address) {
+      return true;
+    }
+
     try {
       const [isDataReaderSupported] = await this.contract.call('supportsInterface', ['0x6eabca0d']);
       if (!isDataReaderSupported) {

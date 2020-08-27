@@ -21,18 +21,14 @@ export default class Contract {
   }
 
   async fetchMethod(method: string, args: string[]): Promise<any> {
-    const inputParam = this.coder.encodeFunctionData(
-      method,
-      args,
-    );
-    const response = await this.fetchData(inputParam) as string | null;
-    if (isNullAddress(response)) {
+    const result = await this.call(method, args);
+    if (!result.length) {
       throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
         recordName: method,
         domain: args[0],
       });
     }
-    return this.coder.decodeFunctionResult(method, response)[0];
+    return result[0];
   }
 
   async call(method: string, args: (string | string[])[]): Promise<ReadonlyArray<any>> {

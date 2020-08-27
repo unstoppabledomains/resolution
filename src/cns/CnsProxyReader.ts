@@ -1,21 +1,11 @@
 import ICnsReader, { Data } from './ICnsReader';
 import Contract from '../utils/contract';
-import FetchProvider from '../FetchProvider';
-import { default as proxyReaderAbi } from './contract/proxyReader';
-import { SourceDefinition, NamingServiceName } from '../types';
 
 export default class CnsProxyReader implements ICnsReader {
-  readonly proxyAddress?: string;
   readonly proxyContract: Contract;
 
-  constructor(source: SourceDefinition = {}) {
-    this.proxyAddress = source.registry;
-    if (this.proxyAddress) {
-      this.proxyContract = new Contract(
-        proxyReaderAbi,
-        this.proxyAddress,
-        source.provider || new FetchProvider(NamingServiceName.CNS, source.url!));
-    }
+  constructor(contract: Contract) {
+    this.proxyContract = contract;
   }
 
   record(tokenId: string, key: string): Promise<Data> {

@@ -39,7 +39,7 @@ export interface BlockhanNetworkUrlMap {
 }
 
 /** @internal */
-export interface RegistryMap {
+export interface ReaderMap {
   [key: string]: string;
 }
 
