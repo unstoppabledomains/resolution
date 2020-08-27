@@ -13,6 +13,8 @@ import {
   protocolLink,
 } from './tests/helpers';
 import ICnsReader from './cns/ICnsReader';
+import FetchProvider from './FetchProvider';
+import { FetchError } from 'node-fetch';
 
 try {
   const dotenv = require('dotenv');
@@ -508,6 +510,32 @@ describe('CNS', () => {
         );
         expect(childhash).toBe(namehash);
       });
+    });
+  });
+
+  describe('Providers', () => {
+    it('should throw error when FetchProvider throws FetchError', async () => {
+      const url = protocolLink();
+      const provider = new FetchProvider(NamingServiceName.CNS, url);
+      resolution = new Resolution({ blockchain: { cns: { url, provider } } });
+      mockAsyncMethods(resolution.cns, { isDataReaderSupported: true });
+      jest.spyOn(provider as any, 'fetch').mockRejectedValue(new FetchError('error', 'error_type'));
+
+      await expectResolutionErrorCode(
+        resolution.record(CryptoDomainWithEmptyResolver, 'No.such.record'),
+        ResolutionErrorCode.NamingServiceDown,
+      );
+    });
+
+    it('should throw error when FetchProvider throws Error', async () => {
+      const url = protocolLink();
+      const provider = new FetchProvider(NamingServiceName.CNS, url);
+      resolution = new Resolution({ blockchain: { cns: { url, provider } } });
+      mockAsyncMethods(resolution.cns, { isDataReaderSupported: true });
+      jest.spyOn(provider as any, 'fetch').mockRejectedValue(new Error('error_up'));
+
+      await expect(resolution.record(CryptoDomainWithEmptyResolver, 'No.such.record'))
+        .rejects.toEqual(new Error('error_up'));
     });
   });
 });
