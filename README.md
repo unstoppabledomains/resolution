@@ -46,3 +46,32 @@ resolution -mc eth,btc,DODGE,unknown -d brad.zil
 ## Note
 
 When resolution hits an error it returns the error code instead of throwing. So if you see something like RECORD_NOT_FOUND you know exactly that record was not found for this query.
+
+# Contributor guide
+
+Paste that in a macOS Terminal or Linux shell prompt.
+--
+
+1) Install NVM
+
+```bash
+ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+```
+
+2) Install concrete version of node.js
+
+```bash
+ nvm install 12.12.0
+```
+
+3) Install ```yarn```
+
+```bash
+ npm install -g yarn
+```
+
+4) Download dependencies 
+
+```bash
+yarn install
+```
