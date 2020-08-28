@@ -67,7 +67,7 @@ Paste that in a macOS Terminal or Linux shell prompt.
 3) Install ```yarn```
 
 ```bash
- nmp install -g yarn
+ npm install -g yarn
 ```
 
 4) Download dependencies 
