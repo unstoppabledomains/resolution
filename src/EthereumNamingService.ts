@@ -44,7 +44,7 @@ export abstract class EthereumNamingService extends NamingService {
     } else {
       // We don't care about this promise anymore
       // Ensure it doesn't generate a warning if it rejects
-      ownerPromise.catch(() => {});
+      ownerPromise.catch(() => { });
     }
     return resolverAddress;
   }
@@ -67,7 +67,7 @@ export abstract class EthereumNamingService extends NamingService {
   }
 
   protected normalizeSource(source: SourceDefinition): SourceDefinition {
-    source = {...source };
+    source = { ...source };
     if (typeof source.network == 'number') {
       source.network = EthereumNamingService.NetworkIdMap[source.network] || source.network;
     }
@@ -99,12 +99,23 @@ export abstract class EthereumNamingService extends NamingService {
 
   protected async callMethod(
     contract: Contract,
-    methodname: string,
+    method: string,
     params: string[],
   ): Promise<any> {
     try {
-      return await contract.fetchMethod(methodname, params);
+      const result = await contract.call(method, params);
+      if (!result.length) {
+        throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+          recordName: method,
+          domain: params[0],
+        });
+      }
+      return result[0];
     } catch (error) {
+      if (error instanceof ResolutionError) {
+        throw error;
+      }
+
       const { message }: { message: string } = error;
       if (
         message.match(/Invalid JSON RPC response/) ||

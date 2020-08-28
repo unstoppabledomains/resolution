@@ -1,40 +1,67 @@
 import { EthereumNamingService } from './EthereumNamingService';
 import {
   NamingServiceName,
-  RegistryMap,
+  ReaderMap,
   ResolutionResponse,
-  isNullAddress,
-  nodeHash,
   SourceDefinition,
+  isNullAddress,
   NullAddress,
 } from './types';
-import { default as resolverInterface } from './cns/contract/resolver';
-import { default as cnsInterface } from './cns/contract/registry';
-import ResolutionError from './errors/resolutionError';
-import { ResolutionErrorCode } from './errors/resolutionError';
+import { default as proxyReaderAbi } from './cns/contract/proxyReader';
+import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
+import ICnsReader, { Data } from './cns/ICnsReader';
+import CnsProxyReader from './cns/CnsProxyReader';
+import CnsRegistryReader from './cns/CnsRegistryReader';
 import Contract from './utils/contract';
 
 /** @internal */
 export default class Cns extends EthereumNamingService {
   readonly registryAddress?: string;
   /** @internal */
-  readonly RegistryMap: RegistryMap = {
-    mainnet: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe',
-    kovan: '0x22c2738cdA28C5598b1a68Fb1C89567c2364936F', // for internal testing
+  readonly ReaderMap: ReaderMap = {
+    mainnet: '0x7ea9ee21077f84339eda9c80048ec6db678642b1',
+    kovan: '0xcf4318918fd18aca9bdc11445c01fbada4b448e3', // for internal testing
   };
+
+  readonly contract: Contract;
+  /** @internal */
+  reader: ICnsReader;
 
   constructor(source: SourceDefinition = {}) {
     super(source, NamingServiceName.CNS);
     source = this.normalizeSource(source);
     this.registryAddress = source.registry ?
       source.registry :
-      this.RegistryMap[this.network];
-    if (this.registryAddress) {
-      this.registryContract = this.buildContract(
-        cnsInterface,
-        this.registryAddress,
-      );
+      this.ReaderMap[this.network];
+    this.contract = this.buildContract(proxyReaderAbi, this.registryAddress);
+  }
+
+  /** @internal */
+  async getReader(): Promise<ICnsReader> {
+    if (!this.reader) {
+      this.reader = await this.isDataReaderSupported() ?
+        new CnsProxyReader(this.contract) :
+        new CnsRegistryReader(this.contract);
     }
+    return this.reader;
+  }
+
+  /** @internal */
+  protected async isDataReaderSupported(): Promise<boolean> {
+    if (this.ReaderMap[this.network] === this.contract.address) {
+      return true;
+    }
+
+    try {
+      const [isDataReaderSupported] = await this.contract.call('supportsInterface', ['0x6eabca0d']);
+      if (!isDataReaderSupported) {
+        throw new Error('Not supported DataReader');
+      }
+
+      return true;
+    } catch { }
+
+    return false;
   }
 
   isSupportedDomain(domain: string): boolean {
@@ -46,13 +73,23 @@ export default class Cns extends EthereumNamingService {
     );
   }
 
+  async resolver(domain: string): Promise<string> {
+    const tokenId = this.namehash(domain);
+
+    const reader = await this.getReader();
+    const data = await reader.resolver(tokenId);
+    await this.verify(domain, data);
+
+    return data.resolver || '';
+  }
+
   /**
    * Resolves the given domain.
    * @deprecated
    * @param domain - domain name to be resolved
    * @returns- Returns a promise that resolves in an object
    */
-  async resolve(domain: string): Promise<ResolutionResponse> {
+  async resolve(_: string): Promise<ResolutionResponse> {
     throw new Error('This method is unsupported for CNS');
   }
 
@@ -67,58 +104,30 @@ export default class Cns extends EthereumNamingService {
    */
   async address(domain: string, currencyTicker: string): Promise<string> {
     const tokenId = this.namehash(domain);
-    const ownerPromise = this.owner(domain);
-    const resolver = await this.getResolver(tokenId);
-    if (isNullAddress(resolver)) {
-      await this.throwOwnershipError(domain, ownerPromise);
-    } else {
-      ownerPromise.catch(() => {});
-    }
-    const addr: string | undefined = await this.ignoreResolutionError(
-      ResolutionErrorCode.RecordNotFound,
-      this.fetchAddress(resolver, this.namehash(domain), currencyTicker),
-    );
-    if (!addr) {
+
+    const reader = await this.getReader();
+    const key = `crypto.${currencyTicker.toUpperCase()}.address`;
+    const data = await reader.record(tokenId, key);
+    await this.verify(domain, data);
+
+    const { values } = data;
+    const value: string | null = values?.length ? values[0] : null;
+    if (!value) {
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
         domain,
         currencyTicker,
       });
     }
-    return addr;
-  }
 
-  /**
-   * @internal
-   * @param resolver - Resolver address
-   * @param tokenId - namehash of a domain name
-   */
-  private async fetchAddress(
-    resolver: string,
-    tokenId: nodeHash,
-    coinName: string,
-  ): Promise<string> {
-    const resolverContract = this.buildContract(resolverInterface, resolver);
-    const addrKey = `crypto.${coinName.toUpperCase()}.address`;
-    const addr: string = await this.getRecord(resolverContract, 'get', [
-      addrKey,
-      tokenId,
-    ]);
-    return addr;
+    return value;
   }
-
-  /** @internal */
-  protected async getResolver(tokenId: nodeHash): Promise<string> {
-    return await this.ignoreResolutionError(
-      ResolutionErrorCode.RecordNotFound,
-      this.callMethod(this.registryContract, 'resolverOf', [tokenId]),
-    );
-  };
 
   /** @internal */
   async owner(domain: string): Promise<string> {
     const tokenId = this.namehash(domain);
     try {
-      return await this.callMethod(this.registryContract, 'ownerOf', [tokenId]);
+      const [owner] = await this.contract.call('ownerOf', [tokenId]);
+      return owner || '';
     } catch (error) {
       if (error.reason === 'ERC721: owner query for nonexistent token') {
         return NullAddress;
@@ -134,11 +143,11 @@ export default class Cns extends EthereumNamingService {
   async ipfsHash(domain: string): Promise<string> {
     return await this.record(domain, 'ipfs.html.value');
   }
+
   /**
    * resolves an email address stored on domain
    * @param domain - domain name
    */
-
   async email(domain: string): Promise<string> {
     return await this.record(domain, 'whois.email.value');
   }
@@ -167,32 +176,43 @@ export default class Cns extends EthereumNamingService {
     return await this.record(domain, 'ipfs.redirect_domain.value');
   }
 
-  private async getTtl(
-    contract: Contract,
-    methodname: string,
-    params: string[],
-  ): Promise<string> {
-    return await this.callMethod(contract, methodname, params);
-  };
-
   /** @internal */
   async record(domain: string, key: string): Promise<string> {
     const tokenId = this.namehash(domain);
-    const resolver = await this.resolver(domain);
-    const resolverContract = this.buildContract(resolverInterface, resolver);
-    const record = await this.getRecord(resolverContract, 'get', [
-      key,
-      tokenId,
-    ]);
-    return this.ensureRecordPresence(domain, key, record);
+
+    const reader = await this.getReader();
+    const data = await reader.record(tokenId, key);
+    await this.verify(domain, data);
+
+    const { values } = data;
+    const value: string | null = values?.length ? values[0] : null;
+    return this.ensureRecordPresence(domain, key, value);
   }
 
-  /** This is done to make testwriting easy */
-  private async getRecord(
-    contract: Contract,
-    methodname: string,
-    params: any[],
-  ): Promise<any> {
-    return await this.callMethod(contract, methodname, params);
+  /** @internal */
+  protected async getResolver(tokenId: string): Promise<string> {
+    return await this.ignoreResolutionError(
+      ResolutionErrorCode.RecordNotFound,
+      this.callMethod(this.registryContract, 'resolverOf', [tokenId]),
+    );
+  }
+
+  /** @internal */
+  protected async verify(domain: string, data: Data) {
+    const { resolver } = data;
+    if (!isNullAddress(resolver)) {
+      return;
+    }
+
+    const owner = data.owner || await this.owner(domain);
+    if (isNullAddress(owner)) {
+      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+        domain,
+      });
+    }
+
+    throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
+      domain,
+    });
   }
 }

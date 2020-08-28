@@ -1,4 +1,4 @@
-import nodeFetch, {FetchError} from 'node-fetch';
+import { FetchError } from 'node-fetch';
 import BaseConnection from './BaseConnection';
 import { Provider, RequestArguments, ResolutionMethod } from './types';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
