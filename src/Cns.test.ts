@@ -231,7 +231,6 @@ describe('CNS', () => {
   describe('.Crypto ProxyReader', () => {
     beforeEach(async () => {
       resolution = new Resolution({ blockchain: { cns: { url: protocolLink() } } });
-      mockAsyncMethods(resolution.cns, { isDataReaderSupported: true });
       reader = await resolution.cns.getReader();
     });
 
@@ -294,7 +293,6 @@ describe('CNS', () => {
 
     it('should work without any configs', async () => {
       resolution = new Resolution();
-      mockAsyncMethods(resolution.cns, { isDataReaderSupported: true });
       reader = await resolution.cns.getReader();
       const eyes = mockAsyncMethods(reader, {
         get: {
@@ -518,7 +516,6 @@ describe('CNS', () => {
       const url = protocolLink();
       const provider = new FetchProvider(NamingServiceName.CNS, url);
       resolution = new Resolution({ blockchain: { cns: { url, provider } } });
-      mockAsyncMethods(resolution.cns, { isDataReaderSupported: true });
       jest.spyOn(provider as any, 'fetch').mockRejectedValue(new FetchError('error', 'error_type'));
 
       await expectResolutionErrorCode(
@@ -531,7 +528,6 @@ describe('CNS', () => {
       const url = protocolLink();
       const provider = new FetchProvider(NamingServiceName.CNS, url);
       resolution = new Resolution({ blockchain: { cns: { url, provider } } });
-      mockAsyncMethods(resolution.cns, { isDataReaderSupported: true });
       jest.spyOn(provider as any, 'fetch').mockRejectedValue(new Error('error_up'));
 
       await expect(resolution.record(CryptoDomainWithEmptyResolver, 'No.such.record'))

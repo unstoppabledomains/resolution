@@ -169,7 +169,6 @@ describe('Resolution', () => {
         cns: { url: protocolLink(), registry: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe' },
       },
     });
-    mockAsyncMethods(resolution.cns, { isDataReaderSupported: false });
     const reader = await resolution.cns.getReader();
     const eyes = mockAsyncMethods(reader, {
       record: {
@@ -190,7 +189,6 @@ describe('Resolution', () => {
         cns: { url: protocolLink(), registry: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe' },
       },
     });
-    mockAsyncMethods(resolution.cns, { isDataReaderSupported: false });
     const reader = await resolution.cns.getReader();
     const eyes = mockAsyncMethods(reader, {
       record: {

@@ -126,7 +126,7 @@ export default class Cns extends EthereumNamingService {
   async owner(domain: string): Promise<string> {
     const tokenId = this.namehash(domain);
     try {
-      const [owner] = await this.contract.call('ownerOf', [tokenId]) || [];
+      const [owner] = await this.contract.call('ownerOf', [tokenId]);
       return owner || '';
     } catch (error) {
       if (error.reason === 'ERC721: owner query for nonexistent token') {
@@ -189,6 +189,7 @@ export default class Cns extends EthereumNamingService {
     return this.ensureRecordPresence(domain, key, value);
   }
 
+  /** @internal */
   protected async getResolver(tokenId: string): Promise<string> {
     return await this.ignoreResolutionError(
       ResolutionErrorCode.RecordNotFound,

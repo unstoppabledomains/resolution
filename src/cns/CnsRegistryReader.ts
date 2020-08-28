@@ -21,14 +21,14 @@ export default class CnsRegistryReader implements ICnsReader {
   }
 
   async resolver(tokenId: string): Promise<Data> {
-    const [resolver] = await this.registryContract.call('resolverOf', [tokenId]) || [];
+    const [resolver] = await this.registryContract.call('resolverOf', [tokenId]);
     return { resolver };
   }
 
   protected async get(resolver: string, tokenId: string, key: string): Promise<Data> {
     const resolverContract = new Contract(resolverAbi, resolver, this.registryContract.provider);
 
-    const [value] = await resolverContract.call('get', [key, tokenId]) || [];
+    const [value] = await resolverContract.call('get', [key, tokenId]);
     return { resolver, values: [value] };
   }
 }
