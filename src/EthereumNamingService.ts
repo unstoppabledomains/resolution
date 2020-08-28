@@ -19,7 +19,6 @@ export abstract class EthereumNamingService extends NamingService {
   abstract registryAddress?: string;
   protected abstract getResolver(id: string): Promise<string>;
   protected registryContract: Contract;
-  /** @internal */
   static readonly NetworkIdMap: NetworkIdMap = {
     1: 'mainnet',
     3: 'ropsten',
@@ -49,13 +48,6 @@ export abstract class EthereumNamingService extends NamingService {
     return resolverAddress;
   }
 
-  /**
-   * Look up for network from url provided
-   * @param url - main api url for blockchain
-   * @returns Network such as:
-   *  - mainnet
-   *  - testnet
-   */
   private networkFromUrl(url: string | undefined): string | undefined {
     if (!url) {
       return undefined;
@@ -78,10 +70,6 @@ export abstract class EthereumNamingService extends NamingService {
     return source;
   }
 
-  /**
-   * Checks if the current network is supported
-   * @returns
-   */
   isSupportedNetwork(): boolean {
     return this.registryAddress != null;
   }

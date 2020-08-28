@@ -28,17 +28,14 @@ export default class Udapi extends NamingService {
     this.headers = { 'X-user-agent': CustomUserAgent };
   }
 
-  /** @internal */
   isSupportedDomain(domain: string): boolean {
     return !!this.findMethod(domain);
   }
 
-  /** @internal */
   isSupportedNetwork(): boolean {
     return true;
   }
 
-  /** @internal */
   namehash(domain: string): string {
     const method = this.findMethod(domain);
     if (!method) {
@@ -49,14 +46,6 @@ export default class Udapi extends NamingService {
     return method.namehash(domain);
   }
 
-  /**
-   * Resolves the domain via UD API mirror
-   * @param domain - domain name to be resolved
-   * @param currencyTicker - currencyTicker such as
-   *  - ZIL
-   *  - BTC
-   *  - ETH
-   */
   async address(domain: string, currencyTicker: string): Promise<string> {
     const data = await this.resolve(domain);
     if (isNullAddress(data.meta.owner)) {
@@ -74,11 +63,6 @@ export default class Udapi extends NamingService {
     return address;
   }
 
-  /**
-   * Owner of the domain
-   * @param domain - domain name
-   * @returns An owner address of the domain
-   */
   async owner(domain: string): Promise<string | null> {
     const { owner } = (await this.resolve(domain)).meta;
     if (!owner) return null;
@@ -163,11 +147,6 @@ export default class Udapi extends NamingService {
     return method;
   }
 
-  /**
-   * Looks up for an arbitrary key inside the records of certain domain
-   * @param domain - domain name
-   * @param key - key to look for
-   */
   async record(domain: string, key: string): Promise<string> {
     return await this.findMethodOrThrow(domain).record(domain, key);
   }

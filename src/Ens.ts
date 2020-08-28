@@ -35,10 +35,6 @@ export default class Ens extends EthereumNamingService {
     }
   }
 
-  /**
-   * Checks if the domain is in valid format
-   * @param domain - domain name to be checked
-   */
   isSupportedDomain(domain: string): boolean {
     return (
       domain === 'eth' ||
@@ -48,25 +44,14 @@ export default class Ens extends EthereumNamingService {
     );
   }
 
-  /**
-   * Checks if the current network is supported
-   */
   isSupportedNetwork(): boolean {
     return this.registryAddress != null;
   }
 
-  /** @internal */
   record(domain: string, key: string): Promise<string> {
     throw new Error('Method not implemented.');
   }
 
-  /**
-   * Reverse the ens address to a ens registered domain name
-   * @async
-   * @param address - address you wish to reverse
-   * @param currencyTicker - currency ticker like BTC, ETH, ZIL
-   * @returns Domain name attached to this address
-   */
   async reverse(
     address: string,
     currencyTicker: string,
@@ -106,11 +91,6 @@ export default class Ens extends EthereumNamingService {
     return addr;
   }
 
-  /**
-   * Owner of the domain
-   * @param domain - domain name
-   * @returns An owner address of the domain
-   */
   async owner(domain: string): Promise<string | null> {
     const nodeHash = this.namehash(domain);
     return (
@@ -121,12 +101,6 @@ export default class Ens extends EthereumNamingService {
     );
   }
 
-  /**
-   * Resolves the given domain
-   * @async
-   * @param domain - domain name to be resolved
-   * @returns A promise that resolves in an object
-   */
   async resolve(domain: string): Promise<ResolutionResponse | null> {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork()) {
       return null;
@@ -147,42 +121,23 @@ export default class Ens extends EthereumNamingService {
     return resolution;
   }
 
-  /**
-   * resolves an ipfsHash stored on domain
-   * @param domain - domain name
-   */
   async ipfsHash(domain: string): Promise<string> {
     const hash = await this.getContentHash(domain);
     return this.ensureRecordPresence(domain, 'IPFS hash', hash);
   }
 
-  /**
-   * resolves a httpUrl stored on domain
-   * @param domain - domain name
-   */
   async httpUrl(domain: string): Promise<string> {
     return await this.getTextRecord( domain, 'url');
   }
-  /**
-   * resolves an email stored on domain
-   * @param domain - domain name
-   */
+
   async email(domain: string): Promise<string> {
     return await this.getTextRecord( domain, 'email');
   }
 
-  /**
-   * resolves a gun db chat id stored on domain
-   * @param domain - domain name
-   */
   async chatId(domain: string): Promise<string> {
     return await this.getTextRecord(domain, 'gundb_username');
   }
 
-  /**
-   * resolves a gundb public key stored on domain
-   * @param domain - domain name
-   */
   async chatpk(domain: string): Promise<string> {
     return await this.getTextRecord(domain, 'gundb_public_key');
   }

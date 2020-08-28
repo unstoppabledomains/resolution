@@ -73,7 +73,6 @@ export default abstract class NamingService extends BaseConnection {
     }
   }
 
-  /* @internal */
   protected async ignoreResolutionError<T>(
     code: ResolutionErrorCode | undefined,
     promise: Promise<T>,
@@ -89,7 +88,6 @@ export default abstract class NamingService extends BaseConnection {
     }
   }
 
-  /* @internal */
   protected isResolutionError(error: any, code?: ResolutionErrorCode): boolean {
     return error instanceof ResolutionError && (!code || error.code === code);
   }

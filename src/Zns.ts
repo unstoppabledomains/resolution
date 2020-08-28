@@ -57,11 +57,6 @@ export default class Zns extends NamingService {
     }
   }
 
-  /**
-   * Resolves the domain name
-   * @param domain - domain name to be resolved
-   * @returns A promise that resolves in a detailed crypto Resolution
-   */
   async resolve(domain: string): Promise<ResolutionResponse | null> {
     const recordAddresses = await this.getRecordsAddresses(domain);
     if (!recordAddresses) return UnclaimedDomainResponse;
@@ -102,21 +97,11 @@ export default class Zns extends NamingService {
     return address;
   }
 
-  /**
-   * Owner of the domain
-   * @param domain - domain name
-   * @returns An owner address of the domain
-   */
   async owner(domain: string): Promise<string | null> {
     const data = await this.resolve(domain);
     return data ? data.meta.owner : null;
   }
 
-  /**
-   * Resolves a domain
-   * @param domain - domain name to be resolved
-   * @returns Everything what is stored on specified domain
-   */
   async resolution(domain: string): Promise<ZnsResolution> {
     return this.structureResolverRecords(await this.records(domain));
   }
@@ -141,28 +126,14 @@ export default class Zns extends NamingService {
     return await this.getRecordOrThrow(domain, 'gundb.public_key.value');
   }
 
-  /**
-   * Resolves a specific field from domain's record
-   * @param domain - domain name
-   * @param field - resolver record name to be queried
-   * @returns Record field associated with the domain
-   */
   async record(domain: string, field: string) {
     return await this.getRecordOrThrow(domain, field);
   }
 
-  /**
-   * Resolver Records
-   * @param domain - domain name to be resolved
-   * @returns ZNS resolver records in an plain key-value format
-   */
   async records(domain: string): Promise<Dictionary<string>> {
     return await this.getResolverRecords((await this.resolverAddress(domain))!);
   }
 
-  /**
-   * Checks if domain is supported by zns
-   */
   isSupportedDomain(domain: string): boolean {
     const tokens = domain.split('.');
     return (
@@ -172,9 +143,6 @@ export default class Zns extends NamingService {
     );
   }
 
-  /**
-   * Checks if zns is supported by current Resolution instance
-   */
   isSupportedNetwork(): boolean {
     return this.registryAddress != null;
   }

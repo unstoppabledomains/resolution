@@ -17,14 +17,12 @@ import Contract from './utils/contract';
 /** @internal */
 export default class Cns extends EthereumNamingService {
   readonly registryAddress?: string;
-  /** @internal */
   readonly ReaderMap: ReaderMap = {
     mainnet: '0x7ea9ee21077f84339eda9c80048ec6db678642b1',
     kovan: '0xcf4318918fd18aca9bdc11445c01fbada4b448e3', // for internal testing
   };
 
   readonly contract: Contract;
-  /** @internal */
   reader: ICnsReader;
 
   constructor(source: SourceDefinition = {}) {
@@ -36,7 +34,6 @@ export default class Cns extends EthereumNamingService {
     this.contract = this.buildContract(proxyReaderAbi, this.registryAddress);
   }
 
-  /** @internal */
   async getReader(): Promise<ICnsReader> {
     if (!this.reader) {
       this.reader = await this.isDataReaderSupported() ?
@@ -46,7 +43,6 @@ export default class Cns extends EthereumNamingService {
     return this.reader;
   }
 
-  /** @internal */
   protected async isDataReaderSupported(): Promise<boolean> {
     if (this.ReaderMap[this.network] === this.contract.address) {
       return true;
@@ -83,25 +79,10 @@ export default class Cns extends EthereumNamingService {
     return data.resolver || '';
   }
 
-  /**
-   * Resolves the given domain.
-   * @deprecated
-   * @param domain - domain name to be resolved
-   * @returns- Returns a promise that resolves in an object
-   */
   async resolve(_: string): Promise<ResolutionResponse> {
     throw new Error('This method is unsupported for CNS');
   }
 
-  /**
-   * Resolves domain to a specific cryptoAddress
-   * @param domain - domain name to be resolved
-   * @param currencyTicker currency ticker such as
-   *  - ZIL
-   *  - BTC
-   *  - ETH
-   * @returns - A promise that resolves in a string
-   */
   async address(domain: string, currencyTicker: string): Promise<string> {
     const tokenId = this.namehash(domain);
 
@@ -122,7 +103,6 @@ export default class Cns extends EthereumNamingService {
     return value;
   }
 
-  /** @internal */
   async owner(domain: string): Promise<string> {
     const tokenId = this.namehash(domain);
     try {
@@ -136,47 +116,26 @@ export default class Cns extends EthereumNamingService {
     }
   }
 
-  /**
-   * resolves an ipfsHash stored on domain
-   * @param domain - domain name
-   */
   async ipfsHash(domain: string): Promise<string> {
     return await this.record(domain, 'ipfs.html.value');
   }
 
-  /**
-   * resolves an email address stored on domain
-   * @param domain - domain name
-   */
   async email(domain: string): Promise<string> {
     return await this.record(domain, 'whois.email.value');
   }
 
-  /**
-   * resolves a gun db userId attached to the domain
-   * @param domain - domain name
-   */
   async chatId(domain: string): Promise<string> {
     return await this.record(domain, 'gundb.username.value');
   }
 
-  /**
-   * resolves a gun db public key attached to the domain
-   * @param domain - domain name
-   */
   async chatpk(domain: string): Promise<string> {
     return await this.record(domain, 'gundb.public_key.value');
   }
 
-  /**
-   * resolves an httpUrl stored on domain
-   * @param domain - domain name
-   */
   async httpUrl(domain: string): Promise<string> {
     return await this.record(domain, 'ipfs.redirect_domain.value');
   }
 
-  /** @internal */
   async record(domain: string, key: string): Promise<string> {
     const tokenId = this.namehash(domain);
 
@@ -189,7 +148,6 @@ export default class Cns extends EthereumNamingService {
     return this.ensureRecordPresence(domain, key, value);
   }
 
-  /** @internal */
   protected async getResolver(tokenId: string): Promise<string> {
     return await this.ignoreResolutionError(
       ResolutionErrorCode.RecordNotFound,
@@ -197,7 +155,6 @@ export default class Cns extends EthereumNamingService {
     );
   }
 
-  /** @internal */
   protected async verify(domain: string, data: Data) {
     const { resolver } = data;
     if (!isNullAddress(resolver)) {
