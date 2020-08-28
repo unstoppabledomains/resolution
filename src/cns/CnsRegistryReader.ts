@@ -1,25 +1,14 @@
 import ICnsReader, { Data } from './ICnsReader';
 import Contract from '../utils/contract';
-import { SourceDefinition, isNullAddress } from '../types';
-import { NamingServiceName } from '..';
-import FetchProvider from '../FetchProvider';
-import { default as registryAbi } from './contract/registry';
+import { isNullAddress } from '../types';
 import { default as resolverAbi } from './contract/resolver';
 
+/** @internal */
 export default class CnsRegistryReader implements ICnsReader {
-  readonly registryAddress?: string;
   readonly registryContract: Contract;
-  readonly source: SourceDefinition;
 
-  constructor(source: SourceDefinition = {}) {
-    this.source = source;
-    this.registryAddress = source.registry;
-    if (this.registryAddress) {
-      this.registryContract = new Contract(
-        registryAbi,
-        this.registryAddress,
-        source.provider || new FetchProvider(NamingServiceName.CNS, source.url!));
-    }
+  constructor(contract: Contract) {
+    this.registryContract = contract;
   }
 
   async record(tokenId: string, key: string): Promise<Data> {
@@ -37,10 +26,7 @@ export default class CnsRegistryReader implements ICnsReader {
   }
 
   protected async get(resolver: string, tokenId: string, key: string): Promise<Data> {
-    const resolverContract = new Contract(
-      resolverAbi,
-      resolver,
-      this.source.provider || new FetchProvider(NamingServiceName.CNS, this.source.url!));
+    const resolverContract = new Contract(resolverAbi, resolver, this.registryContract.provider);
 
     const [value] = await resolverContract.call('get', [key, tokenId]) || [];
     return { resolver, values: [value] };

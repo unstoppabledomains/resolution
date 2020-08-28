@@ -42,7 +42,7 @@ export default class Cns extends EthereumNamingService {
     if (!this.reader) {
       this.reader = await this.isDataReaderSupported() ?
         new CnsProxyReader(this.contract) :
-        new CnsRegistryReader(this.source);
+        new CnsRegistryReader(this.contract);
     }
     return this.reader;
   }
@@ -202,7 +202,7 @@ export default class Cns extends EthereumNamingService {
       return;
     }
 
-    const owner = await this.owner(domain);
+    const owner = data.owner || await this.owner(domain);
     if (isNullAddress(owner)) {
       throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
         domain,
