@@ -1,6 +1,5 @@
-import ResolutionError, { ResolutionErrorCode } from '../errors/resolutionError';
 import { Interface, JsonFragment } from '@ethersproject/abi';
-import { isNullAddress, Provider, RequestArguments } from '../types';
+import { Provider, RequestArguments } from '../types';
 
 /** @internal */
 export default class Contract {
@@ -20,28 +19,17 @@ export default class Contract {
     this.coder = new Interface(this.abi);
   }
 
-  async fetchMethod(method: string, args: string[]): Promise<any> {
-    const result = await this.call(method, args);
-    if (!result.length) {
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-        recordName: method,
-        domain: args[0],
-      });
-    }
-    return result[0];
-  }
-
   async call(method: string, args: (string | string[])[]): Promise<ReadonlyArray<any>> {
     const inputParam = this.coder.encodeFunctionData(method, args);
-    const response = await this.fetchData(inputParam) as string;
-    if (isNullAddress(response)) {
+    const response = await this.callEth(inputParam) as string;
+    if (!response || response === '0x') {
       return [];
     }
 
     return this.coder.decodeFunctionResult(method, response);
   }
 
-  private async fetchData(data: string): Promise<unknown> {
+  private async callEth(data: string): Promise<unknown> {
     const params = [
       {
         data,
