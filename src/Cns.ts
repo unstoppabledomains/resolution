@@ -23,21 +23,20 @@ export default class Cns extends EthereumNamingService {
     kovan: '0xcf4318918fd18aca9bdc11445c01fbada4b448e3', // for internal testing
   };
 
-  readonly source: SourceDefinition;
   readonly contract: Contract;
-
+  /** @internal */
   reader: ICnsReader;
 
   constructor(source: SourceDefinition = {}) {
     super(source, NamingServiceName.CNS);
-
+    source = this.normalizeSource(source);
     this.registryAddress = source.registry ?
       source.registry :
       this.ReaderMap[this.network];
-    this.source = { ...this.normalizeSource(source), registry: this.registryAddress };
     this.contract = this.buildContract(proxyReaderAbi, this.registryAddress);
   }
 
+  /** @internal */
   async getReader(): Promise<ICnsReader> {
     if (!this.reader) {
       this.reader = await this.isDataReaderSupported() ?
@@ -47,6 +46,7 @@ export default class Cns extends EthereumNamingService {
     return this.reader;
   }
 
+  /** @internal */
   protected async isDataReaderSupported(): Promise<boolean> {
     if (this.ReaderMap[this.network] === this.contract.address) {
       return true;
@@ -196,6 +196,7 @@ export default class Cns extends EthereumNamingService {
     );
   }
 
+  /** @internal */
   protected async verify(domain: string, data: Data) {
     const { resolver } = data;
     if (!isNullAddress(resolver)) {
