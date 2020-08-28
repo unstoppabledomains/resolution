@@ -58,7 +58,7 @@ Paste that in a macOS Terminal or Linux shell prompt.
  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
 ```
 
-2) Install concrette version of NVM
+2) Install concrete version of node.js
 
 ```bash
  nvm install 12.12.0
