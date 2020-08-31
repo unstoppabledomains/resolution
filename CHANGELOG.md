@@ -1,5 +1,7 @@
 ## Unreleased
 
+## 1.6.1
+
 * Used ProxyReader(0x7ea9ee21077f84339eda9c80048ec6db678642b1) instead of Registry contract by default
 
 ## 1.6.0
