@@ -1,6 +1,6 @@
 {
   "name": "@unstoppabledomains/resolution",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "Domain Resolution for blockchain domains",
   "main": "./build/index.js",
   "directories": {
@@ -16,23 +16,19 @@
     "release:major": "RELEASE=major yarn release:run",
     "release:run": "yarn build && yarn size && yarn publish --$RELEASE && yarn release:tag && yarn docs:deploy",
     "release:tag": "git push origin v$npm_package_version",
-
     "test": "jest",
     "test:live": "LIVE=1 yarn test",
     "test:live:win": "set LIVE=1&& yarn test",
     "start": "npm run build:live",
     "dev": "yarn build && ./build/cli/cli.js",
-
     "build": "rm -rf build && tsc -p . && chmod +x ./build/cli/cli.js",
     "build:symlink": "yarn build && ln -sf $PWD/build/cli/cli.js  /usr/local/bin/resolution",
     "build:live": "nodemon --watch 'src/**/*.ts' --exec yarn build",
-
     "docs": "yarn docs:clone && yarn docs:generate && yarn docs:readme",
     "docs:clone": "([ -d ./docs ] || git clone --branch gh-pages git@github.com:unstoppabledomains/resolution.git docs) && git -C ./docs pull",
     "docs:generate": "yarn run typedoc --out \"./docs/v$npm_package_version\"",
     "docs:readme": "./docs-readme.sh",
     "docs:deploy": "yarn docs && ./deploy-docs.sh",
-
     "format": "prettier --semi --write -l **/*.{js,json,ts}",
     "analyze": "webpack-cli",
     "size": "yarn run sizecheck -p ./package.json -l 500 -v"
