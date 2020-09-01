@@ -39,10 +39,12 @@ npm install -g @unstoppabledomains/resolution
 ---
 
 It should install binary named resolution in the default folder for your package manager. You can check it by running 
+
 ```
 resolution -V
 ```
-command. If everything is fine you will see the version installed. 
+command. If everything is fine you will see the version installed.
+
 ---
 Once you have installed the CLI you can go ahead and use it without any extra configuration. By default the cli is
 using https://main-rpc.linkpool.io service as a gateway to blockchain. If you want to change it to some other providers
