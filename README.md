@@ -1,8 +1,19 @@
+<<<<<<< HEAD
 [Current Version v1.5.1](https://unstoppabledomains.github.io/resolution//v1.5.1/)
 
 ## Older Versions
 
 * [v1.4.2](https://unstoppabledomains.github.io/resolution//v1.4.2/)
+=======
+[Current Version v1.6.1](https://unstoppabledomains.github.io/resolution//v1.6.1/)
+
+## Older Versions
+
+* [v1.6.0-beta.0](https://unstoppabledomains.github.io/resolution//v1.6.0-beta.0/)
+* [v1.6.0](https://unstoppabledomains.github.io/resolution//v1.6.0/)
+* [v1.5.2-beta.0](https://unstoppabledomains.github.io/resolution//v1.5.2-beta.0/)
+* [v1.5.2-beta-0.0](https://unstoppabledomains.github.io/resolution//v1.5.2-beta-0.0/)
+>>>>>>> 14b1b6e4e31f37d01b03530e46a002f2335df606
 * [v1.4.0](https://unstoppabledomains.github.io/resolution//v1.4.0/)
 * [v1.3.6](https://unstoppabledomains.github.io/resolution//v1.3.6/)
 * [v1.3.5](https://unstoppabledomains.github.io/resolution//v1.3.5/)

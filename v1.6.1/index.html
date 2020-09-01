@@ -1,0 +1,388 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>@unstoppabledomains/resolution</title>
+	<meta name="description" content="Documentation for @unstoppabledomains/resolution">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.json" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">@unstoppabledomains/resolution</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1>@unstoppabledomains/resolution</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<a href="#resolution" id="resolution" style="color: inherit; text-decoration: none;">
+					<h1>Resolution</h1>
+				</a>
+				<p><a href="https://www.npmjs.com/package/@unstoppabledomains/resolution"><img src="https://img.shields.io/npm/v/@unstoppabledomains/resolution.svg?style=flat" alt="NPM version"></a>
+					<a href="https://circleci.com/gh/unstoppabledomains/resolution"><img src="https://circleci.com/gh/unstoppabledomains/resolution.svg?style=shield" alt="CircleCI"></a>
+					<a href="https://bundlephobia.com/result?p=@unstoppabledomains/resolution"><img src="https://img.shields.io/bundlephobia/min/@unstoppabledomains/resolution.svg" alt="Bundle Size Minified"></a>
+				<a href="https://bundlephobia.com/result?p=@unstoppabledomains/resolution"><img src="https://img.shields.io/bundlephobia/minzip/@unstoppabledomains/resolution.svg" alt="Bundle Size Minified Zipped"></a></p>
+				<p>A library for interacting with blockchain domain names.</p>
+				<p>Supported domain zones:</p>
+				<ul>
+					<li>.crypto </li>
+					<li>.zil</li>
+					<li>.eth</li>
+					<li>.kred</li>
+					<li>.xyz</li>
+					<li>.luxe</li>
+				</ul>
+				<p><a href="https://unstoppabledomains.github.io/resolution/">API Referrence</a>
+				<a href="https://docs.unstoppabledomains.com/#tag/npm_library">Documentation</a></p>
+				<p>You can use Resolution in a <code>&lt;script&gt;</code> tag from a
+				<a href="https://unpkg.com/browse/@unstoppabledomains/resolution/build/index.js">CDN</a>, or as the <code>Resolution</code></p>
+				<a href="#cli" id="cli" style="color: inherit; text-decoration: none;">
+					<h1>CLI</h1>
+				</a>
+				<p>Once you have cloned the repo use yarn build to install all of the dependacies and cli tool. It will create a symlink into /usr/local/bin/resolution and set up the permissions to run the file as executable. </p>
+				<p>Before you have started to use the CLI please configure it with -C flag.  In order to use the ens or cns resolution you will need to provide either an INFURA project ID or a custom node url via -C.</p>
+				<pre><code>resolution -C <span class="hljs-attr">infura:</span><span class="hljs-number">12312313.</span>...
+or 
+resolution -C <span class="hljs-attr">url:</span><span class="hljs-attr">https:</span><span class="hljs-comment">//...</span></code></pre><p>You can find all of the options for resolution cli within -h, --help flag. </p>
+				<p>Example:</p>
+				<pre><code><span class="hljs-built_in">resolution</span> -mc eth,btc,DODGE,<span class="hljs-literal">unknown</span> -d brad.zil</code></pre>
+				<a href="#note" id="note" style="color: inherit; text-decoration: none;">
+					<h2>Note</h2>
+				</a>
+				<p>When resolution hits an error it returns the error code instead of throwing. So if you see something like RECORD_NOT_FOUND you know exactly that record was not found for this query.</p>
+				<a href="#contributor-guide" id="contributor-guide" style="color: inherit; text-decoration: none;">
+					<h1>Contributor guide</h1>
+				</a>
+				<a href="#paste-that-in-a-macos-terminal-or-linux-shell-prompt" id="paste-that-in-a-macos-terminal-or-linux-shell-prompt" style="color: inherit; text-decoration: none;">
+					<h2>Paste that in a macOS Terminal or Linux shell prompt.</h2>
+				</a>
+				<p>1) Install NVM</p>
+				<pre><code class="language-bash"> curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash</code></pre>
+				<p>2) Install concrete version of node.js</p>
+				<pre><code class="language-bash"> nvm install 12.12.0</code></pre>
+				<p>3) Install <code>yarn</code></p>
+				<pre><code class="language-bash"> npm install -g yarn</code></pre>
+				<p>4) Download dependencies </p>
+				<pre><code class="language-bash">yarn install</code></pre>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-enum">
+						<a href="enums/configurationerrorcode.html" class="tsd-kind-icon">Configuration<wbr>Error<wbr>Code</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/namingservicename.html" class="tsd-kind-icon">Naming<wbr>Service<wbr>Name</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/resolutionerrorcode.html" class="tsd-kind-icon">Resolution<wbr>Error<wbr>Code</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/configurationerror.html" class="tsd-kind-icon">Configuration<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/resolution.html" class="tsd-kind-icon">Resolution</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/resolutionerror.html" class="tsd-kind-icon">Resolution<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ethersprovider.html" class="tsd-kind-icon">Ethers<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/jsonrpcpayload.html" class="tsd-kind-icon">Json<wbr>Rpc<wbr>Payload</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/jsonrpcresponse.html" class="tsd-kind-icon">Json<wbr>Rpc<wbr>Response</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/provider.html" class="tsd-kind-icon">Provider</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/requestarguments.html" class="tsd-kind-icon">Request<wbr>Arguments</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/sourcedefinition.html" class="tsd-kind-icon">Source<wbr>Definition</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/web3version0provider.html" class="tsd-kind-icon">Web3<wbr>Version0<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/web3version1provider.html" class="tsd-kind-icon">Web3<wbr>Version1<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#api" class="tsd-kind-icon">API</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#bip44constants" class="tsd-kind-icon">Bip44<wbr>Constants</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#blockchain" class="tsd-kind-icon">Blockchain</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#configurationerrorhandler" class="tsd-kind-icon">Configuration<wbr>Error<wbr>Handler</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#configurationerroroptions" class="tsd-kind-icon">Configuration<wbr>Error<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter">
+						<a href="globals.html#dictionary" class="tsd-kind-icon">Dictionary</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#namingservicesource" class="tsd-kind-icon">Naming<wbr>Service<wbr>Source</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#providermethod" class="tsd-kind-icon">Provider<wbr>Method</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#providerparams" class="tsd-kind-icon">Provider<wbr>Params</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#resolutionerrorhandler" class="tsd-kind-icon">Resolution<wbr>Error<wbr>Handler</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#resolutionerroroptions" class="tsd-kind-icon">Resolution<wbr>Error<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#resolutionmethod" class="tsd-kind-icon">Resolution<wbr>Method</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#resolutionresponse" class="tsd-kind-icon">Resolution<wbr>Response</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#transactionrequest" class="tsd-kind-icon">Transaction<wbr>Request</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#znsresolution" class="tsd-kind-icon">Zns<wbr>Resolution</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#nodehash" class="tsd-kind-icon">node<wbr>Hash</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#owner" class="tsd-kind-icon">owner</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#ttl" class="tsd-kind-icon">ttl</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#charset" class="tsd-kind-icon">CHARSET</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#defaultsource" class="tsd-kind-icon">Default<wbr>Source</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#ethcoinindex" class="tsd-kind-icon">Eth<wbr>Coin<wbr>Index</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#generator" class="tsd-kind-icon">GENERATOR</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#hrp" class="tsd-kind-icon">HRP</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#nulladdress" class="tsd-kind-icon">Null<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#oldresolveraddresses" class="tsd-kind-icon">Old<wbr>Resolver<wbr>Addresses</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#udapidefaulturl" class="tsd-kind-icon">UDApi<wbr>Default<wbr>Url</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#unclaimed_domain_response" class="tsd-kind-icon">UNCLAIMED_<wbr>DOMAIN_<wbr>RESPONSE</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#configobject" class="tsd-kind-icon">config<wbr>Object</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#thrp" class="tsd-kind-icon">tHRP</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#urlnetworkmap" class="tsd-kind-icon">Url<wbr>Network<wbr>Map</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#buildresolutionpackage" class="tsd-kind-icon">build<wbr>Resolution<wbr>Package</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#commaseparatedlist" class="tsd-kind-icon">comma<wbr>Separated<wbr>List</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#convertbits" class="tsd-kind-icon">convert<wbr>Bits</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#createchecksum" class="tsd-kind-icon">create<wbr>Checksum</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#decode" class="tsd-kind-icon">decode</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#encode" class="tsd-kind-icon">encode</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#frombech32address" class="tsd-kind-icon">from<wbr>Bech32<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#fromethersprovider" class="tsd-kind-icon">from<wbr>Ethers<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#fromweb3version0provider" class="tsd-kind-icon">from<wbr>Web3<wbr>Version0<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#fromweb3version1provider" class="tsd-kind-icon">from<wbr>Web3<wbr>Version1<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getconfig" class="tsd-kind-icon">get<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getetheriumurl" class="tsd-kind-icon">get<wbr>Etherium<wbr>Url</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#hrpexpand" class="tsd-kind-icon">hrp<wbr>Expand</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#invert" class="tsd-kind-icon">invert</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#isaddress" class="tsd-kind-icon">is<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#isnulladdress" class="tsd-kind-icon">is<wbr>Null<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#parseconfig" class="tsd-kind-icon">parse<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#polymod" class="tsd-kind-icon">polymod</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#set" class="tsd-kind-icon">set</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#signedinfuralink" class="tsd-kind-icon">signed<wbr>Infura<wbr>Link</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#storeconfig" class="tsd-kind-icon">store<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#tobech32address" class="tsd-kind-icon">to<wbr>Bech32<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#tochecksumaddress" class="tsd-kind-icon">to<wbr>Checksum<wbr>Address</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#tryinfo" class="tsd-kind-icon">try<wbr>Info</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#verifychecksum" class="tsd-kind-icon">verify<wbr>Checksum</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter">
+						<a href="globals.html#wraparray" class="tsd-kind-icon">wrap<wbr>Array</a>
+					</li>
+					<li class=" tsd-kind-object-literal">
+						<a href="globals.html#defaultapi" class="tsd-kind-icon">DefaultAPI</a>
+					</li>
+					<li class=" tsd-kind-object-literal">
+						<a href="globals.html#eip1993factories" class="tsd-kind-icon">Eip1993<wbr>Factories</a>
+					</li>
+					<li class=" tsd-kind-object-literal">
+						<a href="globals.html#networkidmap" class="tsd-kind-icon">Network<wbr>IdMap</a>
+					</li>
+					<li class=" tsd-kind-object-literal">
+						<a href="globals.html#registrymap" class="tsd-kind-icon">Registry<wbr>Map</a>
+					</li>
+					<li class=" tsd-kind-object-literal">
+						<a href="globals.html#unclaimeddomainresponse" class="tsd-kind-icon">Unclaimed<wbr>Domain<wbr>Response</a>
+					</li>
+					<li class=" tsd-kind-object-literal">
+						<a href="globals.html#urlmap" class="tsd-kind-icon">Url<wbr>Map</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
