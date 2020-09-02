@@ -24,10 +24,8 @@ Supported domain zones:
 You can use Resolution in a `<script>` tag from a
 [CDN](https://unpkg.com/browse/@unstoppabledomains/resolution/build/index.js), or as the `Resolution`
 
-# CLI
-
-
-You can install CLI by installing this package as a global. 
+# Installation
+Use the `npm` or `yarn` to install resolution.
 
 ```
 yarn global add @unstoppabledomains/resolution
@@ -36,16 +34,13 @@ yarn global add @unstoppabledomains/resolution
 ```
 npm install -g @unstoppabledomains/resolution
 ```
----
 
-It should install binary named resolution in the default folder for your package manager. You can check it by running 
+It should install binary named resolution in the default folder for your package manager. You can check it by running command `resolution -V` in command line. If everything is fine you will see the version installed.
 
-```
-resolution -V
-```
-command. If everything is fine you will see the version installed.
+# Usage
 
----
+## CLI
+
 Once you have installed the CLI you can go ahead and use it without any extra configuration. By default the cli is
 using https://main-rpc.linkpool.io service as a gateway to blockchain. If you want to change it to some other providers
 including your own you can do so by utilizing resolution -C flag.
@@ -68,31 +63,31 @@ resolution -mc eth,btc,DODGE,unknown -d brad.zil
 
 When resolution hits an error it returns the error code instead of throwing. So if you see something like RECORD_NOT_FOUND you know exactly that record was not found for this query.
 
-# Contributor guide
+## Development
 
-Paste that in a macOS Terminal or Linux shell prompt.
---
+Use next commands for setting up development environment. (**macOS Terminal** or **Linux shell**).
 
-1) Install NVM
+1. Install NVM
+    ```bash
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+    ```
 
-```bash
- curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
-```
+2. Install concrete version of node.js
+    ```bash
+    nvm install 12.12.0
+    ```
 
-2) Install concrete version of node.js
+3. Install ```yarn```
+    ```bash
+    npm install -g yarn
+    ```
+4. Clone repo
+    ```
+    git clone https://github.com/unstoppabledomains/resolution.git
+    cd resolution
+    ```
 
-```bash
- nvm install 12.12.0
-```
-
-3) Install ```yarn```
-
-```bash
- npm install -g yarn
-```
-
-4) Download dependencies 
-
-```bash
-yarn install
-```
+5. Install dependencies 
+    ```bash
+    yarn install
+    ```
