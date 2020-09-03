@@ -17,13 +17,6 @@ Supported domain zones:
 - .xyz
 - .luxe
 
-
-[API Referrence](https://unstoppabledomains.github.io/resolution/)
-[Documentation](https://docs.unstoppabledomains.com/#tag/npm_library)
-
-You can use Resolution in a `<script>` tag from a
-[CDN](https://unpkg.com/browse/@unstoppabledomains/resolution/build/index.js), or as the `Resolution`
-
 # Installation
 Use the `npm` or `yarn` to install resolution.
 
@@ -110,3 +103,8 @@ Use next commands for setting up development environment. (**macOS Terminal** or
     ```bash
     yarn install
     ```
+
+# References
+
+1. [API Referrence](https://unstoppabledomains.github.io/resolution/)
+2. [Documentation](https://docs.unstoppabledomains.com/)
