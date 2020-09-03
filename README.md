@@ -59,6 +59,25 @@ Example:
 resolution -mc eth,btc,DODGE,unknown -d brad.zil
 ```
 
+### JavaScript/NodeJs
+
+Install dependency
+```
+npm install @unstoppabledomains/resolution
+```
+
+Example:
+```
+const { Resolution } = require('@unstoppabledomains/resolution');
+
+const resolution = new Resolution();
+resolution.address('resolver.eth', "ETH")
+    .then(console.log)
+    .catch(console.error);
+```
+
+For more information take a look [documentation](https://docs.unstoppabledomains.com/#tag/resolution_library)
+
 ## Note
 
 When resolution hits an error it returns the error code instead of throwing. So if you see something like RECORD_NOT_FOUND you know exactly that record was not found for this query.
