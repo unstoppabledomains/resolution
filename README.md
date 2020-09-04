@@ -56,7 +56,7 @@ resolution -mc eth,btc,DODGE,unknown -d brad.zil
 
 Install dependency
 ```
-npm install @unstoppabledomains/resolution
+npm install @unstoppabledomains/resolution --save
 ```
 
 Example:
@@ -64,7 +64,7 @@ Example:
 const { Resolution } = require('@unstoppabledomains/resolution');
 
 const resolution = new Resolution();
-resolution.address('resolver.eth', "ETH")
+resolution.address('resolver.crypto', "ETH")
     .then(console.log)
     .catch(console.error);
 ```
