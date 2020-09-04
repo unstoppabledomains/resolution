@@ -10,12 +10,15 @@ A library for interacting with blockchain domain names.
 
 Supported domain zones:
 
-- .crypto 
-- .zil
-- .eth
-- .kred
-- .xyz
-- .luxe
+* CNS
+  - .crypto 
+* ZNS
+  - .zil
+* ENS
+  - .eth
+  - .kred
+  - .xyz
+  - .luxe
 
 [API Referrence](https://unstoppabledomains.github.io/resolution/)
 
