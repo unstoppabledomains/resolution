@@ -19,7 +19,6 @@ Supported domain zones:
 
 
 [API Referrence](https://unstoppabledomains.github.io/resolution/)
-[Documentation](https://docs.unstoppabledomains.com/#tag/npm_library)
 
 You can use Resolution in a `<script>` tag from a
 [CDN](https://unpkg.com/browse/@unstoppabledomains/resolution/build/index.js), or as the `Resolution`
