@@ -65,7 +65,7 @@ export default [
   {
     constant: true,
     inputs: [],
-    name: name,
+    name: 'name',
     outputs: [
       {
         internalType: 'string',

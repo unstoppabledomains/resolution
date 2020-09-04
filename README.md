@@ -25,13 +25,34 @@ You can use Resolution in a `<script>` tag from a
 
 # CLI
 
-Once you have cloned the repo use yarn build to install all of the dependacies and cli tool. It will create a symlink into /usr/local/bin/resolution and set up the permissions to run the file as executable. 
 
-Before you have started to use the CLI please configure it with -C flag.  In order to use the ens or cns resolution you will need to provide either an INFURA project ID or a custom node url via -C.
+You can install CLI by installing this package as a global. 
 
 ```
-resolution -C infura:12312313....
-or 
+yarn global add @unstoppabledomains/resolution
+```
+
+```
+npm install -g @unstoppabledomains/resolution
+```
+---
+
+It should install binary named resolution in the default folder for your package manager. You can check it by running 
+
+```
+resolution -V
+```
+command. If everything is fine you will see the version installed.
+
+---
+Once you have installed the CLI you can go ahead and use it without any extra configuration. By default the cli is
+using https://main-rpc.linkpool.io service as a gateway to blockchain. If you want to change it to some other providers
+including your own you can do so by utilizing resolution -C flag.
+
+As an argument to -C type the following structure url:< https://.... >
+
+Example of usage
+```
 resolution -C url:https://...
 ```
 
