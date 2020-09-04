@@ -17,6 +17,8 @@ Supported domain zones:
 - .xyz
 - .luxe
 
+[API Referrence](https://unstoppabledomains.github.io/resolution/)
+
 # Installation
 Use the `npm` or `yarn` to install resolution.
 
@@ -69,8 +71,6 @@ resolution.address('resolver.crypto', "ETH")
     .catch(console.error);
 ```
 
-For more information take a look [documentation](https://docs.unstoppabledomains.com/#tag/resolution_library)
-
 ## Note
 
 When resolution hits an error it returns the error code instead of throwing. So if you see something like RECORD_NOT_FOUND you know exactly that record was not found for this query.
@@ -103,8 +103,3 @@ Use next commands for setting up development environment. (**macOS Terminal** or
     ```bash
     yarn install
     ```
-
-# References
-
-1. [API Referrence](https://unstoppabledomains.github.io/resolution/)
-2. [Documentation](https://docs.unstoppabledomains.com/)
