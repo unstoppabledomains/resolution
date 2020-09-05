@@ -15,10 +15,6 @@ beforeEach(() => {
   resolution = new Resolution();
 });
 
-afterEach(() => {
-  jest.clearAllMocks();
-});
-
 describe('ZNS', () => {
   describe('.NormalizeSource', () => {
     it('checks normalizeSource zns (boolean)', async () => {
