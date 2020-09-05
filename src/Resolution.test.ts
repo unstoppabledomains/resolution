@@ -29,8 +29,7 @@ try {
 
 beforeEach(() => {
   nock.cleanAll();
-  // jest.restoreAllMocks();
-  jest.clearAllMocks();
+  jest.restoreAllMocks();
 });
 
 describe('Resolution', () => {
