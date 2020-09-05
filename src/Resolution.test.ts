@@ -29,7 +29,6 @@ try {
 }
 
 beforeEach(() => {
-  nock.restore()
   nock.cleanAll();
   jest.restoreAllMocks();
 });
@@ -51,6 +50,7 @@ describe('Resolution', () => {
       console.log("RESULT ===>", res);
     } catch (err) {
       console.log("ERROR ===>", err);
+      throw err;
     }
     // await expectResolutionErrorCode(
     //   async () => {
@@ -62,7 +62,10 @@ describe('Resolution', () => {
   });
 
   it('checks Resolution#addressOrThrow error #2', async () => {
-    const resolution = new Resolution();
+    // const resolution = new Resolution();
+    const resolution = new Resolution({
+      blockchain: { zns: { url: 'https://api.zilliqa.com' } },
+    });
     await expectResolutionErrorCode(
       resolution.addressOrThrow('brad.zil', 'INVALID_CURRENCY_SYMBOL'),
       ResolutionErrorCode.UnspecifiedCurrency,
