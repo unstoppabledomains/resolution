@@ -42,10 +42,14 @@ describe('Resolution', () => {
     expect(resolution.cns!.url).toBe(`https://mainnet.infura.com/v3/api-key`);
   });
 
-  it('checks Resolution#addressOrThrow error #1', async () => {
+  it.only('checks Resolution#addressOrThrow error #1', async () => {
     const resolution = new Resolution();
-    const res = await resolution.address('sdncdoncvdinvcsdncs.zil', 'ZIL');
-    console.log("RESULT ===>", res);
+    try {
+      const res = await resolution.addressOrThrow('sdncdoncvdinvcsdncs.zil', 'ZIL');
+      console.log("RESULT ===>", res);
+    } catch (err) {
+      console.log("ERROR ===>", err);
+    }
     // await expectResolutionErrorCode(
     //   async () => {
     //     const res = await resolution.addressOrThrow('sdncdoncvdinvcsdncs.zil', 'ZIL');
