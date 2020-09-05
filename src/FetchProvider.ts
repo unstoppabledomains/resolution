@@ -16,7 +16,7 @@ export default class FetchProvider extends BaseConnection implements Provider {
 
   async request(args: RequestArguments): Promise<unknown> {
     try {
-      const options = {
+      const response = await this.fetch(this.url, {
         method: 'POST',
         body: JSON.stringify({
           jsonrpc: '2.0',
@@ -27,14 +27,10 @@ export default class FetchProvider extends BaseConnection implements Provider {
         headers: {
           'Content-Type': 'application/json',
         },
-      };
-      console.log(this.url, options)
-      const response = await this.fetch(this.url, options);
+      });
       const json = await response.json();
       return json.result;
     } catch (error) {
-      console.log(">>HERE -------------", this.url)
-      console.log(JSON.stringify(error))
       if (error instanceof FetchError) {
         throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
           method: this.name,

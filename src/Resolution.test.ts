@@ -1,5 +1,4 @@
 import nock from 'nock';
-
 import Resolution, { ResolutionErrorCode } from './index';
 import {
   UnclaimedDomainResponse,
@@ -45,17 +44,10 @@ describe('Resolution', () => {
 
   it('checks Resolution#addressOrThrow error #1', async () => {
     const resolution = new Resolution();
-    try {
-      const res = await resolution.addressOrThrow('sdncdoncvdinvcsdncs.zil', 'ZIL');
-      console.log("RESULT ===>", res);
-    } catch (err) {
-      console.log("ERROR ===>", err);
-      throw err;
-    }
-    // await expectResolutionErrorCode(
-    //   resolution.addressOrThrow('sdncdoncvdinvcsdncs.zil', 'ZIL'),
-    //   ResolutionErrorCode.UnregisteredDomain,
-    // );
+    await expectResolutionErrorCode(
+      resolution.addressOrThrow('sdncdoncvdinvcsdncs.zil', 'ZIL'),
+      ResolutionErrorCode.UnregisteredDomain,
+    );
   });
 
   it('checks Resolution#addressOrThrow error #2', async () => {
