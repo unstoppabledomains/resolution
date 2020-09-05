@@ -29,7 +29,8 @@ try {
 }
 
 beforeEach(() => {
-  // nock.cleanAll();
+  nock.restore()
+  nock.cleanAll();
   jest.restoreAllMocks();
 });
 
@@ -43,7 +44,7 @@ describe('Resolution', () => {
     expect(resolution.cns!.url).toBe(`https://mainnet.infura.com/v3/api-key`);
   });
 
-  it.only('checks Resolution#addressOrThrow error #1', async () => {
+  it('checks Resolution#addressOrThrow error #1', async () => {
     const resolution = new Resolution();
     try {
       const res = await resolution.addressOrThrow('sdncdoncvdinvcsdncs.zil', 'ZIL');
