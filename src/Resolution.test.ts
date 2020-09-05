@@ -43,6 +43,7 @@ describe('Resolution', () => {
   });
 
   it('checks Resolution#addressOrThrow error #1', async () => {
+    jest.clearAllMocks();
     const resolution = new Resolution();
     await expectResolutionErrorCode(
       resolution.addressOrThrow('sdncdoncvdinvcsdncs.zil', 'ZIL'),
