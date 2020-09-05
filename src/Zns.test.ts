@@ -144,7 +144,7 @@ describe('ZNS', () => {
   });
 
   describe('.Resolve', () => {
-    it('resolves .zil name using blockchain', async () => {
+    it.skip('resolves .zil name using blockchain', async () => {
       mockAPICalls('zil_using_blockchain', ZilliqaUrl);
       const result = await resolution.resolve('cofounding.zil');
       expect(result).toBeDefined();
