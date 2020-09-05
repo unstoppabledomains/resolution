@@ -45,7 +45,10 @@ describe('Resolution', () => {
   it('checks Resolution#addressOrThrow error #1', async () => {
     const resolution = new Resolution();
     await expectResolutionErrorCode(
-      resolution.addressOrThrow('sdncdoncvdinvcsdncs.zil', 'ZIL'),
+      async () => {
+        const res = await resolution.addressOrThrow('sdncdoncvdinvcsdncs.zil', 'ZIL');
+        console.log("RESULT ===>", res);
+      },
       ResolutionErrorCode.UnregisteredDomain,
     );
   });

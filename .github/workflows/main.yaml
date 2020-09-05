@@ -10,11 +10,12 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: ${{ matrix.os }}
 
     strategy:
       matrix:
-        node: [ '10', '12' ]
+        os: [macos-latest, windows-latest, ubuntu-latest]
+        node: [10, 12]
 
     name: Node ${{ matrix.node }}
 
