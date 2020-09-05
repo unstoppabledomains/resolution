@@ -26,7 +26,6 @@ export default class FetchProvider extends BaseConnection implements Provider {
         }),
         headers: {
           'Content-Type': 'application/json',
-          'Connection': 'keep-alive',
         },
       };
       console.log(this.url, options)
