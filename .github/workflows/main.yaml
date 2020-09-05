@@ -29,4 +29,4 @@ jobs:
 
       - run: yarn install
 
-      - run: yarn test ./src/Zns.test.ts  ./src/Resolution.test.ts
+      - run: yarn test -i ./src/Zns.test.ts  ./src/Resolution.test.ts
