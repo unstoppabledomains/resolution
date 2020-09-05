@@ -1,5 +1,4 @@
 import nock from 'nock';
-import nodeFetch from 'node-fetch';
 
 import Resolution, { ResolutionErrorCode } from './index';
 import {
@@ -30,7 +29,7 @@ try {
 }
 
 beforeEach(() => {
-  nock.cleanAll();
+  // nock.cleanAll();
   jest.restoreAllMocks();
 });
 
@@ -131,7 +130,7 @@ describe('Resolution', () => {
     expect(email).toBe('matt+test@unstoppabledomains.com');
   });
 
-  it('checks error for  email on brad.zil', async () => {
+  it('checks error for email on brad.zil', async () => {
     const resolution = new Resolution();
     await expectResolutionErrorCode(
       resolution.email('brad.zil'),
