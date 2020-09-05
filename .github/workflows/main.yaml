@@ -17,7 +17,7 @@ jobs:
         os: [macos-latest, windows-latest, ubuntu-latest]
         node: [10, 12]
 
-    name: Node ${{ matrix.node }}
+    name: ${{ matrix.os }} - Node ${{ matrix.node }}
 
     steps:
       - uses: actions/checkout@v2
