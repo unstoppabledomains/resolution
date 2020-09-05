@@ -53,19 +53,13 @@ describe('Resolution', () => {
       throw err;
     }
     // await expectResolutionErrorCode(
-    //   async () => {
-    //     const res = await resolution.addressOrThrow('sdncdoncvdinvcsdncs.zil', 'ZIL');
-    //     console.log("RESULT ===>", res);
-    //   },
+    //   resolution.addressOrThrow('sdncdoncvdinvcsdncs.zil', 'ZIL'),
     //   ResolutionErrorCode.UnregisteredDomain,
     // );
   });
 
   it('checks Resolution#addressOrThrow error #2', async () => {
-    // const resolution = new Resolution();
-    const resolution = new Resolution({
-      blockchain: { zns: { url: 'https://api.zilliqa.com' } },
-    });
+    const resolution = new Resolution();
     await expectResolutionErrorCode(
       resolution.addressOrThrow('brad.zil', 'INVALID_CURRENCY_SYMBOL'),
       ResolutionErrorCode.UnspecifiedCurrency,
