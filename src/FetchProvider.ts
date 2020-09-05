@@ -16,7 +16,7 @@ export default class FetchProvider extends BaseConnection implements Provider {
 
   async request(args: RequestArguments): Promise<unknown> {
     try {
-      const response = await this.fetch(this.url, {
+      const options = {
         method: 'POST',
         body: JSON.stringify({
           jsonrpc: '2.0',
@@ -27,7 +27,9 @@ export default class FetchProvider extends BaseConnection implements Provider {
         headers: {
           'Content-Type': 'application/json',
         },
-      });
+      };
+      console.log(this.url, options)
+      const response = await this.fetch(this.url, options);
       const json = await response.json();
       return json.result;
     } catch (error) {

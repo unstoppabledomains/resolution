@@ -45,10 +45,6 @@ describe('Resolution', () => {
   });
 
   it.only('checks Resolution#addressOrThrow error #1', async () => {
-    const response = await nodeFetch('https://api.github.com/users/github');
-    const json = await response.json();
-    console.log(json);
-
     const resolution = new Resolution();
     try {
       const res = await resolution.addressOrThrow('sdncdoncvdinvcsdncs.zil', 'ZIL');
