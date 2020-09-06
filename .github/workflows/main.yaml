@@ -35,3 +35,21 @@ jobs:
       - name: Coverage => (${{ matrix.os }} - Node ${{ matrix.node }})
         if: ${{ matrix.os == 'ubuntu-latest' && matrix.node == 12 }}
         run: yarn test --coverage
+
+  size:
+    runs-on: ubuntu-latest
+
+    name: Size check (<500kb)
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+
+      - name: Install Dependencies
+        run: yarn install
+
+      - run: yarn size
