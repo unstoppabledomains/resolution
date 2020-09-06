@@ -27,6 +27,11 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - run: yarn install
+      - name: Install Dependencies
+        run: yarn install
 
       - run: yarn test
+
+      - name: Coverage
+        if: ${{ matrix.os == 'ubuntu-latest' && matrix.node == 12 }}
+        run: yarn test --coverage

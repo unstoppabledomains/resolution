@@ -12,3 +12,4 @@ stats.json
 dist/
 package-lock.json
 .resolution
+coverage
