@@ -39,7 +39,7 @@ jobs:
   size:
     runs-on: ubuntu-latest
 
-    name: Size check (<500kb)
+    name: size check (<= 500 KB)
 
     steps:
       - uses: actions/checkout@v2
