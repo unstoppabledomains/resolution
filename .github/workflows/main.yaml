@@ -32,6 +32,6 @@ jobs:
 
       - run: yarn test
 
-      - name: Coverage
+      - name: Coverage => (${{ matrix.os }} - Node ${{ matrix.node }})
         if: ${{ matrix.os == 'ubuntu-latest' && matrix.node == 12 }}
         run: yarn test --coverage
