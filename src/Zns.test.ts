@@ -2,8 +2,6 @@ import Resolution, { ResolutionErrorCode } from './index';
 import {
   mockAsyncMethod,
   expectSpyToBeCalled,
-  ZilliqaUrl,
-  mockAPICalls,
   expectResolutionErrorCode,
   mockAsyncMethods,
 } from './tests/helpers';
@@ -33,7 +31,9 @@ describe('ZNS', () => {
     });
 
     it('checks normalizeSource zns unknown url', async () => {
-      const r = new Resolution({ blockchain: { zns: 'https://unknownurl.com' } });
+      const r = new Resolution({
+        blockchain: { zns: 'https://unknownurl.com' },
+      });
       expect(r.zns!.network).toEqual('mainnet');
       expect(r.zns!.url).toEqual('https://unknownurl.com');
     });
@@ -140,8 +140,7 @@ describe('ZNS', () => {
   });
 
   describe('.Resolve', () => {
-    it.skip('resolves .zil name using blockchain', async () => {
-      mockAPICalls('zil_using_blockchain', ZilliqaUrl);
+    it('resolves .zil name using blockchain', async () => {
       const result = await resolution.resolve('cofounding.zil');
       expect(result).toBeDefined();
       expect(result.addresses.ETH).toEqual(
@@ -380,7 +379,7 @@ describe('ZNS', () => {
   });
 
   describe('.isSupportedDomain', () => {
-    it('doesn\'t support zil domain when zns is disabled', () => {
+    it("doesn't support zil domain when zns is disabled", () => {
       const resolution = new Resolution({ blockchain: { zns: false } });
       expect(resolution.zns).toBeUndefined();
       expect(resolution.isSupportedDomain('hello.zil')).toBeFalsy();
