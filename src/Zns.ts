@@ -17,7 +17,6 @@ import {
 } from './types';
 import { ResolutionError, ResolutionErrorCode } from './index';
 import NamingService from './NamingService';
-import FetchProvider from './FetchProvider';
 
 const DefaultSource = 'https://api.zilliqa.com';
 
@@ -247,8 +246,7 @@ export default class Zns extends NamingService {
   ): Promise<any> {
     const params = [contractAddress.replace('0x', ''), field, keys];
     const method = 'GetSmartContractSubState';
-    const provider = this.provider || new FetchProvider(this.name, this.url!);
-    return await provider.request({method, params});
+    return await this.provider.request({method, params});
   }
 
   private async getContractField(

@@ -3,6 +3,7 @@ import ConfigurationError, {
   ConfigurationErrorCode,
 } from './errors/configurationError';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
+import FetchProvider from './FetchProvider';
 import {
   NamingServiceName,
   nodeHash,
@@ -17,7 +18,7 @@ export default abstract class NamingService extends BaseConnection {
   readonly name: ResolutionMethod;
   readonly network: string;
   readonly url: string | undefined;
-  protected provider?: Provider;
+  protected provider: Provider;
   abstract isSupportedDomain(domain: string): boolean;
   abstract isSupportedNetwork(): boolean;
   abstract address(domain: string, currencyTicker: string): Promise<string>;
@@ -34,12 +35,12 @@ export default abstract class NamingService extends BaseConnection {
 
   constructor(source: SourceDefinition, name: ResolutionMethod) {
     super();
-    source = this.normalizeSource(source);
     this.name = name;
-    this.provider = source.provider;
-    this.url = source.url as string;
+    source = this.normalizeSource(source);
+    this.ensureConfigured(source);
+    this.url = source.url;
+    this.provider = source.provider || new FetchProvider(this.name, this.url!);
     this.network = source.network as string;
-    this.ensureConfigured();
   }
 
   serviceName(domain: string): NamingServiceName {
@@ -106,13 +107,13 @@ export default abstract class NamingService extends BaseConnection {
     });
   }
 
-  protected ensureConfigured(): void {
-    if (!this.network) {
+  protected ensureConfigured(source: SourceDefinition): void {
+    if (!source.network) {
       throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedNetwork, {
         method: this.name,
       });
     }
-    if (!this.url && !this.provider) {
+    if (!source.url && !source.provider) {
       throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedUrl, {
         method: this.name,
       });
