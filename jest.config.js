@@ -9,4 +9,8 @@ module.exports = {
     },
   },
   testTimeout: 12000,
+  coveragePathIgnorePatterns : [
+    '/node_modules/',
+    '/src/tests/',
+  ]
 };

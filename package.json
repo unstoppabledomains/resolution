@@ -41,6 +41,19 @@
     "type": "git",
     "url": "https://github.com/unstoppabledomains/resolution.git"
   },
+  "keywords": [
+    "cns",
+    ".crypto",
+    "zns",
+    "ens",
+    "ethereum",
+    "zilliqa",
+    "blockchain",
+    "resolution",
+    "name",
+    "domain",
+    "unstoppable"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/unstoppabledomains/resolution.git"
