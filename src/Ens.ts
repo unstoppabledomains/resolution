@@ -19,14 +19,9 @@ import EnsNetworkMap from 'ethereum-ens-network-map';
 /** @internal */
 export default class Ens extends EthereumNamingService {
   readonly name = NamingServiceName.ENS;
-  readonly registryAddress?: string;
 
   constructor(source: SourceDefinition = {}) {
     super(source, NamingServiceName.ENS);
-    source = this.normalizeSource(source);
-    this.registryAddress = source.registry ?
-      source.registry :
-      EnsNetworkMap[EthereumNamingService.NetworkNameMap[this.network]];
     if (this.registryAddress) {
       this.registryContract = this.buildContract(
         ensInterface,
@@ -140,6 +135,10 @@ export default class Ens extends EthereumNamingService {
 
   async chatpk(domain: string): Promise<string> {
     return await this.getTextRecord(domain, 'gundb_public_key');
+  }
+
+  protected defaultRegistry(network: string): string | undefined {
+    return EnsNetworkMap[EthereumNamingService.NetworkNameMap[network]];
   }
 
   private async getContentHash(domain: string): Promise<string | undefined> {

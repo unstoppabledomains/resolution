@@ -40,20 +40,8 @@ const UrlNetworkMap = (url: string) => invert(UrlMap)[url];
 
 /** @internal */
 export default class Zns extends NamingService {
-  readonly registryAddress?: string;
-
   constructor(source: SourceDefinition = {}) {
     super(source, NamingServiceName.ZNS);
-
-    source = this.normalizeSource(source);
-    this.registryAddress = source.registry ?
-      source.registry :
-      RegistryMap[this.network];
-    if (this.registryAddress) {
-      this.registryAddress = this.registryAddress.startsWith('0x') ?
-        toBech32Address(this.registryAddress) :
-        this.registryAddress;
-    }
   }
 
   async resolve(domain: string): Promise<ResolutionResponse | null> {
@@ -174,14 +162,24 @@ export default class Zns extends NamingService {
     return resolverAddress;
   }
 
-  protected normalizeSource(source: SourceDefinition | undefined): SourceDefinition {
-    source = {...source};
+  protected normalizeSource(
+    source: SourceDefinition | undefined,
+  ): SourceDefinition {
+    source = { ...source };
     if (typeof source.network == 'number') {
       source.network = NetworkIdMap[source.network] || source.network;
     }
-    source.network = source.network || (source.url && UrlNetworkMap[source.url]) || 'mainnet';
+    source.network =
+      source.network || (source.url && UrlNetworkMap[source.url]) || 'mainnet';
     if (!source.provider) {
-      source.url = source.url || (typeof source.network === 'string' && UrlMap[source.network]);
+      source.url =
+        source.url ||
+        (typeof source.network === 'string' && UrlMap[source.network]);
+    }
+
+    source.registry = source.registry || RegistryMap[source.network!];
+    if (source.registry?.startsWith('0x')) {
+      source.registry = toBech32Address(source.registry);
     }
     return source;
   }
@@ -246,7 +244,7 @@ export default class Zns extends NamingService {
   ): Promise<any> {
     const params = [contractAddress.replace('0x', ''), field, keys];
     const method = 'GetSmartContractSubState';
-    return await this.provider.request({method, params});
+    return await this.provider.request({ method, params });
   }
 
   private async getContractField(

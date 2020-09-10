@@ -15,7 +15,6 @@ import Contract from './utils/contract';
 /** @internal */
 export abstract class EthereumNamingService extends NamingService {
   readonly name: NamingServiceName;
-  abstract registryAddress?: string;
   protected abstract getResolver(id: string): Promise<string>;
   protected registryContract: Contract;
   static readonly NetworkIdMap: NetworkIdMap = {
@@ -32,6 +31,8 @@ export abstract class EthereumNamingService extends NamingService {
   };
 
   static readonly NetworkNameMap = invert(EthereumNamingService.NetworkIdMap);
+
+  protected abstract defaultRegistry(network: string): string | undefined;
 
   async resolver(domain: string): Promise<string> {
     const nodeHash = this.namehash(domain);
@@ -66,6 +67,10 @@ export abstract class EthereumNamingService extends NamingService {
     if (!source.provider) {
       source.url = source.url || EthereumNamingService.UrlMap[source.network];
     }
+
+    source.registry = source.registry ?
+      source.registry :
+      this.defaultRegistry(source.network as string);
     return source;
   }
 

@@ -18,6 +18,7 @@ export default abstract class NamingService extends BaseConnection {
   readonly name: ResolutionMethod;
   readonly network: string;
   readonly url: string | undefined;
+  readonly registryAddress?: string;
   protected provider: Provider;
   abstract isSupportedDomain(domain: string): boolean;
   abstract isSupportedNetwork(): boolean;
@@ -41,6 +42,7 @@ export default abstract class NamingService extends BaseConnection {
     this.url = source.url;
     this.provider = source.provider || new FetchProvider(this.name, this.url!);
     this.network = source.network as string;
+    this.registryAddress = source.registry;
   }
 
   serviceName(domain: string): NamingServiceName {

@@ -14,23 +14,17 @@ import CnsProxyReader from './cns/CnsProxyReader';
 import CnsRegistryReader from './cns/CnsRegistryReader';
 import Contract from './utils/contract';
 
+const ReaderMap: ReaderMap = {
+  mainnet: '0x7ea9ee21077f84339eda9c80048ec6db678642b1',
+  kovan: '0xcf4318918fd18aca9bdc11445c01fbada4b448e3', // for internal testing
+};
 /** @internal */
 export default class Cns extends EthereumNamingService {
-  readonly registryAddress?: string;
-  readonly ReaderMap: ReaderMap = {
-    mainnet: '0x7ea9ee21077f84339eda9c80048ec6db678642b1',
-    kovan: '0xcf4318918fd18aca9bdc11445c01fbada4b448e3', // for internal testing
-  };
-
   readonly contract: Contract;
   reader: ICnsReader;
 
   constructor(source: SourceDefinition = {}) {
     super(source, NamingServiceName.CNS);
-    source = this.normalizeSource(source);
-    this.registryAddress = source.registry ?
-      source.registry :
-      this.ReaderMap[this.network];
     this.contract = this.buildContract(proxyReaderAbi, this.registryAddress);
   }
 
@@ -43,8 +37,12 @@ export default class Cns extends EthereumNamingService {
     return this.reader;
   }
 
+  protected defaultRegistry(network: string): string | undefined {
+    return ReaderMap[network];
+  }
+
   protected async isDataReaderSupported(): Promise<boolean> {
-    if (this.ReaderMap[this.network] === this.contract.address) {
+    if (ReaderMap[this.network] === this.contract.address) {
       return true;
     }
 
