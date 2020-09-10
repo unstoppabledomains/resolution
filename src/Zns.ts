@@ -40,20 +40,8 @@ const UrlNetworkMap = (url: string) => invert(UrlMap)[url];
 
 /** @internal */
 export default class Zns extends NamingService {
-  readonly registryAddress?: string;
-
   constructor(source: SourceDefinition = {}) {
     super(source, NamingServiceName.ZNS);
-
-    source = this.normalizeSource(source);
-    this.registryAddress = source.registry
-      ? source.registry
-      : RegistryMap[this.network];
-    if (this.registryAddress) {
-      this.registryAddress = this.registryAddress.startsWith('0x')
-        ? toBech32Address(this.registryAddress)
-        : this.registryAddress;
-    }
   }
 
   async resolve(domain: string): Promise<ResolutionResponse | null> {
@@ -191,6 +179,11 @@ export default class Zns extends NamingService {
       source.url =
         source.url ||
         (typeof source.network === 'string' && UrlMap[source.network]);
+    }
+
+    source.registry = source.registry || RegistryMap[source.network!];
+    if (source.registry?.startsWith('0x')) {
+      source.registry = toBech32Address(source.registry);
     }
     return source;
   }
