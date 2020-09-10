@@ -122,7 +122,8 @@ export default class Zns extends NamingService {
   }
 
   async getAllKeys(domain: string): Promise<string[]> {
-    throw new Error('Method not implemented.');
+    const records = await this.records(domain);
+    return Object.keys(records);
   }
 
   isSupportedDomain(domain: string): boolean {

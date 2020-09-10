@@ -86,7 +86,7 @@ import {
     }, response, 'gundb'),
     recordKey: () => tryInfo(async () => await resolution.record(domain, options.recordKey), response, options.recordKey),
     gunPk: () => tryInfo(async () => await resolution.chatPk(domain), response, 'gundbPk'),
-    all: () => tryInfo(async () => await resolution.getAllKeys(domain), response, 'records')
+    all: () => tryInfo(async () => await resolution.allRecords(domain), response, 'records')
   };
 
   const resolutionProcess: Promise<boolean>[] = [];

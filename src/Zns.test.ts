@@ -499,5 +499,11 @@ describe('ZNS', () => {
       expectSpyToBeCalled([eye, secondEye]);
       expect(httpUrl).toBe('www.unstoppabledomains.com');
     });
+
+    it.only('should return all records for zil domain', async () => {
+      const records = await resolution.allRecords("johnnyjumper.zil");
+      const answers = ['crypto.ETH.address', 'ipfs.html.value', 'whois.email.value'];
+      answers.forEach(answer => expect(records).toContain(answer));
+    })
   });
 });
