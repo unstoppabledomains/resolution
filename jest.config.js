@@ -8,7 +8,7 @@ module.exports = {
       diagnostics: false,
     },
   },
-  testTimeout: 20000,
+  testTimeout: 12000,
   coveragePathIgnorePatterns : [
     '/node_modules/',
     '/src/tests/',
