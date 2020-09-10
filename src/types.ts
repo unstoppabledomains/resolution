@@ -145,12 +145,55 @@ export type TransactionRequest = {
     chainId?: unknown,
 }
 
+export interface EventData {
+  address: string,
+  blockHash: string,
+  blockNumber: string,
+  data: string,
+  logIndex: string,
+  removed: boolean,
+  topics: string[],
+  transactionHash: string,
+  transactionIndex: string
+};
+
+export interface EventFilter {
+  address?: string;
+  topics?: Array<string>;
+  fromBlock?: string,
+  toBlock?: string,
+}
+
+export type RpcProviderTestCase = {request: RpcProviderRequestBody, response: string | RpcProviderLogEntry[] }[];
+
+export interface RpcProviderRequestBody {
+  data?: string,
+  to?: string,
+  fromBlock?: string,
+  toBlock?: string,
+  address?: string,
+  topics?: string[]
+}
+
 /**
  * @see https://github.com/ethers-io/ethers.js/blob/v5.0.4/packages/abstract-provider/src.ts/index.ts#L224
  */
 export interface EthersProvider {
   call(transaction: TransactionRequest, blockTag?: never): Promise<string>;
+  getLogs(filter: EventFilter): Promise<RpcProviderLogEntry[]>;
 }
+
+export interface RpcProviderLogEntry {
+  blockNumber: number,
+  blockHash: string,
+  transactionIndex: number,
+  removed: boolean,
+  address: string,
+  data: string,
+  topics: string[],
+  transactionHash: string,
+  logIndex: number 
+};
 
 export interface Web3Version0Provider {
   sendAsync: ProviderMethod;

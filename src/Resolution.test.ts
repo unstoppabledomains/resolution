@@ -19,6 +19,8 @@ import {
   caseMock,
   mockAsyncMethod,
 } from './tests/helpers';
+import _ from 'lodash';
+import { RpcProviderTestCases } from './tests/providerMockData';
 
 try {
   const dotenv = require('dotenv');
@@ -304,16 +306,6 @@ describe('Resolution', () => {
   });
 
   describe('Providers', () => {
-    const RpcProviderTestCases = [
-      [
-        {
-          data: '0x91015f6b0000000000000000000000000000000000000000000000000000000000000040756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc900000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001263727970746f2e4554482e616464726573730000000000000000000000000000',
-          to: '0x7ea9ee21077f84339eda9c80048ec6db678642b1',
-        },
-        '0x000000000000000000000000b66dce2da6afaaa98f2013446dbcb0f4b0ab28420000000000000000000000008aad44321a86b170879d7a244c1e8d360c99dda8000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002a30783861614434343332314138366231373038373964374132343463316538643336306339394464413800000000000000000000000000000000000000000000',
-      ],
-    ] as const;
-
     it('should work with web3HttpProvider', async () => {
       // web3-providers-http has problems with type definitions
       // We still prefer everything to be statically typed on our end for better mocking
@@ -395,6 +387,63 @@ describe('Resolution', () => {
       const ethAddress = await resolution.addressOrThrow('brad.crypto', 'eth');
       expectSpyToBeCalled([eye]);
       expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
+    });
+
+    describe('.getAllKeys', () => {
+      it('should be able to get logs with ethers default provider', async () => {
+        const provider = getDefaultProvider('mainnet');
+
+        const eye = mockAsyncMethod(provider, "call", params => Promise.resolve(caseMock(params, RpcProviderTestCases)));
+        const eye2 = mockAsyncMethod(provider, "getLogs", params => Promise.resolve(caseMock(params, RpcProviderTestCases)));
+
+        const resolution = Resolution.fromEthersProvider(provider);
+        const resp = await resolution.getAllKeys("brad.crypto");
+        expectSpyToBeCalled([eye, eye2]);
+        expect(resp).toContain('crypto.BTC.address');
+        expect(resp).toContain('crypto.ETH.address');
+        expect(resp).toContain('ipfs.html.value');
+        expect(resp).toContain('ipfs.redirect_domain.value');
+        expect(resp).toContain('gundb.username.value');
+        expect(resp).toContain('gundb.public_key.value');
+        expect(resp.length).toBe(6);
+      });
+
+      it('should be able to get logs with jsonProvider', async () => {
+        const provider = new JsonRpcProvider(
+          protocolLink(ProviderProtocol.http),
+          'mainnet',
+        );
+        const resolution = Resolution.fromEthersProvider(provider);
+        const eye = mockAsyncMethod(provider, "call", params => Promise.resolve(caseMock(params, RpcProviderTestCases)));
+        const eye2 = mockAsyncMethod(provider, "getLogs", params => Promise.resolve(caseMock(params, RpcProviderTestCases)));
+
+        const resp = await resolution.getAllKeys('brad.crypto');
+        expectSpyToBeCalled([eye, eye2]);
+        expect(resp).toContain('crypto.BTC.address');
+        expect(resp).toContain('crypto.ETH.address');
+        expect(resp).toContain('ipfs.html.value');
+        expect(resp).toContain('ipfs.redirect_domain.value');
+        expect(resp).toContain('gundb.username.value');
+        expect(resp).toContain('gundb.public_key.value');
+        expect(resp.length).toBe(6);
+      });
+
+      it('should get standard keys from legacy resolver', async () => {
+        const provider = getDefaultProvider("mainnet");
+        const eye = mockAsyncMethod(provider, "call", params => Promise.resolve(caseMock(params, RpcProviderTestCases)));
+
+        const resolution = Resolution.fromEthersProvider(provider);
+        const resp = await resolution.getAllKeys('monmouthcounty.crypto');
+
+        expectSpyToBeCalled([eye]);
+        expect(resp).toContain('crypto.BTC.address');
+        expect(resp).toContain('crypto.ETH.address');
+        expect(resp).toContain('crypto.LTC.address');
+        expect(resp).toContain('crypto.ADA.address');
+        expect(resp).toContain('ipfs.html.value');
+        expect(resp).toContain('ipfs.redirect_domain.value');
+        expect(resp.length).toBe(6);
+      });
     });
   });
 });

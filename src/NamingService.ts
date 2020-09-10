@@ -32,6 +32,7 @@ export default abstract class NamingService extends BaseConnection {
   abstract chatId(domain: string): Promise<string>;
   abstract chatpk(domain: string): Promise<string>;
   abstract childhash(parent: nodeHash, label: string, options?: {prefix: boolean}): nodeHash;
+  abstract getAllKeys(domain: string): Promise<string[]>;
 
   constructor(source: SourceDefinition, name: ResolutionMethod) {
     super();

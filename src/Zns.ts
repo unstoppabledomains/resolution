@@ -133,6 +133,10 @@ export default class Zns extends NamingService {
     return await this.getResolverRecords((await this.resolverAddress(domain))!);
   }
 
+  async getAllKeys(domain: string): Promise<string[]> {
+    throw new Error('Method not implemented.')
+  }
+
   isSupportedDomain(domain: string): boolean {
     const tokens = domain.split('.');
     return (

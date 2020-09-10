@@ -8,11 +8,14 @@ import {
   NullAddress,
 } from './types';
 import { default as proxyReaderAbi } from './cns/contract/proxyReader';
+import { default as resolverInterface } from './cns/contract/resolver';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import ICnsReader, { Data } from './cns/ICnsReader';
 import CnsProxyReader from './cns/CnsProxyReader';
 import CnsRegistryReader from './cns/CnsRegistryReader';
 import Contract from './utils/contract';
+import standardKeys from './utils/standardKeys';
+import { isLegacyResolver } from './utils';
 
 /** @internal */
 export default class Cns extends EthereumNamingService {
@@ -134,6 +137,35 @@ export default class Cns extends EthereumNamingService {
 
   async httpUrl(domain: string): Promise<string> {
     return await this.record(domain, 'ipfs.redirect_domain.value');
+  }
+
+  async getAllKeys(domain: string): Promise<string[]> {
+    const tokenId = this.namehash(domain);
+    
+    const reader = await this.getReader();
+    const data = await reader.resolver(tokenId);
+    await this.verify(domain, data);    
+
+    const {resolver} = data;
+    const resolverContract = this.buildContract(resolverInterface, resolver);    
+    if (isLegacyResolver(resolver!)) {
+      return await this.getStandardKeys(resolverContract, tokenId); 
+    }
+
+    try {
+      const logs = await resolverContract.fetchLogs('NewKey', tokenId);
+      const keyHashes = logs.map(event => event.topics[2]);
+      const result = await this.callMethod(resolverContract, 'getManyByHash', [keyHashes, tokenId]);
+      return result;
+    } catch(err) {
+      throw new Error("Not supported by provider")
+    }
+  }
+
+  private async getStandardKeys(resolverContract: Contract, tokenId: string): Promise<string[]> {
+    const keys = Object.values(standardKeys);
+    const response = await this.callMethod(resolverContract, 'getMany', [keys, tokenId]);
+    return keys.filter((key, index) => response[index]);
   }
 
   async record(domain: string, key: string): Promise<string> {

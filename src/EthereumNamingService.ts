@@ -87,14 +87,14 @@ export abstract class EthereumNamingService extends NamingService {
   protected async callMethod(
     contract: Contract,
     method: string,
-    params: string[],
+    params: (string | string[])[],
   ): Promise<any> {
     try {
       const result = await contract.call(method, params);
       if (!result.length) {
         throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
           recordName: method,
-          domain: params[0],
+          domain: params[params.length - 1] as string,
         });
       }
       return result[0];
