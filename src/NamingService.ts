@@ -31,7 +31,11 @@ export default abstract class NamingService extends BaseConnection {
   abstract resolver(domain: string): Promise<string>;
   abstract chatId(domain: string): Promise<string>;
   abstract chatpk(domain: string): Promise<string>;
-  abstract childhash(parent: nodeHash, label: string, options?: {prefix: boolean}): nodeHash;
+  abstract childhash(
+    parent: nodeHash,
+    label: string,
+    options?: { prefix: boolean },
+  ): nodeHash;
   abstract getAllKeys(domain: string): Promise<string[]>;
 
   constructor(source: SourceDefinition, name: ResolutionMethod) {
@@ -57,9 +61,11 @@ export default abstract class NamingService extends BaseConnection {
         domain
           .split('.')
           .reverse()
-          .filter((label) => label),
+          .filter(label => label),
       )
-      .reduce((parent, label) => this.childhash(parent, label, { prefix: false }));
+      .reduce((parent, label) =>
+        this.childhash(parent, label, { prefix: false }),
+      );
     return '0x' + assembledHash;
   }
 

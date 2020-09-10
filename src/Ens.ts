@@ -24,9 +24,9 @@ export default class Ens extends EthereumNamingService {
   constructor(source: SourceDefinition = {}) {
     super(source, NamingServiceName.ENS);
     source = this.normalizeSource(source);
-    this.registryAddress = source.registry ?
-      source.registry :
-      EnsNetworkMap[EthereumNamingService.NetworkNameMap[this.network]];
+    this.registryAddress = source.registry
+      ? source.registry
+      : EnsNetworkMap[EthereumNamingService.NetworkNameMap[this.network]];
     if (this.registryAddress) {
       this.registryContract = this.buildContract(
         ensInterface,
@@ -40,7 +40,7 @@ export default class Ens extends EthereumNamingService {
       domain === 'eth' ||
       (domain.indexOf('.') > 0 &&
         /^[^-]*[^-]*\.(eth|luxe|xyz|kred|addr\.reverse)$/.test(domain) &&
-        domain.split('.').every((v) => !!v.length))
+        domain.split('.').every(v => !!v.length))
     );
   }
 
@@ -127,11 +127,11 @@ export default class Ens extends EthereumNamingService {
   }
 
   async httpUrl(domain: string): Promise<string> {
-    return await this.getTextRecord( domain, 'url');
+    return await this.getTextRecord(domain, 'url');
   }
 
   async email(domain: string): Promise<string> {
-    return await this.getTextRecord( domain, 'email');
+    return await this.getTextRecord(domain, 'email');
   }
 
   async chatId(domain: string): Promise<string> {
@@ -143,7 +143,7 @@ export default class Ens extends EthereumNamingService {
   }
 
   async getAllKeys(domain: string): Promise<string[]> {
-    throw new Error('Method not implemented.')
+    throw new Error('Method not implemented.');
   }
 
   private async getContentHash(domain: string): Promise<string | undefined> {
@@ -166,7 +166,10 @@ export default class Ens extends EthereumNamingService {
     return this.ensureRecordPresence(domain, key, record);
   }
 
-  private async getResolverContract(domain: string, coinType?: number): Promise<Contract> {
+  private async getResolverContract(
+    domain: string,
+    coinType?: number,
+  ): Promise<Contract> {
     const resolverAddress = await this.resolver(domain);
     return this.buildContract(
       resolverInterface(resolverAddress, coinType),
@@ -220,7 +223,7 @@ export default class Ens extends EthereumNamingService {
   protected getCoinType(currencyTicker: string): number {
     const constants: Bip44Constants[] = require('bip44-constants');
     const coin = constants.findIndex(
-      (item) =>
+      item =>
         item[1] === currencyTicker.toUpperCase() ||
         item[2] === currencyTicker.toUpperCase(),
     );
@@ -232,7 +235,11 @@ export default class Ens extends EthereumNamingService {
     return coin;
   }
 
-  private async fetchAddressOrThrow(resolver: string, nodeHash, coinType: number) {
+  private async fetchAddressOrThrow(
+    resolver: string,
+    nodeHash,
+    coinType: number,
+  ) {
     if (isNullAddress(resolver)) {
       return null;
     }
@@ -241,9 +248,9 @@ export default class Ens extends EthereumNamingService {
       resolver,
     );
     const addr: string =
-      coinType !== EthCoinIndex ?
-        await this.callMethod(resolverContract, 'addr', [nodeHash, coinType]) :
-        await this.callMethod(resolverContract, 'addr', [nodeHash]);
+      coinType !== EthCoinIndex
+        ? await this.callMethod(resolverContract, 'addr', [nodeHash, coinType])
+        : await this.callMethod(resolverContract, 'addr', [nodeHash]);
     if (isNullAddress(addr)) return null;
     const data = Buffer.from(addr.replace('0x', ''), 'hex');
     return formatsByCoinType[coinType].encoder(data);

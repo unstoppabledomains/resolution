@@ -18,11 +18,11 @@ export default class Udapi extends NamingService {
     [key: string]: string;
   };
 
-  constructor(options: {url: string}) {
+  constructor(options: { url: string }) {
     super(options, 'UDAPI');
-    const DefaultUserAgent = this.isNode() ?
-      'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)' :
-      navigator.userAgent;
+    const DefaultUserAgent = this.isNode()
+      ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'
+      : navigator.userAgent;
     const version = pckg.version;
     const CustomUserAgent = `${DefaultUserAgent} Resolution/${version}`;
     this.headers = { 'X-user-agent': CustomUserAgent };
@@ -102,7 +102,7 @@ export default class Udapi extends NamingService {
   }
 
   async getAllKeys(domain: string): Promise<string[]> {
-    throw new Error('Method not implemented.')
+    throw new Error('Method not implemented.');
   }
 
   async resolve(domain: string): Promise<ResolutionResponse> {
@@ -132,11 +132,11 @@ export default class Udapi extends NamingService {
   }
 
   protected normalizeSource(source): SourceDefinition {
-    return {network: 'mainnet', ...source};
+    return { network: 'mainnet', ...source };
   }
 
   private findMethod(domain: string) {
-    return [new Zns(), new Ens(), new Cns()].find((m) =>
+    return [new Zns(), new Ens(), new Cns()].find(m =>
       m.isSupportedDomain(domain),
     );
   }

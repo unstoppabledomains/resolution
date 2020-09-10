@@ -42,7 +42,7 @@ export abstract class EthereumNamingService extends NamingService {
     } else {
       // We don't care about this promise anymore
       // Ensure it doesn't generate a warning if it rejects
-      ownerPromise.catch(() => { });
+      ownerPromise.catch(() => {});
     }
     return resolverAddress;
   }
@@ -60,9 +60,11 @@ export abstract class EthereumNamingService extends NamingService {
   protected normalizeSource(source: SourceDefinition): SourceDefinition {
     source = { ...source };
     if (typeof source.network == 'number') {
-      source.network = EthereumNamingService.NetworkIdMap[source.network] || source.network;
+      source.network =
+        EthereumNamingService.NetworkIdMap[source.network] || source.network;
     }
-    source.network = source.network || this.networkFromUrl(source.url) || 'mainnet';
+    source.network =
+      source.network || this.networkFromUrl(source.url) || 'mainnet';
     if (!source.provider) {
       source.url = source.url || EthereumNamingService.UrlMap[source.network];
     }

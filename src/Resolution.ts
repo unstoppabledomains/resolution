@@ -118,7 +118,9 @@ export default class Resolution {
    * @see https://github.com/ethereum/web3.js/blob/0.20.7/lib/web3/httpprovider.js#L116
    */
   static fromWeb3Version0Provider(provider: Web3Version0Provider): Resolution {
-    return this.fromEip1193Provider(Eip1993Factories.fromWeb3Version0Provider(provider));
+    return this.fromEip1193Provider(
+      Eip1993Factories.fromWeb3Version0Provider(provider),
+    );
   }
 
   /**
@@ -128,7 +130,9 @@ export default class Resolution {
    * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-providers-http/src/index.js#L95
    */
   static fromWeb3Version1Provider(provider: Web3Version1Provider): Resolution {
-    return this.fromEip1193Provider(Eip1993Factories.fromWeb3Version1Provider(provider));
+    return this.fromEip1193Provider(
+      Eip1993Factories.fromWeb3Version1Provider(provider),
+    );
   }
 
   /**
@@ -141,7 +145,9 @@ export default class Resolution {
    * @see https://github.com/ethers-io/ethers.js/blob/master/packages/providers/src.ts/json-rpc-provider.ts
    */
   static fromEthersProvider(provider: EthersProvider): Resolution {
-    return this.fromEip1193Provider(Eip1993Factories.fromEthersProvider(provider));
+    return this.fromEip1193Provider(
+      Eip1993Factories.fromEthersProvider(provider),
+    );
   }
 
   /**
@@ -310,7 +316,10 @@ export default class Resolution {
     address: string,
     currencyTicker: string,
   ): Promise<string | null> {
-    return (this.findNamingService(NamingServiceName.ENS) as Ens).reverse(address, currencyTicker);
+    return (this.findNamingService(NamingServiceName.ENS) as Ens).reverse(
+      address,
+      currencyTicker,
+    );
   }
 
   /**
@@ -381,7 +390,7 @@ export default class Resolution {
   /**
    * Returns all record keys of the domain.
    * Currently supports only CNS
-   * @param domain - domain name 
+   * @param domain - domain name
    */
   async getAllKeys(domain: string): Promise<string[]> {
     domain = this.prepareDomain(domain);
@@ -390,15 +399,16 @@ export default class Resolution {
 
   private getNamingMethod(domain: string): NamingService | undefined {
     domain = this.prepareDomain(domain);
-    return this.getResolutionMethods().find(
-      (method) => method.isSupportedDomain(domain),
+    return this.getResolutionMethods().find(method =>
+      method.isSupportedDomain(domain),
     );
   }
 
   private getResolutionMethods(): NamingService[] {
-    return (this.blockchain ?
-      [this.ens, this.zns, this.cns] as NamingService[] :
-      [this.api] as NamingService[]).filter((v) => v);
+    return (this.blockchain
+      ? ([this.ens, this.zns, this.cns] as NamingService[])
+      : ([this.api] as NamingService[])
+    ).filter(v => v);
   }
 
   private getNamingMethodOrThrow(domain: string): NamingService {
@@ -413,7 +423,7 @@ export default class Resolution {
   }
 
   private findNamingService(name: NamingServiceName): NamingService {
-    const service = this.getResolutionMethods().find((m) => m.name === name);
+    const service = this.getResolutionMethods().find(m => m.name === name);
     if (!service) {
       throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
         method: name,
@@ -426,20 +436,23 @@ export default class Resolution {
     return domain ? domain.trim().toLowerCase() : '';
   }
 
-  private normalizeSource(source: NamingServiceSource | undefined, provider?: Provider): SourceDefinition | false {
+  private normalizeSource(
+    source: NamingServiceSource | undefined,
+    provider?: Provider,
+  ): SourceDefinition | false {
     switch (typeof source) {
-    case 'undefined': {
-      return {provider};
-    }
-    case 'boolean': {
-      return source ? {provider} : false;
-    }
-    case 'string': {
-      return { url: source };
-    }
-    case 'object': {
-      return {provider, ...source};
-    }
+      case 'undefined': {
+        return { provider };
+      }
+      case 'boolean': {
+        return source ? { provider } : false;
+      }
+      case 'string': {
+        return { url: source };
+      }
+      case 'object': {
+        return { provider, ...source };
+      }
     }
     throw new Error('Unsupported configuration');
   }

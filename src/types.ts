@@ -133,46 +133,49 @@ type ProviderMethod = (
 ) => void;
 
 export type TransactionRequest = {
-    to?: unknown,
-    from?: unknown,
-    nonce?: unknown,
+  to?: unknown;
+  from?: unknown;
+  nonce?: unknown;
 
-    gasLimit?: unknown,
-    gasPrice?: unknown,
+  gasLimit?: unknown;
+  gasPrice?: unknown;
 
-    data?: unknown,
-    value?: unknown,
-    chainId?: unknown,
-}
+  data?: unknown;
+  value?: unknown;
+  chainId?: unknown;
+};
 
 export interface EventData {
-  address: string,
-  blockHash: string,
-  blockNumber: string,
-  data: string,
-  logIndex: string,
-  removed: boolean,
-  topics: string[],
-  transactionHash: string,
-  transactionIndex: string
-};
+  address: string;
+  blockHash: string;
+  blockNumber: string;
+  data: string;
+  logIndex: string;
+  removed: boolean;
+  topics: string[];
+  transactionHash: string;
+  transactionIndex: string;
+}
 
 export interface EventFilter {
   address?: string;
   topics?: Array<string>;
-  fromBlock?: string,
-  toBlock?: string,
+  fromBlock?: string;
+  toBlock?: string;
 }
 
-export type RpcProviderTestCase = {request: RpcProviderRequestBody, response: string | RpcProviderLogEntry[] }[];
+export type RpcProviderTestCase = {
+  request: RpcProviderRequestBody;
+  response: string | RpcProviderLogEntry[];
+}[];
 
 export interface RpcProviderRequestBody {
-  data?: string,
-  to?: string,
-  fromBlock?: string,
-  toBlock?: string,
-  address?: string,
-  topics?: string[]
+  data?: string;
+  to?: string;
+  fromBlock?: string;
+  toBlock?: string;
+  address?: string;
+  topics?: string[];
 }
 
 /**
@@ -184,16 +187,16 @@ export interface EthersProvider {
 }
 
 export interface RpcProviderLogEntry {
-  blockNumber: number,
-  blockHash: string,
-  transactionIndex: number,
-  removed: boolean,
-  address: string,
-  data: string,
-  topics: string[],
-  transactionHash: string,
-  logIndex: number 
-};
+  blockNumber: number;
+  blockHash: string;
+  transactionIndex: number;
+  removed: boolean;
+  address: string;
+  data: string;
+  topics: string[];
+  transactionHash: string;
+  logIndex: number;
+}
 
 export interface Web3Version0Provider {
   sendAsync: ProviderMethod;
@@ -229,7 +232,9 @@ export enum NullAddresses {
   '0x0000000000000000000000000000000000000000000000000000000000000000',
 }
 
-export function isNullAddress(key: string | null | undefined): key is undefined | null {
+export function isNullAddress(
+  key: string | null | undefined,
+): key is undefined | null {
   if (!key) return true;
   return Object.values(NullAddresses).includes(key);
 }

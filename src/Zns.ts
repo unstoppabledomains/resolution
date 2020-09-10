@@ -46,13 +46,13 @@ export default class Zns extends NamingService {
     super(source, NamingServiceName.ZNS);
 
     source = this.normalizeSource(source);
-    this.registryAddress = source.registry ?
-      source.registry :
-      RegistryMap[this.network];
+    this.registryAddress = source.registry
+      ? source.registry
+      : RegistryMap[this.network];
     if (this.registryAddress) {
-      this.registryAddress = this.registryAddress.startsWith('0x') ?
-        toBech32Address(this.registryAddress) :
-        this.registryAddress;
+      this.registryAddress = this.registryAddress.startsWith('0x')
+        ? toBech32Address(this.registryAddress)
+        : this.registryAddress;
     }
   }
 
@@ -134,7 +134,7 @@ export default class Zns extends NamingService {
   }
 
   async getAllKeys(domain: string): Promise<string[]> {
-    throw new Error('Method not implemented.')
+    throw new Error('Method not implemented.');
   }
 
   isSupportedDomain(domain: string): boolean {
@@ -142,7 +142,7 @@ export default class Zns extends NamingService {
     return (
       !!tokens.length &&
       tokens[tokens.length - 1] === 'zil' &&
-      tokens.every((v) => !!v.length)
+      tokens.every(v => !!v.length)
     );
   }
 
@@ -178,14 +178,19 @@ export default class Zns extends NamingService {
     return resolverAddress;
   }
 
-  protected normalizeSource(source: SourceDefinition | undefined): SourceDefinition {
-    source = {...source};
+  protected normalizeSource(
+    source: SourceDefinition | undefined,
+  ): SourceDefinition {
+    source = { ...source };
     if (typeof source.network == 'number') {
       source.network = NetworkIdMap[source.network] || source.network;
     }
-    source.network = source.network || (source.url && UrlNetworkMap[source.url]) || 'mainnet';
+    source.network =
+      source.network || (source.url && UrlNetworkMap[source.url]) || 'mainnet';
     if (!source.provider) {
-      source.url = source.url || (typeof source.network === 'string' && UrlMap[source.network]);
+      source.url =
+        source.url ||
+        (typeof source.network === 'string' && UrlMap[source.network]);
     }
     return source;
   }
@@ -250,7 +255,7 @@ export default class Zns extends NamingService {
   ): Promise<any> {
     const params = [contractAddress.replace('0x', ''), field, keys];
     const method = 'GetSmartContractSubState';
-    return await this.provider.request({method, params});
+    return await this.provider.request({ method, params });
   }
 
   private async getContractField(
@@ -258,9 +263,9 @@ export default class Zns extends NamingService {
     field: string,
     keys: string[] = [],
   ): Promise<any> {
-    const contractAddr = contractAddress.startsWith('zil1') ?
-      fromBech32Address(contractAddress) :
-      contractAddress;
+    const contractAddr = contractAddress.startsWith('zil1')
+      ? fromBech32Address(contractAddress)
+      : contractAddress;
     const result = (await this.fetchSubState(contractAddr, field, keys)) || {};
     return result[field];
   }

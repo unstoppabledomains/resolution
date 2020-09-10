@@ -31,17 +31,17 @@ export default class Cns extends EthereumNamingService {
   constructor(source: SourceDefinition = {}) {
     super(source, NamingServiceName.CNS);
     source = this.normalizeSource(source);
-    this.registryAddress = source.registry ?
-      source.registry :
-      this.ReaderMap[this.network];
+    this.registryAddress = source.registry
+      ? source.registry
+      : this.ReaderMap[this.network];
     this.contract = this.buildContract(proxyReaderAbi, this.registryAddress);
   }
 
   async getReader(): Promise<ICnsReader> {
     if (!this.reader) {
-      this.reader = await this.isDataReaderSupported() ?
-        new CnsProxyReader(this.contract) :
-        new CnsRegistryReader(this.contract);
+      this.reader = (await this.isDataReaderSupported())
+        ? new CnsProxyReader(this.contract)
+        : new CnsRegistryReader(this.contract);
     }
     return this.reader;
   }
@@ -52,13 +52,15 @@ export default class Cns extends EthereumNamingService {
     }
 
     try {
-      const [isDataReaderSupported] = await this.contract.call('supportsInterface', ['0x6eabca0d']);
+      const [
+        isDataReaderSupported,
+      ] = await this.contract.call('supportsInterface', ['0x6eabca0d']);
       if (!isDataReaderSupported) {
         throw new Error('Not supported DataReader');
       }
 
       return true;
-    } catch { }
+    } catch {}
 
     return false;
   }
@@ -68,7 +70,7 @@ export default class Cns extends EthereumNamingService {
       domain === 'crypto' ||
       (domain.indexOf('.') > 0 &&
         /^.{1,}\.(crypto)$/.test(domain) &&
-        domain.split('.').every((v) => !!v.length))
+        domain.split('.').every(v => !!v.length))
     );
   }
 
@@ -141,30 +143,39 @@ export default class Cns extends EthereumNamingService {
 
   async getAllKeys(domain: string): Promise<string[]> {
     const tokenId = this.namehash(domain);
-    
+
     const reader = await this.getReader();
     const data = await reader.resolver(tokenId);
-    await this.verify(domain, data);    
+    await this.verify(domain, data);
 
-    const {resolver} = data;
-    const resolverContract = this.buildContract(resolverInterface, resolver);    
+    const { resolver } = data;
+    const resolverContract = this.buildContract(resolverInterface, resolver);
     if (isLegacyResolver(resolver!)) {
-      return await this.getStandardKeys(resolverContract, tokenId); 
+      return await this.getStandardKeys(resolverContract, tokenId);
     }
 
     try {
       const logs = await resolverContract.fetchLogs('NewKey', tokenId);
       const keyHashes = logs.map(event => event.topics[2]);
-      const result = await this.callMethod(resolverContract, 'getManyByHash', [keyHashes, tokenId]);
+      const result = await this.callMethod(resolverContract, 'getManyByHash', [
+        keyHashes,
+        tokenId,
+      ]);
       return result;
-    } catch(err) {
-      throw new Error("Not supported by provider")
+    } catch (err) {
+      throw new Error('Not supported by provider');
     }
   }
 
-  private async getStandardKeys(resolverContract: Contract, tokenId: string): Promise<string[]> {
+  private async getStandardKeys(
+    resolverContract: Contract,
+    tokenId: string,
+  ): Promise<string[]> {
     const keys = Object.values(standardKeys);
-    const response = await this.callMethod(resolverContract, 'getMany', [keys, tokenId]);
+    const response = await this.callMethod(resolverContract, 'getMany', [
+      keys,
+      tokenId,
+    ]);
     return keys.filter((key, index) => response[index]);
   }
 
@@ -193,7 +204,7 @@ export default class Cns extends EthereumNamingService {
       return;
     }
 
-    const owner = data.owner || await this.owner(domain);
+    const owner = data.owner || (await this.owner(domain));
     if (isNullAddress(owner)) {
       throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
         domain,
