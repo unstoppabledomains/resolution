@@ -2,6 +2,7 @@ import { FetchError } from 'node-fetch';
 import BaseConnection from './BaseConnection';
 import { Provider, RequestArguments, ResolutionMethod } from './types';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
+import ServiceProviderError, { ServiceProviderErrorCode } from './errors/serviceProviderError';
 
 /** @internal */
 export default class FetchProvider extends BaseConnection implements Provider {
@@ -29,7 +30,7 @@ export default class FetchProvider extends BaseConnection implements Provider {
         },
       });
       const json = await response.json();
-      if (json.error) throw json.error;
+      if (json.error) throw new ServiceProviderError(ServiceProviderErrorCode.GeneralError, {providerName: "FetchProvider", providerMessage: json.error.message});
       return json.result;
     } catch (error) {
       if (error instanceof FetchError) {

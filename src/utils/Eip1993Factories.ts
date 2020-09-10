@@ -7,6 +7,7 @@ import {
   Web3Version1Provider,
 } from '../types';
 import { ConfigurationError, ConfigurationErrorCode } from '../errors/configurationError';
+import ServiceProviderError, { ServiceProviderErrorCode } from '../errors/serviceProviderError';
 
 export const Eip1993Factories = {
   fromWeb3Version0Provider,
@@ -28,7 +29,13 @@ function fromWeb3Version0Provider(provider: Web3Version0Provider): Provider {
           { jsonrpc: '2.0', method: request.method, params: wrapArray(request.params), id: 1 },
           (error: Error | null, result: JsonRpcResponse) => {
             if (error) reject(error);
-            if (result.error) reject(new Error(result.error));
+            if (result.error) reject(
+              new ServiceProviderError(
+                ServiceProviderErrorCode.GeneralError,{
+                  providerName: "Web3Version0Provider", 
+                  providerMessage: result.error
+                })
+            );
             resolve(result.result);
           },
         );
@@ -51,7 +58,13 @@ function fromWeb3Version1Provider(provider: Web3Version1Provider): Provider {
           { jsonrpc: '2.0', method: request.method, params: wrapArray(request.params), id: 1 },
           (error: Error | null, result: JsonRpcResponse) => {
             if (error) reject(error);
-            if (result.error) reject(new Error(result.error));
+            if (result.error) reject(
+              new ServiceProviderError(
+                ServiceProviderErrorCode.GeneralError,{
+                  providerName: "Web3Version1Provider", 
+                  providerMessage: result.error
+                })  
+            );
             resolve(result.result);
           },
         );
@@ -72,13 +85,21 @@ function fromEthersProvider(provider: EthersProvider): Provider {
   if (provider.call === undefined) throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
   return {
     request: async (request: RequestArguments) => {
-      switch (request.method) {
-        case 'eth_call':
-          return await provider.call(request.params![0]);
-        case 'eth_getLogs':
-          return await provider.getLogs(request.params![0]);
-        default:
-          throw new Error(`Unsupported provider method ${request.method}`);
+      try {
+        switch (request.method) {
+          case 'eth_call':
+            return await provider.call(request.params![0]);
+          case 'eth_getLogs':
+            return await provider.getLogs(request.params![0]);
+          default:
+            throw new Error(`Unsupported provider method ${request.method}`);
+        }
+      } catch(error) {
+        throw new ServiceProviderError(
+          ServiceProviderErrorCode.GeneralError,{
+            providerName: "EthersProvider", 
+            providerMessage: error.message
+          })
       }
     }
   };

@@ -73,10 +73,8 @@ export class ResolutionError extends Error {
 
   constructor(code: ResolutionErrorCode, options: ResolutionErrorOptions = {}) {
     const resolutionErrorHandler: ResolutionErrorHandler = HandlersByCode[code];
-    const { domain, method, currencyTicker, recordName } = options;
-    super(
-      resolutionErrorHandler({ domain, method, currencyTicker, recordName }),
-    );
+    const { domain, method, currencyTicker } = options;
+    super(resolutionErrorHandler(options));
     this.code = code;
     this.domain = domain;
     this.method = method;

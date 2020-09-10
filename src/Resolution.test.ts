@@ -18,9 +18,12 @@ import {
   ProviderProtocol,
   caseMock,
   mockAsyncMethod,
+  expectConfigurationErrorCode,
+  expectServiceProviderErrorCode,
 } from './tests/helpers';
 import _ from 'lodash';
 import { RpcProviderTestCases } from './tests/providerMockData';
+import { ServiceProviderErrorCode } from './errors/serviceProviderError';
 
 try {
   const dotenv = require('dotenv');
@@ -480,6 +483,17 @@ describe('Resolution', () => {
         expect(resp).toContain('ipfs.html.value');
         expect(resp).toContain('ipfs.redirect_domain.value');
         expect(resp.length).toBe(6);
+      });
+
+      it('should throw serviceProviderError from default provider', async () => {
+        const resolution = new Resolution();
+        expectServiceProviderErrorCode(resolution.allRecords("brad.crypto"), ServiceProviderErrorCode.GeneralError);
+      });      
+
+      it('should throw serviceProviderError from ethers provider', async () => {
+        const provider = getDefaultProvider('mainnet');
+        const resolution = Resolution.fromEthersProvider(provider);
+        expectServiceProviderErrorCode(resolution.allRecords("brad.crypto"), ServiceProviderErrorCode.GeneralError);
       });
     });
   });

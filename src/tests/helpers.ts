@@ -4,6 +4,7 @@ import { Dictionary } from '../types';
 import mockData from './mockData.json';
 import ResolutionError, { ResolutionErrorCode } from '../errors/resolutionError';
 import ConfigurationError, { ConfigurationErrorCode } from '../errors/configurationError';
+import ServiceProviderError, { ServiceProviderErrorCode } from '../errors/serviceProviderError';
 export const MainnetUrl = 'https://mainnet.infura.io';
 export const ZilliqaUrl = 'https://api.zilliqa.com';
 export const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
@@ -64,10 +65,19 @@ export async function expectConfigurationErrorCode(
   return expectError(callback, code, ConfigurationError);
 }
 
+export async function expectServiceProviderErrorCode(
+  callback: Promise<any> | Function,
+  code: ServiceProviderErrorCode
+): Promise<void> {
+  return expectError(callback, code, ServiceProviderError);
+}
+
+type ErrorClass = typeof ResolutionError | typeof ConfigurationError | typeof ServiceProviderError
+
 async function expectError(
   callback: Promise<any> | Function,
   code: string,
-  klass: typeof ResolutionError | typeof ConfigurationError,
+  klass: ErrorClass,
 ): Promise<void> {
   if (callback instanceof Function) {
     callback = new Promise((resolve, reject) => {

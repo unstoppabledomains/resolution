@@ -148,17 +148,13 @@ export default class Cns extends EthereumNamingService {
       return await this.getStandardKeys(resolverContract, tokenId);
     }
 
-    try {
-      const logs = await resolverContract.fetchLogs('NewKey', tokenId);
-      const keyHashes = logs.map(event => event.topics[2]);
-      const result = await this.callMethod(resolverContract, 'getManyByHash', [
-        keyHashes,
-        tokenId,
-      ]);
-      return result;
-    } catch (err) {
-      throw new Error('Not supported by provider');
-    }
+    const logs = await resolverContract.fetchLogs('NewKey', tokenId);
+    const keyHashes = logs.map(event => event.topics[2]);
+    const result = await this.callMethod(resolverContract, 'getManyByHash', [
+      keyHashes,
+      tokenId,
+    ]);
+    return result;
   }
 
   private async getStandardKeys(
