@@ -428,7 +428,7 @@ describe('Resolution', () => {
         );
 
         const resolution = Resolution.fromEthersProvider(provider);
-        const resp = await resolution.getAllKeys('brad.crypto');
+        const resp = await resolution.allRecords('brad.crypto');
         expectSpyToBeCalled([eye, eye2]);
         expect(resp).toContain('crypto.BTC.address');
         expect(resp).toContain('crypto.ETH.address');
@@ -452,7 +452,7 @@ describe('Resolution', () => {
           Promise.resolve(caseMock(params, RpcProviderTestCases)),
         );
 
-        const resp = await resolution.getAllKeys('brad.crypto');
+        const resp = await resolution.allRecords('brad.crypto');
         expectSpyToBeCalled([eye, eye2]);
         expect(resp).toContain('crypto.BTC.address');
         expect(resp).toContain('crypto.ETH.address');
@@ -470,7 +470,7 @@ describe('Resolution', () => {
         );
 
         const resolution = Resolution.fromEthersProvider(provider);
-        const resp = await resolution.getAllKeys('monmouthcounty.crypto');
+        const resp = await resolution.allRecords('monmouthcounty.crypto');
 
         expectSpyToBeCalled([eye]);
         expect(resp).toContain('crypto.BTC.address');
