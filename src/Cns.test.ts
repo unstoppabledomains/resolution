@@ -40,7 +40,7 @@ beforeEach(async () => {
 describe('CNS', () => {
   it('should define the default cns contract', () => {
     expect(resolution.cns).toBeDefined();
-    expect(resolution.cns!.network).toBe('mainnet');
+    expect(resolution.cns!.network).toBe(1);
     expect(resolution.cns!.url).toBe(protocolLink());
   });
 

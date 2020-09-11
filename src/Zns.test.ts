@@ -8,15 +8,15 @@ import {
 import { NullAddress } from './types';
 
 let resolution: Resolution;
-beforeEach(() => {
-  jest.restoreAllMocks();
-  resolution = new Resolution();
-});
 
 describe('ZNS', () => {
+  beforeEach(() => {
+    jest.restoreAllMocks();
+    resolution = new Resolution();
+  });
   describe('.NormalizeSource', () => {
     it('checks normalizeSource zns (boolean)', async () => {
-      expect(resolution.zns!.network).toBe('mainnet');
+      expect(resolution.zns!.network).toBe(1);
       expect(resolution.zns!.url).toBe('https://api.zilliqa.com');
     });
 
@@ -26,7 +26,7 @@ describe('ZNS', () => {
     });
 
     it('checks normalizeSource zns (string)', async () => {
-      expect(resolution.zns!.network).toBe('mainnet');
+      expect(resolution.zns!.network).toBe(1);
       expect(resolution.zns!.url).toBe('https://api.zilliqa.com');
     });
 
@@ -34,7 +34,7 @@ describe('ZNS', () => {
       const r = new Resolution({
         blockchain: { zns: 'https://unknownurl.com' },
       });
-      expect(r.zns!.network).toEqual('mainnet');
+      expect(r.zns!.network).toEqual(1);
       expect(r.zns!.url).toEqual('https://unknownurl.com');
     });
 
@@ -42,7 +42,7 @@ describe('ZNS', () => {
       const resolution = new Resolution({
         blockchain: { zns: { url: 'https://api.zilliqa.com' } },
       });
-      expect(resolution.zns!.network).toBe('mainnet');
+      expect(resolution.zns!.network).toBe(1);
       expect(resolution.zns!.url).toBe('https://api.zilliqa.com');
     });
 
@@ -51,7 +51,7 @@ describe('ZNS', () => {
         blockchain: { zns: { network: 333 } },
       });
       expect(resolution.zns!.url).toBe('https://dev-api.zilliqa.com');
-      expect(resolution.zns!.network).toBe('testnet');
+      expect(resolution.zns!.network).toBe(333);
       expect(resolution.zns!.registryAddress).toBeUndefined();
     });
 
@@ -59,7 +59,7 @@ describe('ZNS', () => {
       const resolution = new Resolution({
         blockchain: { zns: { url: 'https://api.zilliqa.com' } },
       });
-      expect(resolution.zns!.network).toBe('mainnet');
+      expect(resolution.zns!.network).toBe(1);
       expect(resolution.zns!.url).toBe('https://api.zilliqa.com');
     });
 
@@ -67,7 +67,7 @@ describe('ZNS', () => {
       const resolution = new Resolution({
         blockchain: { zns: { url: 'https://api.zilliqa.com', network: 1 } },
       });
-      expect(resolution.zns!.network).toBe('mainnet');
+      expect(resolution.zns!.network).toBe(1);
       expect(resolution.zns!.url).toBe('https://api.zilliqa.com');
     });
 
@@ -77,7 +77,7 @@ describe('ZNS', () => {
       });
 
       expect(resolution.zns!.url).toBe('https://api.zilliqa.com');
-      expect(resolution.zns!.network).toBe('testnet');
+      expect(resolution.zns!.network).toBe(333);
       expect(resolution.zns!.registryAddress).toBeUndefined();
     });
 
@@ -90,14 +90,14 @@ describe('ZNS', () => {
     it('checks normalizeSource zns (object) #7', async () => {
       expect(
         () => new Resolution({ blockchain: { zns: { network: 'invalid' } } }),
-      ).toThrowError('Unspecified url in Resolution ZNS configuration');
+      ).toThrowError('Unspecified network in Resolution ZNS configuration');
     });
 
     it('checks normalizeSource zns (object) #8', async () => {
       const resolution = new Resolution({
-        blockchain: { zns: { network: 'mainnet' } },
+        blockchain: { zns: { network: 1} },
       });
-      expect(resolution.zns!.network).toBe('mainnet');
+      expect(resolution.zns!.network).toBe(1);
       expect(resolution.zns!.url).toBe('https://api.zilliqa.com');
     });
 
@@ -106,7 +106,7 @@ describe('ZNS', () => {
         blockchain: { zns: { network: 'testnet' } },
       });
 
-      expect(resolution.zns!.network).toBe('testnet');
+      expect(resolution.zns!.network).toBe(333);
       expect(resolution.zns!.url).toBe('https://dev-api.zilliqa.com');
       expect(resolution.zns!.registryAddress).toBeUndefined();
     });
@@ -117,7 +117,7 @@ describe('ZNS', () => {
           zns: { registry: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz' },
         },
       });
-      expect(resolution.zns!.network).toBe('mainnet');
+      expect(resolution.zns!.network).toBe(1);
       expect(resolution.zns!.registryAddress).toBe(
         'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
       );
@@ -131,7 +131,7 @@ describe('ZNS', () => {
         },
       });
 
-      expect(resolution.zns!.network).toBe('mainnet');
+      expect(resolution.zns!.network).toBe(1);
       expect(resolution.zns!.url).toBe('https://api.zilliqa.com');
       expect(resolution.zns!.registryAddress).toBe(
         'zil1408llufrzkrrfqv5lj4malcjxyjqyd8urd7xz6',

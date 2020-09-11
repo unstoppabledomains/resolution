@@ -16,7 +16,7 @@ import {
 /** @internal */
 export default abstract class NamingService extends BaseConnection {
   readonly name: ResolutionMethod;
-  readonly network: string;
+  readonly network: number;
   readonly url: string | undefined;
   readonly registryAddress?: string;
   protected provider: Provider;
@@ -41,7 +41,7 @@ export default abstract class NamingService extends BaseConnection {
     this.ensureConfigured(source);
     this.url = source.url;
     this.provider = source.provider || new FetchProvider(this.name, this.url!);
-    this.network = source.network as string;
+    this.network = source.network as number;
     this.registryAddress = source.registry;
   }
 

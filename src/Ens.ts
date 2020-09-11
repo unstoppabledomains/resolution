@@ -137,8 +137,8 @@ export default class Ens extends EthereumNamingService {
     return await this.getTextRecord(domain, 'gundb_public_key');
   }
 
-  protected defaultRegistry(network: string): string | undefined {
-    return EnsNetworkMap[EthereumNamingService.NetworkNameMap[network]];
+  protected defaultRegistry(network: number): string | undefined {
+    return EnsNetworkMap[network];
   }
 
   private async getContentHash(domain: string): Promise<string | undefined> {

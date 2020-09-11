@@ -21,19 +21,19 @@ import NamingService from './NamingService';
 const DefaultSource = 'https://api.zilliqa.com';
 
 const NetworkIdMap = {
-  1: 'mainnet',
-  333: 'testnet',
-  111: 'localnet',
+  mainnet: 1,
+  testnet: 333,
+  localnet: 111,
 };
 
 const RegistryMap = {
-  mainnet: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
+  1: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
 };
 
 const UrlMap = {
-  mainnet: 'https://api.zilliqa.com',
-  testnet: 'https://dev-api.zilliqa.com',
-  localnet: 'http://localhost:4201',
+  1: 'https://api.zilliqa.com',
+  333: 'https://dev-api.zilliqa.com',
+  111: 'http://localhost:4201',
 };
 
 const UrlNetworkMap = (url: string) => invert(UrlMap)[url];
@@ -166,15 +166,12 @@ export default class Zns extends NamingService {
     source: SourceDefinition | undefined,
   ): SourceDefinition {
     source = { ...source };
-    if (typeof source.network == 'number') {
-      source.network = NetworkIdMap[source.network] || source.network;
-    }
-    source.network =
-      source.network || (source.url && UrlNetworkMap[source.url]) || 'mainnet';
-    if (!source.provider) {
-      source.url =
-        source.url ||
-        (typeof source.network === 'string' && UrlMap[source.network]);
+    source.network = typeof source.network == 'string' ?
+      NetworkIdMap[source.network] :
+      source.network || (source.url && UrlNetworkMap[source.url]) || 1;
+
+    if (!source.provider && !source.url) {
+      source.url = typeof source.network === 'number' ? UrlMap[source.network]: undefined;
     }
 
     source.registry = source.registry || RegistryMap[source.network!];

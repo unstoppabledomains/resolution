@@ -128,7 +128,7 @@ export default class Udapi extends NamingService {
   }
 
   protected normalizeSource(source): SourceDefinition {
-    return {network: 'mainnet', ...source};
+    return {network: 1, ...source};
   }
 
   private findMethod(domain: string) {
