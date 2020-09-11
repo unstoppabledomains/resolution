@@ -37,13 +37,7 @@ export default class Udapi extends NamingService {
   }
 
   namehash(domain: string): string {
-    const method = this.findMethod(domain);
-    if (!method) {
-      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
-        domain,
-      });
-    }
-    return method.namehash(domain);
+    return this.findMethodOrThrow(domain).namehash(domain);
   }
 
   async address(domain: string, currencyTicker: string): Promise<string> {
