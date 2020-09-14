@@ -394,7 +394,7 @@ export default class Resolution {
    */
   async allRecords(domain: string): Promise<string[]> {
     domain = this.prepareDomain(domain);
-    return await this.getNamingMethodOrThrow(domain).getAllKeys(domain);
+    return await this.getNamingMethodOrThrow(domain).allRecords(domain);
   }
 
   private getNamingMethod(domain: string): NamingService | undefined {

@@ -139,7 +139,7 @@ export default class Cns extends EthereumNamingService {
     return await this.record(domain, 'ipfs.redirect_domain.value');
   }
 
-  async getAllKeys(domain: string): Promise<string[]> {
+  async allRecords(domain: string): Promise<string[]> {
     const tokenId = this.namehash(domain);
     const resolver = await this.resolver(domain);
 

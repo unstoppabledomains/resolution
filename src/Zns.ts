@@ -53,7 +53,7 @@ export default class Zns extends NamingService {
     );
     const addresses: Record<string, string> = {};
     if (resolution.crypto) {
-      Object.entries(resolution.crypto).map(
+      Object.entries(resolution.crypto).forEach(
         ([key, v]) => v.address && (addresses[key] = v.address),
       );
     }
@@ -121,7 +121,7 @@ export default class Zns extends NamingService {
     return await this.getResolverRecords((await this.resolverAddress(domain))!);
   }
 
-  async getAllKeys(domain: string): Promise<string[]> {
+  async allRecords(domain: string): Promise<string[]> {
     const records = await this.records(domain);
     return Object.keys(records);
   }

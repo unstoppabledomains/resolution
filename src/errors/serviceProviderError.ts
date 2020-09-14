@@ -2,7 +2,6 @@
 type ServiceProviderErrorHandler = (error: ServiceProviderErrorOptions) => string;
 /** Explains ServiceProvider Error options */
 type ServiceProviderErrorOptions = {
-  providerName?: string
   providerMessage?: string;
 };
 
@@ -15,7 +14,7 @@ export enum ServiceProviderErrorCode {
  * Internal Mapping object from ServiceProviderErrorCode to a ServiceProviderErrorHandler
  */
 const HandlersByCode = {
-    [ServiceProviderErrorCode.GeneralError]: (params: {providerMessage, providerName}) => `${params.providerName}: ${params.providerMessage}`
+    [ServiceProviderErrorCode.GeneralError]: (params: {providerMessage, providerName}) => params.providerMessage;
 };
 
 /**

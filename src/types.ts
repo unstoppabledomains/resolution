@@ -73,6 +73,9 @@ export type ResolutionResponse = {
     type: string; // available domain
     ttl: number;
   };
+  records: {
+    [key: string]: string;
+  }
 };
 
 /** @internal */

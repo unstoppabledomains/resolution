@@ -419,7 +419,7 @@ describe('Resolution', () => {
       expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
     });
 
-    describe('.getAllKeys', () => {
+    describe('.allRecords', () => {
       it('should be able to get logs with ethers default provider', async () => {
         const provider = getDefaultProvider('mainnet');
 

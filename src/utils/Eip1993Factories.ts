@@ -32,7 +32,6 @@ function fromWeb3Version0Provider(provider: Web3Version0Provider): Provider {
             if (result.error) reject(
               new ServiceProviderError(
                 ServiceProviderErrorCode.GeneralError,{
-                  providerName: "Web3Version0Provider", 
                   providerMessage: result.error
                 })
             );
@@ -61,9 +60,8 @@ function fromWeb3Version1Provider(provider: Web3Version1Provider): Provider {
             if (result.error) reject(
               new ServiceProviderError(
                 ServiceProviderErrorCode.GeneralError,{
-                  providerName: "Web3Version1Provider", 
                   providerMessage: result.error
-                })  
+                })
             );
             resolve(result.result);
           },
@@ -97,7 +95,6 @@ function fromEthersProvider(provider: EthersProvider): Provider {
       } catch(error) {
         throw new ServiceProviderError(
           ServiceProviderErrorCode.GeneralError,{
-            providerName: "EthersProvider", 
             providerMessage: error.message
           })
       }

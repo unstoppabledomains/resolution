@@ -137,7 +137,7 @@ export default class Ens extends EthereumNamingService {
     return await this.getTextRecord(domain, 'gundb_public_key');
   }
 
-  async getAllKeys(domain: string): Promise<string[]> {
+  async allRecords(domain: string): Promise<string[]> {
     throw new Error('Method not implemented.');
   }
   
