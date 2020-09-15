@@ -22,7 +22,8 @@ Supported domain zones:
 
 [API Referrence](https://unstoppabledomains.github.io/resolution/)
 
-# Installation
+## Installation
+
 Use the `npm` or `yarn` to install resolution.
 
 ```
@@ -35,9 +36,75 @@ npm install -g @unstoppabledomains/resolution
 
 It should install binary named resolution in the default folder for your package manager. You can check it by running command `resolution -V` in command line. If everything is fine you will see the version installed.
 
-# Usage
+## Usage
 
-## CLI
+Create a new project.
+
+```shell
+mkdir test-out-resolution && cd $_
+yarn init -y
+yarn add @unstoppabledomains/resolution
+```
+
+Make a file, `script.js`.
+
+```javascript
+const {default: Resolution} = require('@unstoppabledomains/resolution')
+const resolution = new Resolution()
+function resolve(domain, currency) {
+  resolution.address(domain, currency)
+    .then(address => console.log(domain, 'resolves to', address))
+    .catch(console.error)
+}
+resolve('resolver.eth', "ETH")
+resolve('brad.zil', "ZIL")
+```
+
+Execute the script.
+
+```
+node script.js
+# brad.zil  resolves to zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj
+# resolver.eth resolves to 0xD3ddcCDD3b25A8a7423B5bEe360a42146eb4Baf3
+```
+
+### How to resolve
+
+Resolution library provides a way to resolve a domain name using a direct blockchain call.
+For this purpose there are two main methods to look for: ** Resolution.resolve ** and ** Resolution.address **
+
+#### Resolution#resolve
+
+This method accept the domain name and returns following object or null in case of error
+```javascript
+  {
+    addresses: {}, // if domain will resolve to anything it will be here
+    meta: {
+      owner: null, // this means the domain is avalable for purchase
+      ttl: 0,
+    },
+  }
+```
+
+#### Resolution#address
+
+This method accepts two arguments:
+ - domain name
+ - currency ticker in which address you are interested like ( BTC, ETH, ZIL )
+ 
+It returns you the address if such exists or simply null if such address wasn't found.
+Beside the resolution there are also methods to test whether the domain is in valid format or supported by the network
+
+#### Resolution#isSupportedDomain
+
+Accepts domain name and returns boolean if such domain is supported by ens, .crypto, or .zil
+
+#### Resolution#isSupportedDomainInNetwork
+
+Accepts the domain name and tests it against the current blockchain network specified in constructor of Resolution.
+It will also check if the domain is in valid format
+
+### CLI
 
 Once you have installed the CLI you can go ahead and use it without any extra configuration. By default the cli is
 using https://main-rpc.linkpool.io service as a gateway to blockchain. If you want to change it to some other providers
