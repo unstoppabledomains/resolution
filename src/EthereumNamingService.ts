@@ -70,9 +70,9 @@ export abstract class EthereumNamingService extends NamingService {
       source.url = source.url || EthereumNamingService.UrlMap[source.network];
     }
 
-    source.registry = source.registry ?
-      source.registry :
-      this.defaultRegistry(source.network as string);
+    source.registry = source.registry
+      ? source.registry
+      : this.defaultRegistry(source.network as string);
     return source;
   }
 

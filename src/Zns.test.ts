@@ -501,27 +501,26 @@ describe('ZNS', () => {
     });
 
     it('should return all records for zil domain', async () => {
-      const eye = mockAsyncMethod(resolution.zns, 'getContractMapValue',{ 
+      const eye = mockAsyncMethod(resolution.zns, 'getContractMapValue', {
         argtypes: [],
         arguments: [
           '0xcea21f5a6afc11b3a4ef82e986d63b8b050b6910',
-          '0x34bbdee3404138430c76c2d1b2d4a2d223a896df'
+          '0x34bbdee3404138430c76c2d1b2d4a2d223a896df',
         ],
         constructor: 'Record',
       });
       const secondEye = mockAsyncMethod(resolution.zns, 'getResolverRecords', {
         'crypto.ETH.address': '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
         'ipfs.html.value': 'QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu',
-        'whois.email.value': 'jeyhunt@gmail.com' 
+        'whois.email.value': 'jeyhunt@gmail.com',
       });
-      const records = await resolution.allRecords("johnnyjumper.zil");
+      const records = await resolution.allRecords('johnnyjumper.zil');
       expectSpyToBeCalled([eye, secondEye]);
       expect(records).toMatchObject({
         'crypto.ETH.address': '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
         'ipfs.html.value': 'QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu',
-        'whois.email.value': 'jeyhunt@gmail.com'
+        'whois.email.value': 'jeyhunt@gmail.com',
       });
     });
-
   });
 });

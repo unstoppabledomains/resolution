@@ -187,10 +187,13 @@ export default class Cns extends EthereumNamingService {
     });
   }
 
-  private constructRecords(keys: string[], values:string[]): Record<string, string> {
+  private constructRecords(
+    keys: string[],
+    values: string[],
+  ): Record<string, string> {
     const records: Record<string, string> = {};
     keys.forEach((key, index) => {
-    values[index] ? (records[key] = values[index]) : undefined;
+      values[index] ? (records[key] = values[index]) : undefined;
     });
     return records;
   }
@@ -207,14 +210,20 @@ export default class Cns extends EthereumNamingService {
     return this.constructRecords(keys, values);
   }
 
-  private async getAllRecords(resolverContract: Contract, tokenId: string): Promise<Record<string,string>> {
+  private async getAllRecords(
+    resolverContract: Contract,
+    tokenId: string,
+  ): Promise<Record<string, string>> {
     const logs = await resolverContract.fetchLogs('NewKey', tokenId);
     const keyTopics = logs.map(event => event.topics[2]);
-    const keys =  await this.callMethod(resolverContract, 'getManyByHash', [
+    const keys = await this.callMethod(resolverContract, 'getManyByHash', [
       keyTopics,
       tokenId,
     ]);
-    const keyValues = await this.callMethod(resolverContract, 'getMany', [keys, tokenId]);
+    const keyValues = await this.callMethod(resolverContract, 'getMany', [
+      keys,
+      tokenId,
+    ]);
     return this.constructRecords(keys, keyValues);
   }
 }

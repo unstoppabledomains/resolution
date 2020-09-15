@@ -140,7 +140,7 @@ export default class Ens extends EthereumNamingService {
   async allRecords(domain: string): Promise<Record<string, string>> {
     throw new Error('Method not implemented.');
   }
-  
+
   protected defaultRegistry(network: string): string | undefined {
     return EnsNetworkMap[EthereumNamingService.NetworkNameMap[network]];
   }

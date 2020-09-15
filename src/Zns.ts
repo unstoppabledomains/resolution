@@ -64,7 +64,7 @@ export default class Zns extends NamingService {
         type: this.name,
         ttl: parseInt(resolution.ttl as string) || 0,
       },
-      records: resolution.records
+      records: resolution.records,
     };
   }
 
@@ -124,8 +124,14 @@ export default class Zns extends NamingService {
 
   async allRecords(domain: string): Promise<Record<string, string>> {
     const addresses = await this.getRecordsAddresses(domain);
-    if (!addresses || !addresses[0]) throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {domain: domain});
-    if (!addresses[1]) throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {domain: domain});
+    if (!addresses || !addresses[0])
+      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+        domain: domain,
+      });
+    if (!addresses[1])
+      throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
+        domain: domain,
+      });
     return await this.getResolverRecords(addresses[1]);
   }
 

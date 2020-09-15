@@ -75,7 +75,7 @@ export type ResolutionResponse = {
   };
   records?: {
     [key: string]: string;
-  }
+  };
 };
 
 /** @internal */

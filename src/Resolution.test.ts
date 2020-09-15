@@ -419,7 +419,7 @@ describe('Resolution', () => {
 
     describe('.allRecords', () => {
       it('should be able to get logs with ethers default provider', async () => {
-        const provider = getDefaultProvider('mainnet', {quorum: 1});
+        const provider = getDefaultProvider('mainnet', { quorum: 1 });
 
         const eye = mockAsyncMethod(provider, 'call', params =>
           Promise.resolve(caseMock(params, RpcProviderTestCases)),
@@ -431,15 +431,17 @@ describe('Resolution', () => {
         const resolution = Resolution.fromEthersProvider(provider);
         const resp = await resolution.allRecords('brad.crypto');
         expectSpyToBeCalled([eye, eye2]);
-        expect(resp).toMatchObject({ 'gundb.username.value':
-        '0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c',
-       'ipfs.html.value': 'Qme54oEzRkgooJbCDr78vzKAWcv6DDEZqRhhDyDtzgrZP6',
-       'ipfs.redirect_domain.value':
-        'https://abbfe6z95qov3d40hf6j30g7auo7afhp.mypinata.cloud/ipfs/Qme54oEzRkgooJbCDr78vzKAWcv6DDEZqRhhDyDtzgrZP6',
-       'crypto.ETH.address': '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
-       'gundb.public_key.value':
-        'pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI',
-       'crypto.BTC.address': 'bc1q359khn0phg58xgezyqsuuaha28zkwx047c0c3y' });
+        expect(resp).toMatchObject({
+          'gundb.username.value':
+            '0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c',
+          'ipfs.html.value': 'Qme54oEzRkgooJbCDr78vzKAWcv6DDEZqRhhDyDtzgrZP6',
+          'ipfs.redirect_domain.value':
+            'https://abbfe6z95qov3d40hf6j30g7auo7afhp.mypinata.cloud/ipfs/Qme54oEzRkgooJbCDr78vzKAWcv6DDEZqRhhDyDtzgrZP6',
+          'crypto.ETH.address': '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
+          'gundb.public_key.value':
+            'pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI',
+          'crypto.BTC.address': 'bc1q359khn0phg58xgezyqsuuaha28zkwx047c0c3y',
+        });
       });
 
       it('should be able to get logs with jsonProvider', async () => {
@@ -457,15 +459,17 @@ describe('Resolution', () => {
 
         const resp = await resolution.allRecords('brad.crypto');
         expectSpyToBeCalled([eye, eye2]);
-        expect(resp).toMatchObject({ 'gundb.username.value':
-        '0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c',
-       'ipfs.html.value': 'Qme54oEzRkgooJbCDr78vzKAWcv6DDEZqRhhDyDtzgrZP6',
-       'ipfs.redirect_domain.value':
-        'https://abbfe6z95qov3d40hf6j30g7auo7afhp.mypinata.cloud/ipfs/Qme54oEzRkgooJbCDr78vzKAWcv6DDEZqRhhDyDtzgrZP6',
-       'crypto.ETH.address': '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
-       'gundb.public_key.value':
-        'pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI',
-       'crypto.BTC.address': 'bc1q359khn0phg58xgezyqsuuaha28zkwx047c0c3y' });
+        expect(resp).toMatchObject({
+          'gundb.username.value':
+            '0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c',
+          'ipfs.html.value': 'Qme54oEzRkgooJbCDr78vzKAWcv6DDEZqRhhDyDtzgrZP6',
+          'ipfs.redirect_domain.value':
+            'https://abbfe6z95qov3d40hf6j30g7auo7afhp.mypinata.cloud/ipfs/Qme54oEzRkgooJbCDr78vzKAWcv6DDEZqRhhDyDtzgrZP6',
+          'crypto.ETH.address': '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
+          'gundb.public_key.value':
+            'pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI',
+          'crypto.BTC.address': 'bc1q359khn0phg58xgezyqsuuaha28zkwx047c0c3y',
+        });
       });
 
       it('should get standard keys from legacy resolver', async () => {
@@ -478,25 +482,33 @@ describe('Resolution', () => {
         const resp = await resolution.allRecords('monmouthcounty.crypto');
 
         expectSpyToBeCalled([eye]);
-        expect(resp).toMatchObject( { 'crypto.BTC.address': '3NwuV8nVT2VKbtCs8evChdiW6kHTHcVpdn',
-        'crypto.ETH.address': '0x1C42088b82f6Fa5fB883A14240C4E066dDFf1517',
-        'crypto.LTC.address': 'MTnTNwKikiMi97Teq8XQRabL9SZ4HjnKNB',
-        'crypto.ADA.address':
-         'DdzFFzCqrhsfc3MQvjsLr9BHkaFYeE7BotyTATdETRoSPj6QPiotK4xpcFZk66KVmtr87tvUFTcbTHZRkcdbMR5Ss6jCfzCVtFRMB7WE',
-        'ipfs.html.value': 'QmYqX8D8SkaF5YcpaWMyi5xM43UEteFiSNKYsjLcdvCWud',
-        'ipfs.redirect_domain.value':
-         'https://abbfe6z95qov3d40hf6j30g7auo7afhp.mypinata.cloud/ipfs/QmYqX8D8SkaF5YcpaWMyi5xM43UEteFiSNKYsjLcdvCWud' });
+        expect(resp).toMatchObject({
+          'crypto.BTC.address': '3NwuV8nVT2VKbtCs8evChdiW6kHTHcVpdn',
+          'crypto.ETH.address': '0x1C42088b82f6Fa5fB883A14240C4E066dDFf1517',
+          'crypto.LTC.address': 'MTnTNwKikiMi97Teq8XQRabL9SZ4HjnKNB',
+          'crypto.ADA.address':
+            'DdzFFzCqrhsfc3MQvjsLr9BHkaFYeE7BotyTATdETRoSPj6QPiotK4xpcFZk66KVmtr87tvUFTcbTHZRkcdbMR5Ss6jCfzCVtFRMB7WE',
+          'ipfs.html.value': 'QmYqX8D8SkaF5YcpaWMyi5xM43UEteFiSNKYsjLcdvCWud',
+          'ipfs.redirect_domain.value':
+            'https://abbfe6z95qov3d40hf6j30g7auo7afhp.mypinata.cloud/ipfs/QmYqX8D8SkaF5YcpaWMyi5xM43UEteFiSNKYsjLcdvCWud',
+        });
       });
 
       it('should throw serviceProviderError from default provider', async () => {
         const resolution = new Resolution();
-        expectResolutionErrorCode(resolution.allRecords("brad.crypto"), ResolutionErrorCode.ServiceProviderError);
-      });      
+        expectResolutionErrorCode(
+          resolution.allRecords('brad.crypto'),
+          ResolutionErrorCode.ServiceProviderError,
+        );
+      });
 
       it('should throw serviceProviderError from ethers provider', async () => {
         const provider = getDefaultProvider('mainnet');
         const resolution = Resolution.fromEthersProvider(provider);
-        expectResolutionErrorCode(resolution.allRecords("brad.crypto"), ResolutionErrorCode.ServiceProviderError);
+        expectResolutionErrorCode(
+          resolution.allRecords('brad.crypto'),
+          ResolutionErrorCode.ServiceProviderError,
+        );
       });
     });
   });
