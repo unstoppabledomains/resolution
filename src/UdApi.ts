@@ -101,11 +101,8 @@ export default class Udapi extends NamingService {
     return this.ensureRecordPresence(domain, 'httpUrl', value);
   }
 
-  async allRecords(domain: string): Promise<string[]> {
-    const answer = await this.resolve(domain);
-    const recordsObj = answer.records || [];
-    const recordKeys = Object.keys(recordsObj);
-    return recordKeys;
+  async allRecords(domain: string): Promise<Record<string, string>> {
+    return (await this.resolve(domain)).records || {};
   }
 
   async resolve(domain: string): Promise<ResolutionResponse> {

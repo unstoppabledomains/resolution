@@ -392,7 +392,7 @@ export default class Resolution {
    * Currently supports only CNS
    * @param domain - domain name
    */
-  async allRecords(domain: string): Promise<string[]> {
+  async allRecords(domain: string): Promise<Record<string, string>> {
     domain = this.prepareDomain(domain);
     return await this.getNamingMethodOrThrow(domain).allRecords(domain);
   }

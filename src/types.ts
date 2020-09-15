@@ -73,7 +73,7 @@ export type ResolutionResponse = {
     type: string; // available domain
     ttl: number;
   };
-  records: {
+  records?: {
     [key: string]: string;
   }
 };
