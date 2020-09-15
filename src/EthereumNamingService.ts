@@ -17,22 +17,23 @@ export abstract class EthereumNamingService extends NamingService {
   readonly name: NamingServiceName;
   protected abstract getResolver(id: string): Promise<string>;
   protected registryContract: Contract;
-  static readonly NetworkIdMap: NetworkIdMap = {
-    1: 'mainnet',
-    3: 'ropsten',
-    4: 'rinkeby',
-    5: 'goerli',
-    42: 'kovan',
-  };
 
   static readonly UrlMap: BlockhanNetworkUrlMap = {
-    mainnet: 'https://main-rpc.linkpool.io',
-    ropsten: 'https://ropsten-rpc.linkpool.io',
+    1: 'https://main-rpc.linkpool.io',
+    3: 'https://ropsten-rpc.linkpool.io',
   };
 
-  static readonly NetworkNameMap = invert(EthereumNamingService.NetworkIdMap);
+  static readonly NetworkNameMap = {
+    mainnet: 1,
+    ropsten: 3,
+    rinkeby: 4,
+    goerli: 5,
+    kovan: 42,
+  }
 
-  protected abstract defaultRegistry(network: string): string | undefined;
+  static readonly NetworkIdMap: NetworkIdMap = invert(EthereumNamingService.NetworkNameMap);
+
+  protected abstract defaultRegistry(network: number): string | undefined;
 
   async resolver(domain: string): Promise<string> {
     const nodeHash = this.namehash(domain);
@@ -54,25 +55,23 @@ export abstract class EthereumNamingService extends NamingService {
     }
     for (const key in EthereumNamingService.NetworkNameMap) {
       if (!EthereumNamingService.NetworkNameMap.hasOwnProperty(key)) continue;
-      if (url.indexOf(key) >= 0) return key;
+      if (url.indexOf(key) >= 0) return EthereumNamingService.NetworkNameMap[key];
     }
+    return undefined;
   }
 
   protected normalizeSource(source: SourceDefinition): SourceDefinition {
     source = { ...source };
-    if (typeof source.network == 'number') {
-      source.network =
-        EthereumNamingService.NetworkIdMap[source.network] || source.network;
-    }
-    source.network =
-      source.network || this.networkFromUrl(source.url) || 'mainnet';
-    if (!source.provider) {
-      source.url = source.url || EthereumNamingService.UrlMap[source.network];
+    source.network = typeof source.network == 'string' ?
+      EthereumNamingService.NetworkNameMap[source.network] :
+      source.network || this.networkFromUrl(source.url) || 1;
+    if (!source.provider && !source.url) {
+      source.url = source.network ? EthereumNamingService.UrlMap[source.network] : undefined;
     }
 
-    source.registry = source.registry
-      ? source.registry
-      : this.defaultRegistry(source.network as string);
+    source.registry = source.registry ?
+      source.registry :
+      this.defaultRegistry(source.network as number);
     return source;
   }
 
@@ -98,18 +97,8 @@ export abstract class EthereumNamingService extends NamingService {
   ): Promise<any> {
     try {
       const result = await contract.call(method, params);
-      if (!result.length) {
-        throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-          recordName: method,
-          domain: params[params.length - 1] as string,
-        });
-      }
       return result[0];
     } catch (error) {
-      if (error instanceof ResolutionError) {
-        throw error;
-      }
-
       const { message }: { message: string } = error;
       if (
         message.match(/Invalid JSON RPC response/) ||

@@ -141,8 +141,8 @@ export default class Ens extends EthereumNamingService {
     throw new Error('Method not implemented.');
   }
 
-  protected defaultRegistry(network: string): string | undefined {
-    return EnsNetworkMap[EthereumNamingService.NetworkNameMap[network]];
+  protected defaultRegistry(network: number): string | undefined {
+    return EnsNetworkMap[network];
   }
 
   private async getContentHash(domain: string): Promise<string | undefined> {

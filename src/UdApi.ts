@@ -37,13 +37,7 @@ export default class Udapi extends NamingService {
   }
 
   namehash(domain: string): string {
-    const method = this.findMethod(domain);
-    if (!method) {
-      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
-        domain,
-      });
-    }
-    return method.namehash(domain);
+    return this.findMethodOrThrow(domain).namehash(domain);
   }
 
   async address(domain: string, currencyTicker: string): Promise<string> {
@@ -132,7 +126,7 @@ export default class Udapi extends NamingService {
   }
 
   protected normalizeSource(source): SourceDefinition {
-    return { network: 'mainnet', ...source };
+    return {network: 1, ...source};
   }
 
   private findMethod(domain: string) {
