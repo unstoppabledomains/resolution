@@ -139,33 +139,15 @@ export default class Cns extends EthereumNamingService {
     return await this.record(domain, 'ipfs.redirect_domain.value');
   }
 
-  async allRecords(domain: string): Promise<string[]> {
+  async allRecords(domain: string): Promise<Record<string, string>> {
     const tokenId = this.namehash(domain);
     const resolver = await this.resolver(domain);
 
     const resolverContract = this.buildContract(resolverInterface, resolver);
     if (isLegacyResolver(resolver)) {
-      return await this.getStandardKeys(resolverContract, tokenId);
+      return await this.getStandardRecords(resolverContract, tokenId);
     }
-
-    const logs = await resolverContract.fetchLogs('NewKey', tokenId);
-    const keyHashes = logs.map(event => event.topics[2]);
-    return await this.callMethod(resolverContract, 'getManyByHash', [
-      keyHashes,
-      tokenId,
-    ]);
-  }
-
-  private async getStandardKeys(
-    resolverContract: Contract,
-    tokenId: string,
-  ): Promise<string[]> {
-    const keys = Object.values(standardKeys);
-    const response = await this.callMethod(resolverContract, 'getMany', [
-      keys,
-      tokenId,
-    ]);
-    return keys.filter((key, index) => response[index]);
+    return await this.getAllRecords(resolverContract, tokenId);
   }
 
   async record(domain: string, key: string): Promise<string> {
@@ -203,5 +185,36 @@ export default class Cns extends EthereumNamingService {
     throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
       domain,
     });
+  }
+
+  private constructRecords(keys: string[], values:string[]): Record<string, string> {
+    const records: Record<string, string> = {};
+    keys.forEach((key, index) => {
+    values[index] ? (records[key] = values[index]) : undefined;
+    });
+    return records;
+  }
+
+  private async getStandardRecords(
+    resolverContract: Contract,
+    tokenId: string,
+  ): Promise<Record<string, string>> {
+    const keys = Object.values(standardKeys);
+    const values = await this.callMethod(resolverContract, 'getMany', [
+      keys,
+      tokenId,
+    ]);
+    return this.constructRecords(keys, values);
+  }
+
+  private async getAllRecords(resolverContract: Contract, tokenId: string): Promise<Record<string,string>> {
+    const logs = await resolverContract.fetchLogs('NewKey', tokenId);
+    const keyTopics = logs.map(event => event.topics[2]);
+    const keys =  await this.callMethod(resolverContract, 'getManyByHash', [
+      keyTopics,
+      tokenId,
+    ]);
+    const keyValues = await this.callMethod(resolverContract, 'getMany', [keys, tokenId]);
+    return this.constructRecords(keys, keyValues);
   }
 }

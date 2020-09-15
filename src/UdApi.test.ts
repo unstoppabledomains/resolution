@@ -157,8 +157,8 @@ describe('Unstoppable API', () => {
     });
     const records = await resolution.allRecords("johnnyjumper.zil");
     expectSpyToBeCalled([eyes]);
-    expect(records).toContain("ipfs.html.value");
-    expect(records).toContain("whois.email.value");
-    expect(records).toContain("crypto.ETH.address");
+    expect(records).toMatchObject({ 'ipfs.html.value': 'QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu',
+    'whois.email.value': 'jeyhunt@gmail.com',
+    'crypto.ETH.address': '0xe7474D07fD2FA286e7e0aa23cd107F8379085037' });
   })
 });
