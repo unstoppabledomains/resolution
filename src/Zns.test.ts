@@ -191,119 +191,6 @@ describe('ZNS', () => {
       });
     });
 
-    it('should resolve with Resolution key setuped', async () => {
-      const eye = mockAsyncMethod(resolution.zns, 'getRecordsAddresses', [
-        'zil194qcjskuuxh6qtg8xw3qqrr3kdc6dtq8ct6j9s',
-        '0xdac22230adfe4601f00631eae92df6d77f054891',
-      ]);
-
-      const secondEye = mockAsyncMethod(resolution.zns, 'getResolverRecords', {
-        'crypto.BCH.address': 'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6',
-        'crypto.BTC.address': '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB',
-        'crypto.DASH.address': 'XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j',
-        'crypto.ETH.address': '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
-        'crypto.LTC.address': 'LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL',
-        'crypto.XMR.address':
-          '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d',
-        'crypto.ZEC.address': 't1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV',
-        'crypto.ZIL.address': 'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
-        'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
-        'ipfs.redirect_domain.value': 'www.unstoppabledomains.com',
-      });
-
-      const result = await resolution.zns!.resolution('brad.zil');
-      expectSpyToBeCalled([eye, secondEye]);
-      expect(result).toEqual({
-        crypto: {
-          BCH: { address: 'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6' },
-          BTC: { address: '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB' },
-          DASH: { address: 'XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j' },
-          ETH: { address: '0x45b31e01AA6f42F0549aD482BE81635ED3149abb' },
-          LTC: { address: 'LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL' },
-          XMR: {
-            address:
-              '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d',
-          },
-          ZEC: { address: 't1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV' },
-          ZIL: { address: 'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj' },
-        },
-        ipfs: {
-          html: { value: 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK' },
-          redirect_domain: { value: 'www.unstoppabledomains.com' },
-        },
-      });
-    });
-
-    it('should resolve with Resolution key setuped #2', async () => {
-      const eye = mockAsyncMethod(resolution.zns, 'getRecordsAddresses', [
-        'zil1f6vyj5hgvll3xtx5kuxd8ucn66x9zxmkp34agy',
-        '0xa9b1d3647e4deb9ce4e601c2c9e0a2fdf2d7415a',
-      ]);
-
-      const secondEye = mockAsyncMethod(resolution.zns, 'getResolverRecords', {
-        'ipfs.html.hash': 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
-        'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu',
-        'ipfs.redirect_domain.value': 'www.unstoppabledomains.com',
-        'whois.email.value': 'matt+test@unstoppabledomains.com',
-        'whois.for_sale.value': 'true',
-      });
-
-      const result = await resolution.zns!.resolution('ergergergerg.zil');
-      expectSpyToBeCalled([eye, secondEye]);
-      expect(result).toEqual({
-        ipfs: {
-          html: {
-            hash: 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
-            value: 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu',
-          },
-          redirect_domain: { value: 'www.unstoppabledomains.com' },
-        },
-        whois: {
-          email: { value: 'matt+test@unstoppabledomains.com' },
-          for_sale: { value: 'true' },
-        },
-      });
-    });
-
-    it('should resolve with Resolution key setuped #3', async () => {
-      const zns = resolution.zns;
-
-      expect(zns).toBeDefined();
-      const result = await zns!.resolution('invalid.domain');
-      expect(result).toEqual({});
-    });
-
-    it('should resolve with Resolution key setuped #4', async () => {
-      const zns = resolution.zns;
-      const spies = mockAsyncMethods(zns, {
-        getRecordsAddresses: [
-          'zil1tqcrcg50emead2pp6p37p0hnupkswpnlwpnm3r',
-          '0x6aec0e4bb2c6fa4acacdaa3f3d871db5e2e1c0ea',
-        ],
-        getContractField: {
-          'crypto.BTC.address': '17LV6fxL8b1pJomn5zoDR3ZCnbt88ehGBf',
-          'crypto.ETH.address': '0x0ed6180ef7c638064b9b17ff53ba76ec7077dd95',
-          'crypto.LTC.address': 'MTbeoMfWqEZaaZVG1yE1ENoxVGNmMAxoEj',
-          'whois.email.value': 'jordanb_970@hotmail.com',
-          'whois.for_sale.value': 'true',
-        },
-      });
-      expect(zns).toBeDefined();
-      const result = await zns!.resolution('mcafee2020.zil');
-      expectSpyToBeCalled(spies);
-      expect(result).toEqual({
-        crypto: {
-          BTC: { address: '17LV6fxL8b1pJomn5zoDR3ZCnbt88ehGBf' },
-          ETH: { address: '0x0ed6180ef7c638064b9b17ff53ba76ec7077dd95' },
-          LTC: { address: 'MTbeoMfWqEZaaZVG1yE1ENoxVGNmMAxoEj' },
-        },
-        whois: {
-          email: { value: 'jordanb_970@hotmail.com' },
-          for_sale: { value: 'true' },
-        },
-      });
-    });
-
     it('should return a valid resolver address', async () => {
       const spies = mockAsyncMethods(resolution.zns, {
         getRecordsAddresses: [
@@ -379,7 +266,7 @@ describe('ZNS', () => {
   });
 
   describe('.isSupportedDomain', () => {
-    it("doesn't support zil domain when zns is disabled", () => {
+    it('does not support zil domain when zns is disabled', () => {
       const resolution = new Resolution({ blockchain: { zns: false } });
       expect(resolution.zns).toBeUndefined();
       expect(resolution.isSupportedDomain('hello.zil')).toBeFalsy();
