@@ -89,10 +89,6 @@ export default class Zns extends NamingService {
     return data ? data.meta.owner : null;
   }
 
-  async resolution(domain: string): Promise<ZnsResolution> {
-    return this.structureResolverRecords(await this.records(domain));
-  }
-
   async ipfsHash(domain: string): Promise<string> {
     return await this.getRecordOrThrow(domain, 'ipfs.html.value');
   }
