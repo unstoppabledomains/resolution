@@ -389,7 +389,8 @@ export default class Resolution {
 
   /**
    * Returns all record keys of the domain.
-   * Currently supports only CNS
+   * This method is strongly unrecommended for production use due to lack of support for many ethereum service providers and low performance
+   * Method is not supported by ENS
    * @param domain - domain name
    */
   async allRecords(domain: string): Promise<Record<string, string>> {
