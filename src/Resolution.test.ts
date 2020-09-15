@@ -19,11 +19,9 @@ import {
   caseMock,
   mockAsyncMethod,
   expectConfigurationErrorCode,
-  expectServiceProviderErrorCode,
 } from './tests/helpers';
 import _ from 'lodash';
 import { RpcProviderTestCases } from './tests/providerMockData';
-import { ServiceProviderErrorCode } from './errors/serviceProviderError';
 
 try {
   const dotenv = require('dotenv');
@@ -487,13 +485,13 @@ describe('Resolution', () => {
 
       it('should throw serviceProviderError from default provider', async () => {
         const resolution = new Resolution();
-        expectServiceProviderErrorCode(resolution.allRecords("brad.crypto"), ServiceProviderErrorCode.GeneralError);
+        expectResolutionErrorCode(resolution.allRecords("brad.crypto"), ResolutionErrorCode.ServiceProviderError);
       });      
 
       it('should throw serviceProviderError from ethers provider', async () => {
         const provider = getDefaultProvider('mainnet');
         const resolution = Resolution.fromEthersProvider(provider);
-        expectServiceProviderErrorCode(resolution.allRecords("brad.crypto"), ServiceProviderErrorCode.GeneralError);
+        expectResolutionErrorCode(resolution.allRecords("brad.crypto"), ResolutionErrorCode.ServiceProviderError);
       });
     });
   });

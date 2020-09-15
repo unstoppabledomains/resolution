@@ -7,7 +7,7 @@ import {
   Web3Version1Provider,
 } from '../types';
 import { ConfigurationError, ConfigurationErrorCode } from '../errors/configurationError';
-import ServiceProviderError, { ServiceProviderErrorCode } from '../errors/serviceProviderError';
+import ResolutionError, { ResolutionErrorCode } from '../errors/resolutionError';
 
 export const Eip1993Factories = {
   fromWeb3Version0Provider,
@@ -30,8 +30,8 @@ function fromWeb3Version0Provider(provider: Web3Version0Provider): Provider {
           (error: Error | null, result: JsonRpcResponse) => {
             if (error) reject(error);
             if (result.error) reject(
-              new ServiceProviderError(
-                ServiceProviderErrorCode.GeneralError,{
+              new ResolutionError(
+                ResolutionErrorCode.ServiceProviderError,{
                   providerMessage: result.error
                 })
             );
@@ -58,8 +58,8 @@ function fromWeb3Version1Provider(provider: Web3Version1Provider): Provider {
           (error: Error | null, result: JsonRpcResponse) => {
             if (error) reject(error);
             if (result.error) reject(
-              new ServiceProviderError(
-                ServiceProviderErrorCode.GeneralError,{
+              new ResolutionError(
+                ResolutionErrorCode.ServiceProviderError,{
                   providerMessage: result.error
                 })
             );
@@ -93,8 +93,8 @@ function fromEthersProvider(provider: EthersProvider): Provider {
             throw new Error(`Unsupported provider method ${request.method}`);
         }
       } catch(error) {
-        throw new ServiceProviderError(
-          ServiceProviderErrorCode.GeneralError,{
+        throw new ResolutionError(
+          ResolutionErrorCode.ServiceProviderError,{
             providerMessage: error.message
           })
       }

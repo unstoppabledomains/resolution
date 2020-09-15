@@ -3,6 +3,7 @@ import { ResolutionMethod } from '../types';
 type ResolutionErrorHandler = (error: ResolutionErrorOptions) => string;
 /** Explains Resolution Error options */
 type ResolutionErrorOptions = {
+  providerMessage?: string;
   method?: ResolutionMethod;
   domain?: string;
   currencyTicker?: string;
@@ -18,6 +19,7 @@ export enum ResolutionErrorCode {
   UnsupportedCurrency = 'UnsupportedCurrency',
   IncorrectResolverInterface = 'IncorrectResolverInterface',
   RecordNotFound = 'RecordNotFound',
+  ServiceProviderError = "ServiceProviderError",
 }
 
 /**
@@ -49,6 +51,9 @@ const HandlersByCode = {
     recordName: string;
     domain: string;
   }) => `No ${params.recordName} record found for ${params.domain}`,
+  [ResolutionErrorCode.ServiceProviderError]: (params: {
+    providerMessage?: string
+  }) => `< ${params.providerMessage} >`
 };
 
 /**
