@@ -1,4 +1,5 @@
 ## Unreleased
+* Deprecated Resolution#address Resolution#addressOrThrow ResolutionErrorCode.UnspecifiedCurrency
 
 ## 1.6.1
 
