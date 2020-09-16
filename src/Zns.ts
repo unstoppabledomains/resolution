@@ -53,7 +53,7 @@ export default class Zns extends NamingService {
     );
     const addresses: Record<string, string> = {};
     if (resolution.crypto) {
-      Object.entries(resolution.crypto).map(
+      Object.entries(resolution.crypto).forEach(
         ([key, v]) => v.address && (addresses[key] = v.address),
       );
     }
@@ -64,6 +64,7 @@ export default class Zns extends NamingService {
         type: this.name,
         ttl: parseInt(resolution.ttl as string) || 0,
       },
+      records: resolution.records,
     };
   }
 
@@ -117,12 +118,17 @@ export default class Zns extends NamingService {
     return await this.getResolverRecords((await this.resolverAddress(domain))!);
   }
 
+  async allRecords(domain: string): Promise<Record<string, string>> {
+    const resolverAddress = await this.resolver(domain);
+    return await this.getResolverRecords(resolverAddress);
+  }
+
   isSupportedDomain(domain: string): boolean {
     const tokens = domain.split('.');
     return (
       !!tokens.length &&
       tokens[tokens.length - 1] === 'zil' &&
-      tokens.every((v) => !!v.length)
+      tokens.every(v => !!v.length)
     );
   }
 
@@ -162,12 +168,14 @@ export default class Zns extends NamingService {
     source: SourceDefinition | undefined,
   ): SourceDefinition {
     source = { ...source };
-    source.network = typeof source.network == 'string' ?
-      NetworkIdMap[source.network] :
-      source.network || (source.url && UrlNetworkMap[source.url]) || 1;
+    source.network =
+      typeof source.network == 'string'
+        ? NetworkIdMap[source.network]
+        : source.network || (source.url && UrlNetworkMap[source.url]) || 1;
 
     if (!source.provider && !source.url) {
-      source.url = typeof source.network === 'number' ? UrlMap[source.network]: undefined;
+      source.url =
+        typeof source.network === 'number' ? UrlMap[source.network] : undefined;
     }
 
     source.registry = source.registry || RegistryMap[source.network!];
@@ -245,9 +253,9 @@ export default class Zns extends NamingService {
     field: string,
     keys: string[] = [],
   ): Promise<any> {
-    const contractAddr = contractAddress.startsWith('zil1') ?
-      fromBech32Address(contractAddress) :
-      contractAddress;
+    const contractAddr = contractAddress.startsWith('zil1')
+      ? fromBech32Address(contractAddress)
+      : contractAddress;
     const result = (await this.fetchSubState(contractAddr, field, keys)) || {};
     return result[field];
   }

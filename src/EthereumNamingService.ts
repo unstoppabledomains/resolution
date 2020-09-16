@@ -29,9 +29,11 @@ export abstract class EthereumNamingService extends NamingService {
     rinkeby: 4,
     goerli: 5,
     kovan: 42,
-  }
+  };
 
-  static readonly NetworkIdMap: NetworkIdMap = invert(EthereumNamingService.NetworkNameMap);
+  static readonly NetworkIdMap: NetworkIdMap = invert(
+    EthereumNamingService.NetworkNameMap,
+  );
 
   protected abstract defaultRegistry(network: number): string | undefined;
 
@@ -44,7 +46,7 @@ export abstract class EthereumNamingService extends NamingService {
     } else {
       // We don't care about this promise anymore
       // Ensure it doesn't generate a warning if it rejects
-      ownerPromise.catch(() => { });
+      ownerPromise.catch(() => {});
     }
     return resolverAddress;
   }
@@ -55,23 +57,27 @@ export abstract class EthereumNamingService extends NamingService {
     }
     for (const key in EthereumNamingService.NetworkNameMap) {
       if (!EthereumNamingService.NetworkNameMap.hasOwnProperty(key)) continue;
-      if (url.indexOf(key) >= 0) return EthereumNamingService.NetworkNameMap[key];
+      if (url.indexOf(key) >= 0)
+        return EthereumNamingService.NetworkNameMap[key];
     }
     return undefined;
   }
 
   protected normalizeSource(source: SourceDefinition): SourceDefinition {
     source = { ...source };
-    source.network = typeof source.network == 'string' ?
-      EthereumNamingService.NetworkNameMap[source.network] :
-      source.network || this.networkFromUrl(source.url) || 1;
+    source.network =
+      typeof source.network == 'string'
+        ? EthereumNamingService.NetworkNameMap[source.network]
+        : source.network || this.networkFromUrl(source.url) || 1;
     if (!source.provider && !source.url) {
-      source.url = source.network ? EthereumNamingService.UrlMap[source.network] : undefined;
+      source.url = source.network
+        ? EthereumNamingService.UrlMap[source.network]
+        : undefined;
     }
 
-    source.registry = source.registry ?
-      source.registry :
-      this.defaultRegistry(source.network as number);
+    source.registry = source.registry
+      ? source.registry
+      : this.defaultRegistry(source.network as number);
     return source;
   }
 
@@ -93,7 +99,7 @@ export abstract class EthereumNamingService extends NamingService {
   protected async callMethod(
     contract: Contract,
     method: string,
-    params: string[],
+    params: (string | string[])[],
   ): Promise<any> {
     try {
       const result = await contract.call(method, params);

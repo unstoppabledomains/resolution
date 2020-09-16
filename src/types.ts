@@ -73,6 +73,9 @@ export type ResolutionResponse = {
     type: string; // available domain
     ttl: number;
   };
+  records?: {
+    [key: string]: string;
+  };
 };
 
 /** @internal */
@@ -111,6 +114,7 @@ export interface Provider {
 }
 
 /**
+ * @internal
  * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-core-helpers/types/index.d.ts#L216
  */
 export interface JsonRpcPayload {
@@ -120,6 +124,7 @@ export interface JsonRpcPayload {
   id?: string | number;
 }
 
+/** @internal */
 export interface JsonRpcResponse {
   jsonrpc: string;
   id: number;
@@ -132,17 +137,55 @@ type ProviderMethod = (
   callback: (error: Error | null, result?: JsonRpcResponse) => void,
 ) => void;
 
+/** @internal */
 export type TransactionRequest = {
-    to?: unknown,
-    from?: unknown,
-    nonce?: unknown,
+  to?: unknown;
+  from?: unknown;
+  nonce?: unknown;
 
-    gasLimit?: unknown,
-    gasPrice?: unknown,
+  gasLimit?: unknown;
+  gasPrice?: unknown;
 
-    data?: unknown,
-    value?: unknown,
-    chainId?: unknown,
+  data?: unknown;
+  value?: unknown;
+  chainId?: unknown;
+};
+
+/** @internal */
+export interface EventData {
+  address: string;
+  blockHash: string;
+  blockNumber: string;
+  data: string;
+  logIndex: string;
+  removed: boolean;
+  topics: string[];
+  transactionHash: string;
+  transactionIndex: string;
+}
+
+/** @internal */
+export interface EventFilter {
+  address?: string;
+  topics?: Array<string>;
+  fromBlock?: string;
+  toBlock?: string;
+}
+
+/** @internal */
+export type RpcProviderTestCase = {
+  request: RpcProviderRequestBody;
+  response: string | RpcProviderLogEntry[];
+}[];
+
+/** @internal */
+export interface RpcProviderRequestBody {
+  data?: string;
+  to?: string;
+  fromBlock?: string;
+  toBlock?: string;
+  address?: string;
+  topics?: string[];
 }
 
 /**
@@ -150,6 +193,20 @@ export type TransactionRequest = {
  */
 export interface EthersProvider {
   call(transaction: TransactionRequest, blockTag?: never): Promise<string>;
+  getLogs(filter: EventFilter): Promise<RpcProviderLogEntry[]>;
+}
+
+/** @internal */
+export interface RpcProviderLogEntry {
+  blockNumber: number;
+  blockHash: string;
+  transactionIndex: number;
+  removed: boolean;
+  address: string;
+  data: string;
+  topics: string[];
+  transactionHash: string;
+  logIndex: number;
 }
 
 export interface Web3Version0Provider {
@@ -186,7 +243,9 @@ export enum NullAddresses {
   '0x0000000000000000000000000000000000000000000000000000000000000000',
 }
 
-export function isNullAddress(key: string | null | undefined): key is undefined | null {
+export function isNullAddress(
+  key: string | null | undefined,
+): key is undefined | null {
   if (!key) return true;
   return Object.values(NullAddresses).includes(key);
 }

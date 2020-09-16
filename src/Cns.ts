@@ -8,11 +8,14 @@ import {
   NullAddress,
 } from './types';
 import { default as proxyReaderAbi } from './cns/contract/proxyReader';
+import { default as resolverInterface } from './cns/contract/resolver';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import ICnsReader, { Data } from './cns/ICnsReader';
 import CnsProxyReader from './cns/CnsProxyReader';
 import CnsRegistryReader from './cns/CnsRegistryReader';
 import Contract from './utils/contract';
+import standardKeys from './utils/standardKeys';
+import { isLegacyResolver } from './utils';
 
 const ReaderMap: ReaderMap = {
   1: '0x7ea9ee21077f84339eda9c80048ec6db678642b1',
@@ -30,9 +33,9 @@ export default class Cns extends EthereumNamingService {
 
   async getReader(): Promise<ICnsReader> {
     if (!this.reader) {
-      this.reader = await this.isDataReaderSupported() ?
-        new CnsProxyReader(this.contract) :
-        new CnsRegistryReader(this.contract);
+      this.reader = (await this.isDataReaderSupported())
+        ? new CnsProxyReader(this.contract)
+        : new CnsRegistryReader(this.contract);
     }
     return this.reader;
   }
@@ -47,13 +50,15 @@ export default class Cns extends EthereumNamingService {
     }
 
     try {
-      const [isDataReaderSupported] = await this.contract.call('supportsInterface', ['0x6eabca0d']);
+      const [
+        isDataReaderSupported,
+      ] = await this.contract.call('supportsInterface', ['0x6eabca0d']);
       if (!isDataReaderSupported) {
         throw new Error('Not supported DataReader');
       }
 
       return true;
-    } catch { }
+    } catch {}
 
     return false;
   }
@@ -63,7 +68,7 @@ export default class Cns extends EthereumNamingService {
       domain === 'crypto' ||
       (domain.indexOf('.') > 0 &&
         /^.{1,}\.(crypto)$/.test(domain) &&
-        domain.split('.').every((v) => !!v.length))
+        domain.split('.').every(v => !!v.length))
     );
   }
 
@@ -134,6 +139,17 @@ export default class Cns extends EthereumNamingService {
     return await this.record(domain, 'ipfs.redirect_domain.value');
   }
 
+  async allRecords(domain: string): Promise<Record<string, string>> {
+    const tokenId = this.namehash(domain);
+    const resolver = await this.resolver(domain);
+
+    const resolverContract = this.buildContract(resolverInterface, resolver);
+    if (isLegacyResolver(resolver)) {
+      return await this.getStandardRecords(resolverContract, tokenId);
+    }
+    return await this.getAllRecords(resolverContract, tokenId);
+  }
+
   async record(domain: string, key: string): Promise<string> {
     const tokenId = this.namehash(domain);
 
@@ -159,7 +175,7 @@ export default class Cns extends EthereumNamingService {
       return;
     }
 
-    const owner = data.owner || await this.owner(domain);
+    const owner = data.owner || (await this.owner(domain));
     if (isNullAddress(owner)) {
       throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
         domain,
@@ -169,5 +185,45 @@ export default class Cns extends EthereumNamingService {
     throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
       domain,
     });
+  }
+
+  private constructRecords(
+    keys: string[],
+    values: string[],
+  ): Record<string, string> {
+    const records: Record<string, string> = {};
+    keys.forEach((key, index) => {
+      values[index] ? (records[key] = values[index]) : undefined;
+    });
+    return records;
+  }
+
+  private async getStandardRecords(
+    resolverContract: Contract,
+    tokenId: string,
+  ): Promise<Record<string, string>> {
+    const keys = Object.values(standardKeys);
+    const values = await this.callMethod(resolverContract, 'getMany', [
+      keys,
+      tokenId,
+    ]);
+    return this.constructRecords(keys, values);
+  }
+
+  private async getAllRecords(
+    resolverContract: Contract,
+    tokenId: string,
+  ): Promise<Record<string, string>> {
+    const logs = await resolverContract.fetchLogs('NewKey', tokenId);
+    const keyTopics = logs.map(event => event.topics[2]);
+    const keys = await this.callMethod(resolverContract, 'getManyByHash', [
+      keyTopics,
+      tokenId,
+    ]);
+    const keyValues = await this.callMethod(resolverContract, 'getMany', [
+      keys,
+      tokenId,
+    ]);
+    return this.constructRecords(keys, keyValues);
   }
 }

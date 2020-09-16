@@ -11,7 +11,9 @@ import {
   pendingInLive,
   expectConfigurationErrorCode,
 } from './tests/helpers';
-import ConfigurationError, { ConfigurationErrorCode } from './errors/configurationError';
+import ConfigurationError, {
+  ConfigurationErrorCode,
+} from './errors/configurationError';
 let resolution: Resolution;
 
 try {
@@ -119,11 +121,7 @@ describe('ENS', () => {
   });
 
   it('resolves .luxe name using ENS blockchain with safe null return', async () => {
-    const ownerEye = mockAsyncMethod(
-      resolution.ens,
-      'getOwner',
-      NullAddress,
-    );
+    const ownerEye = mockAsyncMethod(resolution.ens, 'getOwner', NullAddress);
     const result = await resolution.address('something.luxe', 'ETH');
     expectSpyToBeCalled([ownerEye]);
     expect(result).toEqual(null);
@@ -160,7 +158,10 @@ describe('ENS', () => {
   });
 
   it('checks if the network is supported(false)', async () => {
-    expectConfigurationErrorCode(() => new Ens({ network: 42}), ConfigurationErrorCode.UnspecifiedUrl);
+    expectConfigurationErrorCode(
+      () => new Ens({ network: 42 }),
+      ConfigurationErrorCode.UnspecifiedUrl,
+    );
   });
 
   it('checks normalizeSource ens (boolean)', async () => {
@@ -223,7 +224,10 @@ describe('ENS', () => {
   });
 
   it('checks normalizeSource ens (object) #9', async () => {
-    expectConfigurationErrorCode(() => new Resolution({ blockchain: { ens: { network: 'kovan' } }}), ConfigurationErrorCode.UnspecifiedUrl);
+    expectConfigurationErrorCode(
+      () => new Resolution({ blockchain: { ens: { network: 'kovan' } } }),
+      ConfigurationErrorCode.UnspecifiedUrl,
+    );
   });
 
   it('checks normalizeSource ens (object) #10', async () => {
@@ -270,11 +274,15 @@ describe('ENS', () => {
   });
 
   it('checks normalizeSource ens (object) #13', async () => {
-    expectConfigurationErrorCode(() => new Resolution({
-      blockchain: {
-        ens: { network: 'custom', url: 'https://custom.notinfura.io' },
-      },
-    }), ConfigurationErrorCode.UnspecifiedNetwork);
+    expectConfigurationErrorCode(
+      () =>
+        new Resolution({
+          blockchain: {
+            ens: { network: 'custom', url: 'https://custom.notinfura.io' },
+          },
+        }),
+      ConfigurationErrorCode.UnspecifiedNetwork,
+    );
   });
 
   it('checks ens multicoin support #1', async () => {
@@ -590,21 +598,31 @@ describe('ENS', () => {
     it('should resolve gundb id and public key', async () => {
       const eyes = mockAsyncMethods(resolution.ens, {
         getResolver: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
-        callMethod: '0x7e1d12f34e038a2bda3d5f6ee0809d72f668c357d9e64fd7f622513f06ea652146ab5fdee35dc4ce77f1c089fd74972691fccd48130306d9eafcc6e1437d1ab21b',
+        callMethod:
+          '0x7e1d12f34e038a2bda3d5f6ee0809d72f668c357d9e64fd7f622513f06ea652146ab5fdee35dc4ce77f1c089fd74972691fccd48130306d9eafcc6e1437d1ab21b',
       });
-      const chatId = await resolution.chatId('crunk.eth').catch((err) => err.code);
+      const chatId = await resolution
+        .chatId('crunk.eth')
+        .catch(err => err.code);
       expectSpyToBeCalled(eyes);
-      expect(chatId).toBe('0x7e1d12f34e038a2bda3d5f6ee0809d72f668c357d9e64fd7f622513f06ea652146ab5fdee35dc4ce77f1c089fd74972691fccd48130306d9eafcc6e1437d1ab21b');
+      expect(chatId).toBe(
+        '0x7e1d12f34e038a2bda3d5f6ee0809d72f668c357d9e64fd7f622513f06ea652146ab5fdee35dc4ce77f1c089fd74972691fccd48130306d9eafcc6e1437d1ab21b',
+      );
     });
 
     it('should resolve gundb public key', async () => {
       const eyes = mockAsyncMethods(resolution.ens, {
         getResolver: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
-        callMethod: 'yxbMDgFrzemQEcDwJYccE_TDbGmRL_iqZ2JhQxYi2s8.nBEAyMfM2ZBtOf2C-GHe3zEn42Q1vrfPAVqNzgGhXvQ',
+        callMethod:
+          'yxbMDgFrzemQEcDwJYccE_TDbGmRL_iqZ2JhQxYi2s8.nBEAyMfM2ZBtOf2C-GHe3zEn42Q1vrfPAVqNzgGhXvQ',
       });
-      const publicKey = await resolution.chatPk('crunk.eth').catch((err) => err.code);
+      const publicKey = await resolution
+        .chatPk('crunk.eth')
+        .catch(err => err.code);
       expectSpyToBeCalled(eyes);
-      expect(publicKey).toBe('yxbMDgFrzemQEcDwJYccE_TDbGmRL_iqZ2JhQxYi2s8.nBEAyMfM2ZBtOf2C-GHe3zEn42Q1vrfPAVqNzgGhXvQ');
+      expect(publicKey).toBe(
+        'yxbMDgFrzemQEcDwJYccE_TDbGmRL_iqZ2JhQxYi2s8.nBEAyMfM2ZBtOf2C-GHe3zEn42Q1vrfPAVqNzgGhXvQ',
+      );
     });
 
     it('should return resolution error for not finding the gundb chat id', async () => {

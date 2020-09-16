@@ -30,7 +30,10 @@ beforeEach(async () => {
   jest.restoreAllMocks();
   resolution = new Resolution({
     blockchain: {
-      cns: { url: protocolLink(), registry: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe' },
+      cns: {
+        url: protocolLink(),
+        registry: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe',
+      },
     },
   });
   mockAsyncMethods(resolution.cns, { isDataReaderSupported: false });
@@ -51,7 +54,10 @@ describe('CNS', () => {
         values: ['QmVJ26hBrwwNAPVmLavEFXDUunNDXeFSeMPmHuPxKe6dJv'],
       },
     });
-    const ipfsHash = await resolution.record(CryptoDomainWithIpfsRecords, 'ipfs.html.value');
+    const ipfsHash = await resolution.record(
+      CryptoDomainWithIpfsRecords,
+      'ipfs.html.value',
+    );
     expectSpyToBeCalled(eyes);
     expect(ipfsHash).toBe('QmVJ26hBrwwNAPVmLavEFXDUunNDXeFSeMPmHuPxKe6dJv');
   });
@@ -71,7 +77,9 @@ describe('CNS', () => {
     const spies = mockAsyncMethods(reader, {
       resolver: { resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3' },
     });
-    const resolverAddress = await resolution.resolver(CryptoDomainWithEmptyResolver);
+    const resolverAddress = await resolution.resolver(
+      CryptoDomainWithEmptyResolver,
+    );
     expectSpyToBeCalled(spies);
     expect(resolverAddress).toBe('0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3');
   });
@@ -104,7 +112,10 @@ describe('CNS', () => {
           values: ['qzx048ez005q4yhphqu2pylpfc3hy88zzu4lu6q9j8'],
         },
       });
-      const addr = await resolution.address(CryptoDomainWithAdaBchAddresses, 'BCH');
+      const addr = await resolution.address(
+        CryptoDomainWithAdaBchAddresses,
+        'BCH',
+      );
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('qzx048ez005q4yhphqu2pylpfc3hy88zzu4lu6q9j8');
     });
@@ -113,12 +124,19 @@ describe('CNS', () => {
       const eyes = mockAsyncMethods(reader, {
         record: {
           resolver: '0xa1cac442be6673c49f8e74ffc7c4fd746f3cbd0d',
-          values: ['DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj'],
+          values: [
+            'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
+          ],
         },
       });
-      const addr = await resolution.address(CryptoDomainWithAdaBchAddresses, 'ADA');
+      const addr = await resolution.address(
+        CryptoDomainWithAdaBchAddresses,
+        'ADA',
+      );
       expectSpyToBeCalled(eyes);
-      expect(addr).toBe('DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj');
+      expect(addr).toBe(
+        'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
+      );
     });
 
     describe('.Metadata', () => {
@@ -143,9 +161,7 @@ describe('CNS', () => {
         });
         const email = await resolution.email(CryptoDomainWithEmail);
         expectSpyToBeCalled(spies);
-        expect(email).toBe(
-          'paul@unstoppabledomains.com',
-        );
+        expect(email).toBe('paul@unstoppabledomains.com');
       });
 
       it('should resolve with httpUrl stored on cns', async () => {
@@ -164,18 +180,25 @@ describe('CNS', () => {
         const eyes = mockAsyncMethods(reader, {
           record: {
             resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
-            values: ['0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c'],
+            values: [
+              '0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c',
+            ],
           },
         });
         const chatId = await resolution.chatId('brad.crypto');
         expectSpyToBeCalled(eyes);
-        expect(chatId).toBe('0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c');
+        expect(chatId).toBe(
+          '0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c',
+        );
       });
 
       it('should throw UnspecifiedResolver for chatId', async () => {
         const resolution = new Resolution({
           blockchain: {
-            cns: { url: protocolLink(), registry: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe' },
+            cns: {
+              url: protocolLink(),
+              registry: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe',
+            },
           },
         });
         mockAsyncMethods(resolution.cns, { isDataReaderSupported: false });
@@ -187,19 +210,24 @@ describe('CNS', () => {
         });
         await expectResolutionErrorCode(
           resolution.chatId(CryptoDomainWithoutResolver),
-          ResolutionErrorCode.UnspecifiedResolver);
+          ResolutionErrorCode.UnspecifiedResolver,
+        );
       });
 
       it('should resolve with the gundb public key stored on cns', async () => {
         const eyes = mockAsyncMethods(reader, {
           record: {
             resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
-            values: ['pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI'],
+            values: [
+              'pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI',
+            ],
           },
         });
         const publicKey = await resolution.chatPk('brad.crypto');
         expectSpyToBeCalled(eyes);
-        expect(publicKey).toBe('pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI');
+        expect(publicKey).toBe(
+          'pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI',
+        );
       });
 
       it('should error out for gundb public key stored on cns', async () => {
@@ -210,7 +238,8 @@ describe('CNS', () => {
         });
         await expectResolutionErrorCode(
           resolution.chatPk(CryptoDomainWithEmptyResolver),
-          ResolutionErrorCode.RecordNotFound);
+          ResolutionErrorCode.RecordNotFound,
+        );
         expectSpyToBeCalled(eyes);
       });
 
@@ -222,7 +251,8 @@ describe('CNS', () => {
         });
         await expectResolutionErrorCode(
           resolution.chatId(CryptoDomainWithEmptyResolver),
-          ResolutionErrorCode.RecordNotFound);
+          ResolutionErrorCode.RecordNotFound,
+        );
         expectSpyToBeCalled(eyes);
       });
     });
@@ -230,7 +260,9 @@ describe('CNS', () => {
 
   describe('.Crypto ProxyReader', () => {
     beforeEach(async () => {
-      resolution = new Resolution({ blockchain: { cns: { url: protocolLink() } } });
+      resolution = new Resolution({
+        blockchain: { cns: { url: protocolLink() } },
+      });
       reader = await resolution.cns.getReader();
     });
 
@@ -241,7 +273,10 @@ describe('CNS', () => {
           values: ['QmVJ26hBrwwNAPVmLavEFXDUunNDXeFSeMPmHuPxKe6dJv'],
         },
       });
-      const ipfsHash = await resolution.record(CryptoDomainWithIpfsRecords, 'ipfs.html.value');
+      const ipfsHash = await resolution.record(
+        CryptoDomainWithIpfsRecords,
+        'ipfs.html.value',
+      );
       expectSpyToBeCalled(eyes);
       expect(ipfsHash).toBe('QmVJ26hBrwwNAPVmLavEFXDUunNDXeFSeMPmHuPxKe6dJv');
     });
@@ -264,9 +299,13 @@ describe('CNS', () => {
       const spies = mockAsyncMethods(reader, {
         get: { resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3' },
       });
-      const resolverAddress = await resolution.resolver(CryptoDomainWithEmptyResolver);
+      const resolverAddress = await resolution.resolver(
+        CryptoDomainWithEmptyResolver,
+      );
       expectSpyToBeCalled(spies);
-      expect(resolverAddress).toBe('0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3');
+      expect(resolverAddress).toBe(
+        '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+      );
     });
 
     it('should return UnregisteredDomain error when owner address not found', async () => {
@@ -312,7 +351,10 @@ describe('CNS', () => {
           values: ['qzx048ez005q4yhphqu2pylpfc3hy88zzu4lu6q9j8'],
         },
       });
-      const addr = await resolution.address(CryptoDomainWithAdaBchAddresses, 'BCH');
+      const addr = await resolution.address(
+        CryptoDomainWithAdaBchAddresses,
+        'BCH',
+      );
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('qzx048ez005q4yhphqu2pylpfc3hy88zzu4lu6q9j8');
     });
@@ -321,12 +363,19 @@ describe('CNS', () => {
       const eyes = mockAsyncMethods(reader, {
         get: {
           resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
-          values: ['DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj'],
+          values: [
+            'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
+          ],
         },
       });
-      const addr = await resolution.address(CryptoDomainWithAdaBchAddresses, 'ADA');
+      const addr = await resolution.address(
+        CryptoDomainWithAdaBchAddresses,
+        'ADA',
+      );
       expectSpyToBeCalled(eyes);
-      expect(addr).toBe('DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj');
+      expect(addr).toBe(
+        'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
+      );
     });
 
     describe('.Metadata', () => {
@@ -339,9 +388,7 @@ describe('CNS', () => {
         });
         const ipfsHash = await resolution.ipfsHash(CryptoDomainWithIpfsRecords);
         expectSpyToBeCalled(spies);
-        expect(ipfsHash).toBe(
-          'QmVJ26hBrwwNAPVmLavEFXDUunNDXeFSeMPmHuPxKe6dJv',
-        );
+        expect(ipfsHash).toBe('QmVJ26hBrwwNAPVmLavEFXDUunNDXeFSeMPmHuPxKe6dJv');
       });
 
       it('should resolve with email stored on cns', async () => {
@@ -353,9 +400,7 @@ describe('CNS', () => {
         });
         const email = await resolution.email(CryptoDomainWithEmail);
         expectSpyToBeCalled(spies);
-        expect(email).toBe(
-          'paul@unstoppabledomains.com',
-        );
+        expect(email).toBe('paul@unstoppabledomains.com');
       });
 
       it('should resolve with httpUrl stored on cns', async () => {
@@ -367,40 +412,49 @@ describe('CNS', () => {
         });
         const httpUrl = await resolution.httpUrl(CryptoDomainWithIpfsRecords);
         expectSpyToBeCalled(spies);
-        expect(httpUrl).toBe(
-          'https://unstoppabledomains.com/',
-        );
+        expect(httpUrl).toBe('https://unstoppabledomains.com/');
       });
 
       it('should resolve with the gundb chatId stored on cns', async () => {
         const spies = mockAsyncMethods(reader, {
           get: {
             resolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
-            values: ['0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c'],
+            values: [
+              '0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c',
+            ],
           },
         });
         const chatId = await resolution.chatId('brad.crypto');
         expectSpyToBeCalled(spies);
-        expect(chatId).toBe('0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c');
+        expect(chatId).toBe(
+          '0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c',
+        );
       });
 
       it('should throw UnspecifiedResolver for chatId', async () => {
-        mockAsyncMethods(reader, { get: { owner: '0xBD5F5ec7ed5f19b53726344540296C02584A5237' } });
+        mockAsyncMethods(reader, {
+          get: { owner: '0xBD5F5ec7ed5f19b53726344540296C02584A5237' },
+        });
         await expectResolutionErrorCode(
           resolution.chatId(CryptoDomainWithoutResolver),
-          ResolutionErrorCode.UnspecifiedResolver);
+          ResolutionErrorCode.UnspecifiedResolver,
+        );
       });
 
       it('should resolve with the gundb public key stored on cns', async () => {
         const spies = mockAsyncMethods(reader, {
           get: {
             resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
-            values: ['pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI'],
+            values: [
+              'pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI',
+            ],
           },
         });
         const publicKey = await resolution.chatPk('brad.crypto');
         expectSpyToBeCalled(spies);
-        expect(publicKey).toBe('pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI');
+        expect(publicKey).toBe(
+          'pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI',
+        );
       });
 
       it('should error out for gundb public key stored on cns', async () => {
@@ -411,7 +465,8 @@ describe('CNS', () => {
         });
         await expectResolutionErrorCode(
           resolution.chatPk(CryptoDomainWithEmptyResolver),
-          ResolutionErrorCode.RecordNotFound);
+          ResolutionErrorCode.RecordNotFound,
+        );
         expectSpyToBeCalled(spies);
       });
 
@@ -423,7 +478,8 @@ describe('CNS', () => {
         });
         await expectResolutionErrorCode(
           resolution.chatId(CryptoDomainWithEmptyResolver),
-          ResolutionErrorCode.RecordNotFound);
+          ResolutionErrorCode.RecordNotFound,
+        );
         expectSpyToBeCalled(spies);
       });
     });
@@ -516,7 +572,9 @@ describe('CNS', () => {
       const url = protocolLink();
       const provider = new FetchProvider(NamingServiceName.CNS, url);
       resolution = new Resolution({ blockchain: { cns: { url, provider } } });
-      jest.spyOn(provider as any, 'fetch').mockRejectedValue(new FetchError('error', 'error_type'));
+      jest
+        .spyOn(provider as any, 'fetch')
+        .mockRejectedValue(new FetchError('error', 'error_type'));
 
       await expectResolutionErrorCode(
         resolution.record(CryptoDomainWithEmptyResolver, 'No.such.record'),
@@ -528,10 +586,13 @@ describe('CNS', () => {
       const url = protocolLink();
       const provider = new FetchProvider(NamingServiceName.CNS, url);
       resolution = new Resolution({ blockchain: { cns: { url, provider } } });
-      jest.spyOn(provider as any, 'fetch').mockRejectedValue(new Error('error_up'));
+      jest
+        .spyOn(provider as any, 'fetch')
+        .mockRejectedValue(new Error('error_up'));
 
-      await expect(resolution.record(CryptoDomainWithEmptyResolver, 'No.such.record'))
-        .rejects.toEqual(new Error('error_up'));
+      await expect(
+        resolution.record(CryptoDomainWithEmptyResolver, 'No.such.record'),
+      ).rejects.toEqual(new Error('error_up'));
     });
   });
 });

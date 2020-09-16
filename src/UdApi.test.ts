@@ -134,4 +134,35 @@ describe('Unstoppable API', () => {
     expectSpyToBeCalled([eyes]);
     expect(httpUrl).toBe('www.unstoppabledomains.com');
   });
+
+  it('should get all records from API', async () => {
+    const resolution = new Resolution({ blockchain: false });
+    const eyes = mockAsyncMethod(resolution.api, 'resolve', {
+      addresses: { ETH: '0xe7474D07fD2FA286e7e0aa23cd107F8379085037' },
+      whois: { email: 'jeyhunt@gmail.com' },
+      ipfs: { html: 'QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu' },
+      gundb: {},
+      social: {},
+      meta: {
+        domain: 'johnnyjumper.zil',
+        namehash:
+          '0x08ab2ffa92966738c881a37d0d97f168d2e076d24639921762d0985ebaa62e31',
+        owner: '0xcea21f5a6afc11b3a4ef82e986d63b8b050b6910',
+        type: 'ZNS',
+        ttl: 0,
+      },
+      records: {
+        'ipfs.html.value': 'QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu',
+        'whois.email.value': 'jeyhunt@gmail.com',
+        'crypto.ETH.address': '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+      },
+    });
+    const records = await resolution.allRecords('johnnyjumper.zil');
+    expectSpyToBeCalled([eyes]);
+    expect(records).toMatchObject({
+      'ipfs.html.value': 'QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu',
+      'whois.email.value': 'jeyhunt@gmail.com',
+      'crypto.ETH.address': '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+    });
+  });
 });

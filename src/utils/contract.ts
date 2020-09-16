@@ -1,5 +1,6 @@
 import { Interface, JsonFragment } from '@ethersproject/abi';
-import { Provider, RequestArguments } from '../types';
+import { Provider, RequestArguments, isNullAddress, EventData } from '../types';
+import FetchProvider from '../FetchProvider';
 
 /** @internal */
 export default class Contract {
@@ -27,6 +28,23 @@ export default class Contract {
     }
 
     return this.coder.decodeFunctionResult(method, response);
+  }
+
+  async fetchLogs(eventName: string, tokenId: string): Promise<EventData[]> {
+    const topic = this.coder.getEventTopic(eventName);
+    const params = [
+      {
+        fromBlock: '0x960844',
+        toBlock: 'latest',
+        address: this.address,
+        topics: [topic, tokenId]
+      }
+    ]
+    const request: RequestArguments = {
+      method: 'eth_getLogs',
+      params
+    };
+    return await this.provider.request(request) as Promise<EventData[]>;
   }
 
   private async callEth(data: string): Promise<unknown> {

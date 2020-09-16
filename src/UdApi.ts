@@ -18,11 +18,11 @@ export default class Udapi extends NamingService {
     [key: string]: string;
   };
 
-  constructor(options: {url: string}) {
+  constructor(options: { url: string }) {
     super(options, 'UDAPI');
-    const DefaultUserAgent = this.isNode() ?
-      'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)' :
-      navigator.userAgent;
+    const DefaultUserAgent = this.isNode()
+      ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'
+      : navigator.userAgent;
     const version = pckg.version;
     const CustomUserAgent = `${DefaultUserAgent} Resolution/${version}`;
     this.headers = { 'X-user-agent': CustomUserAgent };
@@ -95,6 +95,10 @@ export default class Udapi extends NamingService {
     return this.ensureRecordPresence(domain, 'httpUrl', value);
   }
 
+  async allRecords(domain: string): Promise<Record<string, string>> {
+    return (await this.resolve(domain)).records || {};
+  }
+
   async resolve(domain: string): Promise<ResolutionResponse> {
     try {
       const response = await this.fetch(`${this.url}/${domain}`, {
@@ -122,11 +126,11 @@ export default class Udapi extends NamingService {
   }
 
   protected normalizeSource(source): SourceDefinition {
-    return {network: 1, ...source};
+    return { network: 1, ...source };
   }
 
   private findMethod(domain: string) {
-    return [new Zns(), new Ens(), new Cns()].find((m) =>
+    return [new Zns(), new Ens(), new Cns()].find(m =>
       m.isSupportedDomain(domain),
     );
   }

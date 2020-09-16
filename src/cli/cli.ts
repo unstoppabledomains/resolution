@@ -33,6 +33,7 @@ import {
     .option('-m, --meta', 'shortcut for all meta data options (-siren)')
     .option('-d, --domain <domain>', 'domain you wish to resolve')
     .option('-k, --recordKey <recordkey>', 'custom domain record')
+    .option('-a, --all', 'get all keys stored under a domain' )
     .description(
       'resolution cli exports main usage of @unstoppabledomains/resolution library',
     );
@@ -85,6 +86,7 @@ import {
     }, response, 'gundb'),
     recordKey: () => tryInfo(async () => await resolution.record(domain, options.recordKey), response, options.recordKey),
     gunPk: () => tryInfo(async () => await resolution.chatPk(domain), response, 'gundbPk'),
+    all: () => tryInfo(async () => await resolution.allRecords(domain), response, 'records')
   };
 
   const resolutionProcess: Promise<boolean>[] = [];

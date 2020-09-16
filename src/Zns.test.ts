@@ -95,7 +95,7 @@ describe('ZNS', () => {
 
     it('checks normalizeSource zns (object) #8', async () => {
       const resolution = new Resolution({
-        blockchain: { zns: { network: 1} },
+        blockchain: { zns: { network: 1 } },
       });
       expect(resolution.zns!.network).toBe(1);
       expect(resolution.zns!.url).toBe('https://api.zilliqa.com');
@@ -385,6 +385,29 @@ describe('ZNS', () => {
       const httpUrl = await resolution.httpUrl('ergergergerg.zil');
       expectSpyToBeCalled([eye, secondEye]);
       expect(httpUrl).toBe('www.unstoppabledomains.com');
+    });
+
+    it('should return all records for zil domain', async () => {
+      const eye = mockAsyncMethod(resolution.zns, 'getContractMapValue', {
+        argtypes: [],
+        arguments: [
+          '0xcea21f5a6afc11b3a4ef82e986d63b8b050b6910',
+          '0x34bbdee3404138430c76c2d1b2d4a2d223a896df',
+        ],
+        constructor: 'Record',
+      });
+      const secondEye = mockAsyncMethod(resolution.zns, 'getResolverRecords', {
+        'crypto.ETH.address': '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+        'ipfs.html.value': 'QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu',
+        'whois.email.value': 'jeyhunt@gmail.com',
+      });
+      const records = await resolution.allRecords('johnnyjumper.zil');
+      expectSpyToBeCalled([eye, secondEye]);
+      expect(records).toMatchObject({
+        'crypto.ETH.address': '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+        'ipfs.html.value': 'QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu',
+        'whois.email.value': 'jeyhunt@gmail.com',
+      });
     });
   });
 });
