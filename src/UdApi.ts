@@ -11,6 +11,8 @@ import Zns from './Zns';
 import Ens from './Ens';
 import Cns from './Cns';
 import pckg from './package.json';
+import Resolution from './Resolution';
+import { EEXIST } from 'constants';
 
 /** @internal */
 export default class Udapi extends NamingService {
@@ -40,23 +42,37 @@ export default class Udapi extends NamingService {
     return this.findMethodOrThrow(domain).namehash(domain);
   }
 
+  /** @deprecated since Resolution v1.6.2
+   * use UDApi#addr instead
+   */
   async address(domain: string, currencyTicker: string): Promise<string> {
+    try {
+      return await this.addr(domain, currencyTicker)
+    } catch(error) {
+      if (this.isResolutionError(error, ResolutionErrorCode.RecordNotFound)) {
+        throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {domain, currencyTicker});
+      }
+      throw error;
+    }
+  }
+
+  async addr(domain: string, currencyTicker: string): Promise<string> {
     const data = await this.resolve(domain);
     if (isNullAddress(data.meta.owner)) {
       throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-        domain,
+        domain
       });
     }
     const address = data.addresses[currencyTicker.toUpperCase()];
     if (!address) {
-      throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
         domain,
-        currencyTicker,
+        currencyTicker
       });
     }
     return address;
   }
-
+  
   async owner(domain: string): Promise<string | null> {
     const { owner } = (await this.resolve(domain)).meta;
     if (!owner) return null;

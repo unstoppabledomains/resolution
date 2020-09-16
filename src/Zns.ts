@@ -17,6 +17,7 @@ import {
 } from './types';
 import { ResolutionError, ResolutionErrorCode } from './index';
 import NamingService from './NamingService';
+import { add } from 'lodash';
 
 const DefaultSource = 'https://api.zilliqa.com';
 
@@ -67,7 +68,10 @@ export default class Zns extends NamingService {
       records: resolution.records,
     };
   }
-
+  
+/** @depricated since Resolution v1.6.2
+ * use Zns#addr instead
+*/
   async address(domain: string, currencyTicker: string): Promise<string> {
     const data = await this.resolve(domain);
     if (isNullAddress(data?.meta?.owner)) {
@@ -80,6 +84,23 @@ export default class Zns extends NamingService {
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
         domain,
         currencyTicker,
+      });
+    }
+    return address;
+  }
+
+  async addr(domain: string, currencyTicker:  string): Promise<string> {
+    const data = await this.resolve(domain);
+    if (isNullAddress(data?.meta?.owner)) {
+      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+        domain,
+      });
+    }
+    const address = data!.addresses[currencyTicker.toUpperCase()];
+    if (!address) {
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+        recordName: currencyTicker,
+        domain
       });
     }
     return address;

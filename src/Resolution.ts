@@ -168,12 +168,16 @@ export default class Resolution {
    * @async
    * @param domain - domain name to be resolved
    * @param currencyTicker - currency ticker like BTC, ETH, ZIL
+   * @depricated since Resolution v1.6.2
    * @returns A promise that resolves in an address or null
    */
   async address(
     domain: string,
     currencyTicker: string,
   ): Promise<string | null> {
+    console.warn(
+      'Resolution#address is depricated since 1.6.2, use Resolution#addr instead',
+    );
     domain = this.prepareDomain(domain);
     try {
       return await this.addressOrThrow(domain, currencyTicker);
@@ -184,6 +188,22 @@ export default class Resolution {
         throw error;
       }
     }
+  }
+
+ /**
+   * Resolves give domain name to a specific currency address if exists
+   * @async
+   * @param domain - domain name to be resolved
+   * @param currencyTicker - currency ticker like BTC, ETH, ZIL
+   * @throws [[ResolutionError]] if address is not found 
+   * @returns A promise that resolves in an address
+   */ 
+  async addr(
+    domain: string,
+    currrencyTicker: string,
+  ): Promise<string> {
+    domain = this.prepareDomain(domain);
+    return await this.getNamingMethodOrThrow(domain).addr(domain, currrencyTicker);
   }
 
   /**
@@ -265,11 +285,15 @@ export default class Resolution {
    *  - BTC
    *  - ETH
    * @throws [[ResolutionError]] if address is not found
+   * @depricated use Resolution.addr instead
    */
   async addressOrThrow(
     domain: string,
     currencyTicker: string,
   ): Promise<string> {
+    console.warn(
+      'Resolution#addressOrThrow is depricated since 1.6.2, use Resolution#addr instead',
+    );
     domain = this.prepareDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
     return await method.address(domain, currencyTicker);
