@@ -119,26 +119,6 @@ export default class Cns extends EthereumNamingService {
     }
   }
 
-  async ipfsHash(domain: string): Promise<string> {
-    return await this.record(domain, 'ipfs.html.value');
-  }
-
-  async email(domain: string): Promise<string> {
-    return await this.record(domain, 'whois.email.value');
-  }
-
-  async chatId(domain: string): Promise<string> {
-    return await this.record(domain, 'gundb.username.value');
-  }
-
-  async chatpk(domain: string): Promise<string> {
-    return await this.record(domain, 'gundb.public_key.value');
-  }
-
-  async httpUrl(domain: string): Promise<string> {
-    return await this.record(domain, 'ipfs.redirect_domain.value');
-  }
-
   async allRecords(domain: string): Promise<Record<string, string>> {
     const tokenId = this.namehash(domain);
     const resolver = await this.resolver(domain);

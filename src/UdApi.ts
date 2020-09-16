@@ -95,6 +95,21 @@ export default class Udapi extends NamingService {
     return this.ensureRecordPresence(domain, 'httpUrl', value);
   }
 
+  async record(domain: string, key: string): Promise<string> {
+    const resolution = await this.resolve(domain);
+    
+    // ipfs.redirect_domain.value
+    // ipfs.html.value
+    // gundb.username.value
+    // gundb.public_key.value
+    // whois.email.value
+    // crypto.BTC.address
+    
+    const keyParts = key.split('.');
+    const value = resolution[keyParts[0]][keyParts[1]];
+    return this.ensureRecordPresence(domain, keyParts[1], value);
+  }
+
   async allRecords(domain: string): Promise<Record<string, string>> {
     return (await this.resolve(domain)).records || {};
   }
@@ -143,9 +158,5 @@ export default class Udapi extends NamingService {
       });
     }
     return method;
-  }
-
-  async record(domain: string, key: string): Promise<string> {
-    return await this.findMethodOrThrow(domain).record(domain, key);
   }
 }

@@ -195,7 +195,7 @@ export default class Resolution {
   async chatId(domain: string): Promise<string> {
     domain = this.prepareDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
-    return await method.chatId(domain);
+    return await method.record(domain, 'gundb.username.value');
   }
 
   /**
@@ -207,7 +207,7 @@ export default class Resolution {
   async chatPk(domain: string): Promise<string> {
     domain = this.prepareDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
-    return await method.chatpk(domain);
+    return await method.record(domain, "gundb.public_key.value");
   }
 
   /**
@@ -217,7 +217,7 @@ export default class Resolution {
    */
   async ipfsHash(domain: string): Promise<string> {
     domain = this.prepareDomain(domain);
-    return await this.getNamingMethodOrThrow(domain).ipfsHash(domain);
+    return await this.getNamingMethodOrThrow(domain).record(domain, "ipfs.html.value");
   }
 
   /**
@@ -226,7 +226,7 @@ export default class Resolution {
    */
   async httpUrl(domain: string): Promise<string> {
     domain = this.prepareDomain(domain);
-    return await this.getNamingMethodOrThrow(domain).httpUrl(domain);
+    return await this.getNamingMethodOrThrow(domain).record(domain, 'ipfs.redirect_domain.value');
   }
 
   /**
@@ -254,7 +254,7 @@ export default class Resolution {
    */
   async email(domain: string): Promise<string> {
     domain = this.prepareDomain(domain);
-    return await this.getNamingMethodOrThrow(domain).email(domain);
+    return await this.getNamingMethodOrThrow(domain).record(domain, 'whois.email.value');
   }
 
   /**
