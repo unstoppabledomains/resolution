@@ -69,26 +69,6 @@ export default class Zns extends NamingService {
     };
   }
   
-/** @depricated since Resolution v1.6.2
- * use Zns#addr instead
-*/
-  async address(domain: string, currencyTicker: string): Promise<string> {
-    const data = await this.resolve(domain);
-    if (isNullAddress(data?.meta?.owner)) {
-      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-        domain,
-      });
-    }
-    const address = data!.addresses[currencyTicker.toUpperCase()];
-    if (!address) {
-      throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
-        domain,
-        currencyTicker,
-      });
-    }
-    return address;
-  }
-
   async addr(domain: string, currencyTicker:  string): Promise<string> {
     const data = await this.resolve(domain);
     if (isNullAddress(data?.meta?.owner)) {

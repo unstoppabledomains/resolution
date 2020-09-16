@@ -70,23 +70,6 @@ export default class Ens extends EthereumNamingService {
     return await this.resolverCallToName(resolverContract, nodeHash);
   }
 
-  /** @deprecated since Resolution v1.6.2 
-   * use ENS#addr instead
-  */
-  async address(domain: string, currencyTicker: string): Promise<string> {
-    const resolver = await this.resolver(domain);
-    const coinType = this.getCoinType(currencyTicker.toUpperCase());
-
-    const addr = await this.fetchAddress(resolver, domain, coinType);
-    if (!addr) {
-      throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
-        domain,
-        currencyTicker,
-      });
-    }
-    return addr;
-  }
-
   async addr(domain: string, currencyTicker: string): Promise<string> {
     const resolver = await this.resolver(domain);
     const cointType = this.getCoinType(currencyTicker.toUpperCase());
@@ -240,12 +223,17 @@ export default class Ens extends EthereumNamingService {
     return coin.toString();
   }
 
+  protected getCoinName(coinType: number): string {
+    const constants: Bip44Constants[] = require('bip44-constants');
+    return constants[coinType][1];
+  }
+
   private async fetchAddressOrThrow(
     resolver: string,
     domain: string,
     coinType: string,
   ): Promise<string> {
-    if (isNullAddress(resolver)) throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {domain: domain} );
+    if (isNullAddress(resolver)) throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {domain: domain, recordName: this.getCoinName(parseInt(coinType))} );
     const resolverContract = this.buildContract(
       resolverInterface(resolver, coinType),
       resolver,
@@ -255,7 +243,7 @@ export default class Ens extends EthereumNamingService {
       coinType !== EthCoinIndex
         ? await this.callMethod(resolverContract, 'addr', [nodeHash, coinType])
         : await this.callMethod(resolverContract, 'addr', [nodeHash]);
-    if (isNullAddress(addr)) throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {domain: domain});
+    if (isNullAddress(addr)) throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {domain: domain, recordName: this.getCoinName(parseInt(coinType))});
     const data = Buffer.from(addr.replace('0x', ''), 'hex');
     return formatsByCoinType[coinType].encoder(data);
   }

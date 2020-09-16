@@ -39,9 +39,6 @@ export default abstract class NamingService extends BaseConnection {
   abstract allRecords(domain: string): Promise<Record<string, string>>;
   abstract addr(domain: string, currencyTicker: string);
   
-  /** @depricated since Resolution v1.6.2 */
-  abstract address(domain: string, currencyTicker: string): Promise<string>;
-
   constructor(source: SourceDefinition, name: ResolutionMethod) {
     super();
     this.name = name;
