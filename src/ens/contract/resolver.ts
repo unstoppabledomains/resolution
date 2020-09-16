@@ -10,7 +10,7 @@ export const OldResolverAddresses = [
 ];
 
 
-export default (addr: string, coinType?: number) => {
+export default (addr: string, coinType?: string) => {
   if (coinType === undefined || coinType === EthCoinIndex) {
     // Old interface is only compatible to output the ETH address
     // New interface is compatible to that API

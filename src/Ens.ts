@@ -72,11 +72,10 @@ export default class Ens extends EthereumNamingService {
   }
 
   async address(domain: string, currencyTicker: string): Promise<string> {
-    const nodeHash = this.namehash(domain);
     const resolver = await this.resolver(domain);
     const coinType = this.getCoinType(currencyTicker.toUpperCase());
 
-    const addr = await this.fetchAddressOrThrow(resolver, nodeHash, coinType);
+    const addr = await this.fetchAddress(resolver, domain, coinType);
     if (!addr) {
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
         domain,
@@ -100,11 +99,10 @@ export default class Ens extends EthereumNamingService {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork()) {
       return null;
     }
-    const nodeHash = this.namehash(domain);
     let [owner, ttl, resolver] = await this.getResolutionInfo(domain);
     if (isNullAddress(owner)) owner = null;
-    const address = await this.fetchAddress(resolver, nodeHash, EthCoinIndex);
-    const resolution = {
+    const address = await this.fetchAddress(resolver, domain, EthCoinIndex);
+    const resolution = { 
       meta: {
         owner,
         type: this.name,
@@ -167,7 +165,7 @@ export default class Ens extends EthereumNamingService {
 
   private async getResolverContract(
     domain: string,
-    coinType?: number,
+    coinType?: string,
   ): Promise<Contract> {
     const resolverAddress = await this.resolver(domain);
     return this.buildContract(
@@ -219,7 +217,7 @@ export default class Ens extends EthereumNamingService {
     ]);
   }
 
-  protected getCoinType(currencyTicker: string): number {
+  protected getCoinType(currencyTicker: string): string {
     const constants: Bip44Constants[] = require('bip44-constants');
     const coin = constants.findIndex(
       item =>
@@ -231,13 +229,13 @@ export default class Ens extends EthereumNamingService {
         currencyTicker,
       });
     }
-    return coin;
+    return coin.toString();
   }
 
   private async fetchAddressOrThrow(
     resolver: string,
-    nodeHash,
-    coinType: number,
+    domain: string,
+    coinType: string,
   ) {
     if (isNullAddress(resolver)) {
       return null;
@@ -246,20 +244,21 @@ export default class Ens extends EthereumNamingService {
       resolverInterface(resolver, coinType),
       resolver,
     );
+    const nodeHash = this.namehash(domain);
     const addr: string =
       coinType !== EthCoinIndex
         ? await this.callMethod(resolverContract, 'addr', [nodeHash, coinType])
         : await this.callMethod(resolverContract, 'addr', [nodeHash]);
-    if (isNullAddress(addr)) return null;
+    if (isNullAddress(addr)) throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {});
     const data = Buffer.from(addr.replace('0x', ''), 'hex');
     return formatsByCoinType[coinType].encoder(data);
   }
 
-  private async fetchAddress(resolver, nodeHash, coin) {
+  private async fetchAddress(resolver: string, domain: string, coin: string) {
     return (
       (await this.ignoreResolutionError(
         ResolutionErrorCode.RecordNotFound,
-        this.fetchAddressOrThrow(resolver, nodeHash, coin),
+        this.fetchAddressOrThrow(resolver, domain, coin),
       )) || null
     );
   }
