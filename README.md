@@ -56,16 +56,16 @@ function resolve(domain, currency) {
     .then(address => console.log(domain, 'resolves to', address))
     .catch(console.error)
 }
-resolve('resolver.eth', "ETH")
-resolve('brad.zil', "ZIL")
+resolve('brad.crypto', 'ETH')
+resolve('brad.zil', 'ZIL')
 ```
 
 Execute the script.
 
 ```
-node script.js
-# brad.zil  resolves to zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj
-# resolver.eth resolves to 0xD3ddcCDD3b25A8a7423B5bEe360a42146eb4Baf3
+$ node script.js
+brad.crypto resolves to 0x8aaD44321A86b170879d7A244c1e8d360c99DdA8
+brad.zil resolves to zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj
 ```
 
 ### How to resolve
@@ -122,23 +122,6 @@ You can find all of the options for resolution cli within -h, --help flag.
 Example:
 ```
 resolution -mc eth,btc,DODGE,unknown -d brad.zil
-```
-
-### JavaScript/NodeJs
-
-Install dependency
-```
-npm install @unstoppabledomains/resolution --save
-```
-
-Example:
-```
-const { Resolution } = require('@unstoppabledomains/resolution');
-
-const resolution = new Resolution();
-resolution.addr('resolver.crypto', "ETH")
-    .then(console.log)
-    .catch(console.error);
 ```
 
 ## Note
