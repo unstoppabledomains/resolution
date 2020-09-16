@@ -95,7 +95,7 @@ describe('ZNS', () => {
 
     it('checks normalizeSource zns (object) #8', async () => {
       const resolution = new Resolution({
-        blockchain: { zns: { network: 1} },
+        blockchain: { zns: { network: 1 } },
       });
       expect(resolution.zns!.network).toBe(1);
       expect(resolution.zns!.url).toBe('https://api.zilliqa.com');

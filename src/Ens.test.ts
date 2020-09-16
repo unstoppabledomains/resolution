@@ -274,11 +274,15 @@ describe('ENS', () => {
   });
 
   it('checks normalizeSource ens (object) #13', async () => {
-    expectConfigurationErrorCode(() => new Resolution({
-      blockchain: {
-        ens: { network: 'custom', url: 'https://custom.notinfura.io' },
-      },
-    }), ConfigurationErrorCode.UnspecifiedNetwork);
+    expectConfigurationErrorCode(
+      () =>
+        new Resolution({
+          blockchain: {
+            ens: { network: 'custom', url: 'https://custom.notinfura.io' },
+          },
+        }),
+      ConfigurationErrorCode.UnspecifiedNetwork,
+    );
   });
 
   it('checks ens multicoin support #1', async () => {

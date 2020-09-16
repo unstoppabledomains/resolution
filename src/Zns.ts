@@ -172,12 +172,14 @@ export default class Zns extends NamingService {
     source: SourceDefinition | undefined,
   ): SourceDefinition {
     source = { ...source };
-    source.network = typeof source.network == 'string' ?
-      NetworkIdMap[source.network] :
-      source.network || (source.url && UrlNetworkMap[source.url]) || 1;
+    source.network =
+      typeof source.network == 'string'
+        ? NetworkIdMap[source.network]
+        : source.network || (source.url && UrlNetworkMap[source.url]) || 1;
 
     if (!source.provider && !source.url) {
-      source.url = typeof source.network === 'number' ? UrlMap[source.network]: undefined;
+      source.url =
+        typeof source.network === 'number' ? UrlMap[source.network] : undefined;
     }
 
     source.registry = source.registry || RegistryMap[source.network!];
