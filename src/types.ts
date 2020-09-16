@@ -114,6 +114,7 @@ export interface Provider {
 }
 
 /**
+ * @internal
  * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-core-helpers/types/index.d.ts#L216
  */
 export interface JsonRpcPayload {
@@ -123,6 +124,7 @@ export interface JsonRpcPayload {
   id?: string | number;
 }
 
+/** @internal */
 export interface JsonRpcResponse {
   jsonrpc: string;
   id: number;
@@ -135,6 +137,7 @@ type ProviderMethod = (
   callback: (error: Error | null, result?: JsonRpcResponse) => void,
 ) => void;
 
+/** @internal */
 export type TransactionRequest = {
   to?: unknown;
   from?: unknown;
@@ -148,6 +151,7 @@ export type TransactionRequest = {
   chainId?: unknown;
 };
 
+/** @internal */
 export interface EventData {
   address: string;
   blockHash: string;
@@ -160,6 +164,7 @@ export interface EventData {
   transactionIndex: string;
 }
 
+/** @internal */
 export interface EventFilter {
   address?: string;
   topics?: Array<string>;
@@ -167,11 +172,13 @@ export interface EventFilter {
   toBlock?: string;
 }
 
+/** @internal */
 export type RpcProviderTestCase = {
   request: RpcProviderRequestBody;
   response: string | RpcProviderLogEntry[];
 }[];
 
+/** @internal */
 export interface RpcProviderRequestBody {
   data?: string;
   to?: string;
@@ -189,6 +196,7 @@ export interface EthersProvider {
   getLogs(filter: EventFilter): Promise<RpcProviderLogEntry[]>;
 }
 
+/** @internal */
 export interface RpcProviderLogEntry {
   blockNumber: number;
   blockHash: string;

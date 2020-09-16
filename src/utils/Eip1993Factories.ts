@@ -90,7 +90,10 @@ function fromEthersProvider(provider: EthersProvider): Provider {
           case 'eth_getLogs': 
             return await provider.getLogs(request.params![0]);
           default:
-            throw new Error(`Unsupported provider method ${request.method}`);
+            throw new ResolutionError(
+              ResolutionErrorCode.ServiceProviderError, {
+                providerMessage: `Unsupported provider method ${request.method}`
+              })
         }
       } catch(error) {
         throw new ResolutionError(
