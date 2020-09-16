@@ -37,7 +37,7 @@ import { Eip1993Factories } from './utils/Eip1993Factories';
  *   });
  *
  * let domain = "brad.zil";
- * resolution.address(domain, "eth").then(addr => console.log(addr));;
+ * resolution.addr(domain, "eth").then(addr => console.log(addr));;
  * ```
  */
 export default class Resolution {
@@ -285,7 +285,7 @@ export default class Resolution {
    *  - BTC
    *  - ETH
    * @throws [[ResolutionError]] if address is not found
-   * @depricated use Resolution.addr instead
+   * @depricated since v1.6.2 use Resolution.addr instead
    */
   async addressOrThrow(
     domain: string,

@@ -69,7 +69,7 @@ Example:
 const { Resolution } = require('@unstoppabledomains/resolution');
 
 const resolution = new Resolution();
-resolution.address('resolver.crypto', "ETH")
+resolution.addr('resolver.crypto', "ETH")
     .then(console.log)
     .catch(console.error);
 ```
