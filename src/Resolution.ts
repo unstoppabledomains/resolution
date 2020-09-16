@@ -296,7 +296,14 @@ export default class Resolution {
     );
     domain = this.prepareDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
-    return await method.address(domain, currencyTicker);
+    try {
+      return await method.addr(domain, currencyTicker);
+    } catch(error) {
+      if (error instanceof ResolutionError && error.code === ResolutionErrorCode.RecordNotFound) {
+        throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {domain, currencyTicker});
+      }
+      throw error;
+    }
   }
 
   /**
