@@ -153,16 +153,6 @@ describe('ZNS', () => {
       expect(result.meta.ttl).toEqual(0);
     });
 
-    it('resolves unclaimed domain using blockchain', async () => {
-      const spyes = mockAsyncMethods(resolution.zns, {
-        getRecordsAddresses: undefined,
-      });
-      const address = await resolution.address('test.zil', 'ETH');
-      expectSpyToBeCalled(spyes);
-      expect(address).toEqual(null);
-      expect(await resolution.owner('test.zil')).toEqual(null);
-    });
-
     it('resolves domain using blockchain #2', async () => {
       const spyes = mockAsyncMethods(resolution.zns, {
         getRecordsAddresses: [
@@ -242,24 +232,6 @@ describe('ZNS', () => {
       await expectResolutionErrorCode(
         resolution.zns!.resolver('paulalcock.zil'),
         ResolutionErrorCode.UnspecifiedResolver,
-      );
-      expectSpyToBeCalled(spies);
-    });
-
-    it('should resolve with UnspecifiedCurriency', async () => {
-      const spies = mockAsyncMethods(resolution.zns, {
-        getRecordsAddresses: [
-          'zil1thd3le9wdl3ashy7h4j4dm8slm8grausdm4nyr',
-          '0x2410f1f18062b9e6f03246ba126f1f02605b1837',
-        ],
-        getResolverRecords: {
-          'whois.email.value': 'alain974@protonmail.com',
-          'whois.for_sale.value': 'true',
-        },
-      });
-      await expectResolutionErrorCode(
-        resolution.addressOrThrow('macron2022.zil', 'btc'),
-        ResolutionErrorCode.UnspecifiedCurrency,
       );
       expectSpyToBeCalled(spies);
     });

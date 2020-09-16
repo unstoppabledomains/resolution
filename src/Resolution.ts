@@ -178,6 +178,7 @@ export default class Resolution {
     console.warn(
       'Resolution#address is depricated since 1.6.2, use Resolution#addr instead',
     );
+    // throw new Error("just temp");
     domain = this.prepareDomain(domain);
     try {
       return await this.addressOrThrow(domain, currencyTicker);
@@ -299,6 +300,7 @@ export default class Resolution {
     try {
       return await method.addr(domain, currencyTicker);
     } catch(error) {
+      // re-throw an error for back compatability. New method.addr throws deprecated UnspecifiedCurrency code since v1.6.2
       if (error instanceof ResolutionError && error.code === ResolutionErrorCode.RecordNotFound) {
         throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {domain, currencyTicker});
       }
