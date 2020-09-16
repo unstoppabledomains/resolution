@@ -42,23 +42,23 @@ export default class Ens extends EthereumNamingService {
   isSupportedNetwork(): boolean {
     return this.registryAddress != null;
   }
-  
+
   async record(domain: string, key: string): Promise<string> {
-    if (key === "ipfs.html.value") {
+    if (key === 'ipfs.html.value') {
       const hash = await this.getContentHash(domain);
       return this.ensureRecordPresence(domain, 'IPFS hash', hash);
     }
-    const EnsRecordName = this.fromUDRecordNameToENS(key)
+    const EnsRecordName = this.fromUDRecordNameToENS(key);
     return await this.getTextRecord(domain, EnsRecordName);
   }
 
-  private fromUDRecordNameToENS(record: string) : string {
+  private fromUDRecordNameToENS(record: string): string {
     const mapper = {
-      "ipfs.redirect_domain.value": "url",
-      "whois.email.value": "email",
-      "gundb.username.value": "gundb_username", 
-      "gundb.public_key.value": "gundb_public_key" 
-    }
+      'ipfs.redirect_domain.value': 'url',
+      'whois.email.value': 'email',
+      'gundb.username.value': 'gundb_username',
+      'gundb.public_key.value': 'gundb_public_key',
+    };
     return mapper[record] || record;
   }
 
@@ -130,8 +130,6 @@ export default class Ens extends EthereumNamingService {
     if (address) resolution.addresses = { ETH: address };
     return resolution;
   }
-
-
 
   async allRecords(domain: string): Promise<Record<string, string>> {
     throw new Error('Method not implemented.');

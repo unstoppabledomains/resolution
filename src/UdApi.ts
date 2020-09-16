@@ -97,14 +97,14 @@ export default class Udapi extends NamingService {
 
   async record(domain: string, key: string): Promise<string> {
     const resolution = await this.resolve(domain);
-    
+
     // ipfs.redirect_domain.value
     // ipfs.html.value
     // gundb.username.value
     // gundb.public_key.value
     // whois.email.value
     // crypto.BTC.address
-    
+
     const keyParts = key.split('.');
     const value = resolution[keyParts[0]][keyParts[1]];
     return this.ensureRecordPresence(domain, keyParts[1], value);
