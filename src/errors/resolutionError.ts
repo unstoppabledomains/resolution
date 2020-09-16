@@ -3,6 +3,7 @@ import { ResolutionMethod } from '../types';
 type ResolutionErrorHandler = (error: ResolutionErrorOptions) => string;
 /** Explains Resolution Error options */
 type ResolutionErrorOptions = {
+  deprecated?: boolean;
   providerMessage?: string;
   method?: ResolutionMethod;
   domain?: string;
@@ -36,6 +37,7 @@ const HandlersByCode = {
   [ResolutionErrorCode.UnspecifiedCurrency]: (params: {
     domain: string;
     currencyTicker: string;
+    depecated: boolean;
   }) =>
     `Domain ${params.domain} has no ${params.currencyTicker} attached to it`,
   [ResolutionErrorCode.NamingServiceDown]: (params: {
@@ -79,7 +81,9 @@ export class ResolutionError extends Error {
   constructor(code: ResolutionErrorCode, options: ResolutionErrorOptions = {}) {
     const resolutionErrorHandler: ResolutionErrorHandler = HandlersByCode[code];
     const { domain, method, currencyTicker } = options;
-    super(resolutionErrorHandler(options));
+    let message = resolutionErrorHandler(options);
+    if (options.deprecated) {message += `\nResolutionErrorCode ${code} is deprecated and will be removed in the future`}
+    super(message);
     this.code = code;
     this.domain = domain;
     this.method = method;

@@ -302,7 +302,7 @@ export default class Resolution {
     } catch(error) {
       // re-throw an error for back compatability. New method.addr throws deprecated UnspecifiedCurrency code since v1.6.2
       if (error instanceof ResolutionError && error.code === ResolutionErrorCode.RecordNotFound) {
-        throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {domain, currencyTicker});
+        throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {domain, currencyTicker, deprecated: true});
       }
       throw error;
     }
