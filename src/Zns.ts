@@ -114,10 +114,6 @@ export default class Zns extends NamingService {
     return await this.getRecordOrThrow(domain, field);
   }
 
-  async records(domain: string): Promise<Dictionary<string>> {
-    return await this.getResolverRecords((await this.resolverAddress(domain))!);
-  }
-
   async allRecords(domain: string): Promise<Record<string, string>> {
     const resolverAddress = await this.resolver(domain);
     return await this.getResolverRecords(resolverAddress);
@@ -189,7 +185,7 @@ export default class Zns extends NamingService {
     domain: string,
     field: string,
   ): Promise<string> {
-    const records = await this.records(domain);
+    const records = await this.allRecords(domain);
     return this.ensureRecordPresence(domain, field, records[field]);
   }
 

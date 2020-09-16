@@ -98,7 +98,7 @@ describe('Resolution', () => {
   it('checks return of IPFS hash for brad.zil', async () => {
     const resolution = new Resolution();
     const spies = mockAsyncMethods(resolution.zns, {
-      records: {
+      allRecords: {
         'crypto.BCH.address': 'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6',
         'crypto.BTC.address': '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB',
         'crypto.DASH.address': 'XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j',
