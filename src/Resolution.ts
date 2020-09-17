@@ -193,9 +193,7 @@ export default class Resolution {
    * @returns A promise that resolves in chatId
    */
   async chatId(domain: string): Promise<string> {
-    domain = this.prepareDomain(domain);
-    const method = this.getNamingMethodOrThrow(domain);
-    return await method.record(domain, 'gundb.username.value');
+    return await this.record(domain, 'gundb.username.value');
   }
 
   /**
@@ -205,9 +203,7 @@ export default class Resolution {
    * @returns a promise that resolves in gundb public key
    */
   async chatPk(domain: string): Promise<string> {
-    domain = this.prepareDomain(domain);
-    const method = this.getNamingMethodOrThrow(domain);
-    return await method.record(domain, 'gundb.public_key.value');
+    return await this.record(domain, 'gundb.public_key.value');
   }
 
   /**
@@ -216,11 +212,7 @@ export default class Resolution {
    * @throws [[ResolutionError]]
    */
   async ipfsHash(domain: string): Promise<string> {
-    domain = this.prepareDomain(domain);
-    return await this.getNamingMethodOrThrow(domain).record(
-      domain,
-      'ipfs.html.value',
-    );
+    return await this.record(domain, 'ipfs.html.value');
   }
 
   /**
@@ -228,11 +220,7 @@ export default class Resolution {
    * @param domain - domain name
    */
   async httpUrl(domain: string): Promise<string> {
-    domain = this.prepareDomain(domain);
-    return await this.getNamingMethodOrThrow(domain).record(
-      domain,
-      'ipfs.redirect_domain.value',
-    );
+    return await this.record(domain, 'ipfs.redirect_domain.value');
   }
 
   /**
@@ -246,10 +234,7 @@ export default class Resolution {
     console.warn(
       'Resolution#ipfsRedirect is depricated since 1.0.15, use Resolution#httpUrl instead',
     );
-    return await this.getNamingMethodOrThrow(domain).record(
-      domain,
-      'ipfs.redirect_domain.value',
-    );
+    return await this.record(domain, 'ipfs.redirect_domain.value');
   }
 
   /**
@@ -259,11 +244,7 @@ export default class Resolution {
    * @returns A Promise that resolves in an email address configured for this domain whois
    */
   async email(domain: string): Promise<string> {
-    domain = this.prepareDomain(domain);
-    return await this.getNamingMethodOrThrow(domain).record(
-      domain,
-      'whois.email.value',
-    );
+    return await this.record(domain, 'whois.email.value');
   }
 
   /**

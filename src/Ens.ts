@@ -48,8 +48,8 @@ export default class Ens extends EthereumNamingService {
       const hash = await this.getContentHash(domain);
       return this.ensureRecordPresence(domain, 'IPFS hash', hash);
     }
-    const EnsRecordName = this.fromUDRecordNameToENS(key);
-    return await this.getTextRecord(domain, EnsRecordName);
+    const ensRecordName = this.fromUDRecordNameToENS(key);
+    return await this.getTextRecord(domain, ensRecordName);
   }
 
   private fromUDRecordNameToENS(record: string): string {
