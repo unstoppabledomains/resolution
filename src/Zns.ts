@@ -91,32 +91,8 @@ export default class Zns extends NamingService {
     return data ? data.meta.owner : null;
   }
 
-  async ipfsHash(domain: string): Promise<string> {
-    return await this.getRecordOrThrow(domain, 'ipfs.html.value');
-  }
-
-  async httpUrl(domain: string): Promise<string> {
-    return await this.getRecordOrThrow(domain, 'ipfs.redirect_domain.value');
-  }
-
-  async email(domain: string): Promise<string> {
-    return await this.getRecordOrThrow(domain, 'whois.email.value');
-  }
-
-  async chatId(domain: string): Promise<string> {
-    return await this.getRecordOrThrow(domain, 'gundb.username.value');
-  }
-
-  async chatpk(domain: string): Promise<string> {
-    return await this.getRecordOrThrow(domain, 'gundb.public_key.value');
-  }
-
   async record(domain: string, field: string) {
     return await this.getRecordOrThrow(domain, field);
-  }
-
-  async records(domain: string): Promise<Dictionary<string>> {
-    return await this.getResolverRecords((await this.resolverAddress(domain))!);
   }
 
   async allRecords(domain: string): Promise<Record<string, string>> {
@@ -190,7 +166,7 @@ export default class Zns extends NamingService {
     domain: string,
     field: string,
   ): Promise<string> {
-    const records = await this.records(domain);
+    const records = await this.allRecords(domain);
     return this.ensureRecordPresence(domain, field, records[field]);
   }
 
