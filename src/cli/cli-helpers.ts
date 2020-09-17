@@ -30,7 +30,7 @@ export function signedInfuraLink(key: string): string {
 
 
 const configObject = getConfig();
-export function getEtheriumUrl(): string {
+export function getEthereumUrl(): string {
   switch (configObject.type) {
   case 'infura':
     return signedInfuraLink(configObject.value);
@@ -44,8 +44,8 @@ export function getEtheriumUrl(): string {
 export function buildResolutionPackage() {
   return new Resolution({
     blockchain: {
-      ens: getEtheriumUrl(),
-      cns: getEtheriumUrl(),
+      ens: getEthereumUrl(),
+      cns: getEthereumUrl(),
     },
   });
 }

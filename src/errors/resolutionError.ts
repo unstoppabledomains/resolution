@@ -19,7 +19,8 @@ export enum ResolutionErrorCode {
   UnsupportedCurrency = 'UnsupportedCurrency',
   IncorrectResolverInterface = 'IncorrectResolverInterface',
   RecordNotFound = 'RecordNotFound',
-  ServiceProviderError = "ServiceProviderError",
+  ServiceProviderError = 'ServiceProviderError',
+  InvalidTwitterVerification = 'InvalidTwitterVerification',
 }
 
 /**
@@ -52,8 +53,8 @@ const HandlersByCode = {
     domain: string;
   }) => `No ${params.recordName} record found for ${params.domain}`,
   [ResolutionErrorCode.ServiceProviderError]: (params: {
-    providerMessage?: string
-  }) => `< ${params.providerMessage} >`
+    providerMessage?: string;
+  }) => `< ${params.providerMessage} >`,
 };
 
 /**

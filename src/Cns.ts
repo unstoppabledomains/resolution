@@ -16,6 +16,8 @@ import CnsRegistryReader from './cns/CnsRegistryReader';
 import Contract from './utils/contract';
 import standardKeys from './utils/standardKeys';
 import { isLegacyResolver } from './utils';
+import sha256 from './utils/sha256';
+import { recover } from './utils/recoverSignature';
 
 const ReaderMap: ReaderMap = {
   1: '0x7ea9ee21077f84339eda9c80048ec6db678642b1',
@@ -128,6 +130,29 @@ export default class Cns extends EthereumNamingService {
       return await this.getStandardRecords(resolverContract, tokenId);
     }
     return await this.getAllRecords(resolverContract, tokenId);
+  }
+
+  async twitter(domain: string): Promise<string> {
+    const verificationAddress = '0x9457f96845DA5bF00408AC1837F3eF3D35ce4563';
+    const twitterHandle = await this.record(domain, 'social.twitter.username');
+    const owner = await this.owner(domain);
+    const validationSignature = await this.record(
+      domain,
+      'validation.social.twitter.username',
+    );
+    const message = [domain, owner, 'validation.twitter.name', twitterHandle]
+      .map((value: string) => sha256(value))
+      .reduce((message, hashedValue) => message + hashedValue, '');
+    const signerAddress = recover(message, validationSignature);
+    if (signerAddress !== verificationAddress) {
+      throw new ResolutionError(
+        ResolutionErrorCode.InvalidTwitterVerification,
+        {
+          domain,
+        },
+      );
+    }
+    return twitterHandle;
   }
 
   async record(domain: string, key: string): Promise<string> {
