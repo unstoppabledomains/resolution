@@ -85,7 +85,7 @@ export default abstract class NamingService extends BaseConnection {
     try {
       return await promise;
     } catch (error) {
-      if (codes.every((code) => this.isResolutionError(error, code))) {
+      if (codes.some((code) => this.isResolutionError(error, code))) {
         return undefined;
       } else {
         throw error;

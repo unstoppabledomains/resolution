@@ -3,7 +3,6 @@ import { ResolutionMethod } from '../types';
 type ResolutionErrorHandler = (error: ResolutionErrorOptions) => string;
 /** Explains Resolution Error options */
 type ResolutionErrorOptions = {
-  deprecated?: boolean;
   providerMessage?: string;
   method?: ResolutionMethod;
   domain?: string;
@@ -82,7 +81,9 @@ export class ResolutionError extends Error {
     const resolutionErrorHandler: ResolutionErrorHandler = HandlersByCode[code];
     const { domain, method, currencyTicker } = options;
     let message = resolutionErrorHandler(options);
-    if (options.deprecated) {message += `\nResolutionErrorCode ${code} is deprecated and will be removed in the future`}
+    if (code === ResolutionErrorCode. UnspecifiedCurrency) {
+      message += `\nResolutionErrorCode ${code} is deprecated and will be removed in the future. Use RecordNotFound code instead.`
+    }
     super(message);
     this.code = code;
     this.domain = domain;

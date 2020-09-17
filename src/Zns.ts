@@ -17,7 +17,6 @@ import {
 } from './types';
 import { ResolutionError, ResolutionErrorCode } from './index';
 import NamingService from './NamingService';
-import { add } from 'lodash';
 
 const DefaultSource = 'https://api.zilliqa.com';
 

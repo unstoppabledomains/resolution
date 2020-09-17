@@ -133,6 +133,20 @@ describe('ENS', () => {
     expectSpyToBeCalled(spies);
   });
 
+  //TODO remove this test once addressOrThrow is fully removed
+  it('[Old test]resolves .luxe name using ENS blockchain with thrown error', async () => {
+    const spies = mockAsyncMethods(resolution.ens, {
+      getResolver: undefined,
+      getOwner: undefined,
+    });
+
+    await expectResolutionErrorCode(
+      resolution.addressOrThrow('something.luxe', 'ETH'),
+      ResolutionErrorCode.UnregisteredDomain,
+    );
+    expectSpyToBeCalled(spies);
+  });
+
   it('resolves name with resolver but without an owner', async () => {
     const eyes = mockAsyncMethods(resolution.ens, {
       getOwner: NullAddress,
@@ -370,15 +384,27 @@ describe('ENS', () => {
     );
   });
 
-  it('checks UnsupportedCurrency error', async () => {
+  // This is correct since bnb is not a real ticker from bip-44constants.
+  // It is useful whe someone made a typo in ticker spellwriting
+  // TODO to be removed in 2.0.0
+  it('[Old test] checks UnsupportedCurrency error', async () => {
     const eyes = mockAsyncMethods(resolution.ens, {
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
     });
     await expectResolutionErrorCode(
-      resolution.addr('testthing.eth', 'bnb'),
+      resolution.addressOrThrow('testthing.eth', 'bnb'),
       ResolutionErrorCode.UnsupportedCurrency,
     );
     expectSpyToBeCalled(eyes);
+  });
+
+  // TODO to be removed in 2.0.0
+  it('[Old test] checks Resolution#addressOrThrow error #2', async () => {
+    const resolution = new Resolution();
+    await expectResolutionErrorCode(
+      resolution.addressOrThrow('brad.zil', 'INVALID_CURRENCY_SYMBOL'),
+      ResolutionErrorCode.UnspecifiedCurrency,
+    );
   });
 
   it('checks UnsupportedCurrency error', async () => {
@@ -389,6 +415,20 @@ describe('ENS', () => {
       resolution.addr('testthing.eth', 'UNREALTICKER'),
       ResolutionErrorCode.UnsupportedCurrency,
     );
+    expectSpyToBeCalled(eyes);
+  });
+
+  // TODO to be removed in 2.0.0
+  it('[Old test]resolve to null for empty .eth record', async () => {
+    expect(resolution.ens!.url).toBe(protocolLink());
+    expect(resolution.ens!.network).toEqual(1);
+
+    const eyes = mockAsyncMethods(resolution.ens, {
+      getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
+      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+    });
+
+    expect(await resolution.address('qwdqwd.eth', 'XRP')).toEqual(null);
     expectSpyToBeCalled(eyes);
   });
 
