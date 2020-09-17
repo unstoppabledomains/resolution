@@ -43,8 +43,23 @@ export default class Ens extends EthereumNamingService {
     return this.registryAddress != null;
   }
 
-  record(domain: string, key: string): Promise<string> {
-    throw new Error('Method not implemented.');
+  async record(domain: string, key: string): Promise<string> {
+    if (key === 'ipfs.html.value') {
+      const hash = await this.getContentHash(domain);
+      return this.ensureRecordPresence(domain, 'IPFS hash', hash);
+    }
+    const ensRecordName = this.fromUDRecordNameToENS(key);
+    return await this.getTextRecord(domain, ensRecordName);
+  }
+
+  private fromUDRecordNameToENS(record: string): string {
+    const mapper = {
+      'ipfs.redirect_domain.value': 'url',
+      'whois.email.value': 'email',
+      'gundb.username.value': 'gundb_username',
+      'gundb.public_key.value': 'gundb_public_key',
+    };
+    return mapper[record] || record;
   }
 
   async reverse(
@@ -114,27 +129,6 @@ export default class Ens extends EthereumNamingService {
     };
     if (address) resolution.addresses = { ETH: address };
     return resolution;
-  }
-
-  async ipfsHash(domain: string): Promise<string> {
-    const hash = await this.getContentHash(domain);
-    return this.ensureRecordPresence(domain, 'IPFS hash', hash);
-  }
-
-  async httpUrl(domain: string): Promise<string> {
-    return await this.getTextRecord(domain, 'url');
-  }
-
-  async email(domain: string): Promise<string> {
-    return await this.getTextRecord(domain, 'email');
-  }
-
-  async chatId(domain: string): Promise<string> {
-    return await this.getTextRecord(domain, 'gundb_username');
-  }
-
-  async chatpk(domain: string): Promise<string> {
-    return await this.getTextRecord(domain, 'gundb_public_key');
   }
 
   async allRecords(domain: string): Promise<Record<string, string>> {
