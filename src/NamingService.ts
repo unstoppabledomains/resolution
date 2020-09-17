@@ -32,7 +32,6 @@ export default abstract class NamingService extends BaseConnection {
     options?: { prefix: boolean },
   ): nodeHash;
   abstract allRecords(domain: string): Promise<Record<string, string>>;
-  abstract addr(domain: string, currencyTicker: string);
   
   constructor(source: SourceDefinition, name: ResolutionMethod) {
     super();

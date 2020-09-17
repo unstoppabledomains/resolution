@@ -202,8 +202,7 @@ export default class Resolution {
     domain: string,
     currrencyTicker: string,
   ): Promise<string> {
-    domain = this.prepareDomain(domain);
-    return await this.getNamingMethodOrThrow(domain).addr(domain, currrencyTicker);
+    return await this.record(domain, `crypto.${currrencyTicker.toUpperCase()}.address`);
   }
 
   /**
@@ -287,7 +286,7 @@ export default class Resolution {
     domain = this.prepareDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
     try {
-      const addr = await method.addr(domain, currencyTicker);
+      const addr = await method.record(domain, `crypto.${currencyTicker.toUpperCase()}.address`);
       console.log(`${currencyTicker} => ${addr}`);
       return addr;
     } catch(error) {

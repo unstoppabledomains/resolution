@@ -43,6 +43,10 @@ export default class Ens extends EthereumNamingService {
   }
 
   async record(domain: string, key: string): Promise<string> {
+    if (key.startsWith('crypto.')) {
+      const ticker = key.split('.')[1];
+      return await this.addr(domain, ticker);
+    }
     if (key === 'ipfs.html.value') {
       const hash = await this.getContentHash(domain);
       return this.ensureRecordPresence(domain, 'IPFS hash', hash);
@@ -85,7 +89,7 @@ export default class Ens extends EthereumNamingService {
     return await this.resolverCallToName(resolverContract, nodeHash);
   }
 
-  async addr(domain: string, currencyTicker: string): Promise<string> {
+  private async addr(domain: string, currencyTicker: string): Promise<string> {
     const resolver = await this.resolver(domain);
     const cointType = this.getCoinType(currencyTicker.toUpperCase());
     return (await this.fetchAddressOrThrow(resolver, domain, cointType));

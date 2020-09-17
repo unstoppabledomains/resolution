@@ -12,7 +12,11 @@
           "owner": "0x267ca17e8b3bbf49c52a4c3b473cdebcbaf9025e",
           "type": "zns",
           "ttl": 0
-        }
+        },
+        "records": {
+          "crypto.BTC.address": "1NZKHwpfqprxzcaijcjf71CZr27D8osagR",
+          "crypto.ETH.address": "0xaa91734f90795e80751c96e682a321bb3c1a4186"
+          }
       }
     }
   ],

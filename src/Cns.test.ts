@@ -521,7 +521,7 @@ describe('CNS', () => {
         });
 
         await expectResolutionErrorCode(
-          resolution.cns!.addr('unregistered.crypto', 'ETH'),
+          resolution.cns!.record('unregistered.crypto', 'crypto.ETH.address'),
           ResolutionErrorCode.UnregisteredDomain,
         );
         expectSpyToBeCalled(eyes);

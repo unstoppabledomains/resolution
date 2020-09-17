@@ -86,11 +86,6 @@ export default class Cns extends EthereumNamingService {
     throw new Error('This method is unsupported for CNS');
   }
 
-  async addr(domain: string, currencyTicker: string): Promise<string> {
-    const key = `crypto.${currencyTicker.toUpperCase()}.address`;
-    return await this.record(domain, key);
-  }
-
   async owner(domain: string): Promise<string> {
     const tokenId = this.namehash(domain);
     try {
