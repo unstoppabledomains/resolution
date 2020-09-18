@@ -5,6 +5,7 @@
 [![Bundle Size Minified](https://img.shields.io/bundlephobia/min/@unstoppabledomains/resolution.svg)](https://bundlephobia.com/result?p=@unstoppabledomains/resolution)
 [![Bundle Size Minified Zipped](https://img.shields.io/bundlephobia/minzip/@unstoppabledomains/resolution.svg)](https://bundlephobia.com/result?p=@unstoppabledomains/resolution)
 [![Chat on Telegram](https://img.shields.io/badge/Chat%20on-Telegram-brightgreen.svg)](https://t.me/unstoppabledev)
+[![Unstoppable Domains Documentation](https://img.shields.io/badge/docs-unstoppabledomains.com-blue)](https://docs.unstoppabledomains.com/)
 
 A library for interacting with blockchain domain names.
 
@@ -24,17 +25,17 @@ Supported domain zones:
 
 ## Installation
 
-Use the `npm` or `yarn` to install resolution.
+Use the `npm` or `yarn` to install the resolution package.
 
 ```
-yarn global add @unstoppabledomains/resolution
+yarn add @unstoppabledomains/resolution
 ```
 
 ```
-npm install -g @unstoppabledomains/resolution
+npm install @unstoppabledomains/resolution --save
 ```
 
-It should install binary named resolution in the default folder for your package manager. You can check it by running command `resolution -V` in command line. If everything is fine you will see the version installed.
+If you're interested in resolving domains via the command line, see [CLI section](#CLI). 
 
 ## Usage
 
@@ -105,6 +106,16 @@ Accepts the domain name and tests it against the current blockchain network spec
 It will also check if the domain is in valid format
 
 ### CLI
+
+If you want to use resolution CLI, install this package globally:
+
+```
+yarn global add @unstoppabledomains/resolution
+```
+
+```
+npm install -g @unstoppabledomains/resolution
+```
 
 Once you have installed the CLI you can go ahead and use it without any extra configuration. By default the cli is
 using https://main-rpc.linkpool.io service as a gateway to blockchain. If you want to change it to some other providers
