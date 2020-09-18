@@ -22,7 +22,6 @@ export default abstract class NamingService extends BaseConnection {
   protected provider: Provider;
   abstract isSupportedDomain(domain: string): boolean;
   abstract isSupportedNetwork(): boolean;
-  abstract address(domain: string, currencyTicker: string): Promise<string>;
   abstract owner(domain: string): Promise<string | null>;
   abstract record(domain: string, key: string): Promise<string>;
   abstract resolve(domain: string): Promise<ResolutionResponse | null>;
@@ -78,14 +77,14 @@ export default abstract class NamingService extends BaseConnection {
     }
   }
 
-  protected async ignoreResolutionError<T>(
-    code: ResolutionErrorCode | undefined,
+  protected async ignoreResolutionErrors<T>(
+    codes: ResolutionErrorCode[],
     promise: Promise<T>,
   ): Promise<T | undefined> {
     try {
       return await promise;
     } catch (error) {
-      if (this.isResolutionError(error, code)) {
+      if (codes.some(code => this.isResolutionError(error, code))) {
         return undefined;
       } else {
         throw error;

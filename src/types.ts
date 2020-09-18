@@ -250,7 +250,7 @@ export function isNullAddress(
   return Object.values(NullAddresses).includes(key);
 }
 
-export const EthCoinIndex = 60;
+export const EthCoinIndex = '60';
 
 export const UnclaimedDomainResponse: ResolutionResponse = {
   addresses: {},

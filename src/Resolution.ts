@@ -37,7 +37,7 @@ import { Eip1993Factories } from './utils/Eip1993Factories';
  *   });
  *
  * let domain = "brad.zil";
- * resolution.address(domain, "eth").then(addr => console.log(addr));;
+ * resolution.addr(domain, "eth").then(addr => console.log(addr));;
  * ```
  */
 export default class Resolution {
@@ -168,12 +168,16 @@ export default class Resolution {
    * @async
    * @param domain - domain name to be resolved
    * @param currencyTicker - currency ticker like BTC, ETH, ZIL
+   * @deprecated since Resolution v1.7.0
    * @returns A promise that resolves in an address or null
    */
   async address(
     domain: string,
     currencyTicker: string,
   ): Promise<string | null> {
+    console.warn(
+      'Resolution#address is deprecated since v1.7.0, use Resolution#addr instead',
+    );
     domain = this.prepareDomain(domain);
     try {
       return await this.addressOrThrow(domain, currencyTicker);
@@ -184,6 +188,22 @@ export default class Resolution {
         throw error;
       }
     }
+  }
+
+  /**
+   * Resolves give domain name to a specific currency address if exists
+   * @async
+   * @param domain - domain name to be resolved
+   * @param currencyTicker - currency ticker like BTC, ETH, ZIL
+   * @throws [[ResolutionError]] if address is not found
+   * @returns A promise that resolves in an address
+   */
+
+  async addr(domain: string, currrencyTicker: string): Promise<string> {
+    return await this.record(
+      domain,
+      `crypto.${currrencyTicker.toUpperCase()}.address`,
+    );
   }
 
   /**
@@ -225,14 +245,14 @@ export default class Resolution {
 
   /**
    * Resolves the ipfs redirect url for a supported domain records
-   * @deprecated use Resolution#httpUrl instead
+   * @deprecated since v1.0.15 use Resolution#httpUrl instead
    * @param domain - domain name
    * @throws [[ResolutionError]]
    * @returns A Promise that resolves in redirect url
    */
   async ipfsRedirect(domain: string): Promise<string> {
     console.warn(
-      'Resolution#ipfsRedirect is depricated since 1.0.15, use Resolution#httpUrl instead',
+      'Resolution#ipfsRedirect is deprecated since v1.0.15, use Resolution#httpUrl instead',
     );
     return await this.record(domain, 'ipfs.redirect_domain.value');
   }
@@ -255,14 +275,37 @@ export default class Resolution {
    *  - BTC
    *  - ETH
    * @throws [[ResolutionError]] if address is not found
+   * @deprecated since v1.7.0 use Resolution#addr instead
    */
   async addressOrThrow(
     domain: string,
     currencyTicker: string,
   ): Promise<string> {
+    console.warn(
+      'Resolution#addressOrThrow is deprecated since v1.7.0, use Resolution#addr instead',
+    );
     domain = this.prepareDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
-    return await method.address(domain, currencyTicker);
+    try {
+      const addr = await method.record(
+        domain,
+        `crypto.${currencyTicker.toUpperCase()}.address`,
+      );
+      console.log(`${currencyTicker} => ${addr}`);
+      return addr;
+    } catch (error) {
+      // re-throw an error for back compatability. old method throws deprecated UnspecifiedCurrency code since before v1.7.0
+      if (
+        error instanceof ResolutionError &&
+        error.code === ResolutionErrorCode.RecordNotFound
+      ) {
+        throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
+          domain,
+          currencyTicker,
+        });
+      }
+      throw error;
+    }
   }
 
   /**

@@ -1,4 +1,6 @@
 ## Unreleased
+* Added `Resolution#addr` method that behaves consistently with other record getter methods.
+* Deprecated Resolution#address Resolution#addressOrThrow ResolutionErrorCode.UnspecifiedCurrency
 
 ## 1.6.1
 

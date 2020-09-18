@@ -79,7 +79,11 @@ export class ResolutionError extends Error {
   constructor(code: ResolutionErrorCode, options: ResolutionErrorOptions = {}) {
     const resolutionErrorHandler: ResolutionErrorHandler = HandlersByCode[code];
     const { domain, method, currencyTicker } = options;
-    super(resolutionErrorHandler(options));
+    let message = resolutionErrorHandler(options);
+    if (code === ResolutionErrorCode. UnspecifiedCurrency) {
+      message += `\nResolutionErrorCode ${code} is deprecated and will be removed in the future. Use RecordNotFound code instead.`
+    }
+    super(message);
     this.code = code;
     this.domain = domain;
     this.method = method;

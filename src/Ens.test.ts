@@ -53,7 +53,7 @@ describe('ENS', () => {
       fetchAddressOrThrow: '0x714ef33943d925731FBB89C99aF5780D888bD106',
     });
 
-    expect(await resolution.address('matthewgould.eth', 'ETH')).toEqual(
+    expect(await resolution.addr('matthewgould.eth', 'ETH')).toEqual(
       '0x714ef33943d925731FBB89C99aF5780D888bD106',
     );
     expect(await resolution.owner('matthewgould.eth')).toEqual(
@@ -93,7 +93,7 @@ describe('ENS', () => {
       fetchAddressOrThrow: '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
     });
 
-    const result = await resolution.address('adrian.argent.xyz', 'ETH');
+    const result = await resolution.addr('adrian.argent.xyz', 'ETH');
     expectSpyToBeCalled(eyes);
     expect(result).toEqual('0xb0E7a465D255aE83eb7F8a50504F3867B945164C');
   });
@@ -105,7 +105,7 @@ describe('ENS', () => {
       fetchAddressOrThrow: '0xf3dE750A73C11a6a2863761E930BF5fE979d5663',
     });
 
-    const result = await resolution.address('john.luxe', 'ETH');
+    const result = await resolution.addr('john.luxe', 'ETH');
     expectSpyToBeCalled(eyes);
     expect(result).toEqual('0xf3dE750A73C11a6a2863761E930BF5fE979d5663');
   });
@@ -115,19 +115,26 @@ describe('ENS', () => {
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x96184444629F3489c4dE199871E6F99568229d8f',
     });
-    const result = await resolution.address('brantly.kred', 'ETH');
+    const result = await resolution.addr('brantly.kred', 'ETH');
     expectSpyToBeCalled(eyes);
     expect(result).toEqual('0x96184444629F3489c4dE199871E6F99568229d8f');
   });
 
-  it('resolves .luxe name using ENS blockchain with safe null return', async () => {
-    const ownerEye = mockAsyncMethod(resolution.ens, 'getOwner', NullAddress);
-    const result = await resolution.address('something.luxe', 'ETH');
-    expectSpyToBeCalled([ownerEye]);
-    expect(result).toEqual(null);
+  it('resolves .luxe name using ENS blockchain with thrown error', async () => {
+    const spies = mockAsyncMethods(resolution.ens, {
+      getResolver: undefined,
+      getOwner: undefined,
+    });
+
+    await expectResolutionErrorCode(
+      resolution.addr('something.luxe', 'ETH'),
+      ResolutionErrorCode.UnregisteredDomain,
+    );
+    expectSpyToBeCalled(spies);
   });
 
-  it('resolves .luxe name using ENS blockchain with thrown error', async () => {
+  //TODO remove this test once addressOrThrow is fully removed
+  it('[Old test]resolves .luxe name using ENS blockchain with thrown error', async () => {
     const spies = mockAsyncMethods(resolution.ens, {
       getResolver: undefined,
       getOwner: undefined,
@@ -146,7 +153,7 @@ describe('ENS', () => {
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x76a9144620b70031f0e9437e374a2100934fba4911046088ac',
     });
-    const doge = await resolution.ens!.address('testthing.eth', 'DOGE');
+    const doge = await resolution.ens!.addr('testthing.eth', 'DOGE');
     expectSpyToBeCalled(eyes);
     expect(doge).toBe('DBXu2kgc3xtvCUWFcxFE3r9hEYgmuaaCyD');
   });
@@ -291,7 +298,7 @@ describe('ENS', () => {
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x76a9144620b70031f0e9437e374a2100934fba4911046088ac',
     });
-    const doge = await resolution.ens!.address('testthing.eth', 'DOGE');
+    const doge = await resolution.ens!.addr('testthing.eth', 'DOGE');
     expectSpyToBeCalled(eyes);
     expect(doge).toBe('DBXu2kgc3xtvCUWFcxFE3r9hEYgmuaaCyD');
   });
@@ -302,7 +309,7 @@ describe('ENS', () => {
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0xa914e8604d28ef5d2a7caafe8741e5dd4816b7cb19ea87',
     });
-    const ltc = await resolution.ens!.address('testthing.eth', 'LTC');
+    const ltc = await resolution.ens!.addr('testthing.eth', 'LTC');
     expectSpyToBeCalled(eyes);
     expect(ltc).toBe('MV5rN5EcX1imDS2gEh5jPJXeiW5QN8YrK3');
   });
@@ -313,7 +320,7 @@ describe('ENS', () => {
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x314159265dd8dbb310642f98f50c066173c1259b',
     });
-    const eth = await resolution.ens!.address('testthing.eth', 'ETH');
+    const eth = await resolution.ens!.addr('testthing.eth', 'ETH');
     expectSpyToBeCalled(eyes);
     expect(eth).toBe('0x314159265dD8dbb310642f98f50C066173C1259b');
   });
@@ -324,7 +331,7 @@ describe('ENS', () => {
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x314159265dd8dbb310642f98f50c066173c1259b',
     });
-    const etc = await resolution.ens!.address('testthing.eth', 'etc');
+    const etc = await resolution.ens!.addr('testthing.eth', 'etc');
     expectSpyToBeCalled(eyes);
     expect(etc).toBe('0x314159265dD8dbb310642f98f50C066173C1259b');
   });
@@ -335,7 +342,7 @@ describe('ENS', () => {
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x314159265dd8dbb310642f98f50c066173c1259b',
     });
-    const rsk = await resolution.ens!.address('testthing.eth', 'rsk');
+    const rsk = await resolution.ens!.addr('testthing.eth', 'rsk');
     expectSpyToBeCalled(eyes);
     expect(rsk).toBe('0x314159265dD8DbB310642F98f50C066173c1259B');
   });
@@ -347,7 +354,7 @@ describe('ENS', () => {
       callMethod:
         '0x05444b4e9c06f24296074f7bc48f92a97916c6dc5ea9000000000000000000',
     });
-    const xrp = await resolution.ens!.address('testthing.eth', 'xrp');
+    const xrp = await resolution.ens!.addr('testthing.eth', 'xrp');
     expectSpyToBeCalled(eyes);
     expect(xrp).toBe('X7qvLs7gSnNoKvZzNWUT2e8st17QPY64PPe7zriLNuJszeg');
   });
@@ -358,7 +365,7 @@ describe('ENS', () => {
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x76a91476a04053bda0a88bda5177b86a15c3b29f55987388ac',
     });
-    const bch = await resolution.ens!.address('testthing.eth', 'bch');
+    const bch = await resolution.ens!.addr('testthing.eth', 'bch');
     expectSpyToBeCalled(eyes);
     expect(bch).toBe('bitcoincash:qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a');
   });
@@ -370,14 +377,17 @@ describe('ENS', () => {
       callMethod:
         '0x5128751e76e8199196d454941c45d1b3a323f1433bd6751e76e8199196d454941c45d1b3a323f1433bd6',
     });
-    const btc = await resolution.ens!.address('testthing.eth', 'BTC');
+    const btc = await resolution.ens!.addr('testthing.eth', 'BTC');
     expectSpyToBeCalled(eyes);
     expect(btc).toBe(
       'bc1pw508d6qejxtdg4y5r3zarvary0c5xw7kw508d6qejxtdg4y5r3zarvary0c5xw7k7grplx',
     );
   });
 
-  it('checks UnsupportedCurrency error', async () => {
+  // This is correct since bnb is not a real ticker from bip-44constants.
+  // It is useful whe someone made a typo in ticker spellwriting
+  // TODO to be removed in 2.0.0
+  it('[Old test] checks UnsupportedCurrency error', async () => {
     const eyes = mockAsyncMethods(resolution.ens, {
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
     });
@@ -388,14 +398,37 @@ describe('ENS', () => {
     expectSpyToBeCalled(eyes);
   });
 
+  // TODO to be removed in 2.0.0
+  it('[Old test] checks Resolution#addressOrThrow error #2', async () => {
+    const resolution = new Resolution();
+    await expectResolutionErrorCode(
+      resolution.addressOrThrow('brad.zil', 'INVALID_CURRENCY_SYMBOL'),
+      ResolutionErrorCode.UnspecifiedCurrency,
+    );
+  });
+
   it('checks UnsupportedCurrency error', async () => {
     const eyes = mockAsyncMethods(resolution.ens, {
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
     });
     await expectResolutionErrorCode(
-      resolution.addressOrThrow('testthing.eth', 'UNREALTICKER'),
+      resolution.addr('testthing.eth', 'UNREALTICKER'),
       ResolutionErrorCode.UnsupportedCurrency,
     );
+    expectSpyToBeCalled(eyes);
+  });
+
+  // TODO to be removed in 2.0.0
+  it('[Old test]resolve to null for empty .eth record', async () => {
+    expect(resolution.ens!.url).toBe(protocolLink());
+    expect(resolution.ens!.network).toEqual(1);
+
+    const eyes = mockAsyncMethods(resolution.ens, {
+      getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
+      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+    });
+
+    expect(await resolution.address('qwdqwd.eth', 'XRP')).toEqual(null);
     expectSpyToBeCalled(eyes);
   });
 
@@ -439,19 +472,6 @@ describe('ENS', () => {
           ttl: 0,
         },
       });
-    });
-
-    it('resolve to null for empty .eth record', async () => {
-      expect(resolution.ens!.url).toBe(protocolLink());
-      expect(resolution.ens!.network).toEqual(1);
-
-      const eyes = mockAsyncMethods(resolution.ens, {
-        getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
-        getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-      });
-
-      expect(await resolution.address('qwdqwd.eth', 'XRP')).toEqual(null);
-      expectSpyToBeCalled(eyes);
     });
 
     it('should return correct resolver address', async () => {

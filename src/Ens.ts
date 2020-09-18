@@ -7,7 +7,6 @@ import {
   NamingServiceName,
   Bip44Constants,
   isNullAddress,
-  nodeHash,
   SourceDefinition,
 } from './types';
 import { EthereumNamingService } from './EthereumNamingService';
@@ -33,7 +32,7 @@ export default class Ens extends EthereumNamingService {
   isSupportedDomain(domain: string): boolean {
     return (
       domain === 'eth' ||
-      (domain.indexOf('.') > 0 &&
+      (domain.includes('.') &&
         /^[^-]*[^-]*\.(eth|luxe|xyz|kred|addr\.reverse)$/.test(domain) &&
         domain.split('.').every(v => !!v.length))
     );
@@ -44,6 +43,10 @@ export default class Ens extends EthereumNamingService {
   }
 
   async record(domain: string, key: string): Promise<string> {
+    if (key.startsWith('crypto.')) {
+      const ticker = key.split('.')[1];
+      return await this.addr(domain, ticker);
+    }
     if (key === 'ipfs.html.value') {
       const hash = await this.getContentHash(domain);
       return this.ensureRecordPresence(domain, 'IPFS hash', hash);
@@ -86,26 +89,17 @@ export default class Ens extends EthereumNamingService {
     return await this.resolverCallToName(resolverContract, nodeHash);
   }
 
-  async address(domain: string, currencyTicker: string): Promise<string> {
-    const nodeHash = this.namehash(domain);
+  private async addr(domain: string, currencyTicker: string): Promise<string> {
     const resolver = await this.resolver(domain);
-    const coinType = this.getCoinType(currencyTicker.toUpperCase());
-
-    const addr = await this.fetchAddressOrThrow(resolver, nodeHash, coinType);
-    if (!addr) {
-      throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
-        domain,
-        currencyTicker,
-      });
-    }
-    return addr;
+    const cointType = this.getCoinType(currencyTicker.toUpperCase());
+    return await this.fetchAddressOrThrow(resolver, domain, cointType);
   }
 
   async owner(domain: string): Promise<string | null> {
     const nodeHash = this.namehash(domain);
     return (
-      (await this.ignoreResolutionError(
-        ResolutionErrorCode.RecordNotFound,
+      (await this.ignoreResolutionErrors(
+        [ResolutionErrorCode.RecordNotFound],
         this.getOwner(nodeHash),
       )) || null
     );
@@ -115,10 +109,12 @@ export default class Ens extends EthereumNamingService {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork()) {
       return null;
     }
-    const nodeHash = this.namehash(domain);
     let [owner, ttl, resolver] = await this.getResolutionInfo(domain);
     if (isNullAddress(owner)) owner = null;
-    const address = await this.fetchAddress(resolver, nodeHash, EthCoinIndex);
+    const address = await this.ignoreResolutionErrors(
+      [ResolutionErrorCode.RecordNotFound],
+      this.fetchAddress(resolver, domain, EthCoinIndex),
+    );
     const resolution = {
       meta: {
         owner,
@@ -161,7 +157,7 @@ export default class Ens extends EthereumNamingService {
 
   private async getResolverContract(
     domain: string,
-    coinType?: number,
+    coinType?: string,
   ): Promise<Contract> {
     const resolverAddress = await this.resolver(domain);
     return this.buildContract(
@@ -178,8 +174,8 @@ export default class Ens extends EthereumNamingService {
   }
 
   private async getTTL(nodeHash) {
-    return await this.ignoreResolutionError(
-      ResolutionErrorCode.RecordNotFound,
+    return await this.ignoreResolutionErrors(
+      [ResolutionErrorCode.RecordNotFound],
       this.callMethod(this.registryContract, 'ttl', [nodeHash]),
     );
   }
@@ -188,8 +184,8 @@ export default class Ens extends EthereumNamingService {
    * This was done to make automated tests more configurable
    */
   protected async getResolver(nodeHash) {
-    return await this.ignoreResolutionError(
-      ResolutionErrorCode.RecordNotFound,
+    return await this.ignoreResolutionErrors(
+      [ResolutionErrorCode.RecordNotFound],
       this.callMethod(this.registryContract, 'resolver', [nodeHash]),
     );
   }
@@ -213,7 +209,7 @@ export default class Ens extends EthereumNamingService {
     ]);
   }
 
-  protected getCoinType(currencyTicker: string): number {
+  protected getCoinType(currencyTicker: string): string {
     const constants: Bip44Constants[] = require('bip44-constants');
     const coin = constants.findIndex(
       item =>
@@ -225,35 +221,54 @@ export default class Ens extends EthereumNamingService {
         currencyTicker,
       });
     }
-    return coin;
+    return coin.toString();
+  }
+
+  protected getCoinName(coinType: number): string {
+    const constants: Bip44Constants[] = require('bip44-constants');
+    return constants[coinType][1];
   }
 
   private async fetchAddressOrThrow(
     resolver: string,
-    nodeHash,
-    coinType: number,
-  ) {
-    if (isNullAddress(resolver)) {
-      return null;
-    }
+    domain: string,
+    coinType: string,
+  ): Promise<string> {
+    if (isNullAddress(resolver))
+      throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
+        domain: domain,
+        recordName: this.getCoinName(parseInt(coinType)),
+      });
     const resolverContract = this.buildContract(
       resolverInterface(resolver, coinType),
       resolver,
     );
+    const nodeHash = this.namehash(domain);
     const addr: string =
       coinType !== EthCoinIndex
         ? await this.callMethod(resolverContract, 'addr', [nodeHash, coinType])
         : await this.callMethod(resolverContract, 'addr', [nodeHash]);
-    if (isNullAddress(addr)) return null;
+    if (isNullAddress(addr))
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+        domain: domain,
+        recordName: this.getCoinName(parseInt(coinType)),
+      });
     const data = Buffer.from(addr.replace('0x', ''), 'hex');
     return formatsByCoinType[coinType].encoder(data);
   }
 
-  private async fetchAddress(resolver, nodeHash, coin) {
+  private async fetchAddress(
+    resolver: string,
+    domain: string,
+    coin: string,
+  ): Promise<string | null> {
     return (
-      (await this.ignoreResolutionError(
-        ResolutionErrorCode.RecordNotFound,
-        this.fetchAddressOrThrow(resolver, nodeHash, coin),
+      (await this.ignoreResolutionErrors(
+        [
+          ResolutionErrorCode.RecordNotFound,
+          ResolutionErrorCode.UnspecifiedResolver,
+        ],
+        this.fetchAddressOrThrow(resolver, domain, coin),
       )) || null
     );
   }

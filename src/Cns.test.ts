@@ -112,7 +112,7 @@ describe('CNS', () => {
           values: ['qzx048ez005q4yhphqu2pylpfc3hy88zzu4lu6q9j8'],
         },
       });
-      const addr = await resolution.address(
+      const addr = await resolution.addr(
         CryptoDomainWithAdaBchAddresses,
         'BCH',
       );
@@ -129,7 +129,7 @@ describe('CNS', () => {
           ],
         },
       });
-      const addr = await resolution.address(
+      const addr = await resolution.addr(
         CryptoDomainWithAdaBchAddresses,
         'ADA',
       );
@@ -339,7 +339,7 @@ describe('CNS', () => {
           values: ['0x8aaD44321A86b170879d7A244c1e8d360c99DdA8'],
         },
       });
-      const address = await resolution.address('brad.crypto', 'eth');
+      const address = await resolution.addr('brad.crypto', 'eth');
       expectSpyToBeCalled(eyes);
       expect(address).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
     });
@@ -351,7 +351,7 @@ describe('CNS', () => {
           values: ['qzx048ez005q4yhphqu2pylpfc3hy88zzu4lu6q9j8'],
         },
       });
-      const addr = await resolution.address(
+      const addr = await resolution.addr(
         CryptoDomainWithAdaBchAddresses,
         'BCH',
       );
@@ -368,7 +368,7 @@ describe('CNS', () => {
           ],
         },
       });
-      const addr = await resolution.address(
+      const addr = await resolution.addr(
         CryptoDomainWithAdaBchAddresses,
         'ADA',
       );
@@ -521,7 +521,7 @@ describe('CNS', () => {
         });
 
         await expectResolutionErrorCode(
-          resolution.cns!.address('unregistered.crypto', 'ETH'),
+          resolution.cns!.record('unregistered.crypto', 'crypto.ETH.address'),
           ResolutionErrorCode.UnregisteredDomain,
         );
         expectSpyToBeCalled(eyes);

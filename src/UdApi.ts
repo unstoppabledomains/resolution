@@ -40,7 +40,7 @@ export default class Udapi extends NamingService {
     return this.findMethodOrThrow(domain).namehash(domain);
   }
 
-  async address(domain: string, currencyTicker: string): Promise<string> {
+  async addr(domain: string, currencyTicker: string): Promise<string> {
     const data = await this.resolve(domain);
     if (isNullAddress(data.meta.owner)) {
       throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
@@ -49,7 +49,7 @@ export default class Udapi extends NamingService {
     }
     const address = data.addresses[currencyTicker.toUpperCase()];
     if (!address) {
-      throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
         domain,
         currencyTicker,
       });

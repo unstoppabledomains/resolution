@@ -17,7 +17,7 @@ describe('Unstoppable API', () => {
   it('resolves a domain', async () => {
     mockAPICalls('ud_api_generic_test', DefaultUrl);
     const resolution = new Resolution({ blockchain: false });
-    const result = await resolution.address('cofounding.zil', 'eth');
+    const result = await resolution.addr('cofounding.zil', 'eth');
     expect(result).toEqual('0xaa91734f90795e80751c96e682a321bb3c1a4186');
   });
   it('namehashes zil domain', async () => {

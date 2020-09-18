@@ -86,26 +86,6 @@ export default class Cns extends EthereumNamingService {
     throw new Error('This method is unsupported for CNS');
   }
 
-  async address(domain: string, currencyTicker: string): Promise<string> {
-    const tokenId = this.namehash(domain);
-
-    const reader = await this.getReader();
-    const key = `crypto.${currencyTicker.toUpperCase()}.address`;
-    const data = await reader.record(tokenId, key);
-    await this.verify(domain, data);
-
-    const { values } = data;
-    const value: string | null = values?.length ? values[0] : null;
-    if (!value) {
-      throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
-        domain,
-        currencyTicker,
-      });
-    }
-
-    return value;
-  }
-
   async owner(domain: string): Promise<string> {
     const tokenId = this.namehash(domain);
     try {
@@ -143,10 +123,9 @@ export default class Cns extends EthereumNamingService {
   }
 
   protected async getResolver(tokenId: string): Promise<string> {
-    return await this.ignoreResolutionError(
-      ResolutionErrorCode.RecordNotFound,
-      this.callMethod(this.registryContract, 'resolverOf', [tokenId]),
-    );
+    return await this.callMethod(this.registryContract, 'resolverOf', [
+      tokenId,
+    ]);
   }
 
   protected async verify(domain: string, data: Data) {

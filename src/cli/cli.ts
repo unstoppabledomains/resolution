@@ -95,7 +95,7 @@ import {
     options.currencies.forEach(async (currency:string) => {
       resolutionProcess.push(
         tryInfo(
-          async () => await resolution.addressOrThrow(domain, currency),
+          async () => await resolution.addr(domain, currency),
           response,
           currency,
         ),

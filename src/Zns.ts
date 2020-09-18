@@ -68,23 +68,6 @@ export default class Zns extends NamingService {
     };
   }
 
-  async address(domain: string, currencyTicker: string): Promise<string> {
-    const data = await this.resolve(domain);
-    if (isNullAddress(data?.meta?.owner)) {
-      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-        domain,
-      });
-    }
-    const address = data!.addresses[currencyTicker.toUpperCase()];
-    if (!address) {
-      throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
-        domain,
-        currencyTicker,
-      });
-    }
-    return address;
-  }
-
   async owner(domain: string): Promise<string | null> {
     const data = await this.resolve(domain);
     return data ? data.meta.owner : null;
@@ -208,10 +191,6 @@ export default class Zns extends NamingService {
       set(result, key, value);
     }
     return result;
-  }
-
-  private async resolverAddress(domain: string): Promise<string | undefined> {
-    return ((await this.getRecordsAddresses(domain)) || [])[1];
   }
 
   private async fetchSubState(

@@ -45,34 +45,20 @@ describe('Resolution', () => {
     expect(resolution.cns!.url).toBe(`https://mainnet.infura.com/v3/api-key`);
   });
 
-  it('checks Resolution#addressOrThrow error #1', async () => {
+  it('checks Resolution#addr error #1', async () => {
     const resolution = new Resolution();
     await expectResolutionErrorCode(
-      resolution.addressOrThrow('sdncdoncvdinvcsdncs.zil', 'ZIL'),
+      resolution.addr('sdncdoncvdinvcsdncs.zil', 'ZIL'),
       ResolutionErrorCode.UnregisteredDomain,
-    );
-  });
-
-  it('checks Resolution#addressOrThrow error #2', async () => {
-    const resolution = new Resolution();
-    await expectResolutionErrorCode(
-      resolution.addressOrThrow('brad.zil', 'INVALID_CURRENCY_SYMBOL'),
-      ResolutionErrorCode.UnspecifiedCurrency,
     );
   });
 
   it('resolves non-existing domain zone with throw', async () => {
     const resolution = new Resolution({ blockchain: true });
     await expectResolutionErrorCode(
-      resolution.addressOrThrow('bogdangusiev.qq', 'ZIL'),
+      resolution.addr('bogdangusiev.qq', 'ZIL'),
       ResolutionErrorCode.UnsupportedDomain,
     );
-  });
-
-  it('resolves non-existing domain zone via safe address', async () => {
-    const resolution = new Resolution({ blockchain: true });
-    const result = await resolution.address('bogdangusiev.qq', 'ZIL');
-    expect(result).toEqual(null);
   });
 
   it('provides empty response constant', async () => {
@@ -182,9 +168,9 @@ describe('Resolution', () => {
         values: ['0x45b31e01AA6f42F0549aD482BE81635ED3149abb'],
       },
     });
-    const capital = await resolution.addressOrThrow('Brad.crypto', 'eth');
+    const capital = await resolution.addr('Brad.crypto', 'eth');
     expectSpyToBeCalled(eyes);
-    const lower = await resolution.addressOrThrow('brad.crypto', 'eth');
+    const lower = await resolution.addr('brad.crypto', 'eth');
     expectSpyToBeCalled(eyes);
     expect(capital).toStrictEqual(lower);
   });
@@ -336,7 +322,7 @@ describe('Resolution', () => {
         },
       );
       const resolution = Resolution.fromWeb3Version1Provider(provider);
-      const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
+      const ethAddress = await resolution.addr('brad.crypto', 'ETH');
 
       // expect each mock to be called at least once.
       expectSpyToBeCalled([eye]);
@@ -359,7 +345,7 @@ describe('Resolution', () => {
       });
 
       const resolution = Resolution.fromWeb3Version1Provider(provider);
-      const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
+      const ethAddress = await resolution.addr('brad.crypto', 'ETH');
       provider.disconnect(1000, 'end of test');
       expectSpyToBeCalled([eye]);
       expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
@@ -374,7 +360,7 @@ describe('Resolution', () => {
       const eye = mockAsyncMethod(provider, 'call', params =>
         Promise.resolve(caseMock(params, RpcProviderTestCases)),
       );
-      const ethAddress = await resolution.addressOrThrow('brad.crypto', 'ETH');
+      const ethAddress = await resolution.addr('brad.crypto', 'ETH');
       expectSpyToBeCalled([eye]);
       expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
     });
@@ -386,7 +372,7 @@ describe('Resolution', () => {
         Promise.resolve(caseMock(params, RpcProviderTestCases)),
       );
       const resolution = Resolution.fromEthersProvider(provider);
-      const ethAddress = await resolution.addressOrThrow('brad.crypto', 'eth');
+      const ethAddress = await resolution.addr('brad.crypto', 'eth');
       expectSpyToBeCalled([eye]);
       expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
     });
@@ -412,7 +398,7 @@ describe('Resolution', () => {
         },
       );
       const resolution = Resolution.fromWeb3Version0Provider(provider);
-      const ethAddress = await resolution.addressOrThrow('brad.crypto', 'eth');
+      const ethAddress = await resolution.addr('brad.crypto', 'eth');
       expectSpyToBeCalled([eye]);
       expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
     });
