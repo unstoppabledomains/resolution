@@ -123,7 +123,9 @@ export default class Cns extends EthereumNamingService {
   }
 
   protected async getResolver(tokenId: string): Promise<string> {
-    return await this.callMethod(this.registryContract, 'resolverOf', [tokenId]);
+    return await this.callMethod(this.registryContract, 'resolverOf', [
+      tokenId,
+    ]);
   }
 
   protected async verify(domain: string, data: Data) {

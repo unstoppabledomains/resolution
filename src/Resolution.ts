@@ -190,19 +190,20 @@ export default class Resolution {
     }
   }
 
- /**
+  /**
    * Resolves give domain name to a specific currency address if exists
    * @async
    * @param domain - domain name to be resolved
    * @param currencyTicker - currency ticker like BTC, ETH, ZIL
-   * @throws [[ResolutionError]] if address is not found 
+   * @throws [[ResolutionError]] if address is not found
    * @returns A promise that resolves in an address
-   */ 
-  async addr(
-    domain: string,
-    currrencyTicker: string,
-  ): Promise<string> {
-    return await this.record(domain, `crypto.${currrencyTicker.toUpperCase()}.address`);
+   */
+
+  async addr(domain: string, currrencyTicker: string): Promise<string> {
+    return await this.record(
+      domain,
+      `crypto.${currrencyTicker.toUpperCase()}.address`,
+    );
   }
 
   /**
@@ -286,13 +287,22 @@ export default class Resolution {
     domain = this.prepareDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
     try {
-      const addr = await method.record(domain, `crypto.${currencyTicker.toUpperCase()}.address`);
+      const addr = await method.record(
+        domain,
+        `crypto.${currencyTicker.toUpperCase()}.address`,
+      );
       console.log(`${currencyTicker} => ${addr}`);
       return addr;
-    } catch(error) {
+    } catch (error) {
       // re-throw an error for back compatability. old method throws deprecated UnspecifiedCurrency code since before v1.7.0
-      if (error instanceof ResolutionError && error.code === ResolutionErrorCode.RecordNotFound) {
-        throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {domain, currencyTicker});
+      if (
+        error instanceof ResolutionError &&
+        error.code === ResolutionErrorCode.RecordNotFound
+      ) {
+        throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
+          domain,
+          currencyTicker,
+        });
       }
       throw error;
     }

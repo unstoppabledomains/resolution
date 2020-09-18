@@ -36,7 +36,6 @@ const HandlersByCode = {
   [ResolutionErrorCode.UnspecifiedCurrency]: (params: {
     domain: string;
     currencyTicker: string;
-    depecated: boolean;
   }) =>
     `Domain ${params.domain} has no ${params.currencyTicker} attached to it`,
   [ResolutionErrorCode.NamingServiceDown]: (params: {
