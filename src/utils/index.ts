@@ -8,7 +8,7 @@ export function set(object, key, value) {
   let current = object;
   const tokens = key.split('.');
   const last = tokens.pop();
-  tokens.forEach((token) => {
+  tokens.forEach(token => {
     current[token] = typeof current[token] == 'object' ? current[token] : {};
     current = current[token];
   });
@@ -30,11 +30,25 @@ export function invert(object) {
   return returnee;
 }
 
-export function signedInfuraLink(infura: string, network: string = 'mainnet'): string {
+export function signedInfuraLink(
+  infura: string,
+  network: string = 'mainnet',
+): string {
   return `https://${network}.infura.com/v3/${infura}`;
 }
 
 export function isLegacyResolver(resolverAddress: string): boolean {
-  return ['0xa1cac442be6673c49f8e74ffc7c4fd746f3cbd0d',
-  '0x878bc2f3f717766ab69c0a5f9a6144931e61aed3'].includes(resolverAddress.toLowerCase());
+  return [
+    '0xa1cac442be6673c49f8e74ffc7c4fd746f3cbd0d',
+    '0x878bc2f3f717766ab69c0a5f9a6144931e61aed3',
+  ].includes(resolverAddress.toLowerCase());
+}
+
+export function hexToBytes(hexString: string): number[] {
+  const hex = hexString.replace(/^0x/i, '');
+  const bytes: number[] = [];
+  for (let c = 0; c < hex.length; c += 2) {
+    bytes.push(parseInt(hex.substr(c, 2), 16));
+  }
+  return bytes;
 }

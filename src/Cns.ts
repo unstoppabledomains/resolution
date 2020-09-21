@@ -15,10 +15,9 @@ import CnsProxyReader from './cns/CnsProxyReader';
 import CnsRegistryReader from './cns/CnsRegistryReader';
 import Contract from './utils/contract';
 import standardKeys from './utils/standardKeys';
-import { isLegacyResolver } from './utils';
-import sha256 from './utils/sha256';
+import { isLegacyResolver, hexToBytes } from './utils';
+import { keccak256 as sha3 } from 'js-sha3';
 import { recover } from './utils/recoverSignature';
-
 const ReaderMap: ReaderMap = {
   1: '0x7ea9ee21077f84339eda9c80048ec6db678642b1',
   42: '0xcf4318918fd18aca9bdc11445c01fbada4b448e3', // for internal testing
@@ -27,6 +26,8 @@ const ReaderMap: ReaderMap = {
 export default class Cns extends EthereumNamingService {
   readonly contract: Contract;
   reader: ICnsReader;
+  static TwitterVerificationAddress =
+    '0x12cfb13522F13a78b650a8bCbFCf50b7CB899d82';
 
   constructor(source: SourceDefinition = {}) {
     super(source, NamingServiceName.CNS);
@@ -133,18 +134,29 @@ export default class Cns extends EthereumNamingService {
   }
 
   async twitter(domain: string): Promise<string> {
-    const verificationAddress = '0x9457f96845DA5bF00408AC1837F3eF3D35ce4563';
-    const twitterHandle = await this.record(domain, 'social.twitter.username');
-    const owner = await this.owner(domain);
-    const validationSignature = await this.record(
-      domain,
+    const tokenId = this.namehash(domain);
+    const reader = await this.getReader();
+    const records = [
       'validation.social.twitter.username',
-    );
-    const message = [domain, owner, 'validation.twitter.name', twitterHandle]
-      .map((value: string) => sha256(value))
+      'social.twitter.username',
+    ];
+    const { values } = await reader.records(tokenId, records);
+
+    const owner = await this.owner(domain);
+    records.map((recordName, i) => {
+      return this.ensureRecordPresence(domain, recordName, values && values[i]);
+    });
+    const [validationSignature, twitterHandle] = values!;
+    const message = [domain, owner, 'social.twitter.username', twitterHandle]
+      .map((value: string) => {
+        if (/^0x/i.test(value)) {
+          return '0x' + sha3(hexToBytes(value));
+        }
+        return '0x' + sha3(value);
+      })
       .reduce((message, hashedValue) => message + hashedValue, '');
     const signerAddress = recover(message, validationSignature);
-    if (signerAddress !== verificationAddress) {
+    if (signerAddress !== Cns.TwitterVerificationAddress) {
       throw new ResolutionError(
         ResolutionErrorCode.InvalidTwitterVerification,
         {

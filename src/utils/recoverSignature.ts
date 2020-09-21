@@ -1,5 +1,6 @@
-import sha256 from './sha256';
+import { keccak256 as sha3 } from 'js-sha3';
 import elliptic from 'elliptic';
+import { hexToBytes } from '.';
 // eslint-disable-next-line new-cap
 const secp256k1 = new elliptic.ec('secp256k1');
 
@@ -15,7 +16,7 @@ const decodeSignature = (hex: string) => [
 ];
 
 const toChecksum = (address: string) => {
-  const addressHash = sha256(address.slice(2));
+  const addressHash = sha3(address.slice(2));
   let checksumAddress = '0x';
   for (let i = 0; i < 40; i++) {
     checksumAddress +=
@@ -26,7 +27,17 @@ const toChecksum = (address: string) => {
   return checksumAddress;
 };
 
-export const recover = (hash: string, signature: string) => {
+export const hashMessage = (message: string) => {
+  const messageBytes = hexToBytes(Buffer.from(message, 'utf8').toString('hex'));
+  const messageBuffer = Buffer.from(messageBytes);
+  const preamble = '\x19Ethereum Signed Message:\n' + messageBytes.length;
+  const preambleBuffer = Buffer.from(preamble);
+  const ethMessage = Buffer.concat([preambleBuffer, messageBuffer]);
+  return '0x' + sha3(ethMessage.toString());
+};
+
+export const recover = (message: string, signature: string) => {
+  const hash = hashMessage(message);
   const vals = decodeSignature(signature);
   const vrs = {
     v: bytesToNumber(vals[0]),
@@ -39,7 +50,7 @@ export const recover = (hash: string, signature: string) => {
     vrs.v < 2 ? vrs.v : 1 - (vrs.v % 2),
   );
   const publicKey = '0x' + ecPublicKey.encode('hex', false).slice(2);
-  const publicHash = sha256(publicKey);
+  const publicHash = '0x' + sha3(hexToBytes(publicKey));
   const address = toChecksum('0x' + publicHash.slice(-40));
   return address;
 };
