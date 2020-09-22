@@ -106,6 +106,7 @@
     "bn.js": "^4.4.0",
     "commander": "^4.1.1",
     "content-hash": "^2.5.2",
+    "elliptic": "^6.5.3",
     "ethereum-ens-network-map": "^1.0.2",
     "hash.js": "^1.1.7",
     "js-sha3": "^0.8.0",

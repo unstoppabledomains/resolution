@@ -13,6 +13,7 @@ export const CryptoDomainWithEmptyResolver = 'reseller-test-mago017.crypto';
 export const CryptoDomainWithIpfsRecords = 'reseller-test-paul019.crypto';
 export const CryptoDomainWithEmail = 'reseller-test-paul019.crypto';
 export const CryptoDomainWithAdaBchAddresses = 'reseller-test-mago0.crypto';
+export const CryptoDomainWithTwitterVerification = 'beresnev.crypto';
 
 export function mockAsyncMethod(object: any, method: string, value) {
   const spy = jest.spyOn(object, method);

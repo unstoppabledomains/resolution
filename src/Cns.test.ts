@@ -7,6 +7,7 @@ import {
   CryptoDomainWithEmptyResolver,
   CryptoDomainWithoutResolver,
   CryptoDomainWithIpfsRecords,
+  CryptoDomainWithTwitterVerification,
   mockAsyncMethods,
   expectSpyToBeCalled,
   expectResolutionErrorCode,
@@ -60,6 +61,13 @@ describe('CNS', () => {
     );
     expectSpyToBeCalled(eyes);
     expect(ipfsHash).toBe('QmVJ26hBrwwNAPVmLavEFXDUunNDXeFSeMPmHuPxKe6dJv');
+  });
+
+  it('should return verified twitter handle', async () => {
+    const twitterHandle = await resolution.cns.twitter(
+      CryptoDomainWithTwitterVerification,
+    );
+    expect(twitterHandle).toBe('derainberk');
   });
 
   it('should return NoRecord Resolution error', async () => {
