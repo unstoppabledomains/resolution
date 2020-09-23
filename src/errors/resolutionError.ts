@@ -19,7 +19,8 @@ export enum ResolutionErrorCode {
   UnsupportedCurrency = 'UnsupportedCurrency',
   IncorrectResolverInterface = 'IncorrectResolverInterface',
   RecordNotFound = 'RecordNotFound',
-  ServiceProviderError = "ServiceProviderError",
+  ServiceProviderError = 'ServiceProviderError',
+  InvalidTwitterVerification = 'InvalidTwitterVerification',
 }
 
 /**
@@ -41,6 +42,10 @@ const HandlersByCode = {
   [ResolutionErrorCode.NamingServiceDown]: (params: {
     method: ResolutionMethod;
   }) => `${params.method} naming service is down at the moment`,
+
+  [ResolutionErrorCode.InvalidTwitterVerification]: (params: {
+    domain?: string;
+  }) => `Domain ${params.domain} has invalid Twitter signature verification`,
   [ResolutionErrorCode.UnsupportedCurrency]: (params: {
     currencyTicker: string;
   }) => `${params.currencyTicker} is not supported`,
@@ -52,8 +57,8 @@ const HandlersByCode = {
     domain: string;
   }) => `No ${params.recordName} record found for ${params.domain}`,
   [ResolutionErrorCode.ServiceProviderError]: (params: {
-    providerMessage?: string
-  }) => `< ${params.providerMessage} >`
+    providerMessage?: string;
+  }) => `< ${params.providerMessage} >`,
 };
 
 /**

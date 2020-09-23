@@ -31,6 +31,7 @@ import {
     .option('-o, --owner', `returns domain's owner`)
     .option('-g, --gundb', `returns gundb chat id`)
     .option('-m, --meta', 'shortcut for all meta data options (-siren)')
+    .option('-t, --twitter', 'returns verified Twitter handle (only available for cns domains)')
     .option('-d, --domain <domain>', 'domain you wish to resolve')
     .option('-k, --recordKey <recordkey>', 'custom domain record')
     .option('-a, --all', 'get all keys stored under a domain' )
@@ -86,7 +87,8 @@ import {
     }, response, 'gundb'),
     recordKey: () => tryInfo(async () => await resolution.record(domain, options.recordKey), response, options.recordKey),
     gunPk: () => tryInfo(async () => await resolution.chatPk(domain), response, 'gundbPk'),
-    all: () => tryInfo(async () => await resolution.allRecords(domain), response, 'records')
+    all: () => tryInfo(async () => await resolution.allRecords(domain), response, 'records'),
+    twitter: () => tryInfo(async () => await resolution.cns?.twitter(domain), response, 'twitter'),
   };
 
   const resolutionProcess: Promise<boolean>[] = [];
