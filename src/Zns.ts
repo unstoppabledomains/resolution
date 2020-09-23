@@ -82,6 +82,14 @@ export default class Zns extends NamingService {
     return await this.getResolverRecords(resolverAddress);
   }
 
+  async twitter(domain: string) {
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+      domain,
+      methodName: 'twitter',
+    });
+    return '';
+  }
+
   isSupportedDomain(domain: string): boolean {
     const tokens = domain.split('.');
     return (

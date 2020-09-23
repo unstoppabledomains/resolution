@@ -26,6 +26,7 @@ export default abstract class NamingService extends BaseConnection {
   abstract record(domain: string, key: string): Promise<string>;
   abstract resolve(domain: string): Promise<ResolutionResponse | null>;
   abstract resolver(domain: string): Promise<string>;
+  abstract twitter(domain: string): Promise<string>;
   abstract childhash(
     parent: nodeHash,
     label: string,

@@ -55,6 +55,14 @@ export default class Ens extends EthereumNamingService {
     return await this.getTextRecord(domain, ensRecordName);
   }
 
+  async twitter(domain: string) {
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+      domain,
+      methodName: 'twitter',
+    });
+    return '';
+  }
+
   private fromUDRecordNameToENS(record: string): string {
     const mapper = {
       'ipfs.redirect_domain.value': 'url',

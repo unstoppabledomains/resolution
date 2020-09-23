@@ -207,6 +207,27 @@ export default class Resolution {
   }
 
   /**
+   * Resolves give domain name to a specific currency address if exists
+   * @async
+   * @param domain - domain name to be resolved
+   * @throws [[ResolutionError]] if twitter is not found
+   * @returns A promise that resolves in a verified twitter handle
+   */
+
+  async twitter(domain: string): Promise<string> {
+    domain = this.prepareDomain(domain);
+    const namingService = this.serviceName(domain);
+    if (namingService !== 'CNS') {
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+        domain,
+        methodName: 'twitter',
+      });
+    }
+    const method = this.getNamingMethodOrThrow(domain);
+    return method.twitter(domain);
+  }
+
+  /**
    * Resolve a chat id from the domain record
    * @param domain - domain name to be resolved
    * @throws [[ResolutionError]]

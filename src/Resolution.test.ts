@@ -18,7 +18,7 @@ import {
   ProviderProtocol,
   caseMock,
   mockAsyncMethod,
-  expectConfigurationErrorCode,
+  expectConfigurationErrorCode,, CryptoDomainWithTwitterVerification
 } from './tests/helpers';
 import _ from 'lodash';
 import { RpcProviderTestCases } from './tests/providerMockData';
@@ -259,6 +259,23 @@ describe('Resolution', () => {
       const resolution = new Resolution({ blockchain: false });
       const serviceName = resolution.serviceName('domain.crypto');
       expect(serviceName).toBe('CNS');
+    });
+  });
+
+  describe('twitter', () => {
+    it('should return verified twitter handle', async () => {
+      const resolution = new Resolution();
+      const twitterHandle = await resolution.twitter(
+        CryptoDomainWithTwitterVerification,
+      );
+      expect(twitterHandle).toBe('derainberk');
+    });
+    it('should throw unsupported method', async () => {
+      const resolution = new Resolution();
+      const handle = 'ryan.eth';
+      await expect(resolution.twitter(
+        handle,
+      )).rejects.toThrowError(`Method twitter is not supported for ${handle}`);
     });
   });
 

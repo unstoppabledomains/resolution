@@ -5,6 +5,7 @@ type ResolutionErrorHandler = (error: ResolutionErrorOptions) => string;
 type ResolutionErrorOptions = {
   providerMessage?: string;
   method?: ResolutionMethod;
+  methodName?: string;
   domain?: string;
   currencyTicker?: string;
   recordName?: string;
@@ -14,6 +15,7 @@ export enum ResolutionErrorCode {
   UnregisteredDomain = 'UnregisteredDomain',
   UnspecifiedResolver = 'UnspecifiedResolver',
   UnsupportedDomain = 'UnsupportedDomain',
+  UnsupportedMethod = 'UnsupportedMethod',
   UnspecifiedCurrency = 'UnspecifiedCurrency',
   NamingServiceDown = 'NamingServiceDown',
   UnsupportedCurrency = 'UnsupportedCurrency',
@@ -34,6 +36,10 @@ const HandlersByCode = {
     `Domain ${params.domain} is not configured`,
   [ResolutionErrorCode.UnsupportedDomain]: (params: { domain: string }) =>
     `Domain ${params.domain} is not supported`,
+  [ResolutionErrorCode.UnsupportedMethod]: (params: {
+    methodName: string;
+    domain: string;
+  }) => `Method ${params.methodName} is not supported for ${params.domain}`,
   [ResolutionErrorCode.UnspecifiedCurrency]: (params: {
     domain: string;
     currencyTicker: string;
@@ -85,8 +91,8 @@ export class ResolutionError extends Error {
     const resolutionErrorHandler: ResolutionErrorHandler = HandlersByCode[code];
     const { domain, method, currencyTicker } = options;
     let message = resolutionErrorHandler(options);
-    if (code === ResolutionErrorCode. UnspecifiedCurrency) {
-      message += `\nResolutionErrorCode ${code} is deprecated and will be removed in the future. Use RecordNotFound code instead.`
+    if (code === ResolutionErrorCode.UnspecifiedCurrency) {
+      message += `\nResolutionErrorCode ${code} is deprecated and will be removed in the future. Use RecordNotFound code instead.`;
     }
     super(message);
     this.code = code;
