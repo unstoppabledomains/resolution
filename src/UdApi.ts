@@ -11,6 +11,7 @@ import Zns from './Zns';
 import Ens from './Ens';
 import Cns from './Cns';
 import pckg from './package.json';
+import { isValidTwitterSignature } from './utils/verifyTwitterSig';
 
 /** @internal */
 export default class Udapi extends NamingService {
@@ -98,6 +99,45 @@ export default class Udapi extends NamingService {
   async record(domain: string, key: string): Promise<string> {
     const value = (await this.allRecords(domain))[key];
     return this.ensureRecordPresence(domain, key, value);
+  }
+
+  async twitter(domain: string): Promise<string> {
+    const serviceName = this.serviceName(domain);
+    if (serviceName !== 'CNS') {
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+        domain,
+        methodName: 'twitter',
+      });
+    }
+    const records = [
+      'validation.social.twitter.username',
+      'social.twitter.username',
+    ];
+    const [validationSignature, twitterHandle] = await Promise.all(
+      records.map((record) => this.record(domain, record)),
+    );
+    const owner = await this.owner(domain);
+    if (!owner) {
+      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+        domain,
+      });
+    }
+    if (
+      !isValidTwitterSignature(
+        domain,
+        owner,
+        twitterHandle,
+        validationSignature,
+      )
+    ) {
+      throw new ResolutionError(
+        ResolutionErrorCode.InvalidTwitterVerification,
+        {
+          domain,
+        },
+      );
+    }
+    return twitterHandle;
   }
 
   async allRecords(domain: string): Promise<Record<string, string>> {

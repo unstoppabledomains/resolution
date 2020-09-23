@@ -15,9 +15,9 @@ import CnsProxyReader from './cns/CnsProxyReader';
 import CnsRegistryReader from './cns/CnsRegistryReader';
 import Contract from './utils/contract';
 import standardKeys from './utils/standardKeys';
-import { isLegacyResolver, hexToBytes } from './utils';
-import { keccak256 as sha3 } from 'js-sha3';
-import { recover } from './utils/recoverSignature';
+import { isLegacyResolver } from './utils';
+import { isValidTwitterSignature } from './utils/verifyTwitterSig';
+
 const ReaderMap: ReaderMap = {
   1: '0x7ea9ee21077f84339eda9c80048ec6db678642b1',
   42: '0xcf4318918fd18aca9bdc11445c01fbada4b448e3', // for internal testing
@@ -127,16 +127,14 @@ export default class Cns extends EthereumNamingService {
       return this.ensureRecordPresence(domain, recordName, values && values[i]);
     });
     const [validationSignature, twitterHandle] = values!;
-    const message = [domain, owner, 'social.twitter.username', twitterHandle]
-      .map((value: string) => {
-        if (/^0x/i.test(value)) {
-          return '0x' + sha3(hexToBytes(value));
-        }
-        return '0x' + sha3(value);
-      })
-      .reduce((message, hashedValue) => message + hashedValue, '');
-    const signerAddress = recover(message, validationSignature);
-    if (signerAddress !== Cns.TwitterVerificationAddress) {
+    if (
+      !isValidTwitterSignature(
+        domain,
+        owner,
+        twitterHandle,
+        validationSignature,
+      )
+    ) {
       throw new ResolutionError(
         ResolutionErrorCode.InvalidTwitterVerification,
         {

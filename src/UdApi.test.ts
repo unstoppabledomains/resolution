@@ -5,7 +5,7 @@ import {
   DefaultUrl,
   mockAPICalls,
   mockAsyncMethod,
-  expectSpyToBeCalled,
+  expectSpyToBeCalled,, CryptoDomainWithTwitterVerification
 } from './tests/helpers';
 
 beforeEach(() => {
@@ -41,6 +41,22 @@ describe('Unstoppable API', () => {
     await expectResolutionErrorCode(
       resolution.resolve('hello.zil'),
       ResolutionErrorCode.NamingServiceDown,
+    );
+  });
+
+  it('should return verified twitter handle', async () => {
+    const resolution = new Resolution({ blockchain: false });
+    const twitterHandle = await resolution.twitter(
+      CryptoDomainWithTwitterVerification,
+    );
+    expect(twitterHandle).toBe('derainberk');
+  });
+
+  it('should throw unsupported method', async () => {
+    const resolution = new Resolution({ blockchain: false });
+    const handle = 'ryan.eth';
+    await expect(resolution.twitter(handle)).rejects.toThrowError(
+      `Method twitter is not supported for ${handle}`,
     );
   });
 
