@@ -86,7 +86,7 @@ function resolveIpfsHash(domain) {
 
 function resolveGunDbRecords(domain) {
   resolution.chatId(domain)
-    .then(id => console.log(`domain ${domain} has gundb chatId ${id}`))
+    .then(id => console.log(`Domain ${domain} has a GunDB chat ID: ${id}`))
     .catch(console.error)
   resolution.chatPk(domain)
     .then(pk => console.log(`Domain ${domain} has a GunDB public key: ${pk}`))
