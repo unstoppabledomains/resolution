@@ -164,7 +164,7 @@ export default class Resolution {
   }
 
   /**
-   * Resolves give domain name to a specific currency address if exists
+   * Resolves given domain name to a specific currency address if exists
    * @async
    * @param domain - domain name to be resolved
    * @param currencyTicker - currency ticker like BTC, ETH, ZIL
@@ -191,7 +191,7 @@ export default class Resolution {
   }
 
   /**
-   * Resolves give domain name to a specific currency address if exists
+   * Resolves given domain name to a specific currency address if exists
    * @async
    * @param domain - domain name to be resolved
    * @param currencyTicker - currency ticker like BTC, ETH, ZIL
@@ -207,7 +207,7 @@ export default class Resolution {
   }
 
   /**
-   * Resolves give domain name to a specific currency address if exists
+   * Resolves given domain name to a verified twitter handle
    * @async
    * @param domain - domain name to be resolved
    * @throws [[ResolutionError]] if twitter is not found
