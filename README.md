@@ -89,7 +89,7 @@ function resolveGunDbRecords(domain) {
     .then(id => console.log(`domain ${domain} has gundb chatId ${id}`))
     .catch(console.error)
   resolution.chatPk(domain)
-    .then(pk => console.log(`domain ${domain} has gunDB public key ${pk}`))
+    .then(pk => console.log(`Domain ${domain} has a GunDB public key: ${pk}`))
     .catch(console.error)
 }
 
