@@ -80,7 +80,7 @@ const resolution = new Resolution()
 
 function resolveIpfsHash(domain) {
   resolution.ipfsHash(domain)
-    .then(hash => console.log(`you can view website via public ipfs gateway https://gateway.ipfs.io/ipfs/${hash}`))
+    .then(hash => console.log(`You can access the website via a public IPFS gateway: https://gateway.ipfs.io/ipfs/${hash}`))
     .catch(console.error)
 }
 
