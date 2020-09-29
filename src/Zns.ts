@@ -5,13 +5,15 @@ import {
   toChecksumAddress,
 } from './zns/utils';
 import { invert, set } from './utils';
+import { Dictionary, ZnsResolution, isNullAddress, nodeHash } from './types';
 import {
-  Dictionary,
-  ZnsResolution,
-  isNullAddress,
-  nodeHash,
-} from './types';
-import { NamingServiceName, ResolutionError, ResolutionErrorCode, ResolutionResponse, SourceDefinition, UnclaimedDomainResponse } from './index';
+  NamingServiceName,
+  ResolutionError,
+  ResolutionErrorCode,
+  ResolutionResponse,
+  SourceDefinition,
+  UnclaimedDomainResponse,
+} from './index';
 import NamingService from './NamingService';
 
 /** @internal */

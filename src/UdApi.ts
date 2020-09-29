@@ -1,9 +1,13 @@
 import { toBech32Address } from './zns/utils';
-import { NamingServiceName, ResolutionError, ResolutionErrorCode, ResolutionResponse, SourceDefinition } from './index';
-import NamingService from './NamingService';
 import {
-  isNullAddress,
-} from './types';
+  NamingServiceName,
+  ResolutionError,
+  ResolutionErrorCode,
+  ResolutionResponse,
+  SourceDefinition,
+} from './index';
+import NamingService from './NamingService';
+import { isNullAddress } from './types';
 import Zns from './Zns';
 import Ens from './Ens';
 import Cns from './Cns';
@@ -111,7 +115,7 @@ export default class Udapi extends NamingService {
       'social.twitter.username',
     ];
     const [validationSignature, twitterHandle] = await Promise.all(
-      records.map((record) => this.record(domain, record)),
+      records.map(record => this.record(domain, record)),
     );
     const owner = await this.owner(domain);
     if (!owner) {

@@ -1,8 +1,10 @@
 import nock from 'nock';
-import Resolution, { NamingServiceName, ResolutionErrorCode, UnclaimedDomainResponse } from './index';
-import {
-  JsonRpcPayload,
-} from './publicTypes';
+import Resolution, {
+  NamingServiceName,
+  ResolutionErrorCode,
+  UnclaimedDomainResponse,
+} from './index';
+import { JsonRpcPayload } from './publicTypes';
 import { JsonRpcProvider, getDefaultProvider } from '@ethersproject/providers';
 import Web3HttpProvider from 'web3-providers-http';
 import Web3WsProvider from 'web3-providers-ws';
@@ -16,7 +18,8 @@ import {
   ProviderProtocol,
   caseMock,
   mockAsyncMethod,
-  expectConfigurationErrorCode, CryptoDomainWithTwitterVerification
+  expectConfigurationErrorCode,
+  CryptoDomainWithTwitterVerification,
 } from './tests/helpers';
 import _ from 'lodash';
 import { RpcProviderTestCases } from './tests/providerMockData';
@@ -271,9 +274,9 @@ describe('Resolution', () => {
     it('should throw unsupported method', async () => {
       const resolution = new Resolution();
       const handle = 'ryan.eth';
-      await expect(resolution.twitter(
-        handle,
-      )).rejects.toThrowError(`Method twitter is not supported for ${handle}`);
+      await expect(resolution.twitter(handle)).rejects.toThrowError(
+        `Method twitter is not supported for ${handle}`,
+      );
     });
   });
 

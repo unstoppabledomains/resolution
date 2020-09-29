@@ -1,9 +1,5 @@
 import { EthereumNamingService } from './EthereumNamingService';
-import {
-  ReaderMap,
-  isNullAddress,
-  NullAddress,
-} from './types';
+import { ReaderMap, isNullAddress, NullAddress } from './types';
 import { default as proxyReaderAbi } from './cns/contract/proxyReader';
 import { default as resolverInterface } from './cns/contract/resolver';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
@@ -14,7 +10,11 @@ import Contract from './utils/contract';
 import standardKeys from './utils/standardKeys';
 import { isLegacyResolver } from './utils';
 import { isValidTwitterSignature } from './utils/verifyTwitterSig';
-import { SourceDefinition, NamingServiceName, ResolutionResponse } from './publicTypes';
+import {
+  SourceDefinition,
+  NamingServiceName,
+  ResolutionResponse,
+} from './publicTypes';
 
 const ReaderMap: ReaderMap = {
   1: '0x7ea9ee21077f84339eda9c80048ec6db678642b1',

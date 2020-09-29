@@ -75,7 +75,7 @@ export interface RpcProviderLogEntry {
  * @typedef {object} ZnsResolution
  */
 export type ZnsResolution = {
-  crypto?: Dictionary<{ address?: string;[key: string]: any }>;
+  crypto?: Dictionary<{ address?: string; [key: string]: any }>;
   ttl?: string;
   [key: string]: any;
 };

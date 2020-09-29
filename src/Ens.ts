@@ -1,13 +1,13 @@
 import { default as ensInterface } from './ens/contract/ens';
 import { default as resolverInterface } from './ens/contract/resolver';
 import { formatsByCoinType } from '@ensdomains/address-encoder';
-import {
-  EthCoinIndex,
-  Bip44Constants,
-  isNullAddress,
-} from './types';
+import { EthCoinIndex, Bip44Constants, isNullAddress } from './types';
 import { EthereumNamingService } from './EthereumNamingService';
-import { NamingServiceName, ResolutionError, ResolutionErrorCode } from './index';
+import {
+  NamingServiceName,
+  ResolutionError,
+  ResolutionErrorCode,
+} from './index';
 import Contract from './utils/contract';
 import contentHash from 'content-hash';
 import EnsNetworkMap from 'ethereum-ens-network-map';
