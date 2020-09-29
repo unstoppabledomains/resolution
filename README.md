@@ -80,16 +80,16 @@ const resolution = new Resolution()
 
 function resolveIpfsHash(domain) {
   resolution.ipfsHash(domain)
-    .then(hash => console.log(`you can view website via public ipfs gateway https://gateway.ipfs.io/ipfs/${hash}`))
+    .then(hash => console.log(`You can access the website via a public IPFS gateway: https://gateway.ipfs.io/ipfs/${hash}`))
     .catch(console.error)
 }
 
 function resolveGunDbRecords(domain) {
   resolution.chatId(domain)
-    .then(id => console.log(`domain ${domain} has gundb chatId ${id}`))
+    .then(id => console.log(`Domain ${domain} has a GunDB chat ID: ${id}`))
     .catch(console.error)
   resolution.chatPk(domain)
-    .then(pk => console.log(`domain ${domain} has gunDB public key ${pk}`))
+    .then(pk => console.log(`Domain ${domain} has a GunDB public key: ${pk}`))
     .catch(console.error)
 }
 
@@ -122,7 +122,8 @@ resolution -C url:https://...
 
 You can find all of the options for resolution cli within -h, --help flag. 
 
-Flag -m can retrive all metadata so you don't need to query them separately if you just want an overview of domain records
+Flag -m can retrieve all the metadata, so you don't need to query it separately if you just want an overview of domain records.
+
 Example:
 ```
 resolution -mc eth,btc,DODGE,unknown -d brad.zil
