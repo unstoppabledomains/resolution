@@ -16,22 +16,6 @@ export interface RequestArguments {
   method: string;
   params?: ProviderParams;
 }
-/**
- * @internal
- * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-core-helpers/types/index.d.ts#L216
- */
-export interface JsonRpcPayload {
-  jsonrpc: string;
-  method: string;
-  params: any[];
-  id?: string | number;
-}
-export interface JsonRpcResponse {
-  jsonrpc: string;
-  id: number;
-  result?: any;
-  error?: string;
-}
 export type TransactionRequest = {
   to?: unknown;
   from?: unknown;
@@ -73,13 +57,7 @@ export interface RpcProviderRequestBody {
   address?: string;
   topics?: string[];
 }
-/**
- * @see https://github.com/ethers-io/ethers.js/blob/v5.0.4/packages/abstract-provider/src.ts/index.ts#L224
- */
-export interface EthersProvider {
-  call(transaction: TransactionRequest, blockTag?: never): Promise<string>;
-  getLogs(filter: EventFilter): Promise<RpcProviderLogEntry[]>;
-}
+
 export interface RpcProviderLogEntry {
   blockNumber: number;
   blockHash: string;

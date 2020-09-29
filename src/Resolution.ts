@@ -15,7 +15,8 @@ import {
   NamingServiceSource,
   SourceDefinition,
 } from './publicTypes';
-import {nodeHash, EthersProvider} from './types';
+import { nodeHash } from './types';
+import { EthersProvider } from './publicTypes';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import NamingService from './NamingService';
 import { signedInfuraLink } from './utils';

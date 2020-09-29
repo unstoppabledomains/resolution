@@ -1,4 +1,4 @@
-import { JsonRpcPayload, JsonRpcResponse, RequestArguments } from "./types";
+import { EventFilter, RequestArguments, RpcProviderLogEntry, TransactionRequest } from "./types";
 
 /**
  * SourceDefinition object
@@ -94,6 +94,31 @@ export const UnclaimedDomainResponse: ResolutionResponse = {
     },
 };
 
+/**
+ * @internal
+ * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-core-helpers/types/index.d.ts#L216
+ */
+export interface JsonRpcPayload {
+    jsonrpc: string;
+    method: string;
+    params: any[];
+    id?: string | number;
+  }
+  export interface JsonRpcResponse {
+    jsonrpc: string;
+    id: number;
+    result?: any;
+    error?: string;
+  }
+
+/**
+ * @see https://github.com/ethers-io/ethers.js/blob/v5.0.4/packages/abstract-provider/src.ts/index.ts#L224
+ */
+export interface EthersProvider {
+    call(transaction: TransactionRequest, blockTag?: never): Promise<string>;
+    getLogs(filter: EventFilter): Promise<RpcProviderLogEntry[]>;
+  }
+  
 /**
  * @deprecated Use UnclaimedDomainResponse instead (deprecated since 0.3.4)
  */
