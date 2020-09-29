@@ -1,8 +1,6 @@
 import nock from 'nock';
-import Resolution, { ResolutionErrorCode } from './index';
+import Resolution, { NamingServiceName, ResolutionErrorCode, UnclaimedDomainResponse } from './index';
 import {
-  UnclaimedDomainResponse,
-  NamingServiceName,
   JsonRpcPayload,
 } from './types';
 import { JsonRpcProvider, getDefaultProvider } from '@ethersproject/providers';
@@ -18,7 +16,7 @@ import {
   ProviderProtocol,
   caseMock,
   mockAsyncMethod,
-  expectConfigurationErrorCode,, CryptoDomainWithTwitterVerification
+  expectConfigurationErrorCode, CryptoDomainWithTwitterVerification
 } from './tests/helpers';
 import _ from 'lodash';
 import { RpcProviderTestCases } from './tests/providerMockData';

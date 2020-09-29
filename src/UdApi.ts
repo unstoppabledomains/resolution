@@ -1,10 +1,7 @@
 import { toBech32Address } from './zns/utils';
-import { ResolutionError, ResolutionErrorCode } from './index';
+import { NamingServiceName, ResolutionError, ResolutionErrorCode, ResolutionResponse, SourceDefinition } from './index';
 import NamingService from './NamingService';
 import {
-  ResolutionResponse,
-  NamingServiceName,
-  SourceDefinition,
   isNullAddress,
 } from './types';
 import Zns from './Zns';

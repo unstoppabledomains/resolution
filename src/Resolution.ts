@@ -8,15 +8,14 @@ import {
   ResolutionResponse,
   DefaultAPI,
   API,
-  nodeHash,
   NamingServiceName,
   Web3Version0Provider,
   Web3Version1Provider,
   Provider,
   NamingServiceSource,
   SourceDefinition,
-  EthersProvider,
-} from './types';
+} from './publicTypes';
+import {nodeHash, EthersProvider} from './types';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import NamingService from './NamingService';
 import { signedInfuraLink } from './utils';

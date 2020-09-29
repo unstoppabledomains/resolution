@@ -1,3 +1,4 @@
+import { ResolutionMethod, Provider, ResolutionResponse, SourceDefinition, NamingServiceName } from '.';
 import BaseConnection from './BaseConnection';
 import ConfigurationError, {
   ConfigurationErrorCode,
@@ -5,12 +6,7 @@ import ConfigurationError, {
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import FetchProvider from './FetchProvider';
 import {
-  NamingServiceName,
   nodeHash,
-  Provider,
-  ResolutionMethod,
-  ResolutionResponse,
-  SourceDefinition,
 } from './types';
 
 /** @internal */
