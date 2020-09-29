@@ -1,7 +1,7 @@
 import ICnsReader, { Data } from './ICnsReader';
 import Contract from '../utils/contract';
 
-/** @internal */
+
 export default class CnsProxyReader implements ICnsReader {
   readonly proxyContract: Contract;
 

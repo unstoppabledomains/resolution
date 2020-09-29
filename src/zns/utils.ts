@@ -6,22 +6,22 @@
 import hashjs from 'hash.js';
 import BN from 'bn.js';
 
-/** @internal */
+
 const CHARSET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
-/** @internal */
+
 const GENERATOR = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3];
 // HRP is the human-readable part of zilliqa bech32 addresses
-/** @internal */
+
 const HRP = 'zil';
-/** @internal */
+
 const tHRP = 'tzil';
 
-/** @internal */
+
 function isByteString(str: string, len: number) {
   return !!str.replace('0x', '').match(`^[0-9a-fA-F]{${len}}$`);
 }
 
-/** @internal */
+
 function isAddress(address: string) {
   return isByteString(address, 40);
 }
@@ -76,7 +76,7 @@ function convertBits(
   return Buffer.from(ret);
 }
 
-/** @internal */
+
 function hrpExpand(hrp: string): Buffer {
   const ret: any[] = [];
   let p;
@@ -90,7 +90,7 @@ function hrpExpand(hrp: string): Buffer {
   return Buffer.from(ret);
 }
 
-/** @internal */
+
 function polymod(values: Buffer): number {
   let chk = 1;
   // tslint:disable-next-line
@@ -106,7 +106,7 @@ function polymod(values: Buffer): number {
   return chk;
 }
 
-/** @internal */
+
 function createChecksum(hrp: string, data: Buffer) {
   const values = Buffer.concat([
     Buffer.from(hrpExpand(hrp)),
@@ -122,12 +122,12 @@ function createChecksum(hrp: string, data: Buffer) {
   return Buffer.from(ret);
 }
 
-/** @internal */
+
 function verifyChecksum(hrp: string, data: Buffer) {
   return polymod(Buffer.concat([hrpExpand(hrp), data])) === 1;
 }
 
-/** @internal */
+
 function encode(hrp: string, data: Buffer) {
   const combined = Buffer.concat([data, createChecksum(hrp, data)]);
   let ret = hrp + '1';
@@ -138,7 +138,7 @@ function encode(hrp: string, data: Buffer) {
   return ret;
 }
 
-/** @internal */
+
 function decode(bechString: string) {
   let p;
   let hasLower = false;

@@ -14,7 +14,6 @@ import Cns from './Cns';
 import pckg from './package.json';
 import { isValidTwitterSignature } from './utils/verifyTwitterSig';
 
-/** @internal */
 export default class Udapi extends NamingService {
   private headers: {
     [key: string]: string;

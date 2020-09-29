@@ -13,7 +13,6 @@ import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import FetchProvider from './FetchProvider';
 import { nodeHash } from './types';
 
-/** @internal */
 export default abstract class NamingService extends BaseConnection {
   readonly name: ResolutionMethod;
   readonly network: number;

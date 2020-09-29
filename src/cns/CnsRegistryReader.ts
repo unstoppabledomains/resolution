@@ -3,7 +3,7 @@ import Contract from '../utils/contract';
 import { isNullAddress } from '../types';
 import { default as resolverAbi } from './contract/resolver';
 
-/** @internal */
+
 export default class CnsRegistryReader implements ICnsReader {
   readonly registryContract: Contract;
 

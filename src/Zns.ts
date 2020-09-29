@@ -16,32 +16,26 @@ import {
 } from './index';
 import NamingService from './NamingService';
 
-/** @internal */
 const DefaultSource = 'https://api.zilliqa.com';
 
-/** @internal */
 const NetworkIdMap = {
   mainnet: 1,
   testnet: 333,
   localnet: 111,
 };
 
-/** @internal */
 const RegistryMap = {
   1: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
 };
 
-/** @internal */
 const UrlMap = {
   1: 'https://api.zilliqa.com',
   333: 'https://dev-api.zilliqa.com',
   111: 'http://localhost:4201',
 };
 
-/** @internal */
 const UrlNetworkMap = (url: string) => invert(UrlMap)[url];
 
-/** @internal */
 export default class Zns extends NamingService {
   constructor(source: SourceDefinition = {}) {
     super(source, NamingServiceName.ZNS);

@@ -13,7 +13,6 @@ import contentHash from 'content-hash';
 import EnsNetworkMap from 'ethereum-ens-network-map';
 import { SourceDefinition, ResolutionResponse } from './publicTypes';
 
-/** @internal */
 export default class Ens extends EthereumNamingService {
   readonly name = NamingServiceName.ENS;
 

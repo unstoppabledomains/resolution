@@ -11,7 +11,6 @@ import { invert } from './utils';
 import Contract from './utils/contract';
 import { NamingServiceName, SourceDefinition } from './publicTypes';
 
-/** @internal */
 export abstract class EthereumNamingService extends NamingService {
   readonly name: NamingServiceName;
   protected abstract getResolver(id: string): Promise<string>;
