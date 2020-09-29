@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>RequestArguments | Unstoppabledomains resolution library</title>
+	<title>EventFilter | Unstoppabledomains resolution library</title>
 	<meta name="description" content="Documentation for Unstoppabledomains resolution library">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -54,10 +54,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="requestarguments.html">RequestArguments</a>
+					<a href="eventfilter.html">EventFilter</a>
 				</li>
 			</ul>
-			<h1>Interface RequestArguments</h1>
+			<h1>Interface EventFilter</h1>
 		</div>
 	</div>
 </header>
@@ -68,7 +68,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">RequestArguments</span>
+						<span class="target">EventFilter</span>
 					</li>
 				</ul>
 			</section>
@@ -79,8 +79,10 @@
 						<section class="tsd-index-section tsd-is-external">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="requestarguments.html#method" class="tsd-kind-icon">method</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="requestarguments.html#params" class="tsd-kind-icon">params</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="eventfilter.html#address" class="tsd-kind-icon">address</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="eventfilter.html#fromblock" class="tsd-kind-icon">from<wbr>Block</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="eventfilter.html#toblock" class="tsd-kind-icon">to<wbr>Block</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="eventfilter.html#topics" class="tsd-kind-icon">topics</a></li>
 							</ul>
 						</section>
 					</div>
@@ -89,22 +91,42 @@
 			<section class="tsd-panel-group tsd-member-group tsd-is-external">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-external">
-					<a name="method" class="tsd-anchor"></a>
-					<h3>method</h3>
-					<div class="tsd-signature tsd-kind-icon">method<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<a name="address" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> address</h3>
+					<div class="tsd-signature tsd-kind-icon">address<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/067b821/src/types.ts#L16">src/types.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/067b821/src/types.ts#L43">src/types.ts:43</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-external">
-					<a name="params" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> params</h3>
-					<div class="tsd-signature tsd-kind-icon">params<span class="tsd-signature-symbol">:</span> <a href="../globals.html#providerparams" class="tsd-signature-type">ProviderParams</a></div>
+					<a name="fromblock" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> from<wbr>Block</h3>
+					<div class="tsd-signature tsd-kind-icon">from<wbr>Block<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/067b821/src/types.ts#L17">src/types.ts:17</a></li>
+							<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/067b821/src/types.ts#L45">src/types.ts:45</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-external">
+					<a name="toblock" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> to<wbr>Block</h3>
+					<div class="tsd-signature tsd-kind-icon">to<wbr>Block<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/067b821/src/types.ts#L46">src/types.ts:46</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-external">
+					<a name="topics" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> topics</h3>
+					<div class="tsd-signature tsd-kind-icon">topics<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Array</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/067b821/src/types.ts#L44">src/types.ts:44</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -123,13 +145,19 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface tsd-is-external">
-						<a href="requestarguments.html" class="tsd-kind-icon">Request<wbr>Arguments</a>
+						<a href="eventfilter.html" class="tsd-kind-icon">Event<wbr>Filter</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-external">
-								<a href="requestarguments.html#method" class="tsd-kind-icon">method</a>
+								<a href="eventfilter.html#address" class="tsd-kind-icon">address</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-external">
-								<a href="requestarguments.html#params" class="tsd-kind-icon">params</a>
+								<a href="eventfilter.html#fromblock" class="tsd-kind-icon">from<wbr>Block</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-external">
+								<a href="eventfilter.html#toblock" class="tsd-kind-icon">to<wbr>Block</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-external">
+								<a href="eventfilter.html#topics" class="tsd-kind-icon">topics</a>
 							</li>
 						</ul>
 					</li>
