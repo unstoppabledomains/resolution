@@ -18,6 +18,7 @@
   "typedocOptions": {
     "mode": "file",
     "module": "commonjs",
+    "excludeExternals": true,
     "excludePrivate": true,
     "excludeNotExported": true,
     "name": "Unstoppabledomains resolution library",
