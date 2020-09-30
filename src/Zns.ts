@@ -16,8 +16,6 @@ import {
 } from './index';
 import NamingService from './NamingService';
 
-const DefaultSource = 'https://api.zilliqa.com';
-
 const NetworkIdMap = {
   mainnet: 1,
   testnet: 333,
@@ -79,12 +77,11 @@ export default class Zns extends NamingService {
     return await this.getResolverRecords(resolverAddress);
   }
 
-  async twitter(domain: string) {
+  async twitter(domain: string): Promise<string> {
     throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
       domain,
       methodName: 'twitter',
     });
-    return '';
   }
 
   isSupportedDomain(domain: string): boolean {

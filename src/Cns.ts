@@ -119,9 +119,8 @@ export default class Cns extends EthereumNamingService {
       'social.twitter.username',
     ];
     const { values } = await reader.records(tokenId, records);
-
     const owner = await this.owner(domain);
-    records.map((recordName, i) => {
+    records.forEach((recordName, i) => {
       return this.ensureRecordPresence(domain, recordName, values && values[i]);
     });
     const [validationSignature, twitterHandle] = values!;
@@ -184,9 +183,7 @@ export default class Cns extends EthereumNamingService {
     values: string[],
   ): Record<string, string> {
     const records: Record<string, string> = {};
-    keys.forEach((key, index) => {
-      values[index] ? (records[key] = values[index]) : undefined;
-    });
+    keys.forEach((key, index) => records[key] = values[index]);
     return records;
   }
 
