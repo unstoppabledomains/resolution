@@ -71,8 +71,8 @@ brad.zil resolves to zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj
 
 ### Dweb resolution
 
-Resolution library can help you out with resolving dweb records such as ipfs hash for websites or gundb username for 
-[p2p chat system](https://unstoppabledomains.com/chat)
+Resolution library can help you out with resolving DWeb records, such as IPFS hashes for websites or GunDB usernames for 
+[p2p chat system](https://unstoppabledomains.com/chat).
 
 ```javascript
 const {default: Resolution} = require('@unstoppabledomains/resolution')
