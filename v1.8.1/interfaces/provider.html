@@ -38,8 +38,6 @@
 							</div>
 							<input type="checkbox" id="tsd-filter-inherited" checked />
 							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
-							<input type="checkbox" id="tsd-filter-externals" checked />
-							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
 						</div>
 					</div>
 					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
@@ -99,10 +97,10 @@
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="request" class="tsd-anchor"></a>
 					<h3>request</h3>
-					<div class="tsd-signature tsd-kind-icon">request<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>request<span class="tsd-signature-symbol">: </span><a href="requestarguments.html" class="tsd-signature-type">RequestArguments</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<div class="tsd-signature tsd-kind-icon">request<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>request<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">RequestArguments</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/067b821/src/publicTypes.ts#L82">src/publicTypes.ts:82</a></li>
+							<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/bf79d58/src/publicTypes.ts#L87">src/publicTypes.ts:87</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -110,14 +108,14 @@
 						<ul class="tsd-parameters">
 							<li class="tsd-parameter-signature">
 								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-property">
-									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>request<span class="tsd-signature-symbol">: </span><a href="requestarguments.html" class="tsd-signature-type">RequestArguments</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></li>
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>request<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">RequestArguments</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></li>
 								</ul>
 								<ul class="tsd-descriptions">
 									<li class="tsd-description">
 										<h4 class="tsd-parameters-title">Parameters</h4>
 										<ul class="tsd-parameters">
 											<li>
-												<h5>request: <a href="requestarguments.html" class="tsd-signature-type">RequestArguments</a></h5>
+												<h5>request: <span class="tsd-signature-type">RequestArguments</span></h5>
 											</li>
 										</ul>
 										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -139,6 +137,33 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-enum">
+						<a href="../enums/configurationerrorcode.html" class="tsd-kind-icon">Configuration<wbr>Error<wbr>Code</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="../enums/namingservicename.html" class="tsd-kind-icon">Naming<wbr>Service<wbr>Name</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="../enums/resolutionerrorcode.html" class="tsd-kind-icon">Resolution<wbr>Error<wbr>Code</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="../classes/configurationerror.html" class="tsd-kind-icon">Configuration<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="../classes/resolution.html" class="tsd-kind-icon">Resolution</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="../classes/resolutionerror.html" class="tsd-kind-icon">Resolution<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="ethersprovider.html" class="tsd-kind-icon">Ethers<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="jsonrpcpayload.html" class="tsd-kind-icon">Json<wbr>Rpc<wbr>Payload</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="jsonrpcresponse.html" class="tsd-kind-icon">Json<wbr>Rpc<wbr>Response</a>
+					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface">
@@ -151,6 +176,57 @@
 					</li>
 				</ul>
 				<ul class="after-current">
+					<li class=" tsd-kind-interface">
+						<a href="sourcedefinition.html" class="tsd-kind-icon">Source<wbr>Definition</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="web3version0provider.html" class="tsd-kind-icon">Web3<wbr>Version0<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="web3version1provider.html" class="tsd-kind-icon">Web3<wbr>Version1<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../globals.html#api" class="tsd-kind-icon">API</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../globals.html#blockchain" class="tsd-kind-icon">Blockchain</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../globals.html#configurationerrorhandler" class="tsd-kind-icon">Configuration<wbr>Error<wbr>Handler</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../globals.html#configurationerroroptions" class="tsd-kind-icon">Configuration<wbr>Error<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../globals.html#namingservicesource" class="tsd-kind-icon">Naming<wbr>Service<wbr>Source</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../globals.html#providermethod" class="tsd-kind-icon">Provider<wbr>Method</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../globals.html#resolutionerrorhandler" class="tsd-kind-icon">Resolution<wbr>Error<wbr>Handler</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../globals.html#resolutionerroroptions" class="tsd-kind-icon">Resolution<wbr>Error<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../globals.html#resolutionmethod" class="tsd-kind-icon">Resolution<wbr>Method</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../globals.html#resolutionresponse" class="tsd-kind-icon">Resolution<wbr>Response</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="../globals.html#udapidefaulturl" class="tsd-kind-icon">UDApi<wbr>Default<wbr>Url</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="../globals.html#unclaimed_domain_response" class="tsd-kind-icon">UNCLAIMED_<wbr>DOMAIN_<wbr>RESPONSE</a>
+					</li>
+					<li class=" tsd-kind-object-literal">
+						<a href="../globals.html#defaultapi" class="tsd-kind-icon">DefaultAPI</a>
+					</li>
+					<li class=" tsd-kind-object-literal">
+						<a href="../globals.html#unclaimeddomainresponse" class="tsd-kind-icon">Unclaimed<wbr>Domain<wbr>Response</a>
+					</li>
 				</ul>
 			</nav>
 		</div>

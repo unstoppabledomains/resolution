@@ -38,8 +38,6 @@
 							</div>
 							<input type="checkbox" id="tsd-filter-inherited" checked />
 							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
-							<input type="checkbox" id="tsd-filter-externals" checked />
-							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
 						</div>
 					</div>
 					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
@@ -117,41 +115,31 @@ resolve(<span class="hljs-string">&#x27;brad.zil&#x27;</span>, <span class="hljs
 				<pre><code>$ <span class="hljs-keyword">node</span> <span class="hljs-title">script</span>.js
 brad.crypto resolves to <span class="hljs-number">0</span>x8aaD44321A86b170879d7A244c1e8d360c99DdA8
 brad.zil resolves to zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj</code></pre>
-				<a href="#how-to-resolve" id="how-to-resolve" style="color: inherit; text-decoration: none;">
-					<h3>How to resolve</h3>
+				<a href="#dweb-resolution" id="dweb-resolution" style="color: inherit; text-decoration: none;">
+					<h3>Dweb resolution</h3>
 				</a>
-				<p>Resolution library provides a way to resolve a domain name using a direct blockchain call.
-				For this purpose there are two main methods to look for: ** Resolution.resolve ** and ** Resolution.address **</p>
-				<a href="#resolutionresolve" id="resolutionresolve" style="color: inherit; text-decoration: none;">
-					<h4>Resolution#resolve</h4>
-				</a>
-				<p>This method accept the domain name and returns following object or null in case of error</p>
-				<pre><code class="language-javascript">  {
-    <span class="hljs-attr">addresses</span>: {}, <span class="hljs-comment">// if domain will resolve to anything it will be here</span>
-    <span class="hljs-attr">meta</span>: {
-      <span class="hljs-attr">owner</span>: <span class="hljs-literal">null</span>, <span class="hljs-comment">// this means the domain is avalable for purchase</span>
-      <span class="hljs-attr">ttl</span>: <span class="hljs-number">0</span>,
-    },
-  }</code></pre>
-				<a href="#resolutionaddress" id="resolutionaddress" style="color: inherit; text-decoration: none;">
-					<h4>Resolution#address</h4>
-				</a>
-				<p>This method accepts two arguments:</p>
-				<ul>
-					<li>domain name</li>
-					<li>currency ticker in which address you are interested like ( BTC, ETH, ZIL )</li>
-				</ul>
-				<p>It returns you the address if such exists or simply null if such address wasn&#39;t found.
-				Beside the resolution there are also methods to test whether the domain is in valid format or supported by the network</p>
-				<a href="#resolutionissupporteddomain" id="resolutionissupporteddomain" style="color: inherit; text-decoration: none;">
-					<h4>Resolution#isSupportedDomain</h4>
-				</a>
-				<p>Accepts domain name and returns boolean if such domain is supported by ens, .crypto, or .zil</p>
-				<a href="#resolutionissupporteddomaininnetwork" id="resolutionissupporteddomaininnetwork" style="color: inherit; text-decoration: none;">
-					<h4>Resolution#isSupportedDomainInNetwork</h4>
-				</a>
-				<p>Accepts the domain name and tests it against the current blockchain network specified in constructor of Resolution.
-				It will also check if the domain is in valid format</p>
+				<p>Resolution library can help you out with resolving DWeb records, such as IPFS hashes for websites or GunDB usernames for
+				<a href="https://unstoppabledomains.com/chat">p2p chat system</a>.</p>
+				<pre><code class="language-javascript"><span class="hljs-keyword">const</span> {<span class="hljs-attr">default</span>: Resolution} = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;@unstoppabledomains/resolution&#x27;</span>)
+<span class="hljs-keyword">const</span> resolution = <span class="hljs-keyword">new</span> Resolution()
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">resolveIpfsHash</span>(<span class="hljs-params">domain</span>) </span>{
+  resolution.ipfsHash(domain)
+    .then(<span class="hljs-function"><span class="hljs-params">hash</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(<span class="hljs-string">`You can access the website via a public IPFS gateway: https://gateway.ipfs.io/ipfs/<span class="hljs-subst">${hash}</span>`</span>))
+    .catch(<span class="hljs-built_in">console</span>.error)
+}
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">resolveGunDbRecords</span>(<span class="hljs-params">domain</span>) </span>{
+  resolution.chatId(domain)
+    .then(<span class="hljs-function"><span class="hljs-params">id</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(<span class="hljs-string">`Domain <span class="hljs-subst">${domain}</span> has a GunDB chat ID: <span class="hljs-subst">${id}</span>`</span>))
+    .catch(<span class="hljs-built_in">console</span>.error)
+  resolution.chatPk(domain)
+    .then(<span class="hljs-function"><span class="hljs-params">pk</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(<span class="hljs-string">`Domain <span class="hljs-subst">${domain}</span> has a GunDB public key: <span class="hljs-subst">${pk}</span>`</span>))
+    .catch(<span class="hljs-built_in">console</span>.error)
+}
+
+resolveIpfsHash(<span class="hljs-string">&quot;homecakes.crypto&quot;</span>)
+resolveGunDbRecords(<span class="hljs-string">&quot;homecakes.crypto&quot;</span>)</code></pre>
 				<a href="#cli" id="cli" style="color: inherit; text-decoration: none;">
 					<h3>CLI</h3>
 				</a>
@@ -162,6 +150,7 @@ brad.zil resolves to zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj</code></pre>
 				<p>As an argument to -C type the following structure url:&lt; https://.... &gt;</p>
 				<p>Example of usage</p>
 				<pre><code>resolution -C <span class="hljs-attr">url:</span><span class="hljs-attr">https:</span><span class="hljs-comment">//...</span></code></pre><p>You can find all of the options for resolution cli within -h, --help flag. </p>
+				<p>Flag -m can retrieve all the metadata, so you don&#39;t need to query it separately if you just want an overview of domain records.</p>
 				<p>Example:</p>
 				<pre><code><span class="hljs-built_in">resolution</span> -mc eth,btc,DODGE,<span class="hljs-literal">unknown</span> -d brad.zil</code></pre>
 				<a href="#note" id="note" style="color: inherit; text-decoration: none;">
@@ -207,9 +196,6 @@ brad.zil resolves to zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj</code></pre>
 					<li class=" tsd-kind-enum">
 						<a href="enums/namingservicename.html" class="tsd-kind-icon">Naming<wbr>Service<wbr>Name</a>
 					</li>
-					<li class=" tsd-kind-enum tsd-is-external">
-						<a href="enums/nulladdresses.html" class="tsd-kind-icon">Null<wbr>Addresses</a>
-					</li>
 					<li class=" tsd-kind-enum">
 						<a href="enums/resolutionerrorcode.html" class="tsd-kind-icon">Resolution<wbr>Error<wbr>Code</a>
 					</li>
@@ -222,35 +208,17 @@ brad.zil resolves to zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj</code></pre>
 					<li class=" tsd-kind-class">
 						<a href="classes/resolutionerror.html" class="tsd-kind-icon">Resolution<wbr>Error</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/blockhannetworkurlmap.html" class="tsd-kind-icon">Blockhan<wbr>Network<wbr>Url<wbr>Map</a>
-					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/ethersprovider.html" class="tsd-kind-icon">Ethers<wbr>Provider</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/eventdata.html" class="tsd-kind-icon">Event<wbr>Data</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/eventfilter.html" class="tsd-kind-icon">Event<wbr>Filter</a>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/jsonrpcpayload.html" class="tsd-kind-icon">Json<wbr>Rpc<wbr>Payload</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/jsonrpcresponse.html" class="tsd-kind-icon">Json<wbr>Rpc<wbr>Response</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/provider.html" class="tsd-kind-icon">Provider</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/readermap.html" class="tsd-kind-icon">Reader<wbr>Map</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/requestarguments.html" class="tsd-kind-icon">Request<wbr>Arguments</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/rpcproviderlogentry.html" class="tsd-kind-icon">Rpc<wbr>Provider<wbr>Log<wbr>Entry</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/rpcproviderrequestbody.html" class="tsd-kind-icon">Rpc<wbr>Provider<wbr>Request<wbr>Body</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/sourcedefinition.html" class="tsd-kind-icon">Source<wbr>Definition</a>
@@ -264,9 +232,6 @@ brad.zil resolves to zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj</code></pre>
 					<li class=" tsd-kind-type-alias">
 						<a href="globals.html#api" class="tsd-kind-icon">API</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-is-external">
-						<a href="globals.html#bip44constants" class="tsd-kind-icon">Bip44<wbr>Constants</a>
-					</li>
 					<li class=" tsd-kind-type-alias">
 						<a href="globals.html#blockchain" class="tsd-kind-icon">Blockchain</a>
 					</li>
@@ -276,23 +241,11 @@ brad.zil resolves to zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj</code></pre>
 					<li class=" tsd-kind-type-alias">
 						<a href="globals.html#configurationerroroptions" class="tsd-kind-icon">Configuration<wbr>Error<wbr>Options</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-has-type-parameter tsd-is-external">
-						<a href="globals.html#dictionary" class="tsd-kind-icon">Dictionary</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-is-external">
-						<a href="globals.html#ensnetworkidmap" class="tsd-kind-icon">Ens<wbr>Network<wbr>IdMap</a>
-					</li>
 					<li class=" tsd-kind-type-alias">
 						<a href="globals.html#namingservicesource" class="tsd-kind-icon">Naming<wbr>Service<wbr>Source</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-is-external">
-						<a href="globals.html#networkidmap" class="tsd-kind-icon">Network<wbr>IdMap</a>
-					</li>
 					<li class=" tsd-kind-type-alias">
 						<a href="globals.html#providermethod" class="tsd-kind-icon">Provider<wbr>Method</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-is-external">
-						<a href="globals.html#providerparams" class="tsd-kind-icon">Provider<wbr>Params</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
 						<a href="globals.html#resolutionerrorhandler" class="tsd-kind-icon">Resolution<wbr>Error<wbr>Handler</a>
@@ -306,101 +259,14 @@ brad.zil resolves to zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj</code></pre>
 					<li class=" tsd-kind-type-alias">
 						<a href="globals.html#resolutionresponse" class="tsd-kind-icon">Resolution<wbr>Response</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-is-external">
-						<a href="globals.html#rpcprovidertestcase" class="tsd-kind-icon">Rpc<wbr>Provider<wbr>Test<wbr>Case</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-is-external">
-						<a href="globals.html#transactionrequest" class="tsd-kind-icon">Transaction<wbr>Request</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-is-external">
-						<a href="globals.html#nodehash" class="tsd-kind-icon">node<wbr>Hash</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-is-external">
-						<a href="globals.html#owner" class="tsd-kind-icon">owner</a>
-					</li>
-					<li class=" tsd-kind-type-alias tsd-is-external">
-						<a href="globals.html#ttl" class="tsd-kind-icon">ttl</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#ethcoinindex" class="tsd-kind-icon">Eth<wbr>Coin<wbr>Index</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#nulladdress" class="tsd-kind-icon">Null<wbr>Address</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#oldresolveraddresses" class="tsd-kind-icon">Old<wbr>Resolver<wbr>Addresses</a>
-					</li>
 					<li class=" tsd-kind-variable">
 						<a href="globals.html#udapidefaulturl" class="tsd-kind-icon">UDApi<wbr>Default<wbr>Url</a>
 					</li>
 					<li class=" tsd-kind-variable">
 						<a href="globals.html#unclaimed_domain_response" class="tsd-kind-icon">UNCLAIMED_<wbr>DOMAIN_<wbr>RESPONSE</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#secp256k1" class="tsd-kind-icon">secp256k1</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#byteslength" class="tsd-kind-icon">bytes<wbr>Length</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#bytesslice" class="tsd-kind-icon">bytes<wbr>Slice</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#bytestonumber" class="tsd-kind-icon">bytes<wbr>ToNumber</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#decodesignature" class="tsd-kind-icon">decode<wbr>Signature</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#fromethersprovider" class="tsd-kind-icon">from<wbr>Ethers<wbr>Provider</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#fromweb3version0provider" class="tsd-kind-icon">from<wbr>Web3<wbr>Version0<wbr>Provider</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#fromweb3version1provider" class="tsd-kind-icon">from<wbr>Web3<wbr>Version1<wbr>Provider</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#hashmessage" class="tsd-kind-icon">hash<wbr>Message</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#hextobytes" class="tsd-kind-icon">hex<wbr>ToBytes</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#invert" class="tsd-kind-icon">invert</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#islegacyresolver" class="tsd-kind-icon">is<wbr>Legacy<wbr>Resolver</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#isnulladdress" class="tsd-kind-icon">is<wbr>Null<wbr>Address</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#isvalidtwittersignature" class="tsd-kind-icon">is<wbr>Valid<wbr>Twitter<wbr>Signature</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#recover" class="tsd-kind-icon">recover</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#set" class="tsd-kind-icon">set</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#signedinfuralink" class="tsd-kind-icon">signed<wbr>Infura<wbr>Link</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-external">
-						<a href="globals.html#tochecksum" class="tsd-kind-icon">to<wbr>Checksum</a>
-					</li>
-					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">
-						<a href="globals.html#wraparray" class="tsd-kind-icon">wrap<wbr>Array</a>
-					</li>
 					<li class=" tsd-kind-object-literal">
 						<a href="globals.html#defaultapi" class="tsd-kind-icon">DefaultAPI</a>
-					</li>
-					<li class=" tsd-kind-object-literal tsd-is-external">
-						<a href="globals.html#eip1993factories" class="tsd-kind-icon">Eip1993<wbr>Factories</a>
-					</li>
-					<li class=" tsd-kind-object-literal tsd-is-external">
-						<a href="globals.html#readermap" class="tsd-kind-icon">Reader<wbr>Map</a>
 					</li>
 					<li class=" tsd-kind-object-literal">
 						<a href="globals.html#unclaimeddomainresponse" class="tsd-kind-icon">Unclaimed<wbr>Domain<wbr>Response</a>
