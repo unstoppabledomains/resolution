@@ -18,7 +18,8 @@ import {
   ProviderProtocol,
   caseMock,
   mockAsyncMethod,
-  expectConfigurationErrorCode, CryptoDomainWithTwitterVerification
+  expectConfigurationErrorCode,
+  CryptoDomainWithTwitterVerification,
 } from './tests/helpers';
 import _ from 'lodash';
 import { RpcProviderTestCases } from './tests/providerMockData';
@@ -273,9 +274,9 @@ describe('Resolution', () => {
     it('should throw unsupported method', async () => {
       const resolution = new Resolution();
       const handle = 'ryan.eth';
-      await expect(resolution.twitter(
-        handle,
-      )).rejects.toThrowError(`Method twitter is not supported for ${handle}`);
+      await expect(resolution.twitter(handle)).rejects.toThrowError(
+        `Method twitter is not supported for ${handle}`,
+      );
     });
   });
 
