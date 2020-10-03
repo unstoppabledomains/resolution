@@ -52,7 +52,7 @@ export default class Contract {
     const topic = this.coder.getEventTopic("ResetRecords");
     const params = [
       {
-        fromBlock: CRYPTO_RESOLVER_ADVANCED_EVENTS_STARTING_BLOCK,
+        fromBlock: 'earliest',
         topics: [topic, tokenId],
         address: this.address
       }
