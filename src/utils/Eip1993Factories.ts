@@ -87,12 +87,8 @@ function fromEthersProvider(provider: EthersProvider): Provider {
         switch (request.method) {
           case 'eth_call': 
             return await provider.call(request.params![0]);
-          case 'eth_getLogs': {
-            const result = await provider.getLogs(request.params![0]);
-            
-            // console.log(JSON.stringify({input: request, output: result}, null, 2));
-            return result;
-          }
+          case 'eth_getLogs': 
+            return await provider.getLogs(request.params![0]);
           default:
             throw new ResolutionError(
               ResolutionErrorCode.ServiceProviderError, {
