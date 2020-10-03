@@ -182,7 +182,7 @@ export type RpcProviderTestCase = {
 export interface RpcProviderRequestBody {
   data?: string;
   to?: string;
-  fromBlock?: string;
+  fromBlock?: string | number;
   toBlock?: string;
   address?: string;
   topics?: string[];

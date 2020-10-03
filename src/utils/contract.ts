@@ -53,6 +53,7 @@ export default class Contract {
     const params = [
       {
         fromBlock: 'earliest',
+        toBlock: 'latest',
         topics: [topic, tokenId],
         address: this.address
       }

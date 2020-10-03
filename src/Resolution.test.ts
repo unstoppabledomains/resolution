@@ -18,7 +18,7 @@ import {
   ProviderProtocol,
   caseMock,
   mockAsyncMethod,
-  expectConfigurationErrorCode,, CryptoDomainWithTwitterVerification
+  expectConfigurationErrorCode, CryptoDomainWithTwitterVerification
 } from './tests/helpers';
 import _ from 'lodash';
 import { RpcProviderTestCases } from './tests/providerMockData';
