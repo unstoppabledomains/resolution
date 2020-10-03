@@ -1,7 +1,7 @@
 import { Interface, JsonFragment } from '@ethersproject/abi';
-import { Provider, RequestArguments, isNullAddress, EventData } from '../types';
-import FetchProvider from '../FetchProvider';
+import { Provider, RequestArguments, EventData } from '../types';
 
+const CRYPTO_RESOLVER_ADVANCED_EVENTS_STARTING_BLOCK = "0x960844";
 /** @internal */
 export default class Contract {
   readonly abi: JsonFragment[];
@@ -32,9 +32,10 @@ export default class Contract {
 
   async fetchLogs(eventName: string, tokenId: string): Promise<EventData[]> {
     const topic = this.coder.getEventTopic(eventName);
+    const startingBlockNumber = await this.getStartingBlock(tokenId);
     const params = [
       {
-        fromBlock: '0x960844',
+        fromBlock: startingBlockNumber,
         toBlock: 'latest',
         address: this.address,
         topics: [topic, tokenId]
@@ -45,6 +46,25 @@ export default class Contract {
       params
     };
     return await this.provider.request(request) as Promise<EventData[]>;
+  }
+
+  private async getStartingBlock(tokenId: string) {
+    const topic = this.coder.getEventTopic("ResetRecords");
+    const params = [
+      {
+        fromBlock: CRYPTO_RESOLVER_ADVANCED_EVENTS_STARTING_BLOCK,
+        topics: [topic, tokenId],
+        address: this.address
+      }
+    ];
+
+    const request: RequestArguments = {
+      method: 'eth_getLogs',
+      params
+    };
+    const logs = await this.provider.request(request) as EventData[];
+    const lastResetEvent = logs[logs.length - 1];
+    return lastResetEvent?.blockNumber || CRYPTO_RESOLVER_ADVANCED_EVENTS_STARTING_BLOCK;
   }
 
   private async callEth(data: string): Promise<unknown> {
