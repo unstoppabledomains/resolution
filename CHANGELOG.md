@@ -1,23 +1,28 @@
-## Unreleased
+## 1.8.2
+* Update Twitter validation algorithm
+
+## 1.8.0 - 1.8.1
+* Added `Resolution#twitter` method that returns back the verified twitter handle
+
+## 1.7.0
 * Added `Resolution#addr` method that behaves consistently with other record getter methods.
+
+## 1.6.2
 * Deprecated Resolution#address Resolution#addressOrThrow ResolutionErrorCode.UnspecifiedCurrency
 
 ## 1.8.2
 * Added ability to get verified twitter account connected to CNS domain via `Resolution#twitter` method.  
 
 ## 1.6.1
-
 * Used ProxyReader(0x7ea9ee21077f84339eda9c80048ec6db678642b1) instead of Registry contract by default
 
 ## 1.6.0
-
 * Added support of web3.js and ethers.js providers
 * Throw `ConfigurationError` instead of basic `Error` when Resolution library is configured incorrectly so that it can be targeted within `catch` block.
 * Use [@ethersproject/abi](https://www.npmjs.com/package/@ethersproject/abi) instead of custom abi encoder
 * Change default ethereum provider from infura to linkpool #75
 
 ## 1.5.1
-
 * fixing the version 
 
 ## 1.4.1

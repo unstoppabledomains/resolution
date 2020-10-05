@@ -1,21 +1,18 @@
 import { default as ensInterface } from './ens/contract/ens';
 import { default as resolverInterface } from './ens/contract/resolver';
 import { formatsByCoinType } from '@ensdomains/address-encoder';
-import {
-  ResolutionResponse,
-  EthCoinIndex,
-  NamingServiceName,
-  Bip44Constants,
-  isNullAddress,
-  SourceDefinition,
-} from './types';
+import { EthCoinIndex, Bip44Constants, isNullAddress } from './types';
 import { EthereumNamingService } from './EthereumNamingService';
-import { ResolutionError, ResolutionErrorCode } from './index';
+import {
+  NamingServiceName,
+  ResolutionError,
+  ResolutionErrorCode,
+} from './index';
 import Contract from './utils/contract';
 import contentHash from 'content-hash';
 import EnsNetworkMap from 'ethereum-ens-network-map';
+import { SourceDefinition, ResolutionResponse } from './publicTypes';
 
-/** @internal */
 export default class Ens extends EthereumNamingService {
   readonly name = NamingServiceName.ENS;
 
@@ -125,6 +122,7 @@ export default class Ens extends EthereumNamingService {
     const resolution = {
       meta: {
         namehash: this.namehash(domain),
+        resolver: resolver,
         owner,
         type: this.name,
         ttl: Number(ttl || 0),

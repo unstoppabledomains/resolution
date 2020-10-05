@@ -2,19 +2,25 @@
  * All functionality below came from here https://github.com/Zilliqa/Zilliqa-JavaScript-Library/tree/dev/packages/zilliqa-js-crypto/src
  */
 
+
 import hashjs from 'hash.js';
 import BN from 'bn.js';
 
+
 const CHARSET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
+
 const GENERATOR = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3];
 // HRP is the human-readable part of zilliqa bech32 addresses
+
 const HRP = 'zil';
+
 const tHRP = 'tzil';
 
-/** @internal */
+
 function isByteString(str: string, len: number) {
   return !!str.replace('0x', '').match(`^[0-9a-fA-F]{${len}}$`);
 }
+
 
 function isAddress(address: string) {
   return isByteString(address, 40);
@@ -28,7 +34,6 @@ function isAddress(address: string) {
  * For example, converts byte buffers to buffers of maximum 5 bit numbers,
  * padding those numbers as necessary. Necessary for encoding Ethereum-style
  * addresses as bech32 ones.
- *
  * @param {Buffer} data
  * @param {number} fromWidth
  * @param {number} toWidth
@@ -70,6 +75,7 @@ function convertBits(
   return Buffer.from(ret);
 }
 
+
 function hrpExpand(hrp: string): Buffer {
   const ret: any[] = [];
   let p;
@@ -82,6 +88,7 @@ function hrpExpand(hrp: string): Buffer {
   }
   return Buffer.from(ret);
 }
+
 
 function polymod(values: Buffer): number {
   let chk = 1;
@@ -98,6 +105,7 @@ function polymod(values: Buffer): number {
   return chk;
 }
 
+
 function createChecksum(hrp: string, data: Buffer) {
   const values = Buffer.concat([
     Buffer.from(hrpExpand(hrp)),
@@ -113,9 +121,11 @@ function createChecksum(hrp: string, data: Buffer) {
   return Buffer.from(ret);
 }
 
+
 function verifyChecksum(hrp: string, data: Buffer) {
   return polymod(Buffer.concat([hrpExpand(hrp), data])) === 1;
 }
+
 
 function encode(hrp: string, data: Buffer) {
   const combined = Buffer.concat([data, createChecksum(hrp, data)]);
@@ -126,6 +136,7 @@ function encode(hrp: string, data: Buffer) {
   }
   return ret;
 }
+
 
 function decode(bechString: string) {
   let p;
@@ -171,7 +182,6 @@ function decode(bechString: string) {
  * toChecksumAddress
  *
  * takes hex-encoded string and returns the corresponding address
- *
  * @param {string} address
  * @returns {string}
  */
@@ -209,7 +219,6 @@ export const toChecksumAddress = (address: string): string => {
  *
  * The expected format is zil1<address><checksum> where address and checksum
  * are the result of bech32 encoding a Buffer containing the address bytes.
- *
  * @param {string} 20 byte canonical address
  * @returns {string} 38 char bech32 encoded zilliqa address
  */
@@ -236,7 +245,6 @@ export function toBech32Address(
 
 /**
  * fromBech32Address
- *
  * @param {string} address - a valid Zilliqa bech32 address
  * @returns {string} a canonical 20-byte Ethereum-style address
  */

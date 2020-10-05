@@ -1,6 +1,6 @@
 import Resolution from './index';
 import { ResolutionErrorCode } from './errors/resolutionError';
-import { NullAddress, NamingServiceName } from './types';
+import { NullAddress } from './types';
 import {
   CryptoDomainWithAdaBchAddresses,
   CryptoDomainWithEmail,
@@ -16,6 +16,7 @@ import {
 import ICnsReader from './cns/ICnsReader';
 import FetchProvider from './FetchProvider';
 import { FetchError } from 'node-fetch';
+import { NamingServiceName } from './publicTypes';
 
 try {
   const dotenv = require('dotenv');

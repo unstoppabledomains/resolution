@@ -1,12 +1,13 @@
 import { toBech32Address } from './zns/utils';
-import { ResolutionError, ResolutionErrorCode } from './index';
-import NamingService from './NamingService';
 import {
-  ResolutionResponse,
   NamingServiceName,
+  ResolutionError,
+  ResolutionErrorCode,
+  ResolutionResponse,
   SourceDefinition,
-  isNullAddress,
-} from './types';
+} from './index';
+import NamingService from './NamingService';
+import { isNullAddress } from './types';
 import Zns from './Zns';
 import Ens from './Ens';
 import Cns from './Cns';
@@ -14,7 +15,6 @@ import pckg from './package.json';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 import standardKeys from './utils/standardKeys';
 
-/** @internal */
 export default class Udapi extends NamingService {
   private headers: {
     [key: string]: string;

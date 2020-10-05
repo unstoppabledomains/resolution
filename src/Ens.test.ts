@@ -153,7 +153,7 @@ describe('ENS', () => {
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x76a9144620b70031f0e9437e374a2100934fba4911046088ac',
     });
-    const doge = await resolution.ens!.addr('testthing.eth', 'DOGE');
+    const doge = await resolution.addr('testthing.eth', 'DOGE');
     expectSpyToBeCalled(eyes);
     expect(doge).toBe('DBXu2kgc3xtvCUWFcxFE3r9hEYgmuaaCyD');
   });
@@ -298,7 +298,7 @@ describe('ENS', () => {
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x76a9144620b70031f0e9437e374a2100934fba4911046088ac',
     });
-    const doge = await resolution.ens!.addr('testthing.eth', 'DOGE');
+    const doge = await resolution.addr('testthing.eth', 'DOGE');
     expectSpyToBeCalled(eyes);
     expect(doge).toBe('DBXu2kgc3xtvCUWFcxFE3r9hEYgmuaaCyD');
   });
@@ -309,7 +309,7 @@ describe('ENS', () => {
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0xa914e8604d28ef5d2a7caafe8741e5dd4816b7cb19ea87',
     });
-    const ltc = await resolution.ens!.addr('testthing.eth', 'LTC');
+    const ltc = await resolution.addr('testthing.eth', 'LTC');
     expectSpyToBeCalled(eyes);
     expect(ltc).toBe('MV5rN5EcX1imDS2gEh5jPJXeiW5QN8YrK3');
   });
@@ -320,7 +320,7 @@ describe('ENS', () => {
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x314159265dd8dbb310642f98f50c066173c1259b',
     });
-    const eth = await resolution.ens!.addr('testthing.eth', 'ETH');
+    const eth = await resolution.addr('testthing.eth', 'ETH');
     expectSpyToBeCalled(eyes);
     expect(eth).toBe('0x314159265dD8dbb310642f98f50C066173C1259b');
   });
@@ -331,7 +331,7 @@ describe('ENS', () => {
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x314159265dd8dbb310642f98f50c066173c1259b',
     });
-    const etc = await resolution.ens!.addr('testthing.eth', 'etc');
+    const etc = await resolution.addr('testthing.eth', 'etc');
     expectSpyToBeCalled(eyes);
     expect(etc).toBe('0x314159265dD8dbb310642f98f50C066173C1259b');
   });
@@ -342,7 +342,7 @@ describe('ENS', () => {
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x314159265dd8dbb310642f98f50c066173c1259b',
     });
-    const rsk = await resolution.ens!.addr('testthing.eth', 'rsk');
+    const rsk = await resolution.addr('testthing.eth', 'rsk');
     expectSpyToBeCalled(eyes);
     expect(rsk).toBe('0x314159265dD8DbB310642F98f50C066173c1259B');
   });
@@ -354,7 +354,7 @@ describe('ENS', () => {
       callMethod:
         '0x05444b4e9c06f24296074f7bc48f92a97916c6dc5ea9000000000000000000',
     });
-    const xrp = await resolution.ens!.addr('testthing.eth', 'xrp');
+    const xrp = await resolution.addr('testthing.eth', 'xrp');
     expectSpyToBeCalled(eyes);
     expect(xrp).toBe('X7qvLs7gSnNoKvZzNWUT2e8st17QPY64PPe7zriLNuJszeg');
   });
@@ -365,7 +365,7 @@ describe('ENS', () => {
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x76a91476a04053bda0a88bda5177b86a15c3b29f55987388ac',
     });
-    const bch = await resolution.ens!.addr('testthing.eth', 'bch');
+    const bch = await resolution.addr('testthing.eth', 'bch');
     expectSpyToBeCalled(eyes);
     expect(bch).toBe('bitcoincash:qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a');
   });
@@ -377,7 +377,7 @@ describe('ENS', () => {
       callMethod:
         '0x5128751e76e8199196d454941c45d1b3a323f1433bd6751e76e8199196d454941c45d1b3a323f1433bd6',
     });
-    const btc = await resolution.ens!.addr('testthing.eth', 'BTC');
+    const btc = await resolution.addr('testthing.eth', 'BTC');
     expectSpyToBeCalled(eyes);
     expect(btc).toBe(
       'bc1pw508d6qejxtdg4y5r3zarvary0c5xw7kw508d6qejxtdg4y5r3zarvary0c5xw7k7grplx',
@@ -447,6 +447,7 @@ describe('ENS', () => {
         meta: {
           namehash:
             '0x2b53e3f567989ee41b897998d89eb4d8cf0715fb2cfb41a64939a532c09e495e',
+          resolver: "0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8",
           owner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
           type: 'ENS',
           ttl: 0,
@@ -471,6 +472,7 @@ describe('ENS', () => {
         meta: {
           namehash:
             '0x2b53e3f567989ee41b897998d89eb4d8cf0715fb2cfb41a64939a532c09e495e',
+          resolver: "0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8",
           owner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
           type: 'ENS',
           ttl: 0,

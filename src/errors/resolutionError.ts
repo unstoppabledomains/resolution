@@ -1,5 +1,8 @@
-import { ResolutionMethod } from '../types';
-/** Alias for Resolution error handler function */
+import { ResolutionMethod } from '../publicTypes';
+/** 
+ * Alias for Resolution error handler function 
+ * @internal
+ */
 type ResolutionErrorHandler = (error: ResolutionErrorOptions) => string;
 /** Explains Resolution Error options */
 type ResolutionErrorOptions = {

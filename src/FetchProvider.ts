@@ -1,9 +1,9 @@
 import { FetchError } from 'node-fetch';
 import BaseConnection from './BaseConnection';
-import { Provider, RequestArguments, ResolutionMethod } from './types';
+import { RequestArguments } from './types';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
+import { Provider, ResolutionMethod } from './publicTypes';
 
-/** @internal */
 export default class FetchProvider extends BaseConnection implements Provider {
   readonly url: string;
   readonly name: ResolutionMethod;

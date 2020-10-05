@@ -69,41 +69,33 @@ brad.crypto resolves to 0x8aaD44321A86b170879d7A244c1e8d360c99DdA8
 brad.zil resolves to zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj
 ```
 
-### How to resolve
+### Dweb resolution
 
-Resolution library provides a way to resolve a domain name using a direct blockchain call.
-For this purpose there are two main methods to look for: ** Resolution.resolve ** and ** Resolution.address **
+Resolution library can help you out with resolving DWeb records, such as IPFS hashes for websites or GunDB usernames for 
+[p2p chat system](https://unstoppabledomains.com/chat).
 
-#### Resolution#resolve
-
-This method accept the domain name and returns following object or null in case of error
 ```javascript
-  {
-    addresses: {}, // if domain will resolve to anything it will be here
-    meta: {
-      owner: null, // this means the domain is avalable for purchase
-      ttl: 0,
-    },
-  }
+const {default: Resolution} = require('@unstoppabledomains/resolution')
+const resolution = new Resolution()
+
+function resolveIpfsHash(domain) {
+  resolution.ipfsHash(domain)
+    .then(hash => console.log(`You can access the website via a public IPFS gateway: https://gateway.ipfs.io/ipfs/${hash}`))
+    .catch(console.error)
+}
+
+function resolveGunDbRecords(domain) {
+  resolution.chatId(domain)
+    .then(id => console.log(`Domain ${domain} has a GunDB chat ID: ${id}`))
+    .catch(console.error)
+  resolution.chatPk(domain)
+    .then(pk => console.log(`Domain ${domain} has a GunDB public key: ${pk}`))
+    .catch(console.error)
+}
+
+resolveIpfsHash("homecakes.crypto")
+resolveGunDbRecords("homecakes.crypto")
 ```
-
-#### Resolution#address
-
-This method accepts two arguments:
- - domain name
- - currency ticker in which address you are interested like ( BTC, ETH, ZIL )
- 
-It returns you the address if such exists or simply null if such address wasn't found.
-Beside the resolution there are also methods to test whether the domain is in valid format or supported by the network
-
-#### Resolution#isSupportedDomain
-
-Accepts domain name and returns boolean if such domain is supported by ens, .crypto, or .zil
-
-#### Resolution#isSupportedDomainInNetwork
-
-Accepts the domain name and tests it against the current blockchain network specified in constructor of Resolution.
-It will also check if the domain is in valid format
 
 ### CLI
 
@@ -129,6 +121,8 @@ resolution -C url:https://...
 ```
 
 You can find all of the options for resolution cli within -h, --help flag. 
+
+Flag -m can retrieve all the metadata, so you don't need to query it separately if you just want an overview of domain records.
 
 Example:
 ```

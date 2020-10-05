@@ -5,17 +5,15 @@ import {
   toChecksumAddress,
 } from './zns/utils';
 import { invert, set } from './utils';
+import { Dictionary, ZnsResolution, isNullAddress, nodeHash } from './types';
 import {
-  Dictionary,
+  NamingServiceName,
+  ResolutionError,
+  ResolutionErrorCode,
   ResolutionResponse,
   SourceDefinition,
   UnclaimedDomainResponse,
-  ZnsResolution,
-  NamingServiceName,
-  isNullAddress,
-  nodeHash,
-} from './types';
-import { ResolutionError, ResolutionErrorCode } from './index';
+} from './index';
 import NamingService from './NamingService';
 
 const NetworkIdMap = {
@@ -36,7 +34,6 @@ const UrlMap = {
 
 const UrlNetworkMap = (url: string) => invert(UrlMap)[url];
 
-/** @internal */
 export default class Zns extends NamingService {
   constructor(source: SourceDefinition = {}) {
     super(source, NamingServiceName.ZNS);
@@ -59,6 +56,7 @@ export default class Zns extends NamingService {
       addresses,
       meta: {
         namehash: this.namehash(domain),
+        resolver: resolverAddress,
         owner: ownerAddress || null,
         type: this.name,
         ttl: parseInt(resolution.ttl as string) || 0,

@@ -1,19 +1,18 @@
+import {
+  ResolutionMethod,
+  Provider,
+  ResolutionResponse,
+  SourceDefinition,
+  NamingServiceName,
+} from '.';
 import BaseConnection from './BaseConnection';
 import ConfigurationError, {
   ConfigurationErrorCode,
 } from './errors/configurationError';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import FetchProvider from './FetchProvider';
-import {
-  NamingServiceName,
-  nodeHash,
-  Provider,
-  ResolutionMethod,
-  ResolutionResponse,
-  SourceDefinition,
-} from './types';
+import { nodeHash } from './types';
 
-/** @internal */
 export default abstract class NamingService extends BaseConnection {
   readonly name: ResolutionMethod;
   readonly network: number;

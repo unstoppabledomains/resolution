@@ -1,10 +1,10 @@
 import nock from 'nock';
-import Resolution, { ResolutionErrorCode } from './index';
-import {
-  UnclaimedDomainResponse,
+import Resolution, {
   NamingServiceName,
-  JsonRpcPayload,
-} from './types';
+  ResolutionErrorCode,
+  UnclaimedDomainResponse,
+} from './index';
+import { JsonRpcPayload } from './publicTypes';
 import { JsonRpcProvider, getDefaultProvider } from '@ethersproject/providers';
 import Web3HttpProvider from 'web3-providers-http';
 import Web3WsProvider from 'web3-providers-ws';

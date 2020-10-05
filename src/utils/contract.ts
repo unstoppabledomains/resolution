@@ -1,8 +1,8 @@
 import { Interface, JsonFragment } from '@ethersproject/abi';
-import { Provider, RequestArguments, isNullAddress, EventData } from '../types';
-import FetchProvider from '../FetchProvider';
+import { RequestArguments, EventData } from '../types';
+import { Provider } from '../publicTypes';
 
-/** @internal */
+
 export default class Contract {
   readonly abi: JsonFragment[];
   readonly coder: Interface;

@@ -1,5 +1,5 @@
 export { Resolution, Resolution as default } from './Resolution';
-export { UnclaimedDomainResponse, NamingServiceName } from './types';
+export * from './publicTypes';
 export { ResolutionError, ResolutionErrorCode } from './errors/resolutionError';
 export {
   ConfigurationError,

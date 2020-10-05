@@ -1,12 +1,5 @@
 import { EthereumNamingService } from './EthereumNamingService';
-import {
-  NamingServiceName,
-  ReaderMap,
-  ResolutionResponse,
-  SourceDefinition,
-  isNullAddress,
-  NullAddress,
-} from './types';
+import { ReaderMap, isNullAddress, NullAddress } from './types';
 import { default as proxyReaderAbi } from './cns/contract/proxyReader';
 import { default as resolverInterface } from './cns/contract/resolver';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
@@ -16,13 +9,18 @@ import CnsRegistryReader from './cns/CnsRegistryReader';
 import Contract from './utils/contract';
 import standardKeys from './utils/standardKeys';
 import { isLegacyResolver } from './utils';
+import {
+  SourceDefinition,
+  NamingServiceName,
+  ResolutionResponse,
+} from './publicTypes';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 
 const ReaderMap: ReaderMap = {
   1: '0x7ea9ee21077f84339eda9c80048ec6db678642b1',
   42: '0xcf4318918fd18aca9bdc11445c01fbada4b448e3', // for internal testing
 };
-/** @internal */
+
 export default class Cns extends EthereumNamingService {
   readonly contract: Contract;
   reader: ICnsReader;
