@@ -16,7 +16,7 @@ import CnsRegistryReader from './cns/CnsRegistryReader';
 import Contract from './utils/contract';
 import standardKeys from './utils/standardKeys';
 import { isLegacyResolver } from './utils';
-import { isValidTwitterSignature } from './utils/isValidTwitterSignature';
+import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 
 const ReaderMap: ReaderMap = {
   1: '0x7ea9ee21077f84339eda9c80048ec6db678642b1',

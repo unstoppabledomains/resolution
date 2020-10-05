@@ -121,7 +121,6 @@ export default class Zns extends NamingService {
       });
     }
     const [,resolverAddress] = recordsAddresses;
-    console.log(resolverAddress);
     if (isNullAddress(resolverAddress)) {
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
         domain: domain,

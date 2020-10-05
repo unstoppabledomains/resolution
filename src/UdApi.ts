@@ -11,7 +11,7 @@ import Zns from './Zns';
 import Ens from './Ens';
 import Cns from './Cns';
 import pckg from './package.json';
-import { isValidTwitterSignature } from './utils/isValidTwitterSignature';
+import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 import standardKeys from './utils/standardKeys';
 
 /** @internal */

@@ -1,6 +1,6 @@
-import { isValidTwitterSignature } from './isValidTwitterSignature';
+import { isValidTwitterSignature } from './TwitterSignatureValidator';
 
-describe('isValidTwitterSignature', () => {
+describe('TwitterSignatureValidator', () => {
   it('should return true for valid signature', async () => {
     const isValid = await isValidTwitterSignature({
       tokenId:
