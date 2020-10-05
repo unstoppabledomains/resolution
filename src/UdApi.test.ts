@@ -5,7 +5,8 @@ import {
   DefaultUrl,
   mockAPICalls,
   mockAsyncMethod,
-  expectSpyToBeCalled,, CryptoDomainWithTwitterVerification
+  expectSpyToBeCalled,
+  CryptoDomainWithTwitterVerification,
 } from './tests/helpers';
 
 beforeEach(() => {

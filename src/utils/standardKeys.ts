@@ -78,4 +78,6 @@ export default {
     redirect_domain: 'ipfs.redirect_domain.value',
     gundb_username: 'gundb.username.value',
     gundb_public_key: 'gundb.public_key.value',
+    twitter_username: 'social.twitter.username',
+    validation_twitter_username: 'validation.social.twitter.username',
 };

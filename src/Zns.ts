@@ -58,6 +58,7 @@ export default class Zns extends NamingService {
     return {
       addresses,
       meta: {
+        namehash: this.namehash(domain),
         owner: ownerAddress || null,
         type: this.name,
         ttl: parseInt(resolution.ttl as string) || 0,
@@ -119,7 +120,7 @@ export default class Zns extends NamingService {
         domain: domain,
       });
     }
-    const [_, resolverAddress] = recordsAddresses;
+    const [,resolverAddress] = recordsAddresses;
     if (isNullAddress(resolverAddress)) {
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
         domain: domain,

@@ -11,7 +11,7 @@ import {
   pendingInLive,
   expectConfigurationErrorCode,
 } from './tests/helpers';
-import ConfigurationError, {
+import {
   ConfigurationErrorCode,
 } from './errors/configurationError';
 let resolution: Resolution;
@@ -445,6 +445,8 @@ describe('ENS', () => {
       expect(resolutionObj).toStrictEqual({
         addresses: { ETH: '0x714ef33943d925731FBB89C99aF5780D888bD106' },
         meta: {
+          namehash:
+            '0x2b53e3f567989ee41b897998d89eb4d8cf0715fb2cfb41a64939a532c09e495e',
           owner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
           type: 'ENS',
           ttl: 0,
@@ -467,6 +469,8 @@ describe('ENS', () => {
       expect(result).toStrictEqual({
         addresses: {},
         meta: {
+          namehash:
+            '0x2b53e3f567989ee41b897998d89eb4d8cf0715fb2cfb41a64939a532c09e495e',
           owner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
           type: 'ENS',
           ttl: 0,
