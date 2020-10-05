@@ -23,12 +23,7 @@ export const isValidTwitterSignature = async ({
     standardKeys.twitter_username,
     twitterHandle,
   ]
-    .map((value: string) => {
-      if (value.startsWith('0x')) {
-        return '0x' + sha3(hexToBytes(value));
-      }
-      return '0x' + sha3(value);
-    })
+    .map((value: string) => '0x' + sha3(value.startsWith('0x') ? hexToBytes(value) : value))
     .reduce((message, hashedValue) => message + hashedValue, '');
   const signerAddress = recover(message, validationSignature);
   return signerAddress === Cns.TwitterVerificationAddress;
