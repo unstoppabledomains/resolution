@@ -7,6 +7,9 @@
 ## 1.6.2
 * Deprecated Resolution#address Resolution#addressOrThrow ResolutionErrorCode.UnspecifiedCurrency
 
+## 1.8.2
+* Added ability to get verified twitter account connected to CNS domain via `Resolution#twitter` method.  
+
 ## 1.6.1
 * Used ProxyReader(0x7ea9ee21077f84339eda9c80048ec6db678642b1) instead of Registry contract by default
 

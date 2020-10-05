@@ -53,6 +53,8 @@ export type ResolutionResponse = {
   meta: {
     owner: string | null;
     type: string; // available domain
+    namehash: string;
+    resolver: string;
     ttl: number;
   };
   records?: {
@@ -93,6 +95,8 @@ type ProviderMethod = (
 export const UnclaimedDomainResponse: ResolutionResponse = {
   addresses: {},
   meta: {
+    namehash: '',
+    resolver: '',
     owner: null, // available domain
     type: '',
     ttl: 0,

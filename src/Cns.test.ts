@@ -39,7 +39,7 @@ beforeEach(async () => {
     },
   });
   mockAsyncMethods(resolution.cns, { isDataReaderSupported: false });
-  reader = await resolution.cns.getReader();
+  reader = await resolution.cns!.getReader();
 });
 
 describe('CNS', () => {
@@ -65,7 +65,7 @@ describe('CNS', () => {
   });
 
   it('should return verified twitter handle', async () => {
-    const twitterHandle = await resolution.cns.twitter(
+    const twitterHandle = await resolution.cns!.twitter(
       CryptoDomainWithTwitterVerification,
     );
     expect(twitterHandle).toBe('derainberk');
@@ -211,7 +211,7 @@ describe('CNS', () => {
           },
         });
         mockAsyncMethods(resolution.cns, { isDataReaderSupported: false });
-        reader = await resolution.cns.getReader();
+        reader = await resolution.cns!.getReader();
         mockAsyncMethods(reader, {
           record: {
             owner: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
@@ -272,7 +272,7 @@ describe('CNS', () => {
       resolution = new Resolution({
         blockchain: { cns: { url: protocolLink() } },
       });
-      reader = await resolution.cns.getReader();
+      reader = await resolution.cns!.getReader();
     });
 
     it('should return record by key', async () => {
@@ -341,7 +341,7 @@ describe('CNS', () => {
 
     it('should work without any configs', async () => {
       resolution = new Resolution();
-      reader = await resolution.cns.getReader();
+      reader = await resolution.cns!.getReader();
       const eyes = mockAsyncMethods(reader, {
         get: {
           resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
