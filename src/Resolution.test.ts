@@ -1,10 +1,10 @@
 import nock from 'nock';
-import Resolution, { ResolutionErrorCode } from './index';
-import {
-  UnclaimedDomainResponse,
+import Resolution, {
   NamingServiceName,
-  JsonRpcPayload,
-} from './types';
+  ResolutionErrorCode,
+  UnclaimedDomainResponse,
+} from './index';
+import { JsonRpcPayload } from './publicTypes';
 import { JsonRpcProvider, getDefaultProvider } from '@ethersproject/providers';
 import Web3HttpProvider from 'web3-providers-http';
 import Web3WsProvider from 'web3-providers-ws';
@@ -18,10 +18,8 @@ import {
   ProviderProtocol,
   caseMock,
   mockAsyncMethod,
-  expectConfigurationErrorCode,
   CryptoDomainWithTwitterVerification,
 } from './tests/helpers';
-import _ from 'lodash';
 import { RpcProviderTestCases } from './tests/providerMockData';
 
 try {
@@ -162,7 +160,7 @@ describe('Resolution', () => {
         },
       },
     });
-    const reader = await resolution.cns.getReader();
+    const reader = await resolution.cns!.getReader();
     const eyes = mockAsyncMethods(reader, {
       record: {
         resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
@@ -185,7 +183,7 @@ describe('Resolution', () => {
         },
       },
     });
-    const reader = await resolution.cns.getReader();
+    const reader = await resolution.cns!.getReader();
     const eyes = mockAsyncMethods(reader, {
       record: {
         resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',

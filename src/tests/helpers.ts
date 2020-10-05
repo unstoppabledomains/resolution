@@ -13,7 +13,7 @@ export const CryptoDomainWithEmptyResolver = 'reseller-test-mago017.crypto';
 export const CryptoDomainWithIpfsRecords = 'reseller-test-paul019.crypto';
 export const CryptoDomainWithEmail = 'reseller-test-paul019.crypto';
 export const CryptoDomainWithAdaBchAddresses = 'reseller-test-mago0.crypto';
-export const CryptoDomainWithTwitterVerification = 'beresnev.crypto';
+export const CryptoDomainWithTwitterVerification = 'ijustwannatestsomething2.crypto';
 
 export function mockAsyncMethod(object: any, method: string, value) {
   const spy = jest.spyOn(object, method);
@@ -123,7 +123,6 @@ export function mockAPICalls(testName: string, url = MainnetUrl) {
 }
 
 /**
- * @internal
  * returns either a standard mainnet linkpool url
  * @see https://docs.linkpool.io/docs/rpc_main
  * or the one with attached INFURA SECRET key from
@@ -135,13 +134,12 @@ export function protocolLink(providerProtocol: ProviderProtocol = ProviderProtoc
     [ProviderProtocol.http]: secret ? `https://mainnet.infura.io/v3/${secret}` : 'https://main-rpc.linkpool.io',
     [ProviderProtocol.wss]: secret ? `wss://mainnet.infura.io/ws/v3/${secret}` : 'wss://main-rpc.linkpool.io/ws',
   };
-  const url = protocolMap[providerProtocol];
-  return url;
+  return protocolMap[providerProtocol];
 }
 
 export enum ProviderProtocol {
   'http', 'wss'
-};
+}
 
 export const caseMock = <T, U>(params: T, cases: { request: T, response: U }[]): U => {
   for (const {request, response} of cases) {

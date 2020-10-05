@@ -1,19 +1,20 @@
 import { toBech32Address } from './zns/utils';
-import { ResolutionError, ResolutionErrorCode } from './index';
-import NamingService from './NamingService';
 import {
-  ResolutionResponse,
   NamingServiceName,
+  ResolutionError,
+  ResolutionErrorCode,
+  ResolutionResponse,
   SourceDefinition,
-  isNullAddress,
-} from './types';
+} from './index';
+import NamingService from './NamingService';
+import { isNullAddress } from './types';
 import Zns from './Zns';
 import Ens from './Ens';
 import Cns from './Cns';
 import pckg from './package.json';
-import { isValidTwitterSignature } from './utils/verifyTwitterSig';
+import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
+import standardKeys from './utils/standardKeys';
 
-/** @internal */
 export default class Udapi extends NamingService {
   private headers: {
     [key: string]: string;
@@ -116,8 +117,9 @@ export default class Udapi extends NamingService {
       });
     const owner = domainMetaData.meta.owner;
     const records = domainMetaData.records || {};
-    const validationSignature = records['validation.social.twitter.username'];
-    const twitterHandle = records['social.twitter.username'];
+    const validationSignature =
+      records[standardKeys.validation_twitter_username];
+    const twitterHandle = records[standardKeys.twitter_username];
     this.ensureRecordPresence(
       domain,
       'twitter validation username',
@@ -125,12 +127,12 @@ export default class Udapi extends NamingService {
     );
     this.ensureRecordPresence(domain, 'twitter handle', twitterHandle);
     if (
-      !isValidTwitterSignature(
-        domain,
+      !(await isValidTwitterSignature({
+        tokenId: domainMetaData.meta.namehash,
         owner,
         twitterHandle,
         validationSignature,
-      )
+      }))
     ) {
       throw new ResolutionError(
         ResolutionErrorCode.InvalidTwitterVerification,

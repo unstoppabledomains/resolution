@@ -8,15 +8,15 @@ import {
   ResolutionResponse,
   DefaultAPI,
   API,
-  nodeHash,
   NamingServiceName,
   Web3Version0Provider,
   Web3Version1Provider,
   Provider,
   NamingServiceSource,
   SourceDefinition,
-  EthersProvider,
-} from './types';
+} from './publicTypes';
+import { nodeHash } from './types';
+import { EthersProvider } from './publicTypes';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import NamingService from './NamingService';
 import { signedInfuraLink } from './utils';
@@ -41,9 +41,7 @@ import { Eip1993Factories } from './utils/Eip1993Factories';
  * ```
  */
 export default class Resolution {
-  /**
-   * @returns true if weather resolution library is configured to use blockchain for resolution.
-   */
+  /** @internal */
   readonly blockchain: boolean;
   /** @internal */
   readonly ens?: Ens;
@@ -164,7 +162,7 @@ export default class Resolution {
   }
 
   /**
-   * Resolves give domain name to a specific currency address if exists
+   * Resolves given domain name to a specific currency address if exists
    * @async
    * @param domain - domain name to be resolved
    * @param currencyTicker - currency ticker like BTC, ETH, ZIL
@@ -191,7 +189,7 @@ export default class Resolution {
   }
 
   /**
-   * Resolves give domain name to a specific currency address if exists
+   * Resolves given domain name to a specific currency address if exists
    * @async
    * @param domain - domain name to be resolved
    * @param currencyTicker - currency ticker like BTC, ETH, ZIL
@@ -207,7 +205,7 @@ export default class Resolution {
   }
 
   /**
-   * Resolves give domain name to a specific currency address if exists
+   * Resolves given domain name to a verified twitter handle
    * @async
    * @param domain - domain name to be resolved
    * @throws [[ResolutionError]] if twitter is not found

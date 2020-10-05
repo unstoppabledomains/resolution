@@ -1,13 +1,9 @@
 import {
-  EthersProvider,
-  JsonRpcResponse,
-  Provider,
   RequestArguments,
-  Web3Version0Provider,
-  Web3Version1Provider,
 } from '../types';
 import { ConfigurationError, ConfigurationErrorCode } from '../errors/configurationError';
 import ResolutionError, { ResolutionErrorCode } from '../errors/resolutionError';
+import { Web3Version0Provider, Provider, Web3Version1Provider, JsonRpcResponse, EthersProvider } from '../publicTypes';
 
 export const Eip1993Factories = {
   fromWeb3Version0Provider,

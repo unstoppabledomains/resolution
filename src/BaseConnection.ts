@@ -1,6 +1,5 @@
 import nodeFetch from 'node-fetch';
 
-/** @internal */
 export default abstract class BaseConnection {
   protected isNode = () => {
     if (typeof process === 'object') {

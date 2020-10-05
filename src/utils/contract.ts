@@ -1,8 +1,11 @@
 import { Interface, JsonFragment } from '@ethersproject/abi';
-import { Provider, RequestArguments, EventData } from '../types';
+import { RequestArguments, EventData } from '../types';
+import { Provider } from '../publicTypes';
 
-const CRYPTO_RESOLVER_ADVANCED_EVENTS_STARTING_BLOCK = "0x960844";
 /** @internal */
+const CRYPTO_RESOLVER_ADVANCED_EVENTS_STARTING_BLOCK = "0x960844";
+
+
 export default class Contract {
   readonly abi: JsonFragment[];
   readonly coder: Interface;
