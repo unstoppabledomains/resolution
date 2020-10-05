@@ -1,3 +1,6 @@
+## 1.8.2
+* Update Twitter validation algorithm
+
 ## 1.8.0 - 1.8.1
 * Added `Resolution#twitter` method that returns back the verified twitter handle
 
