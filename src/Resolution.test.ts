@@ -18,9 +18,8 @@ import {
   ProviderProtocol,
   caseMock,
   mockAsyncMethod,
-  expectConfigurationErrorCode,, CryptoDomainWithTwitterVerification
+  CryptoDomainWithTwitterVerification,
 } from './tests/helpers';
-import _ from 'lodash';
 import { RpcProviderTestCases } from './tests/providerMockData';
 
 try {
@@ -161,7 +160,7 @@ describe('Resolution', () => {
         },
       },
     });
-    const reader = await resolution.cns.getReader();
+    const reader = await resolution.cns!.getReader();
     const eyes = mockAsyncMethods(reader, {
       record: {
         resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
@@ -184,7 +183,7 @@ describe('Resolution', () => {
         },
       },
     });
-    const reader = await resolution.cns.getReader();
+    const reader = await resolution.cns!.getReader();
     const eyes = mockAsyncMethods(reader, {
       record: {
         resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
@@ -273,9 +272,9 @@ describe('Resolution', () => {
     it('should throw unsupported method', async () => {
       const resolution = new Resolution();
       const handle = 'ryan.eth';
-      await expect(resolution.twitter(
-        handle,
-      )).rejects.toThrowError(`Method twitter is not supported for ${handle}`);
+      await expect(resolution.twitter(handle)).rejects.toThrowError(
+        `Method twitter is not supported for ${handle}`,
+      );
     });
   });
 
