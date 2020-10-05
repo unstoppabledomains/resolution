@@ -16,7 +16,7 @@ import CnsRegistryReader from './cns/CnsRegistryReader';
 import Contract from './utils/contract';
 import standardKeys from './utils/standardKeys';
 import { isLegacyResolver } from './utils';
-import { isValidTwitterSignature } from './utils/verifyTwitterSig';
+import { isValidTwitterSignature } from './utils/isValidTwitterSignature';
 
 const ReaderMap: ReaderMap = {
   1: '0x7ea9ee21077f84339eda9c80048ec6db678642b1',
@@ -117,8 +117,8 @@ export default class Cns extends EthereumNamingService {
     const tokenId = this.namehash(domain);
     const reader = await this.getReader();
     const records = [
-      'validation.social.twitter.username',
-      'social.twitter.username',
+      standardKeys.validation_twitter_username,
+      standardKeys.twitter_username,
     ];
     const { values } = await reader.records(tokenId, records);
     const owner = await this.owner(domain);
@@ -127,12 +127,12 @@ export default class Cns extends EthereumNamingService {
     });
     const [validationSignature, twitterHandle] = values!;
     if (
-      !isValidTwitterSignature(
-        domain,
+      !(await isValidTwitterSignature({
+        tokenId,
         owner,
         twitterHandle,
         validationSignature,
-      )
+      }))
     ) {
       throw new ResolutionError(
         ResolutionErrorCode.InvalidTwitterVerification,
@@ -185,7 +185,7 @@ export default class Cns extends EthereumNamingService {
     values: string[],
   ): Record<string, string> {
     const records: Record<string, string> = {};
-    keys.forEach((key, index) => records[key] = values[index]);
+    keys.forEach((key, index) => (records[key] = values[index]));
     return records;
   }
 

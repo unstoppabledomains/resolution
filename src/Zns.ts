@@ -58,6 +58,7 @@ export default class Zns extends NamingService {
     return {
       addresses,
       meta: {
+        namehash: '',
         owner: ownerAddress || null,
         type: this.name,
         ttl: parseInt(resolution.ttl as string) || 0,

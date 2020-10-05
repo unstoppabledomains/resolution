@@ -69,6 +69,7 @@ export type ResolutionResponse = {
     [key: string]: string;
   };
   meta: {
+    namehash: string;
     owner: string | null;
     type: string; // available domain
     ttl: number;
@@ -255,6 +256,7 @@ export const EthCoinIndex = '60';
 export const UnclaimedDomainResponse: ResolutionResponse = {
   addresses: {},
   meta: {
+    namehash: '',
     owner: null, // available domain
     type: '',
     ttl: 0,

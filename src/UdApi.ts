@@ -11,7 +11,8 @@ import Zns from './Zns';
 import Ens from './Ens';
 import Cns from './Cns';
 import pckg from './package.json';
-import { isValidTwitterSignature } from './utils/verifyTwitterSig';
+import { isValidTwitterSignature } from './utils/isValidTwitterSignature';
+import standardKeys from './utils/standardKeys';
 
 /** @internal */
 export default class Udapi extends NamingService {
@@ -110,20 +111,28 @@ export default class Udapi extends NamingService {
       });
     }
     const domainMetaData = await this.resolve(domain);
-    if (!domainMetaData.meta.owner) throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {domain});
+    if (!domainMetaData.meta.owner)
+      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+        domain,
+      });
     const owner = domainMetaData.meta.owner;
-    const records = domainMetaData.records || {};    
-    const validationSignature = records['validation.social.twitter.username'];
-    const twitterHandle = records['social.twitter.username'];
-    this.ensureRecordPresence(domain, 'twitter validation username', validationSignature);
+    const records = domainMetaData.records || {};
+    const validationSignature =
+      records[standardKeys.validation_twitter_username];
+    const twitterHandle = records[standardKeys.twitter_username];
+    this.ensureRecordPresence(
+      domain,
+      'twitter validation username',
+      validationSignature,
+    );
     this.ensureRecordPresence(domain, 'twitter handle', twitterHandle);
     if (
-      !isValidTwitterSignature(
-        domain,
+      !(await isValidTwitterSignature({
+        tokenId: domainMetaData.meta.namehash,
         owner,
         twitterHandle,
         validationSignature,
-      )
+      }))
     ) {
       throw new ResolutionError(
         ResolutionErrorCode.InvalidTwitterVerification,

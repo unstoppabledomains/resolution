@@ -124,6 +124,7 @@ export default class Ens extends EthereumNamingService {
     );
     const resolution = {
       meta: {
+        namehash: this.namehash(domain),
         owner,
         type: this.name,
         ttl: Number(ttl || 0),
