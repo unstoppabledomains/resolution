@@ -123,7 +123,6 @@ export function mockAPICalls(testName: string, url = MainnetUrl) {
 }
 
 /**
- * @internal
  * returns either a standard mainnet linkpool url
  * @see https://docs.linkpool.io/docs/rpc_main
  * or the one with attached INFURA SECRET key from

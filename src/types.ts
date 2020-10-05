@@ -71,7 +71,6 @@ export interface RpcProviderLogEntry {
 }
 /**
  * Default structure of ZnsResolution records
- * @internal
  * @typedef {object} ZnsResolution
  */
 export type ZnsResolution = {

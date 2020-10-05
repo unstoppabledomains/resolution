@@ -34,7 +34,6 @@ function isAddress(address: string) {
  * For example, converts byte buffers to buffers of maximum 5 bit numbers,
  * padding those numbers as necessary. Necessary for encoding Ethereum-style
  * addresses as bech32 ones.
- * @internal 
  * @param {Buffer} data
  * @param {number} fromWidth
  * @param {number} toWidth
@@ -183,7 +182,6 @@ function decode(bechString: string) {
  * toChecksumAddress
  *
  * takes hex-encoded string and returns the corresponding address
- * @internal
  * @param {string} address
  * @returns {string}
  */
@@ -221,7 +219,6 @@ export const toChecksumAddress = (address: string): string => {
  *
  * The expected format is zil1<address><checksum> where address and checksum
  * are the result of bech32 encoding a Buffer containing the address bytes.
- * @internal 
  * @param {string} 20 byte canonical address
  * @returns {string} 38 char bech32 encoded zilliqa address
  */
@@ -248,7 +245,6 @@ export function toBech32Address(
 
 /**
  * fromBech32Address
- * @internal
  * @param {string} address - a valid Zilliqa bech32 address
  * @returns {string} a canonical 20-byte Ethereum-style address
  */
