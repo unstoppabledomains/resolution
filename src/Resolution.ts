@@ -41,17 +41,15 @@ import { Eip1993Factories } from './utils/Eip1993Factories';
  * ```
  */
 export default class Resolution {
-  /**
-   * @returns true if weather resolution library is configured to use blockchain for resolution.
-   */
+  /** @internal */
   readonly blockchain: boolean;
-
+  /** @internal */
   readonly ens?: Ens;
-
+  /** @internal */
   readonly zns?: Zns;
-
+  /** @internal */
   readonly cns?: Cns;
-
+  /** @internal */
   readonly api?: UdApi;
 
   constructor({
