@@ -1,0 +1,302 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Unstoppabledomains resolution library</title>
+	<meta name="description" content="Documentation for Unstoppabledomains resolution library">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.json" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">Unstoppabledomains resolution library</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1>Unstoppabledomains resolution library</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<a href="#resolution" id="resolution" style="color: inherit; text-decoration: none;">
+					<h1>Resolution</h1>
+				</a>
+				<p><a href="https://www.npmjs.com/package/@unstoppabledomains/resolution"><img src="https://img.shields.io/npm/v/@unstoppabledomains/resolution.svg?style=flat" alt="NPM version"></a>
+					<img src="https://github.com/unstoppabledomains/resolution/workflows/CI/badge.svg?branch=master" alt="CI">
+					<a href="https://bundlephobia.com/result?p=@unstoppabledomains/resolution"><img src="https://img.shields.io/bundlephobia/min/@unstoppabledomains/resolution.svg" alt="Bundle Size Minified"></a>
+					<a href="https://bundlephobia.com/result?p=@unstoppabledomains/resolution"><img src="https://img.shields.io/bundlephobia/minzip/@unstoppabledomains/resolution.svg" alt="Bundle Size Minified Zipped"></a>
+					<a href="https://t.me/unstoppabledev"><img src="https://img.shields.io/badge/Chat%20on-Telegram-brightgreen.svg" alt="Chat on Telegram"></a>
+				<a href="https://docs.unstoppabledomains.com/"><img src="https://img.shields.io/badge/docs-unstoppabledomains.com-blue" alt="Unstoppable Domains Documentation"></a></p>
+				<p>A library for interacting with blockchain domain names.</p>
+				<p>Supported domain zones:</p>
+				<ul>
+					<li>CNS<ul>
+							<li>.crypto </li>
+						</ul>
+					</li>
+					<li>ZNS<ul>
+							<li>.zil</li>
+						</ul>
+					</li>
+					<li>ENS<ul>
+							<li>.eth</li>
+							<li>.kred</li>
+							<li>.xyz</li>
+							<li>.luxe</li>
+						</ul>
+					</li>
+				</ul>
+				<p><a href="https://unstoppabledomains.github.io/resolution/">API Referrence</a></p>
+				<a href="#installation" id="installation" style="color: inherit; text-decoration: none;">
+					<h2>Installation</h2>
+				</a>
+				<p>Use the <code>npm</code> or <code>yarn</code> to install the resolution package.</p>
+				<pre><code>yarn <span class="hljs-keyword">add</span><span class="bash"> @unstoppabledomains/resolution</span></code></pre><pre><code><span class="hljs-built_in">npm</span> install @unstoppabledomains/resolution --save</code></pre><p>If you&#39;re interested in resolving domains via the command line, see <a href="#CLI">CLI section</a>. </p>
+				<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
+					<h2>Usage</h2>
+				</a>
+				<p>Create a new project.</p>
+				<pre><code class="language-shell">mkdir test-out-resolution &amp;&amp; cd $_
+yarn init -y
+yarn add @unstoppabledomains/resolution</code></pre>
+				<p>Make a file, <code>script.js</code>.</p>
+				<pre><code class="language-javascript"><span class="hljs-keyword">const</span> {<span class="hljs-attr">default</span>: Resolution} = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;@unstoppabledomains/resolution&#x27;</span>)
+<span class="hljs-keyword">const</span> resolution = <span class="hljs-keyword">new</span> Resolution()
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">resolve</span>(<span class="hljs-params">domain, currency</span>) </span>{
+  resolution.address(domain, currency)
+    .then(<span class="hljs-function"><span class="hljs-params">address</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(domain, <span class="hljs-string">&#x27;resolves to&#x27;</span>, address))
+    .catch(<span class="hljs-built_in">console</span>.error)
+}
+resolve(<span class="hljs-string">&#x27;brad.crypto&#x27;</span>, <span class="hljs-string">&#x27;ETH&#x27;</span>)
+resolve(<span class="hljs-string">&#x27;brad.zil&#x27;</span>, <span class="hljs-string">&#x27;ZIL&#x27;</span>)</code></pre>
+				<p>Execute the script.</p>
+				<pre><code>$ <span class="hljs-keyword">node</span> <span class="hljs-title">script</span>.js
+brad.crypto resolves to <span class="hljs-number">0</span>x8aaD44321A86b170879d7A244c1e8d360c99DdA8
+brad.zil resolves to zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj</code></pre>
+				<a href="#dweb-resolution" id="dweb-resolution" style="color: inherit; text-decoration: none;">
+					<h3>Dweb resolution</h3>
+				</a>
+				<p>Resolution library can help you out with resolving DWeb records, such as IPFS hashes for websites or GunDB usernames for
+				<a href="https://unstoppabledomains.com/chat">p2p chat system</a>.</p>
+				<pre><code class="language-javascript"><span class="hljs-keyword">const</span> {<span class="hljs-attr">default</span>: Resolution} = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;@unstoppabledomains/resolution&#x27;</span>)
+<span class="hljs-keyword">const</span> resolution = <span class="hljs-keyword">new</span> Resolution()
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">resolveIpfsHash</span>(<span class="hljs-params">domain</span>) </span>{
+  resolution.ipfsHash(domain)
+    .then(<span class="hljs-function"><span class="hljs-params">hash</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(<span class="hljs-string">`You can access the website via a public IPFS gateway: https://gateway.ipfs.io/ipfs/<span class="hljs-subst">${hash}</span>`</span>))
+    .catch(<span class="hljs-built_in">console</span>.error)
+}
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">resolveGunDbRecords</span>(<span class="hljs-params">domain</span>) </span>{
+  resolution.chatId(domain)
+    .then(<span class="hljs-function"><span class="hljs-params">id</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(<span class="hljs-string">`Domain <span class="hljs-subst">${domain}</span> has a GunDB chat ID: <span class="hljs-subst">${id}</span>`</span>))
+    .catch(<span class="hljs-built_in">console</span>.error)
+  resolution.chatPk(domain)
+    .then(<span class="hljs-function"><span class="hljs-params">pk</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(<span class="hljs-string">`Domain <span class="hljs-subst">${domain}</span> has a GunDB public key: <span class="hljs-subst">${pk}</span>`</span>))
+    .catch(<span class="hljs-built_in">console</span>.error)
+}
+
+resolveIpfsHash(<span class="hljs-string">&quot;homecakes.crypto&quot;</span>)
+resolveGunDbRecords(<span class="hljs-string">&quot;homecakes.crypto&quot;</span>)</code></pre>
+				<a href="#cli" id="cli" style="color: inherit; text-decoration: none;">
+					<h3>CLI</h3>
+				</a>
+				<p>If you want to use resolution CLI, install this package globally:</p>
+				<pre><code>yarn <span class="hljs-keyword">global</span> <span class="hljs-keyword">add</span> <span class="hljs-title">@unstoppabledomains</span>/resolution</code></pre><pre><code><span class="hljs-built_in">npm</span> install -g @unstoppabledomains/resolution</code></pre><p>Once you have installed the CLI you can go ahead and use it without any extra configuration. By default the cli is
+					using <a href="https://main-rpc.linkpool.io">https://main-rpc.linkpool.io</a> service as a gateway to blockchain. If you want to change it to some other providers
+				including your own you can do so by utilizing resolution -C flag.</p>
+				<p>As an argument to -C type the following structure url:&lt; https://.... &gt;</p>
+				<p>Example of usage</p>
+				<pre><code>resolution -C <span class="hljs-attr">url:</span><span class="hljs-attr">https:</span><span class="hljs-comment">//...</span></code></pre><p>You can find all of the options for resolution cli within -h, --help flag. </p>
+				<p>Flag -m can retrieve all the metadata, so you don&#39;t need to query it separately if you just want an overview of domain records.</p>
+				<p>Example:</p>
+				<pre><code><span class="hljs-built_in">resolution</span> -mc eth,btc,DODGE,<span class="hljs-literal">unknown</span> -d brad.zil</code></pre>
+				<a href="#note" id="note" style="color: inherit; text-decoration: none;">
+					<h2>Note</h2>
+				</a>
+				<p>When resolution hits an error it returns the error code instead of throwing. So if you see something like RECORD_NOT_FOUND you know exactly that record was not found for this query.</p>
+				<a href="#development" id="development" style="color: inherit; text-decoration: none;">
+					<h2>Development</h2>
+				</a>
+				<p>Use next commands for setting up development environment. (<strong>macOS Terminal</strong> or <strong>Linux shell</strong>).</p>
+				<ol>
+					<li><p>Install NVM</p>
+						<pre><code class="language-bash"> curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash</code></pre>
+					</li>
+					<li><p>Install concrete version of node.js</p>
+						<pre><code class="language-bash"> nvm install 12.12.0</code></pre>
+					</li>
+					<li><p>Install <code>yarn</code></p>
+						<pre><code class="language-bash"> npm install -g yarn</code></pre>
+					</li>
+					<li><p>Clone repo</p>
+						<pre><code> git clone https:<span class="hljs-regexp">//gi</span>thub.com<span class="hljs-regexp">/unstoppabledomains/</span>resolution.git
+ cd resolution</code></pre></li>
+					<li><p>Install dependencies </p>
+						<pre><code class="language-bash"> yarn install</code></pre>
+					</li>
+				</ol>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-enum">
+						<a href="enums/configurationerrorcode.html" class="tsd-kind-icon">Configuration<wbr>Error<wbr>Code</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/namingservicename.html" class="tsd-kind-icon">Naming<wbr>Service<wbr>Name</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/resolutionerrorcode.html" class="tsd-kind-icon">Resolution<wbr>Error<wbr>Code</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/configurationerror.html" class="tsd-kind-icon">Configuration<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/resolution.html" class="tsd-kind-icon">Resolution</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/resolutionerror.html" class="tsd-kind-icon">Resolution<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ethersprovider.html" class="tsd-kind-icon">Ethers<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/jsonrpcpayload.html" class="tsd-kind-icon">Json<wbr>Rpc<wbr>Payload</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/jsonrpcresponse.html" class="tsd-kind-icon">Json<wbr>Rpc<wbr>Response</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/provider.html" class="tsd-kind-icon">Provider</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/sourcedefinition.html" class="tsd-kind-icon">Source<wbr>Definition</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/web3version0provider.html" class="tsd-kind-icon">Web3<wbr>Version0<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/web3version1provider.html" class="tsd-kind-icon">Web3<wbr>Version1<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#api" class="tsd-kind-icon">API</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#blockchain" class="tsd-kind-icon">Blockchain</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#configurationerroroptions" class="tsd-kind-icon">Configuration<wbr>Error<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#namingservicesource" class="tsd-kind-icon">Naming<wbr>Service<wbr>Source</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#providermethod" class="tsd-kind-icon">Provider<wbr>Method</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#resolutionerroroptions" class="tsd-kind-icon">Resolution<wbr>Error<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#resolutionmethod" class="tsd-kind-icon">Resolution<wbr>Method</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#resolutionresponse" class="tsd-kind-icon">Resolution<wbr>Response</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#udapidefaulturl" class="tsd-kind-icon">UDApi<wbr>Default<wbr>Url</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#unclaimed_domain_response" class="tsd-kind-icon">UNCLAIMED_<wbr>DOMAIN_<wbr>RESPONSE</a>
+					</li>
+					<li class=" tsd-kind-object-literal">
+						<a href="globals.html#defaultapi" class="tsd-kind-icon">DefaultAPI</a>
+					</li>
+					<li class=" tsd-kind-object-literal">
+						<a href="globals.html#unclaimeddomainresponse" class="tsd-kind-icon">Unclaimed<wbr>Domain<wbr>Response</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
