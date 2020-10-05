@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Web3Version0Provider | Unstoppabledomains resolution library</title>
+	<title>EthersProvider | Unstoppabledomains resolution library</title>
 	<meta name="description" content="Documentation for Unstoppabledomains resolution library">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -52,21 +52,30 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="web3version0provider.html">Web3Version0Provider</a>
+					<a href="ethersprovider.html">EthersProvider</a>
 				</li>
 			</ul>
-			<h1>Interface Web3Version0Provider</h1>
+			<h1>Interface EthersProvider</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<dl class="tsd-comment-tags">
+						<dt>see</dt>
+						<dd><p><a href="https://github.com/ethers-io/ethers.js/blob/v5.0.4/packages/abstract-provider/src.ts/index.ts#L224">https://github.com/ethers-io/ethers.js/blob/v5.0.4/packages/abstract-provider/src.ts/index.ts#L224</a></p>
+						</dd>
+					</dl>
+				</div>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">Web3Version0Provider</span>
+						<span class="target">EthersProvider</span>
 					</li>
 				</ul>
 			</section>
@@ -75,25 +84,65 @@
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>Properties</h3>
+							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="web3version0provider.html#sendasync" class="tsd-kind-icon">send<wbr>Async</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="ethersprovider.html#call" class="tsd-kind-icon">call</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="ethersprovider.html#getlogs" class="tsd-kind-icon">get<wbr>Logs</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Properties</h2>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="sendasync" class="tsd-anchor"></a>
-					<h3>send<wbr>Async</h3>
-					<div class="tsd-signature tsd-kind-icon">send<wbr>Async<span class="tsd-signature-symbol">:</span> <a href="../globals.html#providermethod" class="tsd-signature-type">ProviderMethod</a></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/4fe3b97/src/publicTypes.ts#L74">src/publicTypes.ts:74</a></li>
-						</ul>
-					</aside>
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="call" class="tsd-anchor"></a>
+					<h3>call</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">call<span class="tsd-signature-symbol">(</span>transaction<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">TransactionRequest</span>, blockTag<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/00e0c45/src/publicTypes.ts#L126">src/publicTypes.ts:126</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>transaction: <span class="tsd-signature-type">TransactionRequest</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> blockTag: <span class="tsd-signature-type">undefined</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="getlogs" class="tsd-anchor"></a>
+					<h3>get<wbr>Logs</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Logs<span class="tsd-signature-symbol">(</span>filter<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">EventFilter</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">RpcProviderLogEntry</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/00e0c45/src/publicTypes.ts#L127">src/publicTypes.ts:127</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>filter: <span class="tsd-signature-type">EventFilter</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">RpcProviderLogEntry</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
 				</section>
 			</section>
 		</div>
@@ -125,9 +174,21 @@
 					<li class=" tsd-kind-class">
 						<a href="../classes/resolutionerror.html" class="tsd-kind-icon">Resolution<wbr>Error</a>
 					</li>
-					<li class=" tsd-kind-interface">
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-interface">
 						<a href="ethersprovider.html" class="tsd-kind-icon">Ethers<wbr>Provider</a>
+						<ul>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="ethersprovider.html#call" class="tsd-kind-icon">call</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="ethersprovider.html#getlogs" class="tsd-kind-icon">get<wbr>Logs</a>
+							</li>
+						</ul>
 					</li>
+				</ul>
+				<ul class="after-current">
 					<li class=" tsd-kind-interface">
 						<a href="jsonrpcpayload.html" class="tsd-kind-icon">Json<wbr>Rpc<wbr>Payload</a>
 					</li>
@@ -140,18 +201,9 @@
 					<li class=" tsd-kind-interface">
 						<a href="sourcedefinition.html" class="tsd-kind-icon">Source<wbr>Definition</a>
 					</li>
-				</ul>
-				<ul class="current">
-					<li class="current tsd-kind-interface">
+					<li class=" tsd-kind-interface">
 						<a href="web3version0provider.html" class="tsd-kind-icon">Web3<wbr>Version0<wbr>Provider</a>
-						<ul>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="web3version0provider.html#sendasync" class="tsd-kind-icon">send<wbr>Async</a>
-							</li>
-						</ul>
 					</li>
-				</ul>
-				<ul class="after-current">
 					<li class=" tsd-kind-interface">
 						<a href="web3version1provider.html" class="tsd-kind-icon">Web3<wbr>Version1<wbr>Provider</a>
 					</li>
