@@ -32,7 +32,32 @@ export const RpcProviderTestCases: RpcProviderTestCase = [
     },
     {
       request: {
-        fromBlock: '0x960844',
+        fromBlock: "earliest",
+        toBlock: "latest",
+        topics: [
+          "0x185c30856dadb58bf097c1f665a52ada7029752dbcad008ea3fefc73bee8c9fe",
+          "0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9"
+        ],
+        address: "0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842"
+      },
+      response: [{
+        blockNumber: 10069383,
+        blockHash: "0x962ac04ad46d9cd88ee5e53200b4c0f6ec4fbac1c6f42e352300a28d8b623dfb",
+        transactionIndex: 109,
+        removed: false,
+        address: "0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842",
+        data: "0x",
+        topics: [
+          "0x185c30856dadb58bf097c1f665a52ada7029752dbcad008ea3fefc73bee8c9fe",
+          "0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9"
+        ],
+        transactionHash: "0xf2caa45e13dcc3768b6b79d05288cb3b70eef6b855e6c68b1ebae8cef10005dd",
+        logIndex: 109
+      }]
+    },
+    {
+      request: {
+        fromBlock: 10069383,
         toBlock: 'latest',
         address: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
         topics:

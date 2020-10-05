@@ -183,7 +183,9 @@ export default class Cns extends EthereumNamingService {
     values: string[],
   ): Record<string, string> {
     const records: Record<string, string> = {};
-    keys.forEach((key, index) => (records[key] = values[index]));
+    keys.forEach((key, index) => {
+      if (!!values[index]) records[key] = values[index];
+    });
     return records;
   }
 

@@ -118,7 +118,7 @@ export default class Zns extends NamingService {
         domain: domain,
       });
     }
-    const [,resolverAddress] = recordsAddresses;
+    const [_, resolverAddress] = recordsAddresses;
     if (isNullAddress(resolverAddress)) {
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
         domain: domain,

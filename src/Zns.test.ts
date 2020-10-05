@@ -177,7 +177,7 @@ describe('ZNS', () => {
       expect(result.meta).toEqual({
         namehash:
           '0x75aa67cdcb4acd89ee8fa32ff985807eb6096c58f43f6063f2e319a38f6ce5ae',
-        resolver: "0x3f329078d95f043fd902d5c3ea2fbce0b3fca003",
+        resolver: '0x3f329078d95f043fd902d5c3ea2fbce0b3fca003',
         owner: 'zil1zzpjwyp2nu29pcv3sh04qxq9x5l45vke0hrwec',
         type: 'ZNS',
         ttl: 0,
