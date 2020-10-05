@@ -11,9 +11,7 @@ import {
   pendingInLive,
   expectConfigurationErrorCode,
 } from './tests/helpers';
-import {
-  ConfigurationErrorCode,
-} from './errors/configurationError';
+import { ConfigurationErrorCode } from './errors/configurationError';
 let resolution: Resolution;
 
 try {
@@ -447,7 +445,7 @@ describe('ENS', () => {
         meta: {
           namehash:
             '0x2b53e3f567989ee41b897998d89eb4d8cf0715fb2cfb41a64939a532c09e495e',
-          resolver: "0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8",
+          resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
           owner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
           type: 'ENS',
           ttl: 0,
@@ -472,7 +470,7 @@ describe('ENS', () => {
         meta: {
           namehash:
             '0x2b53e3f567989ee41b897998d89eb4d8cf0715fb2cfb41a64939a532c09e495e',
-          resolver: "0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8",
+          resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
           owner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
           type: 'ENS',
           ttl: 0,
