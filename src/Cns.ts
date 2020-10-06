@@ -206,7 +206,11 @@ export default class Cns extends EthereumNamingService {
     tokenId: string,
   ): Promise<Record<string, string>> {
     const startingBlock = await getStartingBlock(resolverContract, tokenId);
-    const logs = await resolverContract.fetchLogs('NewKey', tokenId, startingBlock);
+    const logs = await resolverContract.fetchLogs(
+      'NewKey',
+      tokenId,
+      startingBlock,
+    );
     const keyTopics = logs.map(event => event.topics[2]);
     const keys = await this.callMethod(resolverContract, 'getManyByHash', [
       keyTopics,
