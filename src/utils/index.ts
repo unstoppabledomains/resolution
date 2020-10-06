@@ -1,3 +1,6 @@
+import { EventData, RequestArguments } from "../types";
+import { Interface } from '@ethersproject/abi';
+import Contract from "./contract";
 /**
  * Parses object in format { "key.key2.key3" : value } into { key: { key2: {key3: value } } }
  * @param object object to parse
@@ -51,4 +54,13 @@ export function hexToBytes(hexString: string): number[] {
     bytes.push(parseInt(hex.substr(c, 2), 16));
   }
   return bytes;
+}
+
+/** @internal */
+const CRYPTO_RESOLVER_ADVANCED_EVENTS_STARTING_BLOCK = 9832516;
+
+export async function getStartingBlock(contract: Contract, tokenId: string) {
+  const logs =  await contract.fetchLogs("ResetRecords", tokenId, 'earliest');
+  const lastResetEvent = logs[logs.length - 1];
+  return lastResetEvent?.blockNumber || CRYPTO_RESOLVER_ADVANCED_EVENTS_STARTING_BLOCK;
 }
