@@ -14,6 +14,8 @@ import {
   Provider,
   NamingServiceSource,
   SourceDefinition,
+  NamehashOptions,
+  NamehashOptionsDefault,
 } from './publicTypes';
 import { nodeHash } from './types';
 import { EthersProvider } from './publicTypes';
@@ -380,9 +382,9 @@ export default class Resolution {
    * @param domain - domain name to be converted
    * @throws [[ResolutionError]] with UnsupportedDomain error code if domain extension is unknown
    */
-  namehash(domain: string): string {
+  namehash(domain: string, options: NamehashOptions = NamehashOptionsDefault): string {
     domain = this.prepareDomain(domain);
-    return this.getNamingMethodOrThrow(domain).namehash(domain);
+    return this.getNamingMethodOrThrow(domain).namehash(domain, options);
   }
 
   /**
