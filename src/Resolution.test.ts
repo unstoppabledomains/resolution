@@ -304,12 +304,13 @@ describe('Resolution', () => {
       });
 
       it('checks childhash multi level domain', () => {
-        const cns = new Resolution().cns!;
+        const cns = new Resolution();
         const domain = 'ich.ni.san.yon.hello.world.crypto';
-        const namehash = cns!.namehash(domain);
-        const childhash = cns!.childhash(
-          cns!.namehash('ni.san.yon.hello.world.crypto'),
+        const namehash = cns.namehash(domain);
+        const childhash = cns.childhash(
+          cns.namehash('ni.san.yon.hello.world.crypto'),
           'ich',
+          NamingServiceName.CNS,
         );
         expect(childhash).toBe(namehash);
       });

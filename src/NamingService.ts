@@ -13,7 +13,6 @@ import ConfigurationError, {
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import FetchProvider from './FetchProvider';
 import { nodeHash } from './types';
-import { NamehashOptions, NamehashOptionsDefault } from './publicTypes';
 
 export default abstract class NamingService extends BaseConnection {
   readonly name: ResolutionMethod;
@@ -31,7 +30,6 @@ export default abstract class NamingService extends BaseConnection {
   abstract childhash(
     parent: nodeHash,
     label: string,
-    options?: { prefix: boolean },
   ): nodeHash;
   abstract allRecords(domain: string): Promise<Record<string, string>>;
 
@@ -50,11 +48,11 @@ export default abstract class NamingService extends BaseConnection {
     return this.name as NamingServiceName;
   }
 
-  namehash(domain: string, options: NamehashOptions = NamehashOptionsDefault): string {
+  namehash(domain: string): string {
     this.ensureSupportedDomain(domain);
     const parent =
       '0000000000000000000000000000000000000000000000000000000000000000';
-    const assembledHash = [parent]
+    return '0x' + [parent]
       .concat(
         domain
           .split('.')
@@ -62,13 +60,8 @@ export default abstract class NamingService extends BaseConnection {
           .filter(label => label),
       )
       .reduce((parent, label) =>
-        this.childhash(parent, label, { prefix: false }),
+        this.childhash(parent, label),
       );
-    if (options.format === 'dec') {
-      return new BN(assembledHash, 'hex').toString(10);
-    } else {
-      return (options.prefix ? '0x' : '') + assembledHash;
-    }
   }
 
   protected abstract normalizeSource(

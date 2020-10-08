@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 import sha256 from './utils/sha256';
 import {
   fromBech32Address,
@@ -102,11 +103,10 @@ export default class Zns extends NamingService {
   childhash(
     parent: nodeHash,
     label: string,
-    options: { prefix: boolean } = { prefix: true },
   ): nodeHash {
     parent = parent.replace(/^0x/, '');
     return sha256(parent + sha256(label, { hexPrefix: false }), {
-      hexPrefix: options.prefix,
+      hexPrefix: false,
       inputEnc: 'hex',
     });
   }

@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 import Ens from './Ens';
 import Zns from './Zns';
 import Cns from './Cns';
@@ -384,7 +385,7 @@ export default class Resolution {
    */
   namehash(domain: string, options: NamehashOptions = NamehashOptionsDefault): string {
     domain = this.prepareDomain(domain);
-    return this.getNamingMethodOrThrow(domain).namehash(domain, options);
+    return this.formatNamehash(this.getNamingMethodOrThrow(domain).namehash(domain), options);
   }
 
   /**
@@ -397,8 +398,18 @@ export default class Resolution {
     parent: nodeHash,
     label: string,
     method: NamingServiceName,
+    options: NamehashOptions = NamehashOptionsDefault,
   ): nodeHash {
-    return this.findNamingService(method).childhash(parent, label);
+    return this.formatNamehash(this.findNamingService(method).childhash(parent, label), options);
+  }
+
+  private formatNamehash(hash, options: NamehashOptions) {
+    hash = hash.replace('0x', '');
+    if (options.format === 'dec') {
+      return new BN(hash, 'hex').toString(10);
+    } else {
+      return options.prefix ? '0x' + hash : hash;
+    }
   }
 
   /**
