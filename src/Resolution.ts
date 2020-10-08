@@ -380,7 +380,8 @@ export default class Resolution {
   /**
    * @returns Produces a namehash from supported naming service in hex format with 0x prefix.
    * Corresponds to ERC721 token id in case of Ethereum based naming service like ENS or CNS.
-   * @param domain - domain name to be converted
+   * @param domain domain name to be converted
+   * @param options formatting options
    * @throws [[ResolutionError]] with UnsupportedDomain error code if domain extension is unknown
    */
   namehash(domain: string, options: NamehashOptions = NamehashOptionsDefault): string {
@@ -393,6 +394,7 @@ export default class Resolution {
    * @param parent namehash of a parent domain
    * @param label subdomain name
    * @param method "ENS", "CNS" or "ZNS"
+   * @param options formatting options
    */
   childhash(
     parent: nodeHash,
