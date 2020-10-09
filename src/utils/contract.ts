@@ -33,7 +33,7 @@ export default class Contract {
     const topic = this.coder.getEventTopic(eventName);
     const params = [
       {
-        fromBlock: fromBlock,
+        fromBlock,
         toBlock: 'latest',
         address: this.address,
         topics: [topic, tokenId]
