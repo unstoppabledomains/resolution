@@ -212,6 +212,10 @@ export default class Cns extends EthereumNamingService {
       startingBlock,
     );
     const keyTopics = logs.map(event => event.topics[2]);
+    // If there are no NewKey events we want to check the standardRecords
+    if (keyTopics.length === 0) {
+      return await this.getStandardRecords(resolverContract, tokenId);
+    }
     const keys = await this.callMethod(resolverContract, 'getManyByHash', [
       keyTopics,
       tokenId,
