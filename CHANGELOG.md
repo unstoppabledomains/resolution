@@ -1,3 +1,6 @@
+## Unreleased
+* Cns#allRecords fallbacks to check the standard keys when no NewKey event was found in the resolver logs
+
 ## 1.8.3
 * Enhanced Log searched. Now getting all records from the last resetRecords event if available
 
