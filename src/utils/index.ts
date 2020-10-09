@@ -40,6 +40,7 @@ export function signedInfuraLink(
   return `https://${network}.infura.com/v3/${infura}`;
 }
 
+// Need more sophisticated way to determine if the contract is Legacy
 export function isLegacyResolver(resolverAddress: string): boolean {
   return [
     '0xa1cac442be6673c49f8e74ffc7c4fd746f3cbd0d',
@@ -57,9 +58,9 @@ export function hexToBytes(hexString: string): number[] {
 }
 
 /** @internal */
-const CRYPTO_RESOLVER_ADVANCED_EVENTS_STARTING_BLOCK = 9832516;
+const CRYPTO_RESOLVER_ADVANCED_EVENTS_STARTING_BLOCK = "0x960844";
 
-export async function getStartingBlock(contract: Contract, tokenId: string) {
+export async function getStartingBlock(contract: Contract, tokenId: string): Promise<string> {
   const logs =  await contract.fetchLogs("ResetRecords", tokenId, 'earliest');
   const lastResetEvent = logs[logs.length - 1];
   return lastResetEvent?.blockNumber || CRYPTO_RESOLVER_ADVANCED_EVENTS_STARTING_BLOCK;
