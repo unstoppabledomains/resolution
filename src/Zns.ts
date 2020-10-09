@@ -1,4 +1,4 @@
-import sha256 from './utils/sha256';
+import hash from 'hash.js';
 import {
   fromBech32Address,
   toBech32Address,
@@ -105,10 +105,23 @@ export default class Zns extends NamingService {
     options: { prefix: boolean } = { prefix: true },
   ): nodeHash {
     parent = parent.replace(/^0x/, '');
-    return sha256(parent + sha256(label, { hexPrefix: false }), {
+    return (options.prefix ? '0x' : '') + this.sha256(parent + this.sha256(label), {
       hexPrefix: options.prefix,
       inputEnc: 'hex',
     });
+  }
+
+  private sha256(
+    message,
+    {
+      hexPrefix = true,
+      inputEnc,
+    }: { hexPrefix?: boolean; inputEnc?: 'hex' } = {},
+  ) {
+    return hash
+      .sha256()
+      .update(message, inputEnc)
+      .digest('hex');
   }
 
   async resolver(domain: string): Promise<string> {
