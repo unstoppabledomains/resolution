@@ -29,7 +29,7 @@ export default class Contract {
     return this.coder.decodeFunctionResult(method, response);
   }
 
-  async fetchLogs(eventName: string, tokenId: string, fromBlock: string | number): Promise<EventData[]> {
+  async fetchLogs(eventName: string, tokenId: string, fromBlock: string = 'earliest'): Promise<EventData[]> {
     const topic = this.coder.getEventTopic(eventName);
     const params = [
       {

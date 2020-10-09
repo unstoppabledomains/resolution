@@ -61,7 +61,7 @@ export function hexToBytes(hexString: string): number[] {
 const CRYPTO_RESOLVER_ADVANCED_EVENTS_STARTING_BLOCK = "0x960844";
 
 export async function getStartingBlock(contract: Contract, tokenId: string): Promise<string> {
-  const logs =  await contract.fetchLogs("ResetRecords", tokenId, 'earliest');
+  const logs =  await contract.fetchLogs("ResetRecords", tokenId);
   const lastResetEvent = logs[logs.length - 1];
   return lastResetEvent?.blockNumber || CRYPTO_RESOLVER_ADVANCED_EVENTS_STARTING_BLOCK;
 }
