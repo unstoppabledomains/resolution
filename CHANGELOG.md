@@ -1,4 +1,9 @@
+## Unreleased
+
+* Add formatting options for `Resolution#namehash` and `Resolution#childhash` #91.
+
 ## 1.8.3
+
 * Enhanced Log searched. Now getting all records from the last resetRecords event if available
 
 ## 1.8.2
