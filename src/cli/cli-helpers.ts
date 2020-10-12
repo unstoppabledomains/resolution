@@ -14,7 +14,7 @@ export async function tryInfo(
     return true;
   } catch (err) {
     if (Object.values(ResolutionErrorCode).includes(err.code)) {
-     response[field] = err.code;
+      response[field] = err.code;
     } else response[field] = err.message
     return false;
   }

@@ -4,7 +4,6 @@ module.exports = {
     'es2020': true,
   },
   'extends': [
-    'google',
   ],
   'parser': '@typescript-eslint/parser',
   'parserOptions': {

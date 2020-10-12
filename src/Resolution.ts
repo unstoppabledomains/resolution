@@ -509,18 +509,18 @@ export default class Resolution {
     provider?: Provider,
   ): SourceDefinition | false {
     switch (typeof source) {
-      case 'undefined': {
-        return { provider };
-      }
-      case 'boolean': {
-        return source ? { provider } : false;
-      }
-      case 'string': {
-        return { url: source };
-      }
-      case 'object': {
-        return { provider, ...source };
-      }
+    case 'undefined': {
+      return { provider };
+    }
+    case 'boolean': {
+      return source ? { provider } : false;
+    }
+    case 'string': {
+      return { url: source };
+    }
+    case 'object': {
+      return { provider, ...source };
+    }
     }
     throw new Error('Unsupported configuration');
   }
