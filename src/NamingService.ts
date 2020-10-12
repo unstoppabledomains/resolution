@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 import {
   ResolutionMethod,
   Provider,
@@ -29,7 +30,6 @@ export default abstract class NamingService extends BaseConnection {
   abstract childhash(
     parent: nodeHash,
     label: string,
-    options?: { prefix: boolean },
   ): nodeHash;
   abstract allRecords(domain: string): Promise<Record<string, string>>;
 
@@ -52,7 +52,7 @@ export default abstract class NamingService extends BaseConnection {
     this.ensureSupportedDomain(domain);
     const parent =
       '0000000000000000000000000000000000000000000000000000000000000000';
-    const assembledHash = [parent]
+    return '0x' + [parent]
       .concat(
         domain
           .split('.')
@@ -60,9 +60,8 @@ export default abstract class NamingService extends BaseConnection {
           .filter(label => label),
       )
       .reduce((parent, label) =>
-        this.childhash(parent, label, { prefix: false }),
+        this.childhash(parent, label),
       );
-    return '0x' + assembledHash;
   }
 
   protected abstract normalizeSource(

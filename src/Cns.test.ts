@@ -537,7 +537,7 @@ describe('CNS', () => {
       });
     });
 
-    describe('.Childhash', () => {
+    describe('#childhash', () => {
       it('checks root crypto domain', () => {
         const rootHash =
           '0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f';
@@ -573,6 +573,26 @@ describe('CNS', () => {
         );
         expect(childhash).toBe(namehash);
       });
+    });
+  });
+
+  describe('#namehash', () => {
+    it('supports options', async () => {
+      expect(resolution.namehash('operadingo4.crypto')).toEqual(
+        '0x70f542f09763d3ab404a6d87f6a2fad7d49f01b09c44064b4227d165ead5cf25',
+      );
+
+      expect(
+        resolution.namehash('operadingo4.crypto', { prefix: false }),
+      ).toEqual(
+        '70f542f09763d3ab404a6d87f6a2fad7d49f01b09c44064b4227d165ead5cf25',
+      );
+
+      expect(
+        resolution.namehash('operadingo4.crypto', { format: 'dec' }),
+      ).toEqual(
+        '51092378573785850370557709888128643877973998831507731627523713553233928900389',
+      );
     });
   });
 

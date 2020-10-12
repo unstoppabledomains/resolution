@@ -12,6 +12,7 @@ import {
   expectConfigurationErrorCode,
 } from './tests/helpers';
 import { ConfigurationErrorCode } from './errors/configurationError';
+import { NamingServiceName } from './publicTypes';
 let resolution: Resolution;
 
 try {
@@ -131,7 +132,7 @@ describe('ENS', () => {
     expectSpyToBeCalled(spies);
   });
 
-  //TODO remove this test once addressOrThrow is fully removed
+  // TODO remove this test once addressOrThrow is fully removed
   it('[Old test]resolves .luxe name using ENS blockchain with thrown error', async () => {
     const spies = mockAsyncMethods(resolution.ens, {
       getResolver: undefined,
@@ -506,13 +507,13 @@ describe('ENS', () => {
     describe('.namehash', () => {
       it('supports root node', async () => {
         expect(resolution.ens!.isSupportedDomain('eth')).toEqual(true);
-        expect(resolution.ens!.namehash('eth')).toEqual(
+        expect(resolution.namehash('eth')).toEqual(
           '0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae',
         );
       });
 
       it('should hash appropriately', async () => {
-        expect(resolution.ens!.namehash('alice.eth')).toBe(
+        expect(resolution.namehash('alice.eth')).toBe(
           '0x787192fc5378cc32aa956ddfdedbf26b24e8d78e40109add0eea2c1a012c3dec',
         );
       });
@@ -549,10 +550,11 @@ describe('ENS', () => {
     describe('.childhash', () => {
       it('tests childhash functionality', () => {
         const domain = 'hello.world.eth';
-        const namehash = resolution.ens!.namehash(domain);
-        const childhash = resolution.ens!.childhash(
-          resolution.ens!.namehash('world.eth'),
+        const namehash = resolution.namehash(domain);
+        const childhash = resolution.childhash(
+          resolution.namehash('world.eth'),
           'hello',
+          NamingServiceName.ENS,
         );
         expect(childhash).toBe(namehash);
       });
@@ -560,21 +562,23 @@ describe('ENS', () => {
       it('checks root eth domain', () => {
         const rootHash =
           '0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae';
-        expect(resolution.ens!.namehash('eth')).toBe(rootHash);
+        expect(resolution.namehash('eth')).toBe(rootHash);
         expect(
-          resolution.ens!.childhash(
+          resolution.childhash(
             '0000000000000000000000000000000000000000000000000000000000000000',
             'eth',
+            NamingServiceName.ENS,
           ),
         ).toBe(rootHash);
       });
 
       it('checks childhash multi level domain', () => {
         const domain = 'ich.ni.san.yon.hello.world.eth';
-        const namehash = resolution.ens!.namehash(domain);
-        const childhash = resolution.ens!.childhash(
-          resolution.ens!.namehash('ni.san.yon.hello.world.eth'),
+        const namehash = resolution.namehash(domain);
+        const childhash = resolution.childhash(
+          resolution.namehash('ni.san.yon.hello.world.eth'),
           'ich',
+          NamingServiceName.ENS,
         );
         expect(childhash).toBe(namehash);
       });

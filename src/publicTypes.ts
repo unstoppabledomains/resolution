@@ -143,3 +143,10 @@ export const DefaultAPI: API = {
  * @typedef {string | boolean | SourceDefinition}
  */
 export type NamingServiceSource = string | boolean | SourceDefinition;
+
+export type NamehashOptions = {
+  readonly format?: 'dec' | 'hex',
+  readonly prefix?: boolean,
+};
+
+export const NamehashOptionsDefault = {format: 'hex', prefix: true} as const;
