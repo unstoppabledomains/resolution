@@ -55,11 +55,15 @@ import {
 
   if (options.config) {
     const { type, value } = options.config;
-    if (type == 'infura' || type == 'url') storeConfig(type, value);
+    if (type == 'infura' || type == 'url') {
+      storeConfig(type, value);
+    }
     delete options.config;
   }
 
-  if (!options.domain) return;
+  if (!options.domain) {
+    return;
+  }
 
   const { domain } = options;
   delete options.domain;

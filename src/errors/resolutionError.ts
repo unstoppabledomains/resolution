@@ -97,6 +97,7 @@ export class ResolutionError extends Error {
     if (code === ResolutionErrorCode.UnspecifiedCurrency) {
       message += `\nResolutionErrorCode ${code} is deprecated and will be removed in the future. Use RecordNotFound code instead.`;
     }
+    
     super(message);
     this.code = code;
     this.domain = domain;

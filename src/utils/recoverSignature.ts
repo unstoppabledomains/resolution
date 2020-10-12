@@ -24,6 +24,7 @@ const toChecksum = (address: string) => {
         ? address[i + 2].toUpperCase()
         : address[i + 2];
   }
+  
   return checksumAddress;
 };
 

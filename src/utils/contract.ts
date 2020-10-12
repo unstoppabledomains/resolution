@@ -29,6 +29,7 @@ export default class Contract {
     if (!response || response === '0x') {
       return [];
     }
+    
 
     return this.coder.decodeFunctionResult(method, response);
   }

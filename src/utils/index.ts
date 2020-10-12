@@ -24,7 +24,9 @@ export function invert(object) {
   const returnee = {};
 
   for (const key in object) {
-    if (!object.hasOwnProperty(key)) continue;
+    if (!object.hasOwnProperty(key)) {
+      continue;
+    }
     returnee[object[key]] = key;
   }
   return returnee;
@@ -50,5 +52,6 @@ export function hexToBytes(hexString: string): number[] {
   for (let c = 0; c < hex.length; c += 2) {
     bytes.push(parseInt(hex.substr(c, 2), 16));
   }
+  
   return bytes;
 }

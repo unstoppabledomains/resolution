@@ -74,6 +74,7 @@ export default abstract class NamingService extends BaseConnection {
         domain,
       });
     }
+    
   }
 
   protected async ignoreResolutionErrors<T>(
@@ -88,6 +89,7 @@ export default abstract class NamingService extends BaseConnection {
       } else {
         throw error;
       }
+      
     }
   }
 
@@ -103,6 +105,7 @@ export default abstract class NamingService extends BaseConnection {
     if (value) {
       return value;
     }
+    
     throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
       recordName: key,
       domain: domain,
@@ -115,10 +118,12 @@ export default abstract class NamingService extends BaseConnection {
         method: this.name,
       });
     }
+    
     if (!source.url && !source.provider) {
       throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedUrl, {
         method: this.name,
       });
     }
+    
   }
 }

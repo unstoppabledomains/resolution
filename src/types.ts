@@ -91,7 +91,9 @@ export enum NullAddresses {
 export function isNullAddress(
   key: string | null | undefined,
 ): key is undefined | null {
-  if (!key) return true;
+  if (!key) {
+    return true;
+  }
   return Object.values(NullAddresses).includes(key);
 }
 export const EthCoinIndex = '60';

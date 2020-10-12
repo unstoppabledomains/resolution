@@ -26,8 +26,9 @@ export const Eip1993Factories = {
  * @see https://github.com/ethereum/web3.js/blob/0.20.7/lib/web3/httpprovider.js#L116
  */
 function fromWeb3Version0Provider(provider: Web3Version0Provider): Provider {
-  if (provider.sendAsync === undefined)
+  if (provider.sendAsync === undefined) {
     throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
+  }
   return {
     request: (request: RequestArguments) =>
       new Promise((resolve, reject) => {
@@ -39,13 +40,16 @@ function fromWeb3Version0Provider(provider: Web3Version0Provider): Provider {
             id: 1,
           },
           (error: Error | null, result: JsonRpcResponse) => {
-            if (error) reject(error);
-            if (result.error)
+            if (error) {
+              reject(error);
+            }
+            if (result.error) {
               reject(
                 new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
                   providerMessage: result.error,
                 }),
               );
+            }
             resolve(result.result);
           },
         );
@@ -60,8 +64,9 @@ function fromWeb3Version0Provider(provider: Web3Version0Provider): Provider {
  * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-providers-http/src/index.js#L95
  */
 function fromWeb3Version1Provider(provider: Web3Version1Provider): Provider {
-  if (provider.send === undefined)
+  if (provider.send === undefined) {
     throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
+  }
   return {
     request: (request: RequestArguments) =>
       new Promise((resolve, reject) => {
@@ -73,13 +78,16 @@ function fromWeb3Version1Provider(provider: Web3Version1Provider): Provider {
             id: 1,
           },
           (error: Error | null, result: JsonRpcResponse) => {
-            if (error) reject(error);
-            if (result.error)
+            if (error) {
+              reject(error);
+            }
+            if (result.error) {
               reject(
                 new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
                   providerMessage: result.error,
                 }),
               );
+            }
             resolve(result.result);
           },
         );
@@ -97,8 +105,9 @@ function fromWeb3Version1Provider(provider: Web3Version1Provider): Provider {
  * @see https://github.com/ethers-io/ethers.js/blob/master/packages/providers/src.ts/json-rpc-provider.ts
  */
 function fromEthersProvider(provider: EthersProvider): Provider {
-  if (provider.call === undefined)
+  if (provider.call === undefined) {
     throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
+  }
   return {
     request: async (request: RequestArguments) => {
       try {

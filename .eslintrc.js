@@ -15,10 +15,11 @@ module.exports = {
   ],
   'rules': {
     'object-curly-spacing': ['off'],
+    curly: ['error'],
+    'brace-style': 'error',
     'no-unused-vars': ['off'],
     'valid-jsdoc': ['off'],
     'require-jsdoc': ['off'],
     'indent': ['error', 2],
-    'max-len': ['off']
   },
 };

@@ -47,6 +47,7 @@ export abstract class EthereumNamingService extends NamingService {
       // Ensure it doesn't generate a warning if it rejects
       ownerPromise.catch(() => {});
     }
+
     return resolverAddress;
   }
 
@@ -54,10 +55,14 @@ export abstract class EthereumNamingService extends NamingService {
     if (!url) {
       return undefined;
     }
+
     for (const key in EthereumNamingService.NetworkNameMap) {
-      if (!EthereumNamingService.NetworkNameMap.hasOwnProperty(key)) continue;
-      if (url.indexOf(key) >= 0)
+      if (!EthereumNamingService.NetworkNameMap.hasOwnProperty(key)) {
+        continue;
+      }
+      if (url.indexOf(key) >= 0) {
         return EthereumNamingService.NetworkNameMap[key];
+      }
     }
     return undefined;
   }
@@ -73,6 +78,7 @@ export abstract class EthereumNamingService extends NamingService {
         ? EthereumNamingService.UrlMap[source.network]
         : undefined;
     }
+
 
     source.registry = source.registry
       ? source.registry
@@ -111,6 +117,7 @@ export abstract class EthereumNamingService extends NamingService {
           method: this.name,
         });
       }
+
       throw error;
     }
   }
@@ -129,6 +136,7 @@ export abstract class EthereumNamingService extends NamingService {
         domain,
       });
     }
+
     throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
       domain,
     });
