@@ -49,7 +49,7 @@ export default class Udapi extends NamingService {
         domain,
       });
     }
-    
+
     const address = data.addresses[currencyTicker.toUpperCase()];
     if (!address) {
       throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
@@ -57,7 +57,7 @@ export default class Udapi extends NamingService {
         currencyTicker,
       });
     }
-    
+
     return address;
   }
 
@@ -67,38 +67,6 @@ export default class Udapi extends NamingService {
       return null;
     }
     return owner.startsWith('zil1') ? owner : toBech32Address(owner);
-  }
-
-  async chatId(domain: string): Promise<string> {
-    const resolution = await this.resolve(domain);
-    const value = resolution?.gundb?.username;
-    return this.ensureRecordPresence(domain, 'Gundb chatId', value);
-  }
-
-  async chatpk(domain: string): Promise<string> {
-    const resolution = await this.resolve(domain);
-    // eslint-disable-next-line camelcase
-    const pk = resolution?.gundb?.public_key;
-    return this.ensureRecordPresence(domain, 'Gundb publick key', pk);
-  }
-
-  async ipfsHash(domain: string): Promise<string> {
-    const answer = await this.resolve(domain);
-    const value = answer?.ipfs?.html;
-    return this.ensureRecordPresence(domain, 'IPFS hash', value);
-  }
-
-  async email(domain: string): Promise<string> {
-    const answer = await this.resolve(domain);
-    const value = answer?.whois?.email;
-    return this.ensureRecordPresence(domain, 'email', value);
-  }
-
-  async httpUrl(domain: string): Promise<string> {
-    const answer = await this.resolve(domain);
-    // eslint-disable-next-line camelcase
-    const value = answer?.ipfs?.redirect_domain;
-    return this.ensureRecordPresence(domain, 'httpUrl', value);
   }
 
   async record(domain: string, key: string): Promise<string> {
@@ -114,7 +82,7 @@ export default class Udapi extends NamingService {
         methodName: 'twitter',
       });
     }
-    
+
     const domainMetaData = await this.resolve(domain);
     if (!domainMetaData.meta.owner) {
       throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
@@ -147,7 +115,7 @@ export default class Udapi extends NamingService {
         },
       );
     }
-    
+
     return twitterHandle;
   }
 
@@ -200,7 +168,7 @@ export default class Udapi extends NamingService {
         domain,
       });
     }
-    
+
     return method;
   }
 }

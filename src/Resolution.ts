@@ -64,14 +64,14 @@ export default class Resolution {
       if (blockchain === true) {
         blockchain = {};
       }
-      
+
       const web3provider = blockchain.web3Provider;
       if (web3provider) {
         console.warn(
           'Usage of `web3Provider` option is deprecated. Use `provider` option instead for each individual blockchain',
         );
       }
-      
+
       const ens = this.normalizeSource(blockchain.ens, web3provider);
       const zns = this.normalizeSource(blockchain.zns);
       const cns = this.normalizeSource(blockchain.cns, web3provider);
@@ -79,19 +79,19 @@ export default class Resolution {
       if (ens) {
         this.ens = new Ens(ens);
       }
-      
+
       if (zns) {
         this.zns = new Zns(zns);
       }
-      
+
       if (cns) {
         this.cns = new Cns(cns);
       }
-      
+
     } else {
       this.api = new UdApi(api);
     }
-    
+
   }
 
   /**
@@ -194,7 +194,7 @@ export default class Resolution {
       } else {
         throw error;
       }
-      
+
     }
   }
 
@@ -231,7 +231,7 @@ export default class Resolution {
         methodName: 'twitter',
       });
     }
-    
+
     const method = this.getNamingMethodOrThrow(domain);
     return method.twitter(domain);
   }
@@ -334,7 +334,7 @@ export default class Resolution {
           currencyTicker,
         });
       }
-      
+
       throw error;
     }
   }
@@ -421,7 +421,7 @@ export default class Resolution {
     } else {
       return options.prefix ? '0x' + hash : hash;
     }
-    
+
   }
 
   /**
@@ -497,7 +497,7 @@ export default class Resolution {
         domain,
       });
     }
-    
+
     return method;
   }
 
@@ -508,7 +508,7 @@ export default class Resolution {
         method: name,
       });
     }
-    
+
     return service;
   }
 
