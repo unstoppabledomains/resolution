@@ -66,6 +66,7 @@
   "devDependencies": {
     "@ethersproject/providers": "^5.0.2",
     "@types/bn.js": "^4.11.6",
+    "@types/elliptic": "^6.4.12",
     "@types/jest": "24.0.23",
     "@types/lodash": "^4.14.158",
     "@types/node": "11.15.3",
