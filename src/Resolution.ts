@@ -17,6 +17,8 @@ import {
   SourceDefinition,
   NamehashOptions,
   NamehashOptionsDefault,
+  DnsRecordType,
+  DnsRecord
 } from './publicTypes';
 import { nodeHash } from './types';
 import { EthersProvider } from './publicTypes';
@@ -475,8 +477,11 @@ export default class Resolution {
     return await this.getNamingMethodOrThrow(domain).allRecords(domain);
   }
 
+  async dns(domain: string, type: DnsRecordType[]): Promise<DnsRecord[]> {
+    return [];
+  }
+
   private getNamingMethod(domain: string): NamingService | undefined {
-    domain = this.prepareDomain(domain);
     return this.getResolutionMethods().find(method =>
       method.isSupportedDomain(domain),
     );
@@ -490,7 +495,6 @@ export default class Resolution {
   }
 
   private getNamingMethodOrThrow(domain: string): NamingService {
-    domain = this.prepareDomain(domain);
     const method = this.getNamingMethod(domain);
     if (!method) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
