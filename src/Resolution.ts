@@ -262,7 +262,9 @@ export default class Resolution {
   async ipfsHash(domain: string): Promise<string> {
     const [oldRecord, newRecord] = ['ipfs.html.value', 'dweb.ipfs.hash'];
     const records = await this.records(domain, [oldRecord, newRecord]);
-    if (records[newRecord]) {return records[newRecord];}
+    if (records[newRecord]) {
+      return records[newRecord];
+    }
     return ensureRecordPresence(domain, 'ipfs hash', records[oldRecord]);
   }
 
@@ -273,7 +275,9 @@ export default class Resolution {
   async httpUrl(domain: string): Promise<string> {
     const [oldRecord, newRecord] = ['ipfs.redirect_domain.value', 'browser.redirect_url'];
     const records = await this.records(domain, [oldRecord, newRecord]);
-    if (records[newRecord]) {return records[newRecord];}
+    if (records[newRecord]) {
+      return records[newRecord];
+    }
     return ensureRecordPresence(domain, 'ipfs redirect_url', records[oldRecord]);
   }
 

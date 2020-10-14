@@ -155,7 +155,9 @@ export default class Cns extends EthereumNamingService {
     const data = await reader.records(tokenId, keys);
     await this.verify(domain, data);
 
-    if (!data.values) return {};
+    if (!data.values) {
+      return {};
+    }
     const records: Record<string, string> = {};
     keys.forEach((key, index) => records[key] = data.values![index])
     return records;

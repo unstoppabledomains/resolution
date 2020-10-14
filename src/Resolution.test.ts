@@ -105,44 +105,44 @@ describe('Resolution', () => {
       expect(hash).toBe('QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK');
     });
 
-  it('checks return of email for ergergergerg.zil', async () => {
-    const resolution = new Resolution();
-    const spies = mockAsyncMethods(resolution.zns, {
-      allRecords: {
-        'ipfs.html.hash': 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
-        'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu',
-        'ipfs.redirect_domain.value': 'www.unstoppabledomains.com',
-        'whois.email.value': 'matt+test@unstoppabledomains.com',
-        'whois.for_sale.value': 'true'
-      }
+    it('checks return of email for ergergergerg.zil', async () => {
+      const resolution = new Resolution();
+      const spies = mockAsyncMethods(resolution.zns, {
+        allRecords: {
+          'ipfs.html.hash': 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
+          'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu',
+          'ipfs.redirect_domain.value': 'www.unstoppabledomains.com',
+          'whois.email.value': 'matt+test@unstoppabledomains.com',
+          'whois.for_sale.value': 'true'
+        }
+      });
+      const email = await resolution.email('ergergergerg.zil');
+      expectSpyToBeCalled(spies);
+      expect(email).toBe('matt+test@unstoppabledomains.com');
     });
-    const email = await resolution.email('ergergergerg.zil');
-    expectSpyToBeCalled(spies);
-    expect(email).toBe('matt+test@unstoppabledomains.com');
-  });
 
-  it('checks error for email on brad.zil', async () => {
-    const resolution = new Resolution();
-    const spies = mockAsyncMethods(resolution.zns, {
-      allRecords: {
-        'crypto.BCH.address': 'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6',
-        'crypto.BTC.address': '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB',
-        'crypto.DASH.address': 'XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j',
-        'crypto.ETH.address': '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
-        'crypto.LTC.address': 'LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL',
-        'crypto.XMR.address': '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d',
-        'crypto.ZEC.address': 't1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV',
-        'crypto.ZIL.address': 'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
-        'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
-        'ipfs.redirect_domain.value': 'www.unstoppabledomains.com'
-      }
+    it('checks error for email on brad.zil', async () => {
+      const resolution = new Resolution();
+      const spies = mockAsyncMethods(resolution.zns, {
+        allRecords: {
+          'crypto.BCH.address': 'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6',
+          'crypto.BTC.address': '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB',
+          'crypto.DASH.address': 'XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j',
+          'crypto.ETH.address': '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
+          'crypto.LTC.address': 'LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL',
+          'crypto.XMR.address': '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d',
+          'crypto.ZEC.address': 't1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV',
+          'crypto.ZIL.address': 'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
+          'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
+          'ipfs.redirect_domain.value': 'www.unstoppabledomains.com'
+        }
+      });
+      await expectResolutionErrorCode(
+        resolution.email('brad.zil'),
+        ResolutionErrorCode.RecordNotFound,
+      );
+      expectSpyToBeCalled(spies);
     });
-    await expectResolutionErrorCode(
-      resolution.email('brad.zil'),
-      ResolutionErrorCode.RecordNotFound,
-    );
-    expectSpyToBeCalled(spies);
-  });
 
     it('should be invalid domain', async () => {
       const resolution = new Resolution();
