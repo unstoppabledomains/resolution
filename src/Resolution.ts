@@ -206,7 +206,6 @@ export default class Resolution {
    * @throws [[ResolutionError]] if address is not found
    * @returns A promise that resolves in an address
    */
-
   async addr(domain: string, currrencyTicker: string): Promise<string> {
     return await this.record(
       domain,
@@ -221,7 +220,6 @@ export default class Resolution {
    * @throws [[ResolutionError]] if twitter is not found
    * @returns A promise that resolves in a verified twitter handle
    */
-
   async twitter(domain: string): Promise<string> {
     domain = this.prepareDomain(domain);
     const namingService = this.serviceName(domain);

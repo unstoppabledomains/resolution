@@ -1,3 +1,5 @@
+import { resolve } from "dns";
+import Contract from "./contract";
 /**
  * Parses object in format { "key.key2.key3" : value } into { key: { key2: {key3: value } } }
  * @param object object to parse
@@ -39,11 +41,27 @@ export function signedInfuraLink(
   return `https://${network}.infura.com/v3/${infura}`;
 }
 
+// Need more sophisticated way to determine if the contract is Legacy
 export function isLegacyResolver(resolverAddress: string): boolean {
+  if (isWellKnownLegacyResolver(resolverAddress)) {
+    return true;
+  }
+  if (isUpToDateResolver(resolverAddress)) {
+    return false;
+  }
+  // TODO we need to make an IO call to the contract to check the interface
+  return false;
+}
+
+export function isWellKnownLegacyResolver(resolverAddress: string): boolean {
   return [
     '0xa1cac442be6673c49f8e74ffc7c4fd746f3cbd0d',
     '0x878bc2f3f717766ab69c0a5f9a6144931e61aed3',
   ].includes(resolverAddress.toLowerCase());
+}
+
+export function isUpToDateResolver(resolverAddress: string): boolean {
+  return resolverAddress.toLowerCase() === '0xb66dce2da6afaaa98f2013446dbcb0f4b0ab2842';
 }
 
 export function hexToBytes(hexString: string): number[] {
@@ -54,4 +72,13 @@ export function hexToBytes(hexString: string): number[] {
   }
   
   return bytes;
+}
+
+/** @internal */
+const CRYPTO_RESOLVER_ADVANCED_EVENTS_STARTING_BLOCK = "0x960844";
+
+export async function getStartingBlock(contract: Contract, tokenId: string): Promise<string> {
+  const logs =  await contract.fetchLogs("ResetRecords", tokenId);
+  const lastResetEvent = logs[logs.length - 1];
+  return lastResetEvent?.blockNumber || CRYPTO_RESOLVER_ADVANCED_EVENTS_STARTING_BLOCK;
 }

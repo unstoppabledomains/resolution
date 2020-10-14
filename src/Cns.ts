@@ -8,7 +8,7 @@ import CnsProxyReader from './cns/CnsProxyReader';
 import CnsRegistryReader from './cns/CnsRegistryReader';
 import Contract from './utils/contract';
 import standardKeys from './utils/standardKeys';
-import { isLegacyResolver } from './utils';
+import { getStartingBlock, isLegacyResolver } from './utils';
 import {
   SourceDefinition,
   NamingServiceName,
@@ -215,8 +215,17 @@ export default class Cns extends EthereumNamingService {
     resolverContract: Contract,
     tokenId: string,
   ): Promise<Record<string, string>> {
-    const logs = await resolverContract.fetchLogs('NewKey', tokenId);
+    const startingBlock = await getStartingBlock(resolverContract, tokenId);
+    const logs = await resolverContract.fetchLogs(
+      'NewKey',
+      tokenId,
+      startingBlock,
+    );
     const keyTopics = logs.map(event => event.topics[2]);
+    // If there are no NewKey events we want to check the standardRecords
+    if (keyTopics.length === 0) {
+      return await this.getStandardRecords(resolverContract, tokenId);
+    }
     const keys = await this.callMethod(resolverContract, 'getManyByHash', [
       keyTopics,
       tokenId,
