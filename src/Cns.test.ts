@@ -163,6 +163,20 @@ describe('CNS', () => {
         expect(hash).toBe('new record Ipfs hash');
       });
 
+      it('should prioritize browser record key over ipfs.redirect_url one', async () => {
+        pendingInLive();
+        const spies = mockAsyncMethods(reader, {
+          records: {
+            resolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
+            values: ['oldRecord redirect url', 'new record redirect url']
+          }
+        });
+        const redirectUrl = await resolution.httpUrl(CryptoDomainWithIpfsRecords);
+        expectSpyToBeCalled(spies);
+        expect(redirectUrl).toBe('new record redirect url');
+
+      });
+
       it('should resolve with ipfs stored on cns', async () => {
         const spies = mockAsyncMethods(reader, {
           records: {
