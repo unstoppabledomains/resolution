@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 import {
   ResolutionMethod,
   Provider,
@@ -29,7 +30,6 @@ export default abstract class NamingService extends BaseConnection {
   abstract childhash(
     parent: nodeHash,
     label: string,
-    options?: { prefix: boolean },
   ): nodeHash;
   abstract allRecords(domain: string): Promise<Record<string, string>>;
 
@@ -52,7 +52,7 @@ export default abstract class NamingService extends BaseConnection {
     this.ensureSupportedDomain(domain);
     const parent =
       '0000000000000000000000000000000000000000000000000000000000000000';
-    const assembledHash = [parent]
+    return '0x' + [parent]
       .concat(
         domain
           .split('.')
@@ -60,9 +60,8 @@ export default abstract class NamingService extends BaseConnection {
           .filter(label => label),
       )
       .reduce((parent, label) =>
-        this.childhash(parent, label, { prefix: false }),
+        this.childhash(parent, label),
       );
-    return '0x' + assembledHash;
   }
 
   protected abstract normalizeSource(
@@ -75,6 +74,7 @@ export default abstract class NamingService extends BaseConnection {
         domain,
       });
     }
+    
   }
 
   protected async ignoreResolutionErrors<T>(
@@ -89,6 +89,7 @@ export default abstract class NamingService extends BaseConnection {
       } else {
         throw error;
       }
+      
     }
   }
 
@@ -104,6 +105,7 @@ export default abstract class NamingService extends BaseConnection {
     if (value) {
       return value;
     }
+    
     throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
       recordName: key,
       domain: domain,
@@ -116,10 +118,12 @@ export default abstract class NamingService extends BaseConnection {
         method: this.name,
       });
     }
+    
     if (!source.url && !source.provider) {
       throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedUrl, {
         method: this.name,
       });
     }
+    
   }
 }

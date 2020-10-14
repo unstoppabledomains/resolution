@@ -16,6 +16,7 @@ export default class CnsRegistryReader implements ICnsReader {
     if (isNullAddress(resolver)) {
       return {};
     }
+    
 
     return await this.get(resolver, tokenId, key);
   }
@@ -25,6 +26,7 @@ export default class CnsRegistryReader implements ICnsReader {
     if (isNullAddress(resolver)) {
       return {};
     }
+    
 
     return await this.getMany(resolver, tokenId, keys);
   }

@@ -1,4 +1,4 @@
-import sha256 from './utils/sha256';
+import hash from 'hash.js';
 import {
   fromBech32Address,
   toBech32Address,
@@ -41,7 +41,9 @@ export default class Zns extends NamingService {
 
   async resolve(domain: string): Promise<ResolutionResponse | null> {
     const recordAddresses = await this.getRecordsAddresses(domain);
-    if (!recordAddresses) return UnclaimedDomainResponse;
+    if (!recordAddresses) {
+      return UnclaimedDomainResponse;
+    }
     const [ownerAddress, resolverAddress] = recordAddresses;
     const resolution = this.structureResolverRecords(
       await this.getResolverRecords(resolverAddress),
@@ -52,6 +54,7 @@ export default class Zns extends NamingService {
         ([key, v]) => v.address && (addresses[key] = v.address),
       );
     }
+    
     return {
       addresses,
       meta: {
@@ -102,13 +105,15 @@ export default class Zns extends NamingService {
   childhash(
     parent: nodeHash,
     label: string,
-    options: { prefix: boolean } = { prefix: true },
   ): nodeHash {
     parent = parent.replace(/^0x/, '');
-    return sha256(parent + sha256(label, { hexPrefix: false }), {
-      hexPrefix: options.prefix,
-      inputEnc: 'hex',
-    });
+    return this.sha256(parent + this.sha256(label), 'hex',);
+  }
+
+  private sha256(message: string, inputEnc?: 'hex') {
+    return hash.sha256()
+      .update(message, inputEnc)
+      .digest('hex');
   }
 
   async resolver(domain: string): Promise<string> {
@@ -118,12 +123,14 @@ export default class Zns extends NamingService {
         domain: domain,
       });
     }
+    
     const [_, resolverAddress] = recordsAddresses;
     if (isNullAddress(resolverAddress)) {
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
         domain: domain,
       });
     }
+    
     return resolverAddress;
   }
 
@@ -140,11 +147,13 @@ export default class Zns extends NamingService {
       source.url =
         typeof source.network === 'number' ? UrlMap[source.network] : undefined;
     }
+    
 
     source.registry = source.registry || RegistryMap[source.network!];
     if (source.registry?.startsWith('0x')) {
       source.registry = toBech32Address(source.registry);
     }
+    
     return source;
   }
 
@@ -162,12 +171,15 @@ export default class Zns extends NamingService {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork()) {
       return undefined;
     }
+    
     const registryRecord = await this.getContractMapValue(
       this.registryAddress!,
       'records',
       this.namehash(domain),
     );
-    if (!registryRecord) return undefined;
+    if (!registryRecord) {
+      return undefined;
+    }
     let [ownerAddress, resolverAddress] = registryRecord.arguments as [
       string,
       string,
@@ -175,6 +187,7 @@ export default class Zns extends NamingService {
     if (ownerAddress.startsWith('0x')) {
       ownerAddress = toBech32Address(ownerAddress);
     }
+    
     return [ownerAddress, resolverAddress];
   }
 
@@ -184,6 +197,7 @@ export default class Zns extends NamingService {
     if (isNullAddress(resolverAddress)) {
       return {};
     }
+    
     const resolver = toChecksumAddress(resolverAddress);
     return ((await this.getContractField(resolver, 'records')) ||
       {}) as Dictionary<string>;
@@ -194,6 +208,7 @@ export default class Zns extends NamingService {
     for (const [key, value] of Object.entries(records)) {
       set(result, key, value);
     }
+    
     return result;
   }
 

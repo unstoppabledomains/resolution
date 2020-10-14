@@ -32,21 +32,6 @@ export type ResolutionMethod = NamingServiceName | 'UDAPI';
  * @property {Object} meta - meta information about the owner of the domain
  */
 export type ResolutionResponse = {
-  ipfs?: {
-    html?: string;
-    // eslint-disable-next-line camelcase
-    redirect_domain?: string;
-  };
-  whois?: {
-    email?: string;
-    // eslint-disable-next-line camelcase
-    for_sale?: boolean;
-  };
-  gundb?: {
-    username?: string;
-    // eslint-disable-next-line camelcase
-    public_key?: string;
-  };
   addresses: {
     [key: string]: string;
   };
@@ -143,3 +128,10 @@ export const DefaultAPI: API = {
  * @typedef {string | boolean | SourceDefinition}
  */
 export type NamingServiceSource = string | boolean | SourceDefinition;
+
+export type NamehashOptions = {
+  readonly format?: 'dec' | 'hex',
+  readonly prefix?: boolean,
+};
+
+export const NamehashOptionsDefault = {format: 'hex', prefix: true} as const;

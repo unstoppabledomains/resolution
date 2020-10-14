@@ -6,6 +6,7 @@ import {
   mockAsyncMethods,
 } from './tests/helpers';
 import { NullAddress } from './types';
+import { NamingServiceName } from './publicTypes';
 
 let resolution: Resolution;
 
@@ -263,20 +264,20 @@ describe('ZNS', () => {
   describe('.Hashing', () => {
     describe('.Namehash', () => {
       it('supports standard domain', () => {
-        expect(resolution.zns!.namehash('ny.zil')).toEqual(
+        expect(resolution.namehash('ny.zil')).toEqual(
           '0xd45bcb80c1ca68da09082d7618280839a1102446b639b294d07e9a1692ec241f',
         );
       });
 
       it('supports root "zil" domain', () => {
-        expect(resolution.zns!.namehash('zil')).toEqual(
+        expect(resolution.namehash('zil')).toEqual(
           '0x9915d0456b878862e822e2361da37232f626a2e47505c8795134a95d36138ed3',
         );
       });
 
       it('raises ResoltuionError when domain is not supported', async () => {
         await expectResolutionErrorCode(
-          () => resolution.zns!.namehash('hello.world'),
+          () => resolution.namehash('hello.world'),
           ResolutionErrorCode.UnsupportedDomain,
         );
       });
@@ -286,8 +287,11 @@ describe('ZNS', () => {
       it('checks childhash', () => {
         const zns = resolution.zns;
         const domain = 'hello.world.zil';
-        const namehash = zns!.namehash(domain);
-        const childhash = zns!.childhash(zns!.namehash('world.zil'), 'hello');
+        const namehash = resolution.namehash(domain);
+        const childhash = resolution.childhash(
+          resolution.namehash('world.zil'), 'hello',
+          NamingServiceName.ZNS,
+        );
         expect(namehash).toBe(childhash);
       });
 
@@ -295,22 +299,23 @@ describe('ZNS', () => {
         const zns = resolution.zns;
         const rootHash =
           '0x9915d0456b878862e822e2361da37232f626a2e47505c8795134a95d36138ed3';
-        expect(zns!.namehash('zil')).toBe(rootHash);
+        expect(resolution.namehash('zil')).toBe(rootHash);
         expect(
-          zns!.childhash(
+          resolution.childhash(
             '0000000000000000000000000000000000000000000000000000000000000000',
             'zil',
+            NamingServiceName.ZNS,
           ),
         ).toBe(rootHash);
       });
 
       it('checks childhash multi level domain', () => {
-        const zns = resolution.zns;
         const domain = 'ich.ni.san.yon.hello.world.zil';
-        const namehash = zns!.namehash(domain);
-        const childhash = zns!.childhash(
-          zns!.namehash('ni.san.yon.hello.world.zil'),
+        const namehash = resolution.namehash(domain);
+        const childhash = resolution.childhash(
+          resolution.namehash('ni.san.yon.hello.world.zil'),
           'ich',
+          NamingServiceName.ZNS,
         );
         expect(childhash).toBe(namehash);
       });

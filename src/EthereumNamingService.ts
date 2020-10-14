@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 import { keccak_256 as sha3 } from 'js-sha3';
 import NamingService from './NamingService';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
@@ -46,6 +47,7 @@ export abstract class EthereumNamingService extends NamingService {
       // Ensure it doesn't generate a warning if it rejects
       ownerPromise.catch(() => {});
     }
+
     return resolverAddress;
   }
 
@@ -53,10 +55,14 @@ export abstract class EthereumNamingService extends NamingService {
     if (!url) {
       return undefined;
     }
+
     for (const key in EthereumNamingService.NetworkNameMap) {
-      if (!EthereumNamingService.NetworkNameMap.hasOwnProperty(key)) continue;
-      if (url.indexOf(key) >= 0)
+      if (!EthereumNamingService.NetworkNameMap.hasOwnProperty(key)) {
+        continue;
+      }
+      if (url.indexOf(key) >= 0) {
         return EthereumNamingService.NetworkNameMap[key];
+      }
     }
     return undefined;
   }
@@ -73,6 +79,7 @@ export abstract class EthereumNamingService extends NamingService {
         : undefined;
     }
 
+
     source.registry = source.registry
       ? source.registry
       : this.defaultRegistry(source.network as number);
@@ -86,12 +93,10 @@ export abstract class EthereumNamingService extends NamingService {
   childhash(
     parent: nodeHash,
     label: string,
-    options: { prefix: boolean } = { prefix: true },
   ): nodeHash {
     parent = parent.replace(/^0x/, '');
     const childHash = sha3(label);
-    const mynode = sha3(Buffer.from(parent + childHash, 'hex'));
-    return (options.prefix ? '0x' : '') + mynode;
+    return sha3(Buffer.from(parent + childHash, 'hex'));
   }
 
   protected async callMethod(
@@ -112,6 +117,7 @@ export abstract class EthereumNamingService extends NamingService {
           method: this.name,
         });
       }
+
       throw error;
     }
   }
@@ -130,6 +136,7 @@ export abstract class EthereumNamingService extends NamingService {
         domain,
       });
     }
+
     throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
       domain,
     });

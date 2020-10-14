@@ -24,6 +24,7 @@ export default (addr: string, coinType?: string) => {
         { method: NamingServiceName.ENS },
       );
     }
+
     return newResolver;
   }
 };

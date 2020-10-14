@@ -1,3 +1,4 @@
+import BN from 'bn.js';
 import Ens from './Ens';
 import Zns from './Zns';
 import Cns from './Cns';
@@ -14,6 +15,8 @@ import {
   Provider,
   NamingServiceSource,
   SourceDefinition,
+  NamehashOptions,
+  NamehashOptionsDefault,
 } from './publicTypes';
 import { nodeHash } from './types';
 import { EthersProvider } from './publicTypes';
@@ -61,12 +64,14 @@ export default class Resolution {
       if (blockchain === true) {
         blockchain = {};
       }
+
       const web3provider = blockchain.web3Provider;
       if (web3provider) {
         console.warn(
           'Usage of `web3Provider` option is deprecated. Use `provider` option instead for each individual blockchain',
         );
       }
+
       const ens = this.normalizeSource(blockchain.ens, web3provider);
       const zns = this.normalizeSource(blockchain.zns);
       const cns = this.normalizeSource(blockchain.cns, web3provider);
@@ -74,15 +79,19 @@ export default class Resolution {
       if (ens) {
         this.ens = new Ens(ens);
       }
+
       if (zns) {
         this.zns = new Zns(zns);
       }
+
       if (cns) {
         this.cns = new Cns(cns);
       }
+
     } else {
       this.api = new UdApi(api);
     }
+
   }
 
   /**
@@ -185,6 +194,7 @@ export default class Resolution {
       } else {
         throw error;
       }
+
     }
   }
 
@@ -219,6 +229,7 @@ export default class Resolution {
         methodName: 'twitter',
       });
     }
+
     const method = this.getNamingMethodOrThrow(domain);
     return method.twitter(domain);
   }
@@ -321,6 +332,7 @@ export default class Resolution {
           currencyTicker,
         });
       }
+
       throw error;
     }
   }
@@ -375,12 +387,13 @@ export default class Resolution {
   /**
    * @returns Produces a namehash from supported naming service in hex format with 0x prefix.
    * Corresponds to ERC721 token id in case of Ethereum based naming service like ENS or CNS.
-   * @param domain - domain name to be converted
+   * @param domain domain name to be converted
+   * @param options formatting options
    * @throws [[ResolutionError]] with UnsupportedDomain error code if domain extension is unknown
    */
-  namehash(domain: string): string {
+  namehash(domain: string, options: NamehashOptions = NamehashOptionsDefault): string {
     domain = this.prepareDomain(domain);
-    return this.getNamingMethodOrThrow(domain).namehash(domain);
+    return this.formatNamehash(this.getNamingMethodOrThrow(domain).namehash(domain), options);
   }
 
   /**
@@ -388,13 +401,25 @@ export default class Resolution {
    * @param parent namehash of a parent domain
    * @param label subdomain name
    * @param method "ENS", "CNS" or "ZNS"
+   * @param options formatting options
    */
   childhash(
     parent: nodeHash,
     label: string,
     method: NamingServiceName,
+    options: NamehashOptions = NamehashOptionsDefault,
   ): nodeHash {
-    return this.findNamingService(method).childhash(parent, label);
+    return this.formatNamehash(this.findNamingService(method).childhash(parent, label), options);
+  }
+
+  private formatNamehash(hash, options: NamehashOptions) {
+    hash = hash.replace('0x', '');
+    if (options.format === 'dec') {
+      return new BN(hash, 'hex').toString(10);
+    } else {
+      return options.prefix ? '0x' + hash : hash;
+    }
+
   }
 
   /**
@@ -470,6 +495,7 @@ export default class Resolution {
         domain,
       });
     }
+
     return method;
   }
 
@@ -480,6 +506,7 @@ export default class Resolution {
         method: name,
       });
     }
+
     return service;
   }
 
@@ -492,18 +519,18 @@ export default class Resolution {
     provider?: Provider,
   ): SourceDefinition | false {
     switch (typeof source) {
-      case 'undefined': {
-        return { provider };
-      }
-      case 'boolean': {
-        return source ? { provider } : false;
-      }
-      case 'string': {
-        return { url: source };
-      }
-      case 'object': {
-        return { provider, ...source };
-      }
+    case 'undefined': {
+      return { provider };
+    }
+    case 'boolean': {
+      return source ? { provider } : false;
+    }
+    case 'string': {
+      return { url: source };
+    }
+    case 'object': {
+      return { provider, ...source };
+    }
     }
     throw new Error('Unsupported configuration');
   }

@@ -26,6 +26,8 @@ export function mockAsyncMethod(object: any, method: string, value) {
       return spy.mockResolvedValue(value);
     }
   }
+    
+  
   return spy;
 }
 
@@ -43,12 +45,14 @@ export function pendingInLive() {
   if (isLive()) {
     pending('Disabled in LIVE mode');
   }
+  
 }
 
 export function expectSpyToBeCalled(spies: any[]) {
   if (!isLive()) {
     spies.forEach((spy) => expect(spy).toBeCalled());
   }
+  
 }
 
 export async function expectResolutionErrorCode(
@@ -80,6 +84,7 @@ async function expectError(
       } else {
         resolve(result);
       }
+      
     });
   }
 
@@ -93,6 +98,7 @@ async function expectError(
       } else {
         throw error;
       }
+      
     },
   );
 }
@@ -101,6 +107,7 @@ export function mockAPICalls(testName: string, url = MainnetUrl) {
   if (isLive()) {
     return;
   }
+  
   const mcdt = mockData as any;
   const mockCall = mcdt[testName] as [any];
 
@@ -147,5 +154,7 @@ export const caseMock = <T, U>(params: T, cases: { request: T, response: U }[]):
       return response;
     }
   }
+    
+  
   throw new Error(`got unexpected params ${JSON.stringify(params)}`);
 }
