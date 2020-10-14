@@ -43,8 +43,12 @@ export function signedInfuraLink(
 
 // Need more sophisticated way to determine if the contract is Legacy
 export function isLegacyResolver(resolverAddress: string): boolean {
-  if (isWellKnownLegacyResolver(resolverAddress)) return true;
-  if (isUpToDateResolver(resolverAddress)) return false;
+  if (isWellKnownLegacyResolver(resolverAddress)) {
+    return true;
+  }
+  if (isUpToDateResolver(resolverAddress)) {
+    return false;
+  }
   // TODO we need to make an IO call to the contract to check the interface
   return false;
 }
