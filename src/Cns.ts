@@ -15,7 +15,6 @@ import {
   ResolutionResponse,
 } from './publicTypes';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
-import { read } from 'fs';
 
 const ReaderMap: ReaderMap = {
   1: '0x7ea9ee21077f84339eda9c80048ec6db678642b1',
