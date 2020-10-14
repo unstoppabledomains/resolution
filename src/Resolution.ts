@@ -22,7 +22,7 @@ import { nodeHash } from './types';
 import { EthersProvider } from './publicTypes';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import NamingService from './NamingService';
-import { signedInfuraLink } from './utils';
+import { ensureRecordPresence, signedInfuraLink } from './utils';
 import { Eip1993Factories } from './utils/Eip1993Factories';
 
 /**
@@ -206,7 +206,6 @@ export default class Resolution {
    * @throws [[ResolutionError]] if address is not found
    * @returns A promise that resolves in an address
    */
-
   async addr(domain: string, currrencyTicker: string): Promise<string> {
     return await this.record(
       domain,
@@ -221,7 +220,6 @@ export default class Resolution {
    * @throws [[ResolutionError]] if twitter is not found
    * @returns A promise that resolves in a verified twitter handle
    */
-
   async twitter(domain: string): Promise<string> {
     domain = this.prepareDomain(domain);
     const namingService = this.serviceName(domain);
@@ -262,7 +260,10 @@ export default class Resolution {
    * @throws [[ResolutionError]]
    */
   async ipfsHash(domain: string): Promise<string> {
-    return await this.record(domain, 'ipfs.html.value');
+    const [oldRecord, newRecord] = ['ipfs.html.value', 'dweb.ipfs.hash'];
+    const records = await this.records(domain, ['ipfs.html.value', 'dweb.ipfs.hash']);
+    if (records[newRecord]) {return records[newRecord];}
+    return ensureRecordPresence(domain, 'ipfs hash', records[oldRecord]);
   }
 
   /**
@@ -270,7 +271,10 @@ export default class Resolution {
    * @param domain - domain name
    */
   async httpUrl(domain: string): Promise<string> {
-    return await this.record(domain, 'ipfs.redirect_domain.value');
+    const [oldRecord, newRecord] = ['ipfs.redirect_domain.value', 'browser.redirect_url'];
+    const records = await this.records(domain, ['ipfs.redirect_domain.value', 'browser.redirect_url']);
+    if (records[newRecord]) {return records[newRecord];}
+    return ensureRecordPresence(domain, 'ipfs redirect_url', records[oldRecord]);
   }
 
   /**
@@ -316,13 +320,13 @@ export default class Resolution {
     );
     domain = this.prepareDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
+    const recordKey = `crypto.${currencyTicker.toUpperCase()}.address`;
     try {
-      const addr = await method.record(
+      const addr = await method.records(
         domain,
-        `crypto.${currencyTicker.toUpperCase()}.address`,
+        [recordKey],
       );
-      console.log(`${currencyTicker} => ${addr}`);
-      return addr;
+      return ensureRecordPresence(domain, recordKey, addr[recordKey]);
     } catch (error) {
       // re-throw an error for back compatability. old method throws deprecated UnspecifiedCurrency code since before v1.7.0
       if (
@@ -364,9 +368,13 @@ export default class Resolution {
    * @returns A record value promise for a given record name
    */
   async record(domain: string, recordKey: string): Promise<string> {
+    const value = (await this.records(domain, [recordKey]))[recordKey];
+    return ensureRecordPresence(domain, recordKey, value);
+  }
+
+  async records(domain: string, recordKeys: string[]): Promise<Record<string, string>> {
     domain = this.prepareDomain(domain);
-    const method = this.getNamingMethodOrThrow(domain);
-    return await method.record(domain, recordKey);
+    return await this.getNamingMethodOrThrow(domain).records(domain, recordKeys);
   }
 
   /**
@@ -380,7 +388,7 @@ export default class Resolution {
     address: string,
     currencyTicker: string,
   ): Promise<string | null> {
-    return (this.findNamingService(NamingServiceName.ENS) as Ens).reverse(
+    return (this.findNamingService(NamingServiceName.ENS) as unknown as Ens).reverse(
       address,
       currencyTicker,
     );

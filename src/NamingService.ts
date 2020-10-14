@@ -1,4 +1,3 @@
-import BN from 'bn.js';
 import {
   ResolutionMethod,
   Provider,
@@ -23,7 +22,7 @@ export default abstract class NamingService extends BaseConnection {
   abstract isSupportedDomain(domain: string): boolean;
   abstract isSupportedNetwork(): boolean;
   abstract owner(domain: string): Promise<string | null>;
-  abstract record(domain: string, key: string): Promise<string>;
+  abstract records(domain: string, key: string[]): Promise<Record<string, string>>;
   abstract resolve(domain: string): Promise<ResolutionResponse | null>;
   abstract resolver(domain: string): Promise<string>;
   abstract twitter(domain: string): Promise<string>;
@@ -74,7 +73,6 @@ export default abstract class NamingService extends BaseConnection {
         domain,
       });
     }
-    
   }
 
   protected async ignoreResolutionErrors<T>(
@@ -89,27 +87,11 @@ export default abstract class NamingService extends BaseConnection {
       } else {
         throw error;
       }
-      
     }
   }
 
   protected isResolutionError(error: any, code?: ResolutionErrorCode): boolean {
     return error instanceof ResolutionError && (!code || error.code === code);
-  }
-
-  protected ensureRecordPresence(
-    domain: string,
-    key: string,
-    value: string | undefined | null,
-  ): string {
-    if (value) {
-      return value;
-    }
-    
-    throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-      recordName: key,
-      domain: domain,
-    });
   }
 
   protected ensureConfigured(source: SourceDefinition): void {
@@ -124,6 +106,5 @@ export default abstract class NamingService extends BaseConnection {
         method: this.name,
       });
     }
-    
   }
 }

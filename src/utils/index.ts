@@ -1,3 +1,5 @@
+import { ResolutionError, ResolutionErrorCode } from "../errors/resolutionError";
+
 /**
  * Parses object in format { "key.key2.key3" : value } into { key: { key2: {key3: value } } }
  * @param object object to parse
@@ -54,4 +56,19 @@ export function hexToBytes(hexString: string): number[] {
   }
   
   return bytes;
+}
+
+export function ensureRecordPresence(
+  domain: string,
+  key: string,
+  value: string | undefined | null,
+): string {
+  if (value) {
+    return value;
+  }
+  
+  throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+    recordName: key,
+    domain: domain,
+  });
 }

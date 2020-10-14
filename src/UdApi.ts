@@ -14,6 +14,8 @@ import Cns from './Cns';
 import pckg from './package.json';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 import standardKeys from './utils/standardKeys';
+import { stringify } from 'querystring';
+import { ensureRecordPresence } from './utils';
 
 export default class Udapi extends NamingService {
   private headers: {
@@ -69,9 +71,11 @@ export default class Udapi extends NamingService {
     return owner.startsWith('zil1') ? owner : toBech32Address(owner);
   }
 
-  async record(domain: string, key: string): Promise<string> {
-    const value = (await this.allRecords(domain))[key];
-    return this.ensureRecordPresence(domain, key, value);
+  async records(domain: string, keys: string[]): Promise<Record<string, string>> {
+    const allRecords = await this.allRecords(domain);
+    const neededRecords: Record<string, string> = {};
+    keys.forEach(key => neededRecords[key] = allRecords[key]);
+    return neededRecords;
   }
 
   async twitter(domain: string): Promise<string> {
@@ -94,12 +98,12 @@ export default class Udapi extends NamingService {
     const validationSignature =
       records[standardKeys.validation_twitter_username];
     const twitterHandle = records[standardKeys.twitter_username];
-    this.ensureRecordPresence(
+    ensureRecordPresence(
       domain,
       'twitter validation username',
       validationSignature,
     );
-    this.ensureRecordPresence(domain, 'twitter handle', twitterHandle);
+    ensureRecordPresence(domain, 'twitter handle', twitterHandle);
     if (
       !(await isValidTwitterSignature({
         tokenId: domainMetaData.meta.namehash,

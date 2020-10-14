@@ -8,13 +8,14 @@ import CnsProxyReader from './cns/CnsProxyReader';
 import CnsRegistryReader from './cns/CnsRegistryReader';
 import Contract from './utils/contract';
 import standardKeys from './utils/standardKeys';
-import { isLegacyResolver } from './utils';
+import { ensureRecordPresence, isLegacyResolver } from './utils';
 import {
   SourceDefinition,
   NamingServiceName,
   ResolutionResponse,
 } from './publicTypes';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
+import { read } from 'fs';
 
 const ReaderMap: ReaderMap = {
   1: '0x7ea9ee21077f84339eda9c80048ec6db678642b1',
@@ -126,7 +127,7 @@ export default class Cns extends EthereumNamingService {
     const { values } = await reader.records(tokenId, records);
     const owner = await this.owner(domain);
     records.forEach((recordName, i) => {
-      return this.ensureRecordPresence(domain, recordName, values && values[i]);
+      return ensureRecordPresence(domain, recordName, values && values[i]);
     });
     const [validationSignature, twitterHandle] = values!;
     if (
@@ -148,16 +149,17 @@ export default class Cns extends EthereumNamingService {
     return twitterHandle;
   }
 
-  async record(domain: string, key: string): Promise<string> {
+  async records(domain: string, keys: string[]): Promise<Record<string, string>> {
     const tokenId = this.namehash(domain);
 
     const reader = await this.getReader();
-    const data = await reader.record(tokenId, key);
+    const data = await reader.records(tokenId, keys);
     await this.verify(domain, data);
 
-    const { values } = data;
-    const value: string | null = values?.length ? values[0] : null;
-    return this.ensureRecordPresence(domain, key, value);
+    if (!data.values) return {};
+    const records: Record<string, string> = {};
+    keys.forEach((key, index) => records[key] = data.values![index])
+    return records;
   }
 
   protected async getResolver(tokenId: string): Promise<string> {

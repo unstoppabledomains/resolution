@@ -40,14 +40,23 @@ export default class Ens extends EthereumNamingService {
     return this.registryAddress != null;
   }
 
-  async record(domain: string, key: string): Promise<string> {
+  async records(domain: string, keys: string[]): Promise<Record<string, string>> {
+    const returnee: Record<string, string> = {};
+    for (const key of keys) {
+      const value = await this.record(domain, key);
+      returnee[key] = value;
+    }
+    return returnee;
+  }
+
+  private async record(domain: string, key: string): Promise<string> {
     if (key.startsWith('crypto.')) {
       const ticker = key.split('.')[1];
       return await this.addr(domain, ticker);
     }
-    if (key === 'ipfs.html.value') {
+    if (key === 'ipfs.html.value' || key === "dweb.ipfs.hash") {
       const hash = await this.getContentHash(domain);
-      return this.ensureRecordPresence(domain, 'IPFS hash', hash);
+      return hash || '';
     }
     const ensRecordName = this.fromUDRecordNameToENS(key);
     return await this.getTextRecord(domain, ensRecordName);
@@ -63,6 +72,7 @@ export default class Ens extends EthereumNamingService {
   private fromUDRecordNameToENS(record: string): string {
     const mapper = {
       'ipfs.redirect_domain.value': 'url',
+      'browser.redirect_url': 'url',
       'whois.email.value': 'email',
       'gundb.username.value': 'gundb_username',
       'gundb.public_key.value': 'gundb_public_key',
@@ -168,8 +178,7 @@ export default class Ens extends EthereumNamingService {
   private async getTextRecord(domain, key) {
     const nodeHash = this.namehash(domain);
     const resolver = await this.getResolverContract(domain);
-    const record = await this.callMethod(resolver, 'text', [nodeHash, key]);
-    return this.ensureRecordPresence(domain, key, record);
+    return await this.callMethod(resolver, 'text', [nodeHash, key]);
   }
 
   private async getResolverContract(

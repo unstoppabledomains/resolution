@@ -4,7 +4,7 @@ import {
   toBech32Address,
   toChecksumAddress,
 } from './zns/utils';
-import { invert, set } from './utils';
+import { ensureRecordPresence, invert, set } from './utils';
 import { Dictionary, ZnsResolution, isNullAddress, nodeHash } from './types';
 import {
   NamingServiceName,
@@ -73,8 +73,11 @@ export default class Zns extends NamingService {
     return data ? data.meta.owner : null;
   }
 
-  async record(domain: string, field: string) {
-    return await this.getRecordOrThrow(domain, field);
+  async records(domain: string, keys: string[]): Promise<Record<string, string>> {
+    const allRecords = await this.allRecords(domain);
+    const neededRecords: Record<string, string> = {};
+    keys.forEach(key => neededRecords[key] = allRecords[key]);
+    return neededRecords;
   }
 
   async allRecords(domain: string): Promise<Record<string, string>> {
@@ -162,7 +165,7 @@ export default class Zns extends NamingService {
     field: string,
   ): Promise<string> {
     const records = await this.allRecords(domain);
-    return this.ensureRecordPresence(domain, field, records[field]);
+    return ensureRecordPresence(domain, field, records[field]);
   }
 
   private async getRecordsAddresses(
