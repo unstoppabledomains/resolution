@@ -87,7 +87,6 @@ async function expectError(
       
     });
   }
-  
 
   return callback.then(
     () => fail(`Expected ${klass.name} to be thrown but wasn't`),
