@@ -435,7 +435,7 @@ describe('ENS', () => {
     it('passes without any errors', async () => {
       const eyes = mockAsyncMethods(resolution.ens, {
         getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
-        getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+        getResolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
         getTTL: 0,
         callMethod: '0x714ef33943d925731FBB89C99aF5780D888bD106',
       });
