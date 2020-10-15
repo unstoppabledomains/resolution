@@ -122,10 +122,7 @@ export default class Ens extends EthereumNamingService {
     if (isNullAddress(owner)) {
       owner = null;
     }
-    const address = await this.ignoreResolutionErrors(
-      [ResolutionErrorCode.RecordNotFound],
-      this.fetchAddress(resolver, domain, EthCoinIndex),
-    );
+    const address = await this.fetchAddress(resolver, domain, EthCoinIndex);
     const resolution = {
       meta: {
         namehash: this.namehash(domain),
@@ -191,10 +188,7 @@ export default class Ens extends EthereumNamingService {
   }
 
   private async getTTL(nodeHash) {
-    return await this.ignoreResolutionErrors(
-      [ResolutionErrorCode.RecordNotFound],
-      this.callMethod(this.registryContract, 'ttl', [nodeHash]),
-    );
+    return await this.callMethod(this.registryContract, 'ttl', [nodeHash]);
   }
 
   /**
