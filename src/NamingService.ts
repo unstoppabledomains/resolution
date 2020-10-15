@@ -132,4 +132,17 @@ export default abstract class NamingService extends BaseConnection {
     }
 
   }
+
+  protected constructRecords(
+    keys: string[],
+    values: undefined | (string | undefined)[] | DomainRecords,
+  ): DomainRecords {
+    values = values || [];
+    const records: DomainRecords = {};
+    keys.forEach((key, index) => {
+      records[key] = values instanceof Array ? values[index] : values![key];
+    });
+    return records;
+  }
+
 }

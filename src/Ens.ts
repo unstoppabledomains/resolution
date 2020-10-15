@@ -52,10 +52,7 @@ export default class Ens extends EthereumNamingService {
       const ensRecordName = this.fromUDRecordNameToENS(key);
       return await this.getTextRecord(domain, ensRecordName);
     }));
-    return keys.reduce(
-      (r, k, i) => ({...r, [k]: values[i] || undefined}),
-      {} as DomainRecords
-    );
+    return this.constructRecords(keys, values);
   }
 
   async twitter(domain: string): Promise<string> {

@@ -75,11 +75,8 @@ export default class Zns extends NamingService {
   }
 
   async records(domain: string, keys: string[]): Promise<DomainRecords> {
-    const allRecords = await this.allRecords(domain)
-    return keys.reduce(
-      (r, k) => ({...r, [k]: allRecords[k] || undefined}),
-      {} as DomainRecords,
-    );
+    const records = await this.allRecords(domain)
+    return this.constructRecords(keys, records)
   }
 
   async allRecords(domain: string): Promise<Record<string, string>> {

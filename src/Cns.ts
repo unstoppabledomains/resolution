@@ -156,10 +156,7 @@ export default class Cns extends EthereumNamingService {
     const data = await reader.records(tokenId, keys);
     await this.verify(domain, data);
 
-    return keys.reduce(
-      (r, k, i) => ({...r, [k]: data.values?.[i] || undefined}),
-      {} as DomainRecords
-    );
+    return this.constructRecords(keys, data.values);
   }
 
   protected async getResolver(tokenId: string): Promise<string> {
@@ -186,19 +183,6 @@ export default class Cns extends EthereumNamingService {
     throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
       domain,
     });
-  }
-
-  private constructRecords(
-    keys: string[],
-    values: string[],
-  ): Record<string, string> {
-    const records: Record<string, string> = {};
-    keys.forEach((key, index) => {
-      if (!!values[index]) {
-        records[key] = values[index];
-      }
-    });
-    return records;
   }
 
   private async getStandardRecords(

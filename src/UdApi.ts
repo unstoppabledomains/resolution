@@ -53,10 +53,7 @@ export default class Udapi extends NamingService {
 
   async records(domain: string, keys: string[]): Promise<DomainRecords> {
     const records = await this.allRecords(domain);
-    return keys.reduce(
-      (r, k) => ({...r, [k]: records[k] || undefined}),
-      {} as DomainRecords,
-    );
+    return this.constructRecords(keys, records)
   }
 
   async twitter(domain: string): Promise<string> {
