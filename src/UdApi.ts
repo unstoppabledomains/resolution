@@ -43,25 +43,6 @@ export default class Udapi extends NamingService {
     return this.findMethodOrThrow(domain).namehash(domain);
   }
 
-  async addr(domain: string, currencyTicker: string): Promise<string> {
-    const data = await this.resolve(domain);
-    if (isNullAddress(data.meta.owner)) {
-      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-        domain,
-      });
-    }
-
-    const address = data.addresses[currencyTicker.toUpperCase()];
-    if (!address) {
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-        domain,
-        currencyTicker,
-      });
-    }
-
-    return address;
-  }
-
   async owner(domain: string): Promise<string | null> {
     const { owner } = (await this.resolve(domain)).meta;
     if (!owner) {
