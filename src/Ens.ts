@@ -105,7 +105,7 @@ export default class Ens extends EthereumNamingService {
   private async addr(domain: string, currencyTicker: string): Promise<string | undefined> {
     const resolver = await this.resolver(domain);
     const cointType = this.getCoinType(currencyTicker.toUpperCase());
-    return await this.fetchAddressOrThrow(resolver, domain, cointType);
+    return await this.fetchAddress(resolver, domain, cointType);
   }
 
   async owner(domain: string): Promise<string | null> {
@@ -238,7 +238,7 @@ export default class Ens extends EthereumNamingService {
     return constants[coinType][1];
   }
 
-  private async fetchAddressOrThrow(
+  private async fetchAddress(
     resolver: string,
     domain: string,
     coinType: string,
@@ -257,20 +257,5 @@ export default class Ens extends EthereumNamingService {
     }
     const data = Buffer.from(addr.replace('0x', ''), 'hex');
     return formatsByCoinType[coinType].encoder(data);
-  }
-
-  private async fetchAddress(
-    resolver: string,
-    domain: string,
-    coin: string,
-  ): Promise<string | null> {
-    return (
-      (await this.ignoreResolutionErrors(
-        [
-          ResolutionErrorCode.UnspecifiedResolver,
-        ],
-        this.fetchAddressOrThrow(resolver, domain, coin),
-      )) || null
-    );
   }
 }
