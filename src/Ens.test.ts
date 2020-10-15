@@ -446,7 +446,7 @@ describe('ENS', () => {
         meta: {
           namehash:
             '0x2b53e3f567989ee41b897998d89eb4d8cf0715fb2cfb41a64939a532c09e495e',
-          resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+          resolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
           owner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
           type: 'ENS',
           ttl: 0,
