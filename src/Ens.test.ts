@@ -451,6 +451,7 @@ describe('ENS', () => {
           type: 'ENS',
           ttl: 0,
         },
+        records: {},
       });
     });
 
@@ -476,6 +477,7 @@ describe('ENS', () => {
           type: 'ENS',
           ttl: 0,
         },
+        records: {},
       });
     });
 

@@ -13,6 +13,7 @@ import {
   SourceDefinition,
   NamingServiceName,
   ResolutionResponse,
+  DomainRecords,
 } from './publicTypes';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 
@@ -38,7 +39,7 @@ export default class Cns extends EthereumNamingService {
         ? new CnsProxyReader(this.contract)
         : new CnsRegistryReader(this.contract);
     }
-    
+
     return this.reader;
   }
 
@@ -50,7 +51,7 @@ export default class Cns extends EthereumNamingService {
     if (ReaderMap[this.network] === this.contract.address) {
       return true;
     }
-    
+
 
     try {
       const [
@@ -59,7 +60,7 @@ export default class Cns extends EthereumNamingService {
       if (!isDataReaderSupported) {
         throw new Error('Not supported DataReader');
       }
-      
+
 
       return true;
     } catch {}
@@ -99,7 +100,7 @@ export default class Cns extends EthereumNamingService {
       if (error.reason === 'ERC721: owner query for nonexistent token') {
         return NullAddress;
       }
-      
+
       throw error;
     }
   }
@@ -112,7 +113,7 @@ export default class Cns extends EthereumNamingService {
     if (isLegacyResolver(resolver)) {
       return await this.getStandardRecords(resolverContract, tokenId);
     }
-    
+
     return await this.getAllRecords(resolverContract, tokenId);
   }
 
@@ -144,20 +145,21 @@ export default class Cns extends EthereumNamingService {
         },
       );
     }
-    
+
     return twitterHandle;
   }
 
-  async record(domain: string, key: string): Promise<string> {
+  async records(domain: string, keys: string[]): Promise<DomainRecords> {
     const tokenId = this.namehash(domain);
 
     const reader = await this.getReader();
-    const data = await reader.record(tokenId, key);
+    const data = await reader.records(tokenId, keys);
     await this.verify(domain, data);
 
-    const { values } = data;
-    const value: string | null = values?.length ? values[0] : null;
-    return this.ensureRecordPresence(domain, key, value);
+    return keys.reduce(
+      (r, k, i) => ({...r, [k]: data.values?.[i] || undefined}),
+      {} as DomainRecords
+    );
   }
 
   protected async getResolver(tokenId: string): Promise<string> {
@@ -171,7 +173,7 @@ export default class Cns extends EthereumNamingService {
     if (!isNullAddress(resolver)) {
       return;
     }
-    
+
 
     const owner = data.owner || (await this.owner(domain));
     if (isNullAddress(owner)) {
@@ -179,7 +181,7 @@ export default class Cns extends EthereumNamingService {
         domain,
       });
     }
-    
+
 
     throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
       domain,

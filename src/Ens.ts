@@ -11,7 +11,7 @@ import {
 import Contract from './utils/contract';
 import contentHash from 'content-hash';
 import EnsNetworkMap from 'ethereum-ens-network-map';
-import { SourceDefinition, ResolutionResponse } from './publicTypes';
+import { SourceDefinition, ResolutionResponse, DomainRecords } from './publicTypes';
 
 export default class Ens extends EthereumNamingService {
   readonly name = NamingServiceName.ENS;
@@ -24,7 +24,7 @@ export default class Ens extends EthereumNamingService {
         this.registryAddress,
       );
     }
-    
+
   }
 
   isSupportedDomain(domain: string): boolean {
@@ -40,17 +40,22 @@ export default class Ens extends EthereumNamingService {
     return this.registryAddress != null;
   }
 
-  async record(domain: string, key: string): Promise<string> {
-    if (key.startsWith('crypto.')) {
-      const ticker = key.split('.')[1];
-      return await this.addr(domain, ticker);
-    }
-    if (key === 'ipfs.html.value') {
-      const hash = await this.getContentHash(domain);
-      return this.ensureRecordPresence(domain, 'IPFS hash', hash);
-    }
-    const ensRecordName = this.fromUDRecordNameToENS(key);
-    return await this.getTextRecord(domain, ensRecordName);
+  async records(domain: string, keys: string[]): Promise<DomainRecords> {
+    const values = await Promise.all(keys.map(async key => {
+      if (key.startsWith('crypto.')) {
+        const ticker = key.split('.')[1];
+        return await this.addr(domain, ticker);
+      }
+      if (key === 'ipfs.html.value') {
+        return await this.getContentHash(domain);
+      }
+      const ensRecordName = this.fromUDRecordNameToENS(key);
+      return await this.getTextRecord(domain, ensRecordName);
+    }));
+    return keys.reduce(
+      (r, k, i) => ({...r, [k]: values[i] || undefined}),
+      {} as DomainRecords
+    );
   }
 
   async twitter(domain: string): Promise<string> {
@@ -77,18 +82,18 @@ export default class Ens extends EthereumNamingService {
     if (currencyTicker != 'ETH') {
       throw new Error(`Ens doesn't support any currency other than ETH`);
     }
-    
+
     if (address.startsWith('0x')) {
       address = address.substr(2);
     }
-    
+
     const reverseAddress = address + '.addr.reverse';
     const nodeHash = this.namehash(reverseAddress);
     const resolverAddress = await this.getResolver(nodeHash);
     if (isNullAddress(resolverAddress)) {
       return null;
     }
-    
+
     const resolverContract = this.buildContract(
       resolverInterface(resolverAddress, EthCoinIndex),
       resolverAddress,
@@ -105,19 +110,14 @@ export default class Ens extends EthereumNamingService {
 
   async owner(domain: string): Promise<string | null> {
     const nodeHash = this.namehash(domain);
-    return (
-      (await this.ignoreResolutionErrors(
-        [ResolutionErrorCode.RecordNotFound],
-        this.getOwner(nodeHash),
-      )) || null
-    );
+    return await this.getOwner(nodeHash)
   }
 
   async resolve(domain: string): Promise<ResolutionResponse | null> {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork()) {
       return null;
     }
-    
+
     let [owner, ttl, resolver] = await this.getResolutionInfo(domain);
     if (isNullAddress(owner)) {
       owner = null;
@@ -135,6 +135,7 @@ export default class Ens extends EthereumNamingService {
         ttl: Number(ttl || 0),
       },
       addresses: {},
+      records: {},
     };
     if (address) {
       resolution.addresses = { ETH: address };
@@ -165,11 +166,10 @@ export default class Ens extends EthereumNamingService {
     return contentHash.decode(contentHashEncoded);
   }
 
-  private async getTextRecord(domain, key) {
+  private async getTextRecord(domain, key): Promise<string | undefined> {
     const nodeHash = this.namehash(domain);
     const resolver = await this.getResolverContract(domain);
-    const record = await this.callMethod(resolver, 'text', [nodeHash, key]);
-    return this.ensureRecordPresence(domain, key, record);
+    return await this.callMethod(resolver, 'text', [nodeHash, key]);
   }
 
   private async getResolverContract(
@@ -201,10 +201,7 @@ export default class Ens extends EthereumNamingService {
    * This was done to make automated tests more configurable
    */
   protected async getResolver(nodeHash) {
-    return await this.ignoreResolutionErrors(
-      [ResolutionErrorCode.RecordNotFound],
-      this.callMethod(this.registryContract, 'resolver', [nodeHash]),
-    );
+    return await this.callMethod(this.registryContract, 'resolver', [nodeHash]);
   }
 
   /**
@@ -238,7 +235,7 @@ export default class Ens extends EthereumNamingService {
         currencyTicker,
       });
     }
-    
+
     return coin.toString();
   }
 

@@ -13,6 +13,7 @@ import ConfigurationError, {
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import FetchProvider from './FetchProvider';
 import { nodeHash } from './types';
+import { DomainRecords } from './publicTypes';
 
 export default abstract class NamingService extends BaseConnection {
   readonly name: ResolutionMethod;
@@ -23,7 +24,7 @@ export default abstract class NamingService extends BaseConnection {
   abstract isSupportedDomain(domain: string): boolean;
   abstract isSupportedNetwork(): boolean;
   abstract owner(domain: string): Promise<string | null>;
-  abstract record(domain: string, key: string): Promise<string>;
+  abstract records(domain: string, keys: string[]): Promise<DomainRecords>;
   abstract resolve(domain: string): Promise<ResolutionResponse | null>;
   abstract resolver(domain: string): Promise<string>;
   abstract twitter(domain: string): Promise<string>;
@@ -64,6 +65,11 @@ export default abstract class NamingService extends BaseConnection {
       );
   }
 
+  async record(domain: string, key: string): Promise<string> {
+    const records = await this.records(domain, [key]);
+    return this.ensureRecordPresence(domain, key, records[key]);
+  }
+
   protected abstract normalizeSource(
     source: SourceDefinition | undefined,
   ): SourceDefinition;
@@ -74,7 +80,7 @@ export default abstract class NamingService extends BaseConnection {
         domain,
       });
     }
-    
+
   }
 
   protected async ignoreResolutionErrors<T>(
@@ -89,7 +95,7 @@ export default abstract class NamingService extends BaseConnection {
       } else {
         throw error;
       }
-      
+
     }
   }
 
@@ -105,7 +111,7 @@ export default abstract class NamingService extends BaseConnection {
     if (value) {
       return value;
     }
-    
+
     throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
       recordName: key,
       domain: domain,
@@ -118,12 +124,12 @@ export default abstract class NamingService extends BaseConnection {
         method: this.name,
       });
     }
-    
+
     if (!source.url && !source.provider) {
       throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedUrl, {
         method: this.name,
       });
     }
-    
+
   }
 }
