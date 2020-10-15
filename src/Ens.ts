@@ -102,7 +102,7 @@ export default class Ens extends EthereumNamingService {
     return await this.resolverCallToName(resolverContract, nodeHash);
   }
 
-  private async addr(domain: string, currencyTicker: string): Promise<string> {
+  private async addr(domain: string, currencyTicker: string): Promise<string | undefined> {
     const resolver = await this.resolver(domain);
     const cointType = this.getCoinType(currencyTicker.toUpperCase());
     return await this.fetchAddressOrThrow(resolver, domain, cointType);
@@ -242,7 +242,7 @@ export default class Ens extends EthereumNamingService {
     resolver: string,
     domain: string,
     coinType: string,
-  ): Promise<string> {
+  ): Promise<string | undefined> {
     if (isNullAddress(resolver)) {
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
         domain: domain,
@@ -259,10 +259,7 @@ export default class Ens extends EthereumNamingService {
         ? await this.callMethod(resolverContract, 'addr', [nodeHash, coinType])
         : await this.callMethod(resolverContract, 'addr', [nodeHash]);
     if (isNullAddress(addr)) {
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-        domain: domain,
-        recordName: this.getCoinName(parseInt(coinType)),
-      });
+      return undefined;
     }
     const data = Buffer.from(addr.replace('0x', ''), 'hex');
     return formatsByCoinType[coinType].encoder(data);
@@ -276,7 +273,6 @@ export default class Ens extends EthereumNamingService {
     return (
       (await this.ignoreResolutionErrors(
         [
-          ResolutionErrorCode.RecordNotFound,
           ResolutionErrorCode.UnspecifiedResolver,
         ],
         this.fetchAddressOrThrow(resolver, domain, coin),
