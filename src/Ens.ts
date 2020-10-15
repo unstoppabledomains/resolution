@@ -243,12 +243,6 @@ export default class Ens extends EthereumNamingService {
     domain: string,
     coinType: string,
   ): Promise<string | undefined> {
-    if (isNullAddress(resolver)) {
-      throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
-        domain: domain,
-        recordName: this.getCoinName(parseInt(coinType)),
-      });
-    }
     const resolverContract = this.buildContract(
       resolverInterface(resolver, coinType),
       resolver,
