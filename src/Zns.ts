@@ -15,6 +15,7 @@ import {
   UnclaimedDomainResponse,
 } from './index';
 import NamingService from './NamingService';
+import { DomainRecords } from './publicTypes';
 
 const NetworkIdMap = {
   mainnet: 1,
@@ -54,7 +55,7 @@ export default class Zns extends NamingService {
         ([key, v]) => v.address && (addresses[key] = v.address),
       );
     }
-    
+
     return {
       addresses,
       meta: {
@@ -73,8 +74,9 @@ export default class Zns extends NamingService {
     return data ? data.meta.owner : null;
   }
 
-  async record(domain: string, field: string) {
-    return await this.getRecordOrThrow(domain, field);
+  async records(domain: string, keys: string[]): Promise<DomainRecords> {
+    const records = await this.allRecords(domain)
+    return this.constructRecords(keys, records)
   }
 
   async allRecords(domain: string): Promise<Record<string, string>> {
@@ -123,14 +125,14 @@ export default class Zns extends NamingService {
         domain: domain,
       });
     }
-    
+
     const [_, resolverAddress] = recordsAddresses;
     if (isNullAddress(resolverAddress)) {
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
         domain: domain,
       });
     }
-    
+
     return resolverAddress;
   }
 
@@ -147,22 +149,14 @@ export default class Zns extends NamingService {
       source.url =
         typeof source.network === 'number' ? UrlMap[source.network] : undefined;
     }
-    
+
 
     source.registry = source.registry || RegistryMap[source.network!];
     if (source.registry?.startsWith('0x')) {
       source.registry = toBech32Address(source.registry);
     }
-    
-    return source;
-  }
 
-  private async getRecordOrThrow(
-    domain: string,
-    field: string,
-  ): Promise<string> {
-    const records = await this.allRecords(domain);
-    return this.ensureRecordPresence(domain, field, records[field]);
+    return source;
   }
 
   private async getRecordsAddresses(
@@ -171,7 +165,7 @@ export default class Zns extends NamingService {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork()) {
       return undefined;
     }
-    
+
     const registryRecord = await this.getContractMapValue(
       this.registryAddress!,
       'records',
@@ -187,7 +181,7 @@ export default class Zns extends NamingService {
     if (ownerAddress.startsWith('0x')) {
       ownerAddress = toBech32Address(ownerAddress);
     }
-    
+
     return [ownerAddress, resolverAddress];
   }
 
@@ -197,7 +191,7 @@ export default class Zns extends NamingService {
     if (isNullAddress(resolverAddress)) {
       return {};
     }
-    
+
     const resolver = toChecksumAddress(resolverAddress);
     return ((await this.getContractField(resolver, 'records')) ||
       {}) as Dictionary<string>;
@@ -208,7 +202,7 @@ export default class Zns extends NamingService {
     for (const [key, value] of Object.entries(records)) {
       set(result, key, value);
     }
-    
+
     return result;
   }
 

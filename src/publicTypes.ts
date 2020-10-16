@@ -42,7 +42,7 @@ export type ResolutionResponse = {
     resolver: string;
     ttl: number;
   };
-  records?: {
+  records: {
     [key: string]: string;
   };
 };
@@ -86,6 +86,7 @@ export const UnclaimedDomainResponse: ResolutionResponse = {
     type: '',
     ttl: 0,
   },
+  records: {},
 };
 
 /**
@@ -135,3 +136,4 @@ export type NamehashOptions = {
 };
 
 export const NamehashOptionsDefault = {format: 'hex', prefix: true} as const;
+export type DomainRecords = Record<string, string | undefined>;

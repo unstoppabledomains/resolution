@@ -9,10 +9,6 @@ export default class CnsProxyReader implements ICnsReader {
     this.proxyContract = contract;
   }
 
-  record(tokenId: string, key: string): Promise<Data> {
-    return this.get(tokenId, [key]);
-  }
-
   records(tokenId: string, keys: string[]): Promise<Data> {
     return this.get(tokenId, keys);
   }

@@ -14,6 +14,7 @@ import Cns from './Cns';
 import pckg from './package.json';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 import standardKeys from './utils/standardKeys';
+import { DomainRecords } from './publicTypes';
 
 export default class Udapi extends NamingService {
   private headers: {
@@ -42,25 +43,6 @@ export default class Udapi extends NamingService {
     return this.findMethodOrThrow(domain).namehash(domain);
   }
 
-  async addr(domain: string, currencyTicker: string): Promise<string> {
-    const data = await this.resolve(domain);
-    if (isNullAddress(data.meta.owner)) {
-      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-        domain,
-      });
-    }
-
-    const address = data.addresses[currencyTicker.toUpperCase()];
-    if (!address) {
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-        domain,
-        currencyTicker,
-      });
-    }
-
-    return address;
-  }
-
   async owner(domain: string): Promise<string | null> {
     const { owner } = (await this.resolve(domain)).meta;
     if (!owner) {
@@ -69,9 +51,9 @@ export default class Udapi extends NamingService {
     return owner.startsWith('zil1') ? owner : toBech32Address(owner);
   }
 
-  async record(domain: string, key: string): Promise<string> {
-    const value = (await this.allRecords(domain))[key];
-    return this.ensureRecordPresence(domain, key, value);
+  async records(domain: string, keys: string[]): Promise<DomainRecords> {
+    const records = await this.allRecords(domain);
+    return this.constructRecords(keys, records)
   }
 
   async twitter(domain: string): Promise<string> {

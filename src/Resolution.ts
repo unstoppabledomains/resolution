@@ -17,6 +17,7 @@ import {
   SourceDefinition,
   NamehashOptions,
   NamehashOptionsDefault,
+  DomainRecords,
 } from './publicTypes';
 import { nodeHash } from './types';
 import { EthersProvider } from './publicTypes';
@@ -365,6 +366,17 @@ export default class Resolution {
     domain = this.prepareDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
     return await method.record(domain, recordKey);
+  }
+
+  /**
+   * @param domain domain name
+   * @param keys Array of record keys to be resolved
+   * @returns A Promise with key-value mapping of domain records
+   */
+  async records(domain: string, keys: string[]): Promise<DomainRecords> {
+    domain = this.prepareDomain(domain);
+    const method = this.getNamingMethodOrThrow(domain);
+    return await method.records(domain, keys);
   }
 
   /**
