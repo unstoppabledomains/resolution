@@ -18,7 +18,9 @@ import {
   ProviderProtocol,
   caseMock,
   mockAsyncMethod,
-  CryptoDomainWithTwitterVerification,, pendingInLive, CryptoDomainWithIpfsRecords
+  CryptoDomainWithTwitterVerification,
+  pendingInLive,
+  CryptoDomainWithIpfsRecords
 } from './tests/helpers';
 import { RpcProviderTestCases } from './tests/providerMockData';
 import ICnsReader from './cns/ICnsReader';
