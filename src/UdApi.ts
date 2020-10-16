@@ -7,7 +7,6 @@ import {
   SourceDefinition,
 } from './index';
 import NamingService from './NamingService';
-import { isNullAddress } from './types';
 import Zns from './Zns';
 import Ens from './Ens';
 import Cns from './Cns';
@@ -122,7 +121,7 @@ export default class Udapi extends NamingService {
     }
   }
 
-  childhash(parent: string, label: string): never {
+  childhash(...args: never): never {
     throw new Error('Unsupported method whe using UD Resolution API');
   }
 
@@ -133,7 +132,7 @@ export default class Udapi extends NamingService {
     throw new Error('Method not implemented.');
   }
 
-  protected normalizeSource(source): SourceDefinition {
+  protected normalizeSource(source: SourceDefinition): SourceDefinition {
     return { network: 1, ...source };
   }
 
