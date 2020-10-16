@@ -66,7 +66,7 @@ export default abstract class NamingService extends BaseConnection {
 
   async record(domain: string, key: string): Promise<string> {
     const records = await this.records(domain, [key]);
-    return this.ensureRecordPresence(domain, key, records[key]);
+    return NamingService.ensureRecordPresence(domain, key, records[key]);
   }
 
   protected abstract normalizeSource(
@@ -102,7 +102,7 @@ export default abstract class NamingService extends BaseConnection {
     return error instanceof ResolutionError && (!code || error.code === code);
   }
 
-  protected ensureRecordPresence(
+  public static ensureRecordPresence(
     domain: string,
     key: string,
     value: string | undefined | null,
