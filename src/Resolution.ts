@@ -369,8 +369,8 @@ export default class Resolution {
   }
 
   /**
-   * @param domain - domain name
-   * @param recordKey - a name of a record to be resolved
+   * @param domain domain name
+   * @param keys Array of record keys to be resolved
    * @returns A Promise with key-value mapping of domain records
    */
   async records(domain: string, keys: string[]): Promise<DomainRecords> {
