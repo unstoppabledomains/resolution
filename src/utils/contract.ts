@@ -9,7 +9,7 @@ export default class Contract {
   readonly provider: Provider;
 
   constructor(
-    abi,
+    abi: JsonFragment[],
     address: string,
     provider: Provider,
   ) {
@@ -25,12 +25,12 @@ export default class Contract {
     if (!response || response === '0x') {
       return [];
     }
-    
+
 
     return this.coder.decodeFunctionResult(method, response);
   }
 
-  async fetchLogs(eventName: string, tokenId: string, fromBlock: string = 'earliest'): Promise<EventData[]> {
+  async fetchLogs(eventName: string, tokenId: string, fromBlock = 'earliest'): Promise<EventData[]> {
     const topic = this.coder.getEventTopic(eventName);
     const params = [
       {

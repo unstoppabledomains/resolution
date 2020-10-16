@@ -1,4 +1,3 @@
-import { resolve } from "dns";
 import Contract from "./contract";
 /**
  * Parses object in format { "key.key2.key3" : value } into { key: { key2: {key3: value } } }
@@ -6,10 +5,10 @@ import Contract from "./contract";
  * @param key string to split
  * @param value value to make it equal to
  */
-export function set(object, key, value) {
+export function set<T>(object: T, key: string, value: any): T {
   let current = object;
   const tokens = key.split('.');
-  const last = tokens.pop();
+  const last = tokens.pop()!;
   tokens.forEach(token => {
     current[token] = typeof current[token] == 'object' ? current[token] : {};
     current = current[token];
@@ -22,7 +21,7 @@ export function set(object, key, value) {
  * Should invert the object (keys becomes values and values becomes keys)
  * @param object
  */
-export function invert(object) {
+export function invert(object: Record<string, string | number>): Record<string, string> {
 
   const returnee = {};
 
@@ -38,7 +37,7 @@ export function invert(object) {
 
 export function signedInfuraLink(
   infura: string,
-  network: string = 'mainnet',
+  network = 'mainnet',
 ): string {
   return `https://${network}.infura.com/v3/${infura}`;
 }

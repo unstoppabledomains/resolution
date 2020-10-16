@@ -3,6 +3,7 @@ import { default as newResolver } from './newResolver';
 import { default as oldResolver } from './oldResolver';
 import { EthCoinIndex } from '../../types';
 import { NamingServiceName } from '../../publicTypes';
+import { JsonFragment } from '@ethersproject/abi';
 
 export const OldResolverAddresses = [
   '0x5ffc014343cd971b7eb70732021e26c35b744cc4',
@@ -11,7 +12,7 @@ export const OldResolverAddresses = [
 ];
 
 
-export default (addr: string, coinType?: string) => {
+export default (addr: string, coinType?: string): JsonFragment[] => {
   if (coinType === undefined || coinType === EthCoinIndex) {
     // Old interface is only compatible to output the ETH address
     // New interface is compatible to that API

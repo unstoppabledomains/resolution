@@ -1,7 +1,7 @@
-import nodeFetch from 'node-fetch';
+import nodeFetch, {Response as FetchResponse} from 'node-fetch';
 
 export default abstract class BaseConnection {
-  protected isNode = () => {
+  protected isNode(): boolean {
     if (typeof process === 'object') {
       // eslint-disable-next-line no-undef
       if (typeof process.versions === 'object') {
@@ -15,9 +15,9 @@ export default abstract class BaseConnection {
 
 
     return false;
-  };
+  }
 
-  protected async fetch(url, options) {
+  protected async fetch(url: string, options: {body?: string, headers?: Record<string, string>, method?: string}): Promise<FetchResponse | Response> {
     return this.isNode() ? nodeFetch(url, options) : window.fetch(url, options);
   }
 }

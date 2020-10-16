@@ -100,7 +100,7 @@ export default class Resolution {
    * @param infura infura project id
    * @param network ethereum network name
    */
-  static infura(infura: string, network: string = 'mainnet'): Resolution {
+  static infura(infura: string, network = 'mainnet'): Resolution {
     return new this({
       blockchain: {
         ens: { url: signedInfuraLink(infura, network), network },

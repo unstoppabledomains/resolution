@@ -188,7 +188,7 @@ export default class Ens extends EthereumNamingService {
   /**
    * This was done to make automated tests more configurable
    */
-  protected async getResolver(nodeHash) {
+  protected async getResolver(nodeHash: string): Promise<string> {
     return await this.callMethod(this.registryContract, 'resolver', [nodeHash]);
   }
 
@@ -212,6 +212,7 @@ export default class Ens extends EthereumNamingService {
   }
 
   protected getCoinType(currencyTicker: string): string {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const constants: Bip44Constants[] = require('bip44-constants');
     const coin = constants.findIndex(
       item =>
@@ -225,11 +226,6 @@ export default class Ens extends EthereumNamingService {
     }
 
     return coin.toString();
-  }
-
-  protected getCoinName(coinType: number): string {
-    const constants: Bip44Constants[] = require('bip44-constants');
-    return constants[coinType][1];
   }
 
   private async fetchAddress(

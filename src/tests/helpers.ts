@@ -16,13 +16,14 @@ export const CryptoDomainWithAdaBchAddresses = 'reseller-test-mago0.crypto';
 export const CryptoDomainWithTwitterVerification = 'ijustwannatestsomething2.crypto';
 
 try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const dotenv = require('dotenv');
   dotenv.config();
 } catch (err) {
   console.warn('dotenv is not installed');
 }
 
-export function mockAsyncMethod(object: any, method: string, value): jest.SpyInstance {
+export function mockAsyncMethod(object: any, method: string, value: any): jest.SpyInstance {
   const spy = jest.spyOn(object, method);
   if (!isLive()) {
     if (value instanceof Function) {

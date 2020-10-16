@@ -30,11 +30,8 @@ beforeEach(() => {
 describe('Resolution', () => {
   it('should get a valid resolution instance', async () => {
     const resolution = Resolution.infura('api-key');
-    expect(resolution.ens).toBeDefined();
-    expect(resolution.ens!.url).toBe(`https://mainnet.infura.com/v3/api-key`);
-
-    expect(resolution.cns).toBeDefined();
-    expect(resolution.cns!.url).toBe(`https://mainnet.infura.com/v3/api-key`);
+    expect(resolution.ens?.url).toBe(`https://mainnet.infura.com/v3/api-key`);
+    expect(resolution.cns?.url).toBe(`https://mainnet.infura.com/v3/api-key`);
   });
 
   it('checks Resolution#addr error #1', async () => {
@@ -178,7 +175,7 @@ describe('Resolution', () => {
         },
       },
     });
-    const reader = await resolution.cns!.getReader();
+    const reader = await resolution.cns?.getReader();
     const eyes = mockAsyncMethods(reader, {
       records: {
         resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
@@ -201,7 +198,7 @@ describe('Resolution', () => {
         },
       },
     });
-    const reader = await resolution.cns!.getReader();
+    const reader = await resolution.cns?.getReader();
     const eyes = mockAsyncMethods(reader, {
       records: {
         resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
@@ -282,7 +279,7 @@ describe('Resolution', () => {
   describe('twitter', () => {
     it('should return verified twitter handle', async () => {
       const resolution = new Resolution();
-      const reader = await resolution.cns!.getReader();
+      const reader = await resolution.cns?.getReader();
       const spies = mockAsyncMethods(reader, {
         records: {
           resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
@@ -357,7 +354,7 @@ describe('Resolution', () => {
         provider,
         'send',
         (payload: JsonRpcPayload, callback) => {
-          const result = caseMock(payload.params![0], RpcProviderTestCases);
+          const result = caseMock(payload.params?.[0], RpcProviderTestCases);
           callback &&
             callback(null, {
               jsonrpc: '2.0',
@@ -381,7 +378,7 @@ describe('Resolution', () => {
         protocolLink(ProviderProtocol.wss),
       ) as Web3WsProvider.WebsocketProvider;
       const eye = mockAsyncMethod(provider, 'send', (payload, callback) => {
-        const result = caseMock(payload.params![0], RpcProviderTestCases);
+        const result = caseMock(payload.params?.[0], RpcProviderTestCases);
         callback(null, {
           jsonrpc: '2.0',
           id: 1,
@@ -434,7 +431,7 @@ describe('Resolution', () => {
         provider,
         'sendAsync',
         (payload: JsonRpcPayload, callback: any) => {
-          const result = caseMock(payload.params![0], RpcProviderTestCases);
+          const result = caseMock(payload.params?.[0], RpcProviderTestCases);
           callback(undefined, {
             jsonrpc: '2.0',
             id: 1,

@@ -29,7 +29,7 @@ export default class Cns extends EthereumNamingService {
 
   constructor(source: SourceDefinition = {}) {
     super(source, NamingServiceName.CNS);
-    this.contract = this.buildContract(proxyReaderAbi, this.registryAddress);
+    this.contract = this.buildContract(proxyReaderAbi, this.registryAddress!);
   }
 
   async getReader(): Promise<ICnsReader> {
@@ -164,7 +164,7 @@ export default class Cns extends EthereumNamingService {
     ]);
   }
 
-  protected async verify(domain: string, data: Data) {
+  protected async verify(domain: string, data: Data): Promise<void> {
     const { resolver } = data;
     if (!isNullAddress(resolver)) {
       return;

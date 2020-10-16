@@ -29,7 +29,7 @@ const toChecksum = (address: string) => {
   return checksumAddress;
 };
 
-export const hashMessage = (message: string) => {
+export const hashMessage = (message: string): string => {
   const messageBytes = hexToBytes(Buffer.from(message, 'utf8').toString('hex'));
   const messageBuffer = Buffer.from(messageBytes);
   const preamble = '\x19Ethereum Signed Message:\n' + messageBytes.length;
@@ -38,7 +38,7 @@ export const hashMessage = (message: string) => {
   return '0x' + sha3(ethMessage.toString());
 };
 
-export const recover = (message: string, signature: string) => {
+export const recover = (message: string, signature: string): string => {
   const hash = hashMessage(message);
   const vals = decodeSignature(signature);
   const vrs = {

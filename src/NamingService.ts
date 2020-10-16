@@ -1,4 +1,3 @@
-import BN from 'bn.js';
 import {
   ResolutionMethod,
   Provider,
@@ -40,7 +39,7 @@ export default abstract class NamingService extends BaseConnection {
     source = this.normalizeSource(source);
     this.ensureConfigured(source);
     this.url = source.url;
-    this.provider = source.provider || new FetchProvider(this.name, this.url!);
+    this.provider = source.provider || new FetchProvider(this.name, this.url || '');
     this.network = source.network as number;
     this.registryAddress = source.registry;
   }
@@ -137,10 +136,9 @@ export default abstract class NamingService extends BaseConnection {
     keys: string[],
     values: undefined | (string | undefined)[] | CryptoRecords,
   ): CryptoRecords {
-    values = values || [];
     const records: CryptoRecords = {};
     keys.forEach((key, index) => {
-      records[key] = values instanceof Array ? values[index] : values![key];
+      records[key] = values instanceof Array ? values[index] : values?.[key];
     });
     return records;
   }

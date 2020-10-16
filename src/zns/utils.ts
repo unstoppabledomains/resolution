@@ -45,7 +45,7 @@ function convertBits(
   data: Buffer,
   fromWidth: number,
   toWidth: number,
-  pad: boolean = true,
+  pad = true,
 ) {
   let acc = 0;
   let bits = 0;
@@ -244,7 +244,7 @@ export const toChecksumAddress = (address: string): string => {
  */
 export function toBech32Address(
   address: string,
-  testnet: boolean = false,
+  testnet = false,
 ): string {
   if (!isAddress(address)) {
     throw new Error('Invalid address format.');
@@ -272,7 +272,7 @@ export function toBech32Address(
  */
 export function fromBech32Address(
   address: string,
-  testnet: boolean = false,
+  testnet = false,
 ): string {
   const res = decode(address);
 

@@ -3,8 +3,8 @@ import * as fs from 'fs';
 import { ResolutionErrorCode } from '../errors/resolutionError';
 
 export async function tryInfo(
-  method,
-  response,
+  method: () => any,
+  response: Record<string, string>,
   name: string,
 ): Promise<boolean> {
   const field = name;
@@ -22,7 +22,7 @@ export async function tryInfo(
   }
 }
 
-export function commaSeparatedList(value, dummyPrevious) {
+export function commaSeparatedList(value: string, dummyPrevious: unknown): string[] {
   return value.split(',').map((v: string) => v.toUpperCase());
 }
 
@@ -43,7 +43,7 @@ export function getEthereumUrl(): string {
   }
 }
 
-export function buildResolutionPackage() {
+export function buildResolutionPackage(): Resolution {
   return new Resolution({
     blockchain: {
       ens: getEthereumUrl(),
@@ -52,19 +52,20 @@ export function buildResolutionPackage() {
   });
 }
 
-export function parseConfig(value: string) {
+type Config = {type: string, value: string};
+export function parseConfig(value: string): Config {
   const words = value.split(':');
   return { type: words[0], value: words.slice(1).join(':')};
 }
 
-export function storeConfig(type: 'infura' | 'url', value: string) {
+export function storeConfig(type: 'infura' | 'url', value: string): void {
   // eslint-disable-next-line no-undef
   fs.writeFile(`${process.env.HOME}/.resolution`, `${type}=${value}`, () =>
     console.log(`${type}=${value} record stored`),
   );
 }
 
-export function getConfig() {
+export function getConfig(): Config {
   try {
     const config = fs
       // eslint-disable-next-line no-undef
