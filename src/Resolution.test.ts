@@ -22,13 +22,6 @@ import {
 } from './tests/helpers';
 import { RpcProviderTestCases } from './tests/providerMockData';
 
-try {
-  const dotenv = require('dotenv');
-  dotenv.config();
-} catch (err) {
-  console.warn('dotenv is not installed');
-}
-
 beforeEach(() => {
   nock.cleanAll();
   jest.restoreAllMocks();

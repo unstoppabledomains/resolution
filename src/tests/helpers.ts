@@ -15,11 +15,18 @@ export const CryptoDomainWithEmail = 'reseller-test-paul019.crypto';
 export const CryptoDomainWithAdaBchAddresses = 'reseller-test-mago0.crypto';
 export const CryptoDomainWithTwitterVerification = 'ijustwannatestsomething2.crypto';
 
-export function mockAsyncMethod(object: any, method: string, value) {
+try {
+  const dotenv = require('dotenv');
+  dotenv.config();
+} catch (err) {
+  console.warn('dotenv is not installed');
+}
+
+export function mockAsyncMethod(object: any, method: string, value): jest.SpyInstance {
   const spy = jest.spyOn(object, method);
   if (!isLive()) {
     if (value instanceof Function) {
-      return spy.mockImplementation(value);
+      return spy.mockImplementation(value as any);
     } else if (value instanceof Error) {
       return spy.mockRejectedValue(value);
     } else {
@@ -31,25 +38,25 @@ export function mockAsyncMethod(object: any, method: string, value) {
   return spy;
 }
 
-export function mockAsyncMethods(object: any, methods: Dictionary<any>) {
+export function mockAsyncMethods(object: any, methods: Dictionary<any>): jest.SpyInstance[] {
   return Object.entries(methods).map((method) =>
     mockAsyncMethod(object, method[0], method[1]),
   );
 }
 
-export function isLive() {
+export function isLive(): boolean {
   // eslint-disable-next-line no-undef
   return !!process.env.LIVE;
 }
 
-export function pendingInLive() {
+export function pendingInLive(): void {
   if (isLive()) {
     // eslint-disable-next-line no-undef
     pending('Disabled in LIVE mode');
   }
 }
 
-export function expectSpyToBeCalled(spies: any[]) {
+export function expectSpyToBeCalled(spies: jest.SpyInstance[]): void {
   if (!isLive()) {
     spies.forEach((spy) => expect(spy).toBeCalled());
   }
@@ -105,7 +112,7 @@ async function expectError(
   );
 }
 
-export function mockAPICalls(testName: string, url = MainnetUrl) {
+export function mockAPICalls(testName: string, url = MainnetUrl): void {
   if (isLive()) {
     return;
   }

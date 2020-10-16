@@ -19,13 +19,6 @@ import FetchProvider from './FetchProvider';
 import { FetchError } from 'node-fetch';
 import { NamingServiceName } from './publicTypes';
 
-try {
-  const dotenv = require('dotenv');
-  dotenv.config();
-} catch (err) {
-  console.warn('dotenv is not installed');
-}
-
 let resolution: Resolution;
 let reader: ICnsReader;
 

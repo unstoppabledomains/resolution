@@ -15,13 +15,6 @@ import { ConfigurationErrorCode } from './errors/configurationError';
 import { NamingServiceName } from './publicTypes';
 let resolution: Resolution;
 
-try {
-  const dotenv = require('dotenv');
-  dotenv.config();
-} catch (err) {
-  console.warn('dotenv is not installed');
-}
-
 beforeEach(() => {
   nock.cleanAll();
   jest.restoreAllMocks();
