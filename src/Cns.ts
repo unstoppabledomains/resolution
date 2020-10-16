@@ -17,16 +17,15 @@ import {
 } from './publicTypes';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 
-const ReaderMap: ReaderMap = {
-  1: '0x7ea9ee21077f84339eda9c80048ec6db678642b1',
-  42: '0xcf4318918fd18aca9bdc11445c01fbada4b448e3', // for internal testing
-};
-
 export default class Cns extends EthereumNamingService {
   readonly contract: Contract;
   reader: ICnsReader;
   static TwitterVerificationAddress =
     '0x12cfb13522F13a78b650a8bCbFCf50b7CB899d82';
+  static ReaderMap: ReaderMap = {
+    1: '0x7ea9ee21077f84339eda9c80048ec6db678642b1',
+    42: '0xcf4318918fd18aca9bdc11445c01fbada4b448e3', // for internal testing
+  };
 
   constructor(source: SourceDefinition = {}) {
     super(source, NamingServiceName.CNS);
@@ -44,11 +43,11 @@ export default class Cns extends EthereumNamingService {
   }
 
   protected defaultRegistry(network: number): string | undefined {
-    return ReaderMap[network];
+    return Cns.ReaderMap[network];
   }
 
   protected async isDataReaderSupported(): Promise<boolean> {
-    if (ReaderMap[this.network] === this.contract.address) {
+    if (Cns.ReaderMap[this.network] === this.contract.address) {
       return true;
     }
 
@@ -63,9 +62,9 @@ export default class Cns extends EthereumNamingService {
 
 
       return true;
-    } catch {}
-
-    return false;
+    } catch {
+      return false;
+    }
   }
 
   isSupportedDomain(domain: string): boolean {
@@ -105,7 +104,7 @@ export default class Cns extends EthereumNamingService {
     }
   }
 
-  async allRecords(domain: string): Promise<Record<string, string>> {
+  async allRecords(domain: string): Promise<DomainRecords> {
     const tokenId = this.namehash(domain);
     const resolver = await this.resolver(domain);
 
@@ -194,13 +193,13 @@ export default class Cns extends EthereumNamingService {
       keys,
       tokenId,
     ]);
-    return this.constructRecords(keys, values);
+    return this.constructRecords(keys, values) as Record<string, string>;
   }
 
   private async getAllRecords(
     resolverContract: Contract,
     tokenId: string,
-  ): Promise<Record<string, string>> {
+  ): Promise<DomainRecords> {
     const startingBlock = await getStartingBlock(resolverContract, tokenId);
     const logs = await resolverContract.fetchLogs(
       'NewKey',

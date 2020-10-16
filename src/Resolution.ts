@@ -480,7 +480,7 @@ export default class Resolution {
    * Method is not supported by ENS
    * @param domain - domain name
    */
-  async allRecords(domain: string): Promise<Record<string, string>> {
+  async allRecords(domain: string): Promise<DomainRecords> {
     domain = this.prepareDomain(domain);
     return await this.getNamingMethodOrThrow(domain).allRecords(domain);
   }

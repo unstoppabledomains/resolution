@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { keccak256 as sha3 } from 'js-sha3';
 import elliptic from 'elliptic';
 import { hexToBytes } from '.';
@@ -24,7 +25,7 @@ const toChecksum = (address: string) => {
         ? address[i + 2].toUpperCase()
         : address[i + 2];
   }
-  
+
   return checksumAddress;
 };
 

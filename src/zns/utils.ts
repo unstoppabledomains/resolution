@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /**
  * All functionality below came from here https://github.com/Zilliqa/Zilliqa-JavaScript-Library/tree/dev/packages/zilliqa-js-crypto/src
  */
@@ -56,7 +57,7 @@ function convertBits(
     if (value < 0 || value >> fromWidth !== 0) {
       return null;
     }
-    
+
     acc = (acc << fromWidth) | value;
     bits += fromWidth;
     while (bits >= toWidth) {
@@ -69,11 +70,11 @@ function convertBits(
     if (bits > 0) {
       ret.push((acc << (toWidth - bits)) & maxv);
     }
-    
+
   } else if (bits >= fromWidth || (acc << (toWidth - bits)) & maxv) {
     return null;
   }
-  
+
 
   return Buffer.from(ret);
 }
@@ -85,12 +86,12 @@ function hrpExpand(hrp: string): Buffer {
   for (p = 0; p < hrp.length; ++p) {
     ret.push(hrp.charCodeAt(p) >> 5);
   }
-  
+
   ret.push(0);
   for (p = 0; p < hrp.length; ++p) {
     ret.push(hrp.charCodeAt(p) & 31);
   }
-  
+
   return Buffer.from(ret);
 }
 
@@ -106,8 +107,8 @@ function polymod(values: Buffer): number {
         chk ^= GENERATOR[i];
       }
     }
-      
-    
+
+
   }
   return chk;
 }
@@ -125,7 +126,7 @@ function createChecksum(hrp: string, data: Buffer) {
   for (let p = 0; p < 6; ++p) {
     ret.push((mod >> (5 * (5 - p))) & 31);
   }
-  
+
   return Buffer.from(ret);
 }
 
@@ -142,7 +143,7 @@ function encode(hrp: string, data: Buffer) {
   for (let p = 0; p < combined.length; ++p) {
     ret += CHARSET.charAt(combined[p]);
   }
-  
+
   return ret;
 }
 
@@ -155,26 +156,26 @@ function decode(bechString: string) {
     if (bechString.charCodeAt(p) < 33 || bechString.charCodeAt(p) > 126) {
       return null;
     }
-    
+
     if (bechString.charCodeAt(p) >= 97 && bechString.charCodeAt(p) <= 122) {
       hasLower = true;
     }
-    
+
     if (bechString.charCodeAt(p) >= 65 && bechString.charCodeAt(p) <= 90) {
       hasUpper = true;
     }
-    
+
   }
   if (hasLower && hasUpper) {
     return null;
   }
-  
+
   bechString = bechString.toLowerCase();
   const pos = bechString.lastIndexOf('1');
   if (pos < 1 || pos + 7 > bechString.length || bechString.length > 90) {
     return null;
   }
-  
+
   const hrp = bechString.substring(0, pos);
   const data: number[] = [];
   for (p = pos + 1; p < bechString.length; ++p) {
@@ -182,14 +183,14 @@ function decode(bechString: string) {
     if (d === -1) {
       return null;
     }
-    
+
     data.push(d);
   }
 
   if (!verifyChecksum(hrp, Buffer.from(data))) {
     return null;
   }
-  
+
 
   return { hrp, data: Buffer.from(data.slice(0, data.length - 6)) };
 }
@@ -205,7 +206,7 @@ export const toChecksumAddress = (address: string): string => {
   if (!isAddress(address)) {
     throw new Error(`${address} is not a valid base 16 address`);
   }
-  
+
 
   address = address.toLowerCase().replace('0x', '');
   const hash = hashjs
@@ -224,8 +225,8 @@ export const toChecksumAddress = (address: string): string => {
         address[i].toLowerCase();
     }
   }
-    
-  
+
+
 
   return ret;
 };
@@ -248,7 +249,7 @@ export function toBech32Address(
   if (!isAddress(address)) {
     throw new Error('Invalid address format.');
   }
-  
+
 
   const addrBz = convertBits(
     Buffer.from(address.replace('0x', ''), 'hex'),
@@ -259,7 +260,7 @@ export function toBech32Address(
   if (addrBz === null) {
     throw new Error('Could not convert byte Buffer to 5-bit Buffer');
   }
-  
+
 
   return encode(testnet ? tHRP : HRP, addrBz);
 }
@@ -278,7 +279,7 @@ export function fromBech32Address(
   if (res === null) {
     throw new Error('Invalid bech32 address');
   }
-  
+
 
   const { hrp, data } = res;
 
@@ -286,14 +287,14 @@ export function fromBech32Address(
   if (hrp !== shouldBe) {
     throw new Error(`Expected hrp to be ${shouldBe} but got ${hrp}`);
   }
-  
+
 
   const buf = convertBits(data, 5, 8, false);
 
   if (buf === null) {
     throw new Error('Could not convert buffer to bytes');
   }
-  
+
 
   return toChecksumAddress(buf.toString('hex'));
 }

@@ -58,6 +58,7 @@ export function parseConfig(value: string) {
 }
 
 export function storeConfig(type: 'infura' | 'url', value: string) {
+  // eslint-disable-next-line no-undef
   fs.writeFile(`${process.env.HOME}/.resolution`, `${type}=${value}`, () =>
     console.log(`${type}=${value} record stored`),
   );
@@ -66,6 +67,7 @@ export function storeConfig(type: 'infura' | 'url', value: string) {
 export function getConfig() {
   try {
     const config = fs
+      // eslint-disable-next-line no-undef
       .readFileSync(`${process.env.HOME}/.resolution`)
       .toString()
       .split('=');

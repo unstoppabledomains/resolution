@@ -57,6 +57,7 @@ export abstract class EthereumNamingService extends NamingService {
     }
 
     for (const key in EthereumNamingService.NetworkNameMap) {
+      // eslint-disable-next-line no-prototype-builtins
       if (!EthereumNamingService.NetworkNameMap.hasOwnProperty(key)) {
         continue;
       }
@@ -96,6 +97,7 @@ export abstract class EthereumNamingService extends NamingService {
   ): nodeHash {
     parent = parent.replace(/^0x/, '');
     const childHash = sha3(label);
+    // eslint-disable-next-line no-undef
     return sha3(Buffer.from(parent + childHash, 'hex'));
   }
 

@@ -79,7 +79,7 @@ export default class Zns extends NamingService {
     return this.constructRecords(keys, records)
   }
 
-  async allRecords(domain: string): Promise<Record<string, string>> {
+  async allRecords(domain: string): Promise<DomainRecords> {
     const resolverAddress = await this.resolver(domain);
     return await this.getResolverRecords(resolverAddress);
   }
@@ -174,15 +174,14 @@ export default class Zns extends NamingService {
     if (!registryRecord) {
       return undefined;
     }
-    let [ownerAddress, resolverAddress] = registryRecord.arguments as [
+    const [ownerAddress, resolverAddress] = registryRecord.arguments as [
       string,
       string,
     ];
-    if (ownerAddress.startsWith('0x')) {
-      ownerAddress = toBech32Address(ownerAddress);
-    }
-
-    return [ownerAddress, resolverAddress];
+    return [
+      ownerAddress.startsWith('0x') ? toBech32Address(ownerAddress) : ownerAddress,
+      resolverAddress,
+    ];
   }
 
   private async getResolverRecords(

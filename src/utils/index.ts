@@ -23,9 +23,11 @@ export function set(object, key, value) {
  * @param object
  */
 export function invert(object) {
+
   const returnee = {};
 
   for (const key in object) {
+    // eslint-disable-next-line no-prototype-builtins
     if (!object.hasOwnProperty(key)) {
       continue;
     }
@@ -70,7 +72,7 @@ export function hexToBytes(hexString: string): number[] {
   for (let c = 0; c < hex.length; c += 2) {
     bytes.push(parseInt(hex.substr(c, 2), 16));
   }
-  
+
   return bytes;
 }
 

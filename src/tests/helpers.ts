@@ -17,7 +17,7 @@ export const CryptoDomainWithTwitterVerification = 'ijustwannatestsomething2.cry
 
 export function mockAsyncMethod(object: any, method: string, value) {
   const spy = jest.spyOn(object, method);
-  if (!process.env.LIVE) {
+  if (!isLive()) {
     if (value instanceof Function) {
       return spy.mockImplementation(value);
     } else if (value instanceof Error) {
@@ -26,8 +26,8 @@ export function mockAsyncMethod(object: any, method: string, value) {
       return spy.mockResolvedValue(value);
     }
   }
-    
-  
+
+
   return spy;
 }
 
@@ -38,21 +38,22 @@ export function mockAsyncMethods(object: any, methods: Dictionary<any>) {
 }
 
 export function isLive() {
+  // eslint-disable-next-line no-undef
   return !!process.env.LIVE;
 }
 
 export function pendingInLive() {
   if (isLive()) {
+    // eslint-disable-next-line no-undef
     pending('Disabled in LIVE mode');
   }
-  
 }
 
 export function expectSpyToBeCalled(spies: any[]) {
   if (!isLive()) {
     spies.forEach((spy) => expect(spy).toBeCalled());
   }
-  
+
 }
 
 export async function expectResolutionErrorCode(
@@ -84,11 +85,12 @@ async function expectError(
       } else {
         resolve(result);
       }
-      
+
     });
   }
 
   return callback.then(
+    // eslint-disable-next-line no-undef
     () => fail(`Expected ${klass.name} to be thrown but wasn't`),
     (error) => {
       // Redundant code quality check is required
@@ -98,7 +100,7 @@ async function expectError(
       } else {
         throw error;
       }
-      
+
     },
   );
 }
@@ -107,7 +109,7 @@ export function mockAPICalls(testName: string, url = MainnetUrl) {
   if (isLive()) {
     return;
   }
-  
+
   const mcdt = mockData as any;
   const mockCall = mcdt[testName] as [any];
 
@@ -118,6 +120,7 @@ export function mockAPICalls(testName: string, url = MainnetUrl) {
         // .log()
         .post('/', JSON.stringify(REQUEST), undefined)
         .reply(200, JSON.stringify(RESPONSE));
+      break;
     }
     default: {
       nock(url)
@@ -136,6 +139,7 @@ export function mockAPICalls(testName: string, url = MainnetUrl) {
  * UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID env variable if any
  */
 export function protocolLink(providerProtocol: ProviderProtocol = ProviderProtocol.http): string {
+  // eslint-disable-next-line no-undef
   const secret = process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID;
   const protocolMap = {
     [ProviderProtocol.http]: secret ? `https://mainnet.infura.io/v3/${secret}` : 'https://main-rpc.linkpool.io',
@@ -154,7 +158,7 @@ export const caseMock = <T, U>(params: T, cases: { request: T, response: U }[]):
       return response;
     }
   }
-    
-  
+
+
   throw new Error(`got unexpected params ${JSON.stringify(params)}`);
 }

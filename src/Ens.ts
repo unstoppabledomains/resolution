@@ -115,16 +115,13 @@ export default class Ens extends EthereumNamingService {
       return null;
     }
 
-    let [owner, ttl, resolver] = await this.getResolutionInfo(domain);
-    if (isNullAddress(owner)) {
-      owner = null;
-    }
+    const [owner, ttl, resolver] = await this.getResolutionInfo(domain);
     const address = await this.fetchAddress(resolver, domain, EthCoinIndex);
     const resolution = {
       meta: {
         namehash: this.namehash(domain),
         resolver: resolver,
-        owner,
+        owner: isNullAddress(owner) ? null : owner,
         type: this.name,
         ttl: Number(ttl || 0),
       },
@@ -137,7 +134,7 @@ export default class Ens extends EthereumNamingService {
     return resolution;
   }
 
-  async allRecords(domain: string): Promise<Record<string, string>> {
+  async allRecords(domain: string): Promise<DomainRecords> {
     throw new Error('Method not implemented.');
   }
 
@@ -252,6 +249,7 @@ export default class Ens extends EthereumNamingService {
     if (isNullAddress(addr)) {
       return undefined;
     }
+    // eslint-disable-next-line no-undef
     const data = Buffer.from(addr.replace('0x', ''), 'hex');
     return formatsByCoinType[coinType].encoder(data);
   }

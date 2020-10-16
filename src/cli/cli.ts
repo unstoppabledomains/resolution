@@ -20,7 +20,7 @@ import {
     )
     .option(
       '-C, --config <option>',
-      `option in format <key>:<value>\n\tkey can be either \"infura\" or \"url\"`,
+      `option in format <key>:<value>\n\tkey can be either "infura" or "url"`,
       parseConfig,
     )
     .option('-s, --service', 'returns you a service name from the domain')
@@ -39,6 +39,7 @@ import {
       'resolution cli exports main usage of @unstoppabledomains/resolution library',
     );
 
+  // eslint-disable-next-line no-undef
   program.parse(process.argv);
 
   const options = program.opts();
