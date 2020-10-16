@@ -13,7 +13,7 @@ import ConfigurationError, {
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import FetchProvider from './FetchProvider';
 import { nodeHash } from './types';
-import { DomainRecords } from './publicTypes';
+import { CryptoRecords } from './publicTypes';
 
 export default abstract class NamingService extends BaseConnection {
   readonly name: ResolutionMethod;
@@ -24,7 +24,7 @@ export default abstract class NamingService extends BaseConnection {
   abstract isSupportedDomain(domain: string): boolean;
   abstract isSupportedNetwork(): boolean;
   abstract owner(domain: string): Promise<string | null>;
-  abstract records(domain: string, keys: string[]): Promise<DomainRecords>;
+  abstract records(domain: string, keys: string[]): Promise<CryptoRecords>;
   abstract resolve(domain: string): Promise<ResolutionResponse | null>;
   abstract resolver(domain: string): Promise<string>;
   abstract twitter(domain: string): Promise<string>;
@@ -32,7 +32,7 @@ export default abstract class NamingService extends BaseConnection {
     parent: nodeHash,
     label: string,
   ): nodeHash;
-  abstract allRecords(domain: string): Promise<DomainRecords>;
+  abstract allRecords(domain: string): Promise<CryptoRecords>;
 
   constructor(source: SourceDefinition, name: ResolutionMethod) {
     super();
@@ -135,10 +135,10 @@ export default abstract class NamingService extends BaseConnection {
 
   protected constructRecords(
     keys: string[],
-    values: undefined | (string | undefined)[] | DomainRecords,
-  ): DomainRecords {
+    values: undefined | (string | undefined)[] | CryptoRecords,
+  ): CryptoRecords {
     values = values || [];
-    const records: DomainRecords = {};
+    const records: CryptoRecords = {};
     keys.forEach((key, index) => {
       records[key] = values instanceof Array ? values[index] : values![key];
     });

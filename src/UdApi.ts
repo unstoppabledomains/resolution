@@ -14,7 +14,7 @@ import Cns from './Cns';
 import pckg from './package.json';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 import standardKeys from './utils/standardKeys';
-import { DomainRecords } from './publicTypes';
+import { CryptoRecords } from './publicTypes';
 
 export default class Udapi extends NamingService {
   private headers: {
@@ -51,7 +51,7 @@ export default class Udapi extends NamingService {
     return owner.startsWith('zil1') ? owner : toBech32Address(owner);
   }
 
-  async records(domain: string, keys: string[]): Promise<DomainRecords> {
+  async records(domain: string, keys: string[]): Promise<CryptoRecords> {
     const records = await this.allRecords(domain);
     return this.constructRecords(keys, records)
   }

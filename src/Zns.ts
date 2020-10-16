@@ -15,7 +15,7 @@ import {
   UnclaimedDomainResponse,
 } from './index';
 import NamingService from './NamingService';
-import { DomainRecords } from './publicTypes';
+import { CryptoRecords } from './publicTypes';
 
 const NetworkIdMap = {
   mainnet: 1,
@@ -74,12 +74,12 @@ export default class Zns extends NamingService {
     return data ? data.meta.owner : null;
   }
 
-  async records(domain: string, keys: string[]): Promise<DomainRecords> {
+  async records(domain: string, keys: string[]): Promise<CryptoRecords> {
     const records = await this.allRecords(domain)
     return this.constructRecords(keys, records)
   }
 
-  async allRecords(domain: string): Promise<DomainRecords> {
+  async allRecords(domain: string): Promise<CryptoRecords> {
     const resolverAddress = await this.resolver(domain);
     return await this.getResolverRecords(resolverAddress);
   }

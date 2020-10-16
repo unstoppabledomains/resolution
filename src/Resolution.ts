@@ -17,7 +17,7 @@ import {
   SourceDefinition,
   NamehashOptions,
   NamehashOptionsDefault,
-  DomainRecords,
+  CryptoRecords,
 } from './publicTypes';
 import { nodeHash } from './types';
 import { EthersProvider } from './publicTypes';
@@ -373,7 +373,7 @@ export default class Resolution {
    * @param keys Array of record keys to be resolved
    * @returns A Promise with key-value mapping of domain records
    */
-  async records(domain: string, keys: string[]): Promise<DomainRecords> {
+  async records(domain: string, keys: string[]): Promise<CryptoRecords> {
     domain = this.prepareDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
     return await method.records(domain, keys);
@@ -480,7 +480,7 @@ export default class Resolution {
    * Method is not supported by ENS
    * @param domain - domain name
    */
-  async allRecords(domain: string): Promise<DomainRecords> {
+  async allRecords(domain: string): Promise<CryptoRecords> {
     domain = this.prepareDomain(domain);
     return await this.getNamingMethodOrThrow(domain).allRecords(domain);
   }

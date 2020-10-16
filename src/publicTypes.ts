@@ -136,4 +136,4 @@ export type NamehashOptions = {
 };
 
 export const NamehashOptionsDefault = {format: 'hex', prefix: true} as const;
-export type DomainRecords = Record<string, string | undefined>;
+export type CryptoRecords = Record<string, string | undefined>;

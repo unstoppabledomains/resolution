@@ -13,7 +13,7 @@ import {
   SourceDefinition,
   NamingServiceName,
   ResolutionResponse,
-  DomainRecords,
+  CryptoRecords,
 } from './publicTypes';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 
@@ -104,7 +104,7 @@ export default class Cns extends EthereumNamingService {
     }
   }
 
-  async allRecords(domain: string): Promise<DomainRecords> {
+  async allRecords(domain: string): Promise<CryptoRecords> {
     const tokenId = this.namehash(domain);
     const resolver = await this.resolver(domain);
 
@@ -148,7 +148,7 @@ export default class Cns extends EthereumNamingService {
     return twitterHandle;
   }
 
-  async records(domain: string, keys: string[]): Promise<DomainRecords> {
+  async records(domain: string, keys: string[]): Promise<CryptoRecords> {
     const tokenId = this.namehash(domain);
 
     const reader = await this.getReader();
@@ -199,7 +199,7 @@ export default class Cns extends EthereumNamingService {
   private async getAllRecords(
     resolverContract: Contract,
     tokenId: string,
-  ): Promise<DomainRecords> {
+  ): Promise<CryptoRecords> {
     const startingBlock = await getStartingBlock(resolverContract, tokenId);
     const logs = await resolverContract.fetchLogs(
       'NewKey',

@@ -11,7 +11,7 @@ import {
 import Contract from './utils/contract';
 import contentHash from 'content-hash';
 import EnsNetworkMap from 'ethereum-ens-network-map';
-import { SourceDefinition, ResolutionResponse, DomainRecords } from './publicTypes';
+import { SourceDefinition, ResolutionResponse, CryptoRecords } from './publicTypes';
 
 export default class Ens extends EthereumNamingService {
   readonly name = NamingServiceName.ENS;
@@ -40,7 +40,7 @@ export default class Ens extends EthereumNamingService {
     return this.registryAddress != null;
   }
 
-  async records(domain: string, keys: string[]): Promise<DomainRecords> {
+  async records(domain: string, keys: string[]): Promise<CryptoRecords> {
     const values = await Promise.all(keys.map(async key => {
       if (key.startsWith('crypto.')) {
         const ticker = key.split('.')[1];
@@ -134,7 +134,7 @@ export default class Ens extends EthereumNamingService {
     return resolution;
   }
 
-  async allRecords(domain: string): Promise<DomainRecords> {
+  async allRecords(domain: string): Promise<CryptoRecords> {
     throw new Error('Method not implemented.');
   }
 
