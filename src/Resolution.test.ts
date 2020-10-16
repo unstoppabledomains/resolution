@@ -252,10 +252,9 @@ describe('Resolution', () => {
       const redirectUrl = await resolution.httpUrl(CryptoDomainWithIpfsRecords);
       expectSpyToBeCalled(spies);
       expect(redirectUrl).toBe('new record redirect url');
-
     });
-
   });
+  
   describe('serviceName', () => {
     it('checks ens service name', () => {
       const resolution = new Resolution();
