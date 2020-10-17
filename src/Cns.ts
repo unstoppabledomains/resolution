@@ -76,7 +76,7 @@ export default class Cns extends EthereumNamingService {
     );
   }
 
-  async resolver(domain: string): Promise<string> {
+async resolver(domain: string): Promise<string> {
     const tokenId = this.namehash(domain);
 
     const reader = await this.getReader();
@@ -123,19 +123,20 @@ export default class Cns extends EthereumNamingService {
       standardKeys.validation_twitter_username,
       standardKeys.twitter_username,
     ];
-    const { values } = await reader.records(tokenId, records);
-    const owner = await this.owner(domain);
+    let { values, owner } = await reader.records(tokenId, records);
+    if (!owner) owner = await this.owner(domain);
+
     records.forEach((recordName, i) => {
       return this.ensureRecordPresence(domain, recordName, values && values[i]);
     });
     const [validationSignature, twitterHandle] = values!;
     if (
-      !(await isValidTwitterSignature({
+      !isValidTwitterSignature({
         tokenId,
         owner,
         twitterHandle,
         validationSignature,
-      }))
+      })
     ) {
       throw new ResolutionError(
         ResolutionErrorCode.InvalidTwitterVerification,

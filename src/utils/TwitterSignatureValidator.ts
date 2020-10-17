@@ -5,7 +5,7 @@ import Cns from '../Cns';
 import standardKeys from './standardKeys';
 import BN from 'bn.js';
 
-export const isValidTwitterSignature = async ({
+export const isValidTwitterSignature = ({
   tokenId,
   owner,
   twitterHandle,
@@ -15,7 +15,7 @@ export const isValidTwitterSignature = async ({
   owner: string;
   twitterHandle: string;
   validationSignature: string;
-}): Promise<boolean> => {
+}): boolean => {
   const tokenIdInDecimals = fromHexStringToDecimals(tokenId);
   const message = [
     tokenIdInDecimals,

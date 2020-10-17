@@ -21,6 +21,7 @@ import {
 } from './tests/helpers';
 import { RpcProviderTestCases } from './tests/providerMockData';
 import ICnsReader from './cns/ICnsReader';
+import Contract from './utils/contract';
 
 let resolution: Resolution;
 let reader: ICnsReader;
@@ -128,10 +129,14 @@ describe('Resolution', () => {
   describe('.Errors', () => {
     it('checks Resolution#addr error #1', async () => {
       const resolution = new Resolution();
+      const spy = mockAsyncMethods(resolution.zns!, {
+        getRecordsAddresses: undefined 
+      });
       await expectResolutionErrorCode(
         resolution.addr('sdncdoncvdinvcsdncs.zil', 'ZIL'),
         ResolutionErrorCode.UnregisteredDomain,
       );
+      expectSpyToBeCalled(spy);
     });
 
     it('resolves non-existing domain zone with throw', async () => {
@@ -210,16 +215,6 @@ describe('Resolution', () => {
       });
     });
 
-    describe('.Providers errors', () => {
-      it('should throw serviceProviderError from ethers provider', async () => {
-        const provider = getDefaultProvider('mainnet');
-        const resolution = Resolution.fromEthersProvider(provider);
-        await expectResolutionErrorCode(
-          resolution.allRecords('brad.crypto'),
-          ResolutionErrorCode.ServiceProviderError,
-        );
-      });
-    })
   });
 
   describe('.Records', () => {
@@ -251,6 +246,7 @@ describe('Resolution', () => {
             },
           },
         });
+        const anotherSpy = mockAsyncMethod(resolution.cns, 'isDataReaderSupported', true);
         const reader = await resolution.cns?.getReader();
         const eyes = mockAsyncMethods(reader, {
           records: {
@@ -259,9 +255,9 @@ describe('Resolution', () => {
           },
         });
         const capital = await resolution.addr('Brad.crypto', 'eth');
-        expectSpyToBeCalled(eyes);
         const lower = await resolution.addr('brad.crypto', 'eth');
-        expectSpyToBeCalled(eyes);
+        expectSpyToBeCalled(eyes, 2);
+        expectSpyToBeCalled([anotherSpy]);
         expect(capital).toStrictEqual(lower);
       });
     });
@@ -382,7 +378,8 @@ describe('Resolution', () => {
   
           const resolution = Resolution.fromEthersProvider(provider);
           const resp = await resolution.allRecords('brad.crypto');
-          expectSpyToBeCalled([eye, eye2]);
+          expectSpyToBeCalled([eye], 3);
+          expectSpyToBeCalled([eye2], 2);
           expect(resp).toMatchObject({
             'gundb.username.value':
               '0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c',
@@ -410,7 +407,8 @@ describe('Resolution', () => {
           );
   
           const resp = await resolution.allRecords('brad.crypto');
-          expectSpyToBeCalled([eye, eye2]);
+          expectSpyToBeCalled([eye], 3);
+          expectSpyToBeCalled([eye2], 2);
           expect(resp).toMatchObject({
             'gundb.username.value':
               '0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c',
@@ -433,7 +431,7 @@ describe('Resolution', () => {
           const resolution = Resolution.fromEthersProvider(provider);
           const resp = await resolution.allRecords('monmouthcounty.crypto');
   
-          expectSpyToBeCalled([eye]);
+          expectSpyToBeCalled([eye], 2);
           expect(resp).toMatchObject({
             'crypto.BTC.address': '3NwuV8nVT2VKbtCs8evChdiW6kHTHcVpdn',
             'crypto.ETH.address': '0x1C42088b82f6Fa5fB883A14240C4E066dDFf1517',
@@ -483,6 +481,7 @@ describe('Resolution', () => {
               },
             },
           });
+          const isDataReaderSpy = mockAsyncMethod(resolution.cns, 'isDataReaderSupported', true);
           const reader = await resolution.cns?.getReader();
           const eyes = mockAsyncMethods(reader, {
             records: {
@@ -494,6 +493,7 @@ describe('Resolution', () => {
           });
           const gundb = await resolution.chatId('homecakes.crypto');
           expectSpyToBeCalled(eyes);
+          expectSpyToBeCalled([isDataReaderSpy]);
           expect(gundb).toBe(
             '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c',
           );
@@ -505,8 +505,12 @@ describe('Resolution', () => {
       describe('.Twitter', () => {
         it('should return verified twitter handle', async () => {
           const resolution = new Resolution();
+          const isDataReaderSpy = mockAsyncMethod(resolution.cns, 
+            'isDataReaderSupported', true,
+         );
           const reader = await resolution.cns?.getReader();
-          const spies = mockAsyncMethods(reader, {
+          expectSpyToBeCalled([isDataReaderSpy]);
+          const readerSpies = mockAsyncMethods(reader, {
             records: {
               resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
               owner: '0x6EC0DEeD30605Bcd19342f3c30201DB263291589',
@@ -519,7 +523,7 @@ describe('Resolution', () => {
           const twitterHandle = await resolution.twitter(
             CryptoDomainWithTwitterVerification,
           );
-          expectSpyToBeCalled(spies);
+          expectSpyToBeCalled(readerSpies);
           expect(twitterHandle).toBe('derainberk');
         });
   
