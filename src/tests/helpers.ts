@@ -57,9 +57,11 @@ export function pendingInLive(): void {
   }
 }
 
-export function expectSpyToBeCalled(spies: jest.SpyInstance[], times: number = 1 ): void {
+export function expectSpyToBeCalled(spies: jest.SpyInstance[], times?: number ): void {
   if (!isLive()) {
-    spies.forEach((spy) => expect(spy).toBeCalledTimes(times));
+    spies.forEach((spy) => {
+      times ? expect(spy).toBeCalledTimes(times) : expect(spy).toBeCalled()
+    });
   }
 }
 
