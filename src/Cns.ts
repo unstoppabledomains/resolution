@@ -78,8 +78,8 @@ export default class Cns extends EthereumNamingService {
 
 async resolver(domain: string): Promise<string> {
     const tokenId = this.namehash(domain);
-
     const reader = await this.getReader();
+
     const data = await reader.resolver(tokenId);
     await this.verify(domain, data);
 
@@ -170,8 +170,6 @@ async resolver(domain: string): Promise<string> {
     if (!isNullAddress(resolver)) {
       return;
     }
-
-
     const owner = data.owner || (await this.owner(domain));
     if (isNullAddress(owner)) {
       throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
