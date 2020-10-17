@@ -142,7 +142,15 @@ describe('ZNS', () => {
 
   describe('.Resolve', () => {
     it('resolves .zil name using blockchain', async () => {
+      const eyes = mockAsyncMethods(resolution.zns, {
+        getRecordsAddresses: [
+          'zil1ye72zl5t8wl5n3f2fsa5w0x7hja0jqj7mhct23',
+          '0xb17c35e557a8c13a730696c92d716a58421e36ca'
+        ],
+        getResolverRecords: {"crypto.BTC.address":"1NZKHwpfqprxzcaijcjf71CZr27D8osagR","crypto.ETH.address":"0xaa91734f90795e80751c96e682a321bb3c1a4186"}
+      });
       const result = await resolution.resolve('cofounding.zil');
+      expectSpyToBeCalled(eyes);
       expect(result).toBeDefined();
       expect(result.addresses.ETH).toEqual(
         '0xaa91734f90795e80751c96e682a321bb3c1a4186',
