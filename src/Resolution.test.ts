@@ -227,7 +227,7 @@ describe('Resolution', () => {
     );
   });
   
-  describe('.Resolve', () => {
+  describe('.ipfsHash', () => {
     it('should prioritize new keys over depricated ones', async() => {
       pendingInLive();
       const spies = mockAsyncMethods(reader, {
