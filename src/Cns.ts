@@ -187,13 +187,13 @@ export default class Cns extends EthereumNamingService {
   private async getStandardRecords(
     resolverContract: Contract,
     tokenId: string,
-  ): Promise<Record<string, string>> {
+  ): Promise<CryptoRecords> {
     const keys = Object.values(standardKeys);
     const values = await this.callMethod(resolverContract, 'getMany', [
       keys,
       tokenId,
     ]);
-    return this.constructRecords(keys, values) as Record<string, string>;
+    return this.constructRecords(keys, values);
   }
 
   private async getAllRecords(

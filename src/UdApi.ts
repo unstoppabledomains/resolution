@@ -100,7 +100,7 @@ export default class Udapi extends NamingService {
     return twitterHandle;
   }
 
-  async allRecords(domain: string): Promise<Record<string, string>> {
+  async allRecords(domain: string): Promise<CryptoRecords> {
     return (await this.resolve(domain)).records || {};
   }
 
