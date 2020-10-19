@@ -322,7 +322,6 @@ export default class Resolution {
         domain,
         `crypto.${currencyTicker.toUpperCase()}.address`,
       );
-      console.log(`${currencyTicker} => ${addr}`);
       return addr;
     } catch (error) {
       // re-throw an error for back compatability. old method throws deprecated UnspecifiedCurrency code since before v1.7.0

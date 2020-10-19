@@ -26,7 +26,6 @@ export default class Contract {
       return [];
     }
 
-
     return this.coder.decodeFunctionResult(method, response);
   }
 

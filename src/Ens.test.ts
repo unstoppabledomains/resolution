@@ -40,11 +40,12 @@ describe('ENS', () => {
     expect(resolution.ens?.network).toEqual(1);
 
     const eyes = mockAsyncMethods(resolution.ens, {
-      getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
       getResolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
       fetchAddress: '0x714ef33943d925731FBB89C99aF5780D888bD106',
     });
-
+    const spy = mockAsyncMethods(resolution.ens, {
+      getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
+    });
     expect(await resolution.addr('matthewgould.eth', 'ETH')).toEqual(
       '0x714ef33943d925731FBB89C99aF5780D888bD106',
     );
@@ -52,6 +53,7 @@ describe('ENS', () => {
       '0x714ef33943d925731FBB89C99aF5780D888bD106',
     );
     expectSpyToBeCalled(eyes);
+    expectSpyToBeCalled(spy, 2);
   });
 
   it('reverses address to ENS domain', async () => {
@@ -104,7 +106,7 @@ describe('ENS', () => {
 
   it('resolves .kred name using ENS blockchain', async () => {
     const eyes = mockAsyncMethods(resolution.ens, {
-      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      getResolver: '0x96184444629F3489c4dE199871E6F99568229d8f',
       callMethod: '0x96184444629F3489c4dE199871E6F99568229d8f',
     });
     const result = await resolution.addr('brantly.kred', 'ETH');
@@ -393,10 +395,31 @@ describe('ENS', () => {
   // TODO to be removed in 2.0.0
   it('[Old test] checks Resolution#addressOrThrow error #2', async () => {
     const resolution = new Resolution();
+    const eyes = mockAsyncMethods(resolution.zns, {
+      getRecordsAddresses: [
+        'zil194qcjskuuxh6qtg8xw3qqrr3kdc6dtq8ct6j9s',
+        '0xdac22230adfe4601f00631eae92df6d77f054891'
+      ],
+      fetchSubState: {
+        records: {
+          'crypto.BCH.address': 'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6',
+          'crypto.BTC.address': '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB',
+          'crypto.DASH.address': 'XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j',
+          'crypto.ETH.address': '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
+          'crypto.LTC.address': 'LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL',
+          'crypto.XMR.address': '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d',
+          'crypto.ZEC.address': 't1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV',
+          'crypto.ZIL.address': 'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
+          'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
+          'ipfs.redirect_domain.value': 'www.unstoppabledomains.com'
+        }
+      }
+    });
     await expectResolutionErrorCode(
       resolution.addressOrThrow('brad.zil', 'INVALID_CURRENCY_SYMBOL'),
       ResolutionErrorCode.UnspecifiedCurrency,
     );
+    expectSpyToBeCalled(eyes);
   });
 
   it('checks UnsupportedCurrency error', async () => {
@@ -418,6 +441,7 @@ describe('ENS', () => {
     const eyes = mockAsyncMethods(resolution.ens, {
       getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      callMethod: '0x'
     });
 
     expect(await resolution.address('qwdqwd.eth', 'XRP')).toEqual(null);

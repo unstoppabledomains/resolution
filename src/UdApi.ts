@@ -82,12 +82,12 @@ export default class Udapi extends NamingService {
     );
     NamingService.ensureRecordPresence(domain, 'twitter handle', twitterHandle);
     if (
-      !(await isValidTwitterSignature({
+      !isValidTwitterSignature({
         tokenId: domainMetaData.meta.namehash,
         owner,
         twitterHandle,
         validationSignature,
-      }))
+      })
     ) {
       throw new ResolutionError(
         ResolutionErrorCode.InvalidTwitterVerification,

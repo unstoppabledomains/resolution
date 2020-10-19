@@ -62,17 +62,17 @@ describe('CNS', () => {
     const spies = mockAsyncMethods(reader, {
       records: {
         resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
+        owner: '0x6ec0deed30605bcd19342f3c30201db263291589',
         values: [
           '0xcd2655d9557e5535313b47107fa8f943eb1fec4da6f348668062e66233dde21b413784c4060340f48da364311c6e2549416a6a23dc6fbb48885382802826b8111b',
           'derainberk'
         ]
       }
     });
-    const cnsSpy = mockAsyncMethod(resolution.cns, "owner", '0x6ec0deed30605bcd19342f3c30201db263291589');
     const twitterHandle = await resolution.cns!.twitter(
       CryptoDomainWithTwitterVerification,
     );
-    expectSpyToBeCalled([...spies, cnsSpy]);
+    expectSpyToBeCalled(spies);
     expect(twitterHandle).toBe('derainberk');
   });
 
@@ -99,12 +99,17 @@ describe('CNS', () => {
   });
 
   it('should not find a resolver address', async () => {
-    const spies = mockAsyncMethods(reader, { resolver: {} });
+    const spies = mockAsyncMethods(reader, { resolver: {
+      owner: '0x0000000000000000000000000000000000000000',
+      resolver: undefined
+    } });
+
     await expectResolutionErrorCode(
       resolution.resolver('unknown-unknown-938388383.crypto'),
       ResolutionErrorCode.UnregisteredDomain,
     );
     expectSpyToBeCalled(spies);
+    
   });
 
   it('should throw ResolutionError.UnspecifiedResolver', async () => {
