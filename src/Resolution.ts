@@ -261,7 +261,8 @@ export default class Resolution {
    * @throws [[ResolutionError]]
    */
   async ipfsHash(domain: string): Promise<string> {
-    return await this.record(domain, 'ipfs.html.value');
+    domain = this.prepareDomain(domain);
+    return await this.getPreferableNewRecord(domain, 'dweb.ipfs.hash', 'ipfs.html.value');
   }
 
   /**
@@ -269,7 +270,8 @@ export default class Resolution {
    * @param domain - domain name
    */
   async httpUrl(domain: string): Promise<string> {
-    return await this.record(domain, 'ipfs.redirect_domain.value');
+    domain = this.prepareDomain(domain);
+    return await this.getPreferableNewRecord(domain, 'browser.redirect_url', 'ipfs.redirect_domain.value');
   }
 
   /**
@@ -483,6 +485,11 @@ export default class Resolution {
   async allRecords(domain: string): Promise<CryptoRecords> {
     domain = this.prepareDomain(domain);
     return await this.getNamingMethodOrThrow(domain).allRecords(domain);
+  }
+
+  private async getPreferableNewRecord(domain: string, newRecord: string, oldRecord: string): Promise<string> {
+    const records = await this.records(domain, [newRecord, oldRecord]);
+    return NamingService.ensureRecordPresence(domain, newRecord, records[newRecord] || records[oldRecord]);
   }
 
   private getNamingMethod(domain: string): NamingService | undefined {

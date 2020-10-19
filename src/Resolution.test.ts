@@ -19,8 +19,21 @@ import {
   caseMock,
   mockAsyncMethod,
   CryptoDomainWithTwitterVerification,
+  pendingInLive,
+  CryptoDomainWithIpfsRecords
 } from './tests/helpers';
 import { RpcProviderTestCases } from './tests/providerMockData';
+import ICnsReader from './cns/ICnsReader';
+
+let resolution: Resolution;
+let reader: ICnsReader;
+
+beforeAll(async () => {
+  resolution = new Resolution({
+    blockchain: { cns: { url: protocolLink() } },
+  });
+  reader = await resolution.cns!.getReader();
+})
 
 beforeEach(() => {
   nock.cleanAll();
@@ -213,7 +226,35 @@ describe('Resolution', () => {
       '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c',
     );
   });
+  
+  describe('.ipfsHash', () => {
+    it('should prioritize new keys over depricated ones', async() => {
+      pendingInLive();
+      const spies = mockAsyncMethods(reader, {
+        records: {
+          resolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
+          values: ['new record Ipfs hash', 'old record Ipfs hash']
+        }
+      });
+      const hash = await resolution.ipfsHash(CryptoDomainWithIpfsRecords);
+      expectSpyToBeCalled(spies);
+      expect(hash).toBe('new record Ipfs hash');
+    });
 
+    it('should prioritize browser record key over ipfs.redirect_url one', async () => {
+      pendingInLive();
+      const spies = mockAsyncMethods(reader, {
+        records: {
+          resolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
+          values: ['new record redirect url', 'old record redirect url']
+        }
+      });
+      const redirectUrl = await resolution.httpUrl(CryptoDomainWithIpfsRecords);
+      expectSpyToBeCalled(spies);
+      expect(redirectUrl).toBe('new record redirect url');
+    });
+  });
+  
   describe('serviceName', () => {
     it('checks ens service name', () => {
       const resolution = new Resolution();

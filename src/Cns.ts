@@ -16,6 +16,7 @@ import {
   CryptoRecords,
 } from './publicTypes';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
+import NamingService from './NamingService';
 
 export default class Cns extends EthereumNamingService {
   readonly contract: Contract;
@@ -126,7 +127,7 @@ export default class Cns extends EthereumNamingService {
     const { values } = await reader.records(tokenId, records);
     const owner = await this.owner(domain);
     records.forEach((recordName, i) => {
-      return this.ensureRecordPresence(domain, recordName, values && values[i]);
+      return NamingService.ensureRecordPresence(domain, recordName, values && values[i]);
     });
     const [validationSignature, twitterHandle] = values!;
     if (
