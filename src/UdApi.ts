@@ -75,12 +75,12 @@ export default class Udapi extends NamingService {
     const validationSignature =
       records[standardKeys.validation_twitter_username];
     const twitterHandle = records[standardKeys.twitter_username];
-    this.ensureRecordPresence(
+    NamingService.ensureRecordPresence(
       domain,
       'twitter validation username',
       validationSignature,
     );
-    this.ensureRecordPresence(domain, 'twitter handle', twitterHandle);
+    NamingService.ensureRecordPresence(domain, 'twitter handle', twitterHandle);
     if (
       !isValidTwitterSignature({
         tokenId: domainMetaData.meta.namehash,
@@ -100,7 +100,7 @@ export default class Udapi extends NamingService {
     return twitterHandle;
   }
 
-  async allRecords(domain: string): Promise<Record<string, string>> {
+  async allRecords(domain: string): Promise<CryptoRecords> {
     return (await this.resolve(domain)).records || {};
   }
 

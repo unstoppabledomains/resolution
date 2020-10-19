@@ -46,7 +46,7 @@ export default class Ens extends EthereumNamingService {
         const ticker = key.split('.')[1];
         return await this.addr(domain, ticker);
       }
-      if (key === 'ipfs.html.value') {
+      if (key === 'ipfs.html.value' || key === 'dweb.ipfs.hash') {
         return await this.getContentHash(domain);
       }
       const ensRecordName = this.fromUDRecordNameToENS(key);
@@ -65,6 +65,7 @@ export default class Ens extends EthereumNamingService {
   private fromUDRecordNameToENS(record: string): string {
     const mapper = {
       'ipfs.redirect_domain.value': 'url',
+      'browser.redirect_url': 'url',
       'whois.email.value': 'email',
       'gundb.username.value': 'gundb_username',
       'gundb.public_key.value': 'gundb_public_key',

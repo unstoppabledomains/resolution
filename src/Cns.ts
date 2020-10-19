@@ -16,6 +16,7 @@ import {
   CryptoRecords,
 } from './publicTypes';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
+import NamingService from './NamingService';
 
 export default class Cns extends EthereumNamingService {
   readonly contract: Contract;
@@ -76,7 +77,7 @@ export default class Cns extends EthereumNamingService {
     );
   }
 
-async resolver(domain: string): Promise<string> {
+  async resolver(domain: string): Promise<string> {
     const tokenId = this.namehash(domain);
     const reader = await this.getReader();
 
@@ -123,11 +124,14 @@ async resolver(domain: string): Promise<string> {
       standardKeys.validation_twitter_username,
       standardKeys.twitter_username,
     ];
-    let { values, owner } = await reader.records(tokenId, records);
-    if (!owner) owner = await this.owner(domain);
-
+    const data = await reader.records(tokenId, records);
+    let { owner } = data;
+    if (!owner) {
+      owner = await this.owner(domain);
+    }
+    const { values } = data;
     records.forEach((recordName, i) => {
-      return this.ensureRecordPresence(domain, recordName, values && values[i]);
+      return NamingService.ensureRecordPresence(domain, recordName, values && values[i]);
     });
     const [validationSignature, twitterHandle] = values!;
     if (
@@ -186,13 +190,13 @@ async resolver(domain: string): Promise<string> {
   private async getStandardRecords(
     resolverContract: Contract,
     tokenId: string,
-  ): Promise<Record<string, string>> {
+  ): Promise<CryptoRecords> {
     const keys = Object.values(standardKeys);
     const values = await this.callMethod(resolverContract, 'getMany', [
       keys,
       tokenId,
     ]);
-    return this.constructRecords(keys, values) as Record<string, string>;
+    return this.constructRecords(keys, values);
   }
 
   private async getAllRecords(
