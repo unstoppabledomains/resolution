@@ -11,7 +11,7 @@ import {
 import Contract from './utils/contract';
 import contentHash from 'content-hash';
 import EnsNetworkMap from 'ethereum-ens-network-map';
-import { SourceDefinition, ResolutionResponse } from './publicTypes';
+import { SourceDefinition, ResolutionResponse, CryptoRecords } from './publicTypes';
 
 export default class Ens extends EthereumNamingService {
   readonly name = NamingServiceName.ENS;
@@ -24,7 +24,7 @@ export default class Ens extends EthereumNamingService {
         this.registryAddress,
       );
     }
-    
+
   }
 
   isSupportedDomain(domain: string): boolean {
@@ -40,17 +40,19 @@ export default class Ens extends EthereumNamingService {
     return this.registryAddress != null;
   }
 
-  async record(domain: string, key: string): Promise<string> {
-    if (key.startsWith('crypto.')) {
-      const ticker = key.split('.')[1];
-      return await this.addr(domain, ticker);
-    }
-    if (key === 'ipfs.html.value') {
-      const hash = await this.getContentHash(domain);
-      return this.ensureRecordPresence(domain, 'IPFS hash', hash);
-    }
-    const ensRecordName = this.fromUDRecordNameToENS(key);
-    return await this.getTextRecord(domain, ensRecordName);
+  async records(domain: string, keys: string[]): Promise<CryptoRecords> {
+    const values = await Promise.all(keys.map(async key => {
+      if (key.startsWith('crypto.')) {
+        const ticker = key.split('.')[1];
+        return await this.addr(domain, ticker);
+      }
+      if (key === 'ipfs.html.value' || key === 'dweb.ipfs.hash') {
+        return await this.getContentHash(domain);
+      }
+      const ensRecordName = this.fromUDRecordNameToENS(key);
+      return await this.getTextRecord(domain, ensRecordName);
+    }));
+    return this.constructRecords(keys, values);
   }
 
   async twitter(domain: string): Promise<string> {
@@ -63,6 +65,7 @@ export default class Ens extends EthereumNamingService {
   private fromUDRecordNameToENS(record: string): string {
     const mapper = {
       'ipfs.redirect_domain.value': 'url',
+      'browser.redirect_url': 'url',
       'whois.email.value': 'email',
       'gundb.username.value': 'gundb_username',
       'gundb.public_key.value': 'gundb_public_key',
@@ -77,18 +80,18 @@ export default class Ens extends EthereumNamingService {
     if (currencyTicker != 'ETH') {
       throw new Error(`Ens doesn't support any currency other than ETH`);
     }
-    
+
     if (address.startsWith('0x')) {
       address = address.substr(2);
     }
-    
+
     const reverseAddress = address + '.addr.reverse';
     const nodeHash = this.namehash(reverseAddress);
     const resolverAddress = await this.getResolver(nodeHash);
     if (isNullAddress(resolverAddress)) {
       return null;
     }
-    
+
     const resolverContract = this.buildContract(
       resolverInterface(resolverAddress, EthCoinIndex),
       resolverAddress,
@@ -97,44 +100,34 @@ export default class Ens extends EthereumNamingService {
     return await this.resolverCallToName(resolverContract, nodeHash);
   }
 
-  private async addr(domain: string, currencyTicker: string): Promise<string> {
+  private async addr(domain: string, currencyTicker: string): Promise<string | undefined> {
     const resolver = await this.resolver(domain);
     const cointType = this.getCoinType(currencyTicker.toUpperCase());
-    return await this.fetchAddressOrThrow(resolver, domain, cointType);
+    return await this.fetchAddress(resolver, domain, cointType);
   }
 
   async owner(domain: string): Promise<string | null> {
     const nodeHash = this.namehash(domain);
-    return (
-      (await this.ignoreResolutionErrors(
-        [ResolutionErrorCode.RecordNotFound],
-        this.getOwner(nodeHash),
-      )) || null
-    );
+    return await this.getOwner(nodeHash)
   }
 
   async resolve(domain: string): Promise<ResolutionResponse | null> {
     if (!this.isSupportedDomain(domain) || !this.isSupportedNetwork()) {
       return null;
     }
-    
-    let [owner, ttl, resolver] = await this.getResolutionInfo(domain);
-    if (isNullAddress(owner)) {
-      owner = null;
-    }
-    const address = await this.ignoreResolutionErrors(
-      [ResolutionErrorCode.RecordNotFound],
-      this.fetchAddress(resolver, domain, EthCoinIndex),
-    );
+
+    const [owner, ttl, resolver] = await this.getResolutionInfo(domain);
+    const address = await this.fetchAddress(resolver, domain, EthCoinIndex);
     const resolution = {
       meta: {
         namehash: this.namehash(domain),
         resolver: resolver,
-        owner,
+        owner: isNullAddress(owner) ? null : owner,
         type: this.name,
         ttl: Number(ttl || 0),
       },
       addresses: {},
+      records: {},
     };
     if (address) {
       resolution.addresses = { ETH: address };
@@ -142,7 +135,7 @@ export default class Ens extends EthereumNamingService {
     return resolution;
   }
 
-  async allRecords(domain: string): Promise<Record<string, string>> {
+  async allRecords(domain: string): Promise<CryptoRecords> {
     throw new Error('Method not implemented.');
   }
 
@@ -165,11 +158,10 @@ export default class Ens extends EthereumNamingService {
     return contentHash.decode(contentHashEncoded);
   }
 
-  private async getTextRecord(domain, key) {
+  private async getTextRecord(domain, key): Promise<string | undefined> {
     const nodeHash = this.namehash(domain);
     const resolver = await this.getResolverContract(domain);
-    const record = await this.callMethod(resolver, 'text', [nodeHash, key]);
-    return this.ensureRecordPresence(domain, key, record);
+    return await this.callMethod(resolver, 'text', [nodeHash, key]);
   }
 
   private async getResolverContract(
@@ -191,20 +183,14 @@ export default class Ens extends EthereumNamingService {
   }
 
   private async getTTL(nodeHash) {
-    return await this.ignoreResolutionErrors(
-      [ResolutionErrorCode.RecordNotFound],
-      this.callMethod(this.registryContract, 'ttl', [nodeHash]),
-    );
+    return await this.callMethod(this.registryContract, 'ttl', [nodeHash]);
   }
 
   /**
    * This was done to make automated tests more configurable
    */
-  protected async getResolver(nodeHash) {
-    return await this.ignoreResolutionErrors(
-      [ResolutionErrorCode.RecordNotFound],
-      this.callMethod(this.registryContract, 'resolver', [nodeHash]),
-    );
+  protected async getResolver(nodeHash: string): Promise<string> {
+    return await this.callMethod(this.registryContract, 'resolver', [nodeHash]);
   }
 
   /**
@@ -227,6 +213,7 @@ export default class Ens extends EthereumNamingService {
   }
 
   protected getCoinType(currencyTicker: string): string {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const constants: Bip44Constants[] = require('bip44-constants');
     const coin = constants.findIndex(
       item =>
@@ -238,26 +225,15 @@ export default class Ens extends EthereumNamingService {
         currencyTicker,
       });
     }
-    
+
     return coin.toString();
   }
 
-  protected getCoinName(coinType: number): string {
-    const constants: Bip44Constants[] = require('bip44-constants');
-    return constants[coinType][1];
-  }
-
-  private async fetchAddressOrThrow(
+  private async fetchAddress(
     resolver: string,
     domain: string,
     coinType: string,
-  ): Promise<string> {
-    if (isNullAddress(resolver)) {
-      throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
-        domain: domain,
-        recordName: this.getCoinName(parseInt(coinType)),
-      });
-    }
+  ): Promise<string | undefined> {
     const resolverContract = this.buildContract(
       resolverInterface(resolver, coinType),
       resolver,
@@ -268,28 +244,10 @@ export default class Ens extends EthereumNamingService {
         ? await this.callMethod(resolverContract, 'addr', [nodeHash, coinType])
         : await this.callMethod(resolverContract, 'addr', [nodeHash]);
     if (isNullAddress(addr)) {
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-        domain: domain,
-        recordName: this.getCoinName(parseInt(coinType)),
-      });
+      return undefined;
     }
+    // eslint-disable-next-line no-undef
     const data = Buffer.from(addr.replace('0x', ''), 'hex');
     return formatsByCoinType[coinType].encoder(data);
-  }
-
-  private async fetchAddress(
-    resolver: string,
-    domain: string,
-    coin: string,
-  ): Promise<string | null> {
-    return (
-      (await this.ignoreResolutionErrors(
-        [
-          ResolutionErrorCode.RecordNotFound,
-          ResolutionErrorCode.UnspecifiedResolver,
-        ],
-        this.fetchAddressOrThrow(resolver, domain, coin),
-      )) || null
-    );
   }
 }

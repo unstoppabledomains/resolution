@@ -8,28 +8,29 @@ import CnsProxyReader from './cns/CnsProxyReader';
 import CnsRegistryReader from './cns/CnsRegistryReader';
 import Contract from './utils/contract';
 import standardKeys from './utils/standardKeys';
-import { isLegacyResolver } from './utils';
+import { getStartingBlock, isLegacyResolver } from './utils';
 import {
   SourceDefinition,
   NamingServiceName,
   ResolutionResponse,
+  CryptoRecords,
 } from './publicTypes';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
-
-const ReaderMap: ReaderMap = {
-  1: '0x7ea9ee21077f84339eda9c80048ec6db678642b1',
-  42: '0xcf4318918fd18aca9bdc11445c01fbada4b448e3', // for internal testing
-};
+import NamingService from './NamingService';
 
 export default class Cns extends EthereumNamingService {
   readonly contract: Contract;
   reader: ICnsReader;
   static TwitterVerificationAddress =
     '0x12cfb13522F13a78b650a8bCbFCf50b7CB899d82';
+  static ReaderMap: ReaderMap = {
+    1: '0x7ea9ee21077f84339eda9c80048ec6db678642b1',
+    42: '0xcf4318918fd18aca9bdc11445c01fbada4b448e3', // for internal testing
+  };
 
   constructor(source: SourceDefinition = {}) {
     super(source, NamingServiceName.CNS);
-    this.contract = this.buildContract(proxyReaderAbi, this.registryAddress);
+    this.contract = this.buildContract(proxyReaderAbi, this.registryAddress!);
   }
 
   async getReader(): Promise<ICnsReader> {
@@ -38,19 +39,19 @@ export default class Cns extends EthereumNamingService {
         ? new CnsProxyReader(this.contract)
         : new CnsRegistryReader(this.contract);
     }
-    
+
     return this.reader;
   }
 
   protected defaultRegistry(network: number): string | undefined {
-    return ReaderMap[network];
+    return Cns.ReaderMap[network];
   }
 
   protected async isDataReaderSupported(): Promise<boolean> {
-    if (ReaderMap[this.network] === this.contract.address) {
+    if (Cns.ReaderMap[this.network] === this.contract.address) {
       return true;
     }
-    
+
 
     try {
       const [
@@ -59,12 +60,12 @@ export default class Cns extends EthereumNamingService {
       if (!isDataReaderSupported) {
         throw new Error('Not supported DataReader');
       }
-      
+
 
       return true;
-    } catch {}
-
-    return false;
+    } catch {
+      return false;
+    }
   }
 
   isSupportedDomain(domain: string): boolean {
@@ -78,8 +79,8 @@ export default class Cns extends EthereumNamingService {
 
   async resolver(domain: string): Promise<string> {
     const tokenId = this.namehash(domain);
-
     const reader = await this.getReader();
+
     const data = await reader.resolver(tokenId);
     await this.verify(domain, data);
 
@@ -99,12 +100,12 @@ export default class Cns extends EthereumNamingService {
       if (error.reason === 'ERC721: owner query for nonexistent token') {
         return NullAddress;
       }
-      
+
       throw error;
     }
   }
 
-  async allRecords(domain: string): Promise<Record<string, string>> {
+  async allRecords(domain: string): Promise<CryptoRecords> {
     const tokenId = this.namehash(domain);
     const resolver = await this.resolver(domain);
 
@@ -112,7 +113,7 @@ export default class Cns extends EthereumNamingService {
     if (isLegacyResolver(resolver)) {
       return await this.getStandardRecords(resolverContract, tokenId);
     }
-    
+
     return await this.getAllRecords(resolverContract, tokenId);
   }
 
@@ -123,19 +124,23 @@ export default class Cns extends EthereumNamingService {
       standardKeys.validation_twitter_username,
       standardKeys.twitter_username,
     ];
-    const { values } = await reader.records(tokenId, records);
-    const owner = await this.owner(domain);
+    const data = await reader.records(tokenId, records);
+    let { owner } = data;
+    if (!owner) {
+      owner = await this.owner(domain);
+    }
+    const { values } = data;
     records.forEach((recordName, i) => {
-      return this.ensureRecordPresence(domain, recordName, values && values[i]);
+      return NamingService.ensureRecordPresence(domain, recordName, values && values[i]);
     });
     const [validationSignature, twitterHandle] = values!;
     if (
-      !(await isValidTwitterSignature({
+      !isValidTwitterSignature({
         tokenId,
         owner,
         twitterHandle,
         validationSignature,
-      }))
+      })
     ) {
       throw new ResolutionError(
         ResolutionErrorCode.InvalidTwitterVerification,
@@ -144,20 +149,18 @@ export default class Cns extends EthereumNamingService {
         },
       );
     }
-    
+
     return twitterHandle;
   }
 
-  async record(domain: string, key: string): Promise<string> {
+  async records(domain: string, keys: string[]): Promise<CryptoRecords> {
     const tokenId = this.namehash(domain);
 
     const reader = await this.getReader();
-    const data = await reader.record(tokenId, key);
+    const data = await reader.records(tokenId, keys);
     await this.verify(domain, data);
 
-    const { values } = data;
-    const value: string | null = values?.length ? values[0] : null;
-    return this.ensureRecordPresence(domain, key, value);
+    return this.constructRecords(keys, data.values);
   }
 
   protected async getResolver(tokenId: string): Promise<string> {
@@ -166,43 +169,28 @@ export default class Cns extends EthereumNamingService {
     ]);
   }
 
-  protected async verify(domain: string, data: Data) {
+  protected async verify(domain: string, data: Data): Promise<void> {
     const { resolver } = data;
     if (!isNullAddress(resolver)) {
       return;
     }
-    
-
     const owner = data.owner || (await this.owner(domain));
     if (isNullAddress(owner)) {
       throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
         domain,
       });
     }
-    
+
 
     throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
       domain,
     });
   }
 
-  private constructRecords(
-    keys: string[],
-    values: string[],
-  ): Record<string, string> {
-    const records: Record<string, string> = {};
-    keys.forEach((key, index) => {
-      if (!!values[index]) {
-        records[key] = values[index];
-      }
-    });
-    return records;
-  }
-
   private async getStandardRecords(
     resolverContract: Contract,
     tokenId: string,
-  ): Promise<Record<string, string>> {
+  ): Promise<CryptoRecords> {
     const keys = Object.values(standardKeys);
     const values = await this.callMethod(resolverContract, 'getMany', [
       keys,
@@ -214,9 +202,18 @@ export default class Cns extends EthereumNamingService {
   private async getAllRecords(
     resolverContract: Contract,
     tokenId: string,
-  ): Promise<Record<string, string>> {
-    const logs = await resolverContract.fetchLogs('NewKey', tokenId);
+  ): Promise<CryptoRecords> {
+    const startingBlock = await getStartingBlock(resolverContract, tokenId);
+    const logs = await resolverContract.fetchLogs(
+      'NewKey',
+      tokenId,
+      startingBlock,
+    );
     const keyTopics = logs.map(event => event.topics[2]);
+    // If there are no NewKey events we want to check the standardRecords
+    if (keyTopics.length === 0) {
+      return await this.getStandardRecords(resolverContract, tokenId);
+    }
     const keys = await this.callMethod(resolverContract, 'getManyByHash', [
       keyTopics,
       tokenId,

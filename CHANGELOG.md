@@ -1,6 +1,7 @@
 ## Unreleased
 
-* Add formatting options for `Resolution#namehash` and `Resolution#childhash` #91.
+* Add `Resolution#records` method to query multiple records #96
+* Add formatting options for `Resolution#namehash` and `Resolution#childhash` #91
 
 ## 1.8.3
 

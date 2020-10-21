@@ -1,5 +1,5 @@
 import nock from 'nock';
-import Resolution, { ResolutionErrorCode, ResolutionError } from './index';
+import Resolution, { ResolutionErrorCode } from './index';
 import Ens from './Ens';
 import { NullAddress } from './types';
 import {
@@ -15,13 +15,6 @@ import { ConfigurationErrorCode } from './errors/configurationError';
 import { NamingServiceName } from './publicTypes';
 let resolution: Resolution;
 
-try {
-  const dotenv = require('dotenv');
-  dotenv.config();
-} catch (err) {
-  console.warn('dotenv is not installed');
-}
-
 beforeEach(() => {
   nock.cleanAll();
   jest.restoreAllMocks();
@@ -35,23 +28,24 @@ describe('ENS', () => {
     const resolution = new Resolution({
       blockchain: { ens: { network: 'mainnet' } },
     });
-    expect(resolution.ens!.url).toBe('https://main-rpc.linkpool.io');
-    expect(resolution.ens!.network).toEqual(1);
+    expect(resolution.ens?.url).toBe('https://main-rpc.linkpool.io');
+    expect(resolution.ens?.network).toEqual(1);
   });
 
   it('resolves .eth name using blockchain', async () => {
     const resolution = new Resolution({
       blockchain: { ens: { url: protocolLink() } },
     });
-    expect(resolution.ens!.url).toBe(protocolLink());
-    expect(resolution.ens!.network).toEqual(1);
+    expect(resolution.ens?.url).toBe(protocolLink());
+    expect(resolution.ens?.network).toEqual(1);
 
     const eyes = mockAsyncMethods(resolution.ens, {
-      getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
       getResolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
-      fetchAddressOrThrow: '0x714ef33943d925731FBB89C99aF5780D888bD106',
+      fetchAddress: '0x714ef33943d925731FBB89C99aF5780D888bD106',
     });
-
+    const spy = mockAsyncMethods(resolution.ens, {
+      getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
+    });
     expect(await resolution.addr('matthewgould.eth', 'ETH')).toEqual(
       '0x714ef33943d925731FBB89C99aF5780D888bD106',
     );
@@ -59,6 +53,7 @@ describe('ENS', () => {
       '0x714ef33943d925731FBB89C99aF5780D888bD106',
     );
     expectSpyToBeCalled(eyes);
+    expectSpyToBeCalled(spy, 2);
   });
 
   it('reverses address to ENS domain', async () => {
@@ -67,7 +62,7 @@ describe('ENS', () => {
       resolverCallToName: 'adrian.argent.xyz',
       getResolver: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
     });
-    const result = await resolution.ens!.reverse(
+    const result = await resolution.ens?.reverse(
       '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
       'ETH',
     );
@@ -77,7 +72,7 @@ describe('ENS', () => {
 
   it('reverses address to ENS domain null', async () => {
     const spy = mockAsyncMethod(resolution.ens, 'getResolver', NullAddress);
-    const result = await resolution.ens!.reverse(
+    const result = await resolution.ens?.reverse(
       '0x112234455c3a32fd11230c42e7bccd4a84e02010',
       'ETH',
     );
@@ -89,7 +84,7 @@ describe('ENS', () => {
     const eyes = mockAsyncMethods(resolution.ens, {
       getOwner: '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
       getResolver: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
-      fetchAddressOrThrow: '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
+      fetchAddress: '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
     });
 
     const result = await resolution.addr('adrian.argent.xyz', 'ETH');
@@ -101,7 +96,7 @@ describe('ENS', () => {
     const eyes = mockAsyncMethods(resolution.ens, {
       getOwner: '0xf3dE750A73C11a6a2863761E930BF5fE979d5663',
       getResolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
-      fetchAddressOrThrow: '0xf3dE750A73C11a6a2863761E930BF5fE979d5663',
+      fetchAddress: '0xf3dE750A73C11a6a2863761E930BF5fE979d5663',
     });
 
     const result = await resolution.addr('john.luxe', 'ETH');
@@ -111,7 +106,7 @@ describe('ENS', () => {
 
   it('resolves .kred name using ENS blockchain', async () => {
     const eyes = mockAsyncMethods(resolution.ens, {
-      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      getResolver: '0x96184444629F3489c4dE199871E6F99568229d8f',
       callMethod: '0x96184444629F3489c4dE199871E6F99568229d8f',
     });
     const result = await resolution.addr('brantly.kred', 'ETH');
@@ -172,20 +167,20 @@ describe('ENS', () => {
 
   it('checks normalizeSource ens (boolean)', async () => {
     const resolution = new Resolution({ blockchain: { ens: true } });
-    expect(resolution.ens!.network).toBe(1);
-    expect(resolution.ens!.url).toBe('https://main-rpc.linkpool.io');
+    expect(resolution.ens?.network).toBe(1);
+    expect(resolution.ens?.url).toBe('https://main-rpc.linkpool.io');
   });
 
   it('checks normalizeSource ens (object) #1', async () => {
-    expect(resolution.ens!.network).toBe(1);
-    expect(resolution.ens!.url).toBe(protocolLink());
+    expect(resolution.ens?.network).toBe(1);
+    expect(resolution.ens?.url).toBe(protocolLink());
   });
 
   it('checks normalizeSource ens (object) #2', async () => {
     const resolution = new Resolution({ blockchain: { ens: { network: 3 } } });
-    expect(resolution.ens!.network).toBe(3);
-    expect(resolution.ens!.url).toBe('https://ropsten-rpc.linkpool.io');
-    expect(resolution.ens!.registryAddress).toBe(
+    expect(resolution.ens?.network).toBe(3);
+    expect(resolution.ens?.url).toBe('https://ropsten-rpc.linkpool.io');
+    expect(resolution.ens?.registryAddress).toBe(
       '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
     );
   });
@@ -194,17 +189,17 @@ describe('ENS', () => {
     const resolution = new Resolution({
       blockchain: { ens: { url: 'https://rinkeby.infura.io' } },
     });
-    expect(resolution.ens!.network).toBe(4);
-    expect(resolution.ens!.url).toBe('https://rinkeby.infura.io');
+    expect(resolution.ens?.network).toBe(4);
+    expect(resolution.ens?.url).toBe('https://rinkeby.infura.io');
   });
 
   it('checks normalizeSource ens (object) #4', async () => {
     const resolution = new Resolution({
       blockchain: { ens: { url: 'https://goerli.infura.io', network: 5 } },
     });
-    expect(resolution.ens!.network).toBe(5);
-    expect(resolution.ens!.url).toBe('https://goerli.infura.io');
-    expect(resolution.ens!.registryAddress).toBe(
+    expect(resolution.ens?.network).toBe(5);
+    expect(resolution.ens?.url).toBe('https://goerli.infura.io');
+    expect(resolution.ens?.registryAddress).toBe(
       '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
     );
   });
@@ -225,8 +220,8 @@ describe('ENS', () => {
     const resolution = new Resolution({
       blockchain: { ens: { network: 'mainnet' } },
     });
-    expect(resolution.ens!.network).toBe(1);
-    expect(resolution.ens!.url).toBe('https://main-rpc.linkpool.io');
+    expect(resolution.ens?.network).toBe(1);
+    expect(resolution.ens?.url).toBe('https://main-rpc.linkpool.io');
   });
 
   it('checks normalizeSource ens (object) #9', async () => {
@@ -242,9 +237,9 @@ describe('ENS', () => {
         ens: { registry: '0x314159265dd8dbb310642f98f50c066173c1259b' },
       },
     });
-    expect(resolution.ens!.network).toBe(1);
-    expect(resolution.ens!.url).toBe('https://main-rpc.linkpool.io');
-    expect(resolution.ens!.registryAddress).toBe(
+    expect(resolution.ens?.network).toBe(1);
+    expect(resolution.ens?.url).toBe('https://main-rpc.linkpool.io');
+    expect(resolution.ens?.registryAddress).toBe(
       '0x314159265dd8dbb310642f98f50c066173c1259b',
     );
   });
@@ -258,9 +253,9 @@ describe('ENS', () => {
         },
       },
     });
-    expect(resolution.ens!.network).toBe(3);
-    expect(resolution.ens!.url).toBe('https://ropsten-rpc.linkpool.io');
-    expect(resolution.ens!.registryAddress).toBe(
+    expect(resolution.ens?.network).toBe(3);
+    expect(resolution.ens?.url).toBe('https://ropsten-rpc.linkpool.io');
+    expect(resolution.ens?.registryAddress).toBe(
       '0x112234455c3a32fd11230c42e7bccd4a84e02010',
     );
   });
@@ -272,9 +267,9 @@ describe('ENS', () => {
       },
     });
 
-    expect(resolution.ens!.network).toBe(1);
-    expect(resolution.ens!.url).toBe('https://main-rpc.linkpool.io');
-    expect(resolution.ens!.registryAddress).toBe(
+    expect(resolution.ens?.network).toBe(1);
+    expect(resolution.ens?.url).toBe('https://main-rpc.linkpool.io');
+    expect(resolution.ens?.registryAddress).toBe(
       '0xabcffff1231586348194fcabbeff1231240234fc',
     );
   });
@@ -400,10 +395,31 @@ describe('ENS', () => {
   // TODO to be removed in 2.0.0
   it('[Old test] checks Resolution#addressOrThrow error #2', async () => {
     const resolution = new Resolution();
+    const eyes = mockAsyncMethods(resolution.zns, {
+      getRecordsAddresses: [
+        'zil194qcjskuuxh6qtg8xw3qqrr3kdc6dtq8ct6j9s',
+        '0xdac22230adfe4601f00631eae92df6d77f054891'
+      ],
+      fetchSubState: {
+        records: {
+          'crypto.BCH.address': 'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6',
+          'crypto.BTC.address': '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB',
+          'crypto.DASH.address': 'XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j',
+          'crypto.ETH.address': '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
+          'crypto.LTC.address': 'LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL',
+          'crypto.XMR.address': '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d',
+          'crypto.ZEC.address': 't1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV',
+          'crypto.ZIL.address': 'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
+          'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
+          'ipfs.redirect_domain.value': 'www.unstoppabledomains.com'
+        }
+      }
+    });
     await expectResolutionErrorCode(
       resolution.addressOrThrow('brad.zil', 'INVALID_CURRENCY_SYMBOL'),
       ResolutionErrorCode.UnspecifiedCurrency,
     );
+    expectSpyToBeCalled(eyes);
   });
 
   it('checks UnsupportedCurrency error', async () => {
@@ -419,12 +435,13 @@ describe('ENS', () => {
 
   // TODO to be removed in 2.0.0
   it('[Old test]resolve to null for empty .eth record', async () => {
-    expect(resolution.ens!.url).toBe(protocolLink());
-    expect(resolution.ens!.network).toEqual(1);
+    expect(resolution.ens?.url).toBe(protocolLink());
+    expect(resolution.ens?.network).toEqual(1);
 
     const eyes = mockAsyncMethods(resolution.ens, {
       getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
       getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      callMethod: '0x'
     });
 
     expect(await resolution.address('qwdqwd.eth', 'XRP')).toEqual(null);
@@ -435,7 +452,7 @@ describe('ENS', () => {
     it('passes without any errors', async () => {
       const eyes = mockAsyncMethods(resolution.ens, {
         getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
-        getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+        getResolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
         getTTL: 0,
         callMethod: '0x714ef33943d925731FBB89C99aF5780D888bD106',
       });
@@ -446,11 +463,12 @@ describe('ENS', () => {
         meta: {
           namehash:
             '0x2b53e3f567989ee41b897998d89eb4d8cf0715fb2cfb41a64939a532c09e495e',
-          resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+          resolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
           owner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
           type: 'ENS',
           ttl: 0,
         },
+        records: {},
       });
     });
 
@@ -460,9 +478,7 @@ describe('ENS', () => {
         getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
         getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
         getTTL: 0,
-        fetchAddressOrThrow: new ResolutionError(
-          ResolutionErrorCode.RecordNotFound,
-        ),
+        fetchAddress: undefined
       });
       const result = await resolution.resolve('matthewgould.eth');
       expectSpyToBeCalled(eyes);
@@ -476,6 +492,7 @@ describe('ENS', () => {
           type: 'ENS',
           ttl: 0,
         },
+        records: {},
       });
     });
 
@@ -506,7 +523,7 @@ describe('ENS', () => {
   describe('.Hashing', () => {
     describe('.namehash', () => {
       it('supports root node', async () => {
-        expect(resolution.ens!.isSupportedDomain('eth')).toEqual(true);
+        expect(resolution.isSupportedDomain('eth')).toEqual(true);
         expect(resolution.namehash('eth')).toEqual(
           '0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae',
         );
@@ -520,7 +537,7 @@ describe('ENS', () => {
 
       describe('.domain invalid format', () => {
         it('starts with -', async () => {
-          expect(resolution.ens!.isSupportedDomain('-hello.eth')).toEqual(
+          expect(resolution.isSupportedDomain('-hello.eth')).toEqual(
             false,
           );
           await expectResolutionErrorCode(

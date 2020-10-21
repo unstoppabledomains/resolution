@@ -1,4 +1,3 @@
-import BN from 'bn.js';
 import { keccak_256 as sha3 } from 'js-sha3';
 import NamingService from './NamingService';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
@@ -45,7 +44,7 @@ export abstract class EthereumNamingService extends NamingService {
     } else {
       // We don't care about this promise anymore
       // Ensure it doesn't generate a warning if it rejects
-      ownerPromise.catch(() => {});
+      ownerPromise.catch(() => undefined);
     }
 
     return resolverAddress;
@@ -57,6 +56,7 @@ export abstract class EthereumNamingService extends NamingService {
     }
 
     for (const key in EthereumNamingService.NetworkNameMap) {
+      // eslint-disable-next-line no-prototype-builtins
       if (!EthereumNamingService.NetworkNameMap.hasOwnProperty(key)) {
         continue;
       }
@@ -96,6 +96,7 @@ export abstract class EthereumNamingService extends NamingService {
   ): nodeHash {
     parent = parent.replace(/^0x/, '');
     const childHash = sha3(label);
+    // eslint-disable-next-line no-undef
     return sha3(Buffer.from(parent + childHash, 'hex'));
   }
 
@@ -122,14 +123,14 @@ export abstract class EthereumNamingService extends NamingService {
     }
   }
 
-  protected buildContract(abi, address) {
+  protected buildContract(abi: any, address: string): Contract {
     return new Contract(abi, address, this.provider);
   }
 
   protected async throwOwnershipError(
-    domain,
+    domain: string,
     ownerPromise?: Promise<string | null>,
-  ) {
+  ): Promise<void> {
     const owner = ownerPromise ? await ownerPromise : await this.owner(domain);
     if (isNullAddress(owner)) {
       throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {

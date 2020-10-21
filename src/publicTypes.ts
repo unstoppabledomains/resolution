@@ -42,7 +42,7 @@ export type ResolutionResponse = {
     resolver: string;
     ttl: number;
   };
-  records?: {
+  records: {
     [key: string]: string;
   };
 };
@@ -86,6 +86,7 @@ export const UnclaimedDomainResponse: ResolutionResponse = {
     type: '',
     ttl: 0,
   },
+  records: {},
 };
 
 /**
@@ -187,3 +188,4 @@ ZONEMD,
 }
 
 export type DnsRecord = {type: DnsRecordType, ttl: number, value: string}
+export type CryptoRecords = Record<string, string | undefined>;

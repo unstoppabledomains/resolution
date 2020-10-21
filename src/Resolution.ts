@@ -18,7 +18,8 @@ import {
   NamehashOptions,
   NamehashOptionsDefault,
   DnsRecordType,
-  DnsRecord
+  DnsRecord,
+  CryptoRecords,
 } from './publicTypes';
 import { nodeHash } from './types';
 import { EthersProvider } from './publicTypes';
@@ -101,7 +102,7 @@ export default class Resolution {
    * @param infura infura project id
    * @param network ethereum network name
    */
-  static infura(infura: string, network: string = 'mainnet'): Resolution {
+  static infura(infura: string, network = 'mainnet'): Resolution {
     return new this({
       blockchain: {
         ens: { url: signedInfuraLink(infura, network), network },
@@ -208,7 +209,6 @@ export default class Resolution {
    * @throws [[ResolutionError]] if address is not found
    * @returns A promise that resolves in an address
    */
-
   async addr(domain: string, currrencyTicker: string): Promise<string> {
     return await this.record(
       domain,
@@ -223,7 +223,6 @@ export default class Resolution {
    * @throws [[ResolutionError]] if twitter is not found
    * @returns A promise that resolves in a verified twitter handle
    */
-
   async twitter(domain: string): Promise<string> {
     domain = this.prepareDomain(domain);
     const namingService = this.serviceName(domain);
@@ -264,7 +263,8 @@ export default class Resolution {
    * @throws [[ResolutionError]]
    */
   async ipfsHash(domain: string): Promise<string> {
-    return await this.record(domain, 'ipfs.html.value');
+    domain = this.prepareDomain(domain);
+    return await this.getPreferableNewRecord(domain, 'dweb.ipfs.hash', 'ipfs.html.value');
   }
 
   /**
@@ -272,7 +272,8 @@ export default class Resolution {
    * @param domain - domain name
    */
   async httpUrl(domain: string): Promise<string> {
-    return await this.record(domain, 'ipfs.redirect_domain.value');
+    domain = this.prepareDomain(domain);
+    return await this.getPreferableNewRecord(domain, 'browser.redirect_url', 'ipfs.redirect_domain.value');
   }
 
   /**
@@ -323,7 +324,6 @@ export default class Resolution {
         domain,
         `crypto.${currencyTicker.toUpperCase()}.address`,
       );
-      console.log(`${currencyTicker} => ${addr}`);
       return addr;
     } catch (error) {
       // re-throw an error for back compatability. old method throws deprecated UnspecifiedCurrency code since before v1.7.0
@@ -369,6 +369,17 @@ export default class Resolution {
     domain = this.prepareDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
     return await method.record(domain, recordKey);
+  }
+
+  /**
+   * @param domain domain name
+   * @param keys Array of record keys to be resolved
+   * @returns A Promise with key-value mapping of domain records
+   */
+  async records(domain: string, keys: string[]): Promise<CryptoRecords> {
+    domain = this.prepareDomain(domain);
+    const method = this.getNamingMethodOrThrow(domain);
+    return await method.records(domain, keys);
   }
 
   /**
@@ -472,13 +483,18 @@ export default class Resolution {
    * Method is not supported by ENS
    * @param domain - domain name
    */
-  async allRecords(domain: string): Promise<Record<string, string>> {
+  async allRecords(domain: string): Promise<CryptoRecords> {
     domain = this.prepareDomain(domain);
     return await this.getNamingMethodOrThrow(domain).allRecords(domain);
   }
 
   async dns(domain: string, type: DnsRecordType[]): Promise<DnsRecord[]> {
     return [];
+  }
+  
+  private async getPreferableNewRecord(domain: string, newRecord: string, oldRecord: string): Promise<string> {
+    const records = await this.records(domain, [newRecord, oldRecord]);
+    return NamingService.ensureRecordPresence(domain, newRecord, records[newRecord] || records[oldRecord]);
   }
 
   private getNamingMethod(domain: string): NamingService | undefined {

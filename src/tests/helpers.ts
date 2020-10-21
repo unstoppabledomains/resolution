@@ -15,44 +15,54 @@ export const CryptoDomainWithEmail = 'reseller-test-paul019.crypto';
 export const CryptoDomainWithAdaBchAddresses = 'reseller-test-mago0.crypto';
 export const CryptoDomainWithTwitterVerification = 'ijustwannatestsomething2.crypto';
 
-export function mockAsyncMethod(object: any, method: string, value) {
+try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const dotenv = require('dotenv');
+  dotenv.config();
+} catch (err) {
+  console.warn('dotenv is not installed');
+}
+
+export function mockAsyncMethod(object: any, method: string, value: any): jest.SpyInstance {
   const spy = jest.spyOn(object, method);
-  if (!process.env.LIVE) {
+  if (!isLive()) {
     if (value instanceof Function) {
-      return spy.mockImplementation(value);
+      return spy.mockImplementation(value as any);
     } else if (value instanceof Error) {
       return spy.mockRejectedValue(value);
     } else {
       return spy.mockResolvedValue(value);
     }
   }
-    
-  
+
+
   return spy;
 }
 
-export function mockAsyncMethods(object: any, methods: Dictionary<any>) {
+export function mockAsyncMethods(object: any, methods: Dictionary<any>): jest.SpyInstance[] {
   return Object.entries(methods).map((method) =>
     mockAsyncMethod(object, method[0], method[1]),
   );
 }
 
-export function isLive() {
+export function isLive(): boolean {
+  // eslint-disable-next-line no-undef
   return !!process.env.LIVE;
 }
 
-export function pendingInLive() {
+export function pendingInLive(): void {
   if (isLive()) {
+    // eslint-disable-next-line no-undef
     pending('Disabled in LIVE mode');
   }
-  
 }
 
-export function expectSpyToBeCalled(spies: any[]) {
+export function expectSpyToBeCalled(spies: jest.SpyInstance[], times?: number ): void {
   if (!isLive()) {
-    spies.forEach((spy) => expect(spy).toBeCalled());
+    spies.forEach((spy) => {
+      times ? expect(spy).toBeCalledTimes(times) : expect(spy).toBeCalled()
+    });
   }
-  
 }
 
 export async function expectResolutionErrorCode(
@@ -84,12 +94,12 @@ async function expectError(
       } else {
         resolve(result);
       }
-      
+
     });
   }
-  
 
   return callback.then(
+    // eslint-disable-next-line no-undef
     () => fail(`Expected ${klass.name} to be thrown but wasn't`),
     (error) => {
       // Redundant code quality check is required
@@ -99,16 +109,16 @@ async function expectError(
       } else {
         throw error;
       }
-      
+
     },
   );
 }
 
-export function mockAPICalls(testName: string, url = MainnetUrl) {
+export function mockAPICalls(testName: string, url = MainnetUrl): void {
   if (isLive()) {
     return;
   }
-  
+
   const mcdt = mockData as any;
   const mockCall = mcdt[testName] as [any];
 
@@ -119,6 +129,7 @@ export function mockAPICalls(testName: string, url = MainnetUrl) {
         // .log()
         .post('/', JSON.stringify(REQUEST), undefined)
         .reply(200, JSON.stringify(RESPONSE));
+      break;
     }
     default: {
       nock(url)
@@ -137,6 +148,7 @@ export function mockAPICalls(testName: string, url = MainnetUrl) {
  * UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID env variable if any
  */
 export function protocolLink(providerProtocol: ProviderProtocol = ProviderProtocol.http): string {
+  // eslint-disable-next-line no-undef
   const secret = process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID;
   const protocolMap = {
     [ProviderProtocol.http]: secret ? `https://mainnet.infura.io/v3/${secret}` : 'https://main-rpc.linkpool.io',
@@ -155,7 +167,7 @@ export const caseMock = <T, U>(params: T, cases: { request: T, response: U }[]):
       return response;
     }
   }
-    
-  
+
+
   throw new Error(`got unexpected params ${JSON.stringify(params)}`);
 }

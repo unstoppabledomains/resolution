@@ -1,4 +1,3 @@
-import BN from 'bn.js';
 import {
   ResolutionMethod,
   Provider,
@@ -13,6 +12,7 @@ import ConfigurationError, {
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import FetchProvider from './FetchProvider';
 import { nodeHash } from './types';
+import { CryptoRecords } from './publicTypes';
 
 export default abstract class NamingService extends BaseConnection {
   readonly name: ResolutionMethod;
@@ -23,7 +23,7 @@ export default abstract class NamingService extends BaseConnection {
   abstract isSupportedDomain(domain: string): boolean;
   abstract isSupportedNetwork(): boolean;
   abstract owner(domain: string): Promise<string | null>;
-  abstract record(domain: string, key: string): Promise<string>;
+  abstract records(domain: string, keys: string[]): Promise<CryptoRecords>;
   abstract resolve(domain: string): Promise<ResolutionResponse | null>;
   abstract resolver(domain: string): Promise<string>;
   abstract twitter(domain: string): Promise<string>;
@@ -31,7 +31,7 @@ export default abstract class NamingService extends BaseConnection {
     parent: nodeHash,
     label: string,
   ): nodeHash;
-  abstract allRecords(domain: string): Promise<Record<string, string>>;
+  abstract allRecords(domain: string): Promise<CryptoRecords>;
 
   constructor(source: SourceDefinition, name: ResolutionMethod) {
     super();
@@ -39,7 +39,7 @@ export default abstract class NamingService extends BaseConnection {
     source = this.normalizeSource(source);
     this.ensureConfigured(source);
     this.url = source.url;
-    this.provider = source.provider || new FetchProvider(this.name, this.url!);
+    this.provider = source.provider || new FetchProvider(this.name, this.url || '');
     this.network = source.network as number;
     this.registryAddress = source.registry;
   }
@@ -64,6 +64,11 @@ export default abstract class NamingService extends BaseConnection {
       );
   }
 
+  async record(domain: string, key: string): Promise<string> {
+    const records = await this.records(domain, [key]);
+    return NamingService.ensureRecordPresence(domain, key, records[key]);
+  }
+
   protected abstract normalizeSource(
     source: SourceDefinition | undefined,
   ): SourceDefinition;
@@ -74,7 +79,7 @@ export default abstract class NamingService extends BaseConnection {
         domain,
       });
     }
-    
+
   }
 
   protected async ignoreResolutionErrors<T>(
@@ -89,7 +94,7 @@ export default abstract class NamingService extends BaseConnection {
       } else {
         throw error;
       }
-      
+
     }
   }
 
@@ -97,7 +102,7 @@ export default abstract class NamingService extends BaseConnection {
     return error instanceof ResolutionError && (!code || error.code === code);
   }
 
-  protected ensureRecordPresence(
+  public static ensureRecordPresence(
     domain: string,
     key: string,
     value: string | undefined | null,
@@ -105,7 +110,7 @@ export default abstract class NamingService extends BaseConnection {
     if (value) {
       return value;
     }
-    
+
     throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
       recordName: key,
       domain: domain,
@@ -118,12 +123,24 @@ export default abstract class NamingService extends BaseConnection {
         method: this.name,
       });
     }
-    
+
     if (!source.url && !source.provider) {
       throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedUrl, {
         method: this.name,
       });
     }
-    
+
   }
+
+  protected constructRecords(
+    keys: string[],
+    values: undefined | (string | undefined)[] | CryptoRecords,
+  ): CryptoRecords {
+    const records: CryptoRecords = {};
+    keys.forEach((key, index) => {
+      records[key] = values instanceof Array ? values[index] : values?.[key];
+    });
+    return records;
+  }
+
 }
