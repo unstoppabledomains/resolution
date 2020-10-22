@@ -83,3 +83,10 @@ export async function getStartingBlock(contract: Contract, tokenId: string): Pro
   const lastResetEvent = logs[logs.length - 1];
   return lastResetEvent?.blockNumber || CRYPTO_RESOLVER_ADVANCED_EVENTS_STARTING_BLOCK;
 }
+
+export function isStringArray(value: any): value is string[] {
+  if (value instanceof Array) {
+    return value.every(item => typeof item === "string");
+  }
+  return false
+}

@@ -27,6 +27,8 @@ import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import NamingService from './NamingService';
 import { signedInfuraLink } from './utils';
 import { Eip1993Factories } from './utils/Eip1993Factories';
+import { access } from 'fs';
+import DnsUtils from './DnsUtils';
 
 /**
  * Blockchain domain Resolution library - Resolution.
@@ -488,12 +490,28 @@ export default class Resolution {
     return await this.getNamingMethodOrThrow(domain).allRecords(domain);
   }
 
-  async dns(domain: string, type: DnsRecordType[]): Promise<DnsRecord[]> {
-    return [];
+  async dns(domain: string, types: DnsRecordType[]): Promise<DnsRecord[]> {
+    const dnsUtils = new DnsUtils();
+    domain = this.prepareDomain(domain);
+    const method = this.getNamingMethodOrThrow(domain);
+    const dnsRecordKeys = this.getDnsRecordKeys(types);
+    const blockchainData = await method.records(domain, dnsRecordKeys);
+    console.log({blockchainData});
+    
+    return dnsUtils.toClassical(blockchainData);
   }
-  
+
+  private getDnsRecordKeys(types: DnsRecordType[]): string[] {
+    const records = ['dns.ttl'];
+    types.forEach(type => {
+      records.push(`dns.${type}`);
+      records.push(`dns.${type}.ttl`);
+    });
+    return records;
+  }
+
   private async getPreferableNewRecord(domain: string, newRecord: string, oldRecord: string): Promise<string> {
-    const records = await this.records(domain, [newRecord, oldRecord]);
+    const records = await this.records(domain, [newRecord, oldRecord]) as Record<string, string>;
     return NamingService.ensureRecordPresence(domain, newRecord, records[newRecord] || records[oldRecord]);
   }
 
