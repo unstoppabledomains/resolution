@@ -496,7 +496,6 @@ export default class Resolution {
     const method = this.getNamingMethodOrThrow(domain);
     const dnsRecordKeys = this.getDnsRecordKeys(types);
     const blockchainData = await method.records(domain, dnsRecordKeys);
-    console.log({blockchainData});
     
     return dnsUtils.toClassical(blockchainData);
   }
