@@ -6,7 +6,7 @@ type DnsRecordsErrorOptions = {
 };
 
 export enum DnsRecordsErrorCode {
-  NotCommonTtl = "NotCommonTtl"
+  InconsistentTtl = "InconsistentTtl"
 }
 
 /**
