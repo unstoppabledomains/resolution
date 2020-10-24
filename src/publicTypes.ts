@@ -188,4 +188,4 @@ ZONEMD="ZONEMD",
 }
 
 export type DnsRecord = {type: DnsRecordType, ttl: number, value: string}
-export type CryptoRecords = Record<string, number | string | string[] | undefined>;
+export type CryptoRecords = Record<string, string | undefined>;

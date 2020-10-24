@@ -10,10 +10,10 @@ beforeAll(() => {
 describe('DnsUtils', () => {
   it('toClassical', () => {
     const record: CryptoRecords = {
-        'dns.ttl': 128,
-        'dns.A': [ '10.0.0.1', '10.0.0.2' ],
-        'dns.A.ttl': 90,
-        'dns.AAAA': [ '10.0.0.120' ],
+        'dns.ttl': "128",
+        'dns.A': "[ '10.0.0.1', '10.0.0.2' ]",
+        'dns.A.ttl': "90",
+        'dns.AAAA': "[ '10.0.0.120' ]",
         'dns.AAAA.ttl': undefined    
     };
     const classic: DnsRecord[] = dnsUtils.toClassical(record);

@@ -47,7 +47,21 @@ export default class DnsUtils {
 
   private constructDnsRecords(data: CryptoRecords, type: DnsRecordType ): DnsRecord[] {
     const ttl = !!data[`dns.${type}.ttl`] ? Number(data[`dns.${type}.ttl`]) : Number(data['dns.ttl']);
-    const typeData = data[`dns.${type}`] as string[] || [];
+    const jsonValueString = data[`dns.${type}`];
+    if (!jsonValueString) return [];
+    const typeData = JSON.parse(jsonValueString);
+    if (!isStringArray(typeData)) {
+      return [];
+    }
     return typeData.map(value => ({ttl, value, type}));
+  }
+
+  private parseTtl(data: CryptoRecords, type: DnsRecordType): number {
+    const defaultTtl = data['dns.ttl'];
+    const recordTtl = data[`dns.${type}.ttl`];
+    if (recordTtl) {
+      return parseInt(recordTtl, 10);
+    }
+    return parseInt(defaultTtl || "", 10);
   }
 }
