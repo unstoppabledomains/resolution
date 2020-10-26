@@ -1,10 +1,9 @@
 import DnsRecordsError, { DnsRecordsErrorCode } from "./errors/dnsRecordsError";
 import { CryptoRecords, DnsRecord, DnsRecordType } from "./publicTypes";
 import { isStringArray } from "./utils";
-
 export default class DnsUtils {
 
-  public toClassical(record: CryptoRecords): DnsRecord[] {
+  public toList(record: CryptoRecords): DnsRecord[] {
     const dnsTypes = this.getAllDnsTypes(record);
     return ([] as DnsRecord[]).concat(
       ...dnsTypes.map(type => this.constructDnsRecords(record, type))
@@ -14,23 +13,32 @@ export default class DnsUtils {
   public toCrypto(records: DnsRecord[]): CryptoRecords {
     const cryptoRecords:CryptoRecords = {};
     for (const record of records) {
-      const { ttl, type, value } = record;
-      
-      const dnsRecord = cryptoRecords[`dns.${type}`];
-      const ttlInRecord = cryptoRecords[`dns.${type}.ttl`] as number | undefined;
-
-      if (isStringArray(dnsRecord)) {
-        dnsRecord.push(value);
+      const {type, ttl, value} = record;
+      const ttlInRecord = this.getJsonRepresentation(cryptoRecords[`dns.${type}.ttl`], 'number') as number | undefined;
+      const dnsInRecord = this.getJsonRepresentation(cryptoRecords[`dns.${type}`], 'string[]') as string[] | undefined;
+      if (dnsInRecord) {
+        dnsInRecord.push(value);
+        cryptoRecords[`dns.${type}`] = JSON.stringify(dnsInRecord);
       } else {
-        cryptoRecords[`dns.${type}`] = [value];
+        cryptoRecords[`dns.${type}`] = JSON.stringify([value]);
+        cryptoRecords[`dns.${type}.ttl`] = ttl.toString(10);
       }
 
       if (!!ttlInRecord && ttlInRecord !== ttl) {
-        throw new DnsRecordsError(DnsRecordsErrorCode.NotCommonTtl, {recordType: type});
-      } 
-      cryptoRecords[`dns.${type}.ttl`] = ttl;
+        throw new DnsRecordsError(DnsRecordsErrorCode.InconsistentTtl, {recordType: type});
+      }
     }
     return cryptoRecords;
+  }
+
+  private getJsonRepresentation(rawRecord: string | undefined, type:  'string[]' | 'number'): string[] | number | undefined {
+    if (!rawRecord) {
+      return undefined;
+    }
+    if (type === 'string[]') {
+      return JSON.parse(rawRecord);
+    }
+    return parseInt(rawRecord, 10);
   }
 
   private getAllDnsTypes(records: CryptoRecords): DnsRecordType[] {
@@ -46,9 +54,11 @@ export default class DnsUtils {
   }
 
   private constructDnsRecords(data: CryptoRecords, type: DnsRecordType ): DnsRecord[] {
-    const ttl = !!data[`dns.${type}.ttl`] ? Number(data[`dns.${type}.ttl`]) : Number(data['dns.ttl']);
+    const ttl = this.parseTtl(data, type);
     const jsonValueString = data[`dns.${type}`];
-    if (!jsonValueString) return [];
+    if (!jsonValueString) {
+      return [];
+    }
     const typeData = JSON.parse(jsonValueString);
     if (!isStringArray(typeData)) {
       return [];
@@ -62,6 +72,9 @@ export default class DnsUtils {
     if (recordTtl) {
       return parseInt(recordTtl, 10);
     }
-    return parseInt(defaultTtl || "", 10);
+    if (defaultTtl) {
+      return parseInt(defaultTtl, 10);
+    }
+    throw new DnsRecordsError(DnsRecordsErrorCode.NoTtlFound);
   }
 }

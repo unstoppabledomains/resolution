@@ -274,7 +274,7 @@ describe('Resolution', () => {
           const spies = mockAsyncMethods(reader, {
             records: {
               resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
-              values: [128, ["10.0.0.1","10.0.0.2"], 90, ["10.0.0.120"], undefined ]
+              values: ['128','["10.0.0.1","10.0.0.2"]','90','["10.0.0.120"]',undefined]
             },
           });
           const dnsRecords = await resolution.dns("someTestDomain.crypto", [DnsRecordType.A, DnsRecordType.AAAA]);

@@ -1,4 +1,4 @@
-import { DnsRecordType, ResolutionMethod } from '../publicTypes';
+import { DnsRecordType } from '../publicTypes';
 type DnsRecordsErrorHandler = (error: DnsRecordsErrorOptions) => string;
 /** Explains DnsRecords Error options */
 type DnsRecordsErrorOptions = {
@@ -6,7 +6,8 @@ type DnsRecordsErrorOptions = {
 };
 
 export enum DnsRecordsErrorCode {
-  InconsistentTtl = "InconsistentTtl"
+  InconsistentTtl = "InconsistentTtl",
+  NoTtlFound = "NoTtlFound",
 }
 
 /**
@@ -14,7 +15,8 @@ export enum DnsRecordsErrorCode {
  * Internal Mapping object from DnsRecordsErrorCode to a DnsRecordsErrorHandler
  */
 const HandlersByCode = {
-  [DnsRecordsErrorCode.NotCommonTtl]: (params: DnsRecordsErrorOptions) => `ttl for record ${params.recordType} is different for other records of the same type`
+  [DnsRecordsErrorCode.InconsistentTtl]: (params: DnsRecordsErrorOptions) => `ttl for record ${params.recordType} is different for other records of the same type`,
+  [DnsRecordsErrorCode.NoTtlFound]: (params) => `Ttl record was not present`
 };
 
 /**

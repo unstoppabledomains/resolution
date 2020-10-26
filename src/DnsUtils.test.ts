@@ -10,13 +10,12 @@ beforeAll(() => {
 describe('DnsUtils', () => {
   it('toClassical', () => {
     const record: CryptoRecords = {
-        'dns.ttl': "128",
-        'dns.A': "[ '10.0.0.1', '10.0.0.2' ]",
-        'dns.A.ttl': "90",
-        'dns.AAAA': "[ '10.0.0.120' ]",
-        'dns.AAAA.ttl': undefined    
+      "dns.ttl": "128",
+      "dns.A": '["10.0.0.1","10.0.0.2"]',
+      "dns.A.ttl": "90",
+      "dns.AAAA": '["10.0.0.120"]'
     };
-    const classic: DnsRecord[] = dnsUtils.toClassical(record);
+    const classic: DnsRecord[] = dnsUtils.toList(record);
     expect(classic).toStrictEqual([
       { ttl: 90, value: '10.0.0.1', type: 'A' },
       { ttl: 90, value: '10.0.0.2', type: 'A' },
@@ -31,11 +30,11 @@ describe('DnsUtils', () => {
       { ttl: 128, value: '10.0.0.120', type: 'AAAA' as DnsRecordType }
     ]; 
     const cryptoRecords: CryptoRecords = dnsUtils.toCrypto(classicalRecords);
-      expect(cryptoRecords).toStrictEqual({
-        'dns.A': [ '10.0.0.1', '10.0.0.2' ],
-        'dns.A.ttl': 90,
-        'dns.AAAA': [ '10.0.0.120' ],
-        'dns.AAAA.ttl': 128    
+    expect(cryptoRecords).toStrictEqual({
+      'dns.A': "[\"10.0.0.1\",\"10.0.0.2\"]",
+      'dns.A.ttl': "90",
+      'dns.AAAA': "[\"10.0.0.120\"]",
+      'dns.AAAA.ttl': "128"
     });
   });
 

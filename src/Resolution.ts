@@ -27,7 +27,6 @@ import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import NamingService from './NamingService';
 import { signedInfuraLink } from './utils';
 import { Eip1993Factories } from './utils/Eip1993Factories';
-import { access } from 'fs';
 import DnsUtils from './DnsUtils';
 
 /**
@@ -496,7 +495,7 @@ export default class Resolution {
     const method = this.getNamingMethodOrThrow(domain);
     const dnsRecordKeys = this.getDnsRecordKeys(types);
     const blockchainData = await method.records(domain, dnsRecordKeys);
-    return dnsUtils.toClassical(blockchainData);
+    return dnsUtils.toList(blockchainData);
   }
 
   private getDnsRecordKeys(types: DnsRecordType[]): string[] {
