@@ -118,10 +118,6 @@ function resolveGunDbRecords(domain) {
     .chatId(domain)
     .then((id) => console.log(`Domain ${domain} has a GunDB chat ID: ${id}`))
     .catch(console.error);
-  resolution
-    .chatPk(domain)
-    .then((pk) => console.log(`Domain ${domain} has a GunDB public key: ${pk}`))
-    .catch(console.error);
 }
 
 resolveGunDbRecords("homecakes.crypto");
@@ -132,7 +128,6 @@ Execute the script.
 ```shell
 $ node gundb.js
 Domain homecakes.crypto has a GunDB chat ID: 0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c
-Domain homecakes.crypto has a GunDB public key: 
 ```
 
 ### Command Line Interface
