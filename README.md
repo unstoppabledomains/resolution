@@ -54,18 +54,18 @@ yarn add @unstoppabledomains/resolution
 Create a new file in your project, `address.js`.
 
 ```javascript
-const { default: Resolution } = require("@unstoppabledomains/resolution");
+const { default: Resolution } = require('@unstoppabledomains/resolution');
 const resolution = new Resolution();
 
 function resolve(domain, currency) {
   resolution
     .addr(domain, currency)
-    .then((address) => console.log(domain, "resolves to", address))
+    .then((address) => console.log(domain, 'resolves to', address))
     .catch(console.error);
 }
 
-resolve("brad.crypto", "ETH");
-resolve("brad.zil", "ZIL");
+resolve('brad.crypto', 'ETH');
+resolve('brad.zil', 'ZIL');
 ```
 
 Execute the script.
@@ -81,7 +81,7 @@ brad.zil resolves to zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj
 Create a new file in your project, `ipfs_hash.js`.
 
 ```javascript
-const { default: Resolution } = require("@unstoppabledomains/resolution");
+const { default: Resolution } = require('@unstoppabledomains/resolution');
 const resolution = new Resolution();
 
 function resolveIpfsHash(domain) {
@@ -95,7 +95,7 @@ function resolveIpfsHash(domain) {
     .catch(console.error);
 }
 
-resolveIpfsHash("homecakes.crypto");
+resolveIpfsHash('homecakes.crypto');
 ```
 
 Execute the script.
@@ -110,7 +110,7 @@ You can access this website via a public IPFS gateway: https://gateway.ipfs.io/i
 Create a new file in your project, `gundb.js`.
 
 ```javascript
-const { default: Resolution } = require("@unstoppabledomains/resolution");
+const { default: Resolution } = require('@unstoppabledomains/resolution');
 const resolution = new Resolution();
 
 function resolveGunDbRecords(domain) {
@@ -120,7 +120,7 @@ function resolveGunDbRecords(domain) {
     .catch(console.error);
 }
 
-resolveGunDbRecords("homecakes.crypto");
+resolveGunDbRecords('homecakes.crypto');
 ```
 
 Execute the script.
