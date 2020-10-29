@@ -54,15 +54,8 @@ export default class Cns extends EthereumNamingService {
 
 
     try {
-      const [
-        isDataReaderSupported,
-      ] = await this.contract.call('supportsInterface', ['0x6eabca0d']);
-      if (!isDataReaderSupported) {
-        throw new Error('Not supported DataReader');
-      }
-
-
-      return true;
+      const [ result ] = await this.contract.call('supportsInterface', ['0x6eabca0d']);
+      return result;
     } catch {
       return false;
     }

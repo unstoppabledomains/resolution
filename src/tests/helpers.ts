@@ -8,7 +8,7 @@ export const MainnetUrl = 'https://mainnet.infura.io';
 export const ZilliqaUrl = 'https://api.zilliqa.com';
 export const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
 
-export const CryptoDomainWithoutResolver = 'reseller-test-paul1.crypto';
+export const CryptoDomainWithoutResolver = 'reseller-test-paul2.crypto';
 export const CryptoDomainWithEmptyResolver = 'reseller-test-mago017.crypto';
 export const CryptoDomainWithIpfsRecords = 'reseller-test-paul019.crypto';
 export const CryptoDomainWithEmail = 'reseller-test-paul019.crypto';
