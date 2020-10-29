@@ -174,7 +174,7 @@ Use these commands to set up a local development environment (**macOS Terminal**
     ```bash
     npm install -g yarn
     ```
-4. Clone thhe repository
+4. Clone the repository
     ```bash
     git clone https://github.com/unstoppabledomains/resolution.git
     cd resolution
