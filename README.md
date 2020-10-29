@@ -161,3 +161,8 @@ Use next commands for setting up development environment. (**macOS Terminal** or
     ```bash
     yarn install
     ```
+
+### Internal network config
+
+Internal [network config](src/main/resources/com/unstoppabledomains/config/network/network-config.json) 
+can be updated by running `yarn network-config:pull` task and committing updated file.
