@@ -13,11 +13,11 @@ Resolution is primarily built and maintained by [Unstoppable Domains](https://un
 
 Resoultion supports decentralized domains across three main zones:
 
-- CNS
+- Crypto Name Service (CNS)
   - `.crypto`
-- ZNS
+- Zilliqa Name Service (ZNS)
   - `.zil`
-- ENS
+- Ethereum Name Service (ENS)
   - `.eth`
   - `.kred`
   - `.xyz`
