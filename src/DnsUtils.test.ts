@@ -1,5 +1,5 @@
 import DnsUtils from "./DnsUtils";
-import DnsRecordsError, { DnsRecordsErrorCode } from "./errors/dnsRecordsError";
+import { DnsRecordsErrorCode } from "./errors/dnsRecordsError";
 import { CryptoRecords, DnsRecord, DnsRecordType } from "./publicTypes";
 import { expectDnsRecordErrorCode } from "./tests/helpers";
 

@@ -23,7 +23,7 @@ export default class DnsUtils {
         cryptoRecords[`dns.${type}`] = JSON.stringify(dnsInRecord);
       } else {
         cryptoRecords[`dns.${type}`] = JSON.stringify([data]);
-      cryptoRecords[`dns.${type}.ttl`] = TTL.toString(10);
+        cryptoRecords[`dns.${type}.ttl`] = TTL.toString(10);
       }
 
       if (!!ttlInRecord && ttlInRecord !== TTL) {
@@ -84,17 +84,23 @@ export default class DnsUtils {
     const recordTtl = data[`dns.${type}.ttl`];
     if (recordTtl) {
       const parsedInt = this.parseIfNumber(recordTtl);
-      if (parsedInt) return parsedInt;
+      if (parsedInt) {
+        return parsedInt;
+      }
     }
     if (defaultTtl) {
       const parsedInt = this.parseIfNumber(defaultTtl);
-      if (parsedInt) return parsedInt;
+      if (parsedInt) {
+        return parsedInt;
+      }
     }
     return DnsUtils.DEFAULT_TTL;
   }
 
   private parseIfNumber(str: string): number | undefined {
     const parsedInt = parseInt(str, 10);
-    if (!isNaN(parsedInt)) return parsedInt;
+    if (!isNaN(parsedInt)) {
+      return parsedInt;
+    }
   }
 }
