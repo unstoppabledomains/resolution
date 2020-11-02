@@ -14,8 +14,8 @@ export default class DnsUtils {
     const cryptoRecords:CryptoRecords = {};
     for (const record of records) {
       const {type, ttl, value} = record;
-      const ttlInRecord = this.getJsonRepresentation(cryptoRecords[`dns.${type}.ttl`], 'number') as number | undefined;
-      const dnsInRecord = this.getJsonRepresentation(cryptoRecords[`dns.${type}`], 'string[]') as string[] | undefined;
+      const ttlInRecord = this.getJsonNumber(cryptoRecords[`dns.${type}.ttl`]);
+      const dnsInRecord = this.getJsonArray(cryptoRecords[`dns.${type}`]);
       if (dnsInRecord) {
         dnsInRecord.push(value);
         cryptoRecords[`dns.${type}`] = JSON.stringify(dnsInRecord);
@@ -31,14 +31,12 @@ export default class DnsUtils {
     return cryptoRecords;
   }
 
-  private getJsonRepresentation(rawRecord: string | undefined, type:  'string[]' | 'number'): string[] | number | undefined {
-    if (!rawRecord) {
-      return undefined;
-    }
-    if (type === 'string[]') {
-      return JSON.parse(rawRecord);
-    }
-    return parseInt(rawRecord, 10);
+  private getJsonArray(rawRecord: string | undefined): string[] | undefined {
+    return rawRecord ? JSON.parse(rawRecord) : undefined;
+  }
+
+  private getJsonNumber(rawRecord: string | undefined): number | undefined {
+    return rawRecord ? parseInt(rawRecord, 10) : undefined;
   }
 
   private getAllDnsTypes(records: CryptoRecords): DnsRecordType[] {
