@@ -187,5 +187,5 @@ URI="URI",
 ZONEMD="ZONEMD",
 }
 
-export type DnsRecord = {type: DnsRecordType, ttl: number, value: string}
+export interface DnsRecord { type: DnsRecordType, TTL: number, data: string }
 export type CryptoRecords = Record<string, string | undefined>;

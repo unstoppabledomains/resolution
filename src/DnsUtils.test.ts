@@ -17,17 +17,17 @@ describe('DnsUtils', () => {
     };
     const classic: DnsRecord[] = dnsUtils.toList(record);
     expect(classic).toStrictEqual([
-      { ttl: 90, value: '10.0.0.1', type: 'A' },
-      { ttl: 90, value: '10.0.0.2', type: 'A' },
-      { ttl: 128, value: '10.0.0.120', type: 'AAAA' }
+      { TTL: 90, data: '10.0.0.1', type: 'A' },
+      { TTL: 90, data: '10.0.0.2', type: 'A' },
+      { TTL: 128, data: '10.0.0.120', type: 'AAAA' }
     ]);
   });
 
   it('toCrypto', () => {
     const classicalRecords: DnsRecord[] =[
-      { ttl: 90, value: '10.0.0.1', type: 'A' as DnsRecordType },
-      { ttl: 90, value: '10.0.0.2', type: 'A' as DnsRecordType },
-      { ttl: 128, value: '10.0.0.120', type: 'AAAA' as DnsRecordType }
+      { TTL: 90, data: '10.0.0.1', type: 'A' as DnsRecordType },
+      { TTL: 90, data: '10.0.0.2', type: 'A' as DnsRecordType },
+      { TTL: 128, data: '10.0.0.120', type: 'AAAA' as DnsRecordType }
     ]; 
     const cryptoRecords: CryptoRecords = dnsUtils.toCrypto(classicalRecords);
     expect(cryptoRecords).toStrictEqual({
@@ -40,8 +40,8 @@ describe('DnsUtils', () => {
 
   it('toCrypto with wrong ttl', () => {
     const classicalRecords: DnsRecord[] = [
-      { ttl: 90, value: '10.0.0.20', type: 'A' as DnsRecordType },
-      { ttl: 900, value: '10.0.0.20', type: 'A' as DnsRecordType }
+      { TTL: 90, data: '10.0.0.20', type: 'A' as DnsRecordType },
+      { TTL: 900, data: '10.0.0.20', type: 'A' as DnsRecordType }
     ];
     expect(() => dnsUtils.toCrypto(classicalRecords)).toThrow(DnsRecordsError);
   });
