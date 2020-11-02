@@ -7,6 +7,7 @@ type DnsRecordsErrorOptions = {
 
 export enum DnsRecordsErrorCode {
   InconsistentTtl = "InconsistentTtl",
+  DnsRecordCorrupted = "DnsRecordCorrupted"
 }
 
 /**
@@ -15,6 +16,7 @@ export enum DnsRecordsErrorCode {
  */
 const HandlersByCode = {
   [DnsRecordsErrorCode.InconsistentTtl]: (params: DnsRecordsErrorOptions) => `ttl for record ${params.recordType} is different for other records of the same type`,
+  [DnsRecordsErrorCode.DnsRecordCorrupted]: (params: DnsRecordsErrorOptions) => `dns record ${params.recordType} is invalid json-string`
 };
 
 /**

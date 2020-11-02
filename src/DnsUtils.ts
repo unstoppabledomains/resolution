@@ -17,7 +17,7 @@ export default class DnsUtils {
     for (const record of records) {
       const {type, TTL, data} = record;
       const ttlInRecord = this.getJsonNumber(cryptoRecords[`dns.${type}.ttl`]);
-      const dnsInRecord = this.getJsonArray(cryptoRecords[`dns.${type}`]);
+      const dnsInRecord = this.getJsonArray(cryptoRecords, `dns.${type}`);
       if (dnsInRecord) {
         dnsInRecord.push(data);
         cryptoRecords[`dns.${type}`] = JSON.stringify(dnsInRecord);
@@ -33,8 +33,21 @@ export default class DnsUtils {
     return cryptoRecords;
   }
 
-  private getJsonArray(rawRecord: string | undefined): string[] | undefined {
-    return rawRecord ? JSON.parse(rawRecord) : undefined;
+  private protectFromCorruptRecord(rawRecord: string | undefined, type: DnsRecordType): string[] | undefined {
+    try {
+      return rawRecord ? JSON.parse(rawRecord) : undefined;
+    }catch(err) {
+      if (err instanceof SyntaxError) {
+        throw new DnsRecordsError(DnsRecordsErrorCode.DnsRecordCorrupted, {recordType: type});
+      }
+      throw err;
+    }
+  }
+  
+  private getJsonArray(cryptoRecrods:CryptoRecords, key: string): string[] | undefined {
+    const rawRecord = cryptoRecrods[key];
+    const type = key.split('.')[1] as DnsRecordType;
+    return this.protectFromCorruptRecord(rawRecord, type);
   }
 
   private getJsonNumber(rawRecord: string | undefined): number | undefined {
@@ -59,7 +72,7 @@ export default class DnsUtils {
     if (!jsonValueString) {
       return [];
     }
-    const typeData = JSON.parse(jsonValueString);
+    const typeData = this.protectFromCorruptRecord(jsonValueString, type);
     if (!isStringArray(typeData)) {
       return [];
     }
