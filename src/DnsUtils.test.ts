@@ -74,10 +74,23 @@ describe('DnsUtils', () => {
         { TTL: DnsUtils.DEFAULT_TTL, data: '10.0.0.2', type: "A" }
       ]);
     });
+
+    it('dns.A = valid json invalid format', () => {
+      const record: CryptoRecords = {
+        "dns.ttl": "90",
+        "dns.A": JSON.stringify([[]]),
+        "dns.AAAA": JSON.stringify(["10.0.0.5", "10.0.0.4"])
+      }
+      const list: DnsRecord[] = dnsUtils.toList(record);
+      expect(list).toStrictEqual( [
+        { TTL: 90, data: '10.0.0.5', type: 'AAAA' },
+        { TTL: 90, data: '10.0.0.4', type: 'AAAA' }
+      ]);
+    });
   });
 
   describe('toCrypto', () => {
-    it('should work', () => {
+    it.only('should work', () => {
       const classicalRecords: DnsRecord[] =[
         { TTL: 90, data: '10.0.0.1', type: 'A' as DnsRecordType },
         { TTL: 90, data: '10.0.0.2', type: 'A' as DnsRecordType },
@@ -85,9 +98,9 @@ describe('DnsUtils', () => {
       ]; 
       const cryptoRecords: CryptoRecords = dnsUtils.toCrypto(classicalRecords);
       expect(cryptoRecords).toStrictEqual({
-        'dns.A': "[\"10.0.0.1\",\"10.0.0.2\"]",
+        'dns.A': JSON.stringify(['10.0.0.1', '10.0.0.2']),
         'dns.A.ttl': "90",
-        'dns.AAAA': "[\"10.0.0.120\"]",
+        'dns.AAAA': JSON.stringify(['10.0.0.120']),
         'dns.AAAA.ttl': "128"
       });
     });
