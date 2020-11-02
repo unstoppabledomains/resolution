@@ -3,6 +3,8 @@ import { CryptoRecords, DnsRecord, DnsRecordType } from "./publicTypes";
 import { isStringArray } from "./utils";
 export default class DnsUtils {
 
+  static readonly DEFAULT_TTL: number = 300; // 5 minutes 
+
   public toList(record: CryptoRecords): DnsRecord[] {
     const dnsTypes = this.getAllDnsTypes(record);
     return ([] as DnsRecord[]).concat(
@@ -73,6 +75,6 @@ export default class DnsUtils {
     if (defaultTtl) {
       return parseInt(defaultTtl, 10);
     }
-    throw new DnsRecordsError(DnsRecordsErrorCode.NoTtlFound);
+    return DnsUtils.DEFAULT_TTL;
   }
 }

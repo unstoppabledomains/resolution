@@ -7,7 +7,6 @@ type DnsRecordsErrorOptions = {
 
 export enum DnsRecordsErrorCode {
   InconsistentTtl = "InconsistentTtl",
-  NoTtlFound = "NoTtlFound",
 }
 
 /**
@@ -16,7 +15,6 @@ export enum DnsRecordsErrorCode {
  */
 const HandlersByCode = {
   [DnsRecordsErrorCode.InconsistentTtl]: (params: DnsRecordsErrorOptions) => `ttl for record ${params.recordType} is different for other records of the same type`,
-  [DnsRecordsErrorCode.NoTtlFound]: (params) => `Ttl record was not present`
 };
 
 /**
