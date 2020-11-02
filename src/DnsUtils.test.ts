@@ -1,6 +1,7 @@
 import DnsUtils from "./DnsUtils";
-import DnsRecordsError from "./errors/dnsRecordsError";
+import DnsRecordsError, { DnsRecordsErrorCode } from "./errors/dnsRecordsError";
 import { CryptoRecords, DnsRecord, DnsRecordType } from "./publicTypes";
+import { expectDnsRecordErrorCode } from "./tests/helpers";
 
 let dnsUtils: DnsUtils;
 beforeAll(() => {
@@ -44,9 +45,18 @@ describe('DnsUtils', () => {
         "dns.A.ttl": "90",
         "dns.AAAA": '["10.0.0.120"]'
       };
-      expect(() => dnsUtils.toList(record)).toThrow(DnsRecordsError);
+      expectDnsRecordErrorCode(() => dnsUtils.toList(record), DnsRecordsErrorCode.DnsRecordCorrupted);
     });
 
+    it('dns.ttl is not a number',() => {
+      const record: CryptoRecords = {
+        "dns.ttl": "bh",
+        "dns.A": '[',
+        "dns.A.ttl": "90",
+        "dns.AAAA": '["10.0.0.120"]'
+      };
+      expectDnsRecordErrorCode(() => dnsUtils.toList(record), DnsRecordsErrorCode.DnsRecordCorrupted);
+    });
 
   });
 
@@ -71,7 +81,7 @@ describe('DnsUtils', () => {
         { TTL: 90, data: '10.0.0.20', type: 'A' as DnsRecordType },
         { TTL: 900, data: '10.0.0.20', type: 'A' as DnsRecordType }
       ];
-      expect(() => dnsUtils.toCrypto(classicalRecords)).toThrow(DnsRecordsError);
+      expectDnsRecordErrorCode(() => dnsUtils.toCrypto(classicalRecords), DnsRecordsErrorCode.InconsistentTtl);
     });
 
   });
