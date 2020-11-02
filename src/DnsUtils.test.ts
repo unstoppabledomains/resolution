@@ -51,13 +51,29 @@ describe('DnsUtils', () => {
     it('dns.ttl is not a number',() => {
       const record: CryptoRecords = {
         "dns.ttl": "bh",
-        "dns.A": '[',
+        "dns.A": '["10.0.0.1"]',
         "dns.A.ttl": "90",
         "dns.AAAA": '["10.0.0.120"]'
       };
-      expectDnsRecordErrorCode(() => dnsUtils.toList(record), DnsRecordsErrorCode.DnsRecordCorrupted);
+      const classic: DnsRecord[] = dnsUtils.toList(record);
+      expect(classic).toStrictEqual([
+        { TTL: 90, data: '10.0.0.1', type: 'A' },
+        { TTL: DnsUtils.DEFAULT_TTL, data: '10.0.0.120', type: 'AAAA' }
+      ]); 
     });
 
+    it('all ttls are wrong', () => {
+      const record: CryptoRecords = {
+        "dns.ttl": "asdbasd",
+        "dns.A": '["10.0.0.1", "10.0.0.2"]',
+        "dns.A.ttl": "sda2daf4",
+      }
+      const list: DnsRecord[] = dnsUtils.toList(record);
+      expect(list).toStrictEqual([
+        { TTL: DnsUtils.DEFAULT_TTL, data: '10.0.0.1', type: "A" },
+        { TTL: DnsUtils.DEFAULT_TTL, data: '10.0.0.2', type: "A" }
+      ]);
+    });
   });
 
   describe('toCrypto', () => {

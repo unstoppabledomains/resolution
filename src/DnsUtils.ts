@@ -83,11 +83,18 @@ export default class DnsUtils {
     const defaultTtl = data['dns.ttl'];
     const recordTtl = data[`dns.${type}.ttl`];
     if (recordTtl) {
-      return parseInt(recordTtl, 10);
+      const parsedInt = this.parseIfNumber(recordTtl);
+      if (parsedInt) return parsedInt;
     }
     if (defaultTtl) {
-      return parseInt(defaultTtl, 10);
+      const parsedInt = this.parseIfNumber(defaultTtl);
+      if (parsedInt) return parsedInt;
     }
     return DnsUtils.DEFAULT_TTL;
+  }
+
+  private parseIfNumber(str: string): number | undefined {
+    const parsedInt = parseInt(str, 10);
+    if (!isNaN(parsedInt)) return parsedInt;
   }
 }
