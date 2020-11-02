@@ -7,157 +7,180 @@
 [![Chat on Telegram](https://img.shields.io/badge/Chat%20on-Telegram-brightgreen.svg)](https://t.me/unstoppabledev)
 [![Unstoppable Domains Documentation](https://img.shields.io/badge/docs-unstoppabledomains.com-blue)](https://docs.unstoppabledomains.com/)
 
-A library for interacting with blockchain domain names.
+Resolution is a library for interacting with blockchain domain names. It can be used to retrieve [payment addresses](https://unstoppabledomains.com/features#Add-Crypto-Addresses), IPFS hashes for [decentralized websites](https://unstoppabledomains.com/features#Build-Website), and GunDB usernames for [decentralized chat](https://unstoppabledomains.com/chat).
 
-Supported domain zones:
+Resolution is primarily built and maintained by [Unstoppable Domains](https://unstoppabledomains.com/).
 
-* CNS
-  - .crypto 
-* ZNS
-  - .zil
-* ENS
-  - .eth
-  - .kred
-  - .xyz
-  - .luxe
+Resoultion supports decentralized domains across three main zones:
 
-[API Referrence](https://unstoppabledomains.github.io/resolution/)
+- Crypto Name Service (CNS)
+  - `.crypto`
+- Zilliqa Name Service (ZNS)
+  - `.zil`
+- Ethereum Name Service (ENS)
+  - `.eth`
+  - `.kred`
+  - `.xyz`
+  - `.luxe`
 
-## Installation
+For more information, see our detailed [API Referrence](https://unstoppabledomains.github.io/resolution/).
 
-Use the `npm` or `yarn` to install the resolution package.
+## Installing Resolution
 
-```
+Resolution can be installed with either `yarn` or `npm`.
+
+```shell
 yarn add @unstoppabledomains/resolution
 ```
 
-```
+```shell
 npm install @unstoppabledomains/resolution --save
 ```
 
-If you're interested in resolving domains via the command line, see [CLI section](#CLI). 
+If you're interested in resolving domains via the command line, see our [CLI section](#command-line-interface). 
 
-## Usage
+## Using Resolution
 
 Create a new project.
 
 ```shell
-mkdir test-out-resolution && cd $_
+mkdir resolution && cd $_
 yarn init -y
 yarn add @unstoppabledomains/resolution
 ```
 
-Make a file, `script.js`.
+### Look up a domain's crypto address
+
+Create a new file in your project, `address.js`.
 
 ```javascript
-const {default: Resolution} = require('@unstoppabledomains/resolution')
-const resolution = new Resolution()
+const { default: Resolution } = require('@unstoppabledomains/resolution');
+const resolution = new Resolution();
+
 function resolve(domain, currency) {
-  resolution.address(domain, currency)
-    .then(address => console.log(domain, 'resolves to', address))
-    .catch(console.error)
+  resolution
+    .addr(domain, currency)
+    .then((address) => console.log(domain, 'resolves to', address))
+    .catch(console.error);
 }
-resolve('brad.crypto', 'ETH')
-resolve('brad.zil', 'ZIL')
+
+resolve('brad.crypto', 'ETH');
+resolve('brad.zil', 'ZIL');
 ```
 
 Execute the script.
 
-```
-$ node script.js
+```shell
+$ node address.js
 brad.crypto resolves to 0x8aaD44321A86b170879d7A244c1e8d360c99DdA8
 brad.zil resolves to zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj
 ```
 
-### Dweb resolution
+### Find the IPFS hash for a decentralized website
 
-Resolution library can help you out with resolving DWeb records, such as IPFS hashes for websites or GunDB usernames for 
-[p2p chat system](https://unstoppabledomains.com/chat).
+Create a new file in your project, `ipfs_hash.js`.
 
 ```javascript
-const {default: Resolution} = require('@unstoppabledomains/resolution')
-const resolution = new Resolution()
+const { default: Resolution } = require('@unstoppabledomains/resolution');
+const resolution = new Resolution();
 
 function resolveIpfsHash(domain) {
-  resolution.ipfsHash(domain)
-    .then(hash => console.log(`You can access the website via a public IPFS gateway: https://gateway.ipfs.io/ipfs/${hash}`))
-    .catch(console.error)
+  resolution
+    .ipfsHash(domain)
+    .then((hash) =>
+      console.log(
+        `You can access this website via a public IPFS gateway: https://gateway.ipfs.io/ipfs/${hash}`
+      )
+    )
+    .catch(console.error);
 }
+
+resolveIpfsHash('homecakes.crypto');
+```
+
+Execute the script.
+
+```shell
+$ node ipfs_hash.js
+You can access this website via a public IPFS gateway: https://gateway.ipfs.io/ipfs/QmVJ26hBrwwNAPVmLavEFXDUunNDXeFSeMPmHuPxKe6dJv
+```
+
+### Find a GunDB username
+
+Create a new file in your project, `gundb.js`.
+
+```javascript
+const { default: Resolution } = require('@unstoppabledomains/resolution');
+const resolution = new Resolution();
 
 function resolveGunDbRecords(domain) {
-  resolution.chatId(domain)
-    .then(id => console.log(`Domain ${domain} has a GunDB chat ID: ${id}`))
-    .catch(console.error)
-  resolution.chatPk(domain)
-    .then(pk => console.log(`Domain ${domain} has a GunDB public key: ${pk}`))
-    .catch(console.error)
+  resolution
+    .chatId(domain)
+    .then((id) => console.log(`Domain ${domain} has a GunDB chat ID: ${id}`))
+    .catch(console.error);
 }
 
-resolveIpfsHash("homecakes.crypto")
-resolveGunDbRecords("homecakes.crypto")
+resolveGunDbRecords('homecakes.crypto');
 ```
 
-### CLI
+Execute the script.
 
-If you want to use resolution CLI, install this package globally:
-
+```shell
+$ node gundb.js
+Domain homecakes.crypto has a GunDB chat ID: 0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c
 ```
+
+### Command Line Interface
+
+To use resolution via the command line install the package globally.
+
+```shell
 yarn global add @unstoppabledomains/resolution
 ```
 
-```
+```shell
 npm install -g @unstoppabledomains/resolution
 ```
 
-Once you have installed the CLI you can go ahead and use it without any extra configuration. By default the cli is
-using https://main-rpc.linkpool.io service as a gateway to blockchain. If you want to change it to some other providers
-including your own you can do so by utilizing resolution -C flag.
+By default, the CLI uses https://main-rpc.linkpool.io as its primary gateway to the Ethereum blockchain. If you'd like to override this default and set another provider you can do so using the `-C` flag.
 
-As an argument to -C type the following structure url:< https://.... >
+For example:
 
-Example of usage
-```
-resolution -C url:https://...
+```shell
+resolution -C url:https://main-rpc.linkpool.io/
 ```
 
-You can find all of the options for resolution cli within -h, --help flag. 
+Use the `-h` or `--help` flag to see all the available CLI options.
 
-Flag -m can retrieve all the metadata, so you don't need to query it separately if you just want an overview of domain records.
+## Error Handling
 
-Example:
-```
-resolution -mc eth,btc,DODGE,unknown -d brad.zil
-```
-
-## Note
-
-When resolution hits an error it returns the error code instead of throwing. So if you see something like RECORD_NOT_FOUND you know exactly that record was not found for this query.
+When resolution encounters an error it returns the error code instead of stopping the process. Keep an eye out for return values like `RECORD_NOT_FOUND`.
 
 ## Development
 
-Use next commands for setting up development environment. (**macOS Terminal** or **Linux shell**).
+Use these commands to set up a local development environment (**macOS Terminal** or **Linux shell**).
 
-1. Install NVM
-    ```bash
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
-    ```
+1. Install `nvm`
+   ```bash
+   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.36.0/install.sh | bash
+   ```
 
-2. Install concrete version of node.js
+2. Install concrete version of `node.js`
     ```bash
     nvm install 12.12.0
     ```
 
-3. Install ```yarn```
+3. Install `yarn`
     ```bash
     npm install -g yarn
     ```
-4. Clone repo
-    ```
+4. Clone the repository
+    ```bash
     git clone https://github.com/unstoppabledomains/resolution.git
     cd resolution
     ```
 
-5. Install dependencies 
+5. Install dependencies
     ```bash
     yarn install
     ```
