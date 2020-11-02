@@ -90,7 +90,7 @@ describe('DnsUtils', () => {
   });
 
   describe('toCrypto', () => {
-    it.only('should work', () => {
+    it('should work', () => {
       const classicalRecords: DnsRecord[] =[
         { TTL: 90, data: '10.0.0.1', type: 'A' as DnsRecordType },
         { TTL: 90, data: '10.0.0.2', type: 'A' as DnsRecordType },
