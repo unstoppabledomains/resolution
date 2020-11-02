@@ -1,5 +1,5 @@
 import { EthereumNamingService } from './EthereumNamingService';
-import { ReaderMap, isNullAddress, NullAddress } from './types';
+import { ProxyReaderMap, isNullAddress, NullAddress } from './types';
 import { default as proxyReaderAbi } from './cns/contract/proxyReader';
 import { default as resolverInterface } from './cns/contract/resolver';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
@@ -17,16 +17,13 @@ import {
 } from './publicTypes';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 import NamingService from './NamingService';
+import NetworkConfig from './config/network-config.json';
 
 export default class Cns extends EthereumNamingService {
   readonly contract: Contract;
   reader: ICnsReader;
-  static TwitterVerificationAddress =
-    '0x12cfb13522F13a78b650a8bCbFCf50b7CB899d82';
-  static ReaderMap: ReaderMap = {
-    1: '0x7ea9ee21077f84339eda9c80048ec6db678642b1',
-    42: '0xcf4318918fd18aca9bdc11445c01fbada4b448e3', // for internal testing
-  };
+  static TwitterVerificationAddress = '0x12cfb13522F13a78b650a8bCbFCf50b7CB899d82';
+  static ProxyReaderMap: ProxyReaderMap = getProxyReaderMap();
 
   constructor(source: SourceDefinition = {}) {
     super(source, NamingServiceName.CNS);
@@ -44,11 +41,11 @@ export default class Cns extends EthereumNamingService {
   }
 
   protected defaultRegistry(network: number): string | undefined {
-    return Cns.ReaderMap[network];
+    return Cns.ProxyReaderMap[network];
   }
 
   protected async isDataReaderSupported(): Promise<boolean> {
-    if (Cns.ReaderMap[this.network] === this.contract.address) {
+    if (Cns.ProxyReaderMap[this.network]?.toLowerCase() === this.contract.address.toLowerCase()) {
       return true;
     }
 
@@ -217,4 +214,12 @@ export default class Cns extends EthereumNamingService {
     ]);
     return this.constructRecords(keys, keyValues);
   }
+}
+
+function getProxyReaderMap(): ProxyReaderMap {
+  const map: ProxyReaderMap = {};
+  for (const id of Object.keys(NetworkConfig.networks)) {
+    map[id] = NetworkConfig.networks[id].contracts.ProxyReader.address.toLowerCase();
+  }
+  return map;
 }
