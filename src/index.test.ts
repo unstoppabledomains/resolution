@@ -9,5 +9,8 @@ describe('Exported variables', () => {
     expect(Index.UnclaimedDomainResponse).toBeDefined();
     expect(Index.NamingServiceName).toBeDefined();
     expect(Index.Eip1993Factories).toBeDefined();
+    expect(Index.DnsUtils).toBeDefined();
+    expect(Index.DnsRecordsError).toBeDefined();
+    expect(Index.DnsRecordsErrorCode).toBeDefined();
   });
 });

@@ -3,7 +3,7 @@ import Resolution, {
   ResolutionErrorCode,
   UnclaimedDomainResponse,
 } from './index';
-import { JsonRpcPayload } from './publicTypes';
+import { DnsRecordType, JsonRpcPayload } from './publicTypes';
 import { JsonRpcProvider, getDefaultProvider } from '@ethersproject/providers';
 import Web3HttpProvider from 'web3-providers-http';
 import Web3WsProvider from 'web3-providers-ws';
@@ -267,9 +267,28 @@ describe('Resolution', () => {
     });
 
     describe('.Records', () => {
+      describe('.DNS', () => {
+        it('getting dns records', async () => {
+          pendingInLive();
+          const reader = await resolution.cns!.getReader();
+          const spies = mockAsyncMethods(reader, {
+            records: {
+              resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
+              values: ['128','["10.0.0.1","10.0.0.2"]','90','["10.0.0.120"]',undefined]
+            },
+          });
+          const dnsRecords = await resolution.dns("someTestDomain.crypto", [DnsRecordType.A, DnsRecordType.AAAA]);
+          expectSpyToBeCalled(spies);
+          expect(dnsRecords).toStrictEqual([
+            { TTL: 90, data: '10.0.0.1', type: 'A' },
+            { TTL: 90, data: '10.0.0.2', type: 'A' },
+            { TTL: 128, data: '10.0.0.120', type: 'AAAA' }
+          ]);
+        });
+      });
+
       describe('.Metadata', () => {
         it('checks return of email for ergergergerg.zil', async () => {
-          const resolution = new Resolution();
           const spies = mockAsyncMethods(resolution.zns, {
             allRecords: {
               'ipfs.html.hash': 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',

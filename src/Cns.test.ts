@@ -12,7 +12,6 @@ import {
   expectSpyToBeCalled,
   expectResolutionErrorCode,
   protocolLink,
-  mockAsyncMethod
 } from './tests/helpers';
 import ICnsReader from './cns/ICnsReader';
 import FetchProvider from './FetchProvider';
