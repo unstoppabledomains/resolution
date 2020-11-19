@@ -3,7 +3,7 @@ import { CryptoRecords, DnsRecord, DnsRecordType } from "./publicTypes";
 import { isStringArray } from "./utils";
 export default class DnsUtils {
 
-  static readonly DEFAULT_TTL: number = 300; // 5 minutes 
+  static readonly DefaultTtl: number = 300; // 5 minutes 
 
   public toList(record: CryptoRecords): DnsRecord[] {
     const dnsTypes = this.getAllDnsTypes(record);
@@ -27,7 +27,7 @@ export default class DnsUtils {
       }
 
       if (!!ttlInRecord && ttlInRecord !== TTL) {
-        throw new DnsRecordsError(DnsRecordsErrorCode.InconsistentTtl, {recordType: type});
+        throw new DnsRecordsError(DnsRecordsErrorCode.TtlInconsistent, {recordType: type});
       }
     }
     return cryptoRecords;
@@ -94,7 +94,7 @@ export default class DnsUtils {
         return parsedInt;
       }
     }
-    return DnsUtils.DEFAULT_TTL;
+    return DnsUtils.DefaultTtl;
   }
 
   private parseIfNumber(str: string): number | undefined {

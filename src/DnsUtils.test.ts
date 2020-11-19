@@ -58,7 +58,7 @@ describe('DnsUtils', () => {
       const classic: DnsRecord[] = dnsUtils.toList(record);
       expect(classic).toStrictEqual([
         { TTL: 90, data: '10.0.0.1', type: 'A' },
-        { TTL: DnsUtils.DEFAULT_TTL, data: '10.0.0.120', type: 'AAAA' }
+        { TTL: DnsUtils.DefaultTtl, data: '10.0.0.120', type: 'AAAA' }
       ]); 
     });
 
@@ -70,8 +70,8 @@ describe('DnsUtils', () => {
       }
       const list: DnsRecord[] = dnsUtils.toList(record);
       expect(list).toStrictEqual([
-        { TTL: DnsUtils.DEFAULT_TTL, data: '10.0.0.1', type: "A" },
-        { TTL: DnsUtils.DEFAULT_TTL, data: '10.0.0.2', type: "A" }
+        { TTL: DnsUtils.DefaultTtl, data: '10.0.0.1', type: "A" },
+        { TTL: DnsUtils.DefaultTtl, data: '10.0.0.2', type: "A" }
       ]);
     });
 
@@ -110,7 +110,7 @@ describe('DnsUtils', () => {
         { TTL: 90, data: '10.0.0.20', type: 'A' as DnsRecordType },
         { TTL: 900, data: '10.0.0.20', type: 'A' as DnsRecordType }
       ];
-      expectDnsRecordErrorCode(() => dnsUtils.toCrypto(classicalRecords), DnsRecordsErrorCode.InconsistentTtl);
+      expectDnsRecordErrorCode(() => dnsUtils.toCrypto(classicalRecords), DnsRecordsErrorCode.TtlInconsistent);
     });
 
   });
