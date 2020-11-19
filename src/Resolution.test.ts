@@ -62,7 +62,7 @@ describe('Resolution', () => {
       expect(result).toBe(true);
     });
 
-    describe('.ServiceName', () => {
+    describe('.ServiceName', () => {      
       it('checks ens service name', () => {
         const resolution = new Resolution();
         const serviceName = resolution.serviceName('domain.eth');
@@ -78,6 +78,8 @@ describe('Resolution', () => {
             },
           },
         });
+        
+        const eye = mockAsyncMethod(resolution.cns!, "isDataReaderSupported", true);
         const reader = await resolution.cns?.getReader();
         const eyes = mockAsyncMethods(reader, {
           records: {
@@ -88,7 +90,7 @@ describe('Resolution', () => {
           },
         });
         const gundb = await resolution.chatId('homecakes.crypto');
-        expectSpyToBeCalled(eyes);
+        expectSpyToBeCalled([...eyes, eye]);
         expect(gundb).toBe(
           '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c',
         );
