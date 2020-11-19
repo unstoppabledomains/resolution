@@ -32,7 +32,8 @@
     "docs:readme": "./docs-readme.sh",
     "docs:deploy": "yarn docs && ./deploy-docs.sh",
     "analyze": "webpack-cli",
-    "size": "yarn run sizecheck -p ./package.json -l 500 -v"
+    "size": "yarn run sizecheck -p ./package.json -l 500 -v",
+    "network-config:pull": "curl https://raw.githubusercontent.com/unstoppabledomains/dot-crypto/master/src/network-config/network-config.json -o src/config/network-config.json"
   },
   "files": [
     "build"

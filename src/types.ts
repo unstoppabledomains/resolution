@@ -5,7 +5,7 @@ export type EnsNetworkIdMap = {
 export interface BlockhanNetworkUrlMap {
   [key: string]: string | undefined;
 }
-export interface ReaderMap {
+export interface ProxyReaderMap {
   [key: string]: string;
 }
 export type NetworkIdMap = {
