@@ -1,4 +1,3 @@
-import { after } from 'lodash';
 import nock from 'nock';
 import Resolution, { ResolutionErrorCode } from './index';
 import {
@@ -8,7 +7,6 @@ import {
   mockAsyncMethod,
   expectSpyToBeCalled,
   CryptoDomainWithTwitterVerification,
-  isLive,
 } from './tests/helpers';
 
 beforeEach(() => {

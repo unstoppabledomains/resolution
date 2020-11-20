@@ -12,13 +12,11 @@ import {
   expectSpyToBeCalled,
   expectResolutionErrorCode,
   protocolLink,
-  isLive,
 } from './tests/helpers';
 import ICnsReader from './cns/ICnsReader';
 import FetchProvider from './FetchProvider';
 import { FetchError } from 'node-fetch';
 import { NamingServiceName } from './publicTypes';
-
 
 let resolution: Resolution;
 let reader: ICnsReader;

@@ -20,12 +20,10 @@ import {
   CryptoDomainWithTwitterVerification,
   pendingInLive,
   CryptoDomainWithIpfsRecords,
-  isLive
 } from './tests/helpers';
 import { RpcProviderTestCases } from './tests/providerMockData';
 import ICnsReader from './cns/ICnsReader';
 import fetch, { FetchError } from 'node-fetch';
-import ResolutionError from './errors/resolutionError';
 
 let resolution: Resolution;
 let reader: ICnsReader;
@@ -54,7 +52,7 @@ describe('Resolution', () => {
         // nock should prevent all outgoing traffic
         expect(err).toBeInstanceOf(FetchError);
         return
-      };
+      }
       fail("nock is not configured correctly!");
     });
 

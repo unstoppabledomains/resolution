@@ -10,12 +10,10 @@ import {
   protocolLink,
   pendingInLive,
   expectConfigurationErrorCode,
-  isLive,
 } from './tests/helpers';
 import { ConfigurationErrorCode } from './errors/configurationError';
 import { NamingServiceName } from './publicTypes';
 let resolution: Resolution;
-
 
 beforeEach(() => {
   nock.cleanAll();
