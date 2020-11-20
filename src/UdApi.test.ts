@@ -16,16 +16,6 @@ beforeEach(() => {
   jest.restoreAllMocks();
 });
 
-beforeAll(() => {
-  if (!isLive()) {
-    nock.disableNetConnect()
-  }
-});
-
-afterAll(() => {
-  nock.enableNetConnect()
-});
-
 describe('Unstoppable API', () => {
   it('resolves a domain', async () => {
     mockAPICalls('ud_api_generic_test', DefaultUrl);

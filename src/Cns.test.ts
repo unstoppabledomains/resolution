@@ -18,21 +18,10 @@ import ICnsReader from './cns/ICnsReader';
 import FetchProvider from './FetchProvider';
 import { FetchError } from 'node-fetch';
 import { NamingServiceName } from './publicTypes';
-import nock from 'nock';
 
 
 let resolution: Resolution;
 let reader: ICnsReader;
-
-beforeAll(() => {
-  if (!isLive()) {
-    nock.disableNetConnect()
-  }
-});
-
-afterAll(() => {
-  nock.enableNetConnect()
-});
 
 beforeEach(async () => {
   jest.restoreAllMocks();

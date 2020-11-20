@@ -15,20 +15,11 @@ let resolution: Resolution;
 
 describe('ZNS', () => {
 
-  beforeAll(() => {
-    if (!isLive()) {
-      nock.disableNetConnect()
-    }
-  });
-
-  afterAll(() => {
-    nock.enableNetConnect()
-  });
-
   beforeEach(() => {
     jest.restoreAllMocks();
     resolution = new Resolution();
   });
+  
   describe('.NormalizeSource', () => {
     it('checks normalizeSource zns (boolean)', async () => {
       expect(resolution.zns?.network).toBe(1);

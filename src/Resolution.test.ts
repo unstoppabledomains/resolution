@@ -38,18 +38,11 @@ beforeAll(async () => {
     }
   });
   reader = await resolution.cns!.getReader();
-  if (!isLive()) {
-    nock.disableNetConnect()
-  }
 });
 
 beforeEach(() => {
   nock.cleanAll();
   jest.restoreAllMocks();
-});
-
-afterAll(() => {
-  nock.enableNetConnect()
 });
 
 describe('Resolution', () => {
@@ -62,7 +55,6 @@ describe('Resolution', () => {
         expect(err).toBeInstanceOf(FetchError);
         return
       };
-      
       fail("nock is not configured correctly!");
     });
 
