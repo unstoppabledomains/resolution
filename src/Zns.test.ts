@@ -4,13 +4,27 @@ import {
   expectSpyToBeCalled,
   expectResolutionErrorCode,
   mockAsyncMethods,
+  isLive,
 } from './tests/helpers';
 import { NullAddress } from './types';
 import { NamingServiceName } from './publicTypes';
+import nock from 'nock';
+
 
 let resolution: Resolution;
 
 describe('ZNS', () => {
+
+  beforeAll(() => {
+    if (!isLive()) {
+      nock.disableNetConnect()
+    }
+  });
+
+  afterAll(() => {
+    nock.enableNetConnect()
+  });
+
   beforeEach(() => {
     jest.restoreAllMocks();
     resolution = new Resolution();

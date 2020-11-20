@@ -10,10 +10,17 @@ import {
   protocolLink,
   pendingInLive,
   expectConfigurationErrorCode,
+  isLive,
 } from './tests/helpers';
 import { ConfigurationErrorCode } from './errors/configurationError';
 import { NamingServiceName } from './publicTypes';
 let resolution: Resolution;
+
+beforeAll(() => {
+  if (!isLive()) {
+    nock.disableNetConnect()
+  }
+})
 
 beforeEach(() => {
   nock.cleanAll();
@@ -21,6 +28,10 @@ beforeEach(() => {
   resolution = new Resolution({
     blockchain: { ens: { url: protocolLink() } },
   });
+});
+
+afterAll(() => {
+  nock.enableNetConnect()
 });
 
 describe('ENS', () => {
