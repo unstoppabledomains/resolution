@@ -27,7 +27,7 @@ export default class DnsUtils {
       }
 
       if (!!ttlInRecord && ttlInRecord !== TTL) {
-        throw new DnsRecordsError(DnsRecordsErrorCode.TtlInconsistent, {recordType: type});
+        throw new DnsRecordsError(DnsRecordsErrorCode.InconsistentTtl, {recordType: type});
       }
     }
     return cryptoRecords;
