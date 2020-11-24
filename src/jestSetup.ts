@@ -1,6 +1,12 @@
-import nock from 'nock';
 import {isLive} from './tests/helpers';
+import nock from 'nock';
 
-if (!isLive()) {
-  nock.disableNetConnect()
-}
+beforeAll(() => {
+  if (!isLive()) {
+    nock.disableNetConnect();
+  }
+});
+
+afterAll(() => {
+  nock.enableNetConnect();
+})
