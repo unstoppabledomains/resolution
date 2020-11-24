@@ -19,10 +19,11 @@ import {
   mockAsyncMethod,
   CryptoDomainWithTwitterVerification,
   pendingInLive,
-  CryptoDomainWithIpfsRecords
+  CryptoDomainWithIpfsRecords,
 } from './tests/helpers';
 import { RpcProviderTestCases } from './tests/providerMockData';
 import ICnsReader from './cns/ICnsReader';
+import fetch, { FetchError } from 'node-fetch';
 
 let resolution: Resolution;
 let reader: ICnsReader;
@@ -44,6 +45,17 @@ beforeEach(() => {
 
 describe('Resolution', () => {
   describe('.Basic setup', () => {
+    it('should fail in test development',async () => {
+      try {
+        await fetch("https://pokeres.bastionbot.org/images/pokemon/10.png");
+      } catch(err) {
+        // nock should prevent all outgoing traffic
+        expect(err).toBeInstanceOf(FetchError);
+        return
+      }
+      fail("nock is not configured correctly!");
+    });
+
     it('should get a valid resolution instance', async () => {
       const resolution = Resolution.infura('api-key');
       expect(resolution.ens?.url).toBe(`https://mainnet.infura.com/v3/api-key`);
