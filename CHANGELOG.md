@@ -5,6 +5,7 @@
 * Add `Resolution#dns` method to query dns records from blockchain #99
 * Add DnsUtils as a helper class to convert from CryptoRecord type to DnsRecord and vice-versa #99
 * Plug-in network config from dot-crypto library #101
+* Removed elliptic from dependacy list. (when needed user should install it separately)
 
 ## 1.8.3
 

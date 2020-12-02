@@ -6,6 +6,8 @@ type ConfigurationErrorHandler = (error: ConfigurationErrorOptions) => string;
 /** Explains Resolution Error options */
 type ConfigurationErrorOptions = {
   method?: ResolutionMethod;
+  dependacy?: string;
+  version?: string;
 };
 
 export enum ConfigurationErrorCode {
@@ -13,6 +15,7 @@ export enum ConfigurationErrorCode {
   UnspecifiedNetwork = 'UnspecifiedNetwork',
   UnspecifiedUrl = 'UnspecifiedUrl',
   MissingProviderConfigurations = 'MissingProviderConfigurations',
+  DependacyMissing = "DependacyMissing"
 }
 
 /**
@@ -30,6 +33,8 @@ const HandlersByCode = {
   }) => `Unspecified url in Resolution ${params.method} configuration`,
   [ConfigurationErrorCode.MissingProviderConfigurations]: (params: {}) =>
     `Couldn't find any configurations\n\tUse -C to configurate the library`,
+  [ConfigurationErrorCode.DependacyMissing]: (params: {dependacy: string, version: string}) => 
+    `Missing dependacy for this functionality. Please install ${params.dependacy} @ ${params.version} via npm or yarn`
 };
 
 /**
@@ -50,10 +55,9 @@ export class ConfigurationError extends Error {
   ) {
     const configurationErrorHandler: ConfigurationErrorHandler =
       HandlersByCode[code];
-    const { method } = options;
-    super(configurationErrorHandler({ method }));
+    super(configurationErrorHandler(options));
     this.code = code;
-    this.method = method;
+    this.method = options.method;
     this.name = 'ConfigurationError';
     Object.setPrototypeOf(this, ConfigurationError.prototype);
   }
