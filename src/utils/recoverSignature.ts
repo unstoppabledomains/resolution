@@ -29,6 +29,7 @@ const toChecksum = (address: string) => {
 
 const getSecp256k1 = () => {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const elliptic = require('elliptic');
     const secp256k1 = new elliptic.ec('secp256k1');
     return secp256k1;
