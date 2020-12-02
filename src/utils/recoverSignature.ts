@@ -1,9 +1,7 @@
 /* eslint-disable no-undef */
 import { keccak256 as sha3 } from 'js-sha3';
-import elliptic from 'elliptic';
 import { hexToBytes } from '.';
-// eslint-disable-next-line new-cap
-const secp256k1 = new elliptic.ec('secp256k1');
+import ConfigurationError, { ConfigurationErrorCode } from '../errors/configurationError';
 
 const bytesLength = (a: string) => (a.length - 2) / 2;
 const bytesSlice = (i: number, j: number, bs: string) =>
@@ -29,6 +27,19 @@ const toChecksum = (address: string) => {
   return checksumAddress;
 };
 
+const getSecp256k1 = () => {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const elliptic = require('elliptic');
+    const secp256k1 = new elliptic.ec('secp256k1');
+    return secp256k1;
+  } catch(err) {
+    throw new ConfigurationError(ConfigurationErrorCode.DependencyMissing,
+      {dependency: "elliptic", version: "^6.5.3"}
+    );
+  }
+}
+
 export const hashMessage = (message: string): string => {
   const messageBytes = hexToBytes(Buffer.from(message, 'utf8').toString('hex'));
   const messageBuffer = Buffer.from(messageBytes);
@@ -39,6 +50,7 @@ export const hashMessage = (message: string): string => {
 };
 
 export const recover = (message: string, signature: string): string => {
+  const secp256k1 = getSecp256k1();
   const hash = hashMessage(message);
   const vals = decodeSignature(signature);
   const vrs = {

@@ -1,7 +1,7 @@
 import { isValidTwitterSignature } from './TwitterSignatureValidator';
 
 describe('TwitterSignatureValidator', () => {
-  it('should return true for valid signature', async () => {
+  it('should return true for valid signature', () => {
     const isValid = isValidTwitterSignature({
       tokenId:
         '0xcbef5c2009359c88519191d7c0d00f3973f76f24bdb0fc8d5254de26a44e0903',
