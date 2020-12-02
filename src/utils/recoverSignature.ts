@@ -34,8 +34,8 @@ const getSecp256k1 = () => {
     const secp256k1 = new elliptic.ec('secp256k1');
     return secp256k1;
   } catch(err) {
-    throw new ConfigurationError(ConfigurationErrorCode.DependacyMissing,
-      {dependacy: "elliptic", version: "^6.5.3"}
+    throw new ConfigurationError(ConfigurationErrorCode.DependencyMissing,
+      {dependency: "elliptic", version: "^6.5.3"}
     );
   }
 }
