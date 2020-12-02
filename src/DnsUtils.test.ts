@@ -110,7 +110,7 @@ describe('DnsUtils', () => {
         { TTL: 90, data: '10.0.0.20', type: 'A' as DnsRecordType },
         { TTL: 900, data: '10.0.0.20', type: 'A' as DnsRecordType }
       ];
-      expectDnsRecordErrorCode(() => dnsUtils.toCrypto(classicalRecords), DnsRecordsErrorCode.TtlInconsistent);
+      expectDnsRecordErrorCode(() => dnsUtils.toCrypto(classicalRecords), DnsRecordsErrorCode.InconsistentTtl);
     });
 
   });

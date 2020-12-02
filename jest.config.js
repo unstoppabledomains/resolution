@@ -12,5 +12,6 @@ module.exports = {
   coveragePathIgnorePatterns : [
     '/node_modules/',
     '/src/tests/',
-  ]
+  ],
+  setupFilesAfterEnv: ['<rootDir>/src/jestSetup.ts'],
 };
