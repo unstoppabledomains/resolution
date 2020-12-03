@@ -1,11 +1,10 @@
 import { EthereumNamingService } from './EthereumNamingService';
-import { ProxyReaderMap, isNullAddress, NullAddress } from './types';
+import { ProxyReaderMap, isNullAddress } from './types';
 import { default as proxyReaderAbi } from './cns/contract/proxyReader';
 import { default as resolverInterface } from './cns/contract/resolver';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import ICnsReader, { Data } from './cns/ICnsReader';
 import CnsProxyReader from './cns/CnsProxyReader';
-import CnsRegistryReader from './cns/CnsRegistryReader';
 import Contract from './utils/contract';
 import standardKeys from './utils/standardKeys';
 import { getStartingBlock, isLegacyResolver } from './utils';
@@ -30,11 +29,9 @@ export default class Cns extends EthereumNamingService {
     this.contract = this.buildContract(proxyReaderAbi, this.registryAddress!);
   }
 
-  async getReader(): Promise<ICnsReader> {
+  getReader(): ICnsReader {
     if (!this.reader) {
-      this.reader = (await this.isDataReaderSupported())
-        ? new CnsProxyReader(this.contract)
-        : new CnsRegistryReader(this.contract);
+      this.reader = new CnsProxyReader(this.contract)
     }
 
     return this.reader;
@@ -42,20 +39,6 @@ export default class Cns extends EthereumNamingService {
 
   protected defaultRegistry(network: number): string | undefined {
     return Cns.ProxyReaderMap[network];
-  }
-
-  protected async isDataReaderSupported(): Promise<boolean> {
-    if (Cns.ProxyReaderMap[this.network]?.toLowerCase() === this.contract.address.toLowerCase()) {
-      return true;
-    }
-
-
-    try {
-      const [ result ] = await this.contract.call('supportsInterface', ['0x6eabca0d']);
-      return result;
-    } catch {
-      return false;
-    }
   }
 
   isSupportedDomain(domain: string): boolean {
@@ -69,12 +52,12 @@ export default class Cns extends EthereumNamingService {
 
   async resolver(domain: string): Promise<string> {
     const tokenId = this.namehash(domain);
-    const reader = await this.getReader();
+    const reader = this.getReader();
 
     const data = await reader.resolver(tokenId);
     await this.verify(domain, data);
 
-    return data.resolver || '';
+    return data.resolver!;
   }
 
   async resolve(_: string): Promise<ResolutionResponse> {
@@ -83,16 +66,14 @@ export default class Cns extends EthereumNamingService {
 
   async owner(domain: string): Promise<string> {
     const tokenId = this.namehash(domain);
-    try {
-      const [owner] = await this.contract.call('ownerOf', [tokenId]);
-      return owner || '';
-    } catch (error) {
-      if (error.reason === 'ERC721: owner query for nonexistent token') {
-        return NullAddress;
-      }
+    const reader = this.getReader();
 
-      throw error;
+    const data = await reader.records(tokenId, []);
+    if (!data.owner) {
+      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {domain})
     }
+
+    return data.owner;
   }
 
   async allRecords(domain: string): Promise<CryptoRecords> {
@@ -101,7 +82,7 @@ export default class Cns extends EthereumNamingService {
 
     const resolverContract = this.buildContract(resolverInterface, resolver);
     if (isLegacyResolver(resolver)) {
-      return await this.getStandardRecords(resolverContract, tokenId);
+      return await this.getStandardRecords(tokenId);
     }
 
     return await this.getAllRecords(resolverContract, tokenId);
@@ -109,7 +90,7 @@ export default class Cns extends EthereumNamingService {
 
   async twitter(domain: string): Promise<string> {
     const tokenId = this.namehash(domain);
-    const reader = await this.getReader();
+    const reader = this.getReader();
     const records = [
       standardKeys.validation_twitter_username,
       standardKeys.twitter_username,
@@ -146,7 +127,7 @@ export default class Cns extends EthereumNamingService {
   async records(domain: string, keys: string[]): Promise<CryptoRecords> {
     const tokenId = this.namehash(domain);
 
-    const reader = await this.getReader();
+    const reader = this.getReader();
     const data = await reader.records(tokenId, keys);
     await this.verify(domain, data);
 
@@ -154,9 +135,9 @@ export default class Cns extends EthereumNamingService {
   }
 
   protected async getResolver(tokenId: string): Promise<string> {
-    return await this.callMethod(this.registryContract, 'resolverOf', [
-      tokenId,
-    ]);
+    const reader = this.getReader();
+    const data =  await reader.resolver(tokenId);
+    return data.resolver!;
   }
 
   protected async verify(domain: string, data: Data): Promise<void> {
@@ -164,28 +145,21 @@ export default class Cns extends EthereumNamingService {
     if (!isNullAddress(resolver)) {
       return;
     }
-    const owner = data.owner || (await this.owner(domain));
+    const owner = data.owner;
     if (isNullAddress(owner)) {
       throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
         domain,
       });
     }
-
-
     throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
       domain,
     });
   }
 
-  private async getStandardRecords(
-    resolverContract: Contract,
-    tokenId: string,
-  ): Promise<CryptoRecords> {
+  private async getStandardRecords(tokenId: string): Promise<CryptoRecords> {
     const keys = Object.values(standardKeys);
-    const values = await this.callMethod(resolverContract, 'getMany', [
-      keys,
-      tokenId,
-    ]);
+    const reader = this.getReader();
+    const values = await reader.getMany(tokenId, keys);
     return this.constructRecords(keys, values);
   }
 
@@ -202,17 +176,11 @@ export default class Cns extends EthereumNamingService {
     const keyTopics = logs.map(event => event.topics[2]);
     // If there are no NewKey events we want to check the standardRecords
     if (keyTopics.length === 0) {
-      return await this.getStandardRecords(resolverContract, tokenId);
+      return await this.getStandardRecords(tokenId);
     }
-    const keys = await this.callMethod(resolverContract, 'getManyByHash', [
-      keyTopics,
-      tokenId,
-    ]);
-    const keyValues = await this.callMethod(resolverContract, 'getMany', [
-      keys,
-      tokenId,
-    ]);
-    return this.constructRecords(keys, keyValues);
+    const reader = this.getReader();
+    const [keys, values] = await reader.getManyByHash(tokenId, keyTopics);
+    return this.constructRecords(keys, values);
   }
 }
 

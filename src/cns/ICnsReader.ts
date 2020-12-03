@@ -9,4 +9,6 @@ export type Data = {
 export default interface ICnsReader {
   records(tokenId: string, keys: string[]): Promise<Data>;
   resolver(tokenId: string): Promise<Data>;
+  getManyByHash(tokenId: string, hashes: string[]): Promise<[string[], string[]]>;
+  getMany(tokenId: string, keys: string[]): Promise<string[]>;
 }

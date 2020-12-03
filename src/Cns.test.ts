@@ -31,8 +31,7 @@ beforeEach(async () => {
       },
     },
   });
-  mockAsyncMethods(resolution.cns, { isDataReaderSupported: false });
-  reader = await resolution.cns!.getReader();
+  reader = resolution.cns!.getReader();
 });
 
 describe('CNS', () => {
@@ -219,8 +218,7 @@ describe('CNS', () => {
             },
           },
         });
-        mockAsyncMethods(resolution.cns, { isDataReaderSupported: false });
-        reader = await resolution.cns!.getReader();
+        reader = resolution.cns!.getReader();
         mockAsyncMethods(reader, {
           records: {
             owner: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',

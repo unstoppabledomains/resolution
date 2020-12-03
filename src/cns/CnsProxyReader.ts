@@ -17,11 +17,20 @@ export default class CnsProxyReader implements ICnsReader {
     return this.get(tokenId);
   }
 
+  async getMany(tokenId: string, keys: string[]): Promise<string[]> {
+    const values =  await this.proxyContract.call('getMany', [keys, tokenId]);
+    return values[0] as string[];
+  }
+
+  async getManyByHash(tokenId: string, hashes: string[]): Promise<[string[], string[]]> {
+    return await this.proxyContract.call('getManyByHash', [hashes, tokenId]) as [string[], string[]];
+  }
+
   protected async get(tokenId: string, keys: string[] = []): Promise<Data> {
     const [resolver, owner, values] = await this.proxyContract.call('getData', [
       keys,
       tokenId,
     ]);
     return { resolver, owner, values };
-  }
+  }  
 }

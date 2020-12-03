@@ -112,8 +112,9 @@ function fromEthersProvider(provider: EthersProvider): Provider {
     request: async (request: RequestArguments) => {
       try {
         switch (request.method) {
-        case 'eth_call':
+        case 'eth_call': {
           return await provider.call(request.params![0]);
+        }
         case 'eth_getLogs':
           return await provider.getLogs(request.params![0]);
         default:

@@ -175,7 +175,6 @@ export const caseMock = <T, U>(params: T, cases: { request: T, response: U }[]):
       return response;
     }
   }
-
-
+  
   throw new Error(`got unexpected params ${JSON.stringify(params)}`);
 }

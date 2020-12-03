@@ -46,6 +46,7 @@ beforeEach(() => {
 describe('Resolution', () => {
   describe('.Basic setup', () => {
     it('should fail in test development',async () => {
+      pendingInLive()
       try {
         await fetch("https://pokeres.bastionbot.org/images/pokemon/10.png");
       } catch(err) {
@@ -91,7 +92,6 @@ describe('Resolution', () => {
           },
         });
         
-        const eye = mockAsyncMethod(resolution.cns!, "isDataReaderSupported", true);
         const reader = await resolution.cns?.getReader();
         const eyes = mockAsyncMethods(reader, {
           records: {
@@ -102,7 +102,7 @@ describe('Resolution', () => {
           },
         });
         const gundb = await resolution.chatId('homecakes.crypto');
-        expectSpyToBeCalled([...eyes, eye]);
+        expectSpyToBeCalled(eyes);
         expect(gundb).toBe(
           '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c',
         );
@@ -328,8 +328,7 @@ describe('Resolution', () => {
               },
             },
           });
-          const anotherSpy = mockAsyncMethod(resolution.cns, 'isDataReaderSupported', true);
-          const reader = await resolution.cns?.getReader();
+          const reader = resolution.cns?.getReader();
           const eyes = mockAsyncMethods(reader, {
             records: {
               resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
@@ -339,7 +338,6 @@ describe('Resolution', () => {
           const capital = await resolution.addr('Brad.crypto', 'eth');
           const lower = await resolution.addr('brad.crypto', 'eth');
           expectSpyToBeCalled(eyes, 2);
-          expectSpyToBeCalled([anotherSpy]);
           expect(capital).toStrictEqual(lower);
         });
       });
@@ -460,7 +458,7 @@ describe('Resolution', () => {
   
             const resolution = Resolution.fromEthersProvider(provider);
             const resp = await resolution.allRecords('brad.crypto');
-            expectSpyToBeCalled([eye], 3);
+            expectSpyToBeCalled([eye], 2);
             expectSpyToBeCalled([eye2], 2);
             expect(resp).toMatchObject({
               'gundb.username.value':
@@ -489,7 +487,7 @@ describe('Resolution', () => {
             );
   
             const resp = await resolution.allRecords('brad.crypto');
-            expectSpyToBeCalled([eye], 3);
+            expectSpyToBeCalled([eye], 2);
             expectSpyToBeCalled([eye2], 2);
             expect(resp).toMatchObject({
               'gundb.username.value':
@@ -563,8 +561,7 @@ describe('Resolution', () => {
                 },
               },
             });
-            const isDataReaderSpy = mockAsyncMethod(resolution.cns, 'isDataReaderSupported', true);
-            const reader = await resolution.cns?.getReader();
+            const reader = resolution.cns?.getReader();
             const eyes = mockAsyncMethods(reader, {
               records: {
                 resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
@@ -575,7 +572,6 @@ describe('Resolution', () => {
             });
             const gundb = await resolution.chatId('homecakes.crypto');
             expectSpyToBeCalled(eyes);
-            expectSpyToBeCalled([isDataReaderSpy]);
             expect(gundb).toBe(
               '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c',
             );
@@ -587,11 +583,7 @@ describe('Resolution', () => {
         describe('.Twitter', () => {
           it('should return verified twitter handle', async () => {
             const resolution = new Resolution();
-            const isDataReaderSpy = mockAsyncMethod(resolution.cns, 
-              'isDataReaderSupported', true,
-            );
             const reader = await resolution.cns?.getReader();
-            expectSpyToBeCalled([isDataReaderSpy]);
             const readerSpies = mockAsyncMethods(reader, {
               records: {
                 resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',

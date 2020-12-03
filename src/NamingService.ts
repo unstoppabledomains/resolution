@@ -129,7 +129,6 @@ export default abstract class NamingService extends BaseConnection {
         method: this.name,
       });
     }
-
   }
 
   protected constructRecords(
@@ -139,6 +138,7 @@ export default abstract class NamingService extends BaseConnection {
     const records: CryptoRecords = {};
     keys.forEach((key, index) => {
       records[key] = values instanceof Array ? values[index] : values?.[key];
+      if (!records[key]) delete records[key];
     });
     return records;
   }
