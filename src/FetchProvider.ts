@@ -15,6 +15,17 @@ export default class FetchProvider extends BaseConnection implements Provider {
   }
 
   async request(args: RequestArguments): Promise<unknown> {
+    console.log(new Error().stack);
+    const json = await this.fetchJson(args);
+    if (json.error) {
+      throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
+        providerMessage: json.error.message,
+      });
+    }
+    return json.result;
+  }
+
+  protected async fetchJson(args: RequestArguments): Promise<{error: {message: string}, result: undefined} | {error: undefined, result: unknown}> {
     try {
       const response = await this.fetch(this.url, {
         method: 'POST',
@@ -28,13 +39,7 @@ export default class FetchProvider extends BaseConnection implements Provider {
           'Content-Type': 'application/json',
         },
       });
-      const json = await response.json();
-      if (json.error) {
-        throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
-          providerMessage: json.error.message,
-        });
-      }
-      return json.result;
+      return await response.json();
     } catch (error) {
       if (error instanceof FetchError) {
         throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
