@@ -13,7 +13,6 @@ import { NamingServiceName, SourceDefinition } from './publicTypes';
 
 export abstract class EthereumNamingService extends NamingService {
   readonly name: NamingServiceName;
-  protected abstract getResolver(id: string): Promise<string>;
   protected registryContract: Contract;
 
   static readonly UrlMap: BlockhanNetworkUrlMap = {
@@ -35,20 +34,20 @@ export abstract class EthereumNamingService extends NamingService {
 
   protected abstract defaultRegistry(network: number): string | undefined;
 
-  async resolver(domain: string): Promise<string> {
-    const nodeHash = this.namehash(domain);
-    const ownerPromise = this.owner(domain);
-    const resolverAddress = await this.getResolver(nodeHash);
-    if (isNullAddress(resolverAddress)) {
-      await this.throwOwnershipError(domain, ownerPromise);
-    } else {
-      // We don't care about this promise anymore
-      // Ensure it doesn't generate a warning if it rejects
-      ownerPromise.catch(() => undefined);
-    }
+  // async resolver(domain: string): Promise<string> {
+  //   const nodeHash = this.namehash(domain);
+  //   const ownerPromise = this.owner(domain);
+  //   const resolverAddress = await this.resolver(nodeHash);
+  //   if (isNullAddress(resolverAddress)) {
+  //     await this.throwOwnershipError(domain, ownerPromise);
+  //   } else {
+  //     // We don't care about this promise anymore
+  //     // Ensure it doesn't generate a warning if it rejects
+  //     ownerPromise.catch(() => undefined);
+  //   }
 
-    return resolverAddress;
-  }
+  //   return resolverAddress;
+  // }
 
   private networkFromUrl(url: string | undefined): string | undefined {
     if (!url) {

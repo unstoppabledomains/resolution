@@ -348,7 +348,11 @@ export default class Resolution {
    */
   async resolver(domain: string): Promise<string> {
     domain = this.prepareDomain(domain);
-    return await this.getNamingMethodOrThrow(domain).resolver(domain);
+    const resolver = await this.getNamingMethodOrThrow(domain).resolver(domain);
+    if (!resolver) {
+      throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {domain});
+    }
+    return resolver;
   }
 
   /**

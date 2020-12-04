@@ -22,11 +22,9 @@ import {
   CryptoDomainWithIpfsRecords,
 } from './tests/helpers';
 import { RpcProviderTestCases } from './tests/providerMockData';
-import ICnsReader from './cns/ICnsReader';
 import fetch, { FetchError } from 'node-fetch';
 
 let resolution: Resolution;
-let reader: ICnsReader;
 
 beforeAll(async () => {
   resolution = new Resolution({
@@ -35,7 +33,6 @@ beforeAll(async () => {
       ens: { url: protocolLink() }
     }
   });
-  reader = await resolution.cns!.getReader();
 });
 
 beforeEach(() => {
@@ -86,15 +83,13 @@ describe('Resolution', () => {
         const resolution = new Resolution({
           blockchain: {
             cns: {
-              url: protocolLink(),
-              registry: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe',
+              url: protocolLink()
             },
           },
         });
         
-        const reader = await resolution.cns?.getReader();
-        const eyes = mockAsyncMethods(reader, {
-          records: {
+        const eyes = mockAsyncMethods(resolution.cns, {
+          get: {
             resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
             values: [
               '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c',
@@ -111,8 +106,8 @@ describe('Resolution', () => {
       describe('.ipfsHash', () => {
         it('should prioritize new keys over depricated ones', async() => {
           pendingInLive();
-          const spies = mockAsyncMethods(reader, {
-            records: {
+          const spies = mockAsyncMethods(resolution.cns, {
+            get: {
               resolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
               values: ['new record Ipfs hash', 'old record Ipfs hash']
             }
@@ -124,8 +119,8 @@ describe('Resolution', () => {
 
         it('should prioritize browser record key over ipfs.redirect_url one', async () => {
           pendingInLive();
-          const spies = mockAsyncMethods(reader, {
-            records: {
+          const spies = mockAsyncMethods(resolution.cns, {
+            get: {
               resolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
               values: ['new record redirect url', 'old record redirect url']
             }
@@ -282,11 +277,10 @@ describe('Resolution', () => {
 
     describe('.Records', () => {
       describe('.DNS', () => {
-        it('getting dns records', async () => {
+        it('getting dns get', async () => {
           pendingInLive();
-          const reader = await resolution.cns!.getReader();
-          const spies = mockAsyncMethods(reader, {
-            records: {
+          const spies = mockAsyncMethods(resolution.cns, {
+            get: {
               resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
               values: ['128','["10.0.0.1","10.0.0.2"]','90','["10.0.0.120"]',undefined]
             },
@@ -320,17 +314,8 @@ describe('Resolution', () => {
 
       describe('.Crypto', () => { 
         it(`domains "brad.crypto" and "Brad.crypto" should return the same results`, async () => {
-          const resolution = new Resolution({
-            blockchain: {
-              cns: {
-                url: protocolLink(),
-                registry: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe',
-              },
-            },
-          });
-          const reader = resolution.cns?.getReader();
-          const eyes = mockAsyncMethods(reader, {
-            records: {
+          const eyes = mockAsyncMethods(resolution.cns, {
+            get: {
               resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
               values: ['0x45b31e01AA6f42F0549aD482BE81635ED3149abb'],
             },
@@ -445,7 +430,7 @@ describe('Resolution', () => {
           expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
         });
   
-        describe('.All-records', () => {
+        describe('.All-get', () => {
           it('should be able to get logs with ethers default provider', async () => {
             const provider = getDefaultProvider('mainnet', { quorum: 1 });
   
@@ -510,7 +495,7 @@ describe('Resolution', () => {
   
             const resolution = Resolution.fromEthersProvider(provider);
             const resp = await resolution.allRecords('monmouthcounty.crypto');
-  
+
             expectSpyToBeCalled([eye], 2);
             expect(resp).toMatchObject({
               'crypto.BTC.address': '3NwuV8nVT2VKbtCs8evChdiW6kHTHcVpdn',
@@ -553,17 +538,8 @@ describe('Resolution', () => {
 
         describe('.Gundb', () => {
           it('should resolve gundb chat id', async () => {
-            const resolution = new Resolution({
-              blockchain: {
-                cns: {
-                  url: protocolLink(),
-                  registry: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe',
-                },
-              },
-            });
-            const reader = resolution.cns?.getReader();
-            const eyes = mockAsyncMethods(reader, {
-              records: {
+            const eyes = mockAsyncMethods(resolution.cns, {
+              get: {
                 resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
                 values: [
                   '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c',
@@ -583,9 +559,8 @@ describe('Resolution', () => {
         describe('.Twitter', () => {
           it('should return verified twitter handle', async () => {
             const resolution = new Resolution();
-            const reader = await resolution.cns?.getReader();
-            const readerSpies = mockAsyncMethods(reader, {
-              records: {
+            const readerSpies = mockAsyncMethods(resolution.cns, {
+              get: {
                 resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
                 owner: '0x6EC0DEeD30605Bcd19342f3c30201DB263291589',
                 values: [

@@ -87,7 +87,7 @@ export default class Ens extends EthereumNamingService {
 
     const reverseAddress = address + '.addr.reverse';
     const nodeHash = this.namehash(reverseAddress);
-    const resolverAddress = await this.getResolver(nodeHash);
+    const resolverAddress = await this.resolver(reverseAddress);
     if (isNullAddress(resolverAddress)) {
       return null;
     }
@@ -102,6 +102,14 @@ export default class Ens extends EthereumNamingService {
 
   private async addr(domain: string, currencyTicker: string): Promise<string | undefined> {
     const resolver = await this.resolver(domain);
+    if (!resolver) {
+      const owner = await this.owner(domain);
+      if (!owner) {
+        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {domain});
+      }
+      throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {domain});
+    }
+    
     const cointType = this.getCoinType(currencyTicker.toUpperCase());
     return await this.fetchAddress(resolver, domain, cointType);
   }
@@ -189,7 +197,8 @@ export default class Ens extends EthereumNamingService {
   /**
    * This was done to make automated tests more configurable
    */
-  protected async getResolver(nodeHash: string): Promise<string> {
+  async resolver(domain: string): Promise<string> {
+    const nodeHash = this.namehash(domain);
     return await this.callMethod(this.registryContract, 'resolver', [nodeHash]);
   }
 
@@ -208,7 +217,7 @@ export default class Ens extends EthereumNamingService {
     return await Promise.all([
       this.owner(domain),
       this.getTTL(nodeHash),
-      this.getResolver(nodeHash),
+      this.resolver(domain),
     ]);
   }
 
