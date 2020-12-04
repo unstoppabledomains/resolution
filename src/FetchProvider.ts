@@ -15,7 +15,6 @@ export default class FetchProvider extends BaseConnection implements Provider {
   }
 
   async request(args: RequestArguments): Promise<unknown> {
-    console.log(new Error().stack);
     const json = await this.fetchJson(args);
     if (json.error) {
       throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
