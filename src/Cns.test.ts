@@ -16,7 +16,6 @@ import {
 import FetchProvider from './FetchProvider';
 import { FetchError } from 'node-fetch';
 import { NamingServiceName } from './publicTypes';
-import { resolveTxt } from 'dns';
 import Cns from './Cns';
 
 let resolution: Resolution;
@@ -96,7 +95,7 @@ describe('CNS', () => {
     expect(resolverAddress).toBe('0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3');
   });
 
-  it.only('should not find a resolver address', async () => {
+  it('should not find a resolver address', async () => {
     const spies = mockAsyncMethods(cns, { get: {
       owner: '0x0000000000000000000000000000000000000000',
       resolver: undefined
