@@ -13,12 +13,10 @@ export type NetworkIdMap = {
 };
 
 export type ProxyData = {
-  owner?: string,
-  resolver?: string,
-  values?: string[]
+  owner: string,
+  resolver: string,
+  values: string[]
 }
-
-export type VerifiedData<T> = { [P in keyof T]-?: VerifiedData<NonNullable<T[P]>>}
 
 export type ProviderParams = unknown[] | object;
 export interface RequestArguments {

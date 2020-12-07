@@ -1,5 +1,5 @@
 import { EthereumNamingService } from './EthereumNamingService';
-import { ProxyReaderMap, isNullAddress, ProxyData, VerifiedData } from './types';
+import { ProxyReaderMap, isNullAddress, ProxyData } from './types';
 import { default as proxyReaderAbi } from './cns/contract/proxyReader';
 import { default as resolverInterface } from './cns/contract/resolver';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
@@ -104,7 +104,7 @@ export default class Cns extends EthereumNamingService {
     throw new Error('This method is unsupported for CNS');
   }
 
-  private async getVerifiedData(domain: string, keys?: string[]): Promise<VerifiedData<ProxyData>> {
+  private async getVerifiedData(domain: string, keys?: string[]): Promise<ProxyData> {
     const tokenId = this.namehash(domain);
     const data = await this.get(tokenId, keys);
     if (isNullAddress(data.resolver)) {
@@ -113,7 +113,7 @@ export default class Cns extends EthereumNamingService {
       }
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {domain});
     }
-    return {owner: data.owner!, resolver: data.resolver!, values: data.values || [] };
+    return { owner: data.owner, resolver: data.resolver, values: data.values };
   }
 
   private async getStandardRecords(tokenId: string): Promise<CryptoRecords> {
