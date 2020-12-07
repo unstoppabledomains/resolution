@@ -75,6 +75,8 @@ export default {
   email: 'whois.email.value',
   for_sale: 'whois.for_sale.value',
   html: 'ipfs.html.value',
+  dweb_hash: 'dweb.ipfs.hash',
+  browser_redirect: 'browser.redirect_url',
   redirect_domain: 'ipfs.redirect_domain.value',
   gundb_username: 'gundb.username.value',
   gundb_public_key: 'gundb.public_key.value',

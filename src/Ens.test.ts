@@ -623,7 +623,7 @@ describe('ENS', () => {
       await expectResolutionErrorCode(
         emailPromise,
         ResolutionErrorCode.RecordNotFound,
-        );
+      );
       expectSpyToBeCalled(eyes);
     });
 

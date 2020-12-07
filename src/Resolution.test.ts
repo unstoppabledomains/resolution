@@ -23,6 +23,7 @@ import {
 } from './tests/helpers';
 import { RpcProviderTestCases } from './tests/providerMockData';
 import fetch, { FetchError } from 'node-fetch';
+import standardKeys from './utils/standardKeys';
 
 let resolution: Resolution;
 
@@ -80,20 +81,11 @@ describe('Resolution', () => {
       });
 
       it('should resolve gundb chat id', async () => {
-        const resolution = new Resolution({
-          blockchain: {
-            cns: {
-              url: protocolLink()
-            },
-          },
-        });
-        
         const eyes = mockAsyncMethods(resolution.cns, {
           get: {
             resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
-            values: [
+            [standardKeys.gundb_username]:
               '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c',
-            ],
           },
         });
         const gundb = await resolution.chatId('homecakes.crypto');
@@ -109,7 +101,8 @@ describe('Resolution', () => {
           const spies = mockAsyncMethods(resolution.cns, {
             get: {
               resolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
-              values: ['new record Ipfs hash', 'old record Ipfs hash']
+              [standardKeys.dweb_hash]: 'new record Ipfs hash',
+              [standardKeys.html]: 'old record Ipfs hash'
             }
           });
           const hash = await resolution.ipfsHash(CryptoDomainWithIpfsRecords);
@@ -122,7 +115,8 @@ describe('Resolution', () => {
           const spies = mockAsyncMethods(resolution.cns, {
             get: {
               resolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
-              values: ['new record redirect url', 'old record redirect url']
+              [standardKeys.browser_redirect]: 'new record redirect url',
+              [standardKeys.redirect_domain]: 'old record redirect url'
             }
           });
           const redirectUrl = await resolution.httpUrl(CryptoDomainWithIpfsRecords);
@@ -282,7 +276,10 @@ describe('Resolution', () => {
           const spies = mockAsyncMethods(resolution.cns, {
             get: {
               resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
-              values: ['128','["10.0.0.1","10.0.0.2"]','90','["10.0.0.120"]',undefined]
+              'dns.ttl': '128', 
+              'dns.A': '["10.0.0.1","10.0.0.2"]',
+              'dns.A.ttl': '90',
+              'dns.AAAA': '["10.0.0.120"]',
             },
           });
           const dnsRecords = await resolution.dns("someTestDomain.crypto", [DnsRecordType.A, DnsRecordType.AAAA]);
@@ -317,7 +314,7 @@ describe('Resolution', () => {
           const eyes = mockAsyncMethods(resolution.cns, {
             get: {
               resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
-              values: ['0x45b31e01AA6f42F0549aD482BE81635ED3149abb'],
+              [standardKeys.ETH]: '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
             },
           });
           const capital = await resolution.addr('Brad.crypto', 'eth');
@@ -541,9 +538,8 @@ describe('Resolution', () => {
             const eyes = mockAsyncMethods(resolution.cns, {
               get: {
                 resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
-                values: [
+                [standardKeys.gundb_username]:
                   '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c',
-                ],
               },
             });
             const gundb = await resolution.chatId('homecakes.crypto');
@@ -563,10 +559,8 @@ describe('Resolution', () => {
               get: {
                 resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
                 owner: '0x6EC0DEeD30605Bcd19342f3c30201DB263291589',
-                values: [
-                  '0xcd2655d9557e5535313b47107fa8f943eb1fec4da6f348668062e66233dde21b413784c4060340f48da364311c6e2549416a6a23dc6fbb48885382802826b8111b',
-                  'derainberk'
-                ]
+                [standardKeys.validation_twitter_username]:'0xcd2655d9557e5535313b47107fa8f943eb1fec4da6f348668062e66233dde21b413784c4060340f48da364311c6e2549416a6a23dc6fbb48885382802826b8111b',
+                [standardKeys.twitter_username]: 'derainberk'
               },
             });
             const twitterHandle = await resolution.twitter(
