@@ -1,6 +1,6 @@
 import { ResolutionMethod } from '../publicTypes';
-/** 
- * Alias for Resolution error handler function 
+/**
+ * Alias for Resolution error handler function
  * @internal
  */
 type ResolutionErrorHandler = (error: ResolutionErrorOptions) => string;
@@ -97,7 +97,7 @@ export class ResolutionError extends Error {
     if (code === ResolutionErrorCode.UnspecifiedCurrency) {
       message += `\nResolutionErrorCode ${code} is deprecated and will be removed in the future. Use RecordNotFound code instead.`;
     }
-    
+
     super(message);
     this.code = code;
     this.domain = domain;
