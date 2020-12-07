@@ -24,7 +24,7 @@ module.exports = {
     'no-unused-vars': ['off'],
     'valid-jsdoc': ['off'],
     'require-jsdoc': ['off'],
-    'indent': ['error', 2],
+    'indent': ['warn', 2],
     '@typescript-eslint/no-unused-vars': ['warn', {args: 'none'}],
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/ban-types': 'off',
