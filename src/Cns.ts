@@ -14,20 +14,14 @@ import {
 } from './publicTypes';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 import NetworkConfig from './config/network-config.json';
-import ConfigurationError, { ConfigurationErrorCode } from './errors/configurationError';
 
 export default class Cns extends EthereumNamingService {
-  readonly contract: Contract;
   static TwitterVerificationAddress = '0x12cfb13522F13a78b650a8bCbFCf50b7CB899d82';
   static ProxyReaderMap: ProxyReaderMap = getProxyReaderMap();
 
   constructor(source: SourceDefinition = {}) {
     super(source, NamingServiceName.CNS);
-    const proxyContractAddress  = this.defaultRegistry(this.network);
-    if (!proxyContractAddress) {
-      throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedNetwork)
-    }
-    this.contract = this.buildContract(proxyReaderAbi, proxyContractAddress);
+    this.readerContract = this.buildContract(proxyReaderAbi, this.registryAddress!);
   }
 
   protected defaultRegistry(network: number): string | undefined {
@@ -148,12 +142,12 @@ export default class Cns extends EthereumNamingService {
   }
 
   private async getManyByHash(tokenId: string, hashes: string[]): Promise<CryptoRecords> {
-    const [keys, values] = await this.contract.call('getManyByHash', [hashes, tokenId]) as [string[], string[]];
+    const [keys, values] = await this.readerContract.call('getManyByHash', [hashes, tokenId]) as [string[], string[]];
     return this.constructRecords(keys, values);
   }
 
   private async get(tokenId: string, keys: string[] = []): Promise<CryptoRecords> {
-    const [resolver, owner, values] = await this.contract.call('getData', [
+    const [resolver, owner, values] = await this.readerContract.call('getData', [
       keys,
       tokenId,
     ]);
@@ -161,7 +155,7 @@ export default class Cns extends EthereumNamingService {
     records.resolver = resolver;
     records.owner = owner;
     return records;
-  }  
+  }
 }
 
 function getProxyReaderMap(): ProxyReaderMap {

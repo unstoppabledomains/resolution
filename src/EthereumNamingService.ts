@@ -13,7 +13,7 @@ import { NamingServiceName, SourceDefinition } from './publicTypes';
 
 export abstract class EthereumNamingService extends NamingService {
   readonly name: NamingServiceName;
-  protected registryContract: Contract;
+  protected readerContract: Contract;
 
   static readonly UrlMap: BlockhanNetworkUrlMap = {
     1: 'https://main-rpc.linkpool.io',
