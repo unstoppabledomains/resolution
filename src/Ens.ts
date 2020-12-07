@@ -11,20 +11,17 @@ import {
 import Contract from './utils/contract';
 import contentHash from 'content-hash';
 import EnsNetworkMap from 'ethereum-ens-network-map';
-import { SourceDefinition, ResolutionResponse, CryptoRecords } from './publicTypes';
+import { ResolutionResponse, CryptoRecords, SourceDefinition } from './publicTypes';
 
 export default class Ens extends EthereumNamingService {
   readonly name = NamingServiceName.ENS;
 
   constructor(source: SourceDefinition = {}) {
     super(source, NamingServiceName.ENS);
-    if (this.registryAddress) {
-      this.readerContract = this.buildContract(
-        ensInterface,
-        this.registryAddress,
-      );
-    }
+  }
 
+  protected readerAbi(): any {
+    return ensInterface;
   }
 
   isSupportedDomain(domain: string): boolean {

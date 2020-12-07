@@ -21,7 +21,10 @@ export default class Cns extends EthereumNamingService {
 
   constructor(source: SourceDefinition = {}) {
     super(source, NamingServiceName.CNS);
-    this.readerContract = this.buildContract(proxyReaderAbi, this.registryAddress!);
+  }
+
+  protected readerAbi(): any {
+    return proxyReaderAbi;
   }
 
   protected defaultRegistry(network: number): string | undefined {

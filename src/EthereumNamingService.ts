@@ -9,7 +9,7 @@ import {
 } from './types';
 import { invert } from './utils';
 import Contract from './utils/contract';
-import { NamingServiceName, SourceDefinition } from './publicTypes';
+import { NamingServiceName, SourceDefinition, ResolutionMethod } from './publicTypes';
 
 export abstract class EthereumNamingService extends NamingService {
   readonly name: NamingServiceName;
@@ -32,7 +32,18 @@ export abstract class EthereumNamingService extends NamingService {
     EthereumNamingService.NetworkNameMap,
   );
 
+  constructor(source: SourceDefinition = {}, name: ResolutionMethod) {
+    super(source, name);
+    if (this.registryAddress) {
+      this.readerContract = this.buildContract(
+        this.readerAbi(),
+        this.registryAddress,
+      );
+    }
+  }
+
   protected abstract defaultRegistry(network: number): string | undefined;
+  protected abstract readerAbi(): any;
   private networkFromUrl(url: string | undefined): string | undefined {
     if (!url) {
       return undefined;
