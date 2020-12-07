@@ -8,6 +8,9 @@ import { JsonRpcProvider, getDefaultProvider } from '@ethersproject/providers';
 import Web3HttpProvider from 'web3-providers-http';
 import Web3WsProvider from 'web3-providers-ws';
 import Web3V027Provider from 'web3-0.20.7/lib/web3/httpprovider';
+import {
+  CryptoDomainWithAdaBchAddresses,
+} from './tests/helpers';
 
 import {
   expectResolutionErrorCode,
@@ -61,7 +64,7 @@ describe('Resolution', () => {
       expect(resolution.ens?.url).toBe(`https://mainnet.infura.com/v3/api-key`);
       expect(resolution.cns?.url).toBe(`https://mainnet.infura.com/v3/api-key`);
     });
-  
+
     it('provides empty response constant', async () => {
       const response = UnclaimedDomainResponse;
       expect(response.addresses).toEqual({});
@@ -74,7 +77,7 @@ describe('Resolution', () => {
       expect(result).toBe(true);
     });
 
-    describe('.ServiceName', () => {      
+    describe('.ServiceName', () => {
       it('checks ens service name', () => {
         const resolution = new Resolution();
         const serviceName = resolution.serviceName('domain.eth');
@@ -90,7 +93,7 @@ describe('Resolution', () => {
             },
           },
         });
-        
+
         const eye = mockAsyncMethod(resolution.cns!, "isDataReaderSupported", true);
         const reader = await resolution.cns?.getReader();
         const eyes = mockAsyncMethods(reader, {
@@ -107,7 +110,7 @@ describe('Resolution', () => {
           '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c',
         );
       });
-  
+
       describe('.ipfsHash', () => {
         it('should prioritize new keys over depricated ones', async() => {
           pendingInLive();
@@ -135,7 +138,7 @@ describe('Resolution', () => {
           expect(redirectUrl).toBe('new record redirect url');
         });
       });
-  
+
       describe('serviceName', () => {
         it('checks ens service name', () => {
           const resolution = new Resolution();
@@ -193,7 +196,7 @@ describe('Resolution', () => {
       it('checks Resolution#addr error #1', async () => {
         const resolution = new Resolution();
         const spy = mockAsyncMethods(resolution.zns!, {
-          getRecordsAddresses: undefined 
+          getRecordsAddresses: undefined
         });
         await expectResolutionErrorCode(
           resolution.addr('sdncdoncvdinvcsdncs.zil', 'ZIL'),
@@ -249,7 +252,7 @@ describe('Resolution', () => {
             ResolutionErrorCode.UnsupportedDomain,
           );
         });
-    
+
         it('should be invalid domain 2', async () => {
           const resolution = new Resolution();
           await expectResolutionErrorCode(
@@ -257,7 +260,7 @@ describe('Resolution', () => {
             ResolutionErrorCode.UnsupportedDomain,
           );
         });
-    
+
         it('should be invalid domain 3', async () => {
           const cnsInvalidDomain = 'hello..crypto';
           const ensInvalidDomain = 'hello..eth';
@@ -318,7 +321,7 @@ describe('Resolution', () => {
         });
       });
 
-      describe('.Crypto', () => { 
+      describe('.Crypto', () => {
         it(`domains "brad.crypto" and "Brad.crypto" should return the same results`, async () => {
           const resolution = new Resolution({
             blockchain: {
@@ -367,12 +370,12 @@ describe('Resolution', () => {
           );
           const resolution = Resolution.fromWeb3Version1Provider(provider);
           const ethAddress = await resolution.addr('brad.crypto', 'ETH');
-  
+
           // expect each mock to be called at least once.
           expectSpyToBeCalled([eye]);
           expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
         });
-  
+
         it('should work with webSocketProvider', async () => {
         // web3-providers-ws has problems with type definitions
         // We still prefer everything to be statically typed on our end for better mocking
@@ -387,14 +390,14 @@ describe('Resolution', () => {
               result,
             });
           });
-  
+
           const resolution = Resolution.fromWeb3Version1Provider(provider);
           const ethAddress = await resolution.addr('brad.crypto', 'ETH');
           provider.disconnect(1000, 'end of test');
           expectSpyToBeCalled([eye]);
           expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
         });
-  
+
         it('should work for ethers jsonrpc provider', async () => {
           const provider = new JsonRpcProvider(
             protocolLink(ProviderProtocol.http),
@@ -408,10 +411,10 @@ describe('Resolution', () => {
           expectSpyToBeCalled([eye]);
           expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
         });
-  
+
         it('should work with ethers default provider', async () => {
           const provider = getDefaultProvider('mainnet');
-  
+
           const eye = mockAsyncMethod(provider, 'call', params =>
             Promise.resolve(caseMock(params, RpcProviderTestCases)),
           );
@@ -420,7 +423,7 @@ describe('Resolution', () => {
           expectSpyToBeCalled([eye]);
           expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
         });
-  
+
         it('should work with web3@0.20.7 provider', async () => {
           const provider = new Web3V027Provider(
             protocolLink(ProviderProtocol.http),
@@ -446,18 +449,18 @@ describe('Resolution', () => {
           expectSpyToBeCalled([eye]);
           expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
         });
-  
+
         describe('.All-records', () => {
           it('should be able to get logs with ethers default provider', async () => {
             const provider = getDefaultProvider('mainnet', { quorum: 1 });
-  
+
             const eye = mockAsyncMethod(provider, 'call', params =>
               Promise.resolve(caseMock(params, RpcProviderTestCases)),
             );
             const eye2 = mockAsyncMethod(provider, 'getLogs', params =>
               Promise.resolve(caseMock(params, RpcProviderTestCases)),
             );
-  
+
             const resolution = Resolution.fromEthersProvider(provider);
             const resp = await resolution.allRecords('brad.crypto');
             expectSpyToBeCalled([eye], 3);
@@ -474,7 +477,7 @@ describe('Resolution', () => {
               'crypto.BTC.address': 'bc1q359khn0phg58xgezyqsuuaha28zkwx047c0c3y',
             });
           });
-  
+
           it('should be able to get logs with jsonProvider', async () => {
             const provider = new JsonRpcProvider(
               protocolLink(ProviderProtocol.http),
@@ -487,7 +490,7 @@ describe('Resolution', () => {
             const eye2 = mockAsyncMethod(provider, 'getLogs', params =>
               Promise.resolve(caseMock(params, RpcProviderTestCases)),
             );
-  
+
             const resp = await resolution.allRecords('brad.crypto');
             expectSpyToBeCalled([eye], 3);
             expectSpyToBeCalled([eye2], 2);
@@ -503,16 +506,16 @@ describe('Resolution', () => {
               'crypto.BTC.address': 'bc1q359khn0phg58xgezyqsuuaha28zkwx047c0c3y',
             });
           });
-  
+
           it('should get standard keys from legacy resolver', async () => {
             const provider = getDefaultProvider('mainnet');
             const eye = mockAsyncMethod(provider, 'call', params =>
               Promise.resolve(caseMock(params, RpcProviderTestCases)),
             );
-  
+
             const resolution = Resolution.fromEthersProvider(provider);
             const resp = await resolution.allRecords('monmouthcounty.crypto');
-  
+
             expectSpyToBeCalled([eye], 2);
             expect(resp).toMatchObject({
               'crypto.BTC.address': '3NwuV8nVT2VKbtCs8evChdiW6kHTHcVpdn',
@@ -580,14 +583,14 @@ describe('Resolution', () => {
               '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c',
             );
           });
-        });    
+        });
       });
 
       describe('.Verifications', () => {
         describe('.Twitter', () => {
           it('should return verified twitter handle', async () => {
             const resolution = new Resolution();
-            const isDataReaderSpy = mockAsyncMethod(resolution.cns, 
+            const isDataReaderSpy = mockAsyncMethod(resolution.cns,
               'isDataReaderSupported', true,
             );
             const reader = await resolution.cns?.getReader();
@@ -608,13 +611,35 @@ describe('Resolution', () => {
             expectSpyToBeCalled(readerSpies);
             expect(twitterHandle).toBe('derainberk');
           });
-  
+
           it('should throw unsupported method', async () => {
             const resolution = new Resolution();
             expectResolutionErrorCode(resolution.twitter('ryan.eth'), ResolutionErrorCode.UnsupportedMethod);
           });
         });
       });
+    });
+  });
+
+  describe('.records', () => {
+    it('works', async () => {
+      const resolution = new Resolution();
+      CryptoDomainWithAdaBchAddresses
+      const reader = await resolution.cns?.getReader();
+      const eyes = mockAsyncMethods(reader, {
+        records: {
+          resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+          values: [
+            '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c',
+            '',
+          ],
+        },
+      });
+      expect(await resolution.records(CryptoDomainWithAdaBchAddresses, ['crypto.ADA.address', 'crypto.ETH.address'])).toEqual({
+        "crypto.ADA.address": "0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c",
+        "crypto.ETH.address": "",
+      })
+      expectSpyToBeCalled([...eyes]);
     });
   });
 });

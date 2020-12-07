@@ -138,7 +138,7 @@ export default abstract class NamingService extends BaseConnection {
   ): CryptoRecords {
     const records: CryptoRecords = {};
     keys.forEach((key, index) => {
-      records[key] = values instanceof Array ? values[index] : values?.[key];
+      records[key] = (values instanceof Array ? values[index] : values?.[key]) || '';
     });
     return records;
   }
