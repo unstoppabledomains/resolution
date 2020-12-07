@@ -24,8 +24,7 @@ export default class Cns extends EthereumNamingService {
 
   constructor(source: SourceDefinition = {}) {
     super(source, NamingServiceName.CNS);
-    const network = Number(source.network) || 1;
-    const proxyContractAddress  = this.defaultRegistry(network);
+    const proxyContractAddress  = this.defaultRegistry(this.network);
     if (!proxyContractAddress) {
       throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedNetwork)
     }
