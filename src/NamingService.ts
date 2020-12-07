@@ -133,7 +133,7 @@ export default abstract class NamingService extends BaseConnection {
 
   protected constructRecords(
     keys: string[],
-    values: undefined | string[] | CryptoRecords,
+    values: undefined | (string | undefined)[] | CryptoRecords,
   ): CryptoRecords {
     const records: CryptoRecords = {};
     keys.forEach((key, index) => {
