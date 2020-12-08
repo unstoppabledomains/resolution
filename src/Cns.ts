@@ -11,6 +11,7 @@ import {
   NamingServiceName,
   ResolutionResponse,
   CryptoRecords,
+  DomainData,
 } from './publicTypes';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 import NetworkConfig from './config/network-config.json';
@@ -62,13 +63,14 @@ export default class Cns extends EthereumNamingService {
 
   async twitter(domain: string): Promise<string> {
     const tokenId = this.namehash(domain);
-    const records = [
+    const keys = [
       standardKeys.validation_twitter_username,
       standardKeys.twitter_username,
     ];
-    const data = await this.getVerifiedData(domain, records);
-    const validationSignature = data[standardKeys.validation_twitter_username];
-    const twitterHandle = data[standardKeys.twitter_username];
+    const data = await this.getVerifiedData(domain, keys);
+    const {records} = data;
+    const validationSignature = records[standardKeys.validation_twitter_username];
+    const twitterHandle = records[standardKeys.twitter_username];
     if (isNullAddress(validationSignature)) {
       throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {domain, recordName: standardKeys.validation_twitter_username})
     }
@@ -98,14 +100,14 @@ export default class Cns extends EthereumNamingService {
   }
 
   async records(domain: string, keys: string[]): Promise<CryptoRecords> {
-    return await this.getVerifiedData(domain, keys);
+    return (await this.getVerifiedData(domain, keys)).records;
   }
 
   async resolve(_: string): Promise<ResolutionResponse> {
     throw new Error('This method is unsupported for CNS');
   }
 
-  private async getVerifiedData(domain: string, keys?: string[]): Promise<CryptoRecords> {
+  private async getVerifiedData(domain: string, keys?: string[]): Promise<DomainData> {
     const tokenId = this.namehash(domain);
     const data = await this.get(tokenId, keys);
     if (isNullAddress(data.resolver)) {
@@ -141,7 +143,7 @@ export default class Cns extends EthereumNamingService {
   }
 
   private async getMany(tokenId: string, keys: string[]): Promise<CryptoRecords> {
-    return await this.get(tokenId, keys);
+    return (await this.get(tokenId, keys)).records;
   }
 
   private async getManyByHash(tokenId: string, hashes: string[]): Promise<CryptoRecords> {
@@ -149,15 +151,12 @@ export default class Cns extends EthereumNamingService {
     return this.constructRecords(keys, values);
   }
 
-  private async get(tokenId: string, keys: string[] = []): Promise<CryptoRecords> {
+  private async get(tokenId: string, keys: string[] = []): Promise<DomainData> {
     const [resolver, owner, values] = await this.readerContract.call('getData', [
       keys,
       tokenId,
     ]);
-    const records = this.constructRecords(keys, values);
-    records.resolver = resolver;
-    records.owner = owner;
-    return records;
+    return {owner, resolver, records: this.constructRecords(keys, values)}
   }
 }
 
