@@ -4,7 +4,7 @@ import Resolution, {
   UnclaimedDomainResponse,
 } from './index';
 import { DnsRecordType, JsonRpcPayload } from './publicTypes';
-import { JsonRpcProvider, getDefaultProvider } from '@ethersproject/providers';
+import { JsonRpcProvider, getDefaultProvider, InfuraProvider } from '@ethersproject/providers';
 import Web3HttpProvider from 'web3-providers-http';
 import Web3WsProvider from 'web3-providers-ws';
 import Web3V027Provider from 'web3-0.20.7/lib/web3/httpprovider';
@@ -301,6 +301,27 @@ describe('Resolution', () => {
             { TTL: 128, data: '10.0.0.120', type: 'AAAA' }
           ]);
         });
+
+        it('should work with others records', async () => {
+          pendingInLive();
+          const spies = mockAsyncMethods(resolution.cns, {
+            get: {
+              resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
+              records: {
+                'dns.ttl': '128',
+                'dns.A': '["10.0.0.1","10.0.0.2"]',
+                'dns.A.ttl': '90',
+                'dns.AAAA': '["10.0.0.120"]',
+                [standardKeys.ETH]: '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
+                [standardKeys.ADA]: '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
+                [standardKeys.ARK]: '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
+              }
+            }
+          });
+          const dnsRecords = await resolution.dns("someTestDomain.crypto", [DnsRecordType.A, DnsRecordType.AAAA]);
+          expectSpyToBeCalled(spies);
+          console.log(dnsRecords);
+        })
       });
 
       describe('.Metadata', () => {
@@ -403,7 +424,8 @@ describe('Resolution', () => {
         });
 
         it('should work with ethers default provider', async () => {
-          const provider = getDefaultProvider('mainnet');
+          // const provider = getDefaultProvider('mainnet');
+          const provider = new InfuraProvider('mainnet', '213fff28936343858ca9c5115eff1419');
 
           const eye = mockAsyncMethod(provider, 'call', params =>
             Promise.resolve(caseMock(params, RpcProviderTestCases)),
@@ -442,7 +464,8 @@ describe('Resolution', () => {
 
         describe('.All-get', () => {
           it('should be able to get logs with ethers default provider', async () => {
-            const provider = getDefaultProvider('mainnet', { quorum: 1 });
+            // const provider = getDefaultProvider('mainnet', { quorum: 1 });
+            const provider = new InfuraProvider('mainnet', '213fff28936343858ca9c5115eff1419');
 
             const eye = mockAsyncMethod(provider, 'call', params =>
               Promise.resolve(caseMock(params, RpcProviderTestCases)),
@@ -498,7 +521,8 @@ describe('Resolution', () => {
           });
 
           it('should get standard keys from legacy resolver', async () => {
-            const provider = getDefaultProvider('mainnet');
+            // const provider = getDefaultProvider('mainnet');
+            const provider = new InfuraProvider('mainnet', '213fff28936343858ca9c5115eff1419');
             const eye = mockAsyncMethod(provider, 'call', params =>
               Promise.resolve(caseMock(params, RpcProviderTestCases)),
             );
@@ -605,13 +629,13 @@ describe('Resolution', () => {
           owner: '0x6EC0DEeD30605Bcd19342f3c30201DB263291589',
           resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
           records: {
-            'crypto.ADA.address': '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c',
+            'crypto.ADA.address': 'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
             'crypto.ETH.address': '',
           },
         },
       });
       expect(await resolution.records(CryptoDomainWithAdaBchAddresses, ['crypto.ADA.address', 'crypto.ETH.address'])).toEqual({
-        "crypto.ADA.address": "0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c",
+        "crypto.ADA.address": "DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj",
         "crypto.ETH.address": "",
       })
       expectSpyToBeCalled([...eyes]);
