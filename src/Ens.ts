@@ -11,20 +11,17 @@ import {
 import Contract from './utils/contract';
 import contentHash from 'content-hash';
 import EnsNetworkMap from 'ethereum-ens-network-map';
-import { SourceDefinition, ResolutionResponse, CryptoRecords } from './publicTypes';
+import { ResolutionResponse, CryptoRecords, SourceDefinition } from './publicTypes';
 
 export default class Ens extends EthereumNamingService {
   readonly name = NamingServiceName.ENS;
 
   constructor(source: SourceDefinition = {}) {
     super(source, NamingServiceName.ENS);
-    if (this.registryAddress) {
-      this.registryContract = this.buildContract(
-        ensInterface,
-        this.registryAddress,
-      );
-    }
+  }
 
+  protected readerAbi(): any {
+    return ensInterface;
   }
 
   isSupportedDomain(domain: string): boolean {
@@ -87,7 +84,7 @@ export default class Ens extends EthereumNamingService {
 
     const reverseAddress = address + '.addr.reverse';
     const nodeHash = this.namehash(reverseAddress);
-    const resolverAddress = await this.getResolver(nodeHash);
+    const resolverAddress = await this.resolver(reverseAddress).catch(err => null);
     if (isNullAddress(resolverAddress)) {
       return null;
     }
@@ -101,7 +98,15 @@ export default class Ens extends EthereumNamingService {
   }
 
   private async addr(domain: string, currencyTicker: string): Promise<string | undefined> {
-    const resolver = await this.resolver(domain);
+    const resolver = await this.resolver(domain).catch(err => null);
+    if (!resolver) {
+      const owner = await this.owner(domain);
+      if (isNullAddress(owner)) {
+        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {domain});
+      }
+      throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {domain});
+    }
+
     const cointType = this.getCoinType(currencyTicker.toUpperCase());
     return await this.fetchAddress(resolver, domain, cointType);
   }
@@ -183,21 +188,26 @@ export default class Ens extends EthereumNamingService {
   }
 
   private async getTTL(nodeHash) {
-    return await this.callMethod(this.registryContract, 'ttl', [nodeHash]);
+    return await this.callMethod(this.readerContract, 'ttl', [nodeHash]);
   }
 
   /**
    * This was done to make automated tests more configurable
    */
-  protected async getResolver(nodeHash: string): Promise<string> {
-    return await this.callMethod(this.registryContract, 'resolver', [nodeHash]);
+  async resolver(domain: string): Promise<string> {
+    const nodeHash = this.namehash(domain);
+    const resolverAddr = await this.callMethod(this.readerContract, 'resolver', [nodeHash]);
+    if (isNullAddress(resolverAddr)) {
+      throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver);
+    }
+    return resolverAddr;
   }
 
   /**
    * This was done to make automated tests more configurable
    */
   private async getOwner(nodeHash) {
-    return await this.callMethod(this.registryContract, 'owner', [nodeHash]);
+    return await this.callMethod(this.readerContract, 'owner', [nodeHash]);
   }
 
   /**
@@ -208,7 +218,7 @@ export default class Ens extends EthereumNamingService {
     return await Promise.all([
       this.owner(domain),
       this.getTTL(nodeHash),
-      this.getResolver(nodeHash),
+      this.resolver(domain),
     ]);
   }
 

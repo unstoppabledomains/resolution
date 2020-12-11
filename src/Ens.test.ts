@@ -40,7 +40,7 @@ describe('ENS', () => {
     expect(resolution.ens?.network).toEqual(1);
 
     const eyes = mockAsyncMethods(resolution.ens, {
-      getResolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
+      resolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
       fetchAddress: '0x714ef33943d925731FBB89C99aF5780D888bD106',
     });
     const spy = mockAsyncMethods(resolution.ens, {
@@ -53,14 +53,14 @@ describe('ENS', () => {
       '0x714ef33943d925731FBB89C99aF5780D888bD106',
     );
     expectSpyToBeCalled(eyes);
-    expectSpyToBeCalled(spy, 2);
+    expectSpyToBeCalled(spy, 1);
   });
 
   it('reverses address to ENS domain', async () => {
     pendingInLive();
     const eyes = mockAsyncMethods(resolution.ens, {
       resolverCallToName: 'adrian.argent.xyz',
-      getResolver: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
+      resolver: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
     });
     const result = await resolution.ens?.reverse(
       '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
@@ -71,7 +71,7 @@ describe('ENS', () => {
   });
 
   it('reverses address to ENS domain null', async () => {
-    const spy = mockAsyncMethod(resolution.ens, 'getResolver', NullAddress);
+    const spy = mockAsyncMethod(resolution.ens, 'resolver', NullAddress);
     const result = await resolution.ens?.reverse(
       '0x112234455c3a32fd11230c42e7bccd4a84e02010',
       'ETH',
@@ -82,8 +82,7 @@ describe('ENS', () => {
 
   it('resolves .xyz name using ENS blockchain', async () => {
     const eyes = mockAsyncMethods(resolution.ens, {
-      getOwner: '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
-      getResolver: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
+      resolver: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
       fetchAddress: '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
     });
 
@@ -94,8 +93,7 @@ describe('ENS', () => {
 
   it('resolves .luxe name using ENS blockchain', async () => {
     const eyes = mockAsyncMethods(resolution.ens, {
-      getOwner: '0xf3dE750A73C11a6a2863761E930BF5fE979d5663',
-      getResolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
+      resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
       fetchAddress: '0xf3dE750A73C11a6a2863761E930BF5fE979d5663',
     });
 
@@ -106,7 +104,7 @@ describe('ENS', () => {
 
   it('resolves .kred name using ENS blockchain', async () => {
     const eyes = mockAsyncMethods(resolution.ens, {
-      getResolver: '0x96184444629F3489c4dE199871E6F99568229d8f',
+      resolver: '0x96184444629F3489c4dE199871E6F99568229d8f',
       callMethod: '0x96184444629F3489c4dE199871E6F99568229d8f',
     });
     const result = await resolution.addr('brantly.kred', 'ETH');
@@ -116,7 +114,7 @@ describe('ENS', () => {
 
   it('resolves .luxe name using ENS blockchain with thrown error', async () => {
     const spies = mockAsyncMethods(resolution.ens, {
-      getResolver: undefined,
+      resolver: undefined,
       getOwner: undefined,
     });
 
@@ -130,7 +128,7 @@ describe('ENS', () => {
   // TODO remove this test once addressOrThrow is fully removed
   it('[Old test]resolves .luxe name using ENS blockchain with thrown error', async () => {
     const spies = mockAsyncMethods(resolution.ens, {
-      getResolver: undefined,
+      resolver: undefined,
       getOwner: undefined,
     });
 
@@ -143,8 +141,7 @@ describe('ENS', () => {
 
   it('resolves name with resolver but without an owner', async () => {
     const eyes = mockAsyncMethods(resolution.ens, {
-      getOwner: NullAddress,
-      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x76a9144620b70031f0e9437e374a2100934fba4911046088ac',
     });
     const doge = await resolution.addr('testthing.eth', 'DOGE');
@@ -288,8 +285,7 @@ describe('ENS', () => {
 
   it('checks ens multicoin support #1', async () => {
     const eyes = mockAsyncMethods(resolution.ens, {
-      getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x76a9144620b70031f0e9437e374a2100934fba4911046088ac',
     });
     const doge = await resolution.addr('testthing.eth', 'DOGE');
@@ -299,8 +295,7 @@ describe('ENS', () => {
 
   it('checks ens multicoin support #2', async () => {
     const eyes = mockAsyncMethods(resolution.ens, {
-      getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0xa914e8604d28ef5d2a7caafe8741e5dd4816b7cb19ea87',
     });
     const ltc = await resolution.addr('testthing.eth', 'LTC');
@@ -310,8 +305,7 @@ describe('ENS', () => {
 
   it('checks ens multicoin support #3', async () => {
     const eyes = mockAsyncMethods(resolution.ens, {
-      getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x314159265dd8dbb310642f98f50c066173c1259b',
     });
     const eth = await resolution.addr('testthing.eth', 'ETH');
@@ -321,8 +315,7 @@ describe('ENS', () => {
 
   it('checks ens multicoin support #4', async () => {
     const eyes = mockAsyncMethods(resolution.ens, {
-      getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x314159265dd8dbb310642f98f50c066173c1259b',
     });
     const etc = await resolution.addr('testthing.eth', 'etc');
@@ -332,8 +325,7 @@ describe('ENS', () => {
 
   it('checks ens multicoin support #5', async () => {
     const eyes = mockAsyncMethods(resolution.ens, {
-      getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x314159265dd8dbb310642f98f50c066173c1259b',
     });
     const rsk = await resolution.addr('testthing.eth', 'rsk');
@@ -343,8 +335,7 @@ describe('ENS', () => {
 
   it('checks ens multicoin support #6', async () => {
     const eyes = mockAsyncMethods(resolution.ens, {
-      getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod:
         '0x05444b4e9c06f24296074f7bc48f92a97916c6dc5ea9000000000000000000',
     });
@@ -355,8 +346,7 @@ describe('ENS', () => {
 
   it('checks ens multicoin support #7', async () => {
     const eyes = mockAsyncMethods(resolution.ens, {
-      getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x76a91476a04053bda0a88bda5177b86a15c3b29f55987388ac',
     });
     const bch = await resolution.addr('testthing.eth', 'bch');
@@ -366,8 +356,7 @@ describe('ENS', () => {
 
   it('checks ens multicoin support #8', async () => {
     const eyes = mockAsyncMethods(resolution.ens, {
-      getOwner: '0x0904Dac3347eA47d208F3Fd67402D039a3b99859',
-      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod:
         '0x5128751e76e8199196d454941c45d1b3a323f1433bd6751e76e8199196d454941c45d1b3a323f1433bd6',
     });
@@ -383,7 +372,7 @@ describe('ENS', () => {
   // TODO to be removed in 2.0.0
   it('[Old test] checks UnsupportedCurrency error', async () => {
     const eyes = mockAsyncMethods(resolution.ens, {
-      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
     });
     await expectResolutionErrorCode(
       resolution.addressOrThrow('testthing.eth', 'bnb'),
@@ -424,7 +413,7 @@ describe('ENS', () => {
 
   it('checks UnsupportedCurrency error', async () => {
     const eyes = mockAsyncMethods(resolution.ens, {
-      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
     });
     await expectResolutionErrorCode(
       resolution.addr('testthing.eth', 'UNREALTICKER'),
@@ -439,8 +428,7 @@ describe('ENS', () => {
     expect(resolution.ens?.network).toEqual(1);
 
     const eyes = mockAsyncMethods(resolution.ens, {
-      getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
-      getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x'
     });
 
@@ -452,7 +440,7 @@ describe('ENS', () => {
     it('passes without any errors', async () => {
       const eyes = mockAsyncMethods(resolution.ens, {
         getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
-        getResolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
+        resolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
         getTTL: 0,
         callMethod: '0x714ef33943d925731FBB89C99aF5780D888bD106',
       });
@@ -476,7 +464,7 @@ describe('ENS', () => {
       pendingInLive();
       const eyes = mockAsyncMethods(resolution.ens, {
         getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
-        getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+        resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
         getTTL: 0,
         fetchAddress: undefined
       });
@@ -498,7 +486,7 @@ describe('ENS', () => {
 
     it('should return correct resolver address', async () => {
       const spies = mockAsyncMethods(resolution.ens, {
-        getResolver: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
+        resolver: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
       });
       const resolverAddress = await resolution.resolver('monkybrain.eth');
       expectSpyToBeCalled(spies);
@@ -509,8 +497,7 @@ describe('ENS', () => {
 
     it('should not find a resolver address', async () => {
       const spies = mockAsyncMethods(resolution.ens, {
-        getResolver: undefined,
-        getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
+        resolver: undefined
       });
       await expectResolutionErrorCode(
         resolution.resolver('empty.eth'),
@@ -605,7 +592,7 @@ describe('ENS', () => {
   describe('.Metadata', () => {
     it('should return a valid ipfsHash', async () => {
       const eyes = mockAsyncMethods(resolution.ens, {
-        getResolver: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
+        resolver: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
         callMethod:
           '0xe301017012208723b9b5834fe60801e19af3a3554a6f229dad9cfbb18ce4e80ffc2a457f83aa',
       });
@@ -617,7 +604,7 @@ describe('ENS', () => {
     // todo(johny) find some domains with url property set
     it('should not find an appropriate httpUrl', async () => {
       const eyes = mockAsyncMethods(resolution.ens, {
-        getResolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
+        resolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
         callMethod: '',
       });
       await expectResolutionErrorCode(
@@ -629,20 +616,20 @@ describe('ENS', () => {
 
     it('should return resolution error for not finding the email', async () => {
       const eyes = mockAsyncMethods(resolution.ens, {
-        getResolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
+        resolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
         callMethod: '',
       });
       const emailPromise = resolution.email('matthewgould.eth');
-      expectSpyToBeCalled(eyes);
       await expectResolutionErrorCode(
         emailPromise,
         ResolutionErrorCode.RecordNotFound,
       );
+      expectSpyToBeCalled(eyes);
     });
 
     it('should resolve gundb id and public key', async () => {
       const eyes = mockAsyncMethods(resolution.ens, {
-        getResolver: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
+        resolver: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
         callMethod:
           '0x7e1d12f34e038a2bda3d5f6ee0809d72f668c357d9e64fd7f622513f06ea652146ab5fdee35dc4ce77f1c089fd74972691fccd48130306d9eafcc6e1437d1ab21b',
       });
@@ -657,7 +644,7 @@ describe('ENS', () => {
 
     it('should resolve gundb public key', async () => {
       const eyes = mockAsyncMethods(resolution.ens, {
-        getResolver: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
+        resolver: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
         callMethod:
           'yxbMDgFrzemQEcDwJYccE_TDbGmRL_iqZ2JhQxYi2s8.nBEAyMfM2ZBtOf2C-GHe3zEn42Q1vrfPAVqNzgGhXvQ',
       });
@@ -672,28 +659,28 @@ describe('ENS', () => {
 
     it('should return resolution error for not finding the gundb chat id', async () => {
       const eyes = mockAsyncMethods(resolution.ens, {
-        getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+        resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
         callMethod: undefined,
       });
       const emailPromise = resolution.chatId('test.eth');
-      expectSpyToBeCalled(eyes);
       await expectResolutionErrorCode(
         emailPromise,
         ResolutionErrorCode.RecordNotFound,
       );
+      expectSpyToBeCalled(eyes);
     });
 
     it('should return resolution error for not finding the gundb publicKey', async () => {
       const eyes = mockAsyncMethods(resolution.ens, {
-        getResolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+        resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
         callMethod: undefined,
       });
       const emailPromise = resolution.chatPk('test.eth');
-      expectSpyToBeCalled(eyes);
       await expectResolutionErrorCode(
         emailPromise,
         ResolutionErrorCode.RecordNotFound,
       );
+      expectSpyToBeCalled(eyes);
     });
   });
 });

@@ -38,6 +38,23 @@ describe('DnsUtils', () => {
       ]); 
     });
 
+    it('should work ignoring other records', () => {
+      const records: CryptoRecords = {
+        "dns.ttl": "128",
+        "dns.A": '["10.0.0.1","10.0.0.2"]',
+        "dns.A.ttl": "90",
+        "dns.AAAA": '["10.0.0.120"]',
+        "something.ttl.weird": "more weird",
+        "something.ultra.weird": "WOW"
+      };
+      const classic: DnsRecord[] = dnsUtils.toList(records);
+      expect(classic).toStrictEqual([
+        { TTL: 90, data: '10.0.0.1', type: 'A' },
+        { TTL: 90, data: '10.0.0.2', type: 'A' },
+        { TTL: 128, data: '10.0.0.120', type: 'AAAA' }
+      ]);
+    })
+
     it('dns.A with invalid json', () => {
       const record: CryptoRecords = {
         "dns.ttl": "128",

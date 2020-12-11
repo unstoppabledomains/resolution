@@ -129,7 +129,6 @@ export default abstract class NamingService extends BaseConnection {
         method: this.name,
       });
     }
-
   }
 
   protected constructRecords(

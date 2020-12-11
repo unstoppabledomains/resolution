@@ -9,12 +9,11 @@ import {
 } from './types';
 import { invert } from './utils';
 import Contract from './utils/contract';
-import { NamingServiceName, SourceDefinition } from './publicTypes';
+import { NamingServiceName, SourceDefinition, ResolutionMethod } from './publicTypes';
 
 export abstract class EthereumNamingService extends NamingService {
   readonly name: NamingServiceName;
-  protected abstract getResolver(id: string): Promise<string>;
-  protected registryContract: Contract;
+  protected readerContract: Contract;
 
   static readonly UrlMap: BlockhanNetworkUrlMap = {
     1: 'https://main-rpc.linkpool.io',
@@ -33,23 +32,18 @@ export abstract class EthereumNamingService extends NamingService {
     EthereumNamingService.NetworkNameMap,
   );
 
-  protected abstract defaultRegistry(network: number): string | undefined;
-
-  async resolver(domain: string): Promise<string> {
-    const nodeHash = this.namehash(domain);
-    const ownerPromise = this.owner(domain);
-    const resolverAddress = await this.getResolver(nodeHash);
-    if (isNullAddress(resolverAddress)) {
-      await this.throwOwnershipError(domain, ownerPromise);
-    } else {
-      // We don't care about this promise anymore
-      // Ensure it doesn't generate a warning if it rejects
-      ownerPromise.catch(() => undefined);
+  constructor(source: SourceDefinition = {}, name: ResolutionMethod) {
+    super(source, name);
+    if (this.registryAddress) {
+      this.readerContract = this.buildContract(
+        this.readerAbi(),
+        this.registryAddress,
+      );
     }
-
-    return resolverAddress;
   }
 
+  protected abstract defaultRegistry(network: number): string | undefined;
+  protected abstract readerAbi(): any;
   private networkFromUrl(url: string | undefined): string | undefined {
     if (!url) {
       return undefined;

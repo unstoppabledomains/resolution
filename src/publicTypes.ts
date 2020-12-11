@@ -189,3 +189,8 @@ ZONEMD="ZONEMD",
 
 export interface DnsRecord { type: DnsRecordType, TTL: number, data: string }
 export type CryptoRecords = Record<string, string>;
+export type DomainData = {
+  owner: string,
+  resolver: string,
+  records: CryptoRecords,
+};

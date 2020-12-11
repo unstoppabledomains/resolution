@@ -4,7 +4,7 @@ import Resolution, {
   UnclaimedDomainResponse,
 } from './index';
 import { DnsRecordType, JsonRpcPayload } from './publicTypes';
-import { JsonRpcProvider, getDefaultProvider } from '@ethersproject/providers';
+import { JsonRpcProvider, getDefaultProvider, InfuraProvider } from '@ethersproject/providers';
 import Web3HttpProvider from 'web3-providers-http';
 import Web3WsProvider from 'web3-providers-ws';
 import Web3V027Provider from 'web3-0.20.7/lib/web3/httpprovider';
@@ -25,11 +25,10 @@ import {
   CryptoDomainWithIpfsRecords,
 } from './tests/helpers';
 import { RpcProviderTestCases } from './tests/providerMockData';
-import ICnsReader from './cns/ICnsReader';
 import fetch, { FetchError } from 'node-fetch';
+import standardKeys from './utils/standardKeys';
 
 let resolution: Resolution;
-let reader: ICnsReader;
 
 beforeAll(async () => {
   resolution = new Resolution({
@@ -38,7 +37,6 @@ beforeAll(async () => {
       ens: { url: protocolLink() }
     }
   });
-  reader = await resolution.cns!.getReader();
 });
 
 beforeEach(() => {
@@ -49,6 +47,7 @@ beforeEach(() => {
 describe('Resolution', () => {
   describe('.Basic setup', () => {
     it('should fail in test development',async () => {
+      pendingInLive()
       try {
         await fetch("https://pokeres.bastionbot.org/images/pokemon/10.png");
       } catch(err) {
@@ -85,27 +84,17 @@ describe('Resolution', () => {
       });
 
       it('should resolve gundb chat id', async () => {
-        const resolution = new Resolution({
-          blockchain: {
-            cns: {
-              url: protocolLink(),
-              registry: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe',
-            },
-          },
-        });
-
-        const eye = mockAsyncMethod(resolution.cns!, "isDataReaderSupported", true);
-        const reader = await resolution.cns?.getReader();
-        const eyes = mockAsyncMethods(reader, {
-          records: {
+        const eyes = mockAsyncMethods(resolution.cns, {
+          get: {
             resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
-            values: [
+            records: {
+              [standardKeys.gundb_username]:
               '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c',
-            ],
+            }
           },
         });
         const gundb = await resolution.chatId('homecakes.crypto');
-        expectSpyToBeCalled([...eyes, eye]);
+        expectSpyToBeCalled(eyes);
         expect(gundb).toBe(
           '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c',
         );
@@ -114,10 +103,13 @@ describe('Resolution', () => {
       describe('.ipfsHash', () => {
         it('should prioritize new keys over depricated ones', async() => {
           pendingInLive();
-          const spies = mockAsyncMethods(reader, {
-            records: {
+          const spies = mockAsyncMethods(resolution.cns, {
+            get: {
               resolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
-              values: ['new record Ipfs hash', 'old record Ipfs hash']
+              records: {
+                [standardKeys.dweb_hash]: 'new record Ipfs hash',
+                [standardKeys.html]: 'old record Ipfs hash'
+              }
             }
           });
           const hash = await resolution.ipfsHash(CryptoDomainWithIpfsRecords);
@@ -127,10 +119,13 @@ describe('Resolution', () => {
 
         it('should prioritize browser record key over ipfs.redirect_url one', async () => {
           pendingInLive();
-          const spies = mockAsyncMethods(reader, {
-            records: {
+          const spies = mockAsyncMethods(resolution.cns, {
+            get: {
               resolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
-              values: ['new record redirect url', 'old record redirect url']
+              records: {
+                [standardKeys.browser_redirect]: 'new record redirect url',
+                [standardKeys.redirect_domain]: 'old record redirect url'
+              }
             }
           });
           const redirectUrl = await resolution.httpUrl(CryptoDomainWithIpfsRecords);
@@ -285,13 +280,17 @@ describe('Resolution', () => {
 
     describe('.Records', () => {
       describe('.DNS', () => {
-        it('getting dns records', async () => {
+        it('getting dns get', async () => {
           pendingInLive();
-          const reader = await resolution.cns!.getReader();
-          const spies = mockAsyncMethods(reader, {
-            records: {
+          const spies = mockAsyncMethods(resolution.cns, {
+            get: {
               resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
-              values: ['128','["10.0.0.1","10.0.0.2"]','90','["10.0.0.120"]',undefined]
+              records: {
+                'dns.ttl': '128',
+                'dns.A': '["10.0.0.1","10.0.0.2"]',
+                'dns.A.ttl': '90',
+                'dns.AAAA': '["10.0.0.120"]',
+              }
             },
           });
           const dnsRecords = await resolution.dns("someTestDomain.crypto", [DnsRecordType.A, DnsRecordType.AAAA]);
@@ -302,6 +301,27 @@ describe('Resolution', () => {
             { TTL: 128, data: '10.0.0.120', type: 'AAAA' }
           ]);
         });
+
+        it('should work with others records', async () => {
+          pendingInLive();
+          const spies = mockAsyncMethods(resolution.cns, {
+            get: {
+              resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
+              records: {
+                'dns.ttl': '128',
+                'dns.A': '["10.0.0.1","10.0.0.2"]',
+                'dns.A.ttl': '90',
+                'dns.AAAA': '["10.0.0.120"]',
+                [standardKeys.ETH]: '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
+                [standardKeys.ADA]: '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
+                [standardKeys.ARK]: '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
+              }
+            }
+          });
+          const dnsRecords = await resolution.dns("someTestDomain.crypto", [DnsRecordType.A, DnsRecordType.AAAA]);
+          expectSpyToBeCalled(spies);
+          console.log(dnsRecords);
+        })
       });
 
       describe('.Metadata', () => {
@@ -323,26 +343,17 @@ describe('Resolution', () => {
 
       describe('.Crypto', () => {
         it(`domains "brad.crypto" and "Brad.crypto" should return the same results`, async () => {
-          const resolution = new Resolution({
-            blockchain: {
-              cns: {
-                url: protocolLink(),
-                registry: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe',
-              },
-            },
-          });
-          const anotherSpy = mockAsyncMethod(resolution.cns, 'isDataReaderSupported', true);
-          const reader = await resolution.cns?.getReader();
-          const eyes = mockAsyncMethods(reader, {
-            records: {
+          const eyes = mockAsyncMethods(resolution.cns, {
+            get: {
               resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
-              values: ['0x45b31e01AA6f42F0549aD482BE81635ED3149abb'],
+              records: {
+                [standardKeys.ETH]: '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
+              }
             },
           });
           const capital = await resolution.addr('Brad.crypto', 'eth');
           const lower = await resolution.addr('brad.crypto', 'eth');
           expectSpyToBeCalled(eyes, 2);
-          expectSpyToBeCalled([anotherSpy]);
           expect(capital).toStrictEqual(lower);
         });
       });
@@ -413,7 +424,8 @@ describe('Resolution', () => {
         });
 
         it('should work with ethers default provider', async () => {
-          const provider = getDefaultProvider('mainnet');
+          // const provider = getDefaultProvider('mainnet');
+          const provider = new InfuraProvider('mainnet', '213fff28936343858ca9c5115eff1419');
 
           const eye = mockAsyncMethod(provider, 'call', params =>
             Promise.resolve(caseMock(params, RpcProviderTestCases)),
@@ -450,9 +462,10 @@ describe('Resolution', () => {
           expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
         });
 
-        describe('.All-records', () => {
+        describe('.All-get', () => {
           it('should be able to get logs with ethers default provider', async () => {
-            const provider = getDefaultProvider('mainnet', { quorum: 1 });
+            // const provider = getDefaultProvider('mainnet', { quorum: 1 });
+            const provider = new InfuraProvider('mainnet', '213fff28936343858ca9c5115eff1419');
 
             const eye = mockAsyncMethod(provider, 'call', params =>
               Promise.resolve(caseMock(params, RpcProviderTestCases)),
@@ -463,7 +476,7 @@ describe('Resolution', () => {
 
             const resolution = Resolution.fromEthersProvider(provider);
             const resp = await resolution.allRecords('brad.crypto');
-            expectSpyToBeCalled([eye], 3);
+            expectSpyToBeCalled([eye], 2);
             expectSpyToBeCalled([eye2], 2);
             expect(resp).toMatchObject({
               'gundb.username.value':
@@ -492,7 +505,7 @@ describe('Resolution', () => {
             );
 
             const resp = await resolution.allRecords('brad.crypto');
-            expectSpyToBeCalled([eye], 3);
+            expectSpyToBeCalled([eye], 2);
             expectSpyToBeCalled([eye2], 2);
             expect(resp).toMatchObject({
               'gundb.username.value':
@@ -508,7 +521,8 @@ describe('Resolution', () => {
           });
 
           it('should get standard keys from legacy resolver', async () => {
-            const provider = getDefaultProvider('mainnet');
+            // const provider = getDefaultProvider('mainnet');
+            const provider = new InfuraProvider('mainnet', '213fff28936343858ca9c5115eff1419');
             const eye = mockAsyncMethod(provider, 'call', params =>
               Promise.resolve(caseMock(params, RpcProviderTestCases)),
             );
@@ -558,27 +572,17 @@ describe('Resolution', () => {
 
         describe('.Gundb', () => {
           it('should resolve gundb chat id', async () => {
-            const resolution = new Resolution({
-              blockchain: {
-                cns: {
-                  url: protocolLink(),
-                  registry: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe',
-                },
-              },
-            });
-            const isDataReaderSpy = mockAsyncMethod(resolution.cns, 'isDataReaderSupported', true);
-            const reader = await resolution.cns?.getReader();
-            const eyes = mockAsyncMethods(reader, {
-              records: {
+            const eyes = mockAsyncMethods(resolution.cns, {
+              get: {
                 resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
-                values: [
+                records: {
+                  [standardKeys.gundb_username]:
                   '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c',
-                ],
+                }
               },
             });
             const gundb = await resolution.chatId('homecakes.crypto');
             expectSpyToBeCalled(eyes);
-            expectSpyToBeCalled([isDataReaderSpy]);
             expect(gundb).toBe(
               '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c',
             );
@@ -590,19 +594,14 @@ describe('Resolution', () => {
         describe('.Twitter', () => {
           it('should return verified twitter handle', async () => {
             const resolution = new Resolution();
-            const isDataReaderSpy = mockAsyncMethod(resolution.cns,
-              'isDataReaderSupported', true,
-            );
-            const reader = await resolution.cns?.getReader();
-            expectSpyToBeCalled([isDataReaderSpy]);
-            const readerSpies = mockAsyncMethods(reader, {
-              records: {
+            const readerSpies = mockAsyncMethods(resolution.cns, {
+              get: {
                 resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
                 owner: '0x6EC0DEeD30605Bcd19342f3c30201DB263291589',
-                values: [
-                  '0xcd2655d9557e5535313b47107fa8f943eb1fec4da6f348668062e66233dde21b413784c4060340f48da364311c6e2549416a6a23dc6fbb48885382802826b8111b',
-                  'derainberk'
-                ]
+                records: {
+                  [standardKeys.validation_twitter_username]:'0xcd2655d9557e5535313b47107fa8f943eb1fec4da6f348668062e66233dde21b413784c4060340f48da364311c6e2549416a6a23dc6fbb48885382802826b8111b',
+                  [standardKeys.twitter_username]: 'derainberk'
+                }
               },
             });
             const twitterHandle = await resolution.twitter(
@@ -625,18 +624,18 @@ describe('Resolution', () => {
     it('works', async () => {
       const resolution = new Resolution();
       CryptoDomainWithAdaBchAddresses
-      const reader = await resolution.cns?.getReader();
-      const eyes = mockAsyncMethods(reader, {
-        records: {
+      const eyes = mockAsyncMethods(resolution.cns!, {
+        get: {
+          owner: '0x6EC0DEeD30605Bcd19342f3c30201DB263291589',
           resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
-          values: [
-            '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c',
-            '',
-          ],
+          records: {
+            'crypto.ADA.address': 'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
+            'crypto.ETH.address': '',
+          },
         },
       });
       expect(await resolution.records(CryptoDomainWithAdaBchAddresses, ['crypto.ADA.address', 'crypto.ETH.address'])).toEqual({
-        "crypto.ADA.address": "0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c",
+        "crypto.ADA.address": "DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj",
         "crypto.ETH.address": "",
       })
       expectSpyToBeCalled([...eyes]);

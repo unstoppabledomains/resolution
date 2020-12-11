@@ -11,6 +11,13 @@ export interface ProxyReaderMap {
 export type NetworkIdMap = {
   [key: number]: string;
 };
+
+export type ProxyData = {
+  owner: string,
+  resolver: string,
+  values: string[]
+}
+
 export type ProviderParams = unknown[] | object;
 export interface RequestArguments {
   method: string;

@@ -13,26 +13,25 @@ import {
   expectResolutionErrorCode,
   protocolLink,
 } from './tests/helpers';
-import ICnsReader from './cns/ICnsReader';
 import FetchProvider from './FetchProvider';
 import { FetchError } from 'node-fetch';
 import { NamingServiceName } from './publicTypes';
+import Cns from './Cns';
+import standardKeys from './utils/standardKeys';
 
 let resolution: Resolution;
-let reader: ICnsReader;
+let cns: Cns;
 
 beforeEach(async () => {
   jest.restoreAllMocks();
   resolution = new Resolution({
     blockchain: {
       cns: {
-        url: protocolLink(),
-        registry: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe',
+        url: protocolLink()
       },
     },
   });
-  mockAsyncMethods(resolution.cns, { isDataReaderSupported: false });
-  reader = await resolution.cns!.getReader();
+  cns = resolution.cns!;
 });
 
 describe('CNS', () => {
@@ -43,10 +42,12 @@ describe('CNS', () => {
   });
 
   it('checks the record by key', async () => {
-    const eyes = mockAsyncMethods(reader, {
-      records: {
+    const eyes = mockAsyncMethods(cns, {
+      get: {
         resolver: '0xa1cac442be6673c49f8e74ffc7c4fd746f3cbd0d',
-        values: ['QmVJ26hBrwwNAPVmLavEFXDUunNDXeFSeMPmHuPxKe6dJv'],
+        records: {
+          'ipfs.html.value': 'QmVJ26hBrwwNAPVmLavEFXDUunNDXeFSeMPmHuPxKe6dJv',
+        }
       },
     });
     const ipfsHash = await resolution.record(
@@ -58,14 +59,14 @@ describe('CNS', () => {
   });
 
   it('should return verified twitter handle', async () => {
-    const spies = mockAsyncMethods(reader, {
-      records: {
+    const spies = mockAsyncMethods(cns, {
+      get: {
         resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
         owner: '0x6ec0deed30605bcd19342f3c30201db263291589',
-        values: [
-          '0xcd2655d9557e5535313b47107fa8f943eb1fec4da6f348668062e66233dde21b413784c4060340f48da364311c6e2549416a6a23dc6fbb48885382802826b8111b',
-          'derainberk'
-        ]
+        records: {
+          [standardKeys.validation_twitter_username]: '0xcd2655d9557e5535313b47107fa8f943eb1fec4da6f348668062e66233dde21b413784c4060340f48da364311c6e2549416a6a23dc6fbb48885382802826b8111b',
+          [standardKeys.twitter_username]: 'derainberk'
+        }
       }
     });
     const twitterHandle = await resolution.cns!.twitter(
@@ -76,8 +77,11 @@ describe('CNS', () => {
   });
 
   it('should return NoRecord Resolution error', async () => {
-    const spies = mockAsyncMethods(reader, {
-      records: { resolver: '0xa1cac442be6673c49f8e74ffc7c4fd746f3cbd0d' },
+    const spies = mockAsyncMethods(cns, {
+      get: {
+        resolver: '0xa1cac442be6673c49f8e74ffc7c4fd746f3cbd0d',
+        records: {},
+      },
     });
     await expectResolutionErrorCode(
       resolution.record(CryptoDomainWithEmptyResolver, 'No.such.record'),
@@ -87,8 +91,8 @@ describe('CNS', () => {
   }, 20000);
 
   it('should return a valid resolver address', async () => {
-    const spies = mockAsyncMethods(reader, {
-      resolver: { resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3' },
+    const spies = mockAsyncMethods(cns, {
+      get: { resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3' },
     });
     const resolverAddress = await resolution.resolver(
       CryptoDomainWithEmptyResolver,
@@ -98,7 +102,7 @@ describe('CNS', () => {
   });
 
   it('should not find a resolver address', async () => {
-    const spies = mockAsyncMethods(reader, { resolver: {
+    const spies = mockAsyncMethods(cns, { get: {
       owner: '0x0000000000000000000000000000000000000000',
       resolver: undefined
     } });
@@ -108,12 +112,11 @@ describe('CNS', () => {
       ResolutionErrorCode.UnregisteredDomain,
     );
     expectSpyToBeCalled(spies);
-    
   });
 
   it('should throw ResolutionError.UnspecifiedResolver', async () => {
-    const spies = mockAsyncMethods(reader, {
-      resolver: { owner: 'someowneraddress' },
+    const spies = mockAsyncMethods(cns, {
+      get: { owner: 'someowneraddress', resolver: NullAddress },
     });
     await expectResolutionErrorCode(
       resolution.resolver(CryptoDomainWithoutResolver),
@@ -124,10 +127,12 @@ describe('CNS', () => {
 
   describe('.Crypto', () => {
     it(`checks the BCH address on ${CryptoDomainWithAdaBchAddresses}`, async () => {
-      const eyes = mockAsyncMethods(reader, {
-        records: {
+      const eyes = mockAsyncMethods(cns, {
+        get: {
           resolver: '0xa1cac442be6673c49f8e74ffc7c4fd746f3cbd0d',
-          values: ['qzx048ez005q4yhphqu2pylpfc3hy88zzu4lu6q9j8'],
+          records: {
+            [standardKeys.BCH]: 'qzx048ez005q4yhphqu2pylpfc3hy88zzu4lu6q9j8',
+          }
         },
       });
       const addr = await resolution.addr(
@@ -139,12 +144,13 @@ describe('CNS', () => {
     });
 
     it(`checks the ADA address on ${CryptoDomainWithAdaBchAddresses}`, async () => {
-      const eyes = mockAsyncMethods(reader, {
-        records: {
+      const eyes = mockAsyncMethods(cns, {
+        get: {
           resolver: '0xa1cac442be6673c49f8e74ffc7c4fd746f3cbd0d',
-          values: [
+          records: {
+            [standardKeys.ADA]:
             'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
-          ],
+          }
         },
       });
       const addr = await resolution.addr(
@@ -159,10 +165,12 @@ describe('CNS', () => {
 
     describe('.Metadata', () => {
       it('should resolve with ipfs stored on cns', async () => {
-        const spies = mockAsyncMethods(reader, {
-          records: {
+        const spies = mockAsyncMethods(cns, {
+          get: {
             resolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
-            values: ['QmVJ26hBrwwNAPVmLavEFXDUunNDXeFSeMPmHuPxKe6dJv'],
+            records: {
+              [standardKeys.html]: 'QmVJ26hBrwwNAPVmLavEFXDUunNDXeFSeMPmHuPxKe6dJv',
+            }
           },
         });
         const ipfsHash = await resolution.ipfsHash(CryptoDomainWithIpfsRecords);
@@ -171,10 +179,12 @@ describe('CNS', () => {
       });
 
       it('should resolve with email stored on cns', async () => {
-        const spies = mockAsyncMethods(reader, {
-          records: {
+        const spies = mockAsyncMethods(cns, {
+          get: {
             resolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
-            values: ['paul@unstoppabledomains.com'],
+            records: {
+              [standardKeys.email]: 'paul@unstoppabledomains.com'
+            }
           },
         });
         const email = await resolution.email(CryptoDomainWithEmail);
@@ -183,10 +193,12 @@ describe('CNS', () => {
       });
 
       it('should resolve with httpUrl stored on cns', async () => {
-        const eyes = mockAsyncMethods(reader, {
-          records: {
+        const eyes = mockAsyncMethods(cns, {
+          get: {
             resolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
-            values: ['https://unstoppabledomains.com/'],
+            records: {
+              [standardKeys.redirect_domain]: 'https://unstoppabledomains.com/',
+            }
           },
         });
         const httpUrl = await resolution.httpUrl(CryptoDomainWithIpfsRecords);
@@ -195,12 +207,12 @@ describe('CNS', () => {
       });
 
       it('should resolve with the gundb chatId stored on cns', async () => {
-        const eyes = mockAsyncMethods(reader, {
-          records: {
+        const eyes = mockAsyncMethods(cns, {
+          get: {
             resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
-            values: [
-              '0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c',
-            ],
+            records: {
+              [standardKeys.gundb_username]:'0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c',
+            }
           },
         });
         const chatId = await resolution.chatId('brad.crypto');
@@ -211,18 +223,8 @@ describe('CNS', () => {
       });
 
       it('should throw UnspecifiedResolver for chatId', async () => {
-        const resolution = new Resolution({
-          blockchain: {
-            cns: {
-              url: protocolLink(),
-              registry: '0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe',
-            },
-          },
-        });
-        mockAsyncMethods(resolution.cns, { isDataReaderSupported: false });
-        reader = await resolution.cns!.getReader();
-        mockAsyncMethods(reader, {
-          records: {
+        mockAsyncMethods(cns, {
+          get: {
             owner: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
           },
         });
@@ -233,12 +235,13 @@ describe('CNS', () => {
       });
 
       it('should resolve with the gundb public key stored on cns', async () => {
-        const eyes = mockAsyncMethods(reader, {
-          records: {
+        const eyes = mockAsyncMethods(cns, {
+          get: {
             resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
-            values: [
+            records: {
+              [standardKeys.gundb_public_key]:
               'pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI',
-            ],
+            }
           },
         });
         const publicKey = await resolution.chatPk('brad.crypto');
@@ -249,9 +252,10 @@ describe('CNS', () => {
       });
 
       it('should error out for gundb public key stored on cns', async () => {
-        const eyes = mockAsyncMethods(reader, {
-          records: {
+        const eyes = mockAsyncMethods(cns, {
+          get: {
             resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+            records: {},
           },
         });
         await expectResolutionErrorCode(
@@ -262,9 +266,10 @@ describe('CNS', () => {
       });
 
       it('should error out for gundb chatId stored on cns', async () => {
-        const eyes = mockAsyncMethods(reader, {
-          records: {
+        const eyes = mockAsyncMethods(cns, {
+          get: {
             resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+            records: {},
           },
         });
         await expectResolutionErrorCode(
@@ -281,14 +286,16 @@ describe('CNS', () => {
       resolution = new Resolution({
         blockchain: { cns: { url: protocolLink() } },
       });
-      reader = await resolution.cns!.getReader();
+      cns = resolution.cns!;
     });
 
     it('should return record by key', async () => {
-      const eyes = mockAsyncMethods(reader, {
+      const eyes = mockAsyncMethods(cns, {
         get: {
           resolver: '0xa1cac442be6673c49f8e74ffc7c4fd746f3cbd0d',
-          values: ['QmVJ26hBrwwNAPVmLavEFXDUunNDXeFSeMPmHuPxKe6dJv'],
+          records: {
+            [standardKeys.html]: 'QmVJ26hBrwwNAPVmLavEFXDUunNDXeFSeMPmHuPxKe6dJv',
+          }
         },
       });
       const ipfsHash = await resolution.record(
@@ -300,10 +307,10 @@ describe('CNS', () => {
     });
 
     it('should return NoRecord Resolution error when value not found', async () => {
-      const spies = mockAsyncMethods(reader, {
+      const spies = mockAsyncMethods(cns, {
         get: {
           resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
-          values: [''],
+          records: {},
         },
       });
       await expectResolutionErrorCode(
@@ -314,8 +321,11 @@ describe('CNS', () => {
     });
 
     it('should return a valid resolver address', async () => {
-      const spies = mockAsyncMethods(reader, {
-        get: { resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3' },
+      const spies = mockAsyncMethods(cns, {
+        get: {
+          resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+          records: {},
+        },
       });
       const resolverAddress = await resolution.resolver(
         CryptoDomainWithEmptyResolver,
@@ -327,7 +337,7 @@ describe('CNS', () => {
     });
 
     it('should return UnregisteredDomain error when owner address not found', async () => {
-      const spies = mockAsyncMethods(reader, {
+      const spies = mockAsyncMethods(cns, {
         get: { owner: NullAddress },
       });
       await expectResolutionErrorCode(
@@ -338,7 +348,7 @@ describe('CNS', () => {
     });
 
     it('should return UnspecifiedResolver error when resolver address not found', async () => {
-      const spies = mockAsyncMethods(reader, {
+      const spies = mockAsyncMethods(cns, {
         get: { owner: '0xBD5F5ec7ed5f19b53726344540296C02584A5237' },
       });
       await expectResolutionErrorCode(
@@ -350,11 +360,12 @@ describe('CNS', () => {
 
     it('should work without any configs', async () => {
       resolution = new Resolution();
-      reader = await resolution.cns!.getReader();
-      const eyes = mockAsyncMethods(reader, {
+      const eyes = mockAsyncMethods(resolution.cns!, {
         get: {
           resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
-          values: ['0x8aaD44321A86b170879d7A244c1e8d360c99DdA8'],
+          records: {
+            [standardKeys.ETH]: '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
+          }
         },
       });
       const address = await resolution.addr('brad.crypto', 'eth');
@@ -363,10 +374,12 @@ describe('CNS', () => {
     });
 
     it(`checks the BCH address on ${CryptoDomainWithAdaBchAddresses}`, async () => {
-      const eyes = mockAsyncMethods(reader, {
+      const eyes = mockAsyncMethods(cns, {
         get: {
           resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
-          values: ['qzx048ez005q4yhphqu2pylpfc3hy88zzu4lu6q9j8'],
+          records: {
+            [standardKeys.BCH]: 'qzx048ez005q4yhphqu2pylpfc3hy88zzu4lu6q9j8',
+          }
         },
       });
       const addr = await resolution.addr(
@@ -378,12 +391,13 @@ describe('CNS', () => {
     });
 
     it(`checks the ADA address on ${CryptoDomainWithAdaBchAddresses}`, async () => {
-      const eyes = mockAsyncMethods(reader, {
+      const eyes = mockAsyncMethods(cns, {
         get: {
           resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
-          values: [
+          records: {
+            [standardKeys.ADA]:
             'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
-          ],
+          }
         },
       });
       const addr = await resolution.addr(
@@ -398,10 +412,12 @@ describe('CNS', () => {
 
     describe('.Metadata', () => {
       it('should resolve with ipfs stored on cns', async () => {
-        const spies = mockAsyncMethods(reader, {
+        const spies = mockAsyncMethods(cns, {
           get: {
             resolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
-            values: ['QmVJ26hBrwwNAPVmLavEFXDUunNDXeFSeMPmHuPxKe6dJv'],
+            records: {
+              [standardKeys.html]: 'QmVJ26hBrwwNAPVmLavEFXDUunNDXeFSeMPmHuPxKe6dJv',
+            }
           },
         });
         const ipfsHash = await resolution.ipfsHash(CryptoDomainWithIpfsRecords);
@@ -410,10 +426,10 @@ describe('CNS', () => {
       });
 
       it('should resolve with email stored on cns', async () => {
-        const spies = mockAsyncMethods(reader, {
+        const spies = mockAsyncMethods(cns, {
           get: {
             resolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
-            values: ['paul@unstoppabledomains.com'],
+            records: {[standardKeys.email]: 'paul@unstoppabledomains.com'},
           },
         });
         const email = await resolution.email(CryptoDomainWithEmail);
@@ -422,10 +438,10 @@ describe('CNS', () => {
       });
 
       it('should resolve with httpUrl stored on cns', async () => {
-        const spies = mockAsyncMethods(reader, {
+        const spies = mockAsyncMethods(cns, {
           get: {
             resolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
-            values: ['https://unstoppabledomains.com/'],
+            records: {[standardKeys.redirect_domain]: 'https://unstoppabledomains.com/',}
           },
         });
         const httpUrl = await resolution.httpUrl(CryptoDomainWithIpfsRecords);
@@ -434,12 +450,13 @@ describe('CNS', () => {
       });
 
       it('should resolve with the gundb chatId stored on cns', async () => {
-        const spies = mockAsyncMethods(reader, {
+        const spies = mockAsyncMethods(cns, {
           get: {
             resolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
-            values: [
+            records: {
+              [standardKeys.gundb_username]:
               '0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c',
-            ],
+            }
           },
         });
         const chatId = await resolution.chatId('brad.crypto');
@@ -450,8 +467,8 @@ describe('CNS', () => {
       });
 
       it('should throw UnspecifiedResolver for chatId', async () => {
-        mockAsyncMethods(reader, {
-          get: { owner: '0xBD5F5ec7ed5f19b53726344540296C02584A5237' },
+        mockAsyncMethods(cns, {
+          get: { owner: '0xBD5F5ec7ed5f19b53726344540296C02584A5237', records: {}, resolver: NullAddress },
         });
         await expectResolutionErrorCode(
           resolution.chatId(CryptoDomainWithoutResolver),
@@ -460,12 +477,13 @@ describe('CNS', () => {
       });
 
       it('should resolve with the gundb public key stored on cns', async () => {
-        const spies = mockAsyncMethods(reader, {
+        const spies = mockAsyncMethods(cns, {
           get: {
             resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
-            values: [
+            records: {
+              [standardKeys.gundb_public_key]:
               'pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI',
-            ],
+            }
           },
         });
         const publicKey = await resolution.chatPk('brad.crypto');
@@ -476,9 +494,10 @@ describe('CNS', () => {
       });
 
       it('should error out for gundb public key stored on cns', async () => {
-        const spies = mockAsyncMethods(reader, {
+        const spies = mockAsyncMethods(cns, {
           get: {
             resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+            records: {},
           },
         });
         await expectResolutionErrorCode(
@@ -489,9 +508,10 @@ describe('CNS', () => {
       });
 
       it('should error out for gundb chatId stored on cns', async () => {
-        const spies = mockAsyncMethods(reader, {
+        const spies = mockAsyncMethods(cns, {
           get: {
             resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+            records: {},
           },
         });
         await expectResolutionErrorCode(
@@ -534,8 +554,8 @@ describe('CNS', () => {
       });
 
       it('should throw UnregisteredDomain', async () => {
-        const eyes = mockAsyncMethods(reader, {
-          records: {owner: NullAddress},
+        const eyes = mockAsyncMethods(cns, {
+          get: {owner: NullAddress},
         });
 
         await expectResolutionErrorCode(
