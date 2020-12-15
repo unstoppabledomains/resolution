@@ -2,7 +2,8 @@
 
 * Remove ability to read from registry directly. `ProxyReader` address is now required. #105.
 ## 1.10.0
-* fixing the version
+
+* No changes
 ## 1.9.0
 
 * Add `Resolution#records` method to query multiple records #96
