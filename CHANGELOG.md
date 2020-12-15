@@ -1,7 +1,8 @@
 ## Unreleased
 
 * Remove ability to read from registry directly. `ProxyReader` address is now required. #105.
-
+## 1.10.0
+* fixing the version
 ## 1.9.0
 
 * Add `Resolution#records` method to query multiple records #96
@@ -40,7 +41,7 @@
 * Change default ethereum provider from infura to linkpool #75
 
 ## 1.5.1
-* fixing the version 
+* fixing the version
 
 ## 1.4.1
 * Resolution#chatPk -> get a gundb public key from domain's record
