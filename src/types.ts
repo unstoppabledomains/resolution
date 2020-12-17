@@ -41,7 +41,7 @@ export interface EventData {
   blockNumber?: string;
   data: string;
   logIndex?: string;
-  removed: boolean;
+  removed?: boolean;
   topics: string[];
   transactionHash?: string;
   transactionIndex: string;
@@ -69,7 +69,7 @@ export interface RpcProviderLogEntry {
   blockNumber?: number;
   blockHash?: string;
   transactionIndex?: number;
-  removed: boolean;
+  removed?: boolean;
   address: string;
   data: string;
   topics: string[];
