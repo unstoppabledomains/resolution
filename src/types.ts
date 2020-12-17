@@ -37,13 +37,13 @@ export type TransactionRequest = {
 };
 export interface EventData {
   address: string;
-  blockHash: string;
-  blockNumber: string;
+  blockHash?: string;
+  blockNumber?: string;
   data: string;
-  logIndex: string;
+  logIndex?: string;
   removed: boolean;
   topics: string[];
-  transactionHash: string;
+  transactionHash?: string;
   transactionIndex: string;
 }
 export interface EventFilter {
@@ -66,15 +66,15 @@ export interface RpcProviderRequestBody {
 }
 
 export interface RpcProviderLogEntry {
-  blockNumber: number;
-  blockHash: string;
-  transactionIndex: number;
+  blockNumber?: number;
+  blockHash?: string;
+  transactionIndex?: number;
   removed: boolean;
   address: string;
   data: string;
   topics: string[];
-  transactionHash: string;
-  logIndex: number;
+  transactionHash?: string;
+  logIndex?: number;
 }
 /**
  * Default structure of ZnsResolution records

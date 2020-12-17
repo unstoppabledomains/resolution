@@ -320,7 +320,13 @@ describe('Resolution', () => {
           });
           const dnsRecords = await resolution.dns("someTestDomain.crypto", [DnsRecordType.A, DnsRecordType.AAAA]);
           expectSpyToBeCalled(spies);
-          console.log(dnsRecords);
+          expect(dnsRecords).toStrictEqual(
+          [
+            { TTL: 90, data: '10.0.0.1', type: 'A' },
+            { TTL: 90, data: '10.0.0.2', type: 'A' },
+            { TTL: 128, data: '10.0.0.120', type: 'AAAA' }
+          ]
+          );
         })
       });
 
