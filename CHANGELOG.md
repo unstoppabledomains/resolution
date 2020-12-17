@@ -1,5 +1,5 @@
-## Unreleased
-
+## 1.10.1
+* Fixed bug regarding incompatable types with Ethers InfuraProvider
 * Remove ability to read from registry directly. `ProxyReader` address is now required. #105.
 ## 1.10.0
 
