@@ -32,7 +32,7 @@ import {
     .option('-g, --gundb', `returns gundb chat id`)
     .option('-m, --meta', 'shortcut for all meta data options (-siren)')
     .option('-t, --twitter', 'returns verified Twitter handle (only available for cns domains)')
-    .option('-d, --domain <domain>', 'domain you wish to resolve')
+    .requiredOption('-d, --domain <domain>', 'domain you wish to resolve')
     .option('-k, --recordKey <recordkey>', 'custom domain record')
     .option('-a, --all', 'get all keys stored under a domain' )
     .description(
@@ -114,5 +114,5 @@ import {
   Object.keys(options).forEach((option) => resolutionProcess.push(commandTable[option]()));
 
   await Promise.all(resolutionProcess);
-  console.log(response);
+  console.log(JSON.stringify(response, undefined, 4));
 })();

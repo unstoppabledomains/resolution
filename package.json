@@ -23,7 +23,7 @@
     "test:live": "LIVE=1 yarn test",
     "test:live:win": "set LIVE=1&& yarn test",
     "start": "npm run build:live",
-    "dev": "yarn build && ./build/cli/cli.js",
+    "dev": "yarn build && ./build/cli/cli.js -d brad.crypto",
     "build": "rm -rf build && tsc -p . && chmod +x ./build/cli/cli.js",
     "build:symlink": "yarn build && ln -sf $PWD/build/cli/cli.js  /usr/local/bin/resolution",
     "build:live": "nodemon --watch 'src/**/*.ts' --exec yarn build",
