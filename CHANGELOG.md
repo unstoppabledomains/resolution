@@ -1,3 +1,6 @@
+## 1.10.3
+* provide valid json to the CLI output
+
 ## 1.10.2
 * hotfix regarding incompatable types with Ethers InfuraProvider
 
