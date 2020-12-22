@@ -5,8 +5,6 @@ import {
   buildResolutionPackage,
   commaSeparatedList,
   tryInfo,
-  storeConfig,
-  parseConfig,
 } from './cli-helpers.js';
 
 (async () => {
@@ -17,11 +15,6 @@ import {
       '-c, --currencies <currencies>',
       'comma separated list of currency tickers',
       commaSeparatedList,
-    )
-    .option(
-      '-C, --config <option>',
-      `option in format <key>:<value>\n\tkey can be either "infura" or "url"`,
-      parseConfig,
     )
     .option('-s, --service', 'returns you a service name from the domain')
     .option('-i, --ipfs', 'get IpfsHash')
@@ -35,6 +28,7 @@ import {
     .requiredOption('-d, --domain <domain>', 'domain you wish to resolve')
     .option('-k, --recordKey <recordkey>', 'custom domain record')
     .option('-a, --all', 'get all keys stored under a domain' )
+    .option('--ethereum-url <ethereumUrl>', 'specify custom ethereum provider/url')
     .description(
       'resolution cli exports main usage of @unstoppabledomains/resolution library',
     );
@@ -54,14 +48,6 @@ import {
     delete options.meta;
   }
 
-  if (options.config) {
-    const { type, value } = options.config;
-    if (type == 'infura' || type == 'url') {
-      storeConfig(type, value);
-    }
-    delete options.config;
-  }
-
   if (!options.domain) {
     return;
   }
@@ -69,7 +55,7 @@ import {
   const { domain } = options;
   delete options.domain;
 
-  const resolution = buildResolutionPackage();
+  const resolution = buildResolutionPackage(options.ethereumUrl);
   const response = {};
 
   const commandTable = {
@@ -110,6 +96,7 @@ import {
     });
     delete options.currencies;
   }
+  delete options.ethereumUrl;
   // Execute the rest of options
   Object.keys(options).forEach((option) => resolutionProcess.push(commandTable[option]()));
 
