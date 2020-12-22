@@ -32,7 +32,7 @@ import {
     .option('-g, --gundb', `returns gundb chat id`)
     .option('-m, --meta', 'shortcut for all meta data options (-siren)')
     .option('-t, --twitter', 'returns verified Twitter handle (only available for cns domains)')
-    .requiredOption('-d, --domain <domain>', 'domain you wish to resolve')
+    .option('-d, --domain <domain>', 'domain you wish to resolve')
     .option('-k, --recordKey <recordkey>', 'custom domain record')
     .option('-a, --all', 'get all keys stored under a domain' )
     .description(
