@@ -1,0 +1,1489 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Resolution | Unstoppabledomains resolution library</title>
+	<meta name="description" content="Documentation for Unstoppabledomains resolution library">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="../assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="../assets/js/search.json" data-base="..">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="../index.html" class="title">Unstoppabledomains resolution library</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="../globals.html">Globals</a>
+				</li>
+				<li>
+					<a href="resolution.html">Resolution</a>
+				</li>
+			</ul>
+			<h1>Class Resolution</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Blockchain domain Resolution library - Resolution.</p>
+					</div>
+					<dl class="tsd-comment-tags">
+						<dt>example</dt>
+						<dd><pre><code><span class="hljs-keyword">import</span> Resolution <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@unstoppabledomains/resolution&#x27;</span>;
+
+<span class="hljs-keyword">let</span> resolution = <span class="hljs-keyword">new</span> Resolution({ <span class="hljs-attr">blockchain</span>: {
+       <span class="hljs-attr">ens</span>: {
+          <span class="hljs-attr">url</span>: <span class="hljs-string">&quot;https://mainnet.infura.io/v3/12351245223&quot;</span>,
+          <span class="hljs-attr">network</span>: <span class="hljs-string">&quot;mainnet&quot;</span>
+       }
+     }
+  });
+
+<span class="hljs-keyword">let</span> domain = <span class="hljs-string">&quot;brad.zil&quot;</span>;
+resolution.addr(domain, <span class="hljs-string">&quot;eth&quot;</span>).then(<span class="hljs-function"><span class="hljs-params">addr</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(addr));;</code></pre></dd>
+					</dl>
+				</div>
+			</section>
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<span class="target">Resolution</span>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>Constructors</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="resolution.html#constructor" class="tsd-kind-icon">constructor</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Methods</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="resolution.html#addr" class="tsd-kind-icon">addr</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="resolution.html#address" class="tsd-kind-icon">address</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="resolution.html#addressorthrow" class="tsd-kind-icon">address<wbr>OrThrow</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="resolution.html#allrecords" class="tsd-kind-icon">all<wbr>Records</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="resolution.html#chatid" class="tsd-kind-icon">chat<wbr>Id</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="resolution.html#chatpk" class="tsd-kind-icon">chat<wbr>Pk</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="resolution.html#childhash" class="tsd-kind-icon">childhash</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="resolution.html#dns" class="tsd-kind-icon">dns</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="resolution.html#email" class="tsd-kind-icon">email</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="resolution.html#httpurl" class="tsd-kind-icon">http<wbr>Url</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="resolution.html#ipfshash" class="tsd-kind-icon">ipfs<wbr>Hash</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="resolution.html#ipfsredirect" class="tsd-kind-icon">ipfs<wbr>Redirect</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="resolution.html#issupporteddomain" class="tsd-kind-icon">is<wbr>Supported<wbr>Domain</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="resolution.html#issupporteddomaininnetwork" class="tsd-kind-icon">is<wbr>Supported<wbr>Domain<wbr>InNetwork</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="resolution.html#isvalidhash" class="tsd-kind-icon">is<wbr>Valid<wbr>Hash</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="resolution.html#namehash" class="tsd-kind-icon">namehash</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="resolution.html#owner" class="tsd-kind-icon">owner</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="resolution.html#record" class="tsd-kind-icon">record</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="resolution.html#records" class="tsd-kind-icon">records</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="resolution.html#resolve" class="tsd-kind-icon">resolve</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="resolution.html#resolver" class="tsd-kind-icon">resolver</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="resolution.html#reverse" class="tsd-kind-icon">reverse</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="resolution.html#servicename" class="tsd-kind-icon">service<wbr>Name</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="resolution.html#twitter" class="tsd-kind-icon">twitter</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="resolution.html#fromeip1193provider" class="tsd-kind-icon">from<wbr>Eip1193<wbr>Provider</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="resolution.html#fromethersprovider" class="tsd-kind-icon">from<wbr>Ethers<wbr>Provider</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="resolution.html#fromweb3version0provider" class="tsd-kind-icon">from<wbr>Web3<wbr>Version0<wbr>Provider</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="resolution.html#fromweb3version1provider" class="tsd-kind-icon">from<wbr>Web3<wbr>Version1<wbr>Provider</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="resolution.html#infura" class="tsd-kind-icon">infura</a></li>
+							</ul>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Constructors</h2>
+				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class">
+					<a name="constructor" class="tsd-anchor"></a>
+					<h3>constructor</h3>
+					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Resolution<span class="tsd-signature-symbol">(</span>__namedParameters<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-symbol">{ </span>api<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>url<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>blockchain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span>cns<span class="tsd-signature-symbol">?: </span><a href="../globals.html#namingservicesource" class="tsd-signature-type">NamingServiceSource</a><span class="tsd-signature-symbol">; </span>ens<span class="tsd-signature-symbol">?: </span><a href="../globals.html#namingservicesource" class="tsd-signature-type">NamingServiceSource</a><span class="tsd-signature-symbol">; </span>web3Provider<span class="tsd-signature-symbol">?: </span><a href="../interfaces/provider.html" class="tsd-signature-type">Provider</a><span class="tsd-signature-symbol">; </span>zns<span class="tsd-signature-symbol">?: </span><a href="../globals.html#namingservicesource" class="tsd-signature-type">NamingServiceSource</a><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="resolution.html" class="tsd-signature-type">Resolution</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/743b56e/src/Resolution.ts#L60">src/Resolution.ts:60</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> __namedParameters: <span class="tsd-signature-symbol">{ </span>api<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>url<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">; </span>blockchain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span>cns<span class="tsd-signature-symbol">?: </span><a href="../globals.html#namingservicesource" class="tsd-signature-type">NamingServiceSource</a><span class="tsd-signature-symbol">; </span>ens<span class="tsd-signature-symbol">?: </span><a href="../globals.html#namingservicesource" class="tsd-signature-type">NamingServiceSource</a><span class="tsd-signature-symbol">; </span>web3Provider<span class="tsd-signature-symbol">?: </span><a href="../interfaces/provider.html" class="tsd-signature-type">Provider</a><span class="tsd-signature-symbol">; </span>zns<span class="tsd-signature-symbol">?: </span><a href="../globals.html#namingservicesource" class="tsd-signature-type">NamingServiceSource</a><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> = {}</span></h5>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter">
+											<h5>api<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>url<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></h5>
+											<ul class="tsd-parameters">
+												<li class="tsd-parameter">
+													<h5>url<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
+												</li>
+											</ul>
+										</li>
+										<li class="tsd-parameter">
+											<h5>blockchain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span>cns<span class="tsd-signature-symbol">?: </span><a href="../globals.html#namingservicesource" class="tsd-signature-type">NamingServiceSource</a><span class="tsd-signature-symbol">; </span>ens<span class="tsd-signature-symbol">?: </span><a href="../globals.html#namingservicesource" class="tsd-signature-type">NamingServiceSource</a><span class="tsd-signature-symbol">; </span>web3Provider<span class="tsd-signature-symbol">?: </span><a href="../interfaces/provider.html" class="tsd-signature-type">Provider</a><span class="tsd-signature-symbol">; </span>zns<span class="tsd-signature-symbol">?: </span><a href="../globals.html#namingservicesource" class="tsd-signature-type">NamingServiceSource</a><span class="tsd-signature-symbol"> }</span></h5>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="resolution.html" class="tsd-signature-type">Resolution</a></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="addr" class="tsd-anchor"></a>
+					<h3>addr</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">addr<span class="tsd-signature-symbol">(</span>domain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, currrencyTicker<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/743b56e/src/Resolution.ts#L213">src/Resolution.ts:213</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Resolves given domain name to a specific currency address if exists</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>async</dt>
+									<dd></dd>
+									<dt>throws</dt>
+									<dd><p><a href="resolutionerror.html">ResolutionError</a> if address is not found</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>domain: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>domain name to be resolved</p>
+									</div>
+								</li>
+								<li>
+									<h5>currrencyTicker: <span class="tsd-signature-type">string</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>A promise that resolves in an address</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="address" class="tsd-anchor"></a>
+					<h3>address</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">address<span class="tsd-signature-symbol">(</span>domain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, currencyTicker<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/743b56e/src/Resolution.ts#L185">src/Resolution.ts:185</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Resolves given domain name to a specific currency address if exists</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>async</dt>
+									<dd></dd>
+									<dt>deprecated</dt>
+									<dd><p>since Resolution v1.7.0</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>domain: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>domain name to be resolved</p>
+									</div>
+								</li>
+								<li>
+									<h5>currencyTicker: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>currency ticker like BTC, ETH, ZIL</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>A promise that resolves in an address or null</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="addressorthrow" class="tsd-anchor"></a>
+					<h3>address<wbr>OrThrow</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">address<wbr>OrThrow<span class="tsd-signature-symbol">(</span>domain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, currencyTicker<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/743b56e/src/Resolution.ts#L314">src/Resolution.ts:314</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p><a href="resolutionerror.html">ResolutionError</a> if address is not found</p>
+									</dd>
+									<dt>deprecated</dt>
+									<dd><p>since v1.7.0 use Resolution#addr instead</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>domain: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>domain name</p>
+									</div>
+								</li>
+								<li>
+									<h5>currencyTicker: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>currency ticker such as</p>
+										<ul>
+											<li>ZIL</li>
+											<li>BTC</li>
+											<li>ETH</li>
+										</ul>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>A specific currency address or throws an error</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="allrecords" class="tsd-anchor"></a>
+					<h3>all<wbr>Records</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">all<wbr>Records<span class="tsd-signature-symbol">(</span>domain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../globals.html#cryptorecords" class="tsd-signature-type">CryptoRecords</a><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/743b56e/src/Resolution.ts#L491">src/Resolution.ts:491</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns all record keys of the domain.
+										This method is strongly unrecommended for production use due to lack of support for many ethereum service providers and low performance
+									Method is not supported by ENS</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>domain: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>domain name</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../globals.html#cryptorecords" class="tsd-signature-type">CryptoRecords</a><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="chatid" class="tsd-anchor"></a>
+					<h3>chat<wbr>Id</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">chat<wbr>Id<span class="tsd-signature-symbol">(</span>domain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/743b56e/src/Resolution.ts#L247">src/Resolution.ts:247</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Resolve a chat id from the domain record</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p><a href="resolutionerror.html">ResolutionError</a></p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>domain: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>domain name to be resolved</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>A promise that resolves in chatId</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="chatpk" class="tsd-anchor"></a>
+					<h3>chat<wbr>Pk</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">chat<wbr>Pk<span class="tsd-signature-symbol">(</span>domain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/743b56e/src/Resolution.ts#L257">src/Resolution.ts:257</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Resolve a gundb public key from the domain record</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p><a href="resolutionerror.html">ResolutionError</a></p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>domain: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>domain name to be resolved</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>a promise that resolves in gundb public key</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="childhash" class="tsd-anchor"></a>
+					<h3>childhash</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">childhash<span class="tsd-signature-symbol">(</span>parent<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">nodeHash</span>, label<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, method<span class="tsd-signature-symbol">: </span><a href="../enums/namingservicename.html" class="tsd-signature-type">NamingServiceName</a>, options<span class="tsd-signature-symbol">?: </span><a href="../globals.html#namehashoptions" class="tsd-signature-type">NamehashOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">nodeHash</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/743b56e/src/Resolution.ts#L426">src/Resolution.ts:426</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>parent: <span class="tsd-signature-type">nodeHash</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>namehash of a parent domain</p>
+									</div>
+								</li>
+								<li>
+									<h5>label: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>subdomain name</p>
+									</div>
+								</li>
+								<li>
+									<h5>method: <a href="../enums/namingservicename.html" class="tsd-signature-type">NamingServiceName</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>&quot;ENS&quot;, &quot;CNS&quot; or &quot;ZNS&quot;</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> options: <a href="../globals.html#namehashoptions" class="tsd-signature-type">NamehashOptions</a><span class="tsd-signature-symbol"> = NamehashOptionsDefault</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>formatting options</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">nodeHash</span></h4>
+							<p>a namehash of a subdomain with name label</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="dns" class="tsd-anchor"></a>
+					<h3>dns</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">dns<span class="tsd-signature-symbol">(</span>domain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, types<span class="tsd-signature-symbol">: </span><a href="../enums/dnsrecordtype.html" class="tsd-signature-type">DnsRecordType</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/dnsrecord.html" class="tsd-signature-type">DnsRecord</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/743b56e/src/Resolution.ts#L496">src/Resolution.ts:496</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>domain: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>types: <a href="../enums/dnsrecordtype.html" class="tsd-signature-type">DnsRecordType</a><span class="tsd-signature-symbol">[]</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/dnsrecord.html" class="tsd-signature-type">DnsRecord</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="email" class="tsd-anchor"></a>
+					<h3>email</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">email<span class="tsd-signature-symbol">(</span>domain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/743b56e/src/Resolution.ts#L300">src/Resolution.ts:300</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Resolves the ipfs email field from whois configurations</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p><a href="resolutionerror.html">ResolutionError</a></p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>domain: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>domain name</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>A Promise that resolves in an email address configured for this domain whois</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="httpurl" class="tsd-anchor"></a>
+					<h3>http<wbr>Url</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">http<wbr>Url<span class="tsd-signature-symbol">(</span>domain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/743b56e/src/Resolution.ts#L275">src/Resolution.ts:275</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Resolves the httpUrl attached to domain</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>domain: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>domain name</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="ipfshash" class="tsd-anchor"></a>
+					<h3>ipfs<wbr>Hash</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">ipfs<wbr>Hash<span class="tsd-signature-symbol">(</span>domain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/743b56e/src/Resolution.ts#L266">src/Resolution.ts:266</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Resolves the IPFS hash configured for domain records on ZNS</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p><a href="resolutionerror.html">ResolutionError</a></p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>domain: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>domain name</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="ipfsredirect" class="tsd-anchor"></a>
+					<h3>ipfs<wbr>Redirect</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">ipfs<wbr>Redirect<span class="tsd-signature-symbol">(</span>domain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/743b56e/src/Resolution.ts#L287">src/Resolution.ts:287</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Resolves the ipfs redirect url for a supported domain records</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>deprecated</dt>
+									<dd><p>since v1.0.15 use Resolution#httpUrl instead</p>
+									</dd>
+									<dt>throws</dt>
+									<dd><p><a href="resolutionerror.html">ResolutionError</a></p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>domain: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>domain name</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>A Promise that resolves in redirect url</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="issupporteddomain" class="tsd-anchor"></a>
+					<h3>is<wbr>Supported<wbr>Domain</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Supported<wbr>Domain<span class="tsd-signature-symbol">(</span>domain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/743b56e/src/Resolution.ts#L461">src/Resolution.ts:461</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Checks if the domain name is valid according to naming service rules
+										for valid domain names.
+									Example: ENS doesn&#39;t allow domains that start from &#39;-&#39; symbol.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>domain: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>domain name to be checked</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="issupporteddomaininnetwork" class="tsd-anchor"></a>
+					<h3>is<wbr>Supported<wbr>Domain<wbr>InNetwork</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Supported<wbr>Domain<wbr>InNetwork<span class="tsd-signature-symbol">(</span>domain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/743b56e/src/Resolution.ts#L470">src/Resolution.ts:470</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Checks if the domain is supported by the specified network as well as if it is in valid format</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>domain: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>domain name to be checked</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="isvalidhash" class="tsd-anchor"></a>
+					<h3>is<wbr>Valid<wbr>Hash</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">is<wbr>Valid<wbr>Hash<span class="tsd-signature-symbol">(</span>domain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, hash<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/743b56e/src/Resolution.ts#L450">src/Resolution.ts:450</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Checks weather the domain name matches the hash</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>domain: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>domain name to check againt</p>
+									</div>
+								</li>
+								<li>
+									<h5>hash: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>hash obtained from the blockchain</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="namehash" class="tsd-anchor"></a>
+					<h3>namehash</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">namehash<span class="tsd-signature-symbol">(</span>domain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><a href="../globals.html#namehashoptions" class="tsd-signature-type">NamehashOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/743b56e/src/Resolution.ts#L414">src/Resolution.ts:414</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<dl class="tsd-comment-tags">
+									<dt>throws</dt>
+									<dd><p><a href="resolutionerror.html">ResolutionError</a> with UnsupportedDomain error code if domain extension is unknown</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>domain: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>domain name to be converted</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> options: <a href="../globals.html#namehashoptions" class="tsd-signature-type">NamehashOptions</a><span class="tsd-signature-symbol"> = NamehashOptionsDefault</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>formatting options</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span></h4>
+							<p>Produces a namehash from supported naming service in hex format with 0x prefix.
+							Corresponds to ERC721 token id in case of Ethereum based naming service like ENS or CNS.</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="owner" class="tsd-anchor"></a>
+					<h3>owner</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">owner<span class="tsd-signature-symbol">(</span>domain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/743b56e/src/Resolution.ts#L362">src/Resolution.ts:362</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>domain: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>domain name</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>An owner address of the domain</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="record" class="tsd-anchor"></a>
+					<h3>record</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">record<span class="tsd-signature-symbol">(</span>domain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, recordKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/743b56e/src/Resolution.ts#L373">src/Resolution.ts:373</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>domain: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>domain name</p>
+									</div>
+								</li>
+								<li>
+									<h5>recordKey: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>a name of a record to be resolved</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>A record value promise for a given record name</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="records" class="tsd-anchor"></a>
+					<h3>records</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">records<span class="tsd-signature-symbol">(</span>domain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, keys<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../globals.html#cryptorecords" class="tsd-signature-type">CryptoRecords</a><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/743b56e/src/Resolution.ts#L384">src/Resolution.ts:384</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>domain: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>domain name</p>
+									</div>
+								</li>
+								<li>
+									<h5>keys: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>Array of record keys to be resolved</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../globals.html#cryptorecords" class="tsd-signature-type">CryptoRecords</a><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>A Promise with key-value mapping of domain records</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="resolve" class="tsd-anchor"></a>
+					<h3>resolve</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">resolve<span class="tsd-signature-symbol">(</span>domain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../globals.html#resolutionresponse" class="tsd-signature-type">ResolutionResponse</a><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/743b56e/src/Resolution.ts#L170">src/Resolution.ts:170</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Resolves the given domain</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>async</dt>
+									<dd></dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>domain: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>domain name to be resolved</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../globals.html#resolutionresponse" class="tsd-signature-type">ResolutionResponse</a><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>A promise that resolves in an object</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="resolver" class="tsd-anchor"></a>
+					<h3>resolver</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">resolver<span class="tsd-signature-symbol">(</span>domain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/743b56e/src/Resolution.ts#L349">src/Resolution.ts:349</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>domain: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>domain to look for</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>the resolver address for a specific domain</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="reverse" class="tsd-anchor"></a>
+					<h3>reverse</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">reverse<span class="tsd-signature-symbol">(</span>address<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, currencyTicker<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/743b56e/src/Resolution.ts#L397">src/Resolution.ts:397</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>This method is only for ens at the moment. Reverse the ens address to a ens registered domain name</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>async</dt>
+									<dd></dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>address: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>address you wish to reverse</p>
+									</div>
+								</li>
+								<li>
+									<h5>currencyTicker: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>currency ticker like BTC, ETH, ZIL</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>Domain name attached to this address</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="servicename" class="tsd-anchor"></a>
+					<h3>service<wbr>Name</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">service<wbr>Name<span class="tsd-signature-symbol">(</span>domain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../enums/namingservicename.html" class="tsd-signature-type">NamingServiceName</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/743b56e/src/Resolution.ts#L480">src/Resolution.ts:480</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns the name of the service for a domain ENS | CNS | ZNS</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>domain: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>domain name to look for</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../enums/namingservicename.html" class="tsd-signature-type">NamingServiceName</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="twitter" class="tsd-anchor"></a>
+					<h3>twitter</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">twitter<span class="tsd-signature-symbol">(</span>domain<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/743b56e/src/Resolution.ts#L227">src/Resolution.ts:227</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Resolves given domain name to a verified twitter handle</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>async</dt>
+									<dd></dd>
+									<dt>throws</dt>
+									<dd><p><a href="resolutionerror.html">ResolutionError</a> if twitter is not found</p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>domain: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>domain name to be resolved</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></h4>
+							<p>A promise that resolves in a verified twitter handle</p>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static">
+					<a name="fromeip1193provider" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> from<wbr>Eip1193<wbr>Provider</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
+						<li class="tsd-signature tsd-kind-icon">from<wbr>Eip1193<wbr>Provider<span class="tsd-signature-symbol">(</span>provider<span class="tsd-signature-symbol">: </span><a href="../interfaces/provider.html" class="tsd-signature-type">Provider</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="resolution.html" class="tsd-signature-type">Resolution</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/743b56e/src/Resolution.ts#L120">src/Resolution.ts:120</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Creates a resolution instance with configured provider</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>see</dt>
+									<dd><p><a href="https://eips.ethereum.org/EIPS/eip-1193">https://eips.ethereum.org/EIPS/eip-1193</a></p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>provider: <a href="../interfaces/provider.html" class="tsd-signature-type">Provider</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>any provider compatible with EIP-1193</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="resolution.html" class="tsd-signature-type">Resolution</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static">
+					<a name="fromethersprovider" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> from<wbr>Ethers<wbr>Provider</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
+						<li class="tsd-signature tsd-kind-icon">from<wbr>Ethers<wbr>Provider<span class="tsd-signature-symbol">(</span>provider<span class="tsd-signature-symbol">: </span><a href="../interfaces/ethersprovider.html" class="tsd-signature-type">EthersProvider</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="resolution.html" class="tsd-signature-type">Resolution</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/743b56e/src/Resolution.ts#L158">src/Resolution.ts:158</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Creates instance of resolution from provider that implements Ethers Provider#call interface.
+									This wrapper support only <code>eth_call</code> method for now, which is enough for all the current Resolution functionality</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>see</dt>
+									<dd><p><a href="https://github.com/ethers-io/ethers.js/blob/v4-legacy/providers/abstract-provider.d.ts#L91">https://github.com/ethers-io/ethers.js/blob/v4-legacy/providers/abstract-provider.d.ts#L91</a></p>
+									</dd>
+									<dt>see</dt>
+									<dd><p><a href="https://github.com/ethers-io/ethers.js/blob/v5.0.4/packages/abstract-provider/src.ts/index.ts#L224">https://github.com/ethers-io/ethers.js/blob/v5.0.4/packages/abstract-provider/src.ts/index.ts#L224</a></p>
+									</dd>
+									<dt>see</dt>
+									<dd><p><a href="https://docs.ethers.io/ethers.js/v5-beta/api-providers.html#jsonrpcprovider-inherits-from-provider">https://docs.ethers.io/ethers.js/v5-beta/api-providers.html#jsonrpcprovider-inherits-from-provider</a></p>
+									</dd>
+									<dt>see</dt>
+									<dd><p><a href="https://github.com/ethers-io/ethers.js/blob/master/packages/providers/src.ts/json-rpc-provider.ts">https://github.com/ethers-io/ethers.js/blob/master/packages/providers/src.ts/json-rpc-provider.ts</a></p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>provider: <a href="../interfaces/ethersprovider.html" class="tsd-signature-type">EthersProvider</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>provider object</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="resolution.html" class="tsd-signature-type">Resolution</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static">
+					<a name="fromweb3version0provider" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> from<wbr>Web3<wbr>Version0<wbr>Provider</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
+						<li class="tsd-signature tsd-kind-icon">from<wbr>Web3<wbr>Version0<wbr>Provider<span class="tsd-signature-symbol">(</span>provider<span class="tsd-signature-symbol">: </span><a href="../interfaces/web3version0provider.html" class="tsd-signature-type">Web3Version0Provider</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="resolution.html" class="tsd-signature-type">Resolution</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/743b56e/src/Resolution.ts#L131">src/Resolution.ts:131</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Create a resolution instance from web3 0.x version provider</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>see</dt>
+									<dd><p><a href="https://github.com/ethereum/web3.js/blob/0.20.7/lib/web3/httpprovider.js#L116">https://github.com/ethereum/web3.js/blob/0.20.7/lib/web3/httpprovider.js#L116</a></p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>provider: <a href="../interfaces/web3version0provider.html" class="tsd-signature-type">Web3Version0Provider</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>an 0.x version provider from web3 ( must implement sendAsync(payload, callback) )</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="resolution.html" class="tsd-signature-type">Resolution</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static">
+					<a name="fromweb3version1provider" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> from<wbr>Web3<wbr>Version1<wbr>Provider</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
+						<li class="tsd-signature tsd-kind-icon">from<wbr>Web3<wbr>Version1<wbr>Provider<span class="tsd-signature-symbol">(</span>provider<span class="tsd-signature-symbol">: </span><a href="../interfaces/web3version1provider.html" class="tsd-signature-type">Web3Version1Provider</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="resolution.html" class="tsd-signature-type">Resolution</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/743b56e/src/Resolution.ts#L143">src/Resolution.ts:143</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Create a resolution instance from web3 1.x version provider</p>
+								</div>
+								<dl class="tsd-comment-tags">
+									<dt>see</dt>
+									<dd><p><a href="https://github.com/ethereum/web3.js/blob/1.x/packages/web3-core-helpers/types/index.d.ts#L165">https://github.com/ethereum/web3.js/blob/1.x/packages/web3-core-helpers/types/index.d.ts#L165</a></p>
+									</dd>
+									<dt>see</dt>
+									<dd><p><a href="https://github.com/ethereum/web3.js/blob/1.x/packages/web3-providers-http/src/index.js#L95">https://github.com/ethereum/web3.js/blob/1.x/packages/web3-providers-http/src/index.js#L95</a></p>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>provider: <a href="../interfaces/web3version1provider.html" class="tsd-signature-type">Web3Version1Provider</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>an 1.x version provider from web3 ( must implement send(payload, callback) )</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="resolution.html" class="tsd-signature-type">Resolution</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static">
+					<a name="infura" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> infura</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
+						<li class="tsd-signature tsd-kind-icon">infura<span class="tsd-signature-symbol">(</span>infura<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, network<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="resolution.html" class="tsd-signature-type">Resolution</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/743b56e/src/Resolution.ts#L106">src/Resolution.ts:106</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Creates a resolution with configured infura id for ens and cns</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>infura: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>infura project id</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> network: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = &quot;mainnet&quot;</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>ethereum network name</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="resolution.html" class="tsd-signature-type">Resolution</a></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="../globals.html"><em>Globals</em></a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+					<li class=" tsd-kind-enum">
+						<a href="../enums/configurationerrorcode.html" class="tsd-kind-icon">Configuration<wbr>Error<wbr>Code</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="../enums/dnsrecordtype.html" class="tsd-kind-icon">Dns<wbr>Record<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="../enums/namingservicename.html" class="tsd-kind-icon">Naming<wbr>Service<wbr>Name</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="../enums/resolutionerrorcode.html" class="tsd-kind-icon">Resolution<wbr>Error<wbr>Code</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="configurationerror.html" class="tsd-kind-icon">Configuration<wbr>Error</a>
+					</li>
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-class">
+						<a href="resolution.html" class="tsd-kind-icon">Resolution</a>
+						<ul>
+							<li class=" tsd-kind-constructor tsd-parent-kind-class">
+								<a href="resolution.html#constructor" class="tsd-kind-icon">constructor</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="resolution.html#addr" class="tsd-kind-icon">addr</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="resolution.html#address" class="tsd-kind-icon">address</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="resolution.html#addressorthrow" class="tsd-kind-icon">address<wbr>OrThrow</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="resolution.html#allrecords" class="tsd-kind-icon">all<wbr>Records</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="resolution.html#chatid" class="tsd-kind-icon">chat<wbr>Id</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="resolution.html#chatpk" class="tsd-kind-icon">chat<wbr>Pk</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="resolution.html#childhash" class="tsd-kind-icon">childhash</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="resolution.html#dns" class="tsd-kind-icon">dns</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="resolution.html#email" class="tsd-kind-icon">email</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="resolution.html#httpurl" class="tsd-kind-icon">http<wbr>Url</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="resolution.html#ipfshash" class="tsd-kind-icon">ipfs<wbr>Hash</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="resolution.html#ipfsredirect" class="tsd-kind-icon">ipfs<wbr>Redirect</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="resolution.html#issupporteddomain" class="tsd-kind-icon">is<wbr>Supported<wbr>Domain</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="resolution.html#issupporteddomaininnetwork" class="tsd-kind-icon">is<wbr>Supported<wbr>Domain<wbr>InNetwork</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="resolution.html#isvalidhash" class="tsd-kind-icon">is<wbr>Valid<wbr>Hash</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="resolution.html#namehash" class="tsd-kind-icon">namehash</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="resolution.html#owner" class="tsd-kind-icon">owner</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="resolution.html#record" class="tsd-kind-icon">record</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="resolution.html#records" class="tsd-kind-icon">records</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="resolution.html#resolve" class="tsd-kind-icon">resolve</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="resolution.html#resolver" class="tsd-kind-icon">resolver</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="resolution.html#reverse" class="tsd-kind-icon">reverse</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="resolution.html#servicename" class="tsd-kind-icon">service<wbr>Name</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="resolution.html#twitter" class="tsd-kind-icon">twitter</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
+								<a href="resolution.html#fromeip1193provider" class="tsd-kind-icon">from<wbr>Eip1193<wbr>Provider</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
+								<a href="resolution.html#fromethersprovider" class="tsd-kind-icon">from<wbr>Ethers<wbr>Provider</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
+								<a href="resolution.html#fromweb3version0provider" class="tsd-kind-icon">from<wbr>Web3<wbr>Version0<wbr>Provider</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
+								<a href="resolution.html#fromweb3version1provider" class="tsd-kind-icon">from<wbr>Web3<wbr>Version1<wbr>Provider</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
+								<a href="resolution.html#infura" class="tsd-kind-icon">infura</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="after-current">
+					<li class=" tsd-kind-class">
+						<a href="resolutionerror.html" class="tsd-kind-icon">Resolution<wbr>Error</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/dnsrecord.html" class="tsd-kind-icon">Dns<wbr>Record</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/ethersprovider.html" class="tsd-kind-icon">Ethers<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/jsonrpcpayload.html" class="tsd-kind-icon">Json<wbr>Rpc<wbr>Payload</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/jsonrpcresponse.html" class="tsd-kind-icon">Json<wbr>Rpc<wbr>Response</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/provider.html" class="tsd-kind-icon">Provider</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/sourcedefinition.html" class="tsd-kind-icon">Source<wbr>Definition</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/web3version0provider.html" class="tsd-kind-icon">Web3<wbr>Version0<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/web3version1provider.html" class="tsd-kind-icon">Web3<wbr>Version1<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../globals.html#api" class="tsd-kind-icon">API</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../globals.html#blockchain" class="tsd-kind-icon">Blockchain</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../globals.html#configurationerroroptions" class="tsd-kind-icon">Configuration<wbr>Error<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../globals.html#cryptorecords" class="tsd-kind-icon">Crypto<wbr>Records</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../globals.html#domaindata" class="tsd-kind-icon">Domain<wbr>Data</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../globals.html#namehashoptions" class="tsd-kind-icon">Namehash<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../globals.html#namingservicesource" class="tsd-kind-icon">Naming<wbr>Service<wbr>Source</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../globals.html#providermethod" class="tsd-kind-icon">Provider<wbr>Method</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../globals.html#resolutionerroroptions" class="tsd-kind-icon">Resolution<wbr>Error<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../globals.html#resolutionmethod" class="tsd-kind-icon">Resolution<wbr>Method</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../globals.html#resolutionresponse" class="tsd-kind-icon">Resolution<wbr>Response</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="../globals.html#namehashoptionsdefault" class="tsd-kind-icon">Namehash<wbr>Options<wbr>Default</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="../globals.html#udapidefaulturl" class="tsd-kind-icon">UDApi<wbr>Default<wbr>Url</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="../globals.html#unclaimed_domain_response" class="tsd-kind-icon">UNCLAIMED_<wbr>DOMAIN_<wbr>RESPONSE</a>
+					</li>
+					<li class=" tsd-kind-object-literal">
+						<a href="../globals.html#defaultapi" class="tsd-kind-icon">DefaultAPI</a>
+					</li>
+					<li class=" tsd-kind-object-literal">
+						<a href="../globals.html#unclaimeddomainresponse" class="tsd-kind-icon">Unclaimed<wbr>Domain<wbr>Response</a>
+					</li>
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="../assets/js/main.js"></script>
+</body>
+</html>
