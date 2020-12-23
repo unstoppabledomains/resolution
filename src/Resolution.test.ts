@@ -4,7 +4,7 @@ import Resolution, {
   UnclaimedDomainResponse,
 } from './index';
 import { TickerVersion, DnsRecordType, JsonRpcPayload } from './publicTypes';
-import { JsonRpcProvider, getDefaultProvider, InfuraProvider } from '@ethersproject/providers';
+import { JsonRpcProvider, InfuraProvider } from '@ethersproject/providers';
 import Web3HttpProvider from 'web3-providers-http';
 import Web3WsProvider from 'web3-providers-ws';
 import Web3V027Provider from 'web3-0.20.7/lib/web3/httpprovider';
@@ -321,11 +321,11 @@ describe('Resolution', () => {
           const dnsRecords = await resolution.dns("someTestDomain.crypto", [DnsRecordType.A, DnsRecordType.AAAA]);
           expectSpyToBeCalled(spies);
           expect(dnsRecords).toStrictEqual(
-          [
-            { TTL: 90, data: '10.0.0.1', type: 'A' },
-            { TTL: 90, data: '10.0.0.2', type: 'A' },
-            { TTL: 128, data: '10.0.0.120', type: 'AAAA' }
-          ]
+            [
+              { TTL: 90, data: '10.0.0.1', type: 'A' },
+              { TTL: 90, data: '10.0.0.2', type: 'A' },
+              { TTL: 128, data: '10.0.0.120', type: 'AAAA' }
+            ]
           );
         })
       });
