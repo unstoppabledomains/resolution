@@ -1,3 +1,5 @@
+import { TickerVersion } from "./publicTypes";
+
 export type Dictionary<T> = { [k: string]: T };
 export type EnsNetworkIdMap = {
   [key: number]: string;
@@ -103,4 +105,9 @@ export function isNullAddress(
   }
   return Object.values(NullAddresses).includes(key);
 }
+
+export function isSupportedChainVersion(obj: any): obj is TickerVersion {
+  return Object.values(TickerVersion).includes(obj);
+}
+
 export const EthCoinIndex = '60';
