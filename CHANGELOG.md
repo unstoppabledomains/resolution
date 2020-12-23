@@ -1,3 +1,9 @@
+## 1.12.0
+* Introduced Resolution#usdt(domain: string, version: TickerVersion) which resolves in various USDT records from different chains
+* Introduced TickerVersion enum which holds all values for version parametr ar Resolution#usdt
+## 1.10.4-1.11.1
+* updated resolution cli, config option is depricated
+* introduced --ethereum-url option to provide a non default blockchain provider
 ## 1.10.3
 * provide valid json to the CLI output
 
