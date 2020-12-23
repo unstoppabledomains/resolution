@@ -4,9 +4,10 @@ import {
   expectSpyToBeCalled,
   expectResolutionErrorCode,
   mockAsyncMethods,
+  ZilDomainWithUsdtMultiChainRecords,
 } from './tests/helpers';
 import { NullAddress } from './types';
-import { NamingServiceName } from './publicTypes';
+import { NamingServiceName, TickerVersion } from './publicTypes';
 
 let resolution: Resolution;
 
@@ -248,6 +249,84 @@ describe('ZNS', () => {
         ResolutionErrorCode.UnspecifiedResolver,
       );
       expectSpyToBeCalled(spies);
+    });
+
+    describe('.multichain tokens', () => {
+      it('should work with erc20 usdt record on zilliqa', async () => {
+        const spies = mockAsyncMethods(resolution.zns, {
+          getRecordsAddresses:[
+            'zil19kulqq9m4d8ckt7r68e4xyqwh2znexspz3h77c',
+            '0x8e3c259d774bb9da6cef4bd33bc64d22b4621a96'
+          ],
+          fetchSubState: {records: {
+            ZIL: 'zil19kulqq9m4d8ckt7r68e4xyqwh2znexspz3h77c',
+            'crypto.USDT.version.EOS.address': 'letsminesome',
+            'crypto.USDT.version.ERC20.address': '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+            'crypto.USDT.version.OMNI.address': '19o6LvAdCPkjLi83VsjrCsmvQZUirT4KXJ',
+            'crypto.USDT.version.TRON.address': 'TNemhXhpX7MwzZJa3oXvfCjo5pEeXrfN2h'
+          }}
+        });
+        const erc20 = await resolution.usdt(ZilDomainWithUsdtMultiChainRecords, TickerVersion.ERC20);
+        expectSpyToBeCalled(spies);
+        expect(erc20).toBe('0xe7474D07fD2FA286e7e0aa23cd107F8379085037');
+      });
+
+      it('should work with tron usdt record on zilliqa', async () => {
+        const spies = mockAsyncMethods(resolution.zns, {
+          getRecordsAddresses:[
+            'zil19kulqq9m4d8ckt7r68e4xyqwh2znexspz3h77c',
+            '0x8e3c259d774bb9da6cef4bd33bc64d22b4621a96'
+          ],
+          fetchSubState: {records: {
+            ZIL: 'zil19kulqq9m4d8ckt7r68e4xyqwh2znexspz3h77c',
+            'crypto.USDT.version.EOS.address': 'letsminesome',
+            'crypto.USDT.version.ERC20.address': '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+            'crypto.USDT.version.OMNI.address': '19o6LvAdCPkjLi83VsjrCsmvQZUirT4KXJ',
+            'crypto.USDT.version.TRON.address': 'TNemhXhpX7MwzZJa3oXvfCjo5pEeXrfN2h'
+          }}
+        });
+        const tron = await resolution.usdt(ZilDomainWithUsdtMultiChainRecords, TickerVersion.TRON);
+        expectSpyToBeCalled(spies);
+        expect(tron).toBe('TNemhXhpX7MwzZJa3oXvfCjo5pEeXrfN2h');
+      });
+
+      it('should work with omni usdt record on zilliqa', async () => {
+        const spies = mockAsyncMethods(resolution.zns, {
+          getRecordsAddresses:[
+            'zil19kulqq9m4d8ckt7r68e4xyqwh2znexspz3h77c',
+            '0x8e3c259d774bb9da6cef4bd33bc64d22b4621a96'
+          ],
+          fetchSubState: {records: {
+            ZIL: 'zil19kulqq9m4d8ckt7r68e4xyqwh2znexspz3h77c',
+            'crypto.USDT.version.EOS.address': 'letsminesome',
+            'crypto.USDT.version.ERC20.address': '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+            'crypto.USDT.version.OMNI.address': '19o6LvAdCPkjLi83VsjrCsmvQZUirT4KXJ',
+            'crypto.USDT.version.TRON.address': 'TNemhXhpX7MwzZJa3oXvfCjo5pEeXrfN2h'
+          }}
+        });
+        const omni = await resolution.usdt(ZilDomainWithUsdtMultiChainRecords, TickerVersion.OMNI);
+        expectSpyToBeCalled(spies);
+        expect(omni).toBe('19o6LvAdCPkjLi83VsjrCsmvQZUirT4KXJ');
+      });
+
+      it('should work with erc20 usdt record on zilliqa', async () => {
+        const spies = mockAsyncMethods(resolution.zns, {
+          getRecordsAddresses:[
+            'zil19kulqq9m4d8ckt7r68e4xyqwh2znexspz3h77c',
+            '0x8e3c259d774bb9da6cef4bd33bc64d22b4621a96'
+          ],
+          fetchSubState: {records: {
+            ZIL: 'zil19kulqq9m4d8ckt7r68e4xyqwh2znexspz3h77c',
+            'crypto.USDT.version.EOS.address': 'letsminesome',
+            'crypto.USDT.version.ERC20.address': '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+            'crypto.USDT.version.OMNI.address': '19o6LvAdCPkjLi83VsjrCsmvQZUirT4KXJ',
+            'crypto.USDT.version.TRON.address': 'TNemhXhpX7MwzZJa3oXvfCjo5pEeXrfN2h'
+          }}
+        });
+        const eos = await resolution.usdt(ZilDomainWithUsdtMultiChainRecords, TickerVersion.EOS);
+        expectSpyToBeCalled(spies);
+        expect(eos).toBe('letsminesome');
+      });
     });
   });
 

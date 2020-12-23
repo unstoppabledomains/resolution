@@ -15,6 +15,8 @@ export const CryptoDomainWithIpfsRecords = 'reseller-test-paul019.crypto';
 export const CryptoDomainWithEmail = 'reseller-test-paul019.crypto';
 export const CryptoDomainWithAdaBchAddresses = 'reseller-test-mago0.crypto';
 export const CryptoDomainWithTwitterVerification = 'ijustwannatestsomething2.crypto';
+export const CryptoDomainWithUsdtMultiChainRecords = 'udtestdev-usdt.crypto';
+export const ZilDomainWithUsdtMultiChainRecords = 'reseller-test-udtesting-422508414817.zil';
 
 try {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
