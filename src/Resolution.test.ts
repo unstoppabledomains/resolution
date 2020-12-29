@@ -4,12 +4,13 @@ import Resolution, {
   UnclaimedDomainResponse,
 } from './index';
 import { DnsRecordType, JsonRpcPayload } from './publicTypes';
-import { JsonRpcProvider, getDefaultProvider, InfuraProvider } from '@ethersproject/providers';
+import { JsonRpcProvider, InfuraProvider } from '@ethersproject/providers';
 import Web3HttpProvider from 'web3-providers-http';
 import Web3WsProvider from 'web3-providers-ws';
 import Web3V027Provider from 'web3-0.20.7/lib/web3/httpprovider';
 import {
   CryptoDomainWithAdaBchAddresses,
+  CryptoDomainWithUSDTAddresses,
 } from './tests/helpers';
 
 import {
@@ -34,8 +35,8 @@ beforeAll(async () => {
   resolution = new Resolution({
     blockchain: {
       cns: { url: protocolLink() },
-      ens: { url: protocolLink() }
-    }
+      ens: { url: protocolLink() },
+    },
   });
 });
 
@@ -46,16 +47,16 @@ beforeEach(() => {
 
 describe('Resolution', () => {
   describe('.Basic setup', () => {
-    it('should fail in test development',async () => {
-      pendingInLive()
+    it('should fail in test development', async () => {
+      pendingInLive();
       try {
-        await fetch("https://pokeres.bastionbot.org/images/pokemon/10.png");
-      } catch(err) {
+        await fetch('https://pokeres.bastionbot.org/images/pokemon/10.png');
+      } catch (err) {
         // nock should prevent all outgoing traffic
         expect(err).toBeInstanceOf(FetchError);
-        return
+        return;
       }
-      fail("nock is not configured correctly!");
+      fail('nock is not configured correctly!');
     });
 
     it('should get a valid resolution instance', async () => {
@@ -89,8 +90,8 @@ describe('Resolution', () => {
             resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
             records: {
               [standardKeys.gundb_username]:
-              '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c',
-            }
+                '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c',
+            },
           },
         });
         const gundb = await resolution.chatId('homecakes.crypto');
@@ -101,16 +102,16 @@ describe('Resolution', () => {
       });
 
       describe('.ipfsHash', () => {
-        it('should prioritize new keys over depricated ones', async() => {
+        it('should prioritize new keys over depricated ones', async () => {
           pendingInLive();
           const spies = mockAsyncMethods(resolution.cns, {
             get: {
               resolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
               records: {
                 [standardKeys.dweb_hash]: 'new record Ipfs hash',
-                [standardKeys.html]: 'old record Ipfs hash'
-              }
-            }
+                [standardKeys.html]: 'old record Ipfs hash',
+              },
+            },
           });
           const hash = await resolution.ipfsHash(CryptoDomainWithIpfsRecords);
           expectSpyToBeCalled(spies);
@@ -124,11 +125,13 @@ describe('Resolution', () => {
               resolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
               records: {
                 [standardKeys.browser_redirect]: 'new record redirect url',
-                [standardKeys.redirect_domain]: 'old record redirect url'
-              }
-            }
+                [standardKeys.redirect_domain]: 'old record redirect url',
+              },
+            },
           });
-          const redirectUrl = await resolution.httpUrl(CryptoDomainWithIpfsRecords);
+          const redirectUrl = await resolution.httpUrl(
+            CryptoDomainWithIpfsRecords,
+          );
           expectSpyToBeCalled(spies);
           expect(redirectUrl).toBe('new record redirect url');
         });
@@ -182,22 +185,40 @@ describe('Resolution', () => {
           const serviceName = resolution.serviceName('domain.crypto');
           expect(serviceName).toBe('CNS');
         });
-
       });
-
     });
 
     describe('.Errors', () => {
       it('checks Resolution#addr error #1', async () => {
         const resolution = new Resolution();
         const spy = mockAsyncMethods(resolution.zns!, {
-          getRecordsAddresses: undefined
+          getRecordsAddresses: undefined,
         });
         await expectResolutionErrorCode(
           resolution.addr('sdncdoncvdinvcsdncs.zil', 'ZIL'),
           ResolutionErrorCode.UnregisteredDomain,
         );
         expectSpyToBeCalled(spy);
+      });
+
+      it('checks Resolution#addr error #2', async () => {
+        const resolution = new Resolution();
+        await expectResolutionErrorCode(
+          resolution.addr('testing.zil', 'USDT'),
+          ResolutionErrorCode.IncorrectMultichainCurrencyMethod,
+        );
+      });
+
+      it('checks Resolution#usdt error #1', async () => {
+        const spies = mockAsyncMethods(resolution.cns, {
+          records: {},
+        });
+
+        await expectResolutionErrorCode(
+          resolution.usdt('testing.crypto', 'ERC20'),
+          ResolutionErrorCode.RecordNotFound,
+        );
+        expectSpyToBeCalled(spies);
       });
 
       it('resolves non-existing domain zone with throw', async () => {
@@ -217,12 +238,13 @@ describe('Resolution', () => {
             'crypto.DASH.address': 'XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j',
             'crypto.ETH.address': '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
             'crypto.LTC.address': 'LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL',
-            'crypto.XMR.address': '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d',
+            'crypto.XMR.address':
+              '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d',
             'crypto.ZEC.address': 't1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV',
             'crypto.ZIL.address': 'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
             'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
-            'ipfs.redirect_domain.value': 'www.unstoppabledomains.com'
-          }
+            'ipfs.redirect_domain.value': 'www.unstoppabledomains.com',
+          },
         });
         await expectResolutionErrorCode(
           resolution.email('brad.zil'),
@@ -275,7 +297,6 @@ describe('Resolution', () => {
           );
         });
       });
-
     });
 
     describe('.Records', () => {
@@ -290,15 +311,18 @@ describe('Resolution', () => {
                 'dns.A': '["10.0.0.1","10.0.0.2"]',
                 'dns.A.ttl': '90',
                 'dns.AAAA': '["10.0.0.120"]',
-              }
+              },
             },
           });
-          const dnsRecords = await resolution.dns("someTestDomain.crypto", [DnsRecordType.A, DnsRecordType.AAAA]);
+          const dnsRecords = await resolution.dns('someTestDomain.crypto', [
+            DnsRecordType.A,
+            DnsRecordType.AAAA,
+          ]);
           expectSpyToBeCalled(spies);
           expect(dnsRecords).toStrictEqual([
             { TTL: 90, data: '10.0.0.1', type: 'A' },
             { TTL: 90, data: '10.0.0.2', type: 'A' },
-            { TTL: 128, data: '10.0.0.120', type: 'AAAA' }
+            { TTL: 128, data: '10.0.0.120', type: 'AAAA' },
           ]);
         });
 
@@ -312,34 +336,40 @@ describe('Resolution', () => {
                 'dns.A': '["10.0.0.1","10.0.0.2"]',
                 'dns.A.ttl': '90',
                 'dns.AAAA': '["10.0.0.120"]',
-                [standardKeys.ETH]: '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
-                [standardKeys.ADA]: '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
-                [standardKeys.ARK]: '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
-              }
-            }
+                [standardKeys.ETH]:
+                  '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
+                [standardKeys.ADA]:
+                  '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
+                [standardKeys.ARK]:
+                  '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
+              },
+            },
           });
-          const dnsRecords = await resolution.dns("someTestDomain.crypto", [DnsRecordType.A, DnsRecordType.AAAA]);
+          const dnsRecords = await resolution.dns('someTestDomain.crypto', [
+            DnsRecordType.A,
+            DnsRecordType.AAAA,
+          ]);
           expectSpyToBeCalled(spies);
-          expect(dnsRecords).toStrictEqual(
-          [
+          expect(dnsRecords).toStrictEqual([
             { TTL: 90, data: '10.0.0.1', type: 'A' },
             { TTL: 90, data: '10.0.0.2', type: 'A' },
-            { TTL: 128, data: '10.0.0.120', type: 'AAAA' }
-          ]
-          );
-        })
+            { TTL: 128, data: '10.0.0.120', type: 'AAAA' },
+          ]);
+        });
       });
 
       describe('.Metadata', () => {
         it('checks return of email for ergergergerg.zil', async () => {
           const spies = mockAsyncMethods(resolution.zns, {
             allRecords: {
-              'ipfs.html.hash': 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
-              'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu',
+              'ipfs.html.hash':
+                'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
+              'ipfs.html.value':
+                'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu',
               'ipfs.redirect_domain.value': 'www.unstoppabledomains.com',
               'whois.email.value': 'matt+test@unstoppabledomains.com',
-              'whois.for_sale.value': 'true'
-            }
+              'whois.for_sale.value': 'true',
+            },
           });
           const email = await resolution.email('ergergergerg.zil');
           expectSpyToBeCalled(spies);
@@ -353,8 +383,9 @@ describe('Resolution', () => {
             get: {
               resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
               records: {
-                [standardKeys.ETH]: '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
-              }
+                [standardKeys.ETH]:
+                  '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
+              },
             },
           });
           const capital = await resolution.addr('Brad.crypto', 'eth');
@@ -366,8 +397,8 @@ describe('Resolution', () => {
 
       describe('.Providers', () => {
         it('should work with web3HttpProvider', async () => {
-        // web3-providers-http has problems with type definitions
-        // We still prefer everything to be statically typed on our end for better mocking
+          // web3-providers-http has problems with type definitions
+          // We still prefer everything to be statically typed on our end for better mocking
           const provider = new (Web3HttpProvider as any)(
             protocolLink(),
           ) as Web3HttpProvider.HttpProvider;
@@ -376,13 +407,16 @@ describe('Resolution', () => {
             provider,
             'send',
             (payload: JsonRpcPayload, callback) => {
-              const result = caseMock(payload.params?.[0], RpcProviderTestCases);
+              const result = caseMock(
+                payload.params?.[0],
+                RpcProviderTestCases,
+              );
               callback &&
-              callback(null, {
-                jsonrpc: '2.0',
-                id: 1,
-                result,
-              });
+                callback(null, {
+                  jsonrpc: '2.0',
+                  id: 1,
+                  result,
+                });
             },
           );
           const resolution = Resolution.fromWeb3Version1Provider(provider);
@@ -394,8 +428,8 @@ describe('Resolution', () => {
         });
 
         it('should work with webSocketProvider', async () => {
-        // web3-providers-ws has problems with type definitions
-        // We still prefer everything to be statically typed on our end for better mocking
+          // web3-providers-ws has problems with type definitions
+          // We still prefer everything to be statically typed on our end for better mocking
           const provider = new (Web3WsProvider as any)(
             protocolLink(ProviderProtocol.wss),
           ) as Web3WsProvider.WebsocketProvider;
@@ -421,7 +455,7 @@ describe('Resolution', () => {
             'mainnet',
           );
           const resolution = Resolution.fromEthersProvider(provider);
-          const eye = mockAsyncMethod(provider, 'call', params =>
+          const eye = mockAsyncMethod(provider, 'call', (params) =>
             Promise.resolve(caseMock(params, RpcProviderTestCases)),
           );
           const ethAddress = await resolution.addr('brad.crypto', 'ETH');
@@ -431,9 +465,12 @@ describe('Resolution', () => {
 
         it('should work with ethers default provider', async () => {
           // const provider = getDefaultProvider('mainnet');
-          const provider = new InfuraProvider('mainnet', '213fff28936343858ca9c5115eff1419');
+          const provider = new InfuraProvider(
+            'mainnet',
+            '213fff28936343858ca9c5115eff1419',
+          );
 
-          const eye = mockAsyncMethod(provider, 'call', params =>
+          const eye = mockAsyncMethod(provider, 'call', (params) =>
             Promise.resolve(caseMock(params, RpcProviderTestCases)),
           );
           const resolution = Resolution.fromEthersProvider(provider);
@@ -454,7 +491,10 @@ describe('Resolution', () => {
             provider,
             'sendAsync',
             (payload: JsonRpcPayload, callback: any) => {
-              const result = caseMock(payload.params?.[0], RpcProviderTestCases);
+              const result = caseMock(
+                payload.params?.[0],
+                RpcProviderTestCases,
+              );
               callback(undefined, {
                 jsonrpc: '2.0',
                 id: 1,
@@ -471,12 +511,15 @@ describe('Resolution', () => {
         describe('.All-get', () => {
           it('should be able to get logs with ethers default provider', async () => {
             // const provider = getDefaultProvider('mainnet', { quorum: 1 });
-            const provider = new InfuraProvider('mainnet', '213fff28936343858ca9c5115eff1419');
+            const provider = new InfuraProvider(
+              'mainnet',
+              '213fff28936343858ca9c5115eff1419',
+            );
 
-            const eye = mockAsyncMethod(provider, 'call', params =>
+            const eye = mockAsyncMethod(provider, 'call', (params) =>
               Promise.resolve(caseMock(params, RpcProviderTestCases)),
             );
-            const eye2 = mockAsyncMethod(provider, 'getLogs', params =>
+            const eye2 = mockAsyncMethod(provider, 'getLogs', (params) =>
               Promise.resolve(caseMock(params, RpcProviderTestCases)),
             );
 
@@ -486,14 +529,17 @@ describe('Resolution', () => {
             expectSpyToBeCalled([eye2], 2);
             expect(resp).toMatchObject({
               'gundb.username.value':
-              '0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c',
-              'ipfs.html.value': 'Qme54oEzRkgooJbCDr78vzKAWcv6DDEZqRhhDyDtzgrZP6',
+                '0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c',
+              'ipfs.html.value':
+                'Qme54oEzRkgooJbCDr78vzKAWcv6DDEZqRhhDyDtzgrZP6',
               'ipfs.redirect_domain.value':
-              'https://abbfe6z95qov3d40hf6j30g7auo7afhp.mypinata.cloud/ipfs/Qme54oEzRkgooJbCDr78vzKAWcv6DDEZqRhhDyDtzgrZP6',
-              'crypto.ETH.address': '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
+                'https://abbfe6z95qov3d40hf6j30g7auo7afhp.mypinata.cloud/ipfs/Qme54oEzRkgooJbCDr78vzKAWcv6DDEZqRhhDyDtzgrZP6',
+              'crypto.ETH.address':
+                '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
               'gundb.public_key.value':
-              'pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI',
-              'crypto.BTC.address': 'bc1q359khn0phg58xgezyqsuuaha28zkwx047c0c3y',
+                'pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI',
+              'crypto.BTC.address':
+                'bc1q359khn0phg58xgezyqsuuaha28zkwx047c0c3y',
             });
           });
 
@@ -503,10 +549,10 @@ describe('Resolution', () => {
               'mainnet',
             );
             const resolution = Resolution.fromEthersProvider(provider);
-            const eye = mockAsyncMethod(provider, 'call', params =>
+            const eye = mockAsyncMethod(provider, 'call', (params) =>
               Promise.resolve(caseMock(params, RpcProviderTestCases)),
             );
-            const eye2 = mockAsyncMethod(provider, 'getLogs', params =>
+            const eye2 = mockAsyncMethod(provider, 'getLogs', (params) =>
               Promise.resolve(caseMock(params, RpcProviderTestCases)),
             );
 
@@ -515,21 +561,27 @@ describe('Resolution', () => {
             expectSpyToBeCalled([eye2], 2);
             expect(resp).toMatchObject({
               'gundb.username.value':
-              '0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c',
-              'ipfs.html.value': 'Qme54oEzRkgooJbCDr78vzKAWcv6DDEZqRhhDyDtzgrZP6',
+                '0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c',
+              'ipfs.html.value':
+                'Qme54oEzRkgooJbCDr78vzKAWcv6DDEZqRhhDyDtzgrZP6',
               'ipfs.redirect_domain.value':
-              'https://abbfe6z95qov3d40hf6j30g7auo7afhp.mypinata.cloud/ipfs/Qme54oEzRkgooJbCDr78vzKAWcv6DDEZqRhhDyDtzgrZP6',
-              'crypto.ETH.address': '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
+                'https://abbfe6z95qov3d40hf6j30g7auo7afhp.mypinata.cloud/ipfs/Qme54oEzRkgooJbCDr78vzKAWcv6DDEZqRhhDyDtzgrZP6',
+              'crypto.ETH.address':
+                '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
               'gundb.public_key.value':
-              'pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI',
-              'crypto.BTC.address': 'bc1q359khn0phg58xgezyqsuuaha28zkwx047c0c3y',
+                'pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI',
+              'crypto.BTC.address':
+                'bc1q359khn0phg58xgezyqsuuaha28zkwx047c0c3y',
             });
           });
 
           it('should get standard keys from legacy resolver', async () => {
             // const provider = getDefaultProvider('mainnet');
-            const provider = new InfuraProvider('mainnet', '213fff28936343858ca9c5115eff1419');
-            const eye = mockAsyncMethod(provider, 'call', params =>
+            const provider = new InfuraProvider(
+              'mainnet',
+              '213fff28936343858ca9c5115eff1419',
+            );
+            const eye = mockAsyncMethod(provider, 'call', (params) =>
               Promise.resolve(caseMock(params, RpcProviderTestCases)),
             );
 
@@ -539,13 +591,15 @@ describe('Resolution', () => {
             expectSpyToBeCalled([eye], 2);
             expect(resp).toMatchObject({
               'crypto.BTC.address': '3NwuV8nVT2VKbtCs8evChdiW6kHTHcVpdn',
-              'crypto.ETH.address': '0x1C42088b82f6Fa5fB883A14240C4E066dDFf1517',
+              'crypto.ETH.address':
+                '0x1C42088b82f6Fa5fB883A14240C4E066dDFf1517',
               'crypto.LTC.address': 'MTnTNwKikiMi97Teq8XQRabL9SZ4HjnKNB',
               'crypto.ADA.address':
-              'DdzFFzCqrhsfc3MQvjsLr9BHkaFYeE7BotyTATdETRoSPj6QPiotK4xpcFZk66KVmtr87tvUFTcbTHZRkcdbMR5Ss6jCfzCVtFRMB7WE',
-              'ipfs.html.value': 'QmYqX8D8SkaF5YcpaWMyi5xM43UEteFiSNKYsjLcdvCWud',
+                'DdzFFzCqrhsfc3MQvjsLr9BHkaFYeE7BotyTATdETRoSPj6QPiotK4xpcFZk66KVmtr87tvUFTcbTHZRkcdbMR5Ss6jCfzCVtFRMB7WE',
+              'ipfs.html.value':
+                'QmYqX8D8SkaF5YcpaWMyi5xM43UEteFiSNKYsjLcdvCWud',
               'ipfs.redirect_domain.value':
-              'https://abbfe6z95qov3d40hf6j30g7auo7afhp.mypinata.cloud/ipfs/QmYqX8D8SkaF5YcpaWMyi5xM43UEteFiSNKYsjLcdvCWud',
+                'https://abbfe6z95qov3d40hf6j30g7auo7afhp.mypinata.cloud/ipfs/QmYqX8D8SkaF5YcpaWMyi5xM43UEteFiSNKYsjLcdvCWud',
             });
           });
         });
@@ -557,16 +611,20 @@ describe('Resolution', () => {
             const resolution = new Resolution();
             const spies = mockAsyncMethods(resolution.zns, {
               allRecords: {
-                'crypto.BCH.address': 'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6',
+                'crypto.BCH.address':
+                  'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6',
                 'crypto.BTC.address': '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB',
                 'crypto.DASH.address': 'XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j',
-                'crypto.ETH.address': '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
+                'crypto.ETH.address':
+                  '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
                 'crypto.LTC.address': 'LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL',
                 'crypto.XMR.address':
-              '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d',
+                  '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d',
                 'crypto.ZEC.address': 't1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV',
-                'crypto.ZIL.address': 'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
-                'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
+                'crypto.ZIL.address':
+                  'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
+                'ipfs.html.value':
+                  'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
                 'ipfs.redirect_domain.value': 'www.unstoppabledomains.com',
               },
             });
@@ -583,8 +641,8 @@ describe('Resolution', () => {
                 resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
                 records: {
                   [standardKeys.gundb_username]:
-                  '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c',
-                }
+                    '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c',
+                },
               },
             });
             const gundb = await resolution.chatId('homecakes.crypto');
@@ -605,9 +663,10 @@ describe('Resolution', () => {
                 resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
                 owner: '0x6EC0DEeD30605Bcd19342f3c30201DB263291589',
                 records: {
-                  [standardKeys.validation_twitter_username]:'0xcd2655d9557e5535313b47107fa8f943eb1fec4da6f348668062e66233dde21b413784c4060340f48da364311c6e2549416a6a23dc6fbb48885382802826b8111b',
-                  [standardKeys.twitter_username]: 'derainberk'
-                }
+                  [standardKeys.validation_twitter_username]:
+                    '0xcd2655d9557e5535313b47107fa8f943eb1fec4da6f348668062e66233dde21b413784c4060340f48da364311c6e2549416a6a23dc6fbb48885382802826b8111b',
+                  [standardKeys.twitter_username]: 'derainberk',
+                },
               },
             });
             const twitterHandle = await resolution.twitter(
@@ -619,31 +678,66 @@ describe('Resolution', () => {
 
           it('should throw unsupported method', async () => {
             const resolution = new Resolution();
-            expectResolutionErrorCode(resolution.twitter('ryan.eth'), ResolutionErrorCode.UnsupportedMethod);
+            expectResolutionErrorCode(
+              resolution.twitter('ryan.eth'),
+              ResolutionErrorCode.UnsupportedMethod,
+            );
           });
         });
       });
     });
   });
 
+  describe('.usdt', () => {
+    it('works', async () => {
+      const eyes = mockAsyncMethods(resolution.cns!, {
+        get: {
+          owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
+          resolver: '0xb66dce2da6afaaa98f2013446dbcb0f4b0ab2842',
+          records: {
+            'crypto.USDT.version.ERC20.address':
+              '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
+            'crypto.USDT.version.TRON.address':
+              'TRffnpwigaxr1QHNhzDmzQoQBJTmpfo5mD',
+          },
+        },
+      });
+
+      expect(
+        await resolution.usdt(CryptoDomainWithUSDTAddresses, 'ERC20'),
+      ).toEqual('0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2');
+      expect(
+        await resolution.usdt(CryptoDomainWithUSDTAddresses, 'TRON'),
+      ).toEqual('TRffnpwigaxr1QHNhzDmzQoQBJTmpfo5mD');
+      expectSpyToBeCalled(eyes);
+    });
+  });
+
   describe('.records', () => {
     it('works', async () => {
       const resolution = new Resolution();
-      CryptoDomainWithAdaBchAddresses
+      CryptoDomainWithAdaBchAddresses;
       const eyes = mockAsyncMethods(resolution.cns!, {
         get: {
           owner: '0x6EC0DEeD30605Bcd19342f3c30201DB263291589',
           resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
           records: {
-            'crypto.ADA.address': 'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
+            'crypto.ADA.address':
+              'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
             'crypto.ETH.address': '',
           },
         },
       });
-      expect(await resolution.records(CryptoDomainWithAdaBchAddresses, ['crypto.ADA.address', 'crypto.ETH.address'])).toEqual({
-        "crypto.ADA.address": "DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj",
-        "crypto.ETH.address": "",
-      })
+      expect(
+        await resolution.records(CryptoDomainWithAdaBchAddresses, [
+          'crypto.ADA.address',
+          'crypto.ETH.address',
+        ]),
+      ).toEqual({
+        'crypto.ADA.address':
+          'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
+        'crypto.ETH.address': '',
+      });
       expectSpyToBeCalled([...eyes]);
     });
   });

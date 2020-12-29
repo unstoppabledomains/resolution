@@ -2,9 +2,15 @@ import nock from 'nock';
 import _ from 'lodash';
 import { Dictionary } from '../types';
 import mockData from './mockData.json';
-import ResolutionError, { ResolutionErrorCode } from '../errors/resolutionError';
-import ConfigurationError, { ConfigurationErrorCode } from '../errors/configurationError';
-import DnsRecordsError, { DnsRecordsErrorCode } from '../errors/dnsRecordsError';
+import ResolutionError, {
+  ResolutionErrorCode,
+} from '../errors/resolutionError';
+import ConfigurationError, {
+  ConfigurationErrorCode,
+} from '../errors/configurationError';
+import DnsRecordsError, {
+  DnsRecordsErrorCode,
+} from '../errors/dnsRecordsError';
 export const MainnetUrl = 'https://mainnet.infura.io';
 export const ZilliqaUrl = 'https://api.zilliqa.com';
 export const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
@@ -14,7 +20,9 @@ export const CryptoDomainWithEmptyResolver = 'reseller-test-mago017.crypto';
 export const CryptoDomainWithIpfsRecords = 'reseller-test-paul019.crypto';
 export const CryptoDomainWithEmail = 'reseller-test-paul019.crypto';
 export const CryptoDomainWithAdaBchAddresses = 'reseller-test-mago0.crypto';
-export const CryptoDomainWithTwitterVerification = 'ijustwannatestsomething2.crypto';
+export const CryptoDomainWithTwitterVerification =
+  'ijustwannatestsomething2.crypto';
+export const CryptoDomainWithUSDTAddresses = 'qwdqwdqwdw.crypto';
 
 try {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -24,7 +32,11 @@ try {
   console.warn('dotenv is not installed');
 }
 
-export function mockAsyncMethod(object: any, method: string, value: any): jest.SpyInstance {
+export function mockAsyncMethod(
+  object: any,
+  method: string,
+  value: any,
+): jest.SpyInstance {
   const spy = jest.spyOn(object, method);
   if (!isLive()) {
     if (value instanceof Function) {
@@ -36,11 +48,13 @@ export function mockAsyncMethod(object: any, method: string, value: any): jest.S
     }
   }
 
-
   return spy;
 }
 
-export function mockAsyncMethods(object: any, methods: Dictionary<any>): jest.SpyInstance[] {
+export function mockAsyncMethods(
+  object: any,
+  methods: Dictionary<any>,
+): jest.SpyInstance[] {
   return Object.entries(methods).map((method) =>
     mockAsyncMethod(object, method[0], method[1]),
   );
@@ -58,10 +72,13 @@ export function pendingInLive(): void {
   }
 }
 
-export function expectSpyToBeCalled(spies: jest.SpyInstance[], times?: number ): void {
+export function expectSpyToBeCalled(
+  spies: jest.SpyInstance[],
+  times?: number,
+): void {
   if (!isLive()) {
     spies.forEach((spy) => {
-      times ? expect(spy).toBeCalledTimes(times) : expect(spy).toBeCalled()
+      times ? expect(spy).toBeCalledTimes(times) : expect(spy).toBeCalled();
     });
   }
 }
@@ -87,7 +104,10 @@ export async function expectDnsRecordErrorCode(
   return expectError(callback, code, DnsRecordsError);
 }
 
-type ErrorClass = typeof ResolutionError | typeof ConfigurationError | typeof DnsRecordsError
+type ErrorClass =
+  | typeof ResolutionError
+  | typeof ConfigurationError
+  | typeof DnsRecordsError;
 
 async function expectError(
   callback: Promise<any> | Function,
@@ -102,7 +122,6 @@ async function expectError(
       } else {
         resolve(result);
       }
-
     });
   }
 
@@ -117,7 +136,6 @@ async function expectError(
       } else {
         throw error;
       }
-
     },
   );
 }
@@ -134,14 +152,14 @@ export function mockAPICalls(testName: string, url = MainnetUrl): void {
     switch (METHOD) {
     case 'POST': {
       nock(url)
-        // .log()
+      // .log()
         .post('/', JSON.stringify(REQUEST), undefined)
         .reply(200, JSON.stringify(RESPONSE));
       break;
     }
     default: {
       nock(url)
-        // .log()
+      // .log()
         .get(REQUEST as string, undefined, undefined)
         .reply(200, RESPONSE);
     }
@@ -155,26 +173,36 @@ export function mockAPICalls(testName: string, url = MainnetUrl): void {
  * or the one with attached INFURA SECRET key from
  * UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID env variable if any
  */
-export function protocolLink(providerProtocol: ProviderProtocol = ProviderProtocol.http): string {
+export function protocolLink(
+  providerProtocol: ProviderProtocol = ProviderProtocol.http,
+): string {
   // eslint-disable-next-line no-undef
   const secret = process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID;
   const protocolMap = {
-    [ProviderProtocol.http]: secret ? `https://mainnet.infura.io/v3/${secret}` : 'https://main-rpc.linkpool.io',
-    [ProviderProtocol.wss]: secret ? `wss://mainnet.infura.io/ws/v3/${secret}` : 'wss://main-rpc.linkpool.io/ws',
+    [ProviderProtocol.http]: secret
+      ? `https://mainnet.infura.io/v3/${secret}`
+      : 'https://main-rpc.linkpool.io',
+    [ProviderProtocol.wss]: secret
+      ? `wss://mainnet.infura.io/ws/v3/${secret}`
+      : 'wss://main-rpc.linkpool.io/ws',
   };
   return protocolMap[providerProtocol];
 }
 
 export enum ProviderProtocol {
-  'http', 'wss'
+  'http',
+  'wss',
 }
 
-export const caseMock = <T, U>(params: T, cases: { request: T, response: U }[]): U => {
-  for (const {request, response} of cases) {
+export const caseMock = <T, U>(
+  params: T,
+  cases: { request: T; response: U }[],
+): U => {
+  for (const { request, response } of cases) {
     if (_.isEqual(params, request)) {
       return response;
     }
   }
-  
+
   throw new Error(`got unexpected params ${JSON.stringify(params)}`);
-}
+};

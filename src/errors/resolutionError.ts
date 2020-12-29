@@ -26,6 +26,7 @@ export enum ResolutionErrorCode {
   RecordNotFound = 'RecordNotFound',
   ServiceProviderError = 'ServiceProviderError',
   InvalidTwitterVerification = 'InvalidTwitterVerification',
+  IncorrectMultichainCurrencyMethod = 'IncorrectMultichainCurrencyMethod',
 }
 
 /**
@@ -68,6 +69,10 @@ const HandlersByCode = {
   [ResolutionErrorCode.ServiceProviderError]: (params: {
     providerMessage?: string;
   }) => `< ${params.providerMessage} >`,
+  [ResolutionErrorCode.IncorrectMultichainCurrencyMethod]: (params: {
+    currencyTicker: string;
+  }) =>
+    `Incorrect method for multichain currency ${params.currencyTicker.toUpperCase()}. Use .${params.currencyTicker.toLowerCase()}() instead`,
 };
 
 /**
@@ -81,6 +86,7 @@ const HandlersByCode = {
  * - UnsupportedCurrency - currency is not supported
  * - IncorrectResolverInterface - ResolverInterface is incorrected
  * - RecordNotFound - No record was found
+ * - IncorrectMultichainCurrencyMethod - method does not support multi-chain resolution
  * @param domain - Domain name that was being used
  * @param method
  */

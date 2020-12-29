@@ -91,11 +91,9 @@ export default class Resolution {
       if (cns) {
         this.cns = new Cns(cns);
       }
-
     } else {
       this.api = new UdApi(api);
     }
-
   }
 
   /**
@@ -189,6 +187,14 @@ export default class Resolution {
     console.warn(
       'Resolution#address is deprecated since v1.7.0, use Resolution#addr instead',
     );
+    if (currencyTicker.toUpperCase() === 'USDT') {
+      throw new ResolutionError(
+        ResolutionErrorCode.IncorrectMultichainCurrencyMethod,
+        {
+          currencyTicker: 'USDT',
+        },
+      );
+    }
     domain = this.prepareDomain(domain);
     try {
       return await this.addressOrThrow(domain, currencyTicker);
@@ -198,7 +204,6 @@ export default class Resolution {
       } else {
         throw error;
       }
-
     }
   }
 
@@ -210,10 +215,33 @@ export default class Resolution {
    * @throws [[ResolutionError]] if address is not found
    * @returns A promise that resolves in an address
    */
-  async addr(domain: string, currrencyTicker: string): Promise<string> {
+  async addr(domain: string, currencyTicker: string): Promise<string> {
+    if (currencyTicker.toUpperCase() === 'USDT') {
+      throw new ResolutionError(
+        ResolutionErrorCode.IncorrectMultichainCurrencyMethod,
+        {
+          currencyTicker: currencyTicker.toUpperCase(),
+        },
+      );
+    }
     return await this.record(
       domain,
-      `crypto.${currrencyTicker.toUpperCase()}.address`,
+      `crypto.${currencyTicker.toUpperCase()}.address`,
+    );
+  }
+
+  /**
+   * Resolves given domain name to a specific usdt version if exists
+   * @async
+   * @param domain - domain name to be resolved
+   * @param version - version for USDT address like ERC20, TRON, EOS, OMNI
+   * @throws [[ResolutionError]] if address is not found
+   * @returns A promise that resolves in an address
+   */
+  async usdt(domain: string, version: string): Promise<string> {
+    return await this.record(
+      domain,
+      `crypto.USDT.version.${version.toUpperCase()}.address`,
     );
   }
 
@@ -265,7 +293,11 @@ export default class Resolution {
    */
   async ipfsHash(domain: string): Promise<string> {
     domain = this.prepareDomain(domain);
-    return await this.getPreferableNewRecord(domain, 'dweb.ipfs.hash', 'ipfs.html.value');
+    return await this.getPreferableNewRecord(
+      domain,
+      'dweb.ipfs.hash',
+      'ipfs.html.value',
+    );
   }
 
   /**
@@ -439,7 +471,6 @@ export default class Resolution {
     } else {
       return options.prefix ? '0x' + hash : hash;
     }
-
   }
 
   /**
@@ -504,20 +535,31 @@ export default class Resolution {
 
   private getDnsRecordKeys(types: DnsRecordType[]): string[] {
     const records = ['dns.ttl'];
-    types.forEach(type => {
+    types.forEach((type) => {
       records.push(`dns.${type}`);
       records.push(`dns.${type}.ttl`);
     });
     return records;
   }
 
-  private async getPreferableNewRecord(domain: string, newRecord: string, oldRecord: string): Promise<string> {
-    const records = await this.records(domain, [newRecord, oldRecord]) as Record<string, string>;
-    return NamingService.ensureRecordPresence(domain, newRecord, records[newRecord] || records[oldRecord]);
+  private async getPreferableNewRecord(
+    domain: string,
+    newRecord: string,
+    oldRecord: string,
+  ): Promise<string> {
+    const records = (await this.records(domain, [
+      newRecord,
+      oldRecord,
+    ])) as Record<string, string>;
+    return NamingService.ensureRecordPresence(
+      domain,
+      newRecord,
+      records[newRecord] || records[oldRecord],
+    );
   }
 
   private getNamingMethod(domain: string): NamingService | undefined {
-    return this.getResolutionMethods().find(method =>
+    return this.getResolutionMethods().find((method) =>
       method.isSupportedDomain(domain),
     );
   }
@@ -526,7 +568,7 @@ export default class Resolution {
     return (this.blockchain
       ? ([this.ens, this.zns, this.cns] as NamingService[])
       : ([this.api] as NamingService[])
-    ).filter(v => v);
+    ).filter((v) => v);
   }
 
   private getNamingMethodOrThrow(domain: string): NamingService {
@@ -541,7 +583,7 @@ export default class Resolution {
   }
 
   private findNamingService(name: NamingServiceName): NamingService {
-    const service = this.getResolutionMethods().find(m => m.name === name);
+    const service = this.getResolutionMethods().find((m) => m.name === name);
     if (!service) {
       throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
         method: name,
