@@ -194,3 +194,10 @@ export type DomainData = {
   resolver: string,
   records: CryptoRecords,
 };
+
+export enum TickerVersion {
+  ERC20 = "ERC20",
+  TRON = "TRON",
+  EOS = "EOS",
+  OMNI = "OMNI"
+}

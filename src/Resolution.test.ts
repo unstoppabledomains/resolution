@@ -3,13 +3,13 @@ import Resolution, {
   ResolutionErrorCode,
   UnclaimedDomainResponse,
 } from './index';
-import { DnsRecordType, JsonRpcPayload } from './publicTypes';
-import { JsonRpcProvider, getDefaultProvider, InfuraProvider } from '@ethersproject/providers';
+import { TickerVersion, DnsRecordType, JsonRpcPayload } from './publicTypes';
+import { JsonRpcProvider, InfuraProvider } from '@ethersproject/providers';
 import Web3HttpProvider from 'web3-providers-http';
 import Web3WsProvider from 'web3-providers-ws';
 import Web3V027Provider from 'web3-0.20.7/lib/web3/httpprovider';
 import {
-  CryptoDomainWithAdaBchAddresses,
+  CryptoDomainWithAdaBchAddresses, CryptoDomainWithUsdtMultiChainRecords,
 } from './tests/helpers';
 
 import {
@@ -321,11 +321,11 @@ describe('Resolution', () => {
           const dnsRecords = await resolution.dns("someTestDomain.crypto", [DnsRecordType.A, DnsRecordType.AAAA]);
           expectSpyToBeCalled(spies);
           expect(dnsRecords).toStrictEqual(
-          [
-            { TTL: 90, data: '10.0.0.1', type: 'A' },
-            { TTL: 90, data: '10.0.0.2', type: 'A' },
-            { TTL: 128, data: '10.0.0.120', type: 'AAAA' }
-          ]
+            [
+              { TTL: 90, data: '10.0.0.1', type: 'A' },
+              { TTL: 90, data: '10.0.0.2', type: 'A' },
+              { TTL: 128, data: '10.0.0.120', type: 'AAAA' }
+            ]
           );
         })
       });
@@ -362,7 +362,62 @@ describe('Resolution', () => {
           expectSpyToBeCalled(eyes, 2);
           expect(capital).toStrictEqual(lower);
         });
+
+        describe('.multichain Usdt', () => {
+          it('should work with usdt erc20 multichain', async () => {
+            const erc20Spy = mockAsyncMethod(resolution.cns, "get", {
+              resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
+              owner: '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+              records: {
+                [standardKeys.USDT_ERC20]: '0xe7474D07fD2FA286e7e0aa23cd107F8379085037'
+              }
+            });
+            const erc20 = await resolution.usdt(CryptoDomainWithUsdtMultiChainRecords, TickerVersion.ERC20);
+            expect(erc20).toBe('0xe7474D07fD2FA286e7e0aa23cd107F8379085037');
+            expect(erc20Spy).toBeCalled();
+          });
+
+          it('should work with usdt tron chain', async () => {
+            const tronSpy = mockAsyncMethod(resolution.cns, "get", {
+              resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
+              owner: '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+              records: {
+                [standardKeys.USDT_TRON]: 'TNemhXhpX7MwzZJa3oXvfCjo5pEeXrfN2h'
+              }
+            });
+            const tron = await resolution.usdt(CryptoDomainWithUsdtMultiChainRecords, TickerVersion.TRON);
+            expect(tron).toBe('TNemhXhpX7MwzZJa3oXvfCjo5pEeXrfN2h');
+            expect(tronSpy).toBeCalled();
+          });
+
+          it('should work with usdt omni chain', async () => {
+            const omniSpy = mockAsyncMethod(resolution.cns, "get", {
+              resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
+              owner: '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+              records: {
+                [standardKeys.USDT_OMNI]: '19o6LvAdCPkjLi83VsjrCsmvQZUirT4KXJ'
+              }
+            });
+            const omni = await resolution.usdt(CryptoDomainWithUsdtMultiChainRecords, TickerVersion.OMNI);
+            expect(omni).toBe('19o6LvAdCPkjLi83VsjrCsmvQZUirT4KXJ');
+            expect(omniSpy).toBeCalled();
+          });
+
+          it('should work with usdt eos chain', async () => {
+            const eosSpy = mockAsyncMethod(resolution.cns, "get", {
+              resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
+              owner: '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+              records: {
+                [standardKeys.USDT_EOS]: 'letsminesome'
+              }
+            });
+            const eos = await resolution.usdt(CryptoDomainWithUsdtMultiChainRecords, TickerVersion.EOS);
+            expect(eosSpy).toBeCalled();
+            expect(eos).toBe('letsminesome');
+          });
+        });
       });
+        
 
       describe('.Providers', () => {
         it('should work with web3HttpProvider', async () => {

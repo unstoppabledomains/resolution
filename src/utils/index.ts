@@ -1,3 +1,5 @@
+import { TickerVersion } from "../publicTypes";
+import { NullAddresses } from "../types";
 import Contract from "./contract";
 /**
  * Parses object in format { "key.key2.key3" : value } into { key: { key2: {key3: value } } }
@@ -89,4 +91,17 @@ export function isStringArray(value: any): value is string[] {
     return value.every(item => typeof item === "string");
   }
   return false
+}
+
+export function isNullAddress(
+  key: string | null | undefined,
+): key is undefined | null {
+  if (!key) {
+    return true;
+  }
+  return Object.values(NullAddresses).includes(key);
+}
+
+export function isSupportedChainVersion(obj: any): obj is TickerVersion {
+  return Object.values(TickerVersion).includes(obj);
 }

@@ -1,3 +1,5 @@
+import { TickerVersion } from "./publicTypes";
+
 export type Dictionary<T> = { [k: string]: T };
 export type EnsNetworkIdMap = {
   [key: number]: string;
@@ -95,12 +97,5 @@ export enum NullAddresses {
   '0x0000000000000000000000000000000000000000',
   '0x0000000000000000000000000000000000000000000000000000000000000000',
 }
-export function isNullAddress(
-  key: string | null | undefined,
-): key is undefined | null {
-  if (!key) {
-    return true;
-  }
-  return Object.values(NullAddresses).includes(key);
-}
+
 export const EthCoinIndex = '60';

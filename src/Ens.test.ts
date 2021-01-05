@@ -12,7 +12,7 @@ import {
   expectConfigurationErrorCode,
 } from './tests/helpers';
 import { ConfigurationErrorCode } from './errors/configurationError';
-import { NamingServiceName } from './publicTypes';
+import { NamingServiceName, TickerVersion } from './publicTypes';
 let resolution: Resolution;
 
 beforeEach(() => {
@@ -505,6 +505,13 @@ describe('ENS', () => {
       );
       expectSpyToBeCalled(spies);
     });
+
+    it('usdt method s not supported by ens', async () => {
+      await expectResolutionErrorCode(
+        resolution.usdt('anyensdomain.eth', TickerVersion.EOS),
+        ResolutionErrorCode.UnsupportedMethod
+      );
+    })
   });
 
   describe('.Hashing', () => {

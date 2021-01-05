@@ -4,8 +4,8 @@ import {
   toBech32Address,
   toChecksumAddress,
 } from './zns/utils';
-import { invert, set } from './utils';
-import { Dictionary, ZnsResolution, isNullAddress, nodeHash } from './types';
+import { invert, set, isNullAddress } from './utils';
+import { Dictionary, ZnsResolution, nodeHash } from './types';
 import {
   NamingServiceName,
   ResolutionError,
