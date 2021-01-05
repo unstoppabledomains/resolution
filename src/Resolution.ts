@@ -22,11 +22,11 @@ import {
   CryptoRecords,
   TickerVersion,
 } from './publicTypes';
-import { isSupportedChainVersion, nodeHash } from './types';
+import { nodeHash } from './types';
 import { EthersProvider } from './publicTypes';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import NamingService from './NamingService';
-import { signedInfuraLink } from './utils';
+import { signedInfuraLink, isSupportedChainVersion } from './utils';
 import { Eip1993Factories } from './utils/Eip1993Factories';
 import DnsUtils from './DnsUtils';
 

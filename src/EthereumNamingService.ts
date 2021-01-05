@@ -3,11 +3,10 @@ import NamingService from './NamingService';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import {
   BlockhanNetworkUrlMap,
-  isNullAddress,
   NetworkIdMap,
   nodeHash,
 } from './types';
-import { invert } from './utils';
+import { invert, isNullAddress } from './utils';
 import Contract from './utils/contract';
 import { NamingServiceName, SourceDefinition, ResolutionMethod } from './publicTypes';
 

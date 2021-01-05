@@ -1,11 +1,11 @@
 import { EthereumNamingService } from './EthereumNamingService';
-import { ProxyReaderMap, isNullAddress } from './types';
+import { ProxyReaderMap } from './types';
 import { default as proxyReaderAbi } from './cns/contract/proxyReader';
 import { default as resolverInterface } from './cns/contract/resolver';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import Contract from './utils/contract';
 import standardKeys from './utils/standardKeys';
-import { getStartingBlock, isLegacyResolver } from './utils';
+import { getStartingBlock, isLegacyResolver, isNullAddress } from './utils';
 import {
   SourceDefinition,
   NamingServiceName,

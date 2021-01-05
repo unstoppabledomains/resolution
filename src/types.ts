@@ -97,17 +97,5 @@ export enum NullAddresses {
   '0x0000000000000000000000000000000000000000',
   '0x0000000000000000000000000000000000000000000000000000000000000000',
 }
-export function isNullAddress(
-  key: string | null | undefined,
-): key is undefined | null {
-  if (!key) {
-    return true;
-  }
-  return Object.values(NullAddresses).includes(key);
-}
-
-export function isSupportedChainVersion(obj: any): obj is TickerVersion {
-  return Object.values(TickerVersion).includes(obj);
-}
 
 export const EthCoinIndex = '60';
