@@ -1,3 +1,5 @@
+## 1.16.0
+* Fixed bug with infura.com -> infura.io
 ## 1.12.0
 * Introduced Resolution#usdt(domain: string, version: TickerVersion) which resolves in various USDT records from different chains
 * Introduced TickerVersion enum which holds all values for version parametr ar Resolution#usdt
