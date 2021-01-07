@@ -60,8 +60,8 @@ describe('Resolution', () => {
 
     it('should get a valid resolution instance', async () => {
       const resolution = Resolution.infura('api-key');
-      expect(resolution.ens?.url).toBe(`https://mainnet.infura.com/v3/api-key`);
-      expect(resolution.cns?.url).toBe(`https://mainnet.infura.com/v3/api-key`);
+      expect(resolution.ens?.url).toBe(`https://mainnet.infura.io/v3/api-key`);
+      expect(resolution.cns?.url).toBe(`https://mainnet.infura.io/v3/api-key`);
     });
 
     it('provides empty response constant', async () => {

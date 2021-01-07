@@ -1,6 +1,6 @@
-import { TickerVersion } from "../publicTypes";
-import { NullAddresses } from "../types";
-import Contract from "./contract";
+import { TickerVersion } from '../publicTypes';
+import { NullAddresses } from '../types';
+import Contract from './contract';
 /**
  * Parses object in format { "key.key2.key3" : value } into { key: { key2: {key3: value } } }
  * @param object object to parse
@@ -23,8 +23,9 @@ export function set<T>(object: T, key: string, value: any): T {
  * Should invert the object (keys becomes values and values becomes keys)
  * @param object
  */
-export function invert(object: Record<string, string | number>): Record<string, string> {
-
+export function invert(
+  object: Record<string, string | number>,
+): Record<string, string> {
   const returnee = {};
 
   for (const key in object) {
@@ -37,11 +38,8 @@ export function invert(object: Record<string, string | number>): Record<string, 
   return returnee;
 }
 
-export function signedInfuraLink(
-  infura: string,
-  network = 'mainnet',
-): string {
-  return `https://${network}.infura.com/v3/${infura}`;
+export function signedInfuraLink(infura: string, network = 'mainnet'): string {
+  return `https://${network}.infura.io/v3/${infura}`;
 }
 
 // Need more sophisticated way to determine if the contract is Legacy
@@ -64,7 +62,10 @@ export function isWellKnownLegacyResolver(resolverAddress: string): boolean {
 }
 
 export function isUpToDateResolver(resolverAddress: string): boolean {
-  return resolverAddress.toLowerCase() === '0xb66dce2da6afaaa98f2013446dbcb0f4b0ab2842';
+  return (
+    resolverAddress.toLowerCase() ===
+    '0xb66dce2da6afaaa98f2013446dbcb0f4b0ab2842'
+  );
 }
 
 export function hexToBytes(hexString: string): number[] {
@@ -78,19 +79,25 @@ export function hexToBytes(hexString: string): number[] {
 }
 
 /** @internal */
-const CRYPTO_RESOLVER_ADVANCED_EVENTS_STARTING_BLOCK = "0x960844";
+const CRYPTO_RESOLVER_ADVANCED_EVENTS_STARTING_BLOCK = '0x960844';
 
-export async function getStartingBlock(contract: Contract, tokenId: string): Promise<string> {
-  const logs =  await contract.fetchLogs("ResetRecords", tokenId);
+export async function getStartingBlock(
+  contract: Contract,
+  tokenId: string,
+): Promise<string> {
+  const logs = await contract.fetchLogs('ResetRecords', tokenId);
   const lastResetEvent = logs[logs.length - 1];
-  return lastResetEvent?.blockNumber || CRYPTO_RESOLVER_ADVANCED_EVENTS_STARTING_BLOCK;
+  return (
+    lastResetEvent?.blockNumber ||
+    CRYPTO_RESOLVER_ADVANCED_EVENTS_STARTING_BLOCK
+  );
 }
 
 export function isStringArray(value: any): value is string[] {
   if (value instanceof Array) {
-    return value.every(item => typeof item === "string");
+    return value.every(item => typeof item === 'string');
   }
-  return false
+  return false;
 }
 
 export function isNullAddress(
