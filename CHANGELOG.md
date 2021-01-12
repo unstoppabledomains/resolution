@@ -1,3 +1,6 @@
+## 1.12.1
+* Fixed Fetch error display when used in browser env
+
 ## 1.12.0
 * Introduced Resolution#usdt(domain: string, version: TickerVersion) which resolves in various USDT records from different chains
 * Introduced TickerVersion enum which holds all values for version parametr ar Resolution#usdt
