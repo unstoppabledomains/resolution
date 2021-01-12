@@ -40,13 +40,25 @@ export default class FetchProvider extends BaseConnection implements Provider {
       });
       return await response.json();
     } catch (error) {
-      if (error instanceof FetchError) {
-        throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
-          method: this.name,
-        });
-      } else {
-        throw error;
+      switch(this.getEnv()) {
+        case "NODE": {
+          if (error instanceof FetchError) {
+            throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
+              method: this.name,
+            });
+          }
+          break ;
+        }
+        case "BROWSER": {
+          if (error.name === "TypeError") {
+            throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
+              method: this.name,
+            });
+          }
+          break ;
+        }
       }
+      throw error;
     }
   }
 }

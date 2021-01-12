@@ -12,9 +12,11 @@ export default abstract class BaseConnection {
       }
     }
 
-
-
     return false;
+  }
+
+  protected getEnv(): "NODE" | "BROWSER" {
+    return this.isNode() ? "NODE" : "BROWSER";
   }
 
   protected async fetch(url: string, options: {body?: string, headers?: Record<string, string>, method?: string}): Promise<FetchResponse | Response> {
