@@ -1,5 +1,3 @@
-import { TickerVersion } from "./publicTypes";
-
 export type Dictionary<T> = { [k: string]: T };
 export type EnsNetworkIdMap = {
   [key: number]: string;

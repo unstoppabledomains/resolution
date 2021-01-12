@@ -79,11 +79,11 @@ import {
     recordKey: () => tryInfo(async () => await resolution.record(domain, options.recordKey), response, options.recordKey),
     gunPk: () => tryInfo(async () => await resolution.chatPk(domain), response, 'gundbPk'),
     all: () => tryInfo(async () => {
-     const records = await resolution.allRecords(domain);
-     Object.entries(records).forEach(([key, value]) => 
-      (key && !value ) && (delete records[key])
-     )
-     return records;
+      const records = await resolution.allRecords(domain);
+      Object.entries(records).forEach(([key, value]) => 
+        (key && !value ) && (delete records[key])
+      )
+      return records;
     }, response, 'records'),
     twitter: () => tryInfo(async () => await resolution.cns?.twitter(domain), response, 'twitter'),
   };
