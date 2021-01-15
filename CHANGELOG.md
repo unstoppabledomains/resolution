@@ -1,3 +1,5 @@
+## 1.16.2
+* Add support of USDT for CLI tool. Try `resolution --usdt-versions OMNI,ERC20 -d udtestdev-usdt.crypto` command  
 ## 1.16.1
 * Fixed Fetch error display when used in browser env
 ## 1.16.0
