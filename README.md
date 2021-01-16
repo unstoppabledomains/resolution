@@ -11,7 +11,7 @@ Resolution is a library for interacting with blockchain domain names. It can be 
 
 Resolution is primarily built and maintained by [Unstoppable Domains](https://unstoppabledomains.com/).
 
-Resoultion supports decentralized domains across three main zones:
+Resolution supports decentralized domains across three main zones:
 
 - Crypto Name Service (CNS)
   - `.crypto`
