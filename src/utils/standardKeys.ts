@@ -21,6 +21,7 @@ export default {
   ZEC: 'crypto.ZEC.address',
   ADA: 'crypto.ADA.address',
   EOS: 'crypto.EOS.address',
+  TLOS: 'crypto.TLOS.address',
   XLM: 'crypto.XLM.address',
   BNB: 'crypto.BNB.address',
   BTG: 'crypto.BTG.address',
