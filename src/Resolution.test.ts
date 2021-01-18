@@ -582,7 +582,6 @@ describe('Resolution', () => {
           });
 
           it('should get standard keys from legacy resolver', async () => {
-            // const provider = getDefaultProvider('mainnet');
             const provider = new InfuraProvider('mainnet', '213fff28936343858ca9c5115eff1419');
             const eye = mockAsyncMethod(provider, 'call', params =>
               Promise.resolve(caseMock(params, RpcProviderTestCases)),

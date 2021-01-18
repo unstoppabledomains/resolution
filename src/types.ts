@@ -53,6 +53,7 @@ export interface EventFilter {
   toBlock?: string;
 }
 export type RpcProviderTestCase = {
+  name?: string;
   request: RpcProviderRequestBody;
   response: string | RpcProviderLogEntry[];
 }[];
