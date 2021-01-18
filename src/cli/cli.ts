@@ -6,6 +6,7 @@ import {
   commaSeparatedList,
   tryInfo,
 } from './cli-helpers.js';
+import { TickerVersion } from '../publicTypes';
 
 (async () => {
   program
@@ -16,6 +17,7 @@ import {
       'comma separated list of currency tickers',
       commaSeparatedList,
     )
+    .option('--usdt-versions <usdtVersions>', 'comma separated list of USDT token versions (OMNI, TRON, ERC20, EOS)', commaSeparatedList)
     .option('-s, --service', 'returns you a service name from the domain')
     .option('-i, --ipfs', 'get IpfsHash')
     .option('-r, --resolver', 'get resolver address')
@@ -91,7 +93,7 @@ import {
   const resolutionProcess: Promise<boolean>[] = [];
   // Execute resolution for each currency
   if (options.currencies) {
-    options.currencies.forEach(async (currency:string) => {
+    options.currencies.forEach((currency:string) => {
       resolutionProcess.push(
         tryInfo(
           async () => await resolution.addr(domain, currency),
@@ -101,6 +103,18 @@ import {
       );
     });
     delete options.currencies;
+  }
+  if (options.usdtVersions) {
+    options.usdtVersions.forEach((usdtVersion:string) => {
+      resolutionProcess.push(
+        tryInfo(
+          async () => await resolution.usdt(domain, usdtVersion as TickerVersion),
+          response,
+          usdtVersion,
+        ),
+      );
+    });
+    delete options.usdtVersions;
   }
   delete options.ethereumUrl;
   // Execute the rest of options
