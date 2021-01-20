@@ -1,3 +1,5 @@
+## 1.17.0
+* Add support for TLOS
 ## 1.16.2
 * Add support of USDT for CLI tool. Try `resolution --usdt-versions OMNI,ERC20 -d udtestdev-usdt.crypto` command  
 ## 1.16.1
