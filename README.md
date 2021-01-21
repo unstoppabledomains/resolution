@@ -7,9 +7,16 @@
 [![Unstoppable Domains Documentation](https://img.shields.io/badge/Documentation-unstoppabledomains.com-blue)](https://docs.unstoppabledomains.com/)
 [![Get help on Discord](https://img.shields.io/badge/Get%20help%20on-Discord-blueviolet)](https://discord.gg/b6ZVxSZ9Hn)
 
-Resolution is a library for interacting with blockchain domain names. It can be used to retrieve [payment addresses](https://unstoppabledomains.com/features#Add-Crypto-Addresses), IPFS hashes for [decentralized websites](https://unstoppabledomains.com/features#Build-Website), and GunDB usernames for [decentralized chat](https://unstoppabledomains.com/chat).
+Resolution is a library for interacting with blockchain domain names. It can be
+used to retrieve
+[payment addresses](https://unstoppabledomains.com/features#Add-Crypto-Addresses),
+IPFS hashes for
+[decentralized websites](https://unstoppabledomains.com/features#Build-Website),
+and GunDB usernames for
+[decentralized chat](https://unstoppabledomains.com/chat).
 
-Resolution is primarily built and maintained by [Unstoppable Domains](https://unstoppabledomains.com/).
+Resolution is primarily built and maintained by
+[Unstoppable Domains](https://unstoppabledomains.com/).
 
 Resolution supports decentralized domains across three main zones:
 
@@ -23,7 +30,8 @@ Resolution supports decentralized domains across three main zones:
   - `.xyz`
   - `.luxe`
 
-For more information, see our detailed [API Referrence](https://unstoppabledomains.github.io/resolution/).
+For more information, see our detailed
+[API Referrence](https://unstoppabledomains.github.io/resolution/).
 
 ## Installing Resolution
 
@@ -37,7 +45,14 @@ yarn add @unstoppabledomains/resolution
 npm install @unstoppabledomains/resolution --save
 ```
 
-If you're interested in resolving domains via the command line, see our [CLI section](#command-line-interface). 
+If you're interested in resolving domains via the command line, see our
+[CLI section](#command-line-interface).
+
+## Obtaining JSON RPC Provider
+
+Resolution for .crypto and .eth performs reads on the Ethereum blockchain and
+requires a link to an Ethereum JSON RPC provider. You can obtain a provider url
+by signing up with [Infura](https://infura.io/)
 
 ## Using Resolution
 
@@ -55,7 +70,18 @@ Create a new file in your project, `address.js`.
 
 ```javascript
 const { default: Resolution } = require('@unstoppabledomains/resolution');
-const resolution = new Resolution();
+// Obtained by creating an account with Infura
+const ethProviderURL = `https://mainnet.infura.io/v3/${infuraProjectId}`;
+const resolution = new Resolution({
+  cns: {
+    url: ethProviderURL, // If no provider is specified, https://main-rpc.linkpool.io will be used by default
+    network: 'mainnet',
+  },
+  ens: {
+    url: ethProviderURL,
+    network: 'mainnet',
+  },
+});
 
 function resolve(domain, currency) {
   resolution
@@ -89,8 +115,8 @@ function resolveIpfsHash(domain) {
     .ipfsHash(domain)
     .then((hash) =>
       console.log(
-        `You can access this website via a public IPFS gateway: https://gateway.ipfs.io/ipfs/${hash}`
-      )
+        `You can access this website via a public IPFS gateway: https://gateway.ipfs.io/ipfs/${hash}`,
+      ),
     )
     .catch(console.error);
 }
@@ -142,7 +168,9 @@ yarn global add @unstoppabledomains/resolution
 npm install -g @unstoppabledomains/resolution
 ```
 
-By default, the CLI uses https://main-rpc.linkpool.io as its primary gateway to the Ethereum blockchain. If you'd like to override this default and set another provider you can do so using the `--ethereum-url` flag.
+By default, the CLI uses https://main-rpc.linkpool.io as its primary gateway to
+the Ethereum blockchain. If you'd like to override this default and set another
+provider you can do so using the `--ethereum-url` flag.
 
 For example:
 
@@ -154,47 +182,64 @@ Use the `-h` or `--help` flag to see all the available CLI options.
 
 ## Error Handling
 
-When resolution encounters an error it returns the error code instead of stopping the process. Keep an eye out for return values like `RECORD_NOT_FOUND`.
+When resolution encounters an error it returns the error code instead of
+stopping the process. Keep an eye out for return values like `RECORD_NOT_FOUND`.
 
 ## Development
 
-Use these commands to set up a local development environment (**macOS Terminal** or **Linux shell**).
+Use these commands to set up a local development environment (**macOS Terminal**
+or **Linux shell**).
 
 1. Install `nvm`
+
    ```bash
    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.36.0/install.sh | bash
    ```
 
 2. Install concrete version of `node.js`
-    ```bash
-    nvm install 12.12.0
-    ```
+
+   ```bash
+   nvm install 12.12.0
+   ```
 
 3. Install `yarn`
-    ```bash
-    npm install -g yarn
-    ```
+   ```bash
+   npm install -g yarn
+   ```
 4. Clone the repository
-    ```bash
-    git clone https://github.com/unstoppabledomains/resolution.git
-    cd resolution
-    ```
+
+   ```bash
+   git clone https://github.com/unstoppabledomains/resolution.git
+   cd resolution
+   ```
 
 5. Install dependencies
-    ```bash
-    yarn install
-    ```
+   ```bash
+   yarn install
+   ```
 
 ### Internal network config
 
-Internal [network config](src/main/resources/com/unstoppabledomains/config/network/network-config.json) 
-can be updated by running `yarn network-config:pull` task and committing updated file.
+Internal
+[network config](src/main/resources/com/unstoppabledomains/config/network/network-config.json)
+can be updated by running `yarn network-config:pull` task and committing updated
+file.
 
 ## Free advertising for integrated apps
 
-Once your app has a working Unstoppable Domains integration, [register it here](https://unstoppabledomains.com/app-submission). Registered apps appear on the Unstoppable Domains [homepage](https://unstoppabledomains.com/) and [Applications](https://unstoppabledomains.com/apps) page — putting your app in front of tens of thousands of potential customers per day.
+Once your app has a working Unstoppable Domains integration,
+[register it here](https://unstoppabledomains.com/app-submission). Registered
+apps appear on the Unstoppable Domains
+[homepage](https://unstoppabledomains.com/) and
+[Applications](https://unstoppabledomains.com/apps) page — putting your app in
+front of tens of thousands of potential customers per day.
 
-Also, every week we select a newly-integrated app to feature in the Unstoppable Update newsletter. This newsletter is delivered to straight into the inbox of ~100,000 crypto fanatics — all of whom could be new customers to grow your business.
+Also, every week we select a newly-integrated app to feature in the Unstoppable
+Update newsletter. This newsletter is delivered to straight into the inbox of
+~100,000 crypto fanatics — all of whom could be new customers to grow your
+business.
 
 ## Get help
-[Join our discord community](https://discord.com/invite/b6ZVxSZ9Hn) and ask questions.  
+
+[Join our discord community](https://discord.com/invite/b6ZVxSZ9Hn) and ask
+questions.

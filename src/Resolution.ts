@@ -37,8 +37,12 @@ import DnsUtils from './DnsUtils';
  * import Resolution from '@unstoppabledomains/resolution';
  *
  * let resolution = new Resolution({ blockchain: {
+ *        cns: {
+ *           url: `https://mainnet.infura.io/v3/${infuraProjectId}`,
+ *           network: "mainnet"
+ *        },
  *        ens: {
- *           url: "https://mainnet.infura.io/v3/12351245223",
+ *           url: `https://mainnet.infura.io/v3/${infuraProjectId}`,
  *           network: "mainnet"
  *        }
  *      }
@@ -92,11 +96,9 @@ export default class Resolution {
       if (cns) {
         this.cns = new Cns(cns);
       }
-
     } else {
       this.api = new UdApi(api);
     }
-
   }
 
   /**
@@ -199,7 +201,6 @@ export default class Resolution {
       } else {
         throw error;
       }
-
     }
   }
 
@@ -230,13 +231,17 @@ export default class Resolution {
     domain = this.prepareDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
     if (method.name === NamingServiceName.ENS) {
-      throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, 
-        { methodName: NamingServiceName.ENS, domain });
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+        methodName: NamingServiceName.ENS,
+        domain,
+      });
     }
-    
+
     if (!isSupportedChainVersion(version)) {
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, 
-        { domain, recordName: `crypto.USDT.version.${version}.address` });
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+        domain,
+        recordName: `crypto.USDT.version.${version}.address`,
+      });
     }
 
     const recordKey = `crypto.USDT.version.${version}.address`;
@@ -291,7 +296,11 @@ export default class Resolution {
    */
   async ipfsHash(domain: string): Promise<string> {
     domain = this.prepareDomain(domain);
-    return await this.getPreferableNewRecord(domain, 'dweb.ipfs.hash', 'ipfs.html.value');
+    return await this.getPreferableNewRecord(
+      domain,
+      'dweb.ipfs.hash',
+      'ipfs.html.value',
+    );
   }
 
   /**
@@ -300,7 +309,11 @@ export default class Resolution {
    */
   async httpUrl(domain: string): Promise<string> {
     domain = this.prepareDomain(domain);
-    return await this.getPreferableNewRecord(domain, 'browser.redirect_url', 'ipfs.redirect_domain.value');
+    return await this.getPreferableNewRecord(
+      domain,
+      'browser.redirect_url',
+      'ipfs.redirect_domain.value',
+    );
   }
 
   /**
@@ -376,7 +389,9 @@ export default class Resolution {
     domain = this.prepareDomain(domain);
     const resolver = await this.getNamingMethodOrThrow(domain).resolver(domain);
     if (!resolver) {
-      throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {domain});
+      throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
+        domain,
+      });
     }
     return resolver;
   }
@@ -437,9 +452,15 @@ export default class Resolution {
    * @param options formatting options
    * @throws [[ResolutionError]] with UnsupportedDomain error code if domain extension is unknown
    */
-  namehash(domain: string, options: NamehashOptions = NamehashOptionsDefault): string {
+  namehash(
+    domain: string,
+    options: NamehashOptions = NamehashOptionsDefault,
+  ): string {
     domain = this.prepareDomain(domain);
-    return this.formatNamehash(this.getNamingMethodOrThrow(domain).namehash(domain), options);
+    return this.formatNamehash(
+      this.getNamingMethodOrThrow(domain).namehash(domain),
+      options,
+    );
   }
 
   /**
@@ -455,7 +476,10 @@ export default class Resolution {
     method: NamingServiceName,
     options: NamehashOptions = NamehashOptionsDefault,
   ): nodeHash {
-    return this.formatNamehash(this.findNamingService(method).childhash(parent, label), options);
+    return this.formatNamehash(
+      this.findNamingService(method).childhash(parent, label),
+      options,
+    );
   }
 
   private formatNamehash(hash, options: NamehashOptions) {
@@ -465,7 +489,6 @@ export default class Resolution {
     } else {
       return options.prefix ? '0x' + hash : hash;
     }
-
   }
 
   /**
@@ -530,20 +553,31 @@ export default class Resolution {
 
   private getDnsRecordKeys(types: DnsRecordType[]): string[] {
     const records = ['dns.ttl'];
-    types.forEach(type => {
+    types.forEach((type) => {
       records.push(`dns.${type}`);
       records.push(`dns.${type}.ttl`);
     });
     return records;
   }
 
-  private async getPreferableNewRecord(domain: string, newRecord: string, oldRecord: string): Promise<string> {
-    const records = await this.records(domain, [newRecord, oldRecord]) as Record<string, string>;
-    return NamingService.ensureRecordPresence(domain, newRecord, records[newRecord] || records[oldRecord]);
+  private async getPreferableNewRecord(
+    domain: string,
+    newRecord: string,
+    oldRecord: string,
+  ): Promise<string> {
+    const records = (await this.records(domain, [
+      newRecord,
+      oldRecord,
+    ])) as Record<string, string>;
+    return NamingService.ensureRecordPresence(
+      domain,
+      newRecord,
+      records[newRecord] || records[oldRecord],
+    );
   }
 
   private getNamingMethod(domain: string): NamingService | undefined {
-    return this.getResolutionMethods().find(method =>
+    return this.getResolutionMethods().find((method) =>
       method.isSupportedDomain(domain),
     );
   }
@@ -552,7 +586,7 @@ export default class Resolution {
     return (this.blockchain
       ? ([this.ens, this.zns, this.cns] as NamingService[])
       : ([this.api] as NamingService[])
-    ).filter(v => v);
+    ).filter((v) => v);
   }
 
   private getNamingMethodOrThrow(domain: string): NamingService {
@@ -567,7 +601,7 @@ export default class Resolution {
   }
 
   private findNamingService(name: NamingServiceName): NamingService {
-    const service = this.getResolutionMethods().find(m => m.name === name);
+    const service = this.getResolutionMethods().find((m) => m.name === name);
     if (!service) {
       throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
         method: name,
@@ -586,18 +620,18 @@ export default class Resolution {
     provider?: Provider,
   ): SourceDefinition | false {
     switch (typeof source) {
-    case 'undefined': {
-      return { provider };
-    }
-    case 'boolean': {
-      return source ? { provider } : false;
-    }
-    case 'string': {
-      return { url: source };
-    }
-    case 'object': {
-      return { provider, ...source };
-    }
+      case 'undefined': {
+        return { provider };
+      }
+      case 'boolean': {
+        return source ? { provider } : false;
+      }
+      case 'string': {
+        return { url: source };
+      }
+      case 'object': {
+        return { provider, ...source };
+      }
     }
     throw new Error('Unsupported configuration');
   }
