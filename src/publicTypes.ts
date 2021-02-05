@@ -54,7 +54,6 @@ export type Blockchain = {
   ens?: NamingServiceSource;
   zns?: NamingServiceSource;
   cns?: NamingServiceSource;
-  web3Provider?: Provider;
 };
 
 export interface Web3Version0Provider {
@@ -113,11 +112,6 @@ export interface EthersProvider {
   getLogs(filter: EventFilter): Promise<RpcProviderLogEntry[]>;
 }
 
-/**
- * @deprecated Use UnclaimedDomainResponse instead (deprecated since 0.3.4)
- */
-export const UNCLAIMED_DOMAIN_RESPONSE = UnclaimedDomainResponse;
-
 export const UDApiDefaultUrl = 'https://unstoppabledomains.com/api/v1';
 export const DefaultAPI: API = {
   url: UDApiDefaultUrl,
@@ -131,73 +125,77 @@ export const DefaultAPI: API = {
 export type NamingServiceSource = string | boolean | SourceDefinition;
 
 export type NamehashOptions = {
-  readonly format?: 'dec' | 'hex',
-  readonly prefix?: boolean,
+  readonly format?: 'dec' | 'hex';
+  readonly prefix?: boolean;
 };
 
-export const NamehashOptionsDefault = {format: 'hex', prefix: true} as const;
+export const NamehashOptionsDefault = { format: 'hex', prefix: true } as const;
 
 export enum DnsRecordType {
-A="A",
-AAAA="AAAA",
-AFSDB="AFSDB",
-APL="APL",
-CAA="CAA",
-CDNSKEY="CDNSKEY",
-CDS="CDS",
-CERT="CERT",
-CNAME="CNAME",
-CSYNC="CSYNC",
-DHCID="DHCID",
-DLV="DLV",
-DNAME="DNAME",
-DNSKEY="DNSKEY",
-DS="DS",
-EUI48="EUI48",
-EUI64="EUI64",
-HINFO="HINFO",
-HIP="HIP",
-HTTPS="HTTPS",
-IPSECKEY="IPSECKEY",
-KEY="KEY",
-KX="KX",
-LOC="LOC",
-MX="MX",
-NAPTR="NAPTR",
-NS="NS",
-NSEC="NSEC",
-NSEC3="NSEC3",
-NSEC3PARAM="NSEC3PARAM",
-OPENPGPKEY="OPENPGPKEY",
-PTR="PTR",
-RP="RP",
-RRSIG="RRSIG",
-SIG="SIG",
-SMIMEA="SMIMEA",
-SOA="SOA",
-SRV="SRV",
-SSHFP="SSHFP",
-SVCB="SVCB",
-TA="TA",
-TKEY="TKEY",
-TLSA="TLSA",
-TSIG="TSIG",
-TXT="TXT",
-URI="URI",
-ZONEMD="ZONEMD",
+  A = 'A',
+  AAAA = 'AAAA',
+  AFSDB = 'AFSDB',
+  APL = 'APL',
+  CAA = 'CAA',
+  CDNSKEY = 'CDNSKEY',
+  CDS = 'CDS',
+  CERT = 'CERT',
+  CNAME = 'CNAME',
+  CSYNC = 'CSYNC',
+  DHCID = 'DHCID',
+  DLV = 'DLV',
+  DNAME = 'DNAME',
+  DNSKEY = 'DNSKEY',
+  DS = 'DS',
+  EUI48 = 'EUI48',
+  EUI64 = 'EUI64',
+  HINFO = 'HINFO',
+  HIP = 'HIP',
+  HTTPS = 'HTTPS',
+  IPSECKEY = 'IPSECKEY',
+  KEY = 'KEY',
+  KX = 'KX',
+  LOC = 'LOC',
+  MX = 'MX',
+  NAPTR = 'NAPTR',
+  NS = 'NS',
+  NSEC = 'NSEC',
+  NSEC3 = 'NSEC3',
+  NSEC3PARAM = 'NSEC3PARAM',
+  OPENPGPKEY = 'OPENPGPKEY',
+  PTR = 'PTR',
+  RP = 'RP',
+  RRSIG = 'RRSIG',
+  SIG = 'SIG',
+  SMIMEA = 'SMIMEA',
+  SOA = 'SOA',
+  SRV = 'SRV',
+  SSHFP = 'SSHFP',
+  SVCB = 'SVCB',
+  TA = 'TA',
+  TKEY = 'TKEY',
+  TLSA = 'TLSA',
+  TSIG = 'TSIG',
+  TXT = 'TXT',
+  URI = 'URI',
+  ZONEMD = 'ZONEMD',
 }
 
-export interface DnsRecord { type: DnsRecordType, TTL: number, data: string }
+export interface DnsRecord {
+  type: DnsRecordType;
+  TTL: number;
+  data: string;
+}
 export type CryptoRecords = Record<string, string>;
 export type DomainData = {
-  owner: string,
-  resolver: string,
-  records: CryptoRecords,
+  owner: string;
+  resolver: string;
+  records: CryptoRecords;
 };
 
 export enum TickerVersion {
-  ERC20 = "ERC20",
-  TRON = "TRON",
-  EOS = "EOS",
-  OMNI = "OMNI"
+  ERC20 = 'ERC20',
+  TRON = 'TRON',
+  EOS = 'EOS',
+  OMNI = 'OMNI',
 }

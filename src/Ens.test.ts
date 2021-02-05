@@ -125,20 +125,6 @@ describe('ENS', () => {
     expectSpyToBeCalled(spies);
   });
 
-  // TODO remove this test once addressOrThrow is fully removed
-  it('[Old test]resolves .luxe name using ENS blockchain with thrown error', async () => {
-    const spies = mockAsyncMethods(resolution.ens, {
-      resolver: undefined,
-      getOwner: undefined,
-    });
-
-    await expectResolutionErrorCode(
-      resolution.addressOrThrow('something.luxe', 'ETH'),
-      ResolutionErrorCode.UnregisteredDomain,
-    );
-    expectSpyToBeCalled(spies);
-  });
-
   it('resolves name with resolver but without an owner', async () => {
     const eyes = mockAsyncMethods(resolution.ens, {
       resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
@@ -367,50 +353,6 @@ describe('ENS', () => {
     );
   });
 
-  // This is correct since bnb is not a real ticker from bip-44constants.
-  // It is useful whe someone made a typo in ticker spellwriting
-  // TODO to be removed in 2.0.0
-  it('[Old test] checks UnsupportedCurrency error', async () => {
-    const eyes = mockAsyncMethods(resolution.ens, {
-      resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-    });
-    await expectResolutionErrorCode(
-      resolution.addressOrThrow('testthing.eth', 'bnb'),
-      ResolutionErrorCode.UnsupportedCurrency,
-    );
-    expectSpyToBeCalled(eyes);
-  });
-
-  // TODO to be removed in 2.0.0
-  it('[Old test] checks Resolution#addressOrThrow error #2', async () => {
-    const resolution = new Resolution();
-    const eyes = mockAsyncMethods(resolution.zns, {
-      getRecordsAddresses: [
-        'zil194qcjskuuxh6qtg8xw3qqrr3kdc6dtq8ct6j9s',
-        '0xdac22230adfe4601f00631eae92df6d77f054891'
-      ],
-      fetchSubState: {
-        records: {
-          'crypto.BCH.address': 'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6',
-          'crypto.BTC.address': '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB',
-          'crypto.DASH.address': 'XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j',
-          'crypto.ETH.address': '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
-          'crypto.LTC.address': 'LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL',
-          'crypto.XMR.address': '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d',
-          'crypto.ZEC.address': 't1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV',
-          'crypto.ZIL.address': 'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
-          'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
-          'ipfs.redirect_domain.value': 'www.unstoppabledomains.com'
-        }
-      }
-    });
-    await expectResolutionErrorCode(
-      resolution.addressOrThrow('brad.zil', 'INVALID_CURRENCY_SYMBOL'),
-      ResolutionErrorCode.UnspecifiedCurrency,
-    );
-    expectSpyToBeCalled(eyes);
-  });
-
   it('checks UnsupportedCurrency error', async () => {
     const eyes = mockAsyncMethods(resolution.ens, {
       resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
@@ -419,20 +361,6 @@ describe('ENS', () => {
       resolution.addr('testthing.eth', 'UNREALTICKER'),
       ResolutionErrorCode.UnsupportedCurrency,
     );
-    expectSpyToBeCalled(eyes);
-  });
-
-  // TODO to be removed in 2.0.0
-  it('[Old test]resolve to null for empty .eth record', async () => {
-    expect(resolution.ens?.url).toBe(protocolLink());
-    expect(resolution.ens?.network).toEqual(1);
-
-    const eyes = mockAsyncMethods(resolution.ens, {
-      resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-      callMethod: '0x'
-    });
-
-    expect(await resolution.address('qwdqwd.eth', 'XRP')).toEqual(null);
     expectSpyToBeCalled(eyes);
   });
 
@@ -466,7 +394,7 @@ describe('ENS', () => {
         getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
         resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
         getTTL: 0,
-        fetchAddress: undefined
+        fetchAddress: undefined,
       });
       const result = await resolution.resolve('matthewgould.eth');
       expectSpyToBeCalled(eyes);
@@ -497,7 +425,7 @@ describe('ENS', () => {
 
     it('should not find a resolver address', async () => {
       const spies = mockAsyncMethods(resolution.ens, {
-        resolver: undefined
+        resolver: undefined,
       });
       await expectResolutionErrorCode(
         resolution.resolver('empty.eth'),
@@ -509,9 +437,9 @@ describe('ENS', () => {
     it('usdt method s not supported by ens', async () => {
       await expectResolutionErrorCode(
         resolution.usdt('anyensdomain.eth', TickerVersion.EOS),
-        ResolutionErrorCode.UnsupportedMethod
+        ResolutionErrorCode.UnsupportedMethod,
       );
-    })
+    });
   });
 
   describe('.Hashing', () => {
@@ -531,9 +459,7 @@ describe('ENS', () => {
 
       describe('.domain invalid format', () => {
         it('starts with -', async () => {
-          expect(resolution.isSupportedDomain('-hello.eth')).toEqual(
-            false,
-          );
+          expect(resolution.isSupportedDomain('-hello.eth')).toEqual(false);
           await expectResolutionErrorCode(
             () => resolution.namehash('-hello.eth'),
             ResolutionErrorCode.UnsupportedDomain,
@@ -642,7 +568,7 @@ describe('ENS', () => {
       });
       const chatId = await resolution
         .chatId('crunk.eth')
-        .catch(err => err.code);
+        .catch((err) => err.code);
       expectSpyToBeCalled(eyes);
       expect(chatId).toBe(
         '0x7e1d12f34e038a2bda3d5f6ee0809d72f668c357d9e64fd7f622513f06ea652146ab5fdee35dc4ce77f1c089fd74972691fccd48130306d9eafcc6e1437d1ab21b',
@@ -657,7 +583,7 @@ describe('ENS', () => {
       });
       const publicKey = await resolution
         .chatPk('crunk.eth')
-        .catch(err => err.code);
+        .catch((err) => err.code);
       expectSpyToBeCalled(eyes);
       expect(publicKey).toBe(
         'yxbMDgFrzemQEcDwJYccE_TDbGmRL_iqZ2JhQxYi2s8.nBEAyMfM2ZBtOf2C-GHe3zEn42Q1vrfPAVqNzgGhXvQ',

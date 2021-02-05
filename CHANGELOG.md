@@ -1,3 +1,5 @@
+## 2.0.0
+* Remove deprecated methods
 ## 1.17.0
 * Add support for TLOS
 ## 1.16.2
