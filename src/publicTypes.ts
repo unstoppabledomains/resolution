@@ -5,17 +5,19 @@ import {
   TransactionRequest,
 } from './types';
 
-/**
- * SourceDefinition object
- * @typedef {Object} SourceDefinition
- * @property {string} [url] - main blockchain api url
- * @property {string | number} [network] - blockchain network
- */
-export interface SourceDefinition {
-  url?: string;
-  network?: string | number;
-  registry?: string;
-  provider?: Provider;
+
+export type ZnsConfig = {
+  url: string;
+  network: string | number;
+  registryAddress?: string;
+}
+
+export type EnsConfig = ZnsConfig;
+
+export interface CnsConfig {
+  url: string;
+  network: string | number;
+  proxyReaderAddress?: string;
 }
 
 export enum NamingServiceName {
@@ -50,11 +52,10 @@ export type ResolutionResponse = {
 /**
  * Main configurational object for Resolution instance
  */
-export type Blockchain = {
-  ens?: NamingServiceSource;
-  zns?: NamingServiceSource;
-  cns?: NamingServiceSource;
-  web3Provider?: Provider;
+export type SourceConfig = {
+  ens?: EnsConfig | {provider: Provider};
+  zns?: ZnsConfig | {provider: Provider} | {api: string};
+  cns?: CnsConfig | {provider: Provider} | {api: string};
 };
 
 export interface Web3Version0Provider {
@@ -122,13 +123,6 @@ export const UDApiDefaultUrl = 'https://unstoppabledomains.com/api/v1';
 export const DefaultAPI: API = {
   url: UDApiDefaultUrl,
 };
-
-/**
- * NamingServiceSource
- * just an alias
- * @typedef {string | boolean | SourceDefinition}
- */
-export type NamingServiceSource = string | boolean | SourceDefinition;
 
 export type NamehashOptions = {
   readonly format?: 'dec' | 'hex',

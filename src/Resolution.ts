@@ -4,7 +4,7 @@ import Zns from './Zns';
 import Cns from './Cns';
 import UdApi from './UdApi';
 import {
-  Blockchain,
+  SourceConfig,
   UnclaimedDomainResponse,
   ResolutionResponse,
   DefaultAPI,
@@ -13,8 +13,6 @@ import {
   Web3Version0Provider,
   Web3Version1Provider,
   Provider,
-  NamingServiceSource,
-  SourceDefinition,
   NamehashOptions,
   NamehashOptionsDefault,
   DnsRecordType,
@@ -61,25 +59,13 @@ export default class Resolution {
   readonly api?: UdApi;
 
   constructor({
-    blockchain = true,
-    api = DefaultAPI,
-  }: { blockchain?: Blockchain | boolean; api?: API } = {}) {
-    this.blockchain = !!blockchain;
-    if (blockchain) {
-      if (blockchain === true) {
-        blockchain = {};
-      }
-
-      const web3provider = blockchain.web3Provider;
-      if (web3provider) {
-        console.warn(
-          'Usage of `web3Provider` option is deprecated. Use `provider` option instead for each individual blockchain',
-        );
-      }
-
-      const ens = this.normalizeSource(blockchain.ens, web3provider);
-      const zns = this.normalizeSource(blockchain.zns);
-      const cns = this.normalizeSource(blockchain.cns, web3provider);
+    sourceConfig = undefined,
+  }: { sourceConfig?: SourceConfig } = {}) {
+    this.blockchain = !!sourceConfig;
+    if (sourceConfig) {
+      const ens = sourceConfig.ens;
+      const zns = sourceConfig.zns;
+      const cns = sourceConfig.cns;
 
       if (ens) {
         this.ens = new Ens(ens);
@@ -93,10 +79,8 @@ export default class Resolution {
         this.cns = new Cns(cns);
       }
 
-    } else {
-      this.api = new UdApi(api);
+      // todo handle api case
     }
-
   }
 
   /**
