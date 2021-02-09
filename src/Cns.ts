@@ -17,6 +17,7 @@ import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 import NetworkConfig from './config/network-config.json';
 
 export default class Cns extends EthereumNamingService {
+  static DefaultInfuraKey = 'c4bb906ed6904c42b19c95825fe55f39';
   static TwitterVerificationAddress = '0x12cfb13522F13a78b650a8bCbFCf50b7CB899d82';
   static ProxyReaderMap: ProxyReaderMap = getProxyReaderMap();
 

@@ -27,6 +27,7 @@ import {
 import { RpcProviderTestCases } from './tests/providerMockData';
 import fetch, { FetchError } from 'node-fetch';
 import standardKeys from './utils/standardKeys';
+import Cns from './Cns';
 
 let resolution: Resolution;
 
@@ -62,6 +63,13 @@ describe('Resolution', () => {
       const resolution = Resolution.infura('api-key');
       expect(resolution.ens?.url).toBe(`https://mainnet.infura.io/v3/api-key`);
       expect(resolution.cns?.url).toBe(`https://mainnet.infura.io/v3/api-key`);
+    });
+
+    it('should use default infura key for cns', async () => {
+      const resolution = new Resolution();
+      expect(resolution.cns?.url).toBe(
+        `https://mainnet.infura.io/v3/${Cns.DefaultInfuraKey}`,
+      );
     });
 
     it('provides empty response constant', async () => {

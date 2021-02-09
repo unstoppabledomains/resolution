@@ -79,8 +79,13 @@ export default class Resolution {
 
       const ens = this.normalizeSource(blockchain.ens, web3provider);
       const zns = this.normalizeSource(blockchain.zns);
-      const cns = this.normalizeSource(blockchain.cns, web3provider);
-
+      const cns = this.normalizeSource(
+        blockchain.cns || {
+          url: `https://mainnet.infura.io/v3/${Cns.DefaultInfuraKey}`,
+        },
+        web3provider,
+      );
+      
       if (ens) {
         this.ens = new Ens(ens);
       }
