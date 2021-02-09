@@ -11,7 +11,6 @@ import {
   ResolutionError,
   ResolutionErrorCode,
   ResolutionResponse,
-  SourceDefinition,
   UnclaimedDomainResponse,
 } from './index';
 import NamingService from './NamingService';

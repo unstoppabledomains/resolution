@@ -4,17 +4,12 @@ import Zns from './Zns';
 import Cns from './Cns';
 import UdApi from './UdApi';
 import {
-  Blockchain,
   UnclaimedDomainResponse,
   ResolutionResponse,
-  DefaultAPI,
-  API,
   NamingServiceName,
   Web3Version0Provider,
   Web3Version1Provider,
   Provider,
-  NamingServiceSource,
-  SourceDefinition,
   NamehashOptions,
   NamehashOptionsDefault,
   DnsRecordType,
@@ -84,9 +79,9 @@ export default class Resolution {
    */
   static infura(infura: string, network = 'mainnet'): Resolution {
     return new this({
-        ens: { url: signedInfuraLink(infura, network), network },
-        cns: { url: signedInfuraLink(infura, network), network },
-      },
+      ens: { url: signedInfuraLink(infura, network), network },
+      cns: { url: signedInfuraLink(infura, network), network },
+    },
     );
   }
 
@@ -508,26 +503,6 @@ export default class Resolution {
 
   private prepareDomain(domain: string): string {
     return domain ? domain.trim().toLowerCase() : '';
-  }
-
-  private normalizeSource(
-    source: NamingServiceSource | undefined,
-  ): SourceDefinition | false {
-    switch (typeof source) {
-      case 'undefined': {
-        return {};
-      }
-      case 'boolean': {
-        return source ? {} : false;
-      }
-      case 'string': {
-        return { url: source };
-      }
-      case 'object': {
-        return { ...source };
-      }
-    }
-    throw new Error('Unsupported configuration');
   }
 }
 

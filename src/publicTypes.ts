@@ -5,19 +5,6 @@ import {
   TransactionRequest,
 } from './types';
 
-/**
- * SourceDefinition object
- * @typedef {Object} SourceDefinition
- * @property {string} [url] - main blockchain api url
- * @property {string | number} [network] - blockchain network
- */
-export interface SourceDefinition {
-  url?: string;
-  network?: string | number;
-  registry?: string;
-  provider?: Provider;
-}
-
 export interface NamingServiceConfig {
   url?: string;
   network?: string | number;
@@ -62,16 +49,6 @@ export type ResolutionResponse = {
     [key: string]: string;
   };
 };
-
-/**
- * Main configurational object for Resolution instance
- */
-export type Blockchain = {
-  ens?: NamingServiceSource;
-  zns?: NamingServiceSource;
-  cns?: NamingServiceSource;
-};
-
 export interface Web3Version0Provider {
   sendAsync: ProviderMethod;
 }
@@ -129,17 +106,6 @@ export interface EthersProvider {
 }
 
 export const UDApiDefaultUrl = 'https://unstoppabledomains.com/api/v1';
-export const DefaultAPI: API = {
-  url: UDApiDefaultUrl,
-};
-
-/**
- * NamingServiceSource
- * just an alias
- * @typedef {string | boolean | SourceDefinition}
- */
-export type NamingServiceSource = string | boolean | SourceDefinition;
-
 export type NamehashOptions = {
   readonly format?: 'dec' | 'hex';
   readonly prefix?: boolean;

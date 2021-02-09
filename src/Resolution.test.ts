@@ -32,8 +32,8 @@ let resolution: Resolution;
 
 beforeAll(async () => {
   resolution = new Resolution({
-      cns: { url: protocolLink() },
-      ens: { url: protocolLink() }
+    cns: { url: protocolLink() },
+    ens: { url: protocolLink() }
   });
 });
 

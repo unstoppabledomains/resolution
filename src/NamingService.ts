@@ -2,7 +2,6 @@ import {
   ResolutionMethod,
   Provider,
   ResolutionResponse,
-  SourceDefinition,
   NamingServiceName,
 } from '.';
 import BaseConnection from './BaseConnection';
@@ -51,25 +50,25 @@ export default abstract class NamingService extends BaseConnection {
   // todo update cns url to hold new secure key
   private getDefaultNormalizedSource(name: ResolutionMethod): NamingServiceConfig {
     switch (name) {
-      case NamingServiceName.ENS:
-        return {
-          url: "https://mainnet.infura.io/v3/e05c36b6b2134ccc9f2594ddff94c136",
-          network: "mainnet",
-        }
-      case NamingServiceName.ZNS: 
-        return {
-          url: "https://api.zilliqa.com",
-          network: "mainnet"
-        }
-      case NamingServiceName.CNS: 
-        return {
-          url: "https://mainnet.infura.io/v3/e05c36b6b2134ccc9f2594ddff94c136",
-          network: "mainnet"
-        }
-      case "UDAPI":
-        return {
-          url: "https://unstoppabledomains.com/api/v1/"
-        }
+    case NamingServiceName.ENS:
+      return {
+        url: "https://mainnet.infura.io/v3/e05c36b6b2134ccc9f2594ddff94c136",
+        network: "mainnet",
+      }
+    case NamingServiceName.ZNS: 
+      return {
+        url: "https://api.zilliqa.com",
+        network: "mainnet"
+      }
+    case NamingServiceName.CNS: 
+      return {
+        url: "https://mainnet.infura.io/v3/e05c36b6b2134ccc9f2594ddff94c136",
+        network: "mainnet"
+      }
+    case "UDAPI":
+      return {
+        url: "https://unstoppabledomains.com/api/v1/"
+      }
     }
   }
 
@@ -146,7 +145,7 @@ export default abstract class NamingService extends BaseConnection {
     });
   }
 
-  protected ensureConfigured(source: SourceDefinition): void {
+  protected ensureConfigured(source: NormalizedSource): void {
     if (!source.network) {
       throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedNetwork, {
         method: this.name,

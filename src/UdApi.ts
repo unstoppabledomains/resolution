@@ -4,7 +4,6 @@ import {
   ResolutionError,
   ResolutionErrorCode,
   ResolutionResponse,
-  SourceDefinition,
 } from './index';
 import NamingService from './NamingService';
 import Zns from './Zns';
@@ -13,7 +12,8 @@ import Cns from './Cns';
 import pckg from './package.json';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 import standardKeys from './utils/standardKeys';
-import { CryptoRecords } from './publicTypes';
+import { CryptoRecords, NamingServiceConfig } from './publicTypes';
+import { NormalizedSource } from './types';
 
 export default class Udapi extends NamingService {
   private headers: {
@@ -132,7 +132,7 @@ export default class Udapi extends NamingService {
     throw new Error('Method not implemented.');
   }
 
-  protected normalizeSource(source: SourceDefinition): SourceDefinition {
+  protected normalizeSource(source: NamingServiceConfig): NormalizedSource {
     return { network: 1, ...source };
   }
 

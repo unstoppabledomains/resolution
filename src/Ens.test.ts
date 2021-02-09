@@ -19,7 +19,7 @@ beforeEach(() => {
   nock.cleanAll();
   jest.restoreAllMocks();
   resolution = new Resolution({
-   ens: { url: protocolLink() } 
+    ens: { url: protocolLink() } 
   });
 });
 
@@ -227,10 +227,10 @@ describe('ENS', () => {
 
   it('1111 checks normalizeSource ens (object) #11', async () => {
     const resolution = new Resolution({
-        ens: {
-          network: 'ropsten',
-          registry: '0x112234455c3a32fd11230c42e7bccd4a84e02010',
-        },
+      ens: {
+        network: 'ropsten',
+        registry: '0x112234455c3a32fd11230c42e7bccd4a84e02010',
+      },
     });
     expect(resolution.ens?.network).toBe(3);
     expect(resolution.ens?.url).toBe('https://ropsten.infura.io/v3/e05c36b6b2134ccc9f2594ddff94c136');
@@ -241,7 +241,7 @@ describe('ENS', () => {
 
   it('checks normalizeSource ens (object) #12', async () => {
     const resolution = new Resolution({
-        ens: { registry: '0xabcffff1231586348194fcabbeff1231240234fc' },
+      ens: { registry: '0xabcffff1231586348194fcabbeff1231240234fc' },
     });
 
     expect(resolution.ens?.network).toBe(1);
@@ -255,7 +255,7 @@ describe('ENS', () => {
     expectConfigurationErrorCode(
       () =>
         new Resolution({
-            ens: { network: 'custom', url: 'https://custom.notinfura.io' },
+          ens: { network: 'custom', url: 'https://custom.notinfura.io' },
         }),
       ConfigurationErrorCode.UnspecifiedNetwork,
     );
