@@ -142,7 +142,7 @@ yarn global add @unstoppabledomains/resolution
 npm install -g @unstoppabledomains/resolution
 ```
 
-By default, the CLI uses https://main-rpc.linkpool.io as its primary gateway to the Ethereum blockchain. If you'd like to override this default and set another provider you can do so using the `--ethereum-url` flag.
+You can specify what blockchain provider url to use via `--ethereum-url` flag.
 
 For example:
 

@@ -1,5 +1,14 @@
 ## 2.0.0
 * Remove deprecated methods
+  - Resolution#address
+  - Resolution#ipfsRedirect
+  - Resolution#addressOrThrow
+  - ResolutionErrorCode.UnspecifiedCurrency
+* Simplify constructor
+  - remove type Blockchain
+  - remove type API
+  - Introduced single config type SourceConfig
+    
 ## 1.17.0
 * Add support for TLOS
 ## 1.16.2
