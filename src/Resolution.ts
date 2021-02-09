@@ -59,15 +59,7 @@ export default class Resolution {
   /** @internal */
   readonly api?: UdApi;
 
-  constructor(source?: SourceConfig) {
-
-    if (!source) {
-      this.ens = new Ens();
-      this.cns = new Cns();
-      this.zns = new Zns();
-      return this;
-    }
-
+  constructor(source: SourceConfig = {}) {
     if (source.api) {
       this.api = new UdApi();
       return this;
