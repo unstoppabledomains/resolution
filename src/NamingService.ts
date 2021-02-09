@@ -46,8 +46,6 @@ export default abstract class NamingService extends BaseConnection {
     this.registryAddress = normalized.registry;
   }
 
-
-  // todo update cns url to hold new secure key
   private getDefaultNormalizedSource(name: ResolutionMethod): NamingServiceConfig {
     switch (name) {
     case NamingServiceName.ENS:
@@ -62,7 +60,7 @@ export default abstract class NamingService extends BaseConnection {
       }
     case NamingServiceName.CNS: 
       return {
-        url: "https://mainnet.infura.io/v3/e05c36b6b2134ccc9f2594ddff94c136",
+        url: "https://mainnet.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39",
         network: "mainnet"
       }
     case "UDAPI":

@@ -15,10 +15,9 @@ export abstract class EthereumNamingService extends NamingService {
   readonly name: NamingServiceName;
   protected readerContract: Contract;
 
-  // Todo update projectId for secure Cns one
   static readonly UrlMap: BlockhanNetworkUrlMap = {
-    1: 'https://mainnet.infura.io/v3/e05c36b6b2134ccc9f2594ddff94c136',
-    3: 'https://ropsten.infura.io/v3/e05c36b6b2134ccc9f2594ddff94c136',
+    1: 'https://mainnet.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+    3: 'https://ropsten.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
   };
   
   // Todo remove when ens whitelisting resolver contracts problem solved
