@@ -21,6 +21,7 @@ import {
   DnsRecord,
   CryptoRecords,
   TickerVersion,
+  SourceConfig,
 } from './publicTypes';
 import { nodeHash } from './types';
 import { EthersProvider } from './publicTypes';
@@ -50,8 +51,6 @@ import DnsUtils from './DnsUtils';
  */
 export default class Resolution {
   /** @internal */
-  readonly blockchain: boolean;
-  /** @internal */
   readonly ens?: Ens;
   /** @internal */
   readonly zns?: Zns;
@@ -60,33 +59,29 @@ export default class Resolution {
   /** @internal */
   readonly api?: UdApi;
 
-  constructor({
-    blockchain = true,
-    api = DefaultAPI,
-  }: { blockchain?: Blockchain | boolean; api?: API } = {}) {
-    this.blockchain = !!blockchain;
-    if (blockchain) {
-      if (blockchain === true) {
-        blockchain = {};
-      }
+  constructor(source?: SourceConfig) {
 
-      const ens = this.normalizeSource(blockchain.ens);
-      const zns = this.normalizeSource(blockchain.zns);
-      const cns = this.normalizeSource(blockchain.cns);
+    if (!source) {
+      this.ens = new Ens();
+      this.cns = new Cns();
+      this.zns = new Zns();
+      return this;
+    }
 
-      if (ens) {
-        this.ens = new Ens(ens);
-      }
+    if (source.api) {
+      this.api = new UdApi();
+      return this;
+    }
 
-      if (zns) {
-        this.zns = new Zns(zns);
-      }
+    if (source.ens !== false) {
+      this.ens = new Ens(source.ens);
+    }
 
-      if (cns) {
-        this.cns = new Cns(cns);
-      }
-    } else {
-      this.api = new UdApi(api);
+    if (source.cns !== false) {
+      this.cns = new Cns(source.cns);
+    }
+    if (source.zns !== false) {
+      this.zns = new Zns(source.zns);
     }
   }
 
@@ -97,11 +92,10 @@ export default class Resolution {
    */
   static infura(infura: string, network = 'mainnet'): Resolution {
     return new this({
-      blockchain: {
         ens: { url: signedInfuraLink(infura, network), network },
         cns: { url: signedInfuraLink(infura, network), network },
       },
-    });
+    );
   }
 
   /**
@@ -111,7 +105,9 @@ export default class Resolution {
    */
   static fromEip1193Provider(provider: Provider): Resolution {
     return new this({
-      blockchain: { zns: true, ens: { provider }, cns: { provider } },
+      zns: false,
+      ens: { provider },
+      cns: { provider },
     });
   }
 
@@ -490,7 +486,7 @@ export default class Resolution {
   }
 
   private getResolutionMethods(): NamingService[] {
-    return (this.blockchain
+    return (!this.api
       ? ([this.ens, this.zns, this.cns] as NamingService[])
       : ([this.api] as NamingService[])
     ).filter((v) => v);

@@ -25,11 +25,7 @@ let cns: Cns;
 beforeEach(async () => {
   jest.restoreAllMocks();
   resolution = new Resolution({
-    blockchain: {
-      cns: {
-        url: protocolLink()
-      },
-    },
+    cns: { url: protocolLink() },
   });
   cns = resolution.cns!;
 });
@@ -284,7 +280,7 @@ describe('CNS', () => {
   describe('.Crypto ProxyReader', () => {
     beforeEach(async () => {
       resolution = new Resolution({
-        blockchain: { cns: { url: protocolLink() } },
+        cns: { url: protocolLink() },
       });
       cns = resolution.cns!;
     });
@@ -629,7 +625,7 @@ describe('CNS', () => {
     it('should throw error when FetchProvider throws FetchError', async () => {
       const url = protocolLink();
       const provider = new FetchProvider(NamingServiceName.CNS, url);
-      resolution = new Resolution({ blockchain: { cns: { url, provider } } });
+      resolution = new Resolution({ cns: { url, provider } });
       jest
         .spyOn(provider as any, 'fetch')
         .mockRejectedValue(new FetchError('error', 'error_type'));
@@ -643,7 +639,7 @@ describe('CNS', () => {
     it('should throw error when FetchProvider throws Error', async () => {
       const url = protocolLink();
       const provider = new FetchProvider(NamingServiceName.CNS, url);
-      resolution = new Resolution({ blockchain: { cns: { url, provider } } });
+      resolution = new Resolution({ cns: { url, provider } });
       jest
         .spyOn(provider as any, 'fetch')
         .mockRejectedValue(new Error('error_up'));

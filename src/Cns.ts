@@ -7,7 +7,7 @@ import Contract from './utils/contract';
 import standardKeys from './utils/standardKeys';
 import { getStartingBlock, isLegacyResolver, isNullAddress } from './utils';
 import {
-  SourceDefinition,
+  NamingServiceConfig,
   NamingServiceName,
   ResolutionResponse,
   CryptoRecords,
@@ -17,11 +17,9 @@ import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 import NetworkConfig from './config/network-config.json';
 
 export default class Cns extends EthereumNamingService {
-  static TwitterVerificationAddress = '0x12cfb13522F13a78b650a8bCbFCf50b7CB899d82';
   static ProxyReaderMap: ProxyReaderMap = getProxyReaderMap();
-
-  constructor(source: SourceDefinition = {}) {
-    super(source, NamingServiceName.CNS);
+  constructor(source?: NamingServiceConfig) {
+    super(NamingServiceName.CNS, source);
   }
 
   protected readerAbi(): any {

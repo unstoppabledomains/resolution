@@ -20,8 +20,8 @@ export default class Udapi extends NamingService {
     [key: string]: string;
   };
 
-  constructor(options: { url: string }) {
-    super(options, 'UDAPI');
+  constructor() {
+    super('UDAPI', {url: "https://unstoppabledomains.com/api/v1"});
     const DefaultUserAgent = this.isNode()
       ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'
       : navigator.userAgent;

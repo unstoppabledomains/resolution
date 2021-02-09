@@ -1,3 +1,5 @@
+import { Provider } from "./publicTypes";
+
 export type Dictionary<T> = { [k: string]: T };
 export type EnsNetworkIdMap = {
   [key: number]: string;
@@ -98,3 +100,10 @@ export enum NullAddresses {
 }
 
 export const EthCoinIndex = '60';
+
+export type NormalizedSource = { 
+  url?: string,
+  network?: string | number,
+  provider?: Provider,
+  registry?: string
+}

@@ -5,7 +5,7 @@ import {
   toChecksumAddress,
 } from './zns/utils';
 import { invert, set, isNullAddress } from './utils';
-import { Dictionary, ZnsResolution, nodeHash } from './types';
+import { Dictionary, ZnsResolution, nodeHash, NormalizedSource } from './types';
 import {
   NamingServiceName,
   ResolutionError,
@@ -15,7 +15,7 @@ import {
   UnclaimedDomainResponse,
 } from './index';
 import NamingService from './NamingService';
-import { CryptoRecords } from './publicTypes';
+import { CryptoRecords, NamingServiceConfig } from './publicTypes';
 
 const NetworkIdMap = {
   mainnet: 1,
@@ -36,8 +36,8 @@ const UrlMap = {
 const UrlNetworkMap = (url: string) => invert(UrlMap)[url];
 
 export default class Zns extends NamingService {
-  constructor(source: SourceDefinition = {}) {
-    super(source, NamingServiceName.ZNS);
+  constructor(source?: NamingServiceConfig) {
+    super(NamingServiceName.ZNS, source);
   }
 
   async resolve(domain: string): Promise<ResolutionResponse | null> {
@@ -137,8 +137,8 @@ export default class Zns extends NamingService {
   }
 
   protected normalizeSource(
-    source: SourceDefinition | undefined,
-  ): SourceDefinition {
+    source: NamingServiceConfig,
+  ): NormalizedSource {
     source = { ...source };
     source.network =
       typeof source.network == 'string'

@@ -18,6 +18,22 @@ export interface SourceDefinition {
   provider?: Provider;
 }
 
+export interface NamingServiceConfig {
+  url?: string;
+  network?: string | number;
+  registry?: string;
+  proxyReaderAddress?: string;
+  provider?: Provider;
+  api?: string;
+}
+
+export type SourceConfig = {
+  ens?: NamingServiceConfig | false;
+  zns?: NamingServiceConfig | false;
+  cns?: NamingServiceConfig | false;
+  api?: boolean;
+};
+
 export enum NamingServiceName {
   ENS = 'ENS',
   CNS = 'CNS',

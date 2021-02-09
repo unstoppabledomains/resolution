@@ -8,15 +8,23 @@ import {
 } from './types';
 import { invert, isNullAddress } from './utils';
 import Contract from './utils/contract';
-import { NamingServiceName, SourceDefinition, ResolutionMethod } from './publicTypes';
+import { NamingServiceName, ResolutionMethod, NamingServiceConfig } from './publicTypes';
+import { NormalizedSource } from './types';
 
 export abstract class EthereumNamingService extends NamingService {
   readonly name: NamingServiceName;
   protected readerContract: Contract;
 
+  // Todo update projectId for secure Cns one
   static readonly UrlMap: BlockhanNetworkUrlMap = {
-    1: 'https://main-rpc.linkpool.io',
-    3: 'https://ropsten-rpc.linkpool.io',
+    1: 'https://mainnet.infura.io/v3/e05c36b6b2134ccc9f2594ddff94c136',
+    3: 'https://ropsten.infura.io/v3/e05c36b6b2134ccc9f2594ddff94c136',
+  };
+  
+  // Todo remove when ens whitelisting resolver contracts problem solved
+  static readonly EnsUrlMap: BlockhanNetworkUrlMap = {
+    1: 'https://mainnet.infura.io/v3/e05c36b6b2134ccc9f2594ddff94c136',
+    3: 'https://ropsten.infura.io/v3/e05c36b6b2134ccc9f2594ddff94c136',
   };
 
   static readonly NetworkNameMap = {
@@ -31,8 +39,8 @@ export abstract class EthereumNamingService extends NamingService {
     EthereumNamingService.NetworkNameMap,
   );
 
-  constructor(source: SourceDefinition = {}, name: ResolutionMethod) {
-    super(source, name);
+  constructor(name: ResolutionMethod, source?: NamingServiceConfig) {
+    super(name, source);
     if (this.registryAddress) {
       this.readerContract = this.buildContract(
         this.readerAbi(),
@@ -43,7 +51,7 @@ export abstract class EthereumNamingService extends NamingService {
 
   protected abstract defaultRegistry(network: number): string | undefined;
   protected abstract readerAbi(): any;
-  private networkFromUrl(url: string | undefined): string | undefined {
+  protected networkFromUrl(url: string | undefined): string | undefined {
     if (!url) {
       return undefined;
     }
@@ -60,19 +68,24 @@ export abstract class EthereumNamingService extends NamingService {
     return undefined;
   }
 
-  protected normalizeSource(source: SourceDefinition): SourceDefinition {
-    source = { ...source };
+  // Todo remove when ens whitelisting resolver contracts problem solved
+  protected normalizeSource(source: NamingServiceConfig ): NormalizedSource {
     source.network =
       typeof source.network == 'string'
         ? EthereumNamingService.NetworkNameMap[source.network]
         : source.network || this.networkFromUrl(source.url) || 1;
     if (!source.provider && !source.url) {
-      source.url = source.network
-        ? EthereumNamingService.UrlMap[source.network]
-        : undefined;
+
+      if (this.name === NamingServiceName.ENS) {
+        source.url = source.network
+          ? EthereumNamingService.EnsUrlMap[source.network]
+          : EthereumNamingService.EnsUrlMap[1];
+      } else {
+        source.url = source.network
+          ? EthereumNamingService.UrlMap[source.network]
+          : EthereumNamingService.UrlMap[1];
+      }
     }
-
-
     source.registry = source.registry
       ? source.registry
       : this.defaultRegistry(source.network as number);

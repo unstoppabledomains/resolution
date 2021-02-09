@@ -29,10 +29,8 @@ export function buildResolutionPackage(ethereumUrl?: string): Resolution {
     try {
       const url = (new URL(ethereumUrl)).toString();
       return new Resolution({
-        blockchain: {
-          ens: url,
-          cns: url,
-        },
+          ens: { url },
+          cns: { url },
       });
     } catch (e) {
       if (e instanceof TypeError) {
@@ -42,9 +40,6 @@ export function buildResolutionPackage(ethereumUrl?: string): Resolution {
       }
     }
   }
-
-  console.warn('This RPC is limited to 2,000 calls per 5 minutes. If that is exceeded, then the source IP address is blocked');
-  console.warn('To configure a different provider set --ethereum-url option with valid ethereum provider url');
   return new Resolution();
 }
 

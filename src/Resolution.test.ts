@@ -32,10 +32,8 @@ let resolution: Resolution;
 
 beforeAll(async () => {
   resolution = new Resolution({
-    blockchain: {
       cns: { url: protocolLink() },
       ens: { url: protocolLink() }
-    }
   });
 });
 
@@ -152,37 +150,6 @@ describe('Resolution', () => {
           const serviceName = resolution.serviceName('domain.crypto');
           expect(serviceName).toBe('CNS');
         });
-
-        it('checks naming service via api', () => {
-          const resolution = new Resolution({ blockchain: false });
-          const serviceName = resolution.serviceName('domain.zil');
-          expect(serviceName).toBe('ZNS');
-        });
-
-        it('checks naming service via api 2', () => {
-          const resolution = new Resolution({ blockchain: false });
-          const serviceName = resolution.serviceName('domain.luxe');
-          expect(serviceName).toBe('ENS');
-        });
-
-        it('checks naming service via api 3', () => {
-          const resolution = new Resolution({ blockchain: false });
-          const serviceName = resolution.serviceName('domain.xyz');
-          expect(serviceName).toBe('ENS');
-        });
-
-        it('checks naming service via api 4', () => {
-          const resolution = new Resolution({ blockchain: false });
-          const serviceName = resolution.serviceName('domain.eth');
-          expect(serviceName).toBe('ENS');
-        });
-
-        it('checks naming service via api 5', () => {
-          const resolution = new Resolution({ blockchain: false });
-          const serviceName = resolution.serviceName('domain.crypto');
-          expect(serviceName).toBe('CNS');
-        });
-
       });
 
     });
@@ -201,7 +168,7 @@ describe('Resolution', () => {
       });
 
       it('resolves non-existing domain zone with throw', async () => {
-        const resolution = new Resolution({ blockchain: true });
+        const resolution = new Resolution();
         await expectResolutionErrorCode(
           resolution.addr('bogdangusiev.qq', 'ZIL'),
           ResolutionErrorCode.UnsupportedDomain,

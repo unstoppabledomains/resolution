@@ -25,7 +25,7 @@ describe('ZNS', () => {
     });
 
     it('checks normalizeSource zns (boolean - false)', async () => {
-      const resolution = new Resolution({ blockchain: { zns: false } });
+      const resolution = new Resolution({ zns: false });
       expect(resolution.zns).toBeUndefined();
     });
 
@@ -34,17 +34,9 @@ describe('ZNS', () => {
       expect(resolution.zns?.url).toBe('https://api.zilliqa.com');
     });
 
-    it('checks normalizeSource zns unknown url', async () => {
-      const r = new Resolution({
-        blockchain: { zns: 'https://unknownurl.com' },
-      });
-      expect(r.zns?.network).toEqual(1);
-      expect(r.zns?.url).toEqual('https://unknownurl.com');
-    });
-
     it('checks normalizeSource zns (object) #1', async () => {
       const resolution = new Resolution({
-        blockchain: { zns: { url: 'https://api.zilliqa.com' } },
+        zns: { url: 'https://api.zilliqa.com' },
       });
       expect(resolution.zns?.network).toBe(1);
       expect(resolution.zns?.url).toBe('https://api.zilliqa.com');
@@ -52,7 +44,7 @@ describe('ZNS', () => {
 
     it('checks normalizeSource zns (object) #2', async () => {
       const resolution = new Resolution({
-        blockchain: { zns: { network: 333 } },
+        zns: { network: 333 },
       });
       expect(resolution.zns?.url).toBe('https://dev-api.zilliqa.com');
       expect(resolution.zns?.network).toBe(333);
@@ -61,7 +53,7 @@ describe('ZNS', () => {
 
     it('checks normalizeSource zns (object) #3', async () => {
       const resolution = new Resolution({
-        blockchain: { zns: { url: 'https://api.zilliqa.com' } },
+        zns: { url: 'https://api.zilliqa.com' },
       });
       expect(resolution.zns?.network).toBe(1);
       expect(resolution.zns?.url).toBe('https://api.zilliqa.com');
@@ -69,7 +61,7 @@ describe('ZNS', () => {
 
     it('checks normalizeSource zns (object) #4', async () => {
       const resolution = new Resolution({
-        blockchain: { zns: { url: 'https://api.zilliqa.com', network: 1 } },
+        zns: { url: 'https://api.zilliqa.com', network: 1 },
       });
       expect(resolution.zns?.network).toBe(1);
       expect(resolution.zns?.url).toBe('https://api.zilliqa.com');
@@ -77,7 +69,7 @@ describe('ZNS', () => {
 
     it('checks normalizeSource zns (object) #5', async () => {
       const resolution = new Resolution({
-        blockchain: { zns: { url: 'https://api.zilliqa.com', network: 333 } },
+        zns: { url: 'https://api.zilliqa.com', network: 333 },
       });
 
       expect(resolution.zns?.url).toBe('https://api.zilliqa.com');
@@ -87,19 +79,19 @@ describe('ZNS', () => {
 
     it('checks normalizeSource zns (object) #6', async () => {
       expect(
-        () => new Resolution({ blockchain: { zns: { network: 42 } } }),
+        () => new Resolution({ zns: { network: 42 } }),
       ).toThrowError('Unspecified url in Resolution ZNS configuration');
     });
 
     it('checks normalizeSource zns (object) #7', async () => {
       expect(
-        () => new Resolution({ blockchain: { zns: { network: 'invalid' } } }),
+        () => new Resolution({ zns: { network: 'invalid' } }),
       ).toThrowError('Unspecified network in Resolution ZNS configuration');
     });
 
     it('checks normalizeSource zns (object) #8', async () => {
       const resolution = new Resolution({
-        blockchain: { zns: { network: 1 } },
+        zns: { network: 1 },
       });
       expect(resolution.zns?.network).toBe(1);
       expect(resolution.zns?.url).toBe('https://api.zilliqa.com');
@@ -107,7 +99,7 @@ describe('ZNS', () => {
 
     it('checks normalizeSource zns (object) #9', async () => {
       const resolution = new Resolution({
-        blockchain: { zns: { network: 'testnet' } },
+        zns: { network: 'testnet' },
       });
 
       expect(resolution.zns?.network).toBe(333);
@@ -117,9 +109,7 @@ describe('ZNS', () => {
 
     it('checks normalizeSource zns (object) #10', async () => {
       const resolution = new Resolution({
-        blockchain: {
-          zns: { registry: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz' },
-        },
+        zns: { registry: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz' },
       });
       expect(resolution.zns?.network).toBe(1);
       expect(resolution.zns?.registryAddress).toBe(
@@ -130,9 +120,7 @@ describe('ZNS', () => {
 
     it('checks normalizeSource zns (object) #11', async () => {
       const resolution = new Resolution({
-        blockchain: {
-          zns: { registry: '0xabcffff1231586348194fcabbeff1231240234fc' },
-        },
+        zns: { registry: '0xabcffff1231586348194fcabbeff1231240234fc' },
       });
 
       expect(resolution.zns?.network).toBe(1);
@@ -332,7 +320,7 @@ describe('ZNS', () => {
 
   describe('.isSupportedDomain', () => {
     it('does not support zil domain when zns is disabled', () => {
-      const resolution = new Resolution({ blockchain: { zns: false } });
+      const resolution = new Resolution({  zns: false } );
       expect(resolution.zns).toBeUndefined();
       expect(resolution.isSupportedDomain('hello.zil')).toBeFalsy();
     });

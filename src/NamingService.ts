@@ -11,8 +11,8 @@ import ConfigurationError, {
 } from './errors/configurationError';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import FetchProvider from './FetchProvider';
-import { nodeHash } from './types';
-import { CryptoRecords } from './publicTypes';
+import { nodeHash, NormalizedSource } from './types';
+import { CryptoRecords, NamingServiceConfig } from './publicTypes';
 
 export default abstract class NamingService extends BaseConnection {
   readonly name: ResolutionMethod;
@@ -33,15 +33,44 @@ export default abstract class NamingService extends BaseConnection {
   ): nodeHash;
   abstract allRecords(domain: string): Promise<CryptoRecords>;
 
-  constructor(source: SourceDefinition, name: ResolutionMethod) {
+  constructor(name: ResolutionMethod, source?: NamingServiceConfig) {
     super();
     this.name = name;
-    source = this.normalizeSource(source);
-    this.ensureConfigured(source);
-    this.url = source.url;
-    this.provider = source.provider || new FetchProvider(this.name, this.url || '');
-    this.network = source.network as number;
-    this.registryAddress = source.registry;
+    if (!source) {
+      source = this.getDefaultNormalizedSource(name);
+    }
+    const normalized = this.normalizeSource(source);
+    this.ensureConfigured(normalized);
+    this.url = normalized.url;
+    this.provider = normalized.provider || new FetchProvider(this.name, this.url!);
+    this.network = normalized.network as number;
+    this.registryAddress = normalized.registry;
+  }
+
+
+  // todo update cns url to hold new secure key
+  private getDefaultNormalizedSource(name: ResolutionMethod): NamingServiceConfig {
+    switch (name) {
+      case NamingServiceName.ENS:
+        return {
+          url: "https://mainnet.infura.io/v3/e05c36b6b2134ccc9f2594ddff94c136",
+          network: "mainnet",
+        }
+      case NamingServiceName.ZNS: 
+        return {
+          url: "https://api.zilliqa.com",
+          network: "mainnet"
+        }
+      case NamingServiceName.CNS: 
+        return {
+          url: "https://mainnet.infura.io/v3/e05c36b6b2134ccc9f2594ddff94c136",
+          network: "mainnet"
+        }
+      case "UDAPI":
+        return {
+          url: "https://unstoppabledomains.com/api/v1/"
+        }
+    }
   }
 
   serviceName(domain: string): NamingServiceName {
@@ -70,8 +99,8 @@ export default abstract class NamingService extends BaseConnection {
   }
 
   protected abstract normalizeSource(
-    source: SourceDefinition | undefined,
-  ): SourceDefinition;
+    source: NamingServiceConfig,
+  ): NormalizedSource;
 
   protected ensureSupportedDomain(domain: string): void {
     if (!this.isSupportedDomain(domain)) {

@@ -11,14 +11,13 @@ import {
 import Contract from './utils/contract';
 import contentHash from 'content-hash';
 import EnsNetworkMap from 'ethereum-ens-network-map';
-import { ResolutionResponse, CryptoRecords, SourceDefinition } from './publicTypes';
+import { ResolutionResponse, CryptoRecords, NamingServiceConfig } from './publicTypes';
 import { isNullAddress } from './utils';
 
 export default class Ens extends EthereumNamingService {
   readonly name = NamingServiceName.ENS;
-
-  constructor(source: SourceDefinition = {}) {
-    super(source, NamingServiceName.ENS);
+  constructor(source?: NamingServiceConfig) {
+    super(NamingServiceName.ENS, source);
   }
 
   protected readerAbi(): any {
