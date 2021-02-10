@@ -23,7 +23,7 @@ export abstract class EthereumNamingService extends NamingService {
   // Todo remove when ens whitelisting resolver contracts problem solved
   static readonly EnsUrlMap: BlockhanNetworkUrlMap = {
     1: 'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
-    3: 'https://ropsten.infura.io/v3/e05c36b6b2134ccc9f2594ddff94c136',
+    3: 'https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
   };
 
   static readonly NetworkNameMap = {

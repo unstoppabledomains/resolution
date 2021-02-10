@@ -162,7 +162,7 @@ export function protocolLink(providerProtocol: ProviderProtocol = ProviderProtoc
   const secret = process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID;
   const protocolMap = {
     [ProviderProtocol.http]: secret ? `https://mainnet.infura.io/v3/${secret}` : 'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
-    [ProviderProtocol.wss]: secret ? `wss://mainnet.infura.io/ws/v3/${secret}` : 'wss://mainnet.infura.io/ws/v3/213fff28936343858ca9c5115eff1419',
+    [ProviderProtocol.wss]: secret ? `wss://mainnet.infura.io/ws/v3/${secret}` : 'wss://mainnet.infura.io/ws/v3/d423cf2499584d7fbe171e33b42cfbee',
   };
   return protocolMap[providerProtocol];
 }
