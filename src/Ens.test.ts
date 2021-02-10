@@ -162,7 +162,7 @@ describe('ENS', () => {
   it('checks normalizeSource ens (object) #2', async () => {
     const resolution = new Resolution({ ens: { network: 3 } });
     expect(resolution.ens?.network).toBe(3);
-    expect(resolution.ens?.url).toBe('https://ropsten.infura.io/v3/e05c36b6b2134ccc9f2594ddff94c136');
+    expect(resolution.ens?.url).toBe('https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee');
     expect(resolution.ens?.registryAddress).toBe(
       '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
     );
@@ -233,7 +233,7 @@ describe('ENS', () => {
       },
     });
     expect(resolution.ens?.network).toBe(3);
-    expect(resolution.ens?.url).toBe('https://ropsten.infura.io/v3/e05c36b6b2134ccc9f2594ddff94c136');
+    expect(resolution.ens?.url).toBe('https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee');
     expect(resolution.ens?.registryAddress).toBe(
       '0x112234455c3a32fd11230c42e7bccd4a84e02010',
     );
