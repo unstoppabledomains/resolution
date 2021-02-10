@@ -28,7 +28,7 @@ describe('ENS', () => {
     const resolution = new Resolution({
       ens: { network: 'mainnet' },
     });
-    expect(resolution.ens?.url).toBe('https://mainnet.infura.io/v3/e05c36b6b2134ccc9f2594ddff94c136');
+    expect(resolution.ens?.url).toBe('https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee');
     expect(resolution.ens?.network).toEqual(1);
   });
 
@@ -151,7 +151,7 @@ describe('ENS', () => {
   it('checks normalizeSource ens (boolean)', async () => {
     const resolution = new Resolution();
     expect(resolution.ens?.network).toBe(1);
-    expect(resolution.ens?.url).toBe('https://mainnet.infura.io/v3/e05c36b6b2134ccc9f2594ddff94c136');
+    expect(resolution.ens?.url).toBe('https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee');
   });
 
   it('checks normalizeSource ens (object) #1', async () => {
@@ -204,7 +204,7 @@ describe('ENS', () => {
       ens: { network: 'mainnet' },
     });
     expect(resolution.ens?.network).toBe(1);
-    expect(resolution.ens?.url).toBe('https://mainnet.infura.io/v3/e05c36b6b2134ccc9f2594ddff94c136');
+    expect(resolution.ens?.url).toBe('https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee');
   });
 
   it('checks normalizeSource ens (object) #9', async () => {
@@ -219,7 +219,7 @@ describe('ENS', () => {
       ens: { registry: '0x314159265dd8dbb310642f98f50c066173c1259b' },
     });
     expect(resolution.ens?.network).toBe(1);
-    expect(resolution.ens?.url).toBe('https://mainnet.infura.io/v3/e05c36b6b2134ccc9f2594ddff94c136');
+    expect(resolution.ens?.url).toBe('https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee');
     expect(resolution.ens?.registryAddress).toBe(
       '0x314159265dd8dbb310642f98f50c066173c1259b',
     );
@@ -245,7 +245,7 @@ describe('ENS', () => {
     });
 
     expect(resolution.ens?.network).toBe(1);
-    expect(resolution.ens?.url).toBe('https://mainnet.infura.io/v3/e05c36b6b2134ccc9f2594ddff94c136');
+    expect(resolution.ens?.url).toBe('https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee');
     expect(resolution.ens?.registryAddress).toBe(
       '0xabcffff1231586348194fcabbeff1231240234fc',
     );

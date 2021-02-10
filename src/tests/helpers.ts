@@ -161,7 +161,7 @@ export function protocolLink(providerProtocol: ProviderProtocol = ProviderProtoc
   // eslint-disable-next-line no-undef
   const secret = process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID;
   const protocolMap = {
-    [ProviderProtocol.http]: secret ? `https://mainnet.infura.io/v3/${secret}` : 'https://mainnet.infura.io/v3/e05c36b6b2134ccc9f2594ddff94c136',
+    [ProviderProtocol.http]: secret ? `https://mainnet.infura.io/v3/${secret}` : 'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
     [ProviderProtocol.wss]: secret ? `wss://mainnet.infura.io/ws/v3/${secret}` : 'wss://mainnet.infura.io/ws/v3/213fff28936343858ca9c5115eff1419',
   };
   return protocolMap[providerProtocol];

@@ -50,7 +50,7 @@ export default abstract class NamingService extends BaseConnection {
     switch (name) {
     case NamingServiceName.ENS:
       return {
-        url: "https://mainnet.infura.io/v3/e05c36b6b2134ccc9f2594ddff94c136",
+        url: "https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee",
         network: "mainnet",
       }
     case NamingServiceName.ZNS: 
