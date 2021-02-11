@@ -17,25 +17,25 @@ beforeEach(() => {
 describe('Unstoppable API', () => {
   it('resolves a domain', async () => {
     mockAPICalls('ud_api_generic_test', DefaultUrl);
-    const resolution = new Resolution({ api: true });
+    const resolution = new Resolution({ sourceConfig: { api: true } });
     const result = await resolution.addr('cofounding.zil', 'eth');
     expect(result).toEqual('0xaa91734f90795e80751c96e682a321bb3c1a4186');
   });
   it('namehashes zil domain', async () => {
-    const resolution = new Resolution({ api: true });
+    const resolution = new Resolution({ sourceConfig: { api: true } });
     expect(resolution.namehash('cofounding.zil')).toEqual(
       '0x1cc365ffd60bb50538e01d24c1f1e26c887c36f26a0de250660b8a1465c60667',
     );
   });
   it('supports zil and eth domains', async () => {
-    const resolution = new Resolution({ api: true });
+    const resolution = new Resolution({ sourceConfig: { api: true } });
     expect(resolution.isSupportedDomain('cofounding.zil')).toEqual(true);
     expect(resolution.isSupportedDomain('cofounding.eth')).toEqual(true);
     expect(resolution.isSupportedDomain('cofounding.unknown')).toEqual(false);
   });
 
   it('throws NamingServiceDown on FetchError', async () => {
-    const resolution = new Resolution({ api: true });
+    const resolution = new Resolution({ sourceConfig: { api: true } });
     const error = new Error();
     error.name = 'FetchError';
     jest.spyOn(resolution.api as any, 'fetch').mockRejectedValue(error);
@@ -46,24 +46,30 @@ describe('Unstoppable API', () => {
   });
 
   it('should return verified twitter handle', async () => {
-    const resolution = new Resolution({ api: true });
-    const eyes = mockAsyncMethod(resolution.api, "resolve", 
-      {
-        "addresses":{},
-        "whois":{},
-        "ipfs":{},
-        "gundb":{},
-        "social":{},
-        "meta":
-      {"domain":"ijustwannatestsomething2.crypto",
-        "namehash":"0xcbef5c2009359c88519191d7c0d00f3973f76f24bdb0fc8d5254de26a44e0903",
-        "tokenId":"92242420535237173873666448151646428182056687247223888232110666318291334465795",
-        "owner":"0x6ec0deed30605bcd19342f3c30201db263291589",
-        "resolver":"0xb66dce2da6afaaa98f2013446dbcb0f4b0ab2842",
-        "type":"CNS",
-        "ttl":0
-      },"records":{"social.twitter.username":"derainberk","validation.social.twitter.username":"0xcd2655d9557e5535313b47107fa8f943eb1fec4da6f348668062e66233dde21b413784c4060340f48da364311c6e2549416a6a23dc6fbb48885382802826b8111b"}}
-    );
+    const resolution = new Resolution({ sourceConfig: { api: true } });
+    const eyes = mockAsyncMethod(resolution.api, 'resolve', {
+      addresses: {},
+      whois: {},
+      ipfs: {},
+      gundb: {},
+      social: {},
+      meta: {
+        domain: 'ijustwannatestsomething2.crypto',
+        namehash:
+          '0xcbef5c2009359c88519191d7c0d00f3973f76f24bdb0fc8d5254de26a44e0903',
+        tokenId:
+          '92242420535237173873666448151646428182056687247223888232110666318291334465795',
+        owner: '0x6ec0deed30605bcd19342f3c30201db263291589',
+        resolver: '0xb66dce2da6afaaa98f2013446dbcb0f4b0ab2842',
+        type: 'CNS',
+        ttl: 0,
+      },
+      records: {
+        'social.twitter.username': 'derainberk',
+        'validation.social.twitter.username':
+          '0xcd2655d9557e5535313b47107fa8f943eb1fec4da6f348668062e66233dde21b413784c4060340f48da364311c6e2549416a6a23dc6fbb48885382802826b8111b',
+      },
+    });
     const twitterHandle = await resolution.twitter(
       CryptoDomainWithTwitterVerification,
     );
@@ -72,7 +78,7 @@ describe('Unstoppable API', () => {
   });
 
   it('should throw unsupported method', async () => {
-    const resolution = new Resolution({ api: true});
+    const resolution = new Resolution({ sourceConfig: { api: true } });
     const handle = 'ryan.eth';
     await expect(resolution.twitter(handle)).rejects.toThrowError(
       `Method twitter is not supported for ${handle}`,
@@ -80,7 +86,7 @@ describe('Unstoppable API', () => {
   });
 
   it('returns owner of the domain', async () => {
-    const resolution = new Resolution({ api: true });
+    const resolution = new Resolution({ sourceConfig: { api: true } });
     mockAPICalls('ud_api_generic_test', DefaultUrl);
     expect(await resolution.owner('cofounding.zil')).toEqual(
       'zil1ye72zl5t8wl5n3f2fsa5w0x7hja0jqj7mhct23',
@@ -88,7 +94,7 @@ describe('Unstoppable API', () => {
   });
 
   it('should return a valid ipfsHash from API', async () => {
-    const resolution = new Resolution({ api: true });
+    const resolution = new Resolution({ sourceConfig: { api: true } });
     const eyes = mockAsyncMethod(resolution.api, 'resolve', {
       addresses: {
         BCH: 'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6',
@@ -131,7 +137,7 @@ describe('Unstoppable API', () => {
   });
 
   it('should return a valid email from API', async () => {
-    const resolution = new Resolution({ api: true });
+    const resolution = new Resolution({ sourceConfig: { api: true } });
     const eyes = mockAsyncMethod(resolution.api, 'resolve', {
       addresses: {},
       whois: {
@@ -161,7 +167,7 @@ describe('Unstoppable API', () => {
   });
 
   it('should return a valid httpUrl from API', async () => {
-    const resolution = new Resolution({ api: true });
+    const resolution = new Resolution({ sourceConfig: { api: true } });
     const eyes = mockAsyncMethod(resolution.api, 'resolve', {
       addresses: {
         BCH: 'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6',
@@ -204,7 +210,7 @@ describe('Unstoppable API', () => {
   });
 
   it('should get all records from API', async () => {
-    const resolution = new Resolution({ api: true });
+    const resolution = new Resolution({ sourceConfig: { api: true } });
     const eyes = mockAsyncMethod(resolution.api, 'resolve', {
       addresses: { ETH: '0xe7474D07fD2FA286e7e0aa23cd107F8379085037' },
       whois: { email: 'jeyhunt@gmail.com' },

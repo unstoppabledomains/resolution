@@ -54,21 +54,24 @@ export default class Resolution {
   /** @internal */
   readonly api?: UdApi;
 
-  constructor(source: SourceConfig = {}) {
-    if (source.api) {
+  constructor({
+    sourceConfig = undefined,
+  }: { sourceConfig?: SourceConfig } = {}) {
+    if (sourceConfig?.api) {
       this.api = new UdApi();
       return this;
     }
-
-    if (source.ens !== false) {
-      this.ens = new Ens(source.ens);
+    const ens = sourceConfig?.ens;
+    const zns = sourceConfig?.zns;
+    const cns = sourceConfig?.cns;
+    if (ens !== false) {
+      this.ens = new Ens(ens);
     }
-
-    if (source.cns !== false) {
-      this.cns = new Cns(source.cns);
+    if (cns !== false) {
+      this.cns = new Cns(cns);
     }
-    if (source.zns !== false) {
-      this.zns = new Zns(source.zns);
+    if (zns !== false) {
+      this.zns = new Zns(zns);
     }
   }
 
@@ -79,10 +82,11 @@ export default class Resolution {
    */
   static infura(infura: string, network = 'mainnet'): Resolution {
     return new this({
-      ens: { url: signedInfuraLink(infura, network), network },
-      cns: { url: signedInfuraLink(infura, network), network },
-    },
-    );
+      sourceConfig: {
+        ens: { url: signedInfuraLink(infura, network), network },
+        cns: { url: signedInfuraLink(infura, network), network },
+      },
+    });
   }
 
   /**
@@ -92,9 +96,11 @@ export default class Resolution {
    */
   static fromEip1193Provider(provider: Provider): Resolution {
     return new this({
-      zns: false,
-      ens: { provider },
-      cns: { provider },
+      sourceConfig: {
+        zns: false,
+        ens: { provider },
+        cns: { provider },
+      },
     });
   }
 

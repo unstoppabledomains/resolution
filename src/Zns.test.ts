@@ -12,12 +12,11 @@ import { NamingServiceName, TickerVersion } from './publicTypes';
 let resolution: Resolution;
 
 describe('ZNS', () => {
-
   beforeEach(() => {
     jest.restoreAllMocks();
     resolution = new Resolution();
   });
-  
+
   describe('.NormalizeSource', () => {
     it('checks normalizeSource zns (boolean)', async () => {
       expect(resolution.zns?.network).toBe(1);
@@ -25,7 +24,7 @@ describe('ZNS', () => {
     });
 
     it('checks normalizeSource zns (boolean - false)', async () => {
-      const resolution = new Resolution({ zns: false });
+      const resolution = new Resolution({ sourceConfig: { zns: false } });
       expect(resolution.zns).toBeUndefined();
     });
 
@@ -36,7 +35,7 @@ describe('ZNS', () => {
 
     it('checks normalizeSource zns (object) #1', async () => {
       const resolution = new Resolution({
-        zns: { url: 'https://api.zilliqa.com' },
+        sourceConfig: { zns: { url: 'https://api.zilliqa.com' } },
       });
       expect(resolution.zns?.network).toBe(1);
       expect(resolution.zns?.url).toBe('https://api.zilliqa.com');
@@ -44,7 +43,7 @@ describe('ZNS', () => {
 
     it('checks normalizeSource zns (object) #2', async () => {
       const resolution = new Resolution({
-        zns: { network: 333 },
+        sourceConfig: { zns: { network: 333 } },
       });
       expect(resolution.zns?.url).toBe('https://dev-api.zilliqa.com');
       expect(resolution.zns?.network).toBe(333);
@@ -53,7 +52,7 @@ describe('ZNS', () => {
 
     it('checks normalizeSource zns (object) #3', async () => {
       const resolution = new Resolution({
-        zns: { url: 'https://api.zilliqa.com' },
+        sourceConfig: { zns: { url: 'https://api.zilliqa.com' } },
       });
       expect(resolution.zns?.network).toBe(1);
       expect(resolution.zns?.url).toBe('https://api.zilliqa.com');
@@ -61,7 +60,7 @@ describe('ZNS', () => {
 
     it('checks normalizeSource zns (object) #4', async () => {
       const resolution = new Resolution({
-        zns: { url: 'https://api.zilliqa.com', network: 1 },
+        sourceConfig: { zns: { url: 'https://api.zilliqa.com', network: 1 } },
       });
       expect(resolution.zns?.network).toBe(1);
       expect(resolution.zns?.url).toBe('https://api.zilliqa.com');
@@ -69,7 +68,7 @@ describe('ZNS', () => {
 
     it('checks normalizeSource zns (object) #5', async () => {
       const resolution = new Resolution({
-        zns: { url: 'https://api.zilliqa.com', network: 333 },
+        sourceConfig: { zns: { url: 'https://api.zilliqa.com', network: 333 } },
       });
 
       expect(resolution.zns?.url).toBe('https://api.zilliqa.com');
@@ -79,19 +78,19 @@ describe('ZNS', () => {
 
     it('checks normalizeSource zns (object) #6', async () => {
       expect(
-        () => new Resolution({ zns: { network: 42 } }),
+        () => new Resolution({ sourceConfig: { zns: { network: 42 } } }),
       ).toThrowError('Unspecified url in Resolution ZNS configuration');
     });
 
     it('checks normalizeSource zns (object) #7', async () => {
       expect(
-        () => new Resolution({ zns: { network: 'invalid' } }),
+        () => new Resolution({ sourceConfig: { zns: { network: 'invalid' } } }),
       ).toThrowError('Unspecified network in Resolution ZNS configuration');
     });
 
     it('checks normalizeSource zns (object) #8', async () => {
       const resolution = new Resolution({
-        zns: { network: 1 },
+        sourceConfig: { zns: { network: 1 } },
       });
       expect(resolution.zns?.network).toBe(1);
       expect(resolution.zns?.url).toBe('https://api.zilliqa.com');
@@ -99,7 +98,7 @@ describe('ZNS', () => {
 
     it('checks normalizeSource zns (object) #9', async () => {
       const resolution = new Resolution({
-        zns: { network: 'testnet' },
+        sourceConfig: { zns: { network: 'testnet' } },
       });
 
       expect(resolution.zns?.network).toBe(333);
@@ -109,7 +108,9 @@ describe('ZNS', () => {
 
     it('checks normalizeSource zns (object) #10', async () => {
       const resolution = new Resolution({
-        zns: { registry: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz' },
+        sourceConfig: {
+          zns: { registry: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz' },
+        },
       });
       expect(resolution.zns?.network).toBe(1);
       expect(resolution.zns?.registryAddress).toBe(
@@ -120,7 +121,9 @@ describe('ZNS', () => {
 
     it('checks normalizeSource zns (object) #11', async () => {
       const resolution = new Resolution({
-        zns: { registry: '0xabcffff1231586348194fcabbeff1231240234fc' },
+        sourceConfig: {
+          zns: { registry: '0xabcffff1231586348194fcabbeff1231240234fc' },
+        },
       });
 
       expect(resolution.zns?.network).toBe(1);
@@ -136,9 +139,12 @@ describe('ZNS', () => {
       const eyes = mockAsyncMethods(resolution.zns, {
         getRecordsAddresses: [
           'zil1ye72zl5t8wl5n3f2fsa5w0x7hja0jqj7mhct23',
-          '0xb17c35e557a8c13a730696c92d716a58421e36ca'
+          '0xb17c35e557a8c13a730696c92d716a58421e36ca',
         ],
-        getResolverRecords: {"crypto.BTC.address":"1NZKHwpfqprxzcaijcjf71CZr27D8osagR","crypto.ETH.address":"0xaa91734f90795e80751c96e682a321bb3c1a4186"}
+        getResolverRecords: {
+          'crypto.BTC.address': '1NZKHwpfqprxzcaijcjf71CZr27D8osagR',
+          'crypto.ETH.address': '0xaa91734f90795e80751c96e682a321bb3c1a4186',
+        },
       });
       const result = await resolution.resolve('cofounding.zil');
       expectSpyToBeCalled(eyes);
@@ -203,9 +209,7 @@ describe('ZNS', () => {
         getRecordsAddresses: undefined,
       });
       await expectResolutionErrorCode(
-        resolution.resolver(
-          'sopmethingveryweirdthatnoonewilltakeever.zil',
-        ),
+        resolution.resolver('sopmethingveryweirdthatnoonewilltakeever.zil'),
         ResolutionErrorCode.UnregisteredDomain,
       );
       expectSpyToBeCalled(spies);
@@ -242,76 +246,108 @@ describe('ZNS', () => {
     describe('.multichain tokens', () => {
       it('should work with erc20 usdt record on zilliqa', async () => {
         const spies = mockAsyncMethods(resolution.zns, {
-          getRecordsAddresses:[
+          getRecordsAddresses: [
             'zil19kulqq9m4d8ckt7r68e4xyqwh2znexspz3h77c',
-            '0x8e3c259d774bb9da6cef4bd33bc64d22b4621a96'
+            '0x8e3c259d774bb9da6cef4bd33bc64d22b4621a96',
           ],
-          fetchSubState: {records: {
-            ZIL: 'zil19kulqq9m4d8ckt7r68e4xyqwh2znexspz3h77c',
-            'crypto.USDT.version.EOS.address': 'letsminesome',
-            'crypto.USDT.version.ERC20.address': '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
-            'crypto.USDT.version.OMNI.address': '19o6LvAdCPkjLi83VsjrCsmvQZUirT4KXJ',
-            'crypto.USDT.version.TRON.address': 'TNemhXhpX7MwzZJa3oXvfCjo5pEeXrfN2h'
-          }}
+          fetchSubState: {
+            records: {
+              ZIL: 'zil19kulqq9m4d8ckt7r68e4xyqwh2znexspz3h77c',
+              'crypto.USDT.version.EOS.address': 'letsminesome',
+              'crypto.USDT.version.ERC20.address':
+                '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+              'crypto.USDT.version.OMNI.address':
+                '19o6LvAdCPkjLi83VsjrCsmvQZUirT4KXJ',
+              'crypto.USDT.version.TRON.address':
+                'TNemhXhpX7MwzZJa3oXvfCjo5pEeXrfN2h',
+            },
+          },
         });
-        const erc20 = await resolution.usdt(ZilDomainWithUsdtMultiChainRecords, TickerVersion.ERC20);
+        const erc20 = await resolution.usdt(
+          ZilDomainWithUsdtMultiChainRecords,
+          TickerVersion.ERC20,
+        );
         expectSpyToBeCalled(spies);
         expect(erc20).toBe('0xe7474D07fD2FA286e7e0aa23cd107F8379085037');
       });
 
       it('should work with tron usdt record on zilliqa', async () => {
         const spies = mockAsyncMethods(resolution.zns, {
-          getRecordsAddresses:[
+          getRecordsAddresses: [
             'zil19kulqq9m4d8ckt7r68e4xyqwh2znexspz3h77c',
-            '0x8e3c259d774bb9da6cef4bd33bc64d22b4621a96'
+            '0x8e3c259d774bb9da6cef4bd33bc64d22b4621a96',
           ],
-          fetchSubState: {records: {
-            ZIL: 'zil19kulqq9m4d8ckt7r68e4xyqwh2znexspz3h77c',
-            'crypto.USDT.version.EOS.address': 'letsminesome',
-            'crypto.USDT.version.ERC20.address': '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
-            'crypto.USDT.version.OMNI.address': '19o6LvAdCPkjLi83VsjrCsmvQZUirT4KXJ',
-            'crypto.USDT.version.TRON.address': 'TNemhXhpX7MwzZJa3oXvfCjo5pEeXrfN2h'
-          }}
+          fetchSubState: {
+            records: {
+              ZIL: 'zil19kulqq9m4d8ckt7r68e4xyqwh2znexspz3h77c',
+              'crypto.USDT.version.EOS.address': 'letsminesome',
+              'crypto.USDT.version.ERC20.address':
+                '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+              'crypto.USDT.version.OMNI.address':
+                '19o6LvAdCPkjLi83VsjrCsmvQZUirT4KXJ',
+              'crypto.USDT.version.TRON.address':
+                'TNemhXhpX7MwzZJa3oXvfCjo5pEeXrfN2h',
+            },
+          },
         });
-        const tron = await resolution.usdt(ZilDomainWithUsdtMultiChainRecords, TickerVersion.TRON);
+        const tron = await resolution.usdt(
+          ZilDomainWithUsdtMultiChainRecords,
+          TickerVersion.TRON,
+        );
         expectSpyToBeCalled(spies);
         expect(tron).toBe('TNemhXhpX7MwzZJa3oXvfCjo5pEeXrfN2h');
       });
 
       it('should work with omni usdt record on zilliqa', async () => {
         const spies = mockAsyncMethods(resolution.zns, {
-          getRecordsAddresses:[
+          getRecordsAddresses: [
             'zil19kulqq9m4d8ckt7r68e4xyqwh2znexspz3h77c',
-            '0x8e3c259d774bb9da6cef4bd33bc64d22b4621a96'
+            '0x8e3c259d774bb9da6cef4bd33bc64d22b4621a96',
           ],
-          fetchSubState: {records: {
-            ZIL: 'zil19kulqq9m4d8ckt7r68e4xyqwh2znexspz3h77c',
-            'crypto.USDT.version.EOS.address': 'letsminesome',
-            'crypto.USDT.version.ERC20.address': '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
-            'crypto.USDT.version.OMNI.address': '19o6LvAdCPkjLi83VsjrCsmvQZUirT4KXJ',
-            'crypto.USDT.version.TRON.address': 'TNemhXhpX7MwzZJa3oXvfCjo5pEeXrfN2h'
-          }}
+          fetchSubState: {
+            records: {
+              ZIL: 'zil19kulqq9m4d8ckt7r68e4xyqwh2znexspz3h77c',
+              'crypto.USDT.version.EOS.address': 'letsminesome',
+              'crypto.USDT.version.ERC20.address':
+                '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+              'crypto.USDT.version.OMNI.address':
+                '19o6LvAdCPkjLi83VsjrCsmvQZUirT4KXJ',
+              'crypto.USDT.version.TRON.address':
+                'TNemhXhpX7MwzZJa3oXvfCjo5pEeXrfN2h',
+            },
+          },
         });
-        const omni = await resolution.usdt(ZilDomainWithUsdtMultiChainRecords, TickerVersion.OMNI);
+        const omni = await resolution.usdt(
+          ZilDomainWithUsdtMultiChainRecords,
+          TickerVersion.OMNI,
+        );
         expectSpyToBeCalled(spies);
         expect(omni).toBe('19o6LvAdCPkjLi83VsjrCsmvQZUirT4KXJ');
       });
 
       it('should work with erc20 usdt record on zilliqa', async () => {
         const spies = mockAsyncMethods(resolution.zns, {
-          getRecordsAddresses:[
+          getRecordsAddresses: [
             'zil19kulqq9m4d8ckt7r68e4xyqwh2znexspz3h77c',
-            '0x8e3c259d774bb9da6cef4bd33bc64d22b4621a96'
+            '0x8e3c259d774bb9da6cef4bd33bc64d22b4621a96',
           ],
-          fetchSubState: {records: {
-            ZIL: 'zil19kulqq9m4d8ckt7r68e4xyqwh2znexspz3h77c',
-            'crypto.USDT.version.EOS.address': 'letsminesome',
-            'crypto.USDT.version.ERC20.address': '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
-            'crypto.USDT.version.OMNI.address': '19o6LvAdCPkjLi83VsjrCsmvQZUirT4KXJ',
-            'crypto.USDT.version.TRON.address': 'TNemhXhpX7MwzZJa3oXvfCjo5pEeXrfN2h'
-          }}
+          fetchSubState: {
+            records: {
+              ZIL: 'zil19kulqq9m4d8ckt7r68e4xyqwh2znexspz3h77c',
+              'crypto.USDT.version.EOS.address': 'letsminesome',
+              'crypto.USDT.version.ERC20.address':
+                '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+              'crypto.USDT.version.OMNI.address':
+                '19o6LvAdCPkjLi83VsjrCsmvQZUirT4KXJ',
+              'crypto.USDT.version.TRON.address':
+                'TNemhXhpX7MwzZJa3oXvfCjo5pEeXrfN2h',
+            },
+          },
         });
-        const eos = await resolution.usdt(ZilDomainWithUsdtMultiChainRecords, TickerVersion.EOS);
+        const eos = await resolution.usdt(
+          ZilDomainWithUsdtMultiChainRecords,
+          TickerVersion.EOS,
+        );
         expectSpyToBeCalled(spies);
         expect(eos).toBe('letsminesome');
       });
@@ -320,7 +356,7 @@ describe('ZNS', () => {
 
   describe('.isSupportedDomain', () => {
     it('does not support zil domain when zns is disabled', () => {
-      const resolution = new Resolution({  zns: false } );
+      const resolution = new Resolution({ sourceConfig: { zns: false } });
       expect(resolution.zns).toBeUndefined();
       expect(resolution.isSupportedDomain('hello.zil')).toBeFalsy();
     });
@@ -365,7 +401,8 @@ describe('ZNS', () => {
         const domain = 'hello.world.zil';
         const namehash = resolution.namehash(domain);
         const childhash = resolution.childhash(
-          resolution.namehash('world.zil'), 'hello',
+          resolution.namehash('world.zil'),
+          'hello',
           NamingServiceName.ZNS,
         );
         expect(namehash).toBe(childhash);
