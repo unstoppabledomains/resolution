@@ -5,7 +5,7 @@ import mockData from './mockData.json';
 import ResolutionError, { ResolutionErrorCode } from '../errors/resolutionError';
 import ConfigurationError, { ConfigurationErrorCode } from '../errors/configurationError';
 import DnsRecordsError, { DnsRecordsErrorCode } from '../errors/dnsRecordsError';
-import { NamingServiceName } from '../../build';
+import { NamingServiceName } from '../publicTypes';
 
 export const MainnetUrl = 'https://mainnet.infura.io';
 export const ZilliqaUrl = 'https://api.zilliqa.com';

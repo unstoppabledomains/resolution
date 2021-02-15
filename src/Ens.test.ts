@@ -14,7 +14,7 @@ import {
 } from './tests/helpers';
 import { ConfigurationErrorCode } from './errors/configurationError';
 import { TickerVersion } from './publicTypes';
-import { NamingServiceName } from '../build';
+import { NamingServiceName } from './publicTypes';
 
 let resolution: Resolution;
 

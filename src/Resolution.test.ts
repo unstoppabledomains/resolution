@@ -27,7 +27,7 @@ import {
 import { RpcProviderTestCases } from './tests/providerMockData';
 import fetch, { FetchError } from 'node-fetch';
 import standardKeys from './utils/standardKeys';
-import { NamingServiceName } from '../build';
+import { NamingServiceName } from './publicTypes';
 
 let resolution: Resolution;
 
