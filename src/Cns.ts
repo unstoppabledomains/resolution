@@ -1,5 +1,5 @@
 import { EthereumNamingService } from './EthereumNamingService';
-import { ProxyReaderMap } from './types';
+import { BlockhanNetworkUrlMap, ProxyReaderMap } from './types';
 import { default as proxyReaderAbi } from './cns/contract/proxyReader';
 import { default as resolverInterface } from './cns/contract/resolver';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
@@ -30,6 +30,13 @@ export default class Cns extends EthereumNamingService {
 
   protected defaultRegistry(network: number): string | undefined {
     return Cns.ProxyReaderMap[network];
+  }
+
+  protected urlMap(): BlockhanNetworkUrlMap {
+    return {
+      1: 'https://mainnet.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+      4: 'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+    };
   }
 
   isSupportedDomain(domain: string): boolean {

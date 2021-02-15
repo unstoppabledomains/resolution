@@ -5,6 +5,8 @@ import mockData from './mockData.json';
 import ResolutionError, { ResolutionErrorCode } from '../errors/resolutionError';
 import ConfigurationError, { ConfigurationErrorCode } from '../errors/configurationError';
 import DnsRecordsError, { DnsRecordsErrorCode } from '../errors/dnsRecordsError';
+import { NamingServiceName } from '../../build';
+
 export const MainnetUrl = 'https://mainnet.infura.io';
 export const ZilliqaUrl = 'https://api.zilliqa.com';
 export const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
@@ -60,7 +62,7 @@ export function pendingInLive(): void {
   }
 }
 
-export function expectSpyToBeCalled(spies: jest.SpyInstance[], times?: number ): void {
+export function expectSpyToBeCalled(spies: jest.SpyInstance[], times?: number): void {
   if (!isLive()) {
     spies.forEach((spy) => {
       times ? expect(spy).toBeCalledTimes(times) : expect(spy).toBeCalled()
@@ -134,49 +136,64 @@ export function mockAPICalls(testName: string, url = MainnetUrl): void {
 
   mockCall.forEach(({ METHOD, REQUEST, RESPONSE }) => {
     switch (METHOD) {
-    case 'POST': {
-      nock(url)
-        // .log()
-        .post('/', JSON.stringify(REQUEST), undefined)
-        .reply(200, JSON.stringify(RESPONSE));
-      break;
-    }
-    default: {
-      nock(url)
-        // .log()
-        .get(REQUEST as string, undefined, undefined)
-        .reply(200, RESPONSE);
-    }
+      case 'POST': {
+        nock(url)
+          // .log()
+          .post('/', JSON.stringify(REQUEST), undefined)
+          .reply(200, JSON.stringify(RESPONSE));
+        break;
+      }
+      default: {
+        nock(url)
+          // .log()
+          .get(REQUEST as string, undefined, undefined)
+          .reply(200, RESPONSE);
+      }
     }
   });
 }
 
 /**
- * returns either a standard mainnet linkpool url
- * @see https://docs.linkpool.io/docs/rpc_main
+ * returns either a standard ethereum provider url
  * or the one with attached INFURA SECRET key from
  * UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID env variable if any
  */
-export function protocolLink(providerProtocol: ProviderProtocol = ProviderProtocol.http): string {
-  // eslint-disable-next-line no-undef
-  const secret = process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID;
-  const protocolMap = {
-    [ProviderProtocol.http]: secret ? `https://mainnet.infura.io/v3/${secret}` : 'https://main-rpc.linkpool.io',
-    [ProviderProtocol.wss]: secret ? `wss://mainnet.infura.io/ws/v3/${secret}` : 'wss://main-rpc.linkpool.io/ws',
-  };
-  return protocolMap[providerProtocol];
+export function protocolLink(
+  providerProtocol: ProviderProtocol = ProviderProtocol.http,
+  namingService: NamingServiceName.ENS | NamingServiceName.CNS = NamingServiceName.CNS,
+): string {
+  const secret = process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID ?? undefined;
+
+  if (!secret) {
+    return ethereumDefaultProviders[namingService][providerProtocol];
+  }
+
+  return providerProtocol === ProviderProtocol.wss ?
+    `wss://mainnet.infura.io/ws/v3/${secret}` :
+    `https://mainnet.infura.io/v3/${secret}`;
 }
 
 export enum ProviderProtocol {
-  'http', 'wss'
+  'http' = 'http', 'wss' = 'wss'
 }
 
 export const caseMock = <T, U>(params: T, cases: { request: T, response: U }[]): U => {
-  for (const {request, response} of cases) {
+  for (const { request, response } of cases) {
     if (_.isEqual(params, request)) {
       return response;
     }
   }
   
   throw new Error(`got unexpected params ${JSON.stringify(params)}`);
-}
+};
+
+const ethereumDefaultProviders = {
+  [NamingServiceName.ENS]: {
+    [ProviderProtocol.http]: 'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
+    [ProviderProtocol.wss]: 'wss://mainnet.infura.io/ws/v3/d423cf2499584d7fbe171e33b42cfbee',
+  },
+  [NamingServiceName.CNS]: {
+    [ProviderProtocol.http]: 'https://mainnet.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+    [ProviderProtocol.wss]: 'wss://mainnet.infura.io/ws/v3/c4bb906ed6904c42b19c95825fe55f39',
+  },
+};
