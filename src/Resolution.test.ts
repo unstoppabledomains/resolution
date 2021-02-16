@@ -27,6 +27,7 @@ import {
 import { RpcProviderTestCases } from './tests/providerMockData';
 import fetch, { FetchError } from 'node-fetch';
 import standardKeys from './utils/standardKeys';
+import { NamingServiceName } from './publicTypes';
 
 let resolution: Resolution;
 
@@ -34,7 +35,7 @@ beforeAll(async () => {
   resolution = new Resolution({
     blockchain: {
       cns: { url: protocolLink() },
-      ens: { url: protocolLink() }
+      ens: { url: protocolLink(ProviderProtocol.http, NamingServiceName.ENS) }
     }
   });
 });

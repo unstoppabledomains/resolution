@@ -7,6 +7,12 @@
 [![Unstoppable Domains Documentation](https://img.shields.io/badge/Documentation-unstoppabledomains.com-blue)](https://docs.unstoppabledomains.com/)
 [![Get help on Discord](https://img.shields.io/badge/Get%20help%20on-Discord-blueviolet)](https://discord.gg/b6ZVxSZ9Hn)
 
+- [Installing Resolution](README.md#installing-resolution)
+- [Using Resolution](README.md#using-resolution)
+- [Default Ethereum Providers](README.md#default-ethereum-providers)  
+- [Error Handling](README.md#error-handling)
+- [Free advertising for integrated apps](README.md#free-advertising-for-integrated-apps)
+
 Resolution is a library for interacting with blockchain domain names. It can be used to retrieve [payment addresses](https://unstoppabledomains.com/features#Add-Crypto-Addresses), IPFS hashes for [decentralized websites](https://unstoppabledomains.com/features#Build-Website), and GunDB usernames for [decentralized chat](https://unstoppabledomains.com/chat).
 
 Resolution is primarily built and maintained by [Unstoppable Domains](https://unstoppabledomains.com/).
@@ -142,15 +148,27 @@ yarn global add @unstoppabledomains/resolution
 npm install -g @unstoppabledomains/resolution
 ```
 
-By default, the CLI uses https://main-rpc.linkpool.io as its primary gateway to the Ethereum blockchain. If you'd like to override this default and set another provider you can do so using the `--ethereum-url` flag.
+By default, the CLI uses Infura as its primary gateway to the Ethereum blockchain. If you'd like to override this default and set another provider you can do so using the `--ethereum-url` flag.
 
 For example:
 
 ```shell
-resolution --ethereum-url https://main-rpc.linkpool.io -d udtestdev-usdt.crypto -a
+resolution --ethereum-url https://mainnet.infura.io/v3/${secret} -d udtestdev-usdt.crypto -a
 ```
 
 Use the `-h` or `--help` flag to see all the available CLI options.
+
+## Default Ethereum Providers
+Resolution provides zero-configuration experience by using built-in production-ready [Infura](http://infura.io/) endpoint by default.   
+Default Ethereum provider is free to use without restrictions and rate-limits for `CNS (.crypto domains)` resolution.     
+To resolve `ENS` domains on production it's recommended to change Ethereum provider.  
+Default provider can be changed by changing constructor options `new Resolution(options)` or by using one of the factory methods:   
+ - `Resolution.infura()`  
+ - `Resolution.fromWeb3Version1Provider()`  
+ - `Resolution.fromEthersProvider()`  
+ - etc.    
+    
+To see all constructor options and factory methods check [Unstoppable API reference](https://unstoppabledomains.github.io/resolution).  
 
 ## Error Handling
 
@@ -187,7 +205,7 @@ Use these commands to set up a local development environment (**macOS Terminal**
 
 ### Internal network config
 
-Internal [network config](src/main/resources/com/unstoppabledomains/config/network/network-config.json) 
+Internal [network config](./src/config/network-config.json) 
 can be updated by running `yarn network-config:pull` task and committing updated file.
 
 ## Free advertising for integrated apps

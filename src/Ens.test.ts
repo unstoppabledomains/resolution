@@ -3,23 +3,26 @@ import Resolution, { ResolutionErrorCode } from './index';
 import Ens from './Ens';
 import { NullAddress } from './types';
 import {
+  expectConfigurationErrorCode,
+  expectResolutionErrorCode,
+  expectSpyToBeCalled,
   mockAsyncMethod,
   mockAsyncMethods,
-  expectSpyToBeCalled,
-  expectResolutionErrorCode,
-  protocolLink,
   pendingInLive,
-  expectConfigurationErrorCode,
+  protocolLink,
+  ProviderProtocol,
 } from './tests/helpers';
 import { ConfigurationErrorCode } from './errors/configurationError';
-import { NamingServiceName, TickerVersion } from './publicTypes';
+import { TickerVersion } from './publicTypes';
+import { NamingServiceName } from './publicTypes';
+
 let resolution: Resolution;
 
 beforeEach(() => {
   nock.cleanAll();
   jest.restoreAllMocks();
   resolution = new Resolution({
-    blockchain: { ens: { url: protocolLink() } },
+    blockchain: { ens: { url: protocolLink(ProviderProtocol.http, NamingServiceName.ENS) } },
   });
 });
 
@@ -28,15 +31,15 @@ describe('ENS', () => {
     const resolution = new Resolution({
       blockchain: { ens: { network: 'mainnet' } },
     });
-    expect(resolution.ens?.url).toBe('https://main-rpc.linkpool.io');
+    expect(resolution.ens?.url).toBe('https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee');
     expect(resolution.ens?.network).toEqual(1);
   });
 
   it('resolves .eth name using blockchain', async () => {
     const resolution = new Resolution({
-      blockchain: { ens: { url: protocolLink() } },
+      blockchain: { ens: { url: protocolLink(ProviderProtocol.http, NamingServiceName.ENS) } },
     });
-    expect(resolution.ens?.url).toBe(protocolLink());
+    expect(resolution.ens?.url).toBe(protocolLink(ProviderProtocol.http, NamingServiceName.ENS));
     expect(resolution.ens?.network).toEqual(1);
 
     const eyes = mockAsyncMethods(resolution.ens, {
@@ -165,18 +168,18 @@ describe('ENS', () => {
   it('checks normalizeSource ens (boolean)', async () => {
     const resolution = new Resolution({ blockchain: { ens: true } });
     expect(resolution.ens?.network).toBe(1);
-    expect(resolution.ens?.url).toBe('https://main-rpc.linkpool.io');
+    expect(resolution.ens?.url).toBe('https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee');
   });
 
   it('checks normalizeSource ens (object) #1', async () => {
     expect(resolution.ens?.network).toBe(1);
-    expect(resolution.ens?.url).toBe(protocolLink());
+    expect(resolution.ens?.url).toBe(protocolLink(ProviderProtocol.http, NamingServiceName.ENS));
   });
 
   it('checks normalizeSource ens (object) #2', async () => {
     const resolution = new Resolution({ blockchain: { ens: { network: 3 } } });
     expect(resolution.ens?.network).toBe(3);
-    expect(resolution.ens?.url).toBe('https://ropsten-rpc.linkpool.io');
+    expect(resolution.ens?.url).toBe('https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee');
     expect(resolution.ens?.registryAddress).toBe(
       '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
     );
@@ -218,7 +221,7 @@ describe('ENS', () => {
       blockchain: { ens: { network: 'mainnet' } },
     });
     expect(resolution.ens?.network).toBe(1);
-    expect(resolution.ens?.url).toBe('https://main-rpc.linkpool.io');
+    expect(resolution.ens?.url).toBe('https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee');
   });
 
   it('checks normalizeSource ens (object) #9', async () => {
@@ -235,7 +238,7 @@ describe('ENS', () => {
       },
     });
     expect(resolution.ens?.network).toBe(1);
-    expect(resolution.ens?.url).toBe('https://main-rpc.linkpool.io');
+    expect(resolution.ens?.url).toBe('https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee');
     expect(resolution.ens?.registryAddress).toBe(
       '0x314159265dd8dbb310642f98f50c066173c1259b',
     );
@@ -251,7 +254,7 @@ describe('ENS', () => {
       },
     });
     expect(resolution.ens?.network).toBe(3);
-    expect(resolution.ens?.url).toBe('https://ropsten-rpc.linkpool.io');
+    expect(resolution.ens?.url).toBe('https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee');
     expect(resolution.ens?.registryAddress).toBe(
       '0x112234455c3a32fd11230c42e7bccd4a84e02010',
     );
@@ -265,7 +268,7 @@ describe('ENS', () => {
     });
 
     expect(resolution.ens?.network).toBe(1);
-    expect(resolution.ens?.url).toBe('https://main-rpc.linkpool.io');
+    expect(resolution.ens?.url).toBe('https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee');
     expect(resolution.ens?.registryAddress).toBe(
       '0xabcffff1231586348194fcabbeff1231240234fc',
     );
@@ -424,7 +427,7 @@ describe('ENS', () => {
 
   // TODO to be removed in 2.0.0
   it('[Old test]resolve to null for empty .eth record', async () => {
-    expect(resolution.ens?.url).toBe(protocolLink());
+    expect(resolution.ens?.url).toBe(protocolLink(ProviderProtocol.http, NamingServiceName.ENS));
     expect(resolution.ens?.network).toEqual(1);
 
     const eyes = mockAsyncMethods(resolution.ens, {

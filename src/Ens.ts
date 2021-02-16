@@ -1,7 +1,7 @@
 import { default as ensInterface } from './ens/contract/ens';
 import { default as resolverInterface } from './ens/contract/resolver';
 import { formatsByCoinType } from '@ensdomains/address-encoder';
-import { EthCoinIndex, Bip44Constants } from './types';
+import { EthCoinIndex, Bip44Constants, BlockhanNetworkUrlMap } from './types';
 import { EthereumNamingService } from './EthereumNamingService';
 import {
   NamingServiceName,
@@ -23,6 +23,13 @@ export default class Ens extends EthereumNamingService {
 
   protected readerAbi(): any {
     return ensInterface;
+  }
+
+  protected urlMap(): BlockhanNetworkUrlMap {
+    return {
+      1: 'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
+      3: 'https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee'
+    };
   }
 
   isSupportedDomain(domain: string): boolean {

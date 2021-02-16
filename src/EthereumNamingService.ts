@@ -14,11 +14,6 @@ export abstract class EthereumNamingService extends NamingService {
   readonly name: NamingServiceName;
   protected readerContract: Contract;
 
-  static readonly UrlMap: BlockhanNetworkUrlMap = {
-    1: 'https://main-rpc.linkpool.io',
-    3: 'https://ropsten-rpc.linkpool.io',
-  };
-
   static readonly NetworkNameMap = {
     mainnet: 1,
     ropsten: 3,
@@ -43,6 +38,8 @@ export abstract class EthereumNamingService extends NamingService {
 
   protected abstract defaultRegistry(network: number): string | undefined;
   protected abstract readerAbi(): any;
+  protected abstract urlMap(): BlockhanNetworkUrlMap;
+
   private networkFromUrl(url: string | undefined): string | undefined {
     if (!url) {
       return undefined;
@@ -68,7 +65,7 @@ export abstract class EthereumNamingService extends NamingService {
         : source.network || this.networkFromUrl(source.url) || 1;
     if (!source.provider && !source.url) {
       source.url = source.network
-        ? EthereumNamingService.UrlMap[source.network]
+        ? this.urlMap()[source.network]
         : undefined;
     }
 
