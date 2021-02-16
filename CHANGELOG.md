@@ -1,3 +1,5 @@
+## 1.18.0
+* Use Infura Ethereum Provider by default
 ## 1.17.0
 * Add support for TLOS
 ## 1.16.2
