@@ -1,4 +1,4 @@
-## 1.18.1
+## 1.19.0
 * Update @ensdomains/address-encoder dependency to remove security audit issues
 * Remove webpack dependency to remove security audit issues
 ## 1.18.0
