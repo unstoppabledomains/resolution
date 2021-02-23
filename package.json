@@ -32,7 +32,6 @@
     "docs:generate": "yarn run typedoc --out \"./docs/v$npm_package_version\"",
     "docs:readme": "./docs-readme.sh",
     "docs:deploy": "yarn docs && ./deploy-docs.sh",
-    "analyze": "webpack-cli",
     "size": "yarn run sizecheck -p ./package.json -l 500 -v",
     "network-config:pull": "curl https://raw.githubusercontent.com/unstoppabledomains/dot-crypto/master/src/network-config/network-config.json -o src/config/network-config.json"
   },
@@ -80,6 +79,7 @@
     "jest": "24.9.0",
     "lodash": "^4.17.19",
     "nock": "10.0.6",
+    "nodemon": "^2.0.7",
     "ts-jest": "24.2.0",
     "ts-loader": "6.2.1",
     "ts-node": "^8.6.2",
@@ -87,10 +87,7 @@
     "typescript": "3.8.3",
     "web3-0.20.7": "npm:web3@0.20.7",
     "web3-providers-http": "^1.2.9",
-    "web3-providers-ws": "^1.2.9",
-    "webpack": "4.41.5",
-    "webpack-bundle-analyzer": "3.6.0",
-    "webpack-cli": "3.3.10"
+    "web3-providers-ws": "^1.2.9"
   },
   "publicConfig": {
     "access": "public"

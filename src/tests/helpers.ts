@@ -136,19 +136,19 @@ export function mockAPICalls(testName: string, url = MainnetUrl): void {
 
   mockCall.forEach(({ METHOD, REQUEST, RESPONSE }) => {
     switch (METHOD) {
-      case 'POST': {
-        nock(url)
-          // .log()
-          .post('/', JSON.stringify(REQUEST), undefined)
-          .reply(200, JSON.stringify(RESPONSE));
-        break;
-      }
-      default: {
-        nock(url)
-          // .log()
-          .get(REQUEST as string, undefined, undefined)
-          .reply(200, RESPONSE);
-      }
+    case 'POST': {
+      nock(url)
+      // .log()
+        .post('/', JSON.stringify(REQUEST), undefined)
+        .reply(200, JSON.stringify(RESPONSE));
+      break;
+    }
+    default: {
+      nock(url)
+      // .log()
+        .get(REQUEST as string, undefined, undefined)
+        .reply(200, RESPONSE);
+    }
     }
   });
 }
