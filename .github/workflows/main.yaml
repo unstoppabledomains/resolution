@@ -36,6 +36,9 @@ jobs:
         if: ${{ matrix.os == 'ubuntu-latest' && matrix.node == 12 }}
         run: yarn test --coverage
 
+      - name: Dependencies Security Audit
+      - run: yarn audit-ci --moderate
+
   size:
     runs-on: ubuntu-latest
 
