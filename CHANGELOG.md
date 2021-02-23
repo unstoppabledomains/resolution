@@ -1,3 +1,6 @@
+## 1.18.1
+* Update @ensdomains/address-encoder dependency to remove security audit issues
+* Remove webpack dependency to remove security audit issues
 ## 1.18.0
 * Use Infura Ethereum Provider by default
 ## 1.17.0
