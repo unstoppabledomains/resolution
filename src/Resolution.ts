@@ -211,10 +211,26 @@ export default class Resolution {
    * @throws [[ResolutionError]] if address is not found
    * @returns A promise that resolves in an address
    */
-  async addr(domain: string, currrencyTicker: string): Promise<string> {
-    return await this.record(
+  async addr(domain: string, currencyTicker: string): Promise<string> {
+    return this.record(
       domain,
-      `crypto.${currrencyTicker.toUpperCase()}.address`,
+      `crypto.${currencyTicker.toUpperCase()}.address`,
+    );
+  }
+
+  /**
+   * Read multi-chain currency address if exists
+   * @async
+   * @param domain - domain name to be resolved
+   * @param ticker - currency ticker of multi-chain currency (USDT, FTM, etc.)
+   * @param version - currency version usually means blockchain (ERC20, BEP2, OMNI, etc.)
+   * @throws [[ResolutionError]] if address is not found
+   * @returns A promise that resolves in an address
+   */
+  async addrVersion(domain: string, ticker: string, version: string): Promise<string> {
+    return this.record(
+      domain,
+      `crypto.${ticker.toUpperCase()}.version.${version.toUpperCase()}.address`
     );
   }
 
