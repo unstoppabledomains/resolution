@@ -220,6 +220,7 @@ export default class Resolution {
 
   /**
    * Resolves given domain name to a specific USDT chain address if exists
+   * @deprecated 
    * @async
    * @param domain - domain name to be resolved
    * @param version - chain version to look for such as ERC20, TRON, EOS, OMNI
