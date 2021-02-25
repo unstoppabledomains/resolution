@@ -1,4 +1,3 @@
-import { deprecate } from 'util';
 import {
   EventFilter,
   RequestArguments,
