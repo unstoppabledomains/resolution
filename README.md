@@ -70,9 +70,9 @@ function resolve(domain, currency) {
     .catch(console.error);
 }
 
-function resolveMultiChain(domain, currency, version) {
+function resolveMultiChain(domain, currency, chain) {
   resolution
-    .multiChainAddr(domain, currency, version)
+    .multiChainAddr(domain, currency, chain)
     .then((address) => console.log(domain, 'resolves to', address, version))
     .catch(console.error);
 }
