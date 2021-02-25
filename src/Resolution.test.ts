@@ -364,8 +364,8 @@ describe('Resolution', () => {
           expect(capital).toStrictEqual(lower);
         });
 
-        describe('.multichain Usdt', () => {
-          it('should work with usdt erc20 multichain', async () => {
+        describe('.multichain', () => {
+          it('should work with usdt on different erc20', async () => {
             const erc20Spy = mockAsyncMethod(resolution.cns, "get", {
               resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
               owner: '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
@@ -373,7 +373,7 @@ describe('Resolution', () => {
                 [standardKeys.USDT_ERC20]: '0xe7474D07fD2FA286e7e0aa23cd107F8379085037'
               }
             });
-            const erc20 = await resolution.usdt(CryptoDomainWithUsdtMultiChainRecords, TickerVersion.ERC20);
+            const erc20 = await resolution.multiChainAddr(CryptoDomainWithUsdtMultiChainRecords, "usdt", "erc20");
             expect(erc20).toBe('0xe7474D07fD2FA286e7e0aa23cd107F8379085037');
             expect(erc20Spy).toBeCalled();
           });
@@ -386,7 +386,7 @@ describe('Resolution', () => {
                 [standardKeys.USDT_TRON]: 'TNemhXhpX7MwzZJa3oXvfCjo5pEeXrfN2h'
               }
             });
-            const tron = await resolution.usdt(CryptoDomainWithUsdtMultiChainRecords, TickerVersion.TRON);
+            const tron = await resolution.multiChainAddr(CryptoDomainWithUsdtMultiChainRecords, "usdt", "tron");
             expect(tron).toBe('TNemhXhpX7MwzZJa3oXvfCjo5pEeXrfN2h');
             expect(tronSpy).toBeCalled();
           });
@@ -399,7 +399,7 @@ describe('Resolution', () => {
                 [standardKeys.USDT_OMNI]: '19o6LvAdCPkjLi83VsjrCsmvQZUirT4KXJ'
               }
             });
-            const omni = await resolution.usdt(CryptoDomainWithUsdtMultiChainRecords, TickerVersion.OMNI);
+            const omni = await resolution.multiChainAddr(CryptoDomainWithUsdtMultiChainRecords, "usdt", "omni");
             expect(omni).toBe('19o6LvAdCPkjLi83VsjrCsmvQZUirT4KXJ');
             expect(omniSpy).toBeCalled();
           });
@@ -412,9 +412,65 @@ describe('Resolution', () => {
                 [standardKeys.USDT_EOS]: 'letsminesome'
               }
             });
-            const eos = await resolution.usdt(CryptoDomainWithUsdtMultiChainRecords, TickerVersion.EOS);
+            const eos = await resolution.multiChainAddr(CryptoDomainWithUsdtMultiChainRecords, "usdt", "eos");
             expect(eosSpy).toBeCalled();
             expect(eos).toBe('letsminesome');
+          });
+
+          // Todo remove starting from 2.0
+          describe('.deprecated Resolution#usdt method', () => {            
+            it('should work with usdt erc20 multichain', async () => {
+              const erc20Spy = mockAsyncMethod(resolution.cns, "get", {
+                resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
+                owner: '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+                records: {
+                  [standardKeys.USDT_ERC20]: '0xe7474D07fD2FA286e7e0aa23cd107F8379085037'
+                }
+              });
+              const erc20 = await resolution.usdt(CryptoDomainWithUsdtMultiChainRecords, TickerVersion.ERC20);
+              expect(erc20).toBe('0xe7474D07fD2FA286e7e0aa23cd107F8379085037');
+              expect(erc20Spy).toBeCalled();
+            });
+
+            it('should work with usdt tron chain', async () => {
+              const tronSpy = mockAsyncMethod(resolution.cns, "get", {
+                resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
+                owner: '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+                records: {
+                  [standardKeys.USDT_TRON]: 'TNemhXhpX7MwzZJa3oXvfCjo5pEeXrfN2h'
+                }
+              });
+              const tron = await resolution.usdt(CryptoDomainWithUsdtMultiChainRecords, TickerVersion.TRON);
+              expect(tron).toBe('TNemhXhpX7MwzZJa3oXvfCjo5pEeXrfN2h');
+              expect(tronSpy).toBeCalled();
+            });
+
+            it('should work with usdt omni chain', async () => {
+              const omniSpy = mockAsyncMethod(resolution.cns, "get", {
+                resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
+                owner: '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+                records: {
+                  [standardKeys.USDT_OMNI]: '19o6LvAdCPkjLi83VsjrCsmvQZUirT4KXJ'
+                }
+              });
+              const omni = await resolution.usdt(CryptoDomainWithUsdtMultiChainRecords, TickerVersion.OMNI);
+              expect(omni).toBe('19o6LvAdCPkjLi83VsjrCsmvQZUirT4KXJ');
+              expect(omniSpy).toBeCalled();
+            });
+
+            it('should work with usdt eos chain', async () => {
+              const eosSpy = mockAsyncMethod(resolution.cns, "get", {
+                resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
+                owner: '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+                records: {
+                  [standardKeys.USDT_EOS]: 'letsminesome'
+                }
+              });
+              const eos = await resolution.usdt(CryptoDomainWithUsdtMultiChainRecords, TickerVersion.EOS);
+              expect(eosSpy).toBeCalled();
+              expect(eos).toBe('letsminesome');
+            });
+
           });
         });
       });
