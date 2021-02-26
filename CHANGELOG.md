@@ -1,3 +1,8 @@
+## 1.20.0
+* Introduced Resolution#multiChainAddr(domain: string, ticker: string, chain: string) - More general method to fetch multi chain records.
+* Deprecated Resolution#usdt method in favor of multiChainAddr
+* Deprecated TickerVersion 
+
 ## 1.19.0
 * Update @ensdomains/address-encoder dependency to remove security audit issues
 * Remove webpack dependency to remove security audit issues

@@ -195,6 +195,8 @@ export type DomainData = {
   records: CryptoRecords,
 };
 
+// TODO remove in 2.0
+/** @deprecated */
 export enum TickerVersion {
   ERC20 = "ERC20",
   TRON = "TRON",
