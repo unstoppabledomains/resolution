@@ -3,7 +3,7 @@ import {
   fromBech32Address,
   toBech32Address,
   toChecksumAddress,
-} from './zns/utils';
+} from './utils/znsUtils';
 import { invert, set, isNullAddress } from './utils';
 import { Dictionary, ZnsResolution, nodeHash, NormalizedSource } from './types';
 import {

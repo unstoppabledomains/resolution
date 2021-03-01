@@ -1,4 +1,4 @@
-import { toBech32Address } from './zns/utils';
+import { toBech32Address } from './utils/znsUtils';
 import {
   NamingServiceName,
   ResolutionError,

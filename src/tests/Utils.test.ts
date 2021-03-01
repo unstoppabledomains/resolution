@@ -1,4 +1,4 @@
-import { set, invert } from './index';
+import { set, invert } from '../utils/index';
 
 describe('Lodash', () => {
   describe('set', () => {
