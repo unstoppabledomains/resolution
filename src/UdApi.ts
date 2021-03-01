@@ -14,6 +14,7 @@ import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 import standardKeys from './utils/standardKeys';
 import { CryptoRecords, NamingServiceConfig } from './publicTypes';
 import { NormalizedSource } from './types';
+import Networking from './Networking';
 
 export default class Udapi extends NamingService {
   private headers: {
@@ -22,7 +23,7 @@ export default class Udapi extends NamingService {
 
   constructor() {
     super('UDAPI', {url: "https://unstoppabledomains.com/api/v1"});
-    const DefaultUserAgent = this.isNode()
+    const DefaultUserAgent = Networking.isNode()
       ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'
       : navigator.userAgent;
     const version = pckg.version;
@@ -106,7 +107,7 @@ export default class Udapi extends NamingService {
 
   async resolve(domain: string): Promise<ResolutionResponse> {
     try {
-      const response = await this.fetch(`${this.url}/${domain}`, {
+      const response = await Networking.fetch(`${this.url}/${domain}`, {
         method: 'GET',
         headers: this.headers,
       });

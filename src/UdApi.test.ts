@@ -1,5 +1,6 @@
 import nock from 'nock';
 import Resolution, { ResolutionErrorCode } from './index';
+import Networking from './Networking';
 import {
   expectResolutionErrorCode,
   DefaultUrl,
@@ -21,12 +22,14 @@ describe('Unstoppable API', () => {
     const result = await resolution.addr('cofounding.zil', 'eth');
     expect(result).toEqual('0xaa91734f90795e80751c96e682a321bb3c1a4186');
   });
+  
   it('namehashes zil domain', async () => {
     const resolution = new Resolution({ sourceConfig: { api: true } });
     expect(resolution.namehash('cofounding.zil')).toEqual(
       '0x1cc365ffd60bb50538e01d24c1f1e26c887c36f26a0de250660b8a1465c60667',
     );
   });
+
   it('supports zil and eth domains', async () => {
     const resolution = new Resolution({ sourceConfig: { api: true } });
     expect(resolution.isSupportedDomain('cofounding.zil')).toEqual(true);
@@ -38,7 +41,7 @@ describe('Unstoppable API', () => {
     const resolution = new Resolution({ sourceConfig: { api: true } });
     const error = new Error();
     error.name = 'FetchError';
-    jest.spyOn(resolution.api as any, 'fetch').mockRejectedValue(error);
+    jest.spyOn(Networking, 'fetch').mockRejectedValue(error);
     await expectResolutionErrorCode(
       resolution.resolve('hello.zil'),
       ResolutionErrorCode.NamingServiceDown,

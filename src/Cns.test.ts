@@ -18,6 +18,7 @@ import { FetchError } from 'node-fetch';
 import { NamingServiceName } from './publicTypes';
 import Cns from './Cns';
 import standardKeys from './utils/standardKeys';
+import Networking from './Networking';
 
 let resolution: Resolution;
 let cns: Cns;
@@ -640,7 +641,7 @@ describe('CNS', () => {
       const provider = new FetchProvider(NamingServiceName.CNS, url);
       resolution = new Resolution({ sourceConfig: { cns: { url, provider } } });
       jest
-        .spyOn(provider as any, 'fetch')
+        .spyOn(Networking, 'fetch')
         .mockRejectedValue(new FetchError('error', 'error_type'));
 
       await expectResolutionErrorCode(
@@ -654,7 +655,7 @@ describe('CNS', () => {
       const provider = new FetchProvider(NamingServiceName.CNS, url);
       resolution = new Resolution({ sourceConfig: { cns: { url, provider } } });
       jest
-        .spyOn(provider as any, 'fetch')
+        .spyOn(Networking, 'fetch')
         .mockRejectedValue(new Error('error_up'));
 
       await expect(

@@ -4,7 +4,6 @@ import {
   ResolutionResponse,
   NamingServiceName,
 } from '.';
-import BaseConnection from './BaseConnection';
 import ConfigurationError, {
   ConfigurationErrorCode,
 } from './errors/configurationError';
@@ -13,7 +12,7 @@ import FetchProvider from './FetchProvider';
 import { nodeHash, NormalizedSource } from './types';
 import { CryptoRecords, NamingServiceConfig } from './publicTypes';
 
-export default abstract class NamingService extends BaseConnection {
+export default abstract class NamingService {
   readonly name: ResolutionMethod;
   readonly network: number;
   readonly url: string | undefined;
@@ -33,7 +32,6 @@ export default abstract class NamingService extends BaseConnection {
   abstract allRecords(domain: string): Promise<CryptoRecords>;
 
   constructor(name: ResolutionMethod, source?: NamingServiceConfig) {
-    super();
     this.name = name;
     if (!source) {
       source = this.getDefaultNormalizedSource(name);

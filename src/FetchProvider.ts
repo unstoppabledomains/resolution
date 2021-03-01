@@ -1,15 +1,14 @@
 import { FetchError } from 'node-fetch';
-import BaseConnection from './BaseConnection';
 import { RequestArguments } from './types';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import { Provider, ResolutionMethod } from './publicTypes';
+import Networking from './Networking';
 
-export default class FetchProvider extends BaseConnection implements Provider {
+export default class FetchProvider implements Provider {
   readonly url: string;
   readonly name: ResolutionMethod;
 
   constructor(name: ResolutionMethod, url: string) {
-    super();
     this.url = url;
     this.name = name;
   }
@@ -26,7 +25,7 @@ export default class FetchProvider extends BaseConnection implements Provider {
 
   protected async fetchJson(args: RequestArguments): Promise<{error: {message: string}, result: undefined} | {error: undefined, result: unknown}> {
     try {
-      const response = await this.fetch(this.url, {
+      const response = await Networking.fetch(this.url, {
         method: 'POST',
         body: JSON.stringify({
           jsonrpc: '2.0',
@@ -40,7 +39,7 @@ export default class FetchProvider extends BaseConnection implements Provider {
       });
       return await response.json();
     } catch (error) {
-      switch(this.getEnv()) {
+      switch(Networking.getEnv()) {
       case "NODE": {
         if (error instanceof FetchError) {
           throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
