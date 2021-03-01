@@ -2,8 +2,8 @@ import nock from 'nock';
 import Resolution, {
   ResolutionErrorCode,
   UnclaimedDomainResponse,
-} from './index';
-import { TickerVersion, DnsRecordType, JsonRpcPayload } from './publicTypes';
+} from '../index';
+import { TickerVersion, DnsRecordType, JsonRpcPayload } from '../publicTypes';
 import { JsonRpcProvider, InfuraProvider } from '@ethersproject/providers';
 import Web3HttpProvider from 'web3-providers-http';
 import Web3WsProvider from 'web3-providers-ws';
@@ -11,7 +11,7 @@ import Web3V027Provider from 'web3-0.20.7/lib/web3/httpprovider';
 import {
   CryptoDomainWithAdaBchAddresses,
   CryptoDomainWithUsdtMultiChainRecords,
-} from './tests/helpers';
+} from './uttilities/helpers';
 
 import {
   expectResolutionErrorCode,
@@ -24,10 +24,10 @@ import {
   CryptoDomainWithTwitterVerification,
   pendingInLive,
   CryptoDomainWithIpfsRecords,
-} from './tests/helpers';
-import { RpcProviderTestCases } from './tests/providerMockData';
+} from './uttilities/helpers';
+import { RpcProviderTestCases } from './uttilities/providerMockData';
 import fetch, { FetchError } from 'node-fetch';
-import standardKeys from './utils/standardKeys';
+import standardKeys from '../utils/standardKeys';
 
 let resolution: Resolution;
 

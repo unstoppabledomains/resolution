@@ -1,7 +1,7 @@
-import DnsUtils from "./DnsUtils";
-import { DnsRecordsErrorCode } from "./errors/dnsRecordsError";
-import { CryptoRecords, DnsRecord, DnsRecordType } from "./publicTypes";
-import { expectDnsRecordErrorCode } from "./tests/helpers";
+import DnsUtils from "../DnsUtils";
+import { DnsRecordsErrorCode } from "../errors/dnsRecordsError";
+import { CryptoRecords, DnsRecord, DnsRecordType } from "../publicTypes";
+import { expectDnsRecordErrorCode } from "./uttilities/helpers";
 
 let dnsUtils: DnsUtils;
 beforeAll(() => {

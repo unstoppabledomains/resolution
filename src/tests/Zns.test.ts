@@ -1,13 +1,13 @@
-import Resolution, { ResolutionErrorCode } from './index';
+import Resolution, { ResolutionErrorCode } from '../index';
 import {
   mockAsyncMethod,
   expectSpyToBeCalled,
   expectResolutionErrorCode,
   mockAsyncMethods,
   ZilDomainWithUsdtMultiChainRecords,
-} from './tests/helpers';
-import { NullAddress } from './types';
-import { NamingServiceName, TickerVersion } from './publicTypes';
+} from './uttilities/helpers';
+import { NullAddress } from '../types';
+import { NamingServiceName, TickerVersion } from '../publicTypes';
 
 let resolution: Resolution;
 

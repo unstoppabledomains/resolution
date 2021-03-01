@@ -1,4 +1,4 @@
-import * as Index from './index';
+import * as Index from '../index';
 
 describe('Exported variables', () => {
   it('works', async () => {

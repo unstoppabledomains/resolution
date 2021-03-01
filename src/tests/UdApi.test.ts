@@ -1,6 +1,6 @@
 import nock from 'nock';
-import Resolution, { ResolutionErrorCode } from './index';
-import Networking from './Networking';
+import Resolution, { ResolutionErrorCode } from '../index';
+import Networking from '../Networking';
 import {
   expectResolutionErrorCode,
   DefaultUrl,
@@ -8,7 +8,7 @@ import {
   mockAsyncMethod,
   expectSpyToBeCalled,
   CryptoDomainWithTwitterVerification,
-} from './tests/helpers';
+} from './uttilities/helpers';
 
 beforeEach(() => {
   nock.cleanAll();

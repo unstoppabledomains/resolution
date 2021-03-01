@@ -1,6 +1,6 @@
-import Resolution from './index';
-import { ResolutionErrorCode } from './errors/resolutionError';
-import { NullAddress } from './types';
+import Resolution from '../index';
+import { ResolutionErrorCode } from '../errors/resolutionError';
+import { NullAddress } from '../types';
 import {
   CryptoDomainWithAdaBchAddresses,
   CryptoDomainWithEmail,
@@ -12,13 +12,13 @@ import {
   expectSpyToBeCalled,
   expectResolutionErrorCode,
   protocolLink,
-} from './tests/helpers';
-import FetchProvider from './FetchProvider';
+} from './uttilities/helpers';
+import FetchProvider from '../FetchProvider';
 import { FetchError } from 'node-fetch';
-import { NamingServiceName } from './publicTypes';
-import Cns from './Cns';
-import standardKeys from './utils/standardKeys';
-import Networking from './Networking';
+import { NamingServiceName } from '../publicTypes';
+import Cns from '../Cns';
+import standardKeys from '../utils/standardKeys';
+import Networking from '../Networking';
 
 let resolution: Resolution;
 let cns: Cns;

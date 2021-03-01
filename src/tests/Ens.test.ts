@@ -1,7 +1,7 @@
 import nock from 'nock';
-import Resolution, { ResolutionErrorCode } from './index';
-import Ens from './Ens';
-import { NullAddress } from './types';
+import Resolution, { ResolutionErrorCode } from '../index';
+import Ens from '../Ens';
+import { NullAddress } from '../types';
 import {
   mockAsyncMethod,
   mockAsyncMethods,
@@ -10,9 +10,9 @@ import {
   protocolLink,
   pendingInLive,
   expectConfigurationErrorCode,
-} from './tests/helpers';
-import { ConfigurationErrorCode } from './errors/configurationError';
-import { NamingServiceName, TickerVersion } from './publicTypes';
+} from './uttilities/helpers';
+import { ConfigurationErrorCode } from '../errors/configurationError';
+import { NamingServiceName, TickerVersion } from '../publicTypes';
 let resolution: Resolution;
 
 beforeEach(() => {
