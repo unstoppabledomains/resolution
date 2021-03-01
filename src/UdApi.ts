@@ -14,7 +14,7 @@ import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 import standardKeys from './utils/standardKeys';
 import { CryptoRecords, NamingServiceConfig } from './publicTypes';
 import { NormalizedSource } from './types';
-import Networking from './Networking';
+import Networking from './utils/Networking';
 
 export default class Udapi extends NamingService {
   private headers: {

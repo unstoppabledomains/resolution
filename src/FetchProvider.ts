@@ -2,7 +2,7 @@ import { FetchError } from 'node-fetch';
 import { RequestArguments } from './types';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import { Provider, ResolutionMethod } from './publicTypes';
-import Networking from './Networking';
+import Networking from './utils/Networking';
 
 export default class FetchProvider implements Provider {
   readonly url: string;

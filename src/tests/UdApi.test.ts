@@ -1,6 +1,6 @@
 import nock from 'nock';
 import Resolution, { ResolutionErrorCode } from '../index';
-import Networking from '../Networking';
+import Networking from '../utils/Networking';
 import {
   expectResolutionErrorCode,
   DefaultUrl,

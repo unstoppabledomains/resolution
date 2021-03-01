@@ -1,4 +1,4 @@
-import {isLive} from './tests/uttilities/helpers';
+import {isLive} from '../tests/uttilities/helpers';
 import nock from 'nock';
 
 beforeAll(() => {

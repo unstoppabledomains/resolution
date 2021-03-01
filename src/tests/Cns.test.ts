@@ -18,7 +18,7 @@ import { FetchError } from 'node-fetch';
 import { NamingServiceName } from '../publicTypes';
 import Cns from '../Cns';
 import standardKeys from '../utils/standardKeys';
-import Networking from '../Networking';
+import Networking from '../utils/Networking';
 
 let resolution: Resolution;
 let cns: Cns;
