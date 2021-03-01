@@ -28,10 +28,10 @@
 //   constructor(name: ResolutionMethod, source?: NamingServiceConfig) {
 //     super(name, source);
 //     if (this.registryAddress) {
-  // this.readerContract = this.buildContract(
-  //   this.readerAbi(),
-  //   this.registryAddress,
-  // );
+// this.readerContract = this.buildContract(
+//   this.readerAbi(),
+//   this.registryAddress,
+// );
 //     }
 //   }
 

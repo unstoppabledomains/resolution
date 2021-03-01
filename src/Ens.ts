@@ -89,7 +89,7 @@ export default class Ens implements NamingService {
 
   private hash(domain: string): number[] {
     if (!domain) {
-        return Array.from(new Uint8Array(32));
+      return Array.from(new Uint8Array(32));
     }
     const [label, ...remainder] = domain.split('.');
     const labelHash = sha3.array(label);
@@ -161,7 +161,7 @@ export default class Ens implements NamingService {
     return await this.resolverCallToName(resolverContract, nodeHash);
   }
 
-    /**
+  /**
    * This was done to make automated tests more configurable
    */
   private resolverCallToName(resolverContract: Contract, nodeHash) {

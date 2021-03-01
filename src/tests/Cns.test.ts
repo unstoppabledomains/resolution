@@ -417,9 +417,9 @@ describe('CNS', () => {
             },
           },
         });
-        // const ipfsHash = await resolution.ipfsHash(CryptoDomainWithIpfsRecords);
-        // expectSpyToBeCalled(spies);
-        // expect(ipfsHash).toBe('QmVJ26hBrwwNAPVmLavEFXDUunNDXeFSeMPmHuPxKe6dJv');
+        const ipfsHash = await resolution.ipfsHash(CryptoDomainWithIpfsRecords);
+        expectSpyToBeCalled(spies);
+        expect(ipfsHash).toBe('QmVJ26hBrwwNAPVmLavEFXDUunNDXeFSeMPmHuPxKe6dJv');
       });
 
       it('should resolve with email stored on cns', async () => {
@@ -443,9 +443,9 @@ describe('CNS', () => {
             },
           },
         });
-        // const httpUrl = await resolution.httpUrl(CryptoDomainWithIpfsRecords);
-        // expectSpyToBeCalled(spies);
-        // expect(httpUrl).toBe('https://unstoppabledomains.com/');
+        const httpUrl = await resolution.httpUrl(CryptoDomainWithIpfsRecords);
+        expectSpyToBeCalled(spies);
+        expect(httpUrl).toBe('https://unstoppabledomains.com/');
       });
 
       it('should resolve with the gundb chatId stored on cns', async () => {

@@ -67,7 +67,7 @@ describe('Unstoppable API', () => {
           '0xcd2655d9557e5535313b47107fa8f943eb1fec4da6f348668062e66233dde21b413784c4060340f48da364311c6e2549416a6a23dc6fbb48885382802826b8111b',
       },
     })
-  });
+    });
     const twitterHandle = await resolution.twitter(
       CryptoDomainWithTwitterVerification,
     );

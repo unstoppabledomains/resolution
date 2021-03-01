@@ -7,7 +7,7 @@ import {
   ZilDomainWithUsdtMultiChainRecords,
 } from './uttilities/helpers';
 import { NullAddress } from '../types';
-import { NamingServiceName, TickerVersion, ZnsSupportedNetworks } from '../publicTypes';
+import { TickerVersion, ZnsSupportedNetworks } from '../publicTypes';
 
 let resolution: Resolution;
 
@@ -72,32 +72,32 @@ describe('ZNS', () => {
       expect(resolution.zns?.url).toBe('https://api.zilliqa.com');
     });
 
-    // it('checks normalizeSource zns (object) #10', async () => {
-    //   const resolution = new Resolution({
-    //     sourceConfig: {
-    //       zns: { registry: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz' },
-    //     },
-    //   });
-    //   expect(resolution.zns?.network).toBe(1);
-    //   expect(resolution.zns?.registryAddress).toBe(
-    //     'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
-    //   );
-    //   expect(resolution.zns?.url).toBe('https://api.zilliqa.com');
-    // });
+    it('checks normalizeSource zns (object) #10', async () => {
+      const resolution = new Resolution({
+        sourceConfig: {
+          zns: { registryAddress: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz', network: "mainnet" },
+        },
+      });
+      expect(resolution.zns?.network).toBe(1);
+      expect(resolution.zns?.registryAddress).toBe(
+        'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
+      );
+      expect(resolution.zns?.url).toBe('https://api.zilliqa.com');
+    });
 
-    // it('checks normalizeSource zns (object) #11', async () => {
-    //   const resolution = new Resolution({
-    //     sourceConfig: {
-    //       zns: { registry: '0xabcffff1231586348194fcabbeff1231240234fc' },
-    //     },
-    //   });
+    it('checks normalizeSource zns (object) #11', async () => {
+      const resolution = new Resolution({
+        sourceConfig: {
+          zns: { registryAddress: '0xabcffff1231586348194fcabbeff1231240234fc', network: "mainnet" },
+        },
+      });
 
-    //   expect(resolution.zns?.network).toBe(1);
-    //   expect(resolution.zns?.url).toBe('https://api.zilliqa.com');
-    //   expect(resolution.zns?.registryAddress).toBe(
-    //     'zil1408llufrzkrrfqv5lj4malcjxyjqyd8urd7xz6',
-    //   );
-    // });
+      expect(resolution.zns?.network).toBe(1);
+      expect(resolution.zns?.url).toBe('https://api.zilliqa.com');
+      expect(resolution.zns?.registryAddress).toBe(
+        'zil1408llufrzkrrfqv5lj4malcjxyjqyd8urd7xz6',
+      );
+    });
   });
 
   describe('.Resolve', () => {

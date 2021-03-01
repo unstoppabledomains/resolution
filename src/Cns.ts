@@ -1,4 +1,4 @@
-import { BlockhanNetworkUrlMap, NormalizedSource, ProxyReaderMap } from './types';
+import { BlockhanNetworkUrlMap, ProxyReaderMap } from './types';
 import { keccak_256 as sha3 } from 'js-sha3';
 import { default as proxyReaderAbi } from './contracts/cns/proxyReader';
 import { default as resolverInterface } from './contracts/cns/resolver';
@@ -87,11 +87,11 @@ export default class Cns implements NamingService {
 
   isSupportedDomain(domain: string): boolean {
     return (
-          domain === 'crypto' ||
+      domain === 'crypto' ||
           (domain.indexOf('.') > 0 &&
             /^.{1,}\.(crypto)$/.test(domain) &&
             domain.split('.').every(v => !!v.length))
-        );
+    );
   }
   
   async owner(domain: string): Promise<string> {
@@ -172,7 +172,7 @@ export default class Cns implements NamingService {
 
   private hash(domain: string): number[] {
     if (!domain) {
-        return Array.from(new Uint8Array(32));
+      return Array.from(new Uint8Array(32));
     }
     const [label, ...remainder] = domain.split('.');
     const labelHash = sha3.array(label);

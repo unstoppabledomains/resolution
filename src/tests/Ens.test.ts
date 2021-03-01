@@ -1,6 +1,5 @@
 import nock from 'nock';
 import Resolution, { ResolutionErrorCode } from '../index';
-import Ens from '../Ens';
 import { NullAddress } from '../types';
 import {
   mockAsyncMethod,
@@ -12,7 +11,7 @@ import {
   expectConfigurationErrorCode,
 } from './uttilities/helpers';
 import { ConfigurationErrorCode } from '../errors/configurationError';
-import { NamingServiceName, TickerVersion, EnsSupportedNetworks } from '../publicTypes';
+import { TickerVersion, EnsSupportedNetworks } from '../publicTypes';
 let resolution: Resolution;
 
 beforeEach(() => {

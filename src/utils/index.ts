@@ -3,7 +3,7 @@ import ResolutionError, { ResolutionErrorCode } from '../errors/resolutionError'
 import { CryptoRecords, TickerVersion, EnsSupportedNetworks, CnsSupportedNetworks, Provider, ZnsSupportedNetworks, NamingServiceName } from '../publicTypes';
 import { isCnsSupportedNetworks, NullAddresses, isEnsSupportedNetworks, isZnsSupportedNetworks } from '../types';
 import Contract from './contract';
-import NamingService from '../../build/interfaces/NamingService';
+
 /**
  * Parses object in format { "key.key2.key3" : value } into { key: { key2: {key3: value } } }
  * @param object object to parse
@@ -137,7 +137,7 @@ export function ensureConfigured(source: {
    !( isCnsSupportedNetworks(source.network) ||
       isEnsSupportedNetworks(source.network) ||
       isZnsSupportedNetworks(source.network) 
-    )
+   )
   ) {
     throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedNetwork, {
       method: service,

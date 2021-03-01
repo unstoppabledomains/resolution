@@ -54,6 +54,9 @@ export default class Zns implements NamingService {
       provider: this.provider
     }, this.name);
     this.registryAddress = source.registryAddress || Zns.RegistryMap[this.network];
+    if (this.registryAddress.startsWith("0x")) {
+      this.registryAddress = toBech32Address(this.registryAddress);
+    }
   }
   
 
@@ -101,7 +104,7 @@ export default class Zns implements NamingService {
 
   private hash(name: string): number[] {
     if (!name) {
-        return Array.from(new Uint8Array(32));
+      return Array.from(new Uint8Array(32));
     }
     const [label, ...remainder] = name.split('.');
     const labelHash = sha256.array(label);
