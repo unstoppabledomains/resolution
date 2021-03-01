@@ -4,12 +4,7 @@ import Zns from './Zns';
 import Cns from './Cns';
 import UdApi from './UdApi';
 import {
-  UnclaimedDomainResponse,
-  ResolutionResponse,
   NamingServiceName,
-  Web3Version0Provider,
-  Web3Version1Provider,
-  Provider,
   NamehashOptions,
   NamehashOptionsDefault,
   DnsRecordType,
@@ -17,20 +12,29 @@ import {
   CryptoRecords,
   TickerVersion,
   SourceConfig,
+  CnsConfig,
+  EnsConfig,
+  ZnsConfig,
+  EnsSupportedNetworks,
+  CnsSupportedNetworks,
+  Provider,
+  Web3Version0Provider,
+  Web3Version1Provider,
+  EthersProvider,
 } from './publicTypes';
-import { nodeHash } from './types';
-import { EthersProvider } from './publicTypes';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import NamingService from './interfaces/NamingService';
-import { signedInfuraLink, isSupportedChainVersion } from './utils';
-import { Eip1993Factories } from './utils/Eip1993Factories';
 import DnsUtils from './utils/DnsUtils';
+import { ensureRecordPresence, isSupportedChainVersion, signedInfuraLink } from './utils';
+import { Eip1993Factories } from './utils/Eip1993Factories';
 
 /**
  * Blockchain domain Resolution library - Resolution.
  * @example
  * ```
  * import Resolution from '@unstoppabledomains/resolution';
+import { EnsSupportedNetwork } from './types';
+import { EnsSupportedNetworks, CnsSupportedNetworks } from './publicTypes';
  *
  * let resolution = new Resolution({ blockchain: {
  *        ens: {
@@ -46,33 +50,34 @@ import DnsUtils from './utils/DnsUtils';
  */
 export default class Resolution {
   /** @internal */
-  readonly ens?: Ens;
+  readonly ens?: NamingService;
   /** @internal */
-  readonly zns?: Zns;
+  readonly zns?: NamingService;
   /** @internal */
-  readonly cns?: Cns;
-  /** @internal */
-  readonly api?: UdApi;
-
+  readonly cns?: NamingService;
+  
   constructor({
     sourceConfig = undefined,
   }: { sourceConfig?: SourceConfig } = {}) {
-    if (sourceConfig?.api) {
-      this.api = new UdApi();
-      return this;
+
+    if (sourceConfig && !!sourceConfig.cns && !!sourceConfig.cns['api'] ) {
+      this.cns = new UdApi();
+    } else {
+      this.cns = new Cns(sourceConfig?.cns as CnsConfig)
     }
-    const ens = sourceConfig?.ens;
-    const zns = sourceConfig?.zns;
-    const cns = sourceConfig?.cns;
-    if (ens !== false) {
-      this.ens = new Ens(ens);
+    
+    if (sourceConfig && !!sourceConfig.ens && !!sourceConfig.ens['api'] ) {
+      this.ens = new UdApi();
+    } else {
+      this.ens = new Ens(sourceConfig?.ens as EnsConfig)
     }
-    if (cns !== false) {
-      this.cns = new Cns(cns);
+    
+    if (sourceConfig && !!sourceConfig.zns && !!sourceConfig.zns['api'] ) {
+      this.zns = new UdApi();
+    } else {
+      this.zns = new Zns(sourceConfig?.zns as ZnsConfig)
     }
-    if (zns !== false) {
-      this.zns = new Zns(zns);
-    }
+
   }
 
   /**
@@ -80,11 +85,15 @@ export default class Resolution {
    * @param infura infura project id
    * @param network ethereum network name
    */
-  static infura(infura: string, network = 'mainnet'): Resolution {
+  static infura(infura: string, networks: { ens?: {
+      network: EnsSupportedNetworks 
+    }, cns?: {
+      network: CnsSupportedNetworks
+    }}): Resolution {
     return new this({
       sourceConfig: {
-        ens: { url: signedInfuraLink(infura, network), network },
-        cns: { url: signedInfuraLink(infura, network), network },
+        ens: { url: signedInfuraLink(infura, networks.ens?.network), network: networks.ens?.network || "mainnet" },
+        cns: { url: signedInfuraLink(infura, networks.ens?.network), network: networks.cns?.network || "mainnet" },
       },
     });
   }
@@ -94,12 +103,15 @@ export default class Resolution {
    * @param provider - any provider compatible with EIP-1193
    * @see https://eips.ethereum.org/EIPS/eip-1193
    */
-  static fromEip1193Provider(provider: Provider): Resolution {
+  static fromEip1193Provider(provider: Provider, networks: { ens?: {
+    network: EnsSupportedNetworks 
+  }, cns?: {
+    network: CnsSupportedNetworks
+  }}): Resolution {
     return new this({
       sourceConfig: {
-        zns: false,
-        ens: { provider },
-        cns: { provider },
+        ens: { provider, network: networks.ens?.network || "mainnet" },
+        cns: { provider, network: networks.cns?.network || "mainnet" },
       },
     });
   }
@@ -109,9 +121,14 @@ export default class Resolution {
    * @param provider - an 0.x version provider from web3 ( must implement sendAsync(payload, callback) )
    * @see https://github.com/ethereum/web3.js/blob/0.20.7/lib/web3/httpprovider.js#L116
    */
-  static fromWeb3Version0Provider(provider: Web3Version0Provider): Resolution {
+  static fromWeb3Version0Provider(provider: Web3Version0Provider, networks: { ens?: {
+    network: EnsSupportedNetworks 
+  }, cns?: {
+    network: CnsSupportedNetworks
+  }}): Resolution {
     return this.fromEip1193Provider(
       Eip1993Factories.fromWeb3Version0Provider(provider),
+      networks
     );
   }
 
@@ -121,9 +138,14 @@ export default class Resolution {
    * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-core-helpers/types/index.d.ts#L165
    * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-providers-http/src/index.js#L95
    */
-  static fromWeb3Version1Provider(provider: Web3Version1Provider): Resolution {
+  static fromWeb3Version1Provider(provider: Web3Version1Provider, networks: { ens?: {
+    network: EnsSupportedNetworks 
+  }, cns?: {
+    network: CnsSupportedNetworks
+  }}): Resolution {
     return this.fromEip1193Provider(
       Eip1993Factories.fromWeb3Version1Provider(provider),
+      networks
     );
   }
 
@@ -136,23 +158,15 @@ export default class Resolution {
    * @see https://docs.ethers.io/ethers.js/v5-beta/api-providers.html#jsonrpcprovider-inherits-from-provider
    * @see https://github.com/ethers-io/ethers.js/blob/master/packages/providers/src.ts/json-rpc-provider.ts
    */
-  static fromEthersProvider(provider: EthersProvider): Resolution {
+  static fromEthersProvider(provider: EthersProvider, networks: { ens?: {
+    network: EnsSupportedNetworks 
+  }, cns?: {
+    network: CnsSupportedNetworks
+  }}): Resolution {
     return this.fromEip1193Provider(
       Eip1993Factories.fromEthersProvider(provider),
+      networks
     );
-  }
-
-  /**
-   * Resolves the given domain
-   * @async
-   * @param domain - domain name to be resolved
-   * @returns A promise that resolves in an object
-   */
-  async resolve(domain: string): Promise<ResolutionResponse> {
-    domain = this.prepareDomain(domain);
-    const method = this.getNamingMethodOrThrow(domain);
-    const result = await method.resolve(domain);
-    return result || UnclaimedDomainResponse;
   }
 
   /**
@@ -335,7 +349,7 @@ export default class Resolution {
     address: string,
     currencyTicker: string,
   ): Promise<string | null> {
-    return (this.findNamingService(NamingServiceName.ENS) as Ens).reverse(
+    return (this.findNamingService(NamingServiceName.ENS) as unknown as Ens).reverse(
       address,
       currencyTicker,
     );
@@ -355,25 +369,6 @@ export default class Resolution {
     domain = this.prepareDomain(domain);
     return this.formatNamehash(
       this.getNamingMethodOrThrow(domain).namehash(domain),
-      options,
-    );
-  }
-
-  /**
-   * @returns a namehash of a subdomain with name label
-   * @param parent namehash of a parent domain
-   * @param label subdomain name
-   * @param method "ENS", "CNS" or "ZNS"
-   * @param options formatting options
-   */
-  childhash(
-    parent: nodeHash,
-    label: string,
-    method: NamingServiceName,
-    options: NamehashOptions = NamehashOptionsDefault,
-  ): nodeHash {
-    return this.formatNamehash(
-      this.findNamingService(method).childhash(parent, label),
       options,
     );
   }
@@ -406,16 +401,6 @@ export default class Resolution {
   isSupportedDomain(domain: string): boolean {
     domain = this.prepareDomain(domain);
     return !!this.getNamingMethod(domain);
-  }
-
-  /**
-   * Checks if the domain is supported by the specified network as well as if it is in valid format
-   * @param domain - domain name to be checked
-   */
-  isSupportedDomainInNetwork(domain: string): boolean {
-    domain = this.prepareDomain(domain);
-    const method = this.getNamingMethod(domain);
-    return !!method && method.isSupportedNetwork();
   }
 
   /**
@@ -464,8 +449,8 @@ export default class Resolution {
     const records = (await this.records(domain, [
       newRecord,
       oldRecord,
-    ])) as Record<string, string>;
-    return NamingService.ensureRecordPresence(
+    ]));
+    return ensureRecordPresence(
       domain,
       newRecord,
       records[newRecord] || records[oldRecord],
@@ -479,10 +464,7 @@ export default class Resolution {
   }
 
   private getResolutionMethods(): NamingService[] {
-    return (!this.api
-      ? ([this.ens, this.zns, this.cns] as NamingService[])
-      : ([this.api] as NamingService[])
-    ).filter((v) => v);
+    return ([this.ens, this.zns, this.cns] as NamingService[]).filter((v) => v);
   }
 
   private getNamingMethodOrThrow(domain: string): NamingService {

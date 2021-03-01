@@ -1,6 +1,9 @@
-import { TickerVersion } from '../publicTypes';
-import { NullAddresses } from '../types';
+import ConfigurationError, { ConfigurationErrorCode } from '../errors/configurationError';
+import ResolutionError, { ResolutionErrorCode } from '../errors/resolutionError';
+import { CryptoRecords, TickerVersion, EnsSupportedNetworks, CnsSupportedNetworks, Provider, ZnsSupportedNetworks, NamingServiceName } from '../publicTypes';
+import { isCnsSupportedNetworks, NullAddresses, isEnsSupportedNetworks, isZnsSupportedNetworks } from '../types';
 import Contract from './contract';
+import NamingService from '../../build/interfaces/NamingService';
 /**
  * Parses object in format { "key.key2.key3" : value } into { key: { key2: {key3: value } } }
  * @param object object to parse
@@ -111,4 +114,58 @@ export function isNullAddress(
 
 export function isSupportedChainVersion(obj: any): obj is TickerVersion {
   return Object.values(TickerVersion).includes(obj);
+}
+
+export function constructRecords(
+  keys: string[],
+  values: undefined | (string | undefined)[] | CryptoRecords,
+): CryptoRecords {
+  const records: CryptoRecords = {};
+  keys.forEach((key, index) => {
+    const value = (values instanceof Array ? values[index] : values?.[key]) || '';
+    records[key] = value;
+  });
+  return records;
+}
+
+export function ensureConfigured(source: {
+  network: CnsSupportedNetworks | EnsSupportedNetworks | ZnsSupportedNetworks,
+  url?: string,
+  provider?: Provider
+}, service: NamingServiceName): void {
+  if (!source.network ||
+   !( isCnsSupportedNetworks(source.network) ||
+      isEnsSupportedNetworks(source.network) ||
+      isZnsSupportedNetworks(source.network) 
+    )
+  ) {
+    throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedNetwork, {
+      method: service,
+    });
+  }
+
+  if (!source.url && !source.provider) {
+    throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedUrl, {
+      method: service,
+    });
+  }
+}
+
+export function buildContract(abi: any, address: string, provider: Provider): Contract {
+  return new Contract(abi, address, provider);
+}
+
+export function  ensureRecordPresence(
+  domain: string,
+  key: string,
+  value: string | undefined | null,
+): string {
+  if (value) {
+    return value;
+  }
+
+  throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+    recordName: key,
+    domain: domain,
+  });
 }

@@ -34,8 +34,8 @@ let resolution: Resolution;
 beforeAll(async () => {
   resolution = new Resolution({
     sourceConfig: {
-      cns: { url: protocolLink() },
-      ens: { url: protocolLink() },
+      cns: { url: protocolLink(), network: "mainnet" },
+      ens: { url: protocolLink(), network: "mainnet" },
     },
   });
 });
@@ -60,7 +60,7 @@ describe('Resolution', () => {
     });
 
     it('should get a valid resolution instance', async () => {
-      const resolution = Resolution.infura('api-key');
+      const resolution = Resolution.infura('api-key', {ens: {network: "mainnet"}, cns: {network: "mainnet"}});
       expect(resolution.ens?.url).toBe(`https://mainnet.infura.io/v3/api-key`);
       expect(resolution.cns?.url).toBe(`https://mainnet.infura.io/v3/api-key`);
     });
@@ -69,12 +69,6 @@ describe('Resolution', () => {
       const response = UnclaimedDomainResponse;
       expect(response.addresses).toEqual({});
       expect(response.meta.owner).toEqual(null);
-    });
-
-    it('checks the isSupportedDomainInNetwork', async () => {
-      const resolution = new Resolution();
-      const result = resolution.isSupportedDomainInNetwork('brad.zil');
-      expect(result).toBe(true);
     });
 
     describe('.ServiceName', () => {
@@ -436,7 +430,7 @@ describe('Resolution', () => {
                 });
             },
           );
-          const resolution = Resolution.fromWeb3Version1Provider(provider);
+          const resolution = Resolution.fromWeb3Version1Provider(provider, { cns: { network: "mainnet" } });
           const ethAddress = await resolution.addr('brad.crypto', 'ETH');
 
           // expect each mock to be called at least once.
@@ -459,7 +453,7 @@ describe('Resolution', () => {
             });
           });
 
-          const resolution = Resolution.fromWeb3Version1Provider(provider);
+          const resolution = Resolution.fromWeb3Version1Provider(provider, { cns: {network: "mainnet"}});
           const ethAddress = await resolution.addr('brad.crypto', 'ETH');
           provider.disconnect(1000, 'end of test');
           expectSpyToBeCalled([eye]);
@@ -471,7 +465,7 @@ describe('Resolution', () => {
             protocolLink(ProviderProtocol.http),
             'mainnet',
           );
-          const resolution = Resolution.fromEthersProvider(provider);
+          const resolution = Resolution.fromEthersProvider(provider, {cns: {network: "mainnet"}});
           const eye = mockAsyncMethod(provider, 'call', (params) =>
             Promise.resolve(caseMock(params, RpcProviderTestCases)),
           );
@@ -490,7 +484,7 @@ describe('Resolution', () => {
           const eye = mockAsyncMethod(provider, 'call', (params) =>
             Promise.resolve(caseMock(params, RpcProviderTestCases)),
           );
-          const resolution = Resolution.fromEthersProvider(provider);
+          const resolution = Resolution.fromEthersProvider(provider, {cns: {network: "mainnet"}});
           const ethAddress = await resolution.addr('brad.crypto', 'eth');
           expectSpyToBeCalled([eye]);
           expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
@@ -519,7 +513,7 @@ describe('Resolution', () => {
               });
             },
           );
-          const resolution = Resolution.fromWeb3Version0Provider(provider);
+          const resolution = Resolution.fromWeb3Version0Provider(provider, {cns: {network: "mainnet"}});
           const ethAddress = await resolution.addr('brad.crypto', 'eth');
           expectSpyToBeCalled([eye]);
           expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
@@ -540,7 +534,7 @@ describe('Resolution', () => {
               Promise.resolve(caseMock(params, RpcProviderTestCases)),
             );
 
-            const resolution = Resolution.fromEthersProvider(provider);
+            const resolution = Resolution.fromEthersProvider(provider, {cns: {network: "mainnet"}});
             const resp = await resolution.allRecords('brad.crypto');
             expectSpyToBeCalled([eye], 2);
             expectSpyToBeCalled([eye2], 2);
@@ -565,7 +559,7 @@ describe('Resolution', () => {
               protocolLink(ProviderProtocol.http),
               'mainnet',
             );
-            const resolution = Resolution.fromEthersProvider(provider);
+            const resolution = Resolution.fromEthersProvider(provider, {cns: {network: "mainnet"}});
             const eye = mockAsyncMethod(provider, 'call', (params) =>
               Promise.resolve(caseMock(params, RpcProviderTestCases)),
             );
@@ -601,7 +595,7 @@ describe('Resolution', () => {
               Promise.resolve(caseMock(params, RpcProviderTestCases)),
             );
 
-            const resolution = Resolution.fromEthersProvider(provider);
+            const resolution = Resolution.fromEthersProvider(provider, {cns: {network: "mainnet"}});
             const resp = await resolution.allRecords('monmouthcounty.crypto');
 
             expectSpyToBeCalled([eye], 2);

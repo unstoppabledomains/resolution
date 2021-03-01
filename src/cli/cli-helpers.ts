@@ -28,9 +28,10 @@ export function buildResolutionPackage(ethereumUrl?: string): Resolution {
   if (ethereumUrl) {
     try {
       const url = (new URL(ethereumUrl)).toString();
-      return new Resolution({
-        ens: { url },
-        cns: { url },
+      return new Resolution({ sourceConfig: {
+        ens: { url, network: "mainnet" },
+        cns: { url, network: "mainnet" },
+      }
       });
     } catch (e) {
       if (e instanceof TypeError) {

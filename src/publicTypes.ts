@@ -1,30 +1,60 @@
 import {
+  CnsSupportedNetwork,
+  EnsSupportedNetwork,
   EventFilter,
   RequestArguments,
   RpcProviderLogEntry,
   TransactionRequest,
+  ZnsSupportedNetwork,
 } from './types';
 
 export interface NamingServiceConfig {
   url?: string;
-  network?: string | number;
+  network?: number;
   registry?: string;
   proxyReaderAddress?: string;
   provider?: Provider;
   api?: string;
 }
 
+export type CnsSupportedNetworks = typeof CnsSupportedNetwork.type;
+export type EnsSupportedNetworks = typeof EnsSupportedNetwork.type;
+export type ZnsSupportedNetworks = typeof ZnsSupportedNetwork.type;
+
+export type CnsConfig  = {
+  url?: string,
+  network: CnsSupportedNetworks,
+  provider?: Provider,
+  proxyReaderAddress?: string
+};
+
+export type Api = { api: true };
+
+export type EnsConfig = {
+  url?: string,
+  network: EnsSupportedNetworks,
+  provider?: Provider;
+  registryAddress?: string
+}
+
+export type ZnsConfig = {
+  url?: string,
+  network: ZnsSupportedNetworks,
+  provider?: Provider;
+  registryAddress?: string
+}
+
 export type SourceConfig = {
-  ens?: NamingServiceConfig | false;
-  zns?: NamingServiceConfig | false;
-  cns?: NamingServiceConfig | false;
-  api?: boolean;
+  ens?: EnsConfig | Api;
+  zns?: ZnsConfig | Api;
+  cns?: CnsConfig | Api;
 };
 
 export enum NamingServiceName {
   ENS = 'ENS',
   CNS = 'CNS',
   ZNS = 'ZNS',
+  API = "API"
 }
 export type ResolutionMethod = NamingServiceName | 'UDAPI';
 

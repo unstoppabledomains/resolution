@@ -12,22 +12,30 @@ import Cns from './Cns';
 import pckg from './package.json';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 import standardKeys from './utils/standardKeys';
-import { CryptoRecords, NamingServiceConfig } from './publicTypes';
+import { CryptoRecords, NamingServiceConfig, Provider } from './publicTypes';
 import { NormalizedSource } from './types';
 import Networking from './utils/Networking';
+import { constructRecords, ensureRecordPresence } from './utils';
+import FetchProvider from './FetchProvider';
 
-export default class Udapi extends NamingService {
+export default class Udapi implements NamingService {
+  readonly name: NamingServiceName = NamingServiceName.API;
+  readonly network: number = 1;
+  readonly url: string;
+  readonly provider: Provider;
+
   private headers: {
     [key: string]: string;
   };
 
   constructor() {
-    super('UDAPI', {url: "https://unstoppabledomains.com/api/v1"});
     const DefaultUserAgent = Networking.isNode()
       ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'
       : navigator.userAgent;
     const version = pckg.version;
     const CustomUserAgent = `${DefaultUserAgent} Resolution/${version}`;
+    this.url = "https://unstoppabledomains.com/api/v1";
+    this.provider =  new FetchProvider("UDAPI", this.url);
     this.headers = { 'X-user-agent': CustomUserAgent };
   }
 
@@ -35,25 +43,30 @@ export default class Udapi extends NamingService {
     return !!this.findMethod(domain);
   }
 
-  isSupportedNetwork(): boolean {
-    return true;
-  }
-
   namehash(domain: string): string {
     return this.findMethodOrThrow(domain).namehash(domain);
   }
 
-  async owner(domain: string): Promise<string | null> {
-    const { owner } = (await this.resolve(domain)).meta;
-    if (!owner) {
-      return null;
-    }
-    return owner.startsWith('zil1') ? owner : toBech32Address(owner);
+  async record(domain: string, key: string): Promise<string> {
+    return (await this.records(domain, [key]))[key];
   }
 
   async records(domain: string, keys: string[]): Promise<CryptoRecords> {
     const records = await this.allRecords(domain);
-    return this.constructRecords(keys, records)
+    return constructRecords(keys, records)
+  }
+
+
+  async owner(domain: string): Promise<string> {
+    const { owner } = (await this.resolve(domain)).meta;
+    if (!owner) {
+      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, { domain });
+    }
+
+    if (domain.endsWith('.zil')) {
+      return owner.startsWith('zil1') ? owner : toBech32Address(owner);
+    }
+    return owner;
   }
 
   async twitter(domain: string): Promise<string> {
@@ -76,12 +89,12 @@ export default class Udapi extends NamingService {
     const validationSignature =
       records[standardKeys.validation_twitter_username];
     const twitterHandle = records[standardKeys.twitter_username];
-    NamingService.ensureRecordPresence(
+    ensureRecordPresence(
       domain,
       'twitter validation username',
       validationSignature,
     );
-    NamingService.ensureRecordPresence(domain, 'twitter handle', twitterHandle);
+    ensureRecordPresence(domain, 'twitter handle', twitterHandle);
     if (
       !isValidTwitterSignature({
         tokenId: domainMetaData.meta.namehash,
@@ -122,22 +135,25 @@ export default class Udapi extends NamingService {
     }
   }
 
-  childhash(...args: never): never {
-    throw new Error('Unsupported method whe using UD Resolution API');
+  serviceName(domain: string): NamingServiceName {
+    return this.findMethodOrThrow(domain).name;
   }
 
-  serviceName(domain: string): NamingServiceName {
-    return this.findMethodOrThrow(domain).name as NamingServiceName;
-  }
   async resolver(domain: string): Promise<string> {
     throw new Error('Method not implemented.');
+  }
+
+  async reverse(address: string, currencyTicker: string): Promise<string | null> {
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+      methodName: 'reverse',
+    });
   }
 
   protected normalizeSource(source: NamingServiceConfig): NormalizedSource {
     return { network: 1, ...source };
   }
 
-  private findMethod(domain: string) {
+  private findMethod(domain: string): NamingService | undefined {
     return [new Zns(), new Ens(), new Cns()].find(m =>
       m.isSupportedDomain(domain),
     );

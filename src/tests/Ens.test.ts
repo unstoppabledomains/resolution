@@ -12,7 +12,7 @@ import {
   expectConfigurationErrorCode,
 } from './uttilities/helpers';
 import { ConfigurationErrorCode } from '../errors/configurationError';
-import { NamingServiceName, TickerVersion } from '../publicTypes';
+import { NamingServiceName, TickerVersion, EnsSupportedNetworks } from '../publicTypes';
 let resolution: Resolution;
 
 beforeEach(() => {
@@ -20,7 +20,7 @@ beforeEach(() => {
   jest.restoreAllMocks();
   resolution = new Resolution({
     sourceConfig: {
-      ens: { url: protocolLink() },
+      ens: { url: protocolLink(), network: "mainnet" },
     },
   });
 });
@@ -39,11 +39,6 @@ describe('ENS', () => {
   });
 
   it('resolves .eth name using blockchain', async () => {
-    const resolution = new Resolution({
-      sourceConfig: {
-        ens: { url: protocolLink() },
-      },
-    });
     expect(resolution.ens?.url).toBe(protocolLink());
     expect(resolution.ens?.network).toEqual(1);
 
@@ -52,7 +47,7 @@ describe('ENS', () => {
       fetchAddress: '0x714ef33943d925731FBB89C99aF5780D888bD106',
     });
     const spy = mockAsyncMethods(resolution.ens, {
-      getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
+      owner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
     });
     expect(await resolution.addr('matthewgould.eth', 'ETH')).toEqual(
       '0x714ef33943d925731FBB89C99aF5780D888bD106',
@@ -123,7 +118,7 @@ describe('ENS', () => {
   it('resolves .luxe name using ENS blockchain with thrown error', async () => {
     const spies = mockAsyncMethods(resolution.ens, {
       resolver: undefined,
-      getOwner: undefined,
+      owner: undefined,
     });
 
     await expectResolutionErrorCode(
@@ -143,19 +138,6 @@ describe('ENS', () => {
     expect(doge).toBe('DBXu2kgc3xtvCUWFcxFE3r9hEYgmuaaCyD');
   });
 
-  it('checks if the network is supported(true)', async () => {
-    const ens = new Ens({ network: 1 });
-    const answer = ens.isSupportedNetwork();
-    expect(answer).toBe(true);
-  });
-
-  it('checks if the network is supported(false)', async () => {
-    expectConfigurationErrorCode(
-      () => new Ens({ network: 42 }),
-      ConfigurationErrorCode.UnspecifiedUrl,
-    );
-  });
-
   it('checks normalizeSource ens (boolean)', async () => {
     const resolution = new Resolution();
     expect(resolution.ens?.network).toBe(1);
@@ -171,7 +153,7 @@ describe('ENS', () => {
 
   it('checks normalizeSource ens (object) #2', async () => {
     const resolution = new Resolution({
-      sourceConfig: { ens: { network: 3 } },
+      sourceConfig: { ens: { network: "ropsten" } },
     });
     expect(resolution.ens?.network).toBe(3);
     expect(resolution.ens?.url).toBe(
@@ -185,7 +167,7 @@ describe('ENS', () => {
   it('checks normalizeSource ens (object) #3', async () => {
     const resolution = new Resolution({
       sourceConfig: {
-        ens: { url: 'https://rinkeby.infura.io' },
+        ens: { url: 'https://rinkeby.infura.io', network: "rinkeby" },
       },
     });
     expect(resolution.ens?.network).toBe(4);
@@ -195,7 +177,7 @@ describe('ENS', () => {
   it('checks normalizeSource ens (object) #4', async () => {
     const resolution = new Resolution({
       sourceConfig: {
-        ens: { url: 'https://goerli.infura.io', network: 5 },
+        ens: { url: 'https://goerli.infura.io', network: "goerli" },
       },
     });
     expect(resolution.ens?.network).toBe(5);
@@ -207,13 +189,13 @@ describe('ENS', () => {
 
   it('checks normalizeSource ens (object) #6', async () => {
     expect(
-      () => new Resolution({ sourceConfig: { ens: { network: 7543 } } }),
-    ).toThrowError('Unspecified url in Resolution ENS configuration');
+      () => new Resolution({ sourceConfig: { ens: { network: "notRealNetwork" as EnsSupportedNetworks } } }),
+    ).toThrowError('Unspecified network in Resolution ENS configuration');
   });
 
   it('checks normalizeSource ens (object) #7', async () => {
     expect(
-      () => new Resolution({ sourceConfig: { ens: { network: 'invalid' } } }),
+      () => new Resolution({ sourceConfig: { ens: { network: 'invalid' as EnsSupportedNetworks } } }),
     ).toThrowError('Unspecified network in Resolution ENS configuration');
   });
 
@@ -227,17 +209,10 @@ describe('ENS', () => {
     );
   });
 
-  it('checks normalizeSource ens (object) #9', async () => {
-    expectConfigurationErrorCode(
-      () => new Resolution({ sourceConfig: { ens: { network: 'kovan' } } }),
-      ConfigurationErrorCode.UnspecifiedUrl,
-    );
-  });
-
   it('checks normalizeSource ens (object) #10', async () => {
     const resolution = new Resolution({
       sourceConfig: {
-        ens: { registry: '0x314159265dd8dbb310642f98f50c066173c1259b' },
+        ens: { registryAddress: '0x314159265dd8dbb310642f98f50c066173c1259b', network: "mainnet" },
       },
     });
     expect(resolution.ens?.network).toBe(1);
@@ -254,7 +229,7 @@ describe('ENS', () => {
       sourceConfig: {
         ens: {
           network: 'ropsten',
-          registry: '0x112234455c3a32fd11230c42e7bccd4a84e02010',
+          registryAddress: '0x112234455c3a32fd11230c42e7bccd4a84e02010',
         },
       },
     });
@@ -270,7 +245,7 @@ describe('ENS', () => {
   it('checks normalizeSource ens (object) #12', async () => {
     const resolution = new Resolution({
       sourceConfig: {
-        ens: { registry: '0xabcffff1231586348194fcabbeff1231240234fc' },
+        ens: { registryAddress: '0xabcffff1231586348194fcabbeff1231240234fc', network: "mainnet" },
       },
     });
 
@@ -288,7 +263,7 @@ describe('ENS', () => {
       () =>
         new Resolution({
           sourceConfig: {
-            ens: { network: 'custom', url: 'https://custom.notinfura.io' },
+            ens: { network: 'custom' as EnsSupportedNetworks, url: 'https://custom.notinfura.io' },
           },
         }),
       ConfigurationErrorCode.UnspecifiedNetwork,
@@ -391,53 +366,6 @@ describe('ENS', () => {
   });
 
   describe('.resolve', () => {
-    it('passes without any errors', async () => {
-      const eyes = mockAsyncMethods(resolution.ens, {
-        getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
-        resolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
-        getTTL: 0,
-        callMethod: '0x714ef33943d925731FBB89C99aF5780D888bD106',
-      });
-      const resolutionObj = await resolution.resolve('matthewgould.eth');
-      expectSpyToBeCalled(eyes);
-      expect(resolutionObj).toStrictEqual({
-        addresses: { ETH: '0x714ef33943d925731FBB89C99aF5780D888bD106' },
-        meta: {
-          namehash:
-            '0x2b53e3f567989ee41b897998d89eb4d8cf0715fb2cfb41a64939a532c09e495e',
-          resolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
-          owner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
-          type: 'ENS',
-          ttl: 0,
-        },
-        records: {},
-      });
-    });
-
-    it('returns undefined address', async () => {
-      pendingInLive();
-      const eyes = mockAsyncMethods(resolution.ens, {
-        getOwner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
-        resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-        getTTL: 0,
-        fetchAddress: undefined,
-      });
-      const result = await resolution.resolve('matthewgould.eth');
-      expectSpyToBeCalled(eyes);
-      expect(result).toStrictEqual({
-        addresses: {},
-        meta: {
-          namehash:
-            '0x2b53e3f567989ee41b897998d89eb4d8cf0715fb2cfb41a64939a532c09e495e',
-          resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-          owner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
-          type: 'ENS',
-          ttl: 0,
-        },
-        records: {},
-      });
-    });
-
     it('should return correct resolver address', async () => {
       const spies = mockAsyncMethods(resolution.ens, {
         resolver: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
@@ -507,43 +435,6 @@ describe('ENS', () => {
             ResolutionErrorCode.UnsupportedDomain,
           );
         });
-      });
-    });
-
-    describe('.childhash', () => {
-      it('tests childhash functionality', () => {
-        const domain = 'hello.world.eth';
-        const namehash = resolution.namehash(domain);
-        const childhash = resolution.childhash(
-          resolution.namehash('world.eth'),
-          'hello',
-          NamingServiceName.ENS,
-        );
-        expect(childhash).toBe(namehash);
-      });
-
-      it('checks root eth domain', () => {
-        const rootHash =
-          '0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae';
-        expect(resolution.namehash('eth')).toBe(rootHash);
-        expect(
-          resolution.childhash(
-            '0000000000000000000000000000000000000000000000000000000000000000',
-            'eth',
-            NamingServiceName.ENS,
-          ),
-        ).toBe(rootHash);
-      });
-
-      it('checks childhash multi level domain', () => {
-        const domain = 'ich.ni.san.yon.hello.world.eth';
-        const namehash = resolution.namehash(domain);
-        const childhash = resolution.childhash(
-          resolution.namehash('ni.san.yon.hello.world.eth'),
-          'ich',
-          NamingServiceName.ENS,
-        );
-        expect(childhash).toBe(namehash);
       });
     });
   });
