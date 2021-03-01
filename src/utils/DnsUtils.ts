@@ -1,6 +1,6 @@
-import DnsRecordsError, { DnsRecordsErrorCode } from "./errors/dnsRecordsError";
-import { CryptoRecords, DnsRecord, DnsRecordType } from "./publicTypes";
-import { isStringArray } from "./utils";
+import DnsRecordsError, { DnsRecordsErrorCode } from "../errors/dnsRecordsError";
+import { CryptoRecords, DnsRecord, DnsRecordType } from "../publicTypes";
+import { isStringArray } from "./";
 export default class DnsUtils {
 
   static readonly DefaultTtl: number = 300; // 5 minutes 

@@ -3,14 +3,14 @@ import {
   Provider,
   ResolutionResponse,
   NamingServiceName,
-} from '.';
+} from '..';
 import ConfigurationError, {
   ConfigurationErrorCode,
-} from './errors/configurationError';
-import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
-import FetchProvider from './FetchProvider';
-import { nodeHash, NormalizedSource } from './types';
-import { CryptoRecords, NamingServiceConfig } from './publicTypes';
+} from '../errors/configurationError';
+import ResolutionError, { ResolutionErrorCode } from '../errors/resolutionError';
+import FetchProvider from '../FetchProvider';
+import { nodeHash, NormalizedSource } from '../types';
+import { CryptoRecords, NamingServiceConfig } from '../publicTypes';
 
 export default abstract class NamingService {
   readonly name: ResolutionMethod;

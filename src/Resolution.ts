@@ -21,10 +21,10 @@ import {
 import { nodeHash } from './types';
 import { EthersProvider } from './publicTypes';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
-import NamingService from './NamingService';
+import NamingService from './interfaces/NamingService';
 import { signedInfuraLink, isSupportedChainVersion } from './utils';
 import { Eip1993Factories } from './utils/Eip1993Factories';
-import DnsUtils from './DnsUtils';
+import DnsUtils from './utils/DnsUtils';
 
 /**
  * Blockchain domain Resolution library - Resolution.

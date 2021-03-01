@@ -13,7 +13,7 @@ import {
   ResolutionResponse,
   UnclaimedDomainResponse,
 } from './index';
-import NamingService from './NamingService';
+import NamingService from './interfaces/NamingService';
 import { CryptoRecords, NamingServiceConfig } from './publicTypes';
 
 const NetworkIdMap = {

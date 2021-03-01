@@ -5,7 +5,7 @@ import {
   ResolutionErrorCode,
   ResolutionResponse,
 } from './index';
-import NamingService from './NamingService';
+import NamingService from './interfaces/NamingService';
 import Zns from './Zns';
 import Ens from './Ens';
 import Cns from './Cns';

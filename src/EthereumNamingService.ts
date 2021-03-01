@@ -1,5 +1,5 @@
 import { keccak_256 as sha3 } from 'js-sha3';
-import NamingService from './NamingService';
+import NamingService from './interfaces/NamingService';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import {
   BlockhanNetworkUrlMap,
