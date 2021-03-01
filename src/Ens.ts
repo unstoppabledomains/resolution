@@ -1,5 +1,5 @@
-import { default as ensInterface } from './ens/contract/ens';
-import { default as resolverInterface } from './ens/contract/resolver';
+import { default as ensInterface } from './contracts/ens/ens';
+import { default as resolverInterface } from './contracts/ens/resolver';
 import { formatsByCoinType } from '@ensdomains/address-encoder';
 import { EthCoinIndex, Bip44Constants } from './types';
 import { EthereumNamingService } from './EthereumNamingService';

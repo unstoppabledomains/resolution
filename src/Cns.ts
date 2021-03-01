@@ -1,7 +1,7 @@
 import { EthereumNamingService } from './EthereumNamingService';
 import { ProxyReaderMap } from './types';
-import { default as proxyReaderAbi } from './cns/contract/proxyReader';
-import { default as resolverInterface } from './cns/contract/resolver';
+import { default as proxyReaderAbi } from './contracts/cns/proxyReader';
+import { default as resolverInterface } from './contracts/cns/resolver';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import Contract from './utils/contract';
 import standardKeys from './utils/standardKeys';
