@@ -1,4 +1,4 @@
-import { set, invert } from '../utils/index';
+import { set } from '../utils/znsUtils';
 
 describe('Lodash', () => {
   describe('set', () => {
@@ -23,20 +23,6 @@ describe('Lodash', () => {
           BCH: { address: 'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6' },
         },
       });
-    });
-  });
-
-  it('should invert the object', () => {
-    const object = {
-      mainnet: 'https://api.zilliqa.com',
-      testnet: 'https://dev-api.zilliqa.com',
-      localnet: 'http://localhost:4201',
-    };
-
-    expect(invert(object)).toStrictEqual({
-      'https://api.zilliqa.com': 'mainnet',
-      'https://dev-api.zilliqa.com': 'testnet',
-      'http://localhost:4201': 'localnet',
     });
   });
 });

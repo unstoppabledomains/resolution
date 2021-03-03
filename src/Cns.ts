@@ -7,8 +7,6 @@ import standardKeys from './utils/standardKeys';
 import {
   constructRecords,
   ensureConfigured,
-  getStartingBlock,
-  isLegacyResolver,
   isNullAddress
 } from './utils';
 import {
@@ -123,7 +121,7 @@ export default class Cns implements NamingService {
     const resolver = await this.resolver(domain);
 
     const resolverContract = new Contract(resolverInterface, resolver, this.provider);
-    if (isLegacyResolver(resolver)) {
+    if (this.isLegacyResolver(resolver)) {
       return await this.getStandardRecords(tokenId);
     }
 
@@ -195,7 +193,7 @@ export default class Cns implements NamingService {
     resolverContract: Contract,
     tokenId: string,
   ): Promise<CryptoRecords> {
-    const startingBlock = await getStartingBlock(resolverContract, tokenId);
+    const startingBlock = await this.getStartingBlock(resolverContract, tokenId);
     const logs = await resolverContract.fetchLogs(
       'NewKey',
       tokenId,
@@ -224,5 +222,46 @@ export default class Cns implements NamingService {
       tokenId,
     ]);
     return {owner, resolver, records: constructRecords(keys, values)}
+  }
+
+  // Need more sophisticated way to determine if the contract is Legacy
+  private isLegacyResolver(resolverAddress: string): boolean {
+    if (this.isWellKnownLegacyResolver(resolverAddress)) {
+      return true;
+    }
+    if (this.isUpToDateResolver(resolverAddress)) {
+      return false;
+    }
+    // TODO we need to make an IO call to the contract to check the interface
+    return false;
+  }
+
+  private isWellKnownLegacyResolver(resolverAddress: string): boolean {
+    return [
+      '0xa1cac442be6673c49f8e74ffc7c4fd746f3cbd0d',
+      '0x878bc2f3f717766ab69c0a5f9a6144931e61aed3',
+    ].includes(resolverAddress.toLowerCase());
+  }
+  
+  private isUpToDateResolver(resolverAddress: string): boolean {
+    return (
+      resolverAddress.toLowerCase() ===
+      '0xb66dce2da6afaaa98f2013446dbcb0f4b0ab2842'
+    );
+  }
+  
+
+  private async getStartingBlock(
+    contract: Contract,
+    tokenId: string,
+  ): Promise<string> {
+    const CRYPTO_RESOLVER_ADVANCED_EVENTS_STARTING_BLOCK = '0x960844';
+
+    const logs = await contract.fetchLogs('ResetRecords', tokenId);
+    const lastResetEvent = logs[logs.length - 1];
+    return (
+      lastResetEvent?.blockNumber ||
+      CRYPTO_RESOLVER_ADVANCED_EVENTS_STARTING_BLOCK
+    );
   }
 }

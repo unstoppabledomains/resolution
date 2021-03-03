@@ -1,6 +1,5 @@
 import DnsRecordsError, { DnsRecordsErrorCode } from "../errors/dnsRecordsError";
 import { CryptoRecords, DnsRecord, DnsRecordType } from "../types/publicTypes";
-import { isStringArray } from "./";
 export default class DnsUtils {
 
   static readonly DefaultTtl: number = 300; // 5 minutes 
@@ -73,7 +72,7 @@ export default class DnsUtils {
       return [];
     }
     const typeData = this.protectFromCorruptRecord(jsonValueString, type);
-    if (!isStringArray(typeData)) {
+    if (!this.isStringArray(typeData)) {
       return [];
     }
     return typeData.map(data => ({TTL, data, type}));
@@ -102,5 +101,12 @@ export default class DnsUtils {
     if (!isNaN(parsedInt)) {
       return parsedInt;
     }
+  }
+
+  private isStringArray(value: any): value is string[] {
+    if (value instanceof Array) {
+      return value.every(item => typeof item === 'string');
+    }
+    return false;
   }
 }

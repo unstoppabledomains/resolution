@@ -1,7 +1,7 @@
 import { default as ensInterface } from './contracts/ens/ens';
 import { default as resolverInterface } from './contracts/ens/resolver';
 import { formatsByCoinType } from '@ensdomains/address-encoder';
-import { EthCoinIndex, Bip44Constants, BlockhanNetworkUrlMap, NetworkIdMap } from './types';
+import { EthCoinIndex, Bip44Constants, BlockhanNetworkUrlMap } from './types';
 import {
   NamingServiceName,
   ResolutionError,
@@ -11,7 +11,7 @@ import Contract from './utils/contract';
 import contentHash from 'content-hash';
 import EnsNetworkMap from 'ethereum-ens-network-map';
 import { Provider, EnsSource, EnsConfig } from './types/publicTypes';
-import { constructRecords, ensureConfigured, invert, isNullAddress } from './utils';
+import { constructRecords, ensureConfigured, isNullAddress } from './utils';
 import NamingService from './interfaces/NamingService';
 import FetchProvider from './FetchProvider';
 import Namehash from './utils/Namehash';
@@ -28,8 +28,6 @@ export default class Ens implements NamingService {
     rinkeby: 4,
     goerli: 5,
   };
-
-  static readonly NetworkIdMap: NetworkIdMap = invert(Ens.NetworkNameMap);
 
   readonly name = NamingServiceName.ENS;
   readonly network: number;

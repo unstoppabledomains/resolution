@@ -2,8 +2,9 @@ import {
   fromBech32Address,
   toBech32Address,
   toChecksumAddress,
+  set,
 } from './utils/znsUtils';
-import { set, isNullAddress, constructRecords, ensureConfigured } from './utils';
+import { isNullAddress, constructRecords, ensureConfigured } from './utils';
 import { Dictionary, ZnsResolution } from './types';
 import {
   NamingServiceName,

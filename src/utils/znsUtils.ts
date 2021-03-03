@@ -298,3 +298,20 @@ export function fromBech32Address(
 
   return toChecksumAddress(buf.toString('hex'));
 }
+/**
+ * Parses object in format { "key.key2.key3" : value } into { key: { key2: {key3: value } } }
+ * @param object object to parse
+ * @param key string to split
+ * @param value value to make it equal to
+ */
+export function set<T>(object: T, key: string, value: any): T {
+  let current = object;
+  const tokens = key.split('.');
+  const last = tokens.pop()!;
+  tokens.forEach(token => {
+    current[token] = typeof current[token] == 'object' ? current[token] : {};
+    current = current[token];
+  });
+  current[last] = value;
+  return object;
+}
