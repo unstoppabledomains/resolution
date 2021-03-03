@@ -397,13 +397,6 @@ describe('ENS', () => {
       );
       expectSpyToBeCalled(spies);
     });
-
-    it('usdt method s not supported by ens', async () => {
-      await expectResolutionErrorCode(
-        resolution.usdt('anyensdomain.eth', TickerVersion.EOS),
-        ResolutionErrorCode.UnsupportedMethod,
-      );
-    });
   });
 
   describe('.Hashing', () => {

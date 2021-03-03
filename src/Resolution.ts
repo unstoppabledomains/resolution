@@ -169,35 +169,6 @@ export default class Resolution {
   }
 
   /**
-   * Resolves given domain name to a specific USDT chain address if exists
-   * @async
-   * @param domain - domain name to be resolved
-   * @param version - chain version to look for such as ERC20, TRON, EOS, OMNI
-   * @throws [[ResolutionError]] when domain is not from ZNS or CNS or such address doesn't exist
-   * @returns A promise that resolves in an address
-   */
-  async usdt(domain: string, version: TickerVersion): Promise<string> {
-    domain = this.prepareDomain(domain);
-    const method = this.getNamingMethodOrThrow(domain);
-    if (method.name === NamingServiceName.ENS) {
-      throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
-        methodName: NamingServiceName.ENS,
-        domain,
-      });
-    }
-
-    if (!isSupportedChainVersion(version)) {
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-        domain,
-        recordName: `crypto.USDT.version.${version}.address`,
-      });
-    }
-
-    const recordKey = `crypto.USDT.version.${version}.address`;
-    return await method.record(domain, recordKey);
-  }
-
-  /**
    * Resolves given domain name to a verified twitter handle
    * @async
    * @param domain - domain name to be resolved
