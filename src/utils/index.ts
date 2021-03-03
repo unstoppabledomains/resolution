@@ -146,10 +146,6 @@ export function ensureConfigured(source: {
   }
 }
 
-export function buildContract(abi: any, address: string, provider: Provider): Contract {
-  return new Contract(abi, address, provider);
-}
-
 export function isApi(obj: any): obj is Api {
   return obj && !!obj.api;
 }

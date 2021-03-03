@@ -4,8 +4,7 @@ import { default as resolverInterface } from './contracts/cns/resolver';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import Contract from './utils/contract';
 import standardKeys from './utils/standardKeys';
-import { 
-  buildContract,
+import {
   constructRecords,
   ensureConfigured,
   getStartingBlock,
@@ -63,7 +62,7 @@ export default class Cns implements NamingService {
     this.url = source['url'];
     this.provider = source['provider'] || new FetchProvider(this.name, this.url!);
     
-    this.readerContract = buildContract(
+    this.readerContract = new Contract(
       proxyReaderAbi,
       source['proxyReaderAddress'] || Cns.ProxyReaderMap[this.network],
       this.provider
@@ -121,7 +120,7 @@ export default class Cns implements NamingService {
     const tokenId = this.namehash(domain);
     const resolver = await this.resolver(domain);
 
-    const resolverContract = buildContract(resolverInterface, resolver, this.provider);
+    const resolverContract = new Contract(resolverInterface, resolver, this.provider);
     if (isLegacyResolver(resolver)) {
       return await this.getStandardRecords(tokenId);
     }

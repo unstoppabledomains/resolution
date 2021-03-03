@@ -11,7 +11,7 @@ import Contract from './utils/contract';
 import contentHash from 'content-hash';
 import EnsNetworkMap from 'ethereum-ens-network-map';
 import { Provider, EnsSource, EnsConfig } from './types/publicTypes';
-import { buildContract, constructRecords, ensureConfigured, invert, isNullAddress } from './utils';
+import { constructRecords, ensureConfigured, invert, isNullAddress } from './utils';
 import NamingService from './interfaces/NamingService';
 import FetchProvider from './FetchProvider';
 import Namehash from './utils/Namehash';
@@ -52,7 +52,7 @@ export default class Ens implements NamingService {
     }, this.name);
 
     const registryAddress = source['registryAddress'] || EnsNetworkMap[this.network];
-    this.readerContract = buildContract(
+    this.readerContract = new Contract(
       ensInterface,
       registryAddress,
       this.provider
@@ -135,7 +135,7 @@ export default class Ens implements NamingService {
       return null;
     }
 
-    const resolverContract = buildContract(
+    const resolverContract = new Contract(
       resolverInterface(resolverAddress, EthCoinIndex),
       resolverAddress,
       this.provider
@@ -219,7 +219,7 @@ export default class Ens implements NamingService {
     domain: string,
     coinType: string,
   ): Promise<string | undefined> {
-    const resolverContract = buildContract(
+    const resolverContract = new Contract(
       resolverInterface(resolver, coinType),
       resolver,
       this.provider
@@ -263,7 +263,7 @@ export default class Ens implements NamingService {
     coinType?: string,
   ): Promise<Contract> {
     const resolverAddress = await this.resolver(domain);
-    return buildContract(
+    return new Contract(
       resolverInterface(resolverAddress, coinType),
       resolverAddress,
       this.provider
