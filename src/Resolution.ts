@@ -164,11 +164,32 @@ export default class Resolution {
    * @throws [[ResolutionError]] if address is not found
    * @returns A promise that resolves in an address
    */
-  async addr(domain: string, currrencyTicker: string): Promise<string> {
+  async addr(domain: string, ticker: string): Promise<string> {
     return await this.record(
       domain,
-      `crypto.${currrencyTicker.toUpperCase()}.address`,
+      `crypto.${ticker.toUpperCase()}.address`,
     );
+  }
+
+  /** 
+   * Read multi-chain currency address if exists
+   * @async
+   * @param domain - domain name to be resolved
+   * @param ticker - currency ticker (USDT, FTM, etc.) 
+   * @param chain - chain version, usually means blockchain ( ERC20, BEP2, OMNI, etc. )
+   * @throws [[ResolutionError]] if address is not found
+   * @returns A promise that resolves in an adress
+  */
+  async multiChainAddr(domain: string, ticker: string, chain: string): Promise<string> {
+    domain = this.prepareDomain(domain);
+    const method = this.getNamingMethodOrThrow(domain);
+    if (method.serviceName() === NamingServiceName.ENS) {
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod,
+        { methodName: NamingServiceName.ENS, domain });
+    }
+
+    const recordKey = `crypto.${ticker.toUpperCase()}.version.${chain.toUpperCase()}.address`;
+    return await method.record(domain, recordKey);
   }
 
   /**

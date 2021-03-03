@@ -7,9 +7,22 @@
 [![Unstoppable Domains Documentation](https://img.shields.io/badge/Documentation-unstoppabledomains.com-blue)](https://docs.unstoppabledomains.com/)
 [![Get help on Discord](https://img.shields.io/badge/Get%20help%20on-Discord-blueviolet)](https://discord.gg/b6ZVxSZ9Hn)
 
-Resolution is a library for interacting with blockchain domain names. It can be used to retrieve [payment addresses](https://unstoppabledomains.com/features#Add-Crypto-Addresses), IPFS hashes for [decentralized websites](https://unstoppabledomains.com/features#Build-Website), and GunDB usernames for [decentralized chat](https://unstoppabledomains.com/chat).
+- [Installing Resolution](README.md#installing-resolution)
+- [Using Resolution](README.md#using-resolution)
+- [Default Ethereum Providers](README.md#default-ethereum-providers)
+- [Error Handling](README.md#error-handling)
+- [Free advertising for integrated apps](README.md#free-advertising-for-integrated-apps)
 
-Resolution is primarily built and maintained by [Unstoppable Domains](https://unstoppabledomains.com/).
+Resolution is a library for interacting with blockchain domain names. It can be
+used to retrieve
+[payment addresses](https://unstoppabledomains.com/features#Add-Crypto-Addresses),
+IPFS hashes for
+[decentralized websites](https://unstoppabledomains.com/features#Build-Website),
+and GunDB usernames for
+[decentralized chat](https://unstoppabledomains.com/chat).
+
+Resolution is primarily built and maintained by
+[Unstoppable Domains](https://unstoppabledomains.com/).
 
 Resolution supports decentralized domains across three main zones:
 
@@ -23,7 +36,8 @@ Resolution supports decentralized domains across three main zones:
   - `.xyz`
   - `.luxe`
 
-For more information, see our detailed [API Referrence](https://unstoppabledomains.github.io/resolution/).
+For more information, see our detailed
+[API Referrence](https://unstoppabledomains.github.io/resolution/).
 
 ## Installing Resolution
 
@@ -37,7 +51,8 @@ yarn add @unstoppabledomains/resolution
 npm install @unstoppabledomains/resolution --save
 ```
 
-If you're interested in resolving domains via the command line, see our [CLI section](#command-line-interface). 
+If you're interested in resolving domains via the command line, see our
+[CLI section](#command-line-interface).
 
 ## Using Resolution
 
@@ -64,8 +79,17 @@ function resolve(domain, currency) {
     .catch(console.error);
 }
 
+function resolveMultiChain(domain, currency, chain) {
+  resolution
+    .multiChainAddr(domain, currency, chain)
+    .then((address) => console.log(domain, 'resolves to', address, version))
+    .catch(console.error);
+}
+
 resolve('brad.crypto', 'ETH');
 resolve('brad.zil', 'ZIL');
+resolveMultiChain('brad.crypto', 'USDT', 'ERC20');
+resolveMultiChain('brad.crypto', 'USDT', 'OMNI');
 ```
 
 Execute the script.
@@ -89,8 +113,8 @@ function resolveIpfsHash(domain) {
     .ipfsHash(domain)
     .then((hash) =>
       console.log(
-        `You can access this website via a public IPFS gateway: https://gateway.ipfs.io/ipfs/${hash}`
-      )
+        `You can access this website via a public IPFS gateway: https://gateway.ipfs.io/ipfs/${hash}`,
+      ),
     )
     .catch(console.error);
 }
@@ -105,22 +129,22 @@ $ node ipfs_hash.js
 You can access this website via a public IPFS gateway: https://gateway.ipfs.io/ipfs/QmVJ26hBrwwNAPVmLavEFXDUunNDXeFSeMPmHuPxKe6dJv
 ```
 
-### Find a GunDB username
+### Find a custom record
 
-Create a new file in your project, `gundb.js`.
+Create a new file in your project, `custom-resolution.js`.
 
 ```javascript
 const { default: Resolution } = require('@unstoppabledomains/resolution');
 const resolution = new Resolution();
 
-function resolveGunDbRecords(domain) {
+function resolveCustomRecord(domain, record) {
   resolution
-    .chatId(domain)
-    .then((id) => console.log(`Domain ${domain} has a GunDB chat ID: ${id}`))
+    .records(domain, [record])
+    .then((value) => console.log(`Domain ${domain} ${record} is: ${value}`))
     .catch(console.error);
 }
 
-resolveGunDbRecords('homecakes.crypto');
+resolveCustomRecord('homecakes.crypto', 'custom.record.value');
 ```
 
 Execute the script.
@@ -142,59 +166,95 @@ yarn global add @unstoppabledomains/resolution
 npm install -g @unstoppabledomains/resolution
 ```
 
-You can specify what blockchain provider url to use via `--ethereum-url` flag.
+By default, the CLI uses Infura as its primary gateway to the Ethereum
+blockchain. If you'd like to override this default and set another provider you
+can do so using the `--ethereum-url` flag.
 
 For example:
 
 ```shell
-resolution --ethereum-url https://main-rpc.linkpool.io -d udtestdev-usdt.crypto -a
+resolution --ethereum-url https://mainnet.infura.io/v3/${secret} -d udtestdev-usdt.crypto -a
 ```
 
 Use the `-h` or `--help` flag to see all the available CLI options.
 
+## Default Ethereum Providers
+
+Resolution provides zero-configuration experience by using built-in
+production-ready [Infura](http://infura.io/) endpoint by default.  
+Default Ethereum provider is free to use without restrictions and rate-limits
+for `CNS (.crypto domains)` resolution.  
+To resolve `ENS` domains on production it's recommended to change Ethereum
+provider.  
+Default provider can be changed by changing constructor options
+`new Resolution(options)` or by using one of the factory methods:
+
+- `Resolution.infura()`
+- `Resolution.fromWeb3Version1Provider()`
+- `Resolution.fromEthersProvider()`
+- etc.
+
+To see all constructor options and factory methods check
+[Unstoppable API reference](https://unstoppabledomains.github.io/resolution).
+
 ## Error Handling
 
-When resolution encounters an error it returns the error code instead of stopping the process. Keep an eye out for return values like `RECORD_NOT_FOUND`.
+When resolution encounters an error it returns the error code instead of
+stopping the process. Keep an eye out for return values like `RECORD_NOT_FOUND`.
 
 ## Development
 
-Use these commands to set up a local development environment (**macOS Terminal** or **Linux shell**).
+Use these commands to set up a local development environment (**macOS Terminal**
+or **Linux shell**).
 
 1. Install `nvm`
+
    ```bash
    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.36.0/install.sh | bash
    ```
 
 2. Install concrete version of `node.js`
-    ```bash
-    nvm install 12.12.0
-    ```
+
+   ```bash
+   nvm install 12.12.0
+   ```
 
 3. Install `yarn`
-    ```bash
-    npm install -g yarn
-    ```
+   ```bash
+   npm install -g yarn
+   ```
 4. Clone the repository
-    ```bash
-    git clone https://github.com/unstoppabledomains/resolution.git
-    cd resolution
-    ```
+
+   ```bash
+   git clone https://github.com/unstoppabledomains/resolution.git
+   cd resolution
+   ```
 
 5. Install dependencies
-    ```bash
-    yarn install
-    ```
+   ```bash
+   yarn install
+   ```
 
 ### Internal network config
 
-Internal [network config](src/main/resources/com/unstoppabledomains/config/network/network-config.json) 
-can be updated by running `yarn network-config:pull` task and committing updated file.
+Internal [network config](./src/config/network-config.json) can be updated by
+running `yarn network-config:pull` task and committing updated file.
 
 ## Free advertising for integrated apps
 
-Once your app has a working Unstoppable Domains integration, [register it here](https://unstoppabledomains.com/app-submission). Registered apps appear on the Unstoppable Domains [homepage](https://unstoppabledomains.com/) and [Applications](https://unstoppabledomains.com/apps) page — putting your app in front of tens of thousands of potential customers per day.
+Once your app has a working Unstoppable Domains integration,
+[register it here](https://unstoppabledomains.com/app-submission). Registered
+apps appear on the Unstoppable Domains
+[homepage](https://unstoppabledomains.com/) and
+[Applications](https://unstoppabledomains.com/apps) page — putting your app in
+front of tens of thousands of potential customers per day.
 
-Also, every week we select a newly-integrated app to feature in the Unstoppable Update newsletter. This newsletter is delivered to straight into the inbox of ~100,000 crypto fanatics — all of whom could be new customers to grow your business.
+Also, every week we select a newly-integrated app to feature in the Unstoppable
+Update newsletter. This newsletter is delivered to straight into the inbox of
+~100,000 crypto fanatics — all of whom could be new customers to grow your
+business.
 
 ## Get help
-[Join our discord community](https://discord.com/invite/b6ZVxSZ9Hn) and ask questions.  
+
+[Join our discord community](https://discord.com/invite/b6ZVxSZ9Hn) and ask
+questions.

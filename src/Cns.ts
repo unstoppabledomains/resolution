@@ -86,6 +86,13 @@ export default class Cns implements NamingService {
     return this.name;
   }
 
+  protected urlMap(): BlockhanNetworkUrlMap {
+    return {
+      1: 'https://mainnet.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+      4: 'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+    };
+  }
+
   isSupportedDomain(domain: string): boolean {
     return (
       domain === 'crypto' ||

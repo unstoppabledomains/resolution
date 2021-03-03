@@ -2,13 +2,13 @@ import nock from 'nock';
 import Resolution, { ResolutionErrorCode } from '../index';
 import { NullAddress } from '../types';
 import {
+  expectConfigurationErrorCode,
+  expectResolutionErrorCode,
+  expectSpyToBeCalled,
   mockAsyncMethod,
   mockAsyncMethods,
-  expectSpyToBeCalled,
-  expectResolutionErrorCode,
-  protocolLink,
   pendingInLive,
-  expectConfigurationErrorCode,
+  protocolLink,
 } from '../utils/helpers';
 import { ConfigurationErrorCode } from '../errors/configurationError';
 import { EnsSupportedNetworks, NamingServiceName } from '../types/publicTypes';

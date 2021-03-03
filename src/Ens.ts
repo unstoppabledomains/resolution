@@ -68,6 +68,13 @@ export default class Ens implements NamingService {
     return Namehash.hash(domain);
   }
 
+  protected urlMap(): BlockhanNetworkUrlMap {
+    return {
+      1: 'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
+      3: 'https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee'
+    };
+  }
+
   isSupportedDomain(domain: string): boolean {
     return (
       domain === 'eth' ||
