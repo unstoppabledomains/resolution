@@ -11,7 +11,7 @@ import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 import standardKeys from './utils/standardKeys';
 import { CryptoRecords, Provider, NamingServiceName } from './types/publicTypes';
 import Networking from './utils/Networking';
-import { constructRecords, domainEndingToNS, ensureRecordPresence } from './utils';
+import { constructRecords, domainEndingToNS} from './utils';
 import FetchProvider from './FetchProvider';
 import Namehash from './utils/Namehash';
 
@@ -86,12 +86,20 @@ export default class Udapi implements NamingService {
     const validationSignature =
       records[standardKeys.validation_twitter_username];
     const twitterHandle = records[standardKeys.twitter_username];
-    ensureRecordPresence(
-      domain,
-      'twitter validation username',
-      validationSignature,
-    );
-    ensureRecordPresence(domain, 'twitter handle', twitterHandle);
+
+    if (!validationSignature) {
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+        recordName: standardKeys.validation_twitter_username,
+        domain: domain,
+      });
+    }
+    if (!twitterHandle) {
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+        recordName: standardKeys.twitter_username,
+        domain: domain,
+      });
+    }
+    
     if (
       !isValidTwitterSignature({
         tokenId: domainMetaData.meta.namehash,

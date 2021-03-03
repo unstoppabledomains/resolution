@@ -22,7 +22,7 @@ import {
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import NamingService from './interfaces/NamingService';
 import DnsUtils from './utils/DnsUtils';
-import { domainEndingToNS, ensureRecordPresence, isApi, signedInfuraLink } from './utils';
+import { domainEndingToNS, isApi, signedInfuraLink } from './utils';
 import { Eip1993Factories } from './utils/Eip1993Factories';
 /**
  * Blockchain domain Resolution library - Resolution.
@@ -43,8 +43,8 @@ import { Eip1993Factories } from './utils/Eip1993Factories';
  * ```
  */
 export default class Resolution {
-  private services: NamingService[];
-  private serviceMap: Record<NamingServiceName, NamingService>;
+  private readonly services: NamingService[];
+  private readonly serviceMap: Record<NamingServiceName, NamingService>;
   
   constructor({
     sourceConfig = undefined,
@@ -396,11 +396,13 @@ export default class Resolution {
       newRecord,
       oldRecord,
     ]));
-    return ensureRecordPresence(
-      domain,
-      newRecord,
-      records[newRecord] || records[oldRecord],
-    );
+    if (!records[newRecord] && !records[oldRecord]) {
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+        recordName: newRecord,
+        domain: domain,
+      });
+    }
+    return (records[newRecord] || records[oldRecord]);
   }
 
   private getNamingMethod(domain: string): NamingService | undefined {

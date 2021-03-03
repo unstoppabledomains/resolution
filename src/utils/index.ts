@@ -151,21 +151,6 @@ export function buildContract(abi: any, address: string, provider: Provider): Co
   return new Contract(abi, address, provider);
 }
 
-export function  ensureRecordPresence(
-  domain: string,
-  key: string,
-  value: string | undefined | null,
-): string {
-  if (value) {
-    return value;
-  }
-
-  throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-    recordName: key,
-    domain: domain,
-  });
-}
-
 export function isApi(obj: any): obj is Api {
   return obj && !!obj.api;
 }
