@@ -1,5 +1,5 @@
 import DnsRecordsError, { DnsRecordsErrorCode } from "../errors/dnsRecordsError";
-import { CryptoRecords, DnsRecord, DnsRecordType } from "../publicTypes";
+import { CryptoRecords, DnsRecord, DnsRecordType } from "../types/publicTypes";
 import { isStringArray } from "./";
 export default class DnsUtils {
 

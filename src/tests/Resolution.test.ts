@@ -3,7 +3,7 @@ import Resolution, {
   ResolutionErrorCode,
   UnclaimedDomainResponse,
 } from '../index';
-import { TickerVersion, DnsRecordType, JsonRpcPayload, NamingServiceName } from '../publicTypes';
+import { TickerVersion, DnsRecordType, JsonRpcPayload, NamingServiceName } from '../types/publicTypes';
 import { JsonRpcProvider, InfuraProvider } from '@ethersproject/providers';
 import Web3HttpProvider from 'web3-providers-http';
 import Web3WsProvider from 'web3-providers-ws';

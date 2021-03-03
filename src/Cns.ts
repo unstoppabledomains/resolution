@@ -1,4 +1,4 @@
-import { BlockhanNetworkUrlMap, ProxyReaderMap } from './types';
+import { BlockhanNetworkUrlMap, ProxyReaderMap } from './types/types';
 import { default as proxyReaderAbi } from './contracts/cns/proxyReader';
 import { default as resolverInterface } from './contracts/cns/resolver';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
@@ -18,12 +18,12 @@ import {
   DomainData,
   Provider,
   CnsSource,
-} from './publicTypes';
+} from './types/publicTypes';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 import NetworkConfig from './config/network-config.json';
 import NamingService from './interfaces/NamingService';
 import FetchProvider from './FetchProvider';
-import { CnsConfig } from './publicTypes';
+import { CnsConfig } from './types/publicTypes';
 import Namehash from './utils/Namehash';
 
 

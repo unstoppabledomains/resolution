@@ -1,8 +1,8 @@
 import { ResolutionError, ResolutionErrorCode } from '../../errors/resolutionError';
 import { default as newResolver } from './newResolver';
 import { default as oldResolver } from './oldResolver';
-import { EthCoinIndex } from '../../types';
-import { NamingServiceName } from '../../publicTypes';
+import { EthCoinIndex } from '../../types/types';
+import { NamingServiceName } from '../../types/publicTypes';
 import { JsonFragment } from '@ethersproject/abi';
 
 export const OldResolverAddresses = [

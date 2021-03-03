@@ -9,7 +9,7 @@ import NamingService from './interfaces/NamingService';
 import pckg from './package.json';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 import standardKeys from './utils/standardKeys';
-import { CryptoRecords, Provider, NamingServiceName } from './publicTypes';
+import { CryptoRecords, Provider, NamingServiceName } from './types/publicTypes';
 import Networking from './utils/Networking';
 import { constructRecords, domainEndingToNS, ensureRecordPresence } from './utils';
 import FetchProvider from './FetchProvider';

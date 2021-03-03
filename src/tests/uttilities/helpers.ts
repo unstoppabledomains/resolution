@@ -1,6 +1,6 @@
 import nock from 'nock';
 import _ from 'lodash';
-import { Dictionary } from '../../types';
+import { Dictionary } from '../../types/types';
 import mockData from '../testData/mockData.json';
 import ResolutionError, { ResolutionErrorCode } from '../../errors/resolutionError';
 import ConfigurationError, { ConfigurationErrorCode } from '../../errors/configurationError';

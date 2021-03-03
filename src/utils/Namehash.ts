@@ -1,6 +1,6 @@
 
 import { domainEndingToNS } from './index';
-import { NamingServiceName } from '../publicTypes';
+import { NamingServiceName } from '../types/publicTypes';
 import ResolutionError from '../errors/resolutionError';
 import { ResolutionErrorCode } from '../errors/resolutionError';
 import { keccak_256 as sha3 } from 'js-sha3';
@@ -15,12 +15,12 @@ export default class Namehash {
   static hash(domain: string): string {
     const serviceName = domainEndingToNS[domain.split(".").pop() || ''];
     switch(serviceName) {
-      case NamingServiceName.CNS: 
-        return this.cnsNamehash(domain);
-      case NamingServiceName.ZNS:
-        return this.znsNamehash(domain);
-      case NamingServiceName.ENS:
-        return this.ensNamehash(domain);
+    case NamingServiceName.CNS: 
+      return this.cnsNamehash(domain);
+    case NamingServiceName.ZNS:
+      return this.znsNamehash(domain);
+    case NamingServiceName.ENS:
+      return this.ensNamehash(domain);
     }
     throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, { domain });
   }

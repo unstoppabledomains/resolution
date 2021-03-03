@@ -19,7 +19,7 @@ import {
   Web3Version1Provider,
   EthersProvider,
   ResolutionMethod,
-} from './publicTypes';
+} from './types/publicTypes';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import NamingService from './interfaces/NamingService';
 import DnsUtils from './utils/DnsUtils';

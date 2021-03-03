@@ -1,5 +1,5 @@
 import { Provider } from '..';
-import {  ResolutionMethod } from '../publicTypes';
+import {  ResolutionMethod } from '../types/publicTypes';
 
 export default interface NamingService {
   readonly name: ResolutionMethod;

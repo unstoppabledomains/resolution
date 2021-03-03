@@ -6,7 +6,7 @@ import {
   commaSeparatedList,
   tryInfo,
 } from './cli-helpers.js';
-import { TickerVersion } from '../publicTypes';
+import { TickerVersion } from '../types/publicTypes';
 
 (async () => {
   program

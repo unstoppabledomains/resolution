@@ -4,7 +4,7 @@ import {
   toChecksumAddress,
 } from './utils/znsUtils';
 import { set, isNullAddress, constructRecords, ensureConfigured } from './utils';
-import { Dictionary, ZnsResolution } from './types';
+import { Dictionary, ZnsResolution } from './types/types';
 import {
   NamingServiceName,
   ResolutionError,
@@ -13,7 +13,7 @@ import {
   UnclaimedDomainResponse,
 } from './index';
 import NamingService from './interfaces/NamingService';
-import { CryptoRecords, Provider, ZnsSource, ZnsConfig } from './publicTypes';
+import { CryptoRecords, Provider, ZnsSource, ZnsConfig } from './types/publicTypes';
 import FetchProvider from './FetchProvider';
 import Namehash from './utils/Namehash';
 

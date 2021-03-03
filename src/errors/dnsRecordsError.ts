@@ -1,4 +1,4 @@
-import { DnsRecordType } from '../publicTypes';
+import { DnsRecordType } from '../types/publicTypes';
 type DnsRecordsErrorHandler = (error: DnsRecordsErrorOptions) => string;
 /** Explains DnsRecords Error options */
 type DnsRecordsErrorOptions = {

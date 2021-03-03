@@ -1,4 +1,4 @@
-import { ResolutionMethod } from '../publicTypes';
+import { ResolutionMethod } from '../types/publicTypes';
 /** Alias for Resolution error handler function
  * @internal
  */

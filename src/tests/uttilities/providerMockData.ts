@@ -1,4 +1,4 @@
-import { RpcProviderTestCase } from "../../types";
+import { RpcProviderTestCase } from "../../types/types";
 import NetworkConfig from '../../config/network-config.json';
 const ProxyReaderAddress = NetworkConfig.networks[1].contracts.ProxyReader.address.toLowerCase();
 
