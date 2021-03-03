@@ -65,18 +65,18 @@ export default class Resolution {
 
   /**
    * Creates a resolution with configured infura id for ens and cns
-   * @param infura infura project id
-   * @param network ethereum network name
+   * @param infura - infura project id
+   * @param networks - an optional object that describes what network to use when connecting ENS or CNS default is mainnet
    */
-  static infura(infura: string, networks: { ens?: {
+  static infura(infura: string, networks?: { ens?: {
       network: EnsSupportedNetworks 
     }, cns?: {
       network: CnsSupportedNetworks
     }}): Resolution {
     return new this({
       sourceConfig: {
-        ens: { url: signedInfuraLink(infura, networks.ens?.network), network: networks.ens?.network || "mainnet" },
-        cns: { url: signedInfuraLink(infura, networks.ens?.network), network: networks.cns?.network || "mainnet" },
+        ens: { url: signedInfuraLink(infura, networks?.ens?.network), network: networks?.ens?.network || "mainnet" },
+        cns: { url: signedInfuraLink(infura, networks?.ens?.network), network: networks?.cns?.network || "mainnet" },
       },
     });
   }
@@ -84,17 +84,18 @@ export default class Resolution {
   /**
    * Creates a resolution instance with configured provider
    * @param provider - any provider compatible with EIP-1193
+   * @param networks - an optional object that describes what network to use when connecting ENS or CNS default is mainnet
    * @see https://eips.ethereum.org/EIPS/eip-1193
    */
-  static fromEip1193Provider(provider: Provider, networks: { ens?: {
+  static fromEip1193Provider(provider: Provider, networks?: { ens?: {
     network: EnsSupportedNetworks 
   }, cns?: {
     network: CnsSupportedNetworks
   }}): Resolution {
     return new this({
       sourceConfig: {
-        ens: { provider, network: networks.ens?.network || "mainnet" },
-        cns: { provider, network: networks.cns?.network || "mainnet" },
+        ens: { provider, network: networks?.ens?.network || "mainnet" },
+        cns: { provider, network: networks?.cns?.network || "mainnet" },
       },
     });
   }
@@ -102,9 +103,10 @@ export default class Resolution {
   /**
    * Create a resolution instance from web3 0.x version provider
    * @param provider - an 0.x version provider from web3 ( must implement sendAsync(payload, callback) )
+   * @param networks - an optional object that describes what network to use when connecting ENS or CNS default is mainnet
    * @see https://github.com/ethereum/web3.js/blob/0.20.7/lib/web3/httpprovider.js#L116
    */
-  static fromWeb3Version0Provider(provider: Web3Version0Provider, networks: { ens?: {
+  static fromWeb3Version0Provider(provider: Web3Version0Provider, networks?: { ens?: {
     network: EnsSupportedNetworks 
   }, cns?: {
     network: CnsSupportedNetworks
@@ -118,10 +120,11 @@ export default class Resolution {
   /**
    * Create a resolution instance from web3 1.x version provider
    * @param provider - an 1.x version provider from web3 ( must implement send(payload, callback) )
+   * @param networks - an optional object that describes what network to use when connecting ENS or CNS default is mainnet
    * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-core-helpers/types/index.d.ts#L165
    * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-providers-http/src/index.js#L95
    */
-  static fromWeb3Version1Provider(provider: Web3Version1Provider, networks: { ens?: {
+  static fromWeb3Version1Provider(provider: Web3Version1Provider, networks?: { ens?: {
     network: EnsSupportedNetworks 
   }, cns?: {
     network: CnsSupportedNetworks
@@ -136,12 +139,13 @@ export default class Resolution {
    * Creates instance of resolution from provider that implements Ethers Provider#call interface.
    * This wrapper support only `eth_call` method for now, which is enough for all the current Resolution functionality
    * @param provider - provider object
+   * @param networks - an optional object that describes what network to use when connecting ENS or CNS default is mainnet
    * @see https://github.com/ethers-io/ethers.js/blob/v4-legacy/providers/abstract-provider.d.ts#L91
    * @see https://github.com/ethers-io/ethers.js/blob/v5.0.4/packages/abstract-provider/src.ts/index.ts#L224
    * @see https://docs.ethers.io/ethers.js/v5-beta/api-providers.html#jsonrpcprovider-inherits-from-provider
    * @see https://github.com/ethers-io/ethers.js/blob/master/packages/providers/src.ts/json-rpc-provider.ts
    */
-  static fromEthersProvider(provider: EthersProvider, networks: { ens?: {
+  static fromEthersProvider(provider: EthersProvider, networks?: { ens?: {
     network: EnsSupportedNetworks 
   }, cns?: {
     network: CnsSupportedNetworks
