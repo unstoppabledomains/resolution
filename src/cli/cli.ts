@@ -87,7 +87,7 @@ import { TickerVersion } from '../publicTypes';
       )
       return records;
     }, response, 'records'),
-    twitter: () => tryInfo(async () => await resolution.cns?.twitter(domain), response, 'twitter'),
+    twitter: () => tryInfo(async () => await resolution.twitter(domain), response, 'twitter'),
   };
 
   const resolutionProcess: Promise<boolean>[] = [];
