@@ -12,6 +12,5 @@ describe('Exported variables', () => {
     expect(Index.DnsUtils).toBeDefined();
     expect(Index.DnsRecordsError).toBeDefined();
     expect(Index.DnsRecordsErrorCode).toBeDefined();
-    expect(Index.TickerVersion).toBeDefined();
   });
 });

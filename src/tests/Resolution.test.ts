@@ -3,14 +3,13 @@ import Resolution, {
   ResolutionErrorCode,
   UnclaimedDomainResponse,
 } from '../index';
-import { TickerVersion, DnsRecordType, JsonRpcPayload, NamingServiceName } from '../types/publicTypes';
+import { DnsRecordType, JsonRpcPayload, NamingServiceName } from '../types/publicTypes';
 import { JsonRpcProvider, InfuraProvider } from '@ethersproject/providers';
 import Web3HttpProvider from 'web3-providers-http';
 import Web3WsProvider from 'web3-providers-ws';
 import Web3V027Provider from 'web3-0.20.7/lib/web3/httpprovider';
 import {
   CryptoDomainWithAdaBchAddresses,
-  CryptoDomainWithUsdtMultiChainRecords,
 } from '../utils/helpers';
 
 import {

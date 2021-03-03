@@ -10,7 +10,6 @@ import {
   DnsRecordType,
   DnsRecord,
   CryptoRecords,
-  TickerVersion,
   SourceConfig,
   EnsSupportedNetworks,
   CnsSupportedNetworks,
@@ -23,7 +22,7 @@ import {
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import NamingService from './interfaces/NamingService';
 import DnsUtils from './utils/DnsUtils';
-import { domainEndingToNS, ensureRecordPresence, isApi, isSupportedChainVersion, signedInfuraLink } from './utils';
+import { domainEndingToNS, ensureRecordPresence, isApi, signedInfuraLink } from './utils';
 import { Eip1993Factories } from './utils/Eip1993Factories';
 /**
  * Blockchain domain Resolution library - Resolution.

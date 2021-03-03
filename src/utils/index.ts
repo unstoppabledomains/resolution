@@ -1,6 +1,6 @@
 import ConfigurationError, { ConfigurationErrorCode } from '../errors/configurationError';
 import ResolutionError, { ResolutionErrorCode } from '../errors/resolutionError';
-import { CryptoRecords, TickerVersion, EnsSupportedNetworks, CnsSupportedNetworks, Provider, ZnsSupportedNetworks, NamingServiceName, Api } from '../types/publicTypes';
+import { CryptoRecords, EnsSupportedNetworks, CnsSupportedNetworks, Provider, ZnsSupportedNetworks, NamingServiceName, Api } from '../types/publicTypes';
 import { isCnsSupportedNetworks, NullAddresses, isEnsSupportedNetworks, isZnsSupportedNetworks } from '../types';
 import Contract from './contract';
 
@@ -110,10 +110,6 @@ export function isNullAddress(
     return true;
   }
   return Object.values(NullAddresses).includes(key);
-}
-
-export function isSupportedChainVersion(obj: any): obj is TickerVersion {
-  return Object.values(TickerVersion).includes(obj);
 }
 
 export function constructRecords(

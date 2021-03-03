@@ -11,7 +11,7 @@ import {
   expectConfigurationErrorCode,
 } from '../utils/helpers';
 import { ConfigurationErrorCode } from '../errors/configurationError';
-import { TickerVersion, EnsSupportedNetworks, NamingServiceName } from '../types/publicTypes';
+import { EnsSupportedNetworks, NamingServiceName } from '../types/publicTypes';
 import Ens from '../Ens';
 let resolution: Resolution;
 let ens: Ens;
