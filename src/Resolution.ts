@@ -50,9 +50,9 @@ export default class Resolution {
     sourceConfig = undefined,
   }: { sourceConfig?: SourceConfig } = {}) {
 
-    const cns = isApi(sourceConfig?.cns) ? new UdApi() : new Cns(sourceConfig?.cns);
-    const ens = isApi(sourceConfig?.ens) ? new UdApi() : new Ens(sourceConfig?.ens);
-    const zns = isApi(sourceConfig?.zns) ? new UdApi() : new Zns(sourceConfig?.zns);
+    const cns = (isApi(sourceConfig?.cns) ? new UdApi() : new Cns(sourceConfig?.cns)) as NamingService;
+    const ens = (isApi(sourceConfig?.ens) ? new UdApi() : new Ens(sourceConfig?.ens)) as NamingService;
+    const zns = (isApi(sourceConfig?.zns) ? new UdApi() : new Zns(sourceConfig?.zns)) as NamingService;
 
     this.serviceMap = {
       [NamingServiceName.CNS]: cns,
@@ -359,7 +359,7 @@ export default class Resolution {
    */
   serviceName(domain: string): ResolutionMethod {
     domain = this.prepareDomain(domain);
-    return this.getNamingMethodOrThrow(domain).serviceName(domain);
+    return this.getNamingMethodOrThrow(domain).serviceName();
   }
 
   /**

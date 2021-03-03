@@ -67,8 +67,8 @@ export default class Udapi implements NamingService {
   }
 
   async twitter(domain: string): Promise<string> {
-    const serviceName = this.serviceName(domain);
-    if (serviceName !== 'CNS') {
+    const serviceName = this.findMethod(domain);
+    if (serviceName !== NamingServiceName.CNS) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
         domain,
         methodName: 'twitter',
@@ -140,8 +140,8 @@ export default class Udapi implements NamingService {
     }
   }
 
-  serviceName(domain: string): NamingServiceName {
-    return domainEndingToNS[domain.split(".").pop() || ''];
+  serviceName(): ResolutionMethod {
+    return this.name;
   }
 
   async resolver(domain: string): Promise<string> {

@@ -14,7 +14,7 @@ export default interface NamingService {
   isSupportedDomain(domain: string): boolean;
   record(domain: string, key: string): Promise<string>;
   records(domain: string, keys: string[]): Promise<Record<string, string>>;
-  serviceName(domain: string): ResolutionMethod;
+  serviceName(): ResolutionMethod;
   twitter(domain: string): Promise<string>;
   reverse(address: string, currencyTicker: string): Promise<string | null>;
   allRecords(domain: string): Promise<Record<string, string>>;
