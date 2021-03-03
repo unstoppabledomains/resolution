@@ -4,7 +4,7 @@ import {
   toChecksumAddress,
 } from './utils/znsUtils';
 import { set, isNullAddress, constructRecords, ensureConfigured } from './utils';
-import { Dictionary, ZnsResolution } from './types/types';
+import { Dictionary, ZnsResolution } from './types';
 import {
   NamingServiceName,
   ResolutionError,

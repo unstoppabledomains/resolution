@@ -6,7 +6,7 @@ import {
   RpcProviderLogEntry,
   TransactionRequest,
   ZnsSupportedNetwork,
-} from './types';
+} from '.';
 
 export type CnsSupportedNetworks = typeof CnsSupportedNetwork.type;
 export type EnsSupportedNetworks = typeof EnsSupportedNetwork.type;

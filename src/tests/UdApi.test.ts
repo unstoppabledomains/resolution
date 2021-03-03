@@ -8,7 +8,7 @@ import {
   mockAsyncMethod,
   expectSpyToBeCalled,
   CryptoDomainWithTwitterVerification,
-} from './uttilities/helpers';
+} from '../utils/helpers';
 
 let resolution: Resolution;
 

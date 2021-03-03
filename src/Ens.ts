@@ -1,7 +1,7 @@
 import { default as ensInterface } from './contracts/ens/ens';
 import { default as resolverInterface } from './contracts/ens/resolver';
 import { formatsByCoinType } from '@ensdomains/address-encoder';
-import { EthCoinIndex, Bip44Constants, BlockhanNetworkUrlMap, NetworkIdMap } from './types/types';
+import { EthCoinIndex, Bip44Constants, BlockhanNetworkUrlMap, NetworkIdMap } from './types';
 import {
   NamingServiceName,
   ResolutionError,

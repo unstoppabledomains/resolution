@@ -9,9 +9,9 @@ import {
   protocolLink,
   pendingInLive,
   expectConfigurationErrorCode,
-} from './uttilities/helpers';
+} from '../utils/helpers';
 import { ConfigurationErrorCode } from '../errors/configurationError';
-import { TickerVersion, EnsSupportedNetworks, NamingServiceName } from '../publicTypes';
+import { TickerVersion, EnsSupportedNetworks, NamingServiceName } from '../types/publicTypes';
 import Ens from '../Ens';
 let resolution: Resolution;
 let ens: Ens;

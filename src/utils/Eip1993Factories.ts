@@ -1,4 +1,4 @@
-import { RequestArguments } from '../types/types';
+import { RequestArguments } from '../types';
 import {
   ConfigurationError,
   ConfigurationErrorCode,

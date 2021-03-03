@@ -5,9 +5,9 @@ import {
   expectResolutionErrorCode,
   mockAsyncMethods,
   ZilDomainWithUsdtMultiChainRecords,
-} from './uttilities/helpers';
+} from '../utils/helpers';
 import { NullAddress } from '../types';
-import { NamingServiceName, TickerVersion, ZnsSupportedNetworks } from '../publicTypes';
+import { NamingServiceName, TickerVersion, ZnsSupportedNetworks } from '../types/publicTypes';
 import Zns from '../Zns';
 
 let resolution: Resolution;

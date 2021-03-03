@@ -12,10 +12,10 @@ import {
   expectSpyToBeCalled,
   expectResolutionErrorCode,
   protocolLink,
-} from './uttilities/helpers';
+} from '../utils/helpers';
 import FetchProvider from '../FetchProvider';
 import { FetchError } from 'node-fetch';
-import { NamingServiceName } from '../publicTypes';
+import { NamingServiceName } from '../types/publicTypes';
 import Cns from '../Cns';
 import standardKeys from '../utils/standardKeys';
 import Networking from '../utils/Networking';

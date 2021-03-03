@@ -1,5 +1,5 @@
 import { Interface, JsonFragment } from '@ethersproject/abi';
-import { RequestArguments, EventData } from '../types/types';
+import { RequestArguments, EventData } from '../types';
 import { Provider } from '../types/publicTypes';
 
 export default class Contract {

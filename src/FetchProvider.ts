@@ -1,5 +1,5 @@
 import { FetchError } from 'node-fetch';
-import { RequestArguments } from './types/types';
+import { RequestArguments } from './types';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import { ResolutionMethod, Provider } from './types/publicTypes';
 import Networking from './utils/Networking';

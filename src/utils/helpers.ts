@@ -1,10 +1,10 @@
 import nock from 'nock';
 import _ from 'lodash';
-import { Dictionary } from '../../types/types';
-import mockData from '../testData/mockData.json';
-import ResolutionError, { ResolutionErrorCode } from '../../errors/resolutionError';
-import ConfigurationError, { ConfigurationErrorCode } from '../../errors/configurationError';
-import DnsRecordsError, { DnsRecordsErrorCode } from '../../errors/dnsRecordsError';
+import { Dictionary } from '../types';
+import mockData from '../tests/testData/mockData.json';
+import ResolutionError, { ResolutionErrorCode } from '../errors/resolutionError';
+import ConfigurationError, { ConfigurationErrorCode } from '../errors/configurationError';
+import DnsRecordsError, { DnsRecordsErrorCode } from '../errors/dnsRecordsError';
 export const MainnetUrl = 'https://mainnet.infura.io';
 export const ZilliqaUrl = 'https://api.zilliqa.com';
 export const DefaultUrl = 'https://unstoppabledomains.com/api/v1';

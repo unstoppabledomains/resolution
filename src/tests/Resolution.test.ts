@@ -11,7 +11,7 @@ import Web3V027Provider from 'web3-0.20.7/lib/web3/httpprovider';
 import {
   CryptoDomainWithAdaBchAddresses,
   CryptoDomainWithUsdtMultiChainRecords,
-} from './uttilities/helpers';
+} from '../utils/helpers';
 
 import {
   expectResolutionErrorCode,
@@ -24,8 +24,8 @@ import {
   CryptoDomainWithTwitterVerification,
   pendingInLive,
   CryptoDomainWithIpfsRecords,
-} from './uttilities/helpers';
-import { RpcProviderTestCases } from './uttilities/providerMockData';
+} from '../utils/helpers';
+import { RpcProviderTestCases } from '../utils/providerMockData';
 import fetch, { FetchError } from 'node-fetch';
 import standardKeys from '../utils/standardKeys';
 import Cns from '../Cns';
