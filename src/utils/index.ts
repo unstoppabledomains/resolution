@@ -123,17 +123,23 @@ export function constructRecords(
   return records;
 }
 
+function ensureCorrectNetwork(network: CnsSupportedNetworks | EnsSupportedNetworks | ZnsSupportedNetworks, service: NamingServiceName) {
+  switch(service) {
+    case NamingServiceName.CNS:
+      return isCnsSupportedNetworks(network);
+    case NamingServiceName.ENS:
+      return isEnsSupportedNetworks(network);
+    case NamingServiceName.ZNS:
+      return isZnsSupportedNetworks(network);
+  }
+}
+
 export function ensureConfigured(source: {
   network: CnsSupportedNetworks | EnsSupportedNetworks | ZnsSupportedNetworks,
   url?: string,
   provider?: Provider
 }, service: NamingServiceName): void {
-  if (!source.network ||
-   !( isCnsSupportedNetworks(source.network) ||
-      isEnsSupportedNetworks(source.network) ||
-      isZnsSupportedNetworks(source.network) 
-   )
-  ) {
+  if (!source.network || !ensureCorrectNetwork(source.network, service)) {
     throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedNetwork, {
       method: service,
     });

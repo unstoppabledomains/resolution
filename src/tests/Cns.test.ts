@@ -12,13 +12,15 @@ import {
   expectSpyToBeCalled,
   expectResolutionErrorCode,
   protocolLink,
+  expectConfigurationErrorCode,
 } from '../utils/helpers';
 import FetchProvider from '../FetchProvider';
 import { FetchError } from 'node-fetch';
-import { NamingServiceName } from '../types/publicTypes';
+import { CnsSupportedNetworks, NamingServiceName } from '../types/publicTypes';
 import Cns from '../Cns';
 import standardKeys from '../utils/standardKeys';
 import Networking from '../utils/Networking';
+import { ConfigurationErrorCode } from '../errors/configurationError';
 
 let resolution: Resolution;
 let cns: Cns;
@@ -36,6 +38,15 @@ describe('CNS', () => {
     expect(resolution['findNamingService'](NamingServiceName.CNS)).toBeDefined();
     expect(resolution['findNamingService'](NamingServiceName.CNS).network).toBe(1);
     expect(resolution['findNamingService'](NamingServiceName.CNS).url).toBe(protocolLink());
+  });
+
+  it('should not allow ropsten as testnet', async () => {
+    await expectConfigurationErrorCode(
+      () => new Resolution({sourceConfig: {
+        cns: {network: "ropsten" as CnsSupportedNetworks}
+      }}),
+      ConfigurationErrorCode.UnspecifiedNetwork,
+    );
   });
 
   it('checks the record by key', async () => {

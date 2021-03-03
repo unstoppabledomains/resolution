@@ -56,12 +56,14 @@ export default class Cns implements NamingService {
     if (!source) {
       source = this.getDefaultSource();
     }
-    ensureConfigured(source, this.name);
     this.network = Cns.NetworkNameMap[source.network];
-
     this.url = source['url'];
     this.provider = source['provider'] || new FetchProvider(this.name, this.url!);
-    
+    ensureConfigured({
+      url: this.url,
+      provider: this.provider,
+      network: source.network
+    }, this.name);
     this.readerContract = new Contract(
       proxyReaderAbi,
       source['proxyReaderAddress'] || Cns.ProxyReaderMap[this.network],
