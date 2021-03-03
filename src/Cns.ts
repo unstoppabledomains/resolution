@@ -19,6 +19,7 @@ import {
   DomainData,
   Provider,
   CnsSupportedNetworks,
+  CnsSource,
 } from './publicTypes';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 import NetworkConfig from './config/network-config.json';
@@ -53,26 +54,27 @@ export default class Cns implements NamingService {
   readonly provider: Provider;
   readonly readerContract: Contract;
 
-  constructor(source?: CnsConfig) {
+  constructor(source?: CnsSource) {
     if (!source) {
       source = this.getDefaultSource();
     }
     ensureConfigured(source, this.name);
     this.network = Cns.NetworkNameMap[source.network];
-    this.url = source?.url || Cns.UrlMap[this.network];
-    this.provider = source?.provider || new FetchProvider(this.name, this.url!);
+
+    this.url = source['url'];
+    this.provider = source['provider'] || new FetchProvider(this.name, this.url!);
     
     this.readerContract = buildContract(
       proxyReaderAbi,
-      source.proxyReaderAddress || Cns.ProxyReaderMap[this.network],
+      source['proxyReaderAddress'] || Cns.ProxyReaderMap[this.network],
       this.provider
     );
   }
 
-  private getDefaultSource() {
+  private getDefaultSource(): CnsConfig {
     return {
-      url: Cns.UrlMap[1]!,
-      network: "mainnet" as CnsSupportedNetworks,
+      url: Cns.UrlMap[1],
+      network: "mainnet",
     }
   }
 

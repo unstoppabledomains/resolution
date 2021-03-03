@@ -24,7 +24,6 @@ export type ZnsSupportedNetworks = typeof ZnsSupportedNetwork.type;
 export type CnsConfig  = {
   url?: string,
   network: CnsSupportedNetworks,
-  provider?: Provider,
   proxyReaderAddress?: string
 };
 
@@ -33,21 +32,23 @@ export type Api = { api: true };
 export type EnsConfig = {
   url?: string,
   network: EnsSupportedNetworks,
-  provider?: Provider;
   registryAddress?: string
 }
 
 export type ZnsConfig = {
   url?: string,
   network: ZnsSupportedNetworks,
-  provider?: Provider;
   registryAddress?: string
 }
 
+export type CnsSource = CnsConfig | { provider: Provider, network: CnsSupportedNetworks };
+export type EnsSource = EnsConfig | { provider: Provider, network: EnsSupportedNetworks };
+export type ZnsSource = ZnsConfig | { provider: Provider, network: ZnsSupportedNetworks };
+
 export type SourceConfig = {
-  ens?: EnsConfig | Api;
-  zns?: ZnsConfig | Api;
-  cns?: CnsConfig | Api;
+  ens?: EnsSource | Api;
+  zns?: ZnsSource | Api;
+  cns?: CnsSource | Api;
 };
 
 export enum NamingServiceName {

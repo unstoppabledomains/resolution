@@ -14,7 +14,7 @@ import {
   UnclaimedDomainResponse,
 } from './index';
 import NamingService from './interfaces/NamingService';
-import { CryptoRecords, Provider, ZnsConfig, ZnsSupportedNetworks } from './publicTypes';
+import { CryptoRecords, Provider, ZnsSource, ZnsSupportedNetworks, ZnsConfig } from './publicTypes';
 import FetchProvider from './FetchProvider';
 
 export default class Zns implements NamingService {
@@ -41,29 +41,30 @@ export default class Zns implements NamingService {
   readonly registryAddress: string;
   readonly provider: Provider;
   
-  constructor(source?: ZnsConfig) {
+  constructor(source?: ZnsSource) {
     if (!source) {
       source = this.getDefaultSource();
     }
     this.network = Zns.NetworkNameMap[source.network];
-    this.url = source?.url || Zns.UrlMap[this.network];
-    this.provider = source?.provider || new FetchProvider(this.name, this.url!);
+    this.url = source['url'] || Zns.UrlMap[this.network];
+    this.provider = source['provider'] || new FetchProvider(this.name, this.url!);
     ensureConfigured({
-      network: source.network,
       url: this.url,
+      network: source.network,
       provider: this.provider
     }, this.name);
-    this.registryAddress = source.registryAddress || Zns.RegistryMap[this.network];
+    
+    this.registryAddress = source['registryAddress'] || Zns.RegistryMap[this.network];
     if (this.registryAddress.startsWith("0x")) {
       this.registryAddress = toBech32Address(this.registryAddress);
     }
   }
   
 
-  private getDefaultSource() {
+  private getDefaultSource(): ZnsConfig {
     return {
-      url: Zns.UrlMap[1]!,
-      network: "mainnet" as ZnsSupportedNetworks,
+      url: Zns.UrlMap[1],
+      network: "mainnet"
     }
   }
 

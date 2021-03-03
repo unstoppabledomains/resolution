@@ -11,7 +11,7 @@ import {
 import Contract from './utils/contract';
 import contentHash from 'content-hash';
 import EnsNetworkMap from 'ethereum-ens-network-map';
-import { Provider, EnsConfig, EnsSupportedNetworks } from './publicTypes';
+import { Provider, EnsSupportedNetworks, EnsSource, EnsConfig } from './publicTypes';
 import { buildContract, constructRecords, ensureConfigured, invert, isNullAddress } from './utils';
 import NamingService from './interfaces/NamingService';
 import FetchProvider from './FetchProvider';
@@ -34,34 +34,35 @@ export default class Ens implements NamingService {
   readonly name = NamingServiceName.ENS;
   readonly network: number;
   readonly url: string | undefined;
-  readonly registryAddress: string;
   readonly provider: Provider;
   readonly readerContract: Contract;
 
-  constructor(source?: EnsConfig) {
+  constructor(source?: EnsSource) {
     if (!source) {
       source = this.getDefaultSource();
     }
+    
     this.network = Ens.NetworkNameMap[source.network];
-    this.url = source?.url || Ens.UrlMap[this.network];
-    this.provider = source?.provider || new FetchProvider(this.name, this.url!);
+    this.url = source['url'] || Ens.UrlMap[this.network];
+    this.provider = source['provider'] || new FetchProvider(this.name, this.url!);
     ensureConfigured({
       network: source.network,
       url: this.url,
       provider: this.provider
     }, this.name);
-    this.registryAddress = source.registryAddress || EnsNetworkMap[this.network];
+
+    const registryAddress = source['registryAddress'] || EnsNetworkMap[this.network];
     this.readerContract = buildContract(
       ensInterface,
-      this.registryAddress,
+      registryAddress,
       this.provider
     );
   }
 
-  private getDefaultSource() {
+  private getDefaultSource(): EnsConfig {
     return {
-      url: Ens.UrlMap[1]!,
-      network: "mainnet" as EnsSupportedNetworks,
+      url: Ens.UrlMap[1],
+      network: "mainnet",
     }
   }
 

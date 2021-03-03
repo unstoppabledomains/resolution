@@ -63,7 +63,7 @@ export default class Resolution {
     if (sourceConfig && !!sourceConfig.cns && !!sourceConfig.cns['api'] ) {
       this.cns = new UdApi();
     } else {
-      this.cns = new Cns(sourceConfig?.cns as CnsConfig)
+      this.cns = new Cns(sourceConfig?.cns as CnsConfig | { provider: Provider, network: CnsSupportedNetworks});
     }
     
     if (sourceConfig && !!sourceConfig.ens && !!sourceConfig.ens['api'] ) {

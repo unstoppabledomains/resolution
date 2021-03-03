@@ -158,7 +158,7 @@ describe('ENS', () => {
     expect(resolution.ens?.url).toBe(
       'https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
     );
-    expect(resolution.ens?.registryAddress).toBe(
+    expect(resolution.ens['readerContract']['address']).toBe(
       '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
     );
   });
@@ -181,7 +181,7 @@ describe('ENS', () => {
     });
     expect(resolution.ens?.network).toBe(5);
     expect(resolution.ens?.url).toBe('https://goerli.infura.io');
-    expect(resolution.ens?.registryAddress).toBe(
+    expect(resolution.ens['readerContract']['address']).toBe(
       '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
     );
   });
@@ -218,12 +218,12 @@ describe('ENS', () => {
     expect(resolution.ens?.url).toBe(
       'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
     );
-    expect(resolution.ens?.registryAddress).toBe(
+    expect(resolution.ens['readerContract']['address']).toBe(
       '0x314159265dd8dbb310642f98f50c066173c1259b',
     );
   });
 
-  it('1111 checks normalizeSource ens (object) #11', async () => {
+  it('checks normalizeSource ens (object) #11', async () => {
     const resolution = new Resolution({
       sourceConfig: {
         ens: {
@@ -236,7 +236,7 @@ describe('ENS', () => {
     expect(resolution.ens?.url).toBe(
       'https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
     );
-    expect(resolution.ens?.registryAddress).toBe(
+    expect(resolution.ens['readerContract']['address']).toBe(
       '0x112234455c3a32fd11230c42e7bccd4a84e02010',
     );
   });
@@ -252,7 +252,7 @@ describe('ENS', () => {
     expect(resolution.ens?.url).toBe(
       'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
     );
-    expect(resolution.ens?.registryAddress).toBe(
+    expect(resolution.ens['readerContract']['address']).toBe(
       '0xabcffff1231586348194fcabbeff1231240234fc',
     );
   });
