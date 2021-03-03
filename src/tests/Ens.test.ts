@@ -11,8 +11,10 @@ import {
   expectConfigurationErrorCode,
 } from './uttilities/helpers';
 import { ConfigurationErrorCode } from '../errors/configurationError';
-import { TickerVersion, EnsSupportedNetworks } from '../publicTypes';
+import { TickerVersion, EnsSupportedNetworks, NamingServiceName } from '../publicTypes';
+import Ens from '../Ens';
 let resolution: Resolution;
+let ens: Ens;
 
 beforeEach(() => {
   nock.cleanAll();
@@ -22,6 +24,7 @@ beforeEach(() => {
       ens: { url: protocolLink(), network: "mainnet" },
     },
   });
+  ens = resolution['findNamingService'](NamingServiceName.ENS) as Ens;
 });
 
 describe('ENS', () => {
@@ -31,21 +34,22 @@ describe('ENS', () => {
         ens: { network: 'mainnet' },
       },
     });
-    expect(resolution.ens?.url).toBe(
+    const ens = resolution['findNamingService'](NamingServiceName.ENS)
+    expect(ens?.url).toBe(
       'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
     );
-    expect(resolution.ens?.network).toEqual(1);
+    expect(ens?.network).toEqual(1);
   });
 
   it('resolves .eth name using blockchain', async () => {
-    expect(resolution.ens?.url).toBe(protocolLink());
-    expect(resolution.ens?.network).toEqual(1);
+    expect(ens?.url).toBe(protocolLink());
+    expect(ens?.network).toEqual(1);
 
-    const eyes = mockAsyncMethods(resolution.ens, {
+    const eyes = mockAsyncMethods(ens, {
       resolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
       fetchAddress: '0x714ef33943d925731FBB89C99aF5780D888bD106',
     });
-    const spy = mockAsyncMethods(resolution.ens, {
+    const spy = mockAsyncMethods(ens, {
       owner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
     });
     expect(await resolution.addr('matthewgould.eth', 'ETH')).toEqual(
@@ -60,11 +64,11 @@ describe('ENS', () => {
 
   it('reverses address to ENS domain', async () => {
     pendingInLive();
-    const eyes = mockAsyncMethods(resolution.ens, {
+    const eyes = mockAsyncMethods(ens, {
       resolverCallToName: 'adrian.argent.xyz',
       resolver: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
     });
-    const result = await resolution.ens?.reverse(
+    const result = await ens?.reverse(
       '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
       'ETH',
     );
@@ -73,8 +77,8 @@ describe('ENS', () => {
   });
 
   it('reverses address to ENS domain null', async () => {
-    const spy = mockAsyncMethod(resolution.ens, 'resolver', NullAddress);
-    const result = await resolution.ens?.reverse(
+    const spy = mockAsyncMethod(ens, 'resolver', NullAddress);
+    const result = await ens?.reverse(
       '0x112234455c3a32fd11230c42e7bccd4a84e02010',
       'ETH',
     );
@@ -83,7 +87,7 @@ describe('ENS', () => {
   });
 
   it('resolves .xyz name using ENS blockchain', async () => {
-    const eyes = mockAsyncMethods(resolution.ens, {
+    const eyes = mockAsyncMethods(ens, {
       resolver: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
       fetchAddress: '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
     });
@@ -94,7 +98,7 @@ describe('ENS', () => {
   });
 
   it('resolves .luxe name using ENS blockchain', async () => {
-    const eyes = mockAsyncMethods(resolution.ens, {
+    const eyes = mockAsyncMethods(ens, {
       resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
       fetchAddress: '0xf3dE750A73C11a6a2863761E930BF5fE979d5663',
     });
@@ -105,7 +109,7 @@ describe('ENS', () => {
   });
 
   it('resolves .kred name using ENS blockchain', async () => {
-    const eyes = mockAsyncMethods(resolution.ens, {
+    const eyes = mockAsyncMethods(ens, {
       resolver: '0x96184444629F3489c4dE199871E6F99568229d8f',
       callMethod: '0x96184444629F3489c4dE199871E6F99568229d8f',
     });
@@ -115,7 +119,7 @@ describe('ENS', () => {
   });
 
   it('resolves .luxe name using ENS blockchain with thrown error', async () => {
-    const spies = mockAsyncMethods(resolution.ens, {
+    const spies = mockAsyncMethods(ens, {
       resolver: undefined,
       owner: undefined,
     });
@@ -128,7 +132,7 @@ describe('ENS', () => {
   });
 
   it('resolves name with resolver but without an owner', async () => {
-    const eyes = mockAsyncMethods(resolution.ens, {
+    const eyes = mockAsyncMethods(ens, {
       resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x76a9144620b70031f0e9437e374a2100934fba4911046088ac',
     });
@@ -139,26 +143,28 @@ describe('ENS', () => {
 
   it('checks normalizeSource ens (boolean)', async () => {
     const resolution = new Resolution();
-    expect(resolution.ens?.network).toBe(1);
-    expect(resolution.ens?.url).toBe(
+    ens = resolution['findNamingService'](NamingServiceName.ENS) as Ens;
+    expect(ens?.network).toBe(1);
+    expect(ens?.url).toBe(
       'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
     );
   });
 
   it('checks normalizeSource ens (object) #1', async () => {
-    expect(resolution.ens?.network).toBe(1);
-    expect(resolution.ens?.url).toBe(protocolLink());
+    expect(ens?.network).toBe(1);
+    expect(ens?.url).toBe(protocolLink());
   });
 
   it('checks normalizeSource ens (object) #2', async () => {
     const resolution = new Resolution({
       sourceConfig: { ens: { network: "ropsten" } },
     });
-    expect(resolution.ens?.network).toBe(3);
-    expect(resolution.ens?.url).toBe(
+    ens = resolution['findNamingService'](NamingServiceName.ENS) as Ens;
+    expect(ens?.network).toBe(3);
+    expect(ens?.url).toBe(
       'https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
     );
-    expect(resolution.ens['readerContract']['address']).toBe(
+    expect(ens['readerContract']['address']).toBe(
       '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
     );
   });
@@ -169,8 +175,9 @@ describe('ENS', () => {
         ens: { url: 'https://rinkeby.infura.io', network: "rinkeby" },
       },
     });
-    expect(resolution.ens?.network).toBe(4);
-    expect(resolution.ens?.url).toBe('https://rinkeby.infura.io');
+    ens = resolution['findNamingService'](NamingServiceName.ENS) as Ens;
+    expect(ens?.network).toBe(4);
+    expect(ens?.url).toBe('https://rinkeby.infura.io');
   });
 
   it('checks normalizeSource ens (object) #4', async () => {
@@ -179,9 +186,10 @@ describe('ENS', () => {
         ens: { url: 'https://goerli.infura.io', network: "goerli" },
       },
     });
-    expect(resolution.ens?.network).toBe(5);
-    expect(resolution.ens?.url).toBe('https://goerli.infura.io');
-    expect(resolution.ens['readerContract']['address']).toBe(
+    ens = resolution['findNamingService'](NamingServiceName.ENS) as Ens;
+    expect(ens?.network).toBe(5);
+    expect(ens?.url).toBe('https://goerli.infura.io');
+    expect(ens['readerContract']['address']).toBe(
       '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
     );
   });
@@ -202,8 +210,9 @@ describe('ENS', () => {
     const resolution = new Resolution({
       sourceConfig: { ens: { network: 'mainnet' } },
     });
-    expect(resolution.ens?.network).toBe(1);
-    expect(resolution.ens?.url).toBe(
+    ens = resolution['findNamingService'](NamingServiceName.ENS) as Ens;
+    expect(ens?.network).toBe(1);
+    expect(ens?.url).toBe(
       'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
     );
   });
@@ -214,11 +223,12 @@ describe('ENS', () => {
         ens: { registryAddress: '0x314159265dd8dbb310642f98f50c066173c1259b', network: "mainnet" },
       },
     });
-    expect(resolution.ens?.network).toBe(1);
-    expect(resolution.ens?.url).toBe(
+    ens = resolution['findNamingService'](NamingServiceName.ENS) as Ens;
+    expect(ens?.network).toBe(1);
+    expect(ens?.url).toBe(
       'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
     );
-    expect(resolution.ens['readerContract']['address']).toBe(
+    expect(ens['readerContract']['address']).toBe(
       '0x314159265dd8dbb310642f98f50c066173c1259b',
     );
   });
@@ -232,11 +242,12 @@ describe('ENS', () => {
         },
       },
     });
-    expect(resolution.ens?.network).toBe(3);
-    expect(resolution.ens?.url).toBe(
+    ens = resolution['findNamingService'](NamingServiceName.ENS) as Ens;
+    expect(ens?.network).toBe(3);
+    expect(ens?.url).toBe(
       'https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
     );
-    expect(resolution.ens['readerContract']['address']).toBe(
+    expect(ens['readerContract']['address']).toBe(
       '0x112234455c3a32fd11230c42e7bccd4a84e02010',
     );
   });
@@ -247,12 +258,12 @@ describe('ENS', () => {
         ens: { registryAddress: '0xabcffff1231586348194fcabbeff1231240234fc', network: "mainnet" },
       },
     });
-
-    expect(resolution.ens?.network).toBe(1);
-    expect(resolution.ens?.url).toBe(
+    ens = resolution['findNamingService'](NamingServiceName.ENS) as Ens;
+    expect(ens?.network).toBe(1);
+    expect(ens?.url).toBe(
       'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
     );
-    expect(resolution.ens['readerContract']['address']).toBe(
+    expect(ens['readerContract']['address']).toBe(
       '0xabcffff1231586348194fcabbeff1231240234fc',
     );
   });
@@ -270,7 +281,7 @@ describe('ENS', () => {
   });
 
   it('checks ens multicoin support #1', async () => {
-    const eyes = mockAsyncMethods(resolution.ens, {
+    const eyes = mockAsyncMethods(ens, {
       resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x76a9144620b70031f0e9437e374a2100934fba4911046088ac',
     });
@@ -280,7 +291,7 @@ describe('ENS', () => {
   });
 
   it('checks ens multicoin support #2', async () => {
-    const eyes = mockAsyncMethods(resolution.ens, {
+    const eyes = mockAsyncMethods(ens, {
       resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0xa914e8604d28ef5d2a7caafe8741e5dd4816b7cb19ea87',
     });
@@ -290,7 +301,7 @@ describe('ENS', () => {
   });
 
   it('checks ens multicoin support #3', async () => {
-    const eyes = mockAsyncMethods(resolution.ens, {
+    const eyes = mockAsyncMethods(ens, {
       resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x314159265dd8dbb310642f98f50c066173c1259b',
     });
@@ -300,7 +311,7 @@ describe('ENS', () => {
   });
 
   it('checks ens multicoin support #4', async () => {
-    const eyes = mockAsyncMethods(resolution.ens, {
+    const eyes = mockAsyncMethods(ens, {
       resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x314159265dd8dbb310642f98f50c066173c1259b',
     });
@@ -310,7 +321,7 @@ describe('ENS', () => {
   });
 
   it('checks ens multicoin support #5', async () => {
-    const eyes = mockAsyncMethods(resolution.ens, {
+    const eyes = mockAsyncMethods(ens, {
       resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x314159265dd8dbb310642f98f50c066173c1259b',
     });
@@ -320,7 +331,7 @@ describe('ENS', () => {
   });
 
   it('checks ens multicoin support #6', async () => {
-    const eyes = mockAsyncMethods(resolution.ens, {
+    const eyes = mockAsyncMethods(ens, {
       resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod:
         '0x05444b4e9c06f24296074f7bc48f92a97916c6dc5ea9000000000000000000',
@@ -331,7 +342,7 @@ describe('ENS', () => {
   });
 
   it('checks ens multicoin support #7', async () => {
-    const eyes = mockAsyncMethods(resolution.ens, {
+    const eyes = mockAsyncMethods(ens, {
       resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod: '0x76a91476a04053bda0a88bda5177b86a15c3b29f55987388ac',
     });
@@ -341,7 +352,7 @@ describe('ENS', () => {
   });
 
   it('checks ens multicoin support #8', async () => {
-    const eyes = mockAsyncMethods(resolution.ens, {
+    const eyes = mockAsyncMethods(ens, {
       resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod:
         '0x5128751e76e8199196d454941c45d1b3a323f1433bd6751e76e8199196d454941c45d1b3a323f1433bd6',
@@ -354,7 +365,7 @@ describe('ENS', () => {
   });
 
   it('checks UnsupportedCurrency error', async () => {
-    const eyes = mockAsyncMethods(resolution.ens, {
+    const eyes = mockAsyncMethods(ens, {
       resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
     });
     await expectResolutionErrorCode(
@@ -366,7 +377,7 @@ describe('ENS', () => {
 
   describe('.resolve', () => {
     it('should return correct resolver address', async () => {
-      const spies = mockAsyncMethods(resolution.ens, {
+      const spies = mockAsyncMethods(ens, {
         resolver: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
       });
       const resolverAddress = await resolution.resolver('monkybrain.eth');
@@ -377,7 +388,7 @@ describe('ENS', () => {
     });
 
     it('should not find a resolver address', async () => {
-      const spies = mockAsyncMethods(resolution.ens, {
+      const spies = mockAsyncMethods(ens, {
         resolver: undefined,
       });
       await expectResolutionErrorCode(
@@ -440,7 +451,7 @@ describe('ENS', () => {
 
   describe('.Metadata', () => {
     it('should return a valid ipfsHash', async () => {
-      const eyes = mockAsyncMethods(resolution.ens, {
+      const eyes = mockAsyncMethods(ens, {
         resolver: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
         callMethod:
           '0xe301017012208723b9b5834fe60801e19af3a3554a6f229dad9cfbb18ce4e80ffc2a457f83aa',
@@ -452,7 +463,7 @@ describe('ENS', () => {
 
     // todo(johny) find some domains with url property set
     it('should not find an appropriate httpUrl', async () => {
-      const eyes = mockAsyncMethods(resolution.ens, {
+      const eyes = mockAsyncMethods(ens, {
         resolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
         callMethod: '',
       });
@@ -464,7 +475,7 @@ describe('ENS', () => {
     });
 
     it('should return resolution error for not finding the email', async () => {
-      const eyes = mockAsyncMethods(resolution.ens, {
+      const eyes = mockAsyncMethods(ens, {
         resolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
         callMethod: '',
       });
@@ -477,7 +488,7 @@ describe('ENS', () => {
     });
 
     it('should resolve gundb id and public key', async () => {
-      const eyes = mockAsyncMethods(resolution.ens, {
+      const eyes = mockAsyncMethods(ens, {
         resolver: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
         callMethod:
           '0x7e1d12f34e038a2bda3d5f6ee0809d72f668c357d9e64fd7f622513f06ea652146ab5fdee35dc4ce77f1c089fd74972691fccd48130306d9eafcc6e1437d1ab21b',
@@ -492,7 +503,7 @@ describe('ENS', () => {
     });
 
     it('should resolve gundb public key', async () => {
-      const eyes = mockAsyncMethods(resolution.ens, {
+      const eyes = mockAsyncMethods(ens, {
         resolver: '0x4976fb03C32e5B8cfe2b6cCB31c09Ba78EBaBa41',
         callMethod:
           'yxbMDgFrzemQEcDwJYccE_TDbGmRL_iqZ2JhQxYi2s8.nBEAyMfM2ZBtOf2C-GHe3zEn42Q1vrfPAVqNzgGhXvQ',
@@ -507,7 +518,7 @@ describe('ENS', () => {
     });
 
     it('should return resolution error for not finding the gundb chat id', async () => {
-      const eyes = mockAsyncMethods(resolution.ens, {
+      const eyes = mockAsyncMethods(ens, {
         resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
         callMethod: undefined,
       });
@@ -520,7 +531,7 @@ describe('ENS', () => {
     });
 
     it('should return resolution error for not finding the gundb publicKey', async () => {
-      const eyes = mockAsyncMethods(resolution.ens, {
+      const eyes = mockAsyncMethods(ens, {
         resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
         callMethod: undefined,
       });

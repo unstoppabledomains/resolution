@@ -21,6 +21,9 @@ import {
   Web3Version0Provider,
   Web3Version1Provider,
   EthersProvider,
+  CnsSource,
+  EnsSource,
+  ZnsSource,
 } from './publicTypes';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import NamingService from './interfaces/NamingService';
@@ -49,34 +52,16 @@ import { EnsSupportedNetworks, CnsSupportedNetworks } from './publicTypes';
  * ```
  */
 export default class Resolution {
-  /** @internal */
-  readonly ens?: NamingService;
-  /** @internal */
-  readonly zns?: NamingService;
-  /** @internal */
-  readonly cns?: NamingService;
+  private services: NamingService[];
   
   constructor({
     sourceConfig = undefined,
   }: { sourceConfig?: SourceConfig } = {}) {
 
-    if (sourceConfig && !!sourceConfig.cns && !!sourceConfig.cns['api'] ) {
-      this.cns = new UdApi();
-    } else {
-      this.cns = new Cns(sourceConfig?.cns as CnsConfig | { provider: Provider, network: CnsSupportedNetworks});
-    }
-    
-    if (sourceConfig && !!sourceConfig.ens && !!sourceConfig.ens['api'] ) {
-      this.ens = new UdApi();
-    } else {
-      this.ens = new Ens(sourceConfig?.ens as EnsConfig)
-    }
-    
-    if (sourceConfig && !!sourceConfig.zns && !!sourceConfig.zns['api'] ) {
-      this.zns = new UdApi();
-    } else {
-      this.zns = new Zns(sourceConfig?.zns as ZnsConfig)
-    }
+    const cns = sourceConfig && sourceConfig.cns && sourceConfig?.cns['api'] ? new UdApi() : new Cns(sourceConfig?.cns as CnsSource);
+    const zns = sourceConfig && sourceConfig.zns && sourceConfig?.zns['api'] ? new UdApi() : new Zns(sourceConfig?.zns as ZnsSource);
+    const ens = sourceConfig && sourceConfig.ens && sourceConfig?.ens['api'] ? new UdApi() : new Ens(sourceConfig?.ens as EnsSource);
+    this.services = [cns, ens, zns];
 
   }
 
@@ -458,13 +443,9 @@ export default class Resolution {
   }
 
   private getNamingMethod(domain: string): NamingService | undefined {
-    return this.getResolutionMethods().find((method) =>
+    return this.services.find((method) =>
       method.isSupportedDomain(domain),
     );
-  }
-
-  private getResolutionMethods(): NamingService[] {
-    return ([this.ens, this.zns, this.cns] as NamingService[]).filter((v) => v);
   }
 
   private getNamingMethodOrThrow(domain: string): NamingService {
@@ -479,7 +460,7 @@ export default class Resolution {
   }
 
   private findNamingService(name: NamingServiceName): NamingService {
-    const service = this.getResolutionMethods().find((m) => m.name === name);
+    const service = this.services.find((m) => m.name === name);
     if (!service) {
       throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
         method: name,

@@ -46,9 +46,9 @@ export type EnsSource = EnsConfig | { provider: Provider, network: EnsSupportedN
 export type ZnsSource = ZnsConfig | { provider: Provider, network: ZnsSupportedNetworks };
 
 export type SourceConfig = {
-  ens?: EnsSource | Api;
-  zns?: ZnsSource | Api;
   cns?: CnsSource | Api;
+  zns?: ZnsSource | Api;
+  ens?: EnsSource | Api;
 };
 
 export enum NamingServiceName {

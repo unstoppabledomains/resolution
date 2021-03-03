@@ -7,49 +7,55 @@ import {
   ZilDomainWithUsdtMultiChainRecords,
 } from './uttilities/helpers';
 import { NullAddress } from '../types';
-import { TickerVersion, ZnsSupportedNetworks } from '../publicTypes';
+import { NamingServiceName, TickerVersion, ZnsSupportedNetworks } from '../publicTypes';
+import Zns from '../Zns';
 
 let resolution: Resolution;
+let zns: Zns;
 
 describe('ZNS', () => {
   beforeEach(() => {
     jest.restoreAllMocks();
     resolution = new Resolution();
+    zns = resolution['findNamingService'](NamingServiceName.ZNS) as Zns;
   });
 
   describe('.NormalizeSource', () => {
     it('checks normalizeSource zns (boolean)', async () => {
-      expect(resolution.zns?.network).toBe(1);
-      expect(resolution.zns?.url).toBe('https://api.zilliqa.com');
+      expect(zns.network).toBe(1);
+      expect(zns.url).toBe('https://api.zilliqa.com');
     });
 
     it('checks normalizeSource zns (string)', async () => {
-      expect(resolution.zns?.network).toBe(1);
-      expect(resolution.zns?.url).toBe('https://api.zilliqa.com');
+      expect(zns.network).toBe(1);
+      expect(zns.url).toBe('https://api.zilliqa.com');
     });
 
     it('checks normalizeSource zns (object) #1', async () => {
       const resolution = new Resolution({
         sourceConfig: { zns: { url: 'https://api.zilliqa.com', network: "mainnet" } },
       });
-      expect(resolution.zns?.network).toBe(1);
-      expect(resolution.zns?.url).toBe('https://api.zilliqa.com');
+      zns = resolution['findNamingService'](NamingServiceName.ZNS) as Zns;
+      expect(zns.network).toBe(1);
+      expect(zns.url).toBe('https://api.zilliqa.com');
     });
 
     it('checks normalizeSource zns (object) #3', async () => {
       const resolution = new Resolution({
         sourceConfig: { zns: { url: 'https://api.zilliqa.com', network: "mainnet" } },
       });
-      expect(resolution.zns?.network).toBe(1);
-      expect(resolution.zns?.url).toBe('https://api.zilliqa.com');
+      zns = resolution['findNamingService'](NamingServiceName.ZNS) as Zns;
+      expect(zns.network).toBe(1);
+      expect(zns.url).toBe('https://api.zilliqa.com');
     });
 
     it('checks normalizeSource zns (object) #4', async () => {
       const resolution = new Resolution({
         sourceConfig: { zns: { url: 'https://api.zilliqa.com', network: "mainnet" } },
       });
-      expect(resolution.zns?.network).toBe(1);
-      expect(resolution.zns?.url).toBe('https://api.zilliqa.com');
+      zns = resolution['findNamingService'](NamingServiceName.ZNS) as Zns;
+      expect(zns.network).toBe(1);
+      expect(zns.url).toBe('https://api.zilliqa.com');
     });
 
     it('checks normalizeSource zns (object) #6', async () => {
@@ -68,8 +74,9 @@ describe('ZNS', () => {
       const resolution = new Resolution({
         sourceConfig: { zns: { network: "mainnet" } },
       });
-      expect(resolution.zns?.network).toBe(1);
-      expect(resolution.zns?.url).toBe('https://api.zilliqa.com');
+      zns = resolution['findNamingService'](NamingServiceName.ZNS) as Zns;
+      expect(zns.network).toBe(1);
+      expect(zns.url).toBe('https://api.zilliqa.com');
     });
 
     it('checks normalizeSource zns (object) #10', async () => {
@@ -78,11 +85,12 @@ describe('ZNS', () => {
           zns: { registryAddress: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz', network: "mainnet" },
         },
       });
-      expect(resolution.zns?.network).toBe(1);
-      expect(resolution.zns?.registryAddress).toBe(
+      zns = resolution['findNamingService'](NamingServiceName.ZNS) as Zns;
+      expect(zns.network).toBe(1);
+      expect(zns.registryAddress).toBe(
         'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
       );
-      expect(resolution.zns?.url).toBe('https://api.zilliqa.com');
+      expect(zns.url).toBe('https://api.zilliqa.com');
     });
 
     it('checks normalizeSource zns (object) #11', async () => {
@@ -91,10 +99,10 @@ describe('ZNS', () => {
           zns: { registryAddress: '0xabcffff1231586348194fcabbeff1231240234fc', network: "mainnet" },
         },
       });
-
-      expect(resolution.zns?.network).toBe(1);
-      expect(resolution.zns?.url).toBe('https://api.zilliqa.com');
-      expect(resolution.zns?.registryAddress).toBe(
+      zns = resolution['findNamingService'](NamingServiceName.ZNS) as Zns;
+      expect(zns.network).toBe(1);
+      expect(zns.url).toBe('https://api.zilliqa.com');
+      expect(zns.registryAddress).toBe(
         'zil1408llufrzkrrfqv5lj4malcjxyjqyd8urd7xz6',
       );
     });
@@ -102,7 +110,7 @@ describe('ZNS', () => {
 
   describe('.Resolve', () => {
     it('resolves .zil name using blockchain', async () => {
-      const eyes = mockAsyncMethods(resolution.zns, {
+      const eyes = mockAsyncMethods(zns, {
         getRecordsAddresses: [
           'zil1ye72zl5t8wl5n3f2fsa5w0x7hja0jqj7mhct23',
           '0xb17c35e557a8c13a730696c92d716a58421e36ca',
@@ -124,7 +132,7 @@ describe('ZNS', () => {
     });
 
     it('resolves domain using blockchain #2', async () => {
-      const spyes = mockAsyncMethods(resolution.zns, {
+      const spyes = mockAsyncMethods(zns, {
         getRecordsAddresses: [
           'zil1zzpjwyp2nu29pcv3sh04qxq9x5l45vke0hrwec',
           '0x3f329078d95f043fd902d5c3ea2fbce0b3fca003',
@@ -150,7 +158,7 @@ describe('ZNS', () => {
     });
 
     it('should return a valid resolver address', async () => {
-      const spies = mockAsyncMethods(resolution.zns, {
+      const spies = mockAsyncMethods(zns, {
         getRecordsAddresses: [
           'zil194qcjskuuxh6qtg8xw3qqrr3kdc6dtq8ct6j9s',
           '0xdac22230adfe4601f00631eae92df6d77f054891',
@@ -164,7 +172,7 @@ describe('ZNS', () => {
     });
 
     it('should not find a resolverAddress', async () => {
-      const spies = mockAsyncMethods(resolution.zns, {
+      const spies = mockAsyncMethods(zns, {
         getRecordsAddresses: undefined,
       });
       await expectResolutionErrorCode(
@@ -175,7 +183,7 @@ describe('ZNS', () => {
     });
 
     it('should have a zero resolver hahaha', async () => {
-      const spies = mockAsyncMethods(resolution.zns, {
+      const spies = mockAsyncMethods(zns, {
         getRecordsAddresses: [
           'zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz',
           NullAddress,
@@ -189,7 +197,7 @@ describe('ZNS', () => {
     });
 
     it('should have a zero resolver 2', async () => {
-      const spies = mockAsyncMethods(resolution.zns, {
+      const spies = mockAsyncMethods(zns, {
         getRecordsAddresses: [
           'zil10scu59zrf8fr6gyw5vnwcz43hg7rvah747pz5h',
           NullAddress,
@@ -204,7 +212,7 @@ describe('ZNS', () => {
 
     describe('.multichain tokens', () => {
       it('should work with erc20 usdt record on zilliqa', async () => {
-        const spies = mockAsyncMethods(resolution.zns, {
+        const spies = mockAsyncMethods(zns, {
           getRecordsAddresses: [
             'zil19kulqq9m4d8ckt7r68e4xyqwh2znexspz3h77c',
             '0x8e3c259d774bb9da6cef4bd33bc64d22b4621a96',
@@ -231,7 +239,7 @@ describe('ZNS', () => {
       });
 
       it('should work with tron usdt record on zilliqa', async () => {
-        const spies = mockAsyncMethods(resolution.zns, {
+        const spies = mockAsyncMethods(zns, {
           getRecordsAddresses: [
             'zil19kulqq9m4d8ckt7r68e4xyqwh2znexspz3h77c',
             '0x8e3c259d774bb9da6cef4bd33bc64d22b4621a96',
@@ -258,7 +266,7 @@ describe('ZNS', () => {
       });
 
       it('should work with omni usdt record on zilliqa', async () => {
-        const spies = mockAsyncMethods(resolution.zns, {
+        const spies = mockAsyncMethods(zns, {
           getRecordsAddresses: [
             'zil19kulqq9m4d8ckt7r68e4xyqwh2znexspz3h77c',
             '0x8e3c259d774bb9da6cef4bd33bc64d22b4621a96',
@@ -285,7 +293,7 @@ describe('ZNS', () => {
       });
 
       it('should work with erc20 usdt record on zilliqa', async () => {
-        const spies = mockAsyncMethods(resolution.zns, {
+        const spies = mockAsyncMethods(zns, {
           getRecordsAddresses: [
             'zil19kulqq9m4d8ckt7r68e4xyqwh2znexspz3h77c',
             '0x8e3c259d774bb9da6cef4bd33bc64d22b4621a96',
@@ -352,7 +360,7 @@ describe('ZNS', () => {
 
   describe('.Record Data', () => {
     it('should return IPFS hash from zns', async () => {
-      const eye = mockAsyncMethod(resolution.zns, 'getContractMapValue', {
+      const eye = mockAsyncMethod(zns, 'getContractMapValue', {
         argtypes: [],
         arguments: [
           '0x4e984952e867ff132cd4b70cd3f313d68c511b76',
@@ -360,7 +368,7 @@ describe('ZNS', () => {
         ],
         constructor: 'Record',
       });
-      const secondEye = mockAsyncMethod(resolution.zns, 'getResolverRecords', {
+      const secondEye = mockAsyncMethod(zns, 'getResolverRecords', {
         'ipfs.html.hash': 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
         'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu',
         'ipfs.redirect_domain.value': 'www.unstoppabledomains.com',
@@ -375,7 +383,7 @@ describe('ZNS', () => {
     });
 
     it('should return httpUrl associated with the domain', async () => {
-      const eye = mockAsyncMethod(resolution.zns, 'getContractMapValue', {
+      const eye = mockAsyncMethod(zns, 'getContractMapValue', {
         argtypes: [],
         arguments: [
           '0x4e984952e867ff132cd4b70cd3f313d68c511b76',
@@ -383,7 +391,7 @@ describe('ZNS', () => {
         ],
         constructor: 'Record',
       });
-      const secondEye = mockAsyncMethod(resolution.zns, 'getResolverRecords', {
+      const secondEye = mockAsyncMethod(zns, 'getResolverRecords', {
         'ipfs.html.hash': 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
         'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu',
         'ipfs.redirect_domain.value': 'www.unstoppabledomains.com',
@@ -396,7 +404,7 @@ describe('ZNS', () => {
     });
 
     it('should return all records for zil domain', async () => {
-      const eye = mockAsyncMethod(resolution.zns, 'getContractMapValue', {
+      const eye = mockAsyncMethod(zns, 'getContractMapValue', {
         argtypes: [],
         arguments: [
           '0xcea21f5a6afc11b3a4ef82e986d63b8b050b6910',
@@ -404,7 +412,7 @@ describe('ZNS', () => {
         ],
         constructor: 'Record',
       });
-      const secondEye = mockAsyncMethod(resolution.zns, 'getResolverRecords', {
+      const secondEye = mockAsyncMethod(zns, 'getResolverRecords', {
         'crypto.ETH.address': '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
         'ipfs.html.value': 'QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu',
         'whois.email.value': 'jeyhunt@gmail.com',
