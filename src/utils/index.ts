@@ -1,5 +1,4 @@
 import ConfigurationError, { ConfigurationErrorCode } from '../errors/configurationError';
-import ResolutionError, { ResolutionErrorCode } from '../errors/resolutionError';
 import { CryptoRecords, EnsSupportedNetworks, CnsSupportedNetworks, Provider, ZnsSupportedNetworks, NamingServiceName, Api } from '../types/publicTypes';
 import { isCnsSupportedNetworks, NullAddresses, isEnsSupportedNetworks, isZnsSupportedNetworks } from '../types';
 import Contract from './contract';
