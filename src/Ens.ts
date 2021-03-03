@@ -2,7 +2,6 @@ import { default as ensInterface } from './contracts/ens/ens';
 import { default as resolverInterface } from './contracts/ens/resolver';
 import { formatsByCoinType } from '@ensdomains/address-encoder';
 import { EthCoinIndex, Bip44Constants, BlockhanNetworkUrlMap, NetworkIdMap } from './types';
-import { keccak_256 as sha3 } from 'js-sha3';
 import {
   NamingServiceName,
   ResolutionError,
@@ -15,6 +14,7 @@ import { Provider, EnsSource, EnsConfig } from './publicTypes';
 import { buildContract, constructRecords, ensureConfigured, invert, isNullAddress } from './utils';
 import NamingService from './interfaces/NamingService';
 import FetchProvider from './FetchProvider';
+import Namehash from './utils/Namehash';
 
 export default class Ens implements NamingService {
   static readonly UrlMap: BlockhanNetworkUrlMap = {
@@ -59,47 +59,15 @@ export default class Ens implements NamingService {
     );
   }
 
-  private getDefaultSource(): EnsConfig {
-    return {
-      url: Ens.UrlMap[1],
-      network: "mainnet",
-    }
-  }
-
   serviceName(): NamingServiceName {
     return this.name;
   }
 
-  async owner(domain: string): Promise<string> {
-    const namehash = this.namehash(domain);
-    return await this.callMethod(this.readerContract, 'owner', [namehash]);
-  }
-  async resolver(domain: string): Promise<string> {
-    const nodeHash = this.namehash(domain);
-    const resolverAddr = await this.callMethod(this.readerContract, 'resolver', [nodeHash]);
-    if (isNullAddress(resolverAddr)) {
-      throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver);
-    }
-    return resolverAddr;
-  }
-
   namehash(domain: string): string {
-    const hashArray = this.hash(domain);
-    return this.arrayToHex(hashArray);
-  }
-
-  private hash(domain: string): number[] {
-    if (!domain) {
-      return Array.from(new Uint8Array(32));
+    if (!this.isSupportedDomain(domain)) {
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {domain});
     }
-    const [label, ...remainder] = domain.split('.');
-    const labelHash = sha3.array(label);
-    const remainderHash = this.hash(remainder.join('.'));
-    return sha3.array(new Uint8Array([...remainderHash, ...labelHash]));
-  }
-
-  private arrayToHex(arr) {
-    return '0x' + Array.prototype.map.call(arr, x => ('00' + x.toString(16)).slice(-2)).join('');
+    return Namehash.hash(domain);
   }
 
   isSupportedDomain(domain: string): boolean {
@@ -109,6 +77,20 @@ export default class Ens implements NamingService {
         /^[^-]*[^-]*\.(eth|luxe|xyz|kred|addr\.reverse)$/.test(domain) &&
         domain.split('.').every(v => !!v.length))
     );
+  }
+
+  async owner(domain: string): Promise<string> {
+    const namehash = this.namehash(domain);
+    return await this.callMethod(this.readerContract, 'owner', [namehash]);
+  }
+
+  async resolver(domain: string): Promise<string> {
+    const nodeHash = this.namehash(domain);
+    const resolverAddr = await this.callMethod(this.readerContract, 'resolver', [nodeHash]);
+    if (isNullAddress(resolverAddr)) {
+      throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver);
+    }
+    return resolverAddr;
   }
 
   async record(domain: string, key: string): Promise<string> {
@@ -183,17 +165,6 @@ export default class Ens implements NamingService {
     });
   }
 
-  private fromUDRecordNameToENS(record: string): string {
-    const mapper = {
-      'ipfs.redirect_domain.value': 'url',
-      'browser.redirect_url': 'url',
-      'whois.email.value': 'email',
-      'gundb.username.value': 'gundb_username',
-      'gundb.public_key.value': 'gundb_public_key',
-    };
-    return mapper[record] || record;
-  }
-
   protected getCoinType(currencyTicker: string): string {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const constants: Bip44Constants[] = require('bip44-constants');
@@ -211,6 +182,24 @@ export default class Ens implements NamingService {
     return coin.toString();
   }
 
+  private fromUDRecordNameToENS(record: string): string {
+    const mapper = {
+      'ipfs.redirect_domain.value': 'url',
+      'browser.redirect_url': 'url',
+      'whois.email.value': 'email',
+      'gundb.username.value': 'gundb_username',
+      'gundb.public_key.value': 'gundb_public_key',
+    };
+    return mapper[record] || record;
+  }
+  
+  private getDefaultSource(): EnsConfig {
+    return {
+      url: Ens.UrlMap[1],
+      network: "mainnet",
+    }
+  }
+
   private async addr(domain: string, currencyTicker: string): Promise<string | undefined> {
     const resolver = await this.resolver(domain).catch(err => null);
     if (!resolver) {
@@ -224,7 +213,6 @@ export default class Ens implements NamingService {
     const cointType = this.getCoinType(currencyTicker.toUpperCase());
     return await this.fetchAddress(resolver, domain, cointType);
   }
-
 
   private async fetchAddress(
     resolver: string,

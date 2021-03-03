@@ -46,8 +46,9 @@ export enum NamingServiceName {
   ENS = 'ENS',
   CNS = 'CNS',
   ZNS = 'ZNS',
-  API = "API"
 }
+
+export type ResolutionMethod = NamingServiceName | 'UDAPI';
 
 /**
  * ResolutionResulution

@@ -1,4 +1,3 @@
-import { sha256 } from 'js-sha256';
 import {
   fromBech32Address,
   toBech32Address,
@@ -16,6 +15,7 @@ import {
 import NamingService from './interfaces/NamingService';
 import { CryptoRecords, Provider, ZnsSource, ZnsConfig } from './publicTypes';
 import FetchProvider from './FetchProvider';
+import Namehash from './utils/Namehash';
 
 export default class Zns implements NamingService {
 
@@ -59,7 +59,6 @@ export default class Zns implements NamingService {
       this.registryAddress = toBech32Address(this.registryAddress);
     }
   }
-  
 
   private getDefaultSource(): ZnsConfig {
     return {
@@ -99,22 +98,10 @@ export default class Zns implements NamingService {
   }
 
   namehash(domain: string): string {
-    const hashArray = this.hash(domain);
-    return this.arrayToHex(hashArray);
-  }
-
-  private hash(name: string): number[] {
-    if (!name) {
-      return Array.from(new Uint8Array(32));
+    if (!this.isSupportedDomain(domain)) {
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {domain});
     }
-    const [label, ...remainder] = name.split('.');
-    const labelHash = sha256.array(label);
-    const remainderHash = this.hash(remainder.join('.'));
-    return sha256.array(new Uint8Array([...remainderHash, ...labelHash]));
-  }
-
-  private arrayToHex(arr: number[]): string {
-    return '0x' + Array.prototype.map.call(arr, x => ('00' + x.toString(16)).slice(-2)).join('');
+    return Namehash.hash(domain);
   }
 
   isSupportedDomain(domain: string): boolean {
@@ -229,7 +216,6 @@ export default class Zns implements NamingService {
     for (const [key, value] of Object.entries(records)) {
       set(result, key, value);
     }
-
     return result;
   }
 

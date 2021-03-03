@@ -1,6 +1,6 @@
 import ConfigurationError, { ConfigurationErrorCode } from '../errors/configurationError';
 import ResolutionError, { ResolutionErrorCode } from '../errors/resolutionError';
-import { CryptoRecords, TickerVersion, EnsSupportedNetworks, CnsSupportedNetworks, Provider, ZnsSupportedNetworks, NamingServiceName } from '../publicTypes';
+import { CryptoRecords, TickerVersion, EnsSupportedNetworks, CnsSupportedNetworks, Provider, ZnsSupportedNetworks, NamingServiceName, Api } from '../publicTypes';
 import { isCnsSupportedNetworks, NullAddresses, isEnsSupportedNetworks, isZnsSupportedNetworks } from '../types';
 import Contract from './contract';
 
@@ -168,4 +168,18 @@ export function  ensureRecordPresence(
     recordName: key,
     domain: domain,
   });
+}
+
+export function isApi(obj: any): obj is Api {
+  return obj && !!obj.api;
+}
+
+export const domainEndingToNS = {
+  "crypto": NamingServiceName.CNS,
+  "zil": NamingServiceName.ZNS,
+  "eth": NamingServiceName.ENS,
+  "luxe": NamingServiceName.ENS,
+  "xyz": NamingServiceName.ENS,
+  "kred": NamingServiceName.ENS,
+  "reverse": NamingServiceName.ENS
 }

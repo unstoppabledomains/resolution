@@ -15,8 +15,12 @@ let resolution: Resolution;
 beforeEach(() => {
   nock.cleanAll();
   jest.restoreAllMocks();
-  resolution = new Resolution({ sourceConfig: { zns: { api: true }, ens: { api: true }, cns: { api: true } }});
-  
+  resolution = new Resolution({ 
+    sourceConfig: { 
+      zns: { api: true },
+      ens: { api: true },
+      cns: { api: true } 
+    }});
 });
 
 describe('Unstoppable API', () => {

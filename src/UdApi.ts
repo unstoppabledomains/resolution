@@ -1,24 +1,22 @@
 import { toBech32Address } from './utils/znsUtils';
 import {
-  NamingServiceName,
+  ResolutionMethod,
   ResolutionError,
   ResolutionErrorCode,
   ResolutionResponse,
 } from './index';
 import NamingService from './interfaces/NamingService';
-import Zns from './Zns';
-import Ens from './Ens';
-import Cns from './Cns';
 import pckg from './package.json';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 import standardKeys from './utils/standardKeys';
-import { CryptoRecords, Provider } from './publicTypes';
+import { CryptoRecords, Provider, NamingServiceName } from './publicTypes';
 import Networking from './utils/Networking';
-import { constructRecords, ensureRecordPresence } from './utils';
+import { constructRecords, domainEndingToNS, ensureRecordPresence } from './utils';
 import FetchProvider from './FetchProvider';
+import Namehash from './utils/Namehash';
 
 export default class Udapi implements NamingService {
-  readonly name: NamingServiceName = NamingServiceName.API;
+  readonly name: ResolutionMethod = "UDAPI";
   readonly network: number = 1;
   readonly url: string;
   readonly provider: Provider;
@@ -43,7 +41,7 @@ export default class Udapi implements NamingService {
   }
 
   namehash(domain: string): string {
-    return this.findMethodOrThrow(domain).namehash(domain);
+    return Namehash.hash(domain);
   }
 
   async record(domain: string, key: string): Promise<string> {
@@ -135,11 +133,12 @@ export default class Udapi implements NamingService {
   }
 
   serviceName(domain: string): NamingServiceName {
-    return this.findMethodOrThrow(domain).name;
+    return domainEndingToNS[domain.split(".").pop() || ''];
   }
 
   async resolver(domain: string): Promise<string> {
-    throw new Error('Method not implemented.');
+    const record = await this.resolve(domain);
+    return record.meta.resolver;
   }
 
   async reverse(address: string, currencyTicker: string): Promise<string | null> {
@@ -148,20 +147,7 @@ export default class Udapi implements NamingService {
     });
   }
 
-  private findMethod(domain: string): NamingService | undefined {
-    return [new Zns(), new Ens(), new Cns()].find(m =>
-      m.isSupportedDomain(domain),
-    );
-  }
-
-  private findMethodOrThrow(domain: string) {
-    const method = this.findMethod(domain);
-    if (!method) {
-      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
-        domain,
-      });
-    }
-
-    return method;
+  private findMethod(domain: string): NamingServiceName | undefined {
+    return domainEndingToNS[domain.split(".").pop() || '']
   }
 }

@@ -1,5 +1,4 @@
 import { BlockhanNetworkUrlMap, ProxyReaderMap } from './types';
-import { keccak_256 as sha3 } from 'js-sha3';
 import { default as proxyReaderAbi } from './contracts/cns/proxyReader';
 import { default as resolverInterface } from './contracts/cns/resolver';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
@@ -25,6 +24,7 @@ import NetworkConfig from './config/network-config.json';
 import NamingService from './interfaces/NamingService';
 import FetchProvider from './FetchProvider';
 import { CnsConfig } from './publicTypes';
+import Namehash from './utils/Namehash';
 
 
 function getProxyReaderMap(): ProxyReaderMap {
@@ -78,8 +78,10 @@ export default class Cns implements NamingService {
   }
 
   namehash(domain: string): string {
-    const hashArray = this.hash(domain);
-    return this.arrayToHex(hashArray);
+    if (!this.isSupportedDomain(domain)) {
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {domain});
+    }
+    return Namehash.hash(domain);
   }
 
   serviceName(): NamingServiceName {
@@ -169,20 +171,6 @@ export default class Cns implements NamingService {
     throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
       methodName: 'reverse',
     });
-  }
-
-  private hash(domain: string): number[] {
-    if (!domain) {
-      return Array.from(new Uint8Array(32));
-    }
-    const [label, ...remainder] = domain.split('.');
-    const labelHash = sha3.array(label);
-    const remainderHash = this.hash(remainder.join('.'));
-    return sha3.array(new Uint8Array([...remainderHash, ...labelHash]));
-  }
-
-  private arrayToHex(arr) {
-    return '0x' + Array.prototype.map.call(arr, x => ('00' + x.toString(16)).slice(-2)).join('');
   }
 
   private async getVerifiedData(domain: string, keys?: string[]): Promise<DomainData> {

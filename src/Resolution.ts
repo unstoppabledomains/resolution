@@ -18,16 +18,13 @@ import {
   Web3Version0Provider,
   Web3Version1Provider,
   EthersProvider,
-  CnsSource,
-  EnsSource,
-  ZnsSource,
+  ResolutionMethod,
 } from './publicTypes';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import NamingService from './interfaces/NamingService';
 import DnsUtils from './utils/DnsUtils';
-import { ensureRecordPresence, isSupportedChainVersion, signedInfuraLink } from './utils';
+import { domainEndingToNS, ensureRecordPresence, isApi, isSupportedChainVersion, signedInfuraLink } from './utils';
 import { Eip1993Factories } from './utils/Eip1993Factories';
-
 /**
  * Blockchain domain Resolution library - Resolution.
  * @example
@@ -48,16 +45,23 @@ import { Eip1993Factories } from './utils/Eip1993Factories';
  */
 export default class Resolution {
   private services: NamingService[];
+  private serviceMap: Record<NamingServiceName, NamingService>;
   
   constructor({
     sourceConfig = undefined,
   }: { sourceConfig?: SourceConfig } = {}) {
 
-    const cns = sourceConfig && sourceConfig.cns && sourceConfig?.cns['api'] ? new UdApi() : new Cns(sourceConfig?.cns as CnsSource);
-    const zns = sourceConfig && sourceConfig.zns && sourceConfig?.zns['api'] ? new UdApi() : new Zns(sourceConfig?.zns as ZnsSource);
-    const ens = sourceConfig && sourceConfig.ens && sourceConfig?.ens['api'] ? new UdApi() : new Ens(sourceConfig?.ens as EnsSource);
-    this.services = [cns, ens, zns];
+    const cns = isApi(sourceConfig?.cns) ? new UdApi() : new Cns(sourceConfig?.cns);
+    const ens = isApi(sourceConfig?.ens) ? new UdApi() : new Ens(sourceConfig?.ens);
+    const zns = isApi(sourceConfig?.zns) ? new UdApi() : new Zns(sourceConfig?.zns);
 
+    this.serviceMap = {
+      [NamingServiceName.CNS]: cns,
+      [NamingServiceName.ENS]: ens,
+      [NamingServiceName.ZNS]: zns,
+    };
+
+    this.services = [cns, ens, zns];
   }
 
   /**
@@ -202,14 +206,6 @@ export default class Resolution {
    */
   async twitter(domain: string): Promise<string> {
     domain = this.prepareDomain(domain);
-    const namingService = this.serviceName(domain);
-    if (namingService !== 'CNS') {
-      throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
-        domain,
-        methodName: 'twitter',
-      });
-    }
-
     const method = this.getNamingMethodOrThrow(domain);
     return method.twitter(domain);
   }
@@ -329,10 +325,10 @@ export default class Resolution {
     address: string,
     currencyTicker: string,
   ): Promise<string | null> {
-    return (this.findNamingService(NamingServiceName.ENS) as unknown as Ens).reverse(
+    return (this.services[NamingServiceName.ENS].reverse(
       address,
       currencyTicker,
-    );
+    ));
   }
 
   /**
@@ -380,14 +376,14 @@ export default class Resolution {
    */
   isSupportedDomain(domain: string): boolean {
     domain = this.prepareDomain(domain);
-    return !!this.getNamingMethod(domain);
+    return !!this.getNamingMethod(domain)?.isSupportedDomain(domain);
   }
 
   /**
    * Returns the name of the service for a domain ENS | CNS | ZNS
    * @param domain - domain name to look for
    */
-  serviceName(domain: string): NamingServiceName {
+  serviceName(domain: string): ResolutionMethod {
     domain = this.prepareDomain(domain);
     return this.getNamingMethodOrThrow(domain).serviceName(domain);
   }
@@ -438,9 +434,8 @@ export default class Resolution {
   }
 
   private getNamingMethod(domain: string): NamingService | undefined {
-    return this.services.find((method) =>
-      method.isSupportedDomain(domain),
-    );
+    const lastWord = domain.split(".").pop() || '';
+    return this.serviceMap[domainEndingToNS[lastWord]];
   }
 
   private getNamingMethodOrThrow(domain: string): NamingService {
@@ -454,10 +449,11 @@ export default class Resolution {
     return method;
   }
 
+  // this is requiered for testing purposes
   private findNamingService(name: NamingServiceName): NamingService {
-    const service = this.services.find((m) => m.name === name);
+    const service = this.serviceMap[name];
     if (!service) {
-      throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
         method: name,
       });
     }
