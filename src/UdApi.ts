@@ -16,23 +16,25 @@ import FetchProvider from './FetchProvider';
 import Namehash from './utils/Namehash';
 
 export default class Udapi implements NamingService {
-  readonly name: ResolutionMethod = "UDAPI";
-  readonly network: number = 1;
-  readonly url: string;
-  readonly provider: Provider;
+  private readonly name: ResolutionMethod;
+  private readonly network: number;
+  private readonly url: string;
+  private readonly provider: Provider;
 
   private headers: {
     [key: string]: string;
   };
 
   constructor() {
+    this.name = "UDAPI";
+    this.network = 1;
+    this.url = "https://unstoppabledomains.com/api/v1";
+    this.provider =  new FetchProvider(this.name, this.url);
     const DefaultUserAgent = Networking.isNode()
       ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'
       : navigator.userAgent;
     const version = pckg.version;
     const CustomUserAgent = `${DefaultUserAgent} Resolution/${version}`;
-    this.url = "https://unstoppabledomains.com/api/v1";
-    this.provider =  new FetchProvider(this.name, this.url);
     this.headers = { 'X-user-agent': CustomUserAgent };
   }
 

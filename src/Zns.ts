@@ -36,11 +36,11 @@ export default class Zns implements NamingService {
     1: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
   };
   
-  readonly name: NamingServiceName = NamingServiceName.ZNS;
-  readonly network: number;
-  readonly url: string | undefined;
-  readonly registryAddress: string;
-  readonly provider: Provider;
+  private readonly name: NamingServiceName = NamingServiceName.ZNS;
+  private readonly network: number;
+  private readonly url: string | undefined;
+  private readonly registryAddress: string;
+  private readonly provider: Provider;
   
   constructor(source?: ZnsSource) {
     if (!source) {

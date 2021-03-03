@@ -35,15 +35,15 @@ describe('ENS', () => {
       },
     });
     const ens = resolution['findNamingService'](NamingServiceName.ENS)
-    expect(ens?.url).toBe(
+    expect(ens['url']).toBe(
       'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
     );
-    expect(ens?.network).toEqual(1);
+    expect(ens['network']).toEqual(1);
   });
 
   it('resolves .eth name using blockchain', async () => {
-    expect(ens?.url).toBe(protocolLink());
-    expect(ens?.network).toEqual(1);
+    expect(ens['url']).toBe(protocolLink());
+    expect(ens['network']).toEqual(1);
 
     const eyes = mockAsyncMethods(ens, {
       resolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
@@ -144,15 +144,15 @@ describe('ENS', () => {
   it('checks normalizeSource ens (boolean)', async () => {
     const resolution = new Resolution();
     ens = resolution['findNamingService'](NamingServiceName.ENS) as Ens;
-    expect(ens?.network).toBe(1);
-    expect(ens?.url).toBe(
+    expect(ens['network']).toBe(1);
+    expect(ens['url']).toBe(
       'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
     );
   });
 
   it('checks normalizeSource ens (object) #1', async () => {
-    expect(ens?.network).toBe(1);
-    expect(ens?.url).toBe(protocolLink());
+    expect(ens['network']).toBe(1);
+    expect(ens['url']).toBe(protocolLink());
   });
 
   it('checks normalizeSource ens (object) #2', async () => {
@@ -160,8 +160,8 @@ describe('ENS', () => {
       sourceConfig: { ens: { network: "ropsten" } },
     });
     ens = resolution['findNamingService'](NamingServiceName.ENS) as Ens;
-    expect(ens?.network).toBe(3);
-    expect(ens?.url).toBe(
+    expect(ens['network']).toBe(3);
+    expect(ens['url']).toBe(
       'https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
     );
     expect(ens['readerContract']['address']).toBe(
@@ -176,8 +176,8 @@ describe('ENS', () => {
       },
     });
     ens = resolution['findNamingService'](NamingServiceName.ENS) as Ens;
-    expect(ens?.network).toBe(4);
-    expect(ens?.url).toBe('https://rinkeby.infura.io');
+    expect(ens['network']).toBe(4);
+    expect(ens['url']).toBe('https://rinkeby.infura.io');
   });
 
   it('checks normalizeSource ens (object) #4', async () => {
@@ -187,8 +187,8 @@ describe('ENS', () => {
       },
     });
     ens = resolution['findNamingService'](NamingServiceName.ENS) as Ens;
-    expect(ens?.network).toBe(5);
-    expect(ens?.url).toBe('https://goerli.infura.io');
+    expect(ens['network']).toBe(5);
+    expect(ens['url']).toBe('https://goerli.infura.io');
     expect(ens['readerContract']['address']).toBe(
       '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
     );
@@ -211,8 +211,8 @@ describe('ENS', () => {
       sourceConfig: { ens: { network: 'mainnet' } },
     });
     ens = resolution['findNamingService'](NamingServiceName.ENS) as Ens;
-    expect(ens?.network).toBe(1);
-    expect(ens?.url).toBe(
+    expect(ens['network']).toBe(1);
+    expect(ens['url']).toBe(
       'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
     );
   });
@@ -224,8 +224,8 @@ describe('ENS', () => {
       },
     });
     ens = resolution['findNamingService'](NamingServiceName.ENS) as Ens;
-    expect(ens?.network).toBe(1);
-    expect(ens?.url).toBe(
+    expect(ens['network']).toBe(1);
+    expect(ens['url']).toBe(
       'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
     );
     expect(ens['readerContract']['address']).toBe(
@@ -243,8 +243,8 @@ describe('ENS', () => {
       },
     });
     ens = resolution['findNamingService'](NamingServiceName.ENS) as Ens;
-    expect(ens?.network).toBe(3);
-    expect(ens?.url).toBe(
+    expect(ens['network']).toBe(3);
+    expect(ens['url']).toBe(
       'https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
     );
     expect(ens['readerContract']['address']).toBe(
@@ -259,8 +259,8 @@ describe('ENS', () => {
       },
     });
     ens = resolution['findNamingService'](NamingServiceName.ENS) as Ens;
-    expect(ens?.network).toBe(1);
-    expect(ens?.url).toBe(
+    expect(ens['network']).toBe(1);
+    expect(ens['url']).toBe(
       'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
     );
     expect(ens['readerContract']['address']).toBe(

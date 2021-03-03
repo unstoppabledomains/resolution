@@ -23,7 +23,6 @@ import FetchProvider from './FetchProvider';
 import { CnsConfig } from './types/publicTypes';
 import Namehash from './utils/Namehash';
 
-
 function getProxyReaderMap(): ProxyReaderMap {
   const map: ProxyReaderMap = {};
   for (const id of Object.keys(NetworkConfig.networks)) {
@@ -44,11 +43,11 @@ export default class Cns implements NamingService {
     rinkeby: 4
   };
 
-  readonly name: NamingServiceName = NamingServiceName.CNS;
-  readonly network: number;
-  readonly url: string | undefined;
-  readonly provider: Provider;
-  readonly readerContract: Contract;
+  private readonly name: NamingServiceName = NamingServiceName.CNS;
+  private readonly network: number;
+  private readonly url: string | undefined;
+  private readonly provider: Provider;
+  private readonly readerContract: Contract;
 
   constructor(source?: CnsSource) {
     if (!source) {

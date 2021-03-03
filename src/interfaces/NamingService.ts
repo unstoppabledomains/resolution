@@ -1,13 +1,6 @@
-import { Provider } from '..';
 import {  ResolutionMethod } from '../types/publicTypes';
 
 export default interface NamingService {
-  readonly name: ResolutionMethod;
-  readonly network: number;
-  readonly url: string | undefined;
-  readonly registryAddress?: string;
-  readonly provider: Provider;
-
   owner(domain: string): Promise<string>;
   resolver(domain: string): Promise<string>;
   namehash(domain: string): string;
