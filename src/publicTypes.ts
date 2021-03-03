@@ -8,15 +8,6 @@ import {
   ZnsSupportedNetwork,
 } from './types';
 
-export interface NamingServiceConfig {
-  url?: string;
-  network?: number;
-  registry?: string;
-  proxyReaderAddress?: string;
-  provider?: Provider;
-  api?: string;
-}
-
 export type CnsSupportedNetworks = typeof CnsSupportedNetwork.type;
 export type EnsSupportedNetworks = typeof EnsSupportedNetwork.type;
 export type ZnsSupportedNetworks = typeof ZnsSupportedNetwork.type;
@@ -57,7 +48,6 @@ export enum NamingServiceName {
   ZNS = 'ZNS',
   API = "API"
 }
-export type ResolutionMethod = NamingServiceName | 'UDAPI';
 
 /**
  * ResolutionResulution
@@ -86,9 +76,6 @@ export interface Web3Version0Provider {
 export interface Web3Version1Provider {
   send: ProviderMethod;
 }
-export type API = {
-  url: string;
-};
 
 /**
  * @see https://eips.ethereum.org/EIPS/eip-1193

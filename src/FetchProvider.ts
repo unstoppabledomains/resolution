@@ -1,14 +1,14 @@
 import { FetchError } from 'node-fetch';
 import { RequestArguments } from './types';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
-import { Provider, ResolutionMethod } from './publicTypes';
+import { NamingServiceName, Provider } from './publicTypes';
 import Networking from './utils/Networking';
 
 export default class FetchProvider implements Provider {
   readonly url: string;
-  readonly name: ResolutionMethod;
+  readonly name: NamingServiceName;
 
-  constructor(name: ResolutionMethod, url: string) {
+  constructor(name: NamingServiceName, url: string) {
     this.url = url;
     this.name = name;
   }

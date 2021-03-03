@@ -33,8 +33,6 @@ import { Eip1993Factories } from './utils/Eip1993Factories';
  * @example
  * ```
  * import Resolution from '@unstoppabledomains/resolution';
-import { EnsSupportedNetwork } from './types';
-import { EnsSupportedNetworks, CnsSupportedNetworks } from './publicTypes';
  *
  * let resolution = new Resolution({ blockchain: {
  *        ens: {

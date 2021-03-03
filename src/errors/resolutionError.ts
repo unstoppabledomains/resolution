@@ -1,4 +1,4 @@
-import { ResolutionMethod } from '../publicTypes';
+import { NamingServiceName } from '../publicTypes';
 /**
  * Alias for Resolution error handler function
  * @internal
@@ -7,7 +7,7 @@ type ResolutionErrorHandler = (error: ResolutionErrorOptions) => string;
 /** Explains Resolution Error options */
 type ResolutionErrorOptions = {
   providerMessage?: string;
-  method?: ResolutionMethod;
+  method?: NamingServiceName;
   methodName?: string;
   domain?: string;
   currencyTicker?: string;
@@ -44,7 +44,7 @@ const HandlersByCode = {
     domain: string;
   }) => `Method ${params.methodName} is not supported for ${params.domain}`,
   [ResolutionErrorCode.NamingServiceDown]: (params: {
-    method: ResolutionMethod;
+    method: NamingServiceName;
   }) => `${params.method} naming service is down at the moment`,
 
   [ResolutionErrorCode.InvalidTwitterVerification]: (params: {
@@ -54,7 +54,7 @@ const HandlersByCode = {
     currencyTicker: string;
   }) => `${params.currencyTicker} is not supported`,
   [ResolutionErrorCode.IncorrectResolverInterface]: (params: {
-    method: ResolutionMethod;
+    method: NamingServiceName;
   }) => `Domain resolver is configured incorrectly for ${params.method}`,
   [ResolutionErrorCode.RecordNotFound]: (params: {
     recordName: string;

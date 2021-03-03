@@ -12,8 +12,7 @@ import Cns from './Cns';
 import pckg from './package.json';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 import standardKeys from './utils/standardKeys';
-import { CryptoRecords, NamingServiceConfig, Provider } from './publicTypes';
-import { NormalizedSource } from './types';
+import { CryptoRecords, Provider } from './publicTypes';
 import Networking from './utils/Networking';
 import { constructRecords, ensureRecordPresence } from './utils';
 import FetchProvider from './FetchProvider';
@@ -35,7 +34,7 @@ export default class Udapi implements NamingService {
     const version = pckg.version;
     const CustomUserAgent = `${DefaultUserAgent} Resolution/${version}`;
     this.url = "https://unstoppabledomains.com/api/v1";
-    this.provider =  new FetchProvider("UDAPI", this.url);
+    this.provider =  new FetchProvider(this.name, this.url);
     this.headers = { 'X-user-agent': CustomUserAgent };
   }
 
@@ -147,10 +146,6 @@ export default class Udapi implements NamingService {
     throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
       methodName: 'reverse',
     });
-  }
-
-  protected normalizeSource(source: NamingServiceConfig): NormalizedSource {
-    return { network: 1, ...source };
   }
 
   private findMethod(domain: string): NamingService | undefined {

@@ -1,11 +1,11 @@
-import { ResolutionMethod } from '../publicTypes';
+import { NamingServiceName } from '../publicTypes';
 /** Alias for Resolution error handler function
  * @internal
  */
 type ConfigurationErrorHandler = (error: ConfigurationErrorOptions) => string;
 /** Explains Resolution Error options */
 type ConfigurationErrorOptions = {
-  method?: ResolutionMethod;
+  method?: NamingServiceName;
   dependency?: string;
   version?: string;
 };
@@ -26,10 +26,10 @@ const HandlersByCode = {
   [ConfigurationErrorCode.IncorrectProvider]: (params: {}) =>
     'Provider doesn\'t implement sendAsync or send method',
   [ConfigurationErrorCode.UnspecifiedNetwork]: (params: {
-    method: ResolutionMethod;
+    method: NamingServiceName;
   }) => `Unspecified network in Resolution ${params.method} configuration`,
   [ConfigurationErrorCode.UnspecifiedUrl]: (params: {
-    method: ResolutionMethod;
+    method: NamingServiceName;
   }) => `Unspecified url in Resolution ${params.method} configuration`,
   [ConfigurationErrorCode.MissingProviderConfigurations]: (params: {}) =>
     `Couldn't find any configurations\n\tUse -C to configurate the library`,

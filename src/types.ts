@@ -101,13 +101,6 @@ export enum NullAddresses {
 
 export const EthCoinIndex = '60';
 
-export type NormalizedSource = { 
-  url?: string,
-  network?: string | number,
-  provider?: Provider,
-  registry?: string
-}
-
 // TypeScript will infer a string union type from the literal values passed to
 // this function. Without `extends string`, it would instead generalize them
 // to the common string type. 
