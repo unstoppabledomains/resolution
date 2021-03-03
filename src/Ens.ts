@@ -11,7 +11,7 @@ import {
 import Contract from './utils/contract';
 import contentHash from 'content-hash';
 import EnsNetworkMap from 'ethereum-ens-network-map';
-import { Provider, EnsSupportedNetworks, EnsSource, EnsConfig } from './publicTypes';
+import { Provider, EnsSource, EnsConfig } from './publicTypes';
 import { buildContract, constructRecords, ensureConfigured, invert, isNullAddress } from './utils';
 import NamingService from './interfaces/NamingService';
 import FetchProvider from './FetchProvider';

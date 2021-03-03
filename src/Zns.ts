@@ -14,7 +14,7 @@ import {
   UnclaimedDomainResponse,
 } from './index';
 import NamingService from './interfaces/NamingService';
-import { CryptoRecords, Provider, ZnsSource, ZnsSupportedNetworks, ZnsConfig } from './publicTypes';
+import { CryptoRecords, Provider, ZnsSource, ZnsConfig } from './publicTypes';
 import FetchProvider from './FetchProvider';
 
 export default class Zns implements NamingService {

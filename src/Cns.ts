@@ -18,7 +18,6 @@ import {
   CryptoRecords,
   DomainData,
   Provider,
-  CnsSupportedNetworks,
   CnsSource,
 } from './publicTypes';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
