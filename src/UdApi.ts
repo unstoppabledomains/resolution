@@ -9,17 +9,15 @@ import NamingService from './interfaces/NamingService';
 import pckg from './package.json';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 import standardKeys from './utils/standardKeys';
-import { CryptoRecords, Provider, NamingServiceName } from './types/publicTypes';
+import { CryptoRecords, NamingServiceName } from './types/publicTypes';
 import Networking from './utils/Networking';
-import { constructRecords, domainEndingToNS} from './utils';
-import FetchProvider from './FetchProvider';
+import { constructRecords} from './utils';
 import Namehash from './utils/Namehash';
+import { findNamingServiceNameFromDomainByExtension } from './utils/index';
 
 export default class Udapi implements NamingService {
   private readonly name: ResolutionMethod;
-  private readonly network: number;
   private readonly url: string;
-  private readonly provider: Provider;
 
   private headers: {
     [key: string]: string;
@@ -27,9 +25,7 @@ export default class Udapi implements NamingService {
 
   constructor() {
     this.name = "UDAPI";
-    this.network = 1;
     this.url = "https://unstoppabledomains.com/api/v1";
-    this.provider =  new FetchProvider(this.name, this.url);
     const DefaultUserAgent = Networking.isNode()
       ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'
       : navigator.userAgent;
@@ -39,7 +35,9 @@ export default class Udapi implements NamingService {
   }
 
   isSupportedDomain(domain: string): boolean {
-    return !!this.findMethod(domain);
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+      methodName: 'isSupportedDomain',
+    });
   }
 
   namehash(domain: string): string {
@@ -69,11 +67,11 @@ export default class Udapi implements NamingService {
   }
 
   async twitter(domain: string): Promise<string> {
-    const serviceName = this.findMethod(domain);
+    const serviceName = findNamingServiceNameFromDomainByExtension(domain);
     if (serviceName !== NamingServiceName.CNS) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
         domain,
-        methodName: 'twitter',
+        recordName: "twitter"
       });
     }
 
@@ -155,9 +153,5 @@ export default class Udapi implements NamingService {
     throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
       methodName: 'reverse',
     });
-  }
-
-  private findMethod(domain: string): NamingServiceName | undefined {
-    return domainEndingToNS[domain.split(".").pop() || '']
   }
 }

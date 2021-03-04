@@ -70,7 +70,7 @@ export function isApi(obj: any): obj is Api {
   return obj && !!obj.api;
 }
 
-export const domainEndingToNS = {
+export const domainExtensionToNamingServiceName = {
   "crypto": NamingServiceName.CNS,
   "zil": NamingServiceName.ZNS,
   "eth": NamingServiceName.ENS,
@@ -78,4 +78,8 @@ export const domainEndingToNS = {
   "xyz": NamingServiceName.ENS,
   "kred": NamingServiceName.ENS,
   "reverse": NamingServiceName.ENS
+}
+
+export const findNamingServiceNameFromDomainByExtension = (domain: string): NamingServiceName => {
+  return domainExtensionToNamingServiceName[domain.split('.').pop() || ''] || '';
 }

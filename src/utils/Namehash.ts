@@ -1,10 +1,9 @@
-
-import { domainEndingToNS } from './index';
 import { NamingServiceName } from '../types/publicTypes';
 import ResolutionError from '../errors/resolutionError';
 import { ResolutionErrorCode } from '../errors/resolutionError';
 import { keccak_256 as sha3 } from 'js-sha3';
 import { sha256 } from 'js-sha256';
+import { findNamingServiceNameFromDomainByExtension } from './index';
 
 /**
  * @internal
@@ -13,7 +12,7 @@ import { sha256 } from 'js-sha256';
 export default class Namehash {
 
   static hash(domain: string): string {
-    const serviceName = domainEndingToNS[domain.split(".").pop() || ''];
+    const serviceName = findNamingServiceNameFromDomainByExtension(domain);
     switch(serviceName) {
     case NamingServiceName.CNS: 
       return this.cnsNamehash(domain);

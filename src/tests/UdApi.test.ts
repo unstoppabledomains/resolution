@@ -30,13 +30,6 @@ describe('Unstoppable API', () => {
     );
   });
 
-  it('supports zil and eth domains', async () => {
-    const resolution = new Resolution({ sourceConfig: {zns: { api: true }, ens: {api: true}} });
-    expect(resolution.isSupportedDomain('cofounding.zil')).toEqual(true);
-    expect(resolution.isSupportedDomain('cofounding.eth')).toEqual(true);
-    expect(resolution.isSupportedDomain('cofounding.unknown')).toEqual(false);
-  });
-
   it('throws NamingServiceDown on FetchError', async () => {
     const error = new Error();
     error.name = 'FetchError';

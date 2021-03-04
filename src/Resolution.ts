@@ -22,7 +22,7 @@ import {
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import NamingService from './interfaces/NamingService';
 import DnsUtils from './utils/DnsUtils';
-import { domainEndingToNS, isApi, signedInfuraLink } from './utils';
+import { findNamingServiceNameFromDomainByExtension, isApi, signedInfuraLink } from './utils';
 import { Eip1993Factories } from './utils/Eip1993Factories';
 /**
  * Blockchain domain Resolution library - Resolution.
@@ -428,8 +428,7 @@ export default class Resolution {
   }
 
   private getNamingMethod(domain: string): NamingService | undefined {
-    const lastWord = domain.split(".").pop() || '';
-    return this.serviceMap[domainEndingToNS[lastWord]];
+    return this.serviceMap[findNamingServiceNameFromDomainByExtension(domain)];
   }
 
   private getNamingMethodOrThrow(domain: string): NamingService {

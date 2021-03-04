@@ -6,7 +6,6 @@ import {
   commaSeparatedList,
   tryInfo,
 } from './cli-helpers.js';
-import { TickerVersion } from '../types/publicTypes';
 
 (async () => {
   program
@@ -108,7 +107,7 @@ import { TickerVersion } from '../types/publicTypes';
     options.usdtVersions.forEach((usdtVersion:string) => {
       resolutionProcess.push(
         tryInfo(
-          async () => await resolution.usdt(domain, usdtVersion as TickerVersion),
+          async () => await resolution.multiChainAddr(domain, "usdt", usdtVersion),
           response,
           usdtVersion,
         ),
