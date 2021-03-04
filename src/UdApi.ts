@@ -71,7 +71,7 @@ export default class Udapi implements NamingService {
     if (serviceName !== NamingServiceName.CNS) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
         domain,
-        recordName: "twitter"
+        methodName: "twitter"
       });
     }
 
