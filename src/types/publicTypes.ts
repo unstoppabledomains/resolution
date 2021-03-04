@@ -32,9 +32,9 @@ export type ZnsConfig = {
   registryAddress?: string
 }
 
-export type CnsSource = CnsConfig | { provider: Provider, network: CnsSupportedNetworks };
-export type EnsSource = EnsConfig | { provider: Provider, network: EnsSupportedNetworks };
-export type ZnsSource = ZnsConfig | { provider: Provider, network: ZnsSupportedNetworks };
+export type CnsSource = CnsConfig | { provider: Provider, network: CnsSupportedNetworks, proxyReaderAddress?: string };
+export type EnsSource = EnsConfig | { provider: Provider, network: EnsSupportedNetworks, registryAddress?: string };
+export type ZnsSource = ZnsConfig | { provider: Provider, network: ZnsSupportedNetworks, registryAddress?: string };
 
 export type SourceConfig = {
   cns?: CnsSource | Api;

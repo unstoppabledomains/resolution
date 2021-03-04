@@ -39,7 +39,6 @@ export default class Ens implements NamingService {
     if (!source) {
       source = this.getDefaultSource();
     }
-    
     this.network = Ens.NetworkNameMap[source.network];
     this.url = source['url'] || Ens.UrlMap[this.network];
     this.provider = source['provider'] || new FetchProvider(this.name, this.url!);

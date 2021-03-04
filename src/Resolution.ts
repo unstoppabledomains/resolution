@@ -43,7 +43,6 @@ import { Eip1993Factories } from './utils/Eip1993Factories';
  * ```
  */
 export default class Resolution {
-  private readonly services: NamingService[];
   private readonly serviceMap: Record<NamingServiceName, NamingService>;
   
   constructor({
@@ -59,8 +58,6 @@ export default class Resolution {
       [NamingServiceName.ENS]: ens,
       [NamingServiceName.ZNS]: zns,
     };
-
-    this.services = [cns, ens, zns];
   }
 
   /**
@@ -320,7 +317,7 @@ export default class Resolution {
     address: string,
     currencyTicker: string,
   ): Promise<string | null> {
-    return (this.services[NamingServiceName.ENS].reverse(
+    return (this.serviceMap[NamingServiceName.ENS].reverse(
       address,
       currencyTicker,
     ));

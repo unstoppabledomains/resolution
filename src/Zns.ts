@@ -206,7 +206,6 @@ export default class Zns implements NamingService {
     if (isNullAddress(resolverAddress)) {
       return {};
     }
-
     const resolver = toChecksumAddress(resolverAddress);
     return ((await this.getContractField(resolver, 'records')) ||
       {}) as Dictionary<string>;

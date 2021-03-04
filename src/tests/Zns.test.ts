@@ -108,7 +108,7 @@ describe('ZNS', () => {
   });
 
   describe('.Resolve', () => {
-    it('resolves .zil name using blockchain', async () => {
+    it.only('resolves .zil name using blockchain', async () => {
       const eyes = mockAsyncMethods(zns, {
         getRecordsAddresses: [
           'zil1ye72zl5t8wl5n3f2fsa5w0x7hja0jqj7mhct23',
