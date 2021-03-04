@@ -4,8 +4,8 @@
  */
 
 
-import hashjs from 'hash.js';
 import BN from 'bn.js';
+import { sha256 } from 'js-sha256';
 
 
 const CHARSET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
@@ -195,6 +195,15 @@ function decode(bechString: string) {
   return { hrp, data: Buffer.from(data.slice(0, data.length - 6)) };
 }
 
+// Convert a hex string to a byte array
+function hexToBytes(hex) {
+  const bytes: number[] = [];
+  for (let c = 0; c < hex.length; c += 2) {
+    bytes.push(parseInt(hex.substr(c, 2), 16));
+  }
+  return bytes;
+}
+
 /**
  * toChecksumAddress
  *
@@ -209,10 +218,7 @@ export const toChecksumAddress = (address: string): string => {
 
 
   address = address.toLowerCase().replace('0x', '');
-  const hash = hashjs
-    .sha256()
-    .update(address, 'hex')
-    .digest('hex');
+  const hash = sha256(hexToBytes(address));
   const v = new BN((hash as unknown) as string, 'hex', 'be');
   let ret = '0x';
 
