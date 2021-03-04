@@ -52,7 +52,7 @@ export default class Namehash {
     return hashingAlgo.array(new Uint8Array([...remainderHash, ...labelHash]));
   }
 
-  static arrayToHex(arr) {
+  private static arrayToHex(arr) {
     return '0x' + Array.prototype.map.call(arr, x => ('00' + x.toString(16)).slice(-2)).join('');
   }
 } 
