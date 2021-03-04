@@ -35,9 +35,9 @@ beforeEach(async () => {
 
 describe('CNS', () => {
   it('should define the default cns contract', () => {
-    expect(resolution.serviceMap[NamingServiceName.CNS]).toBeDefined();
-    expect(resolution.serviceMap[NamingServiceName.CNS]['network']).toBe(1);
-    expect(resolution.serviceMap[NamingServiceName.CNS]['url']).toBe(protocolLink());
+    expect(cns).toBeDefined();
+    expect(cns.network).toBe(1);
+    expect(cns.url).toBe(protocolLink());
   });
 
   it('should not allow ropsten as testnet', async () => {

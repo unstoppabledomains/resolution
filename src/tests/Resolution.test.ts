@@ -68,8 +68,8 @@ describe('Resolution', () => {
       const resolution = Resolution.infura('api-key', {ens: {network: "mainnet"}, cns: {network: "mainnet"}});
       cns = resolution.serviceMap[NamingServiceName.CNS] as Cns;
       ens = resolution.serviceMap[NamingServiceName.ENS] as Ens;
-      expect(ens['url']).toBe(`https://mainnet.infura.io/v3/api-key`);
-      expect(cns['url']).toBe(`https://mainnet.infura.io/v3/api-key`);
+      expect(ens.url).toBe(`https://mainnet.infura.io/v3/api-key`);
+      expect(cns.url).toBe(`https://mainnet.infura.io/v3/api-key`);
     });
 
     it('provides empty response constant', async () => {

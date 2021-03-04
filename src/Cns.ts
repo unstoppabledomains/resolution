@@ -43,11 +43,11 @@ export default class Cns implements NamingService {
     rinkeby: 4
   };
 
-  private readonly name: NamingServiceName = NamingServiceName.CNS;
-  private readonly network: number;
-  private readonly url: string | undefined;
-  private readonly provider: Provider;
-  private readonly readerContract: Contract;
+  readonly name: NamingServiceName = NamingServiceName.CNS;
+  readonly network: number;
+  readonly url: string | undefined;
+  readonly provider: Provider;
+  readonly readerContract: Contract;
 
   constructor(source?: CnsSource) {
     if (!source) {

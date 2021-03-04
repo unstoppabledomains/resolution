@@ -29,11 +29,11 @@ export default class Ens implements NamingService {
     goerli: 5,
   };
 
-  private readonly name = NamingServiceName.ENS;
-  private readonly network: number;
-  private readonly url: string | undefined;
-  private readonly provider: Provider;
-  private readonly readerContract: Contract;
+  readonly name = NamingServiceName.ENS;
+  readonly network: number;
+  readonly url: string | undefined;
+  readonly provider: Provider;
+  readonly readerContract: Contract;
 
   constructor(source?: EnsSource) {
     if (!source) {

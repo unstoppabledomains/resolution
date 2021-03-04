@@ -21,13 +21,13 @@ describe('ZNS', () => {
 
   describe('.NormalizeSource', () => {
     it('checks normalizeSource zns (boolean)', async () => {
-      expect(zns['network']).toBe(1);
-      expect(zns['url']).toBe('https://api.zilliqa.com');
+      expect(zns.network).toBe(1);
+      expect(zns.url).toBe('https://api.zilliqa.com');
     });
 
     it('checks normalizeSource zns (string)', async () => {
-      expect(zns['network']).toBe(1);
-      expect(zns['url']).toBe('https://api.zilliqa.com');
+      expect(zns.network).toBe(1);
+      expect(zns.url).toBe('https://api.zilliqa.com');
     });
 
     it('checks normalizeSource zns (object) #1', async () => {
@@ -35,8 +35,8 @@ describe('ZNS', () => {
         sourceConfig: { zns: { url: 'https://api.zilliqa.com', network: "mainnet" } },
       });
       zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
-      expect(zns['network']).toBe(1);
-      expect(zns['url']).toBe('https://api.zilliqa.com');
+      expect(zns.network).toBe(1);
+      expect(zns.url).toBe('https://api.zilliqa.com');
     });
 
     it('checks normalizeSource zns (object) #3', async () => {
@@ -44,8 +44,8 @@ describe('ZNS', () => {
         sourceConfig: { zns: { url: 'https://api.zilliqa.com', network: "mainnet" } },
       });
       zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
-      expect(zns['network']).toBe(1);
-      expect(zns['url']).toBe('https://api.zilliqa.com');
+      expect(zns.network).toBe(1);
+      expect(zns.url).toBe('https://api.zilliqa.com');
     });
 
     it('checks normalizeSource zns (object) #4', async () => {
@@ -53,8 +53,8 @@ describe('ZNS', () => {
         sourceConfig: { zns: { url: 'https://api.zilliqa.com', network: "mainnet" } },
       });
       zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
-      expect(zns['network']).toBe(1);
-      expect(zns['url']).toBe('https://api.zilliqa.com');
+      expect(zns.network).toBe(1);
+      expect(zns.url).toBe('https://api.zilliqa.com');
     });
 
     it('checks normalizeSource zns (object) #6', async () => {
@@ -74,8 +74,8 @@ describe('ZNS', () => {
         sourceConfig: { zns: { network: "mainnet" } },
       });
       zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
-      expect(zns['network']).toBe(1);
-      expect(zns['url']).toBe('https://api.zilliqa.com');
+      expect(zns.network).toBe(1);
+      expect(zns.url).toBe('https://api.zilliqa.com');
     });
 
     it('checks normalizeSource zns (object) #10', async () => {
@@ -85,11 +85,11 @@ describe('ZNS', () => {
         },
       });
       zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
-      expect(zns['network']).toBe(1);
-      expect(zns['registryAddress']).toBe(
+      expect(zns.network).toBe(1);
+      expect(zns.registryAddress).toBe(
         'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
       );
-      expect(zns['url']).toBe('https://api.zilliqa.com');
+      expect(zns.url).toBe('https://api.zilliqa.com');
     });
 
     it('checks normalizeSource zns (object) #11', async () => {
@@ -99,9 +99,9 @@ describe('ZNS', () => {
         },
       });
       zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
-      expect(zns['network']).toBe(1);
-      expect(zns['url']).toBe('https://api.zilliqa.com');
-      expect(zns['registryAddress']).toBe(
+      expect(zns.network).toBe(1);
+      expect(zns.url).toBe('https://api.zilliqa.com');
+      expect(zns.registryAddress).toBe(
         'zil1408llufrzkrrfqv5lj4malcjxyjqyd8urd7xz6',
       );
     });
