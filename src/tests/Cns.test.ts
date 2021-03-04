@@ -30,14 +30,14 @@ beforeEach(async () => {
   resolution = new Resolution({
     sourceConfig: { cns: { url: protocolLink(), network: "mainnet" } },
   });
-  cns = resolution['findNamingService'](NamingServiceName.CNS) as Cns;
+  cns = resolution.serviceMap[NamingServiceName.CNS] as Cns;
 });
 
 describe('CNS', () => {
   it('should define the default cns contract', () => {
-    expect(resolution['findNamingService'](NamingServiceName.CNS)).toBeDefined();
-    expect(resolution['findNamingService'](NamingServiceName.CNS)['network']).toBe(1);
-    expect(resolution['findNamingService'](NamingServiceName.CNS)['url']).toBe(protocolLink());
+    expect(resolution.serviceMap[NamingServiceName.CNS]).toBeDefined();
+    expect(resolution.serviceMap[NamingServiceName.CNS]['network']).toBe(1);
+    expect(resolution.serviceMap[NamingServiceName.CNS]['url']).toBe(protocolLink());
   });
 
   it('should not allow ropsten as testnet', async () => {
@@ -78,7 +78,7 @@ describe('CNS', () => {
         },
       },
     });
-    const twitterHandle = await resolution['findNamingService'](NamingServiceName.CNS).twitter(
+    const twitterHandle = await resolution.serviceMap[NamingServiceName.CNS].twitter(
       CryptoDomainWithTwitterVerification,
     );
     expectSpyToBeCalled(spies);
@@ -367,7 +367,7 @@ describe('CNS', () => {
 
     it('should work without any configs', async () => {
       resolution = new Resolution();
-      const eyes = mockAsyncMethods(resolution['findNamingService'](NamingServiceName.CNS), {
+      const eyes = mockAsyncMethods(resolution.serviceMap[NamingServiceName.CNS], {
         get: {
           resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
           records: {

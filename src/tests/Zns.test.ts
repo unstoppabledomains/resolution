@@ -16,7 +16,7 @@ describe('ZNS', () => {
   beforeEach(() => {
     jest.restoreAllMocks();
     resolution = new Resolution();
-    zns = resolution['findNamingService'](NamingServiceName.ZNS) as Zns;
+    zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
   });
 
   describe('.NormalizeSource', () => {
@@ -34,7 +34,7 @@ describe('ZNS', () => {
       const resolution = new Resolution({
         sourceConfig: { zns: { url: 'https://api.zilliqa.com', network: "mainnet" } },
       });
-      zns = resolution['findNamingService'](NamingServiceName.ZNS) as Zns;
+      zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
       expect(zns['network']).toBe(1);
       expect(zns['url']).toBe('https://api.zilliqa.com');
     });
@@ -43,7 +43,7 @@ describe('ZNS', () => {
       const resolution = new Resolution({
         sourceConfig: { zns: { url: 'https://api.zilliqa.com', network: "mainnet" } },
       });
-      zns = resolution['findNamingService'](NamingServiceName.ZNS) as Zns;
+      zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
       expect(zns['network']).toBe(1);
       expect(zns['url']).toBe('https://api.zilliqa.com');
     });
@@ -52,7 +52,7 @@ describe('ZNS', () => {
       const resolution = new Resolution({
         sourceConfig: { zns: { url: 'https://api.zilliqa.com', network: "mainnet" } },
       });
-      zns = resolution['findNamingService'](NamingServiceName.ZNS) as Zns;
+      zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
       expect(zns['network']).toBe(1);
       expect(zns['url']).toBe('https://api.zilliqa.com');
     });
@@ -73,7 +73,7 @@ describe('ZNS', () => {
       const resolution = new Resolution({
         sourceConfig: { zns: { network: "mainnet" } },
       });
-      zns = resolution['findNamingService'](NamingServiceName.ZNS) as Zns;
+      zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
       expect(zns['network']).toBe(1);
       expect(zns['url']).toBe('https://api.zilliqa.com');
     });
@@ -84,7 +84,7 @@ describe('ZNS', () => {
           zns: { registryAddress: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz', network: "mainnet" },
         },
       });
-      zns = resolution['findNamingService'](NamingServiceName.ZNS) as Zns;
+      zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
       expect(zns['network']).toBe(1);
       expect(zns['registryAddress']).toBe(
         'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
@@ -98,7 +98,7 @@ describe('ZNS', () => {
           zns: { registryAddress: '0xabcffff1231586348194fcabbeff1231240234fc', network: "mainnet" },
         },
       });
-      zns = resolution['findNamingService'](NamingServiceName.ZNS) as Zns;
+      zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
       expect(zns['network']).toBe(1);
       expect(zns['url']).toBe('https://api.zilliqa.com');
       expect(zns['registryAddress']).toBe(

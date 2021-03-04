@@ -45,9 +45,9 @@ beforeEach(() => {
       ens: { url: protocolLink(), network: "mainnet" },
     },
   });
-  cns = resolution['findNamingService'](NamingServiceName.CNS) as Cns;
-  ens = resolution['findNamingService'](NamingServiceName.ENS) as Ens;
-  zns = resolution['findNamingService'](NamingServiceName.ZNS) as Zns;
+  cns = resolution.serviceMap[NamingServiceName.CNS] as Cns;
+  ens = resolution.serviceMap[NamingServiceName.ENS] as Ens;
+  zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
 });
 
 describe('Resolution', () => {
@@ -66,8 +66,8 @@ describe('Resolution', () => {
 
     it('should get a valid resolution instance', async () => {
       const resolution = Resolution.infura('api-key', {ens: {network: "mainnet"}, cns: {network: "mainnet"}});
-      cns = resolution['findNamingService'](NamingServiceName.CNS) as Cns;
-      ens = resolution['findNamingService'](NamingServiceName.ENS) as Ens;
+      cns = resolution.serviceMap[NamingServiceName.CNS] as Cns;
+      ens = resolution.serviceMap[NamingServiceName.ENS] as Ens;
       expect(ens['url']).toBe(`https://mainnet.infura.io/v3/api-key`);
       expect(cns['url']).toBe(`https://mainnet.infura.io/v3/api-key`);
     });
@@ -162,7 +162,7 @@ describe('Resolution', () => {
     describe('.Errors', () => {
       it('checks Resolution#addr error #1', async () => {
         const resolution = new Resolution();
-        zns = resolution['findNamingService'](NamingServiceName.ZNS) as Zns
+        zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns
         const spy = mockAsyncMethods(zns, {
           getRecordsAddresses: undefined,
         });

@@ -24,7 +24,7 @@ beforeEach(() => {
       ens: { url: protocolLink(), network: "mainnet" },
     },
   });
-  ens = resolution['findNamingService'](NamingServiceName.ENS) as Ens;
+  ens = resolution.serviceMap[NamingServiceName.ENS] as Ens;
 });
 
 describe('ENS', () => {
@@ -34,7 +34,7 @@ describe('ENS', () => {
         ens: { network: 'mainnet' },
       },
     });
-    const ens = resolution['findNamingService'](NamingServiceName.ENS)
+    const ens = resolution.serviceMap[NamingServiceName.ENS]
     expect(ens['url']).toBe(
       'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
     );
@@ -143,7 +143,7 @@ describe('ENS', () => {
 
   it('checks normalizeSource ens (boolean)', async () => {
     const resolution = new Resolution();
-    ens = resolution['findNamingService'](NamingServiceName.ENS) as Ens;
+    ens = resolution.serviceMap[NamingServiceName.ENS] as Ens;
     expect(ens['network']).toBe(1);
     expect(ens['url']).toBe(
       'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
@@ -159,7 +159,7 @@ describe('ENS', () => {
     const resolution = new Resolution({
       sourceConfig: { ens: { network: "ropsten" } },
     });
-    ens = resolution['findNamingService'](NamingServiceName.ENS) as Ens;
+    ens = resolution.serviceMap[NamingServiceName.ENS] as Ens;
     expect(ens['network']).toBe(3);
     expect(ens['url']).toBe(
       'https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
@@ -175,7 +175,7 @@ describe('ENS', () => {
         ens: { url: 'https://rinkeby.infura.io', network: "rinkeby" },
       },
     });
-    ens = resolution['findNamingService'](NamingServiceName.ENS) as Ens;
+    ens = resolution.serviceMap[NamingServiceName.ENS] as Ens;
     expect(ens['network']).toBe(4);
     expect(ens['url']).toBe('https://rinkeby.infura.io');
   });
@@ -186,7 +186,7 @@ describe('ENS', () => {
         ens: { url: 'https://goerli.infura.io', network: "goerli" },
       },
     });
-    ens = resolution['findNamingService'](NamingServiceName.ENS) as Ens;
+    ens = resolution.serviceMap[NamingServiceName.ENS] as Ens;
     expect(ens['network']).toBe(5);
     expect(ens['url']).toBe('https://goerli.infura.io');
     expect(ens['readerContract']['address']).toBe(
@@ -210,7 +210,7 @@ describe('ENS', () => {
     const resolution = new Resolution({
       sourceConfig: { ens: { network: 'mainnet' } },
     });
-    ens = resolution['findNamingService'](NamingServiceName.ENS) as Ens;
+    ens = resolution.serviceMap[NamingServiceName.ENS] as Ens;
     expect(ens['network']).toBe(1);
     expect(ens['url']).toBe(
       'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
@@ -223,7 +223,7 @@ describe('ENS', () => {
         ens: { registryAddress: '0x314159265dd8dbb310642f98f50c066173c1259b', network: "mainnet" },
       },
     });
-    ens = resolution['findNamingService'](NamingServiceName.ENS) as Ens;
+    ens = resolution.serviceMap[NamingServiceName.ENS] as Ens;
     expect(ens['network']).toBe(1);
     expect(ens['url']).toBe(
       'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
@@ -242,7 +242,7 @@ describe('ENS', () => {
         },
       },
     });
-    ens = resolution['findNamingService'](NamingServiceName.ENS) as Ens;
+    ens = resolution.serviceMap[NamingServiceName.ENS] as Ens;
     expect(ens['network']).toBe(3);
     expect(ens['url']).toBe(
       'https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
@@ -258,7 +258,7 @@ describe('ENS', () => {
         ens: { registryAddress: '0xabcffff1231586348194fcabbeff1231240234fc', network: "mainnet" },
       },
     });
-    ens = resolution['findNamingService'](NamingServiceName.ENS) as Ens;
+    ens = resolution.serviceMap[NamingServiceName.ENS] as Ens;
     expect(ens['network']).toBe(1);
     expect(ens['url']).toBe(
       'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',

@@ -43,7 +43,7 @@ import { Eip1993Factories } from './utils/Eip1993Factories';
  * ```
  */
 export default class Resolution {
-  private readonly serviceMap: Record<NamingServiceName, NamingService>;
+  readonly serviceMap: Record<NamingServiceName, NamingService>;
   
   constructor({
     sourceConfig = undefined,
@@ -441,18 +441,6 @@ export default class Resolution {
     }
 
     return method;
-  }
-
-  // this is requiered for testing purposes
-  private findNamingService(name: NamingServiceName): NamingService {
-    const service = this.serviceMap[name];
-    if (!service) {
-      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
-        method: name,
-      });
-    }
-
-    return service;
   }
 
   private prepareDomain(domain: string): string {
