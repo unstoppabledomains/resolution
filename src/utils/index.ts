@@ -1,6 +1,5 @@
-import ConfigurationError, { ConfigurationErrorCode } from '../errors/configurationError';
-import { CryptoRecords, EnsSupportedNetworks, CnsSupportedNetworks, Provider, ZnsSupportedNetworks, NamingServiceName, Api } from '../types/publicTypes';
-import { isCnsSupportedNetworks, NullAddresses, isEnsSupportedNetworks, isZnsSupportedNetworks } from '../types';
+import { CryptoRecords, NamingServiceName } from '../types/publicTypes';
+import {  NullAddresses } from '../types';
 
 export function signedInfuraLink(infura: string, network = 'mainnet'): string {
   return `https://${network}.infura.io/v3/${infura}`;
@@ -31,43 +30,9 @@ export function constructRecords(
 ): CryptoRecords {
   const records: CryptoRecords = {};
   keys.forEach((key, index) => {
-    const value = (values instanceof Array ? values[index] : values?.[key]) || '';
-    records[key] = value;
+    records[key] = (values instanceof Array ? values[index] : values?.[key]) || '';
   });
   return records;
-}
-
-function ensureCorrectNetwork(network: CnsSupportedNetworks | EnsSupportedNetworks | ZnsSupportedNetworks, service: NamingServiceName) {
-  switch(service) {
-  case NamingServiceName.CNS:
-    return isCnsSupportedNetworks(network);
-  case NamingServiceName.ENS:
-    return isEnsSupportedNetworks(network);
-  case NamingServiceName.ZNS:
-    return isZnsSupportedNetworks(network);
-  }
-}
-
-export function ensureConfigured(source: {
-  network: CnsSupportedNetworks | EnsSupportedNetworks | ZnsSupportedNetworks,
-  url?: string,
-  provider?: Provider
-}, service: NamingServiceName): void {
-  if (!source.network || !ensureCorrectNetwork(source.network, service)) {
-    throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedNetwork, {
-      method: service,
-    });
-  }
-
-  if (!source.url && !source.provider) {
-    throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedUrl, {
-      method: service,
-    });
-  }
-}
-
-export function isApi(obj: any): obj is Api {
-  return obj && !!obj.api;
 }
 
 export const domainExtensionToNamingServiceName = {
@@ -80,6 +45,6 @@ export const domainExtensionToNamingServiceName = {
   "reverse": NamingServiceName.ENS
 }
 
-export const findNamingServiceNameFromDomainByExtension = (domain: string): NamingServiceName => {
+export const findNamingServiceName = (domain: string): NamingServiceName => {
   return domainExtensionToNamingServiceName[domain.split('.').pop() || ''] || '';
 }

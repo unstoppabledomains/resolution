@@ -4,8 +4,8 @@ import {
   toChecksumAddress,
   set,
 } from './utils/znsUtils';
-import { isNullAddress, constructRecords, ensureConfigured } from './utils';
-import { Dictionary, ZnsResolution } from './types';
+import { isNullAddress, constructRecords } from './utils';
+import { Dictionary, ZnsResolution, ZnsSupportedNetwork } from './types';
 import {
   NamingServiceName,
   ResolutionError,
@@ -13,13 +13,16 @@ import {
   ResolutionResponse,
   UnclaimedDomainResponse,
 } from './index';
-import NamingService from './interfaces/NamingService';
-import { CryptoRecords, Provider, ZnsSource, ZnsConfig } from './types/publicTypes';
+import { CryptoRecords, Provider, ZnsSource } from './types/publicTypes';
 import FetchProvider from './FetchProvider';
-import Namehash from './utils/Namehash';
+import { znsNamehash } from './utils/namehash';
+import { NamingService } from './NamingService';
+import ConfigurationError, { ConfigurationErrorCode } from './errors/configurationError';
 
-export default class Zns implements NamingService {
-
+/**
+ * @internal
+ */
+export default class Zns extends NamingService {
   static readonly UrlMap = {
     1: 'https://api.zilliqa.com',
     333: 'https://dev-api.zilliqa.com',
@@ -43,28 +46,24 @@ export default class Zns implements NamingService {
   readonly provider: Provider;
   
   constructor(source?: ZnsSource) {
+    super();
     if (!source) {
-      source = this.getDefaultSource();
+      source = {
+        url: Zns.UrlMap[1],
+        network: "mainnet"
+      };
+    }
+    if (!source.network || !ZnsSupportedNetwork.guard(source.network)) {
+      throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedNetwork, {
+        method: NamingServiceName.ZNS,
+      });
     }
     this.network = Zns.NetworkNameMap[source.network];
     this.url = source['url'] || Zns.UrlMap[this.network];
     this.provider = source['provider'] || new FetchProvider(this.name, this.url!);
-    ensureConfigured({
-      url: this.url,
-      network: source.network,
-      provider: this.provider
-    }, this.name);
-    
     this.registryAddress = source['registryAddress'] || Zns.RegistryMap[this.network];
     if (this.registryAddress.startsWith("0x")) {
       this.registryAddress = toBech32Address(this.registryAddress);
-    }
-  }
-
-  private getDefaultSource(): ZnsConfig {
-    return {
-      url: Zns.UrlMap[1],
-      network: "mainnet"
     }
   }
 
@@ -102,7 +101,7 @@ export default class Zns implements NamingService {
     if (!this.isSupportedDomain(domain)) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {domain});
     }
-    return Namehash.hash(domain);
+    return znsNamehash(domain);
   }
 
   isSupportedDomain(domain: string): boolean {

@@ -1,14 +1,13 @@
 import nock from 'nock';
-import Resolution, { ResolutionErrorCode } from '../index';
+import Resolution  from '../index';
 import Networking from '../utils/Networking';
 import {
-  expectResolutionErrorCode,
   DefaultUrl,
   mockAPICalls,
   mockAsyncMethod,
   expectSpyToBeCalled,
   CryptoDomainWithTwitterVerification,
-} from '../utils/helpers';
+} from './helpers';
 
 let resolution: Resolution;
 
@@ -27,16 +26,6 @@ describe('Unstoppable API', () => {
   it('namehashes zil domain', async () => {
     expect(resolution.namehash('cofounding.zil')).toEqual(
       '0x1cc365ffd60bb50538e01d24c1f1e26c887c36f26a0de250660b8a1465c60667',
-    );
-  });
-
-  it('throws NamingServiceDown on FetchError', async () => {
-    const error = new Error();
-    error.name = 'FetchError';
-    jest.spyOn(Networking, 'fetch').mockRejectedValue(error);
-    await expectResolutionErrorCode(
-      resolution.allRecords('hello.zil'),
-      ResolutionErrorCode.NamingServiceDown,
     );
   });
 

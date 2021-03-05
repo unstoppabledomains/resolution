@@ -33,7 +33,9 @@
     "docs:readme": "./docs-readme.sh",
     "docs:deploy": "yarn docs && ./deploy-docs.sh",
     "size": "yarn run sizecheck -p ./package.json -l 500 -v",
-    "network-config:pull": "curl https://raw.githubusercontent.com/unstoppabledomains/dot-crypto/master/src/network-config/network-config.json -o src/config/network-config.json"
+    "config:pull": "yarn network-config:pull && yarn supported-keys:pull",
+    "network-config:pull": "curl https://raw.githubusercontent.com/unstoppabledomains/dot-crypto/master/src/network-config/network-config.json -o src/config/network-config.json",
+    "supported-keys:pull": "curl https://raw.githubusercontent.com/unstoppabledomains/dot-crypto/master/src/supported-keys/supported-keys.json -o src/config/supported-keys.json"
   },
   "files": [
     "build"
@@ -94,7 +96,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@ensdomains/address-encoder": "^0.2.6",
+    "@ensdomains/address-encoder": "0.2.6",
     "@ethersproject/abi": "^5.0.1",
     "bip44-constants": "^8.0.5",
     "bn.js": "^4.4.0",

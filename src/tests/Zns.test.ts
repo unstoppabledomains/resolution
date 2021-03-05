@@ -4,7 +4,7 @@ import {
   expectSpyToBeCalled,
   expectResolutionErrorCode,
   mockAsyncMethods,
-} from '../utils/helpers';
+} from './helpers';
 import { NullAddress } from '../types';
 import { NamingServiceName, ZnsSupportedNetworks } from '../types/publicTypes';
 import Zns from '../Zns';

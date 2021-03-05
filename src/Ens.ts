@@ -1,22 +1,26 @@
 import { default as ensInterface } from './contracts/ens/ens';
 import { default as resolverInterface } from './contracts/ens/resolver';
 import { formatsByCoinType } from '@ensdomains/address-encoder';
-import { EthCoinIndex, Bip44Constants, BlockhanNetworkUrlMap } from './types';
+import { EthCoinIndex, Bip44Constants, BlockhanNetworkUrlMap, EnsSupportedNetwork } from './types';
 import {
   NamingServiceName,
   ResolutionError,
   ResolutionErrorCode,
 } from './index';
-import Contract from './utils/contract';
+import EthereumContract from './contracts/EthereumContract';
 import contentHash from 'content-hash';
 import EnsNetworkMap from 'ethereum-ens-network-map';
-import { Provider, EnsSource, EnsConfig } from './types/publicTypes';
-import { constructRecords, ensureConfigured, isNullAddress } from './utils';
-import NamingService from './interfaces/NamingService';
+import { Provider, EnsSource } from './types/publicTypes';
+import { constructRecords, isNullAddress } from './utils';
 import FetchProvider from './FetchProvider';
-import Namehash from './utils/Namehash';
+import { eip137Namehash } from './utils/namehash';
+import { NamingService } from './NamingService';
+import ConfigurationError, { ConfigurationErrorCode } from './errors/configurationError';
 
-export default class Ens implements NamingService {
+/**
+ * @internal
+ */
+export default class Ens extends NamingService {
   static readonly UrlMap: BlockhanNetworkUrlMap = {
     1: 'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
     3: 'https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee'
@@ -33,23 +37,26 @@ export default class Ens implements NamingService {
   readonly network: number;
   readonly url: string | undefined;
   readonly provider: Provider;
-  readonly readerContract: Contract;
+  readonly readerContract: EthereumContract;
 
   constructor(source?: EnsSource) {
+    super();
     if (!source) {
-      source = this.getDefaultSource();
+      source = {
+        url: Ens.UrlMap[1],
+        network: "mainnet",
+      };
+    }
+    if (!source.network || !EnsSupportedNetwork.guard(source.network)) {
+      throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedNetwork, {
+        method: NamingServiceName.ENS,
+      });
     }
     this.network = Ens.NetworkNameMap[source.network];
     this.url = source['url'] || Ens.UrlMap[this.network];
     this.provider = source['provider'] || new FetchProvider(this.name, this.url!);
-    ensureConfigured({
-      network: source.network,
-      url: this.url,
-      provider: this.provider
-    }, this.name);
-
     const registryAddress = source['registryAddress'] || EnsNetworkMap[this.network];
-    this.readerContract = new Contract(
+    this.readerContract = new EthereumContract(
       ensInterface,
       registryAddress,
       this.provider
@@ -64,21 +71,13 @@ export default class Ens implements NamingService {
     if (!this.isSupportedDomain(domain)) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {domain});
     }
-    return Namehash.hash(domain);
-  }
-
-  protected urlMap(): BlockhanNetworkUrlMap {
-    return {
-      1: 'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
-      3: 'https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee'
-    };
+    return eip137Namehash(domain);
   }
 
   isSupportedDomain(domain: string): boolean {
     return (
       domain === 'eth' ||
-      (domain.includes('.') &&
-        /^[^-]*[^-]*\.(eth|luxe|xyz|kred|addr\.reverse)$/.test(domain) &&
+      (/^[^-]*[^-]*\.(eth|luxe|xyz|kred|addr\.reverse)$/.test(domain) &&
         domain.split('.').every(v => !!v.length))
     );
   }
@@ -139,7 +138,7 @@ export default class Ens implements NamingService {
       return null;
     }
 
-    const resolverContract = new Contract(
+    const resolverContract = new EthereumContract(
       resolverInterface(resolverAddress, EthCoinIndex),
       resolverAddress,
       this.provider
@@ -151,7 +150,7 @@ export default class Ens implements NamingService {
   /**
    * This was done to make automated tests more configurable
    */
-  private resolverCallToName(resolverContract: Contract, nodeHash) {
+  private resolverCallToName(resolverContract: EthereumContract, nodeHash) {
     return this.callMethod(resolverContract, 'name', [nodeHash]);
   }
   
@@ -196,13 +195,6 @@ export default class Ens implements NamingService {
     };
     return mapper[record] || record;
   }
-  
-  private getDefaultSource(): EnsConfig {
-    return {
-      url: Ens.UrlMap[1],
-      network: "mainnet",
-    }
-  }
 
   private async addr(domain: string, currencyTicker: string): Promise<string | undefined> {
     const resolver = await this.resolver(domain).catch(err => null);
@@ -223,7 +215,7 @@ export default class Ens implements NamingService {
     domain: string,
     coinType: string,
   ): Promise<string | undefined> {
-    const resolverContract = new Contract(
+    const resolverContract = new EthereumContract(
       resolverInterface(resolver, coinType),
       resolver,
       this.provider
@@ -265,9 +257,9 @@ export default class Ens implements NamingService {
   private async getResolverContract(
     domain: string,
     coinType?: string,
-  ): Promise<Contract> {
+  ): Promise<EthereumContract> {
     const resolverAddress = await this.resolver(domain);
-    return new Contract(
+    return new EthereumContract(
       resolverInterface(resolverAddress, coinType),
       resolverAddress,
       this.provider
@@ -275,25 +267,11 @@ export default class Ens implements NamingService {
   }
 
   private async callMethod(
-    contract: Contract,
+    contract: EthereumContract,
     method: string,
     params: (string | string[])[],
   ): Promise<any> {
-    try {
-      const result = await contract.call(method, params);
-      return result[0];
-    } catch (error) {
-      const { message }: { message: string } = error;
-      if (
-        message.match(/Invalid JSON RPC response/) ||
-        message.match(/legacy access request rate exceeded/)
-      ) {
-        throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
-          method: this.name,
-        });
-      }
-
-      throw error;
-    }
+    const result = await contract.call(method, params);
+    return result[0];
   }
 }

@@ -2,7 +2,7 @@ import { Interface, JsonFragment } from '@ethersproject/abi';
 import { RequestArguments, EventData } from '../types';
 import { Provider } from '../types/publicTypes';
 
-export default class Contract {
+export default class EthereumContract {
   readonly abi: JsonFragment[];
   readonly coder: Interface;
   readonly address: string;

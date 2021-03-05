@@ -13,9 +13,8 @@ import {
   expectResolutionErrorCode,
   protocolLink,
   expectConfigurationErrorCode,
-} from '../utils/helpers';
+} from './helpers';
 import FetchProvider from '../FetchProvider';
-import { FetchError } from 'node-fetch';
 import { CnsSupportedNetworks, NamingServiceName } from '../types/publicTypes';
 import Cns from '../Cns';
 import standardKeys from '../utils/standardKeys';
@@ -602,19 +601,6 @@ describe('CNS', () => {
   });
 
   describe('Providers', () => {
-    it('should throw error when FetchProvider throws FetchError', async () => {
-      const url = protocolLink();
-      const provider = new FetchProvider(NamingServiceName.CNS, url);
-      resolution = new Resolution({ sourceConfig: { cns: { url, provider, network: "mainnet" } } });
-      jest
-        .spyOn(Networking, 'fetch')
-        .mockRejectedValue(new FetchError('error', 'error_type'));
-
-      await expectResolutionErrorCode(
-        resolution.record(CryptoDomainWithEmptyResolver, 'No.such.record'),
-        ResolutionErrorCode.NamingServiceDown,
-      );
-    });
 
     it('should throw error when FetchProvider throws Error', async () => {
       const url = protocolLink();

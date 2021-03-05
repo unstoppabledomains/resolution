@@ -17,13 +17,14 @@ import {
   Web3Version0Provider,
   Web3Version1Provider,
   EthersProvider,
-  ResolutionMethod,
+  ResolutionMethod, Api,
 } from './types/publicTypes';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
-import NamingService from './interfaces/NamingService';
 import DnsUtils from './utils/DnsUtils';
-import { findNamingServiceNameFromDomainByExtension, isApi, signedInfuraLink } from './utils';
+import { findNamingServiceName, signedInfuraLink } from './utils';
 import { Eip1993Factories } from './utils/Eip1993Factories';
+import { NamingService } from './NamingService';
+
 /**
  * Blockchain domain Resolution library - Resolution.
  * @example
@@ -43,16 +44,17 @@ import { Eip1993Factories } from './utils/Eip1993Factories';
  * ```
  */
 export default class Resolution {
+  /**
+   * @internal
+   */
   readonly serviceMap: Record<NamingServiceName, NamingService>;
   
   constructor({
     sourceConfig = undefined,
   }: { sourceConfig?: SourceConfig } = {}) {
-
-    const cns = (isApi(sourceConfig?.cns) ? new UdApi() : new Cns(sourceConfig?.cns));
-    const ens = (isApi(sourceConfig?.ens) ? new UdApi() : new Ens(sourceConfig?.ens));
-    const zns = (isApi(sourceConfig?.zns) ? new UdApi() : new Zns(sourceConfig?.zns));
-
+    const cns = (isApi(sourceConfig?.cns) ? new UdApi(sourceConfig?.cns.url) : new Cns(sourceConfig?.cns));
+    const ens = (isApi(sourceConfig?.ens) ? new UdApi(sourceConfig?.ens.url) : new Ens(sourceConfig?.ens));
+    const zns = (isApi(sourceConfig?.zns) ? new UdApi(sourceConfig?.zns.url) : new Zns(sourceConfig?.zns));
     this.serviceMap = {
       [NamingServiceName.CNS]: cns,
       [NamingServiceName.ENS]: ens,
@@ -100,7 +102,7 @@ export default class Resolution {
   /**
    * Create a resolution instance from web3 0.x version provider
    * @param provider - an 0.x version provider from web3 ( must implement sendAsync(payload, callback) )
-   * @param networks - an optional object that describes what network to use when connecting ENS or CNS default is mainnet
+   * @param networks - Ethereum network configuration
    * @see https://github.com/ethereum/web3.js/blob/0.20.7/lib/web3/httpprovider.js#L116
    */
   static fromWeb3Version0Provider(provider: Web3Version0Provider, networks?: { ens?: {
@@ -157,7 +159,7 @@ export default class Resolution {
    * Resolves given domain name to a specific currency address if exists
    * @async
    * @param domain - domain name to be resolved
-   * @param currencyTicker - currency ticker like BTC, ETH, ZIL
+   * @param ticker - currency ticker like BTC, ETH, ZIL
    * @throws [[ResolutionError]] if address is not found
    * @returns A promise that resolves in an address
    */
@@ -428,7 +430,7 @@ export default class Resolution {
   }
 
   private getNamingMethod(domain: string): NamingService | undefined {
-    return this.serviceMap[findNamingServiceNameFromDomainByExtension(domain)];
+    return this.serviceMap[findNamingServiceName(domain)];
   }
 
   private getNamingMethodOrThrow(domain: string): NamingService {
@@ -448,3 +450,7 @@ export default class Resolution {
 }
 
 export { Resolution };
+
+function isApi(obj: any): obj is Api {
+  return obj && obj.api;
+}

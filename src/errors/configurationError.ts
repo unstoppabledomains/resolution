@@ -15,7 +15,7 @@ export enum ConfigurationErrorCode {
   UnspecifiedNetwork = 'UnspecifiedNetwork',
   UnspecifiedUrl = 'UnspecifiedUrl',
   MissingProviderConfigurations = 'MissingProviderConfigurations',
-  DependencyMissing = "DependencyMissing"
+  DependencyMissing = 'DependencyMissing'
 }
 
 /**

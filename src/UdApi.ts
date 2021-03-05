@@ -1,31 +1,34 @@
 import { toBech32Address } from './utils/znsUtils';
 import {
-  ResolutionMethod,
+  NamingServiceName,
   ResolutionError,
   ResolutionErrorCode,
+  ResolutionMethod,
   ResolutionResponse,
 } from './index';
-import NamingService from './interfaces/NamingService';
 import pckg from './package.json';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 import standardKeys from './utils/standardKeys';
-import { CryptoRecords, NamingServiceName } from './types/publicTypes';
+import { CryptoRecords } from './types/publicTypes';
 import Networking from './utils/Networking';
-import { constructRecords} from './utils';
-import Namehash from './utils/Namehash';
-import { findNamingServiceNameFromDomainByExtension } from './utils/index';
+import { constructRecords, findNamingServiceName } from './utils';
+import { znsNamehash, eip137Namehash } from './utils/namehash';
+import { NamingService } from './NamingService';
 
-export default class Udapi implements NamingService {
+/**
+ * @internal
+ */
+export default class Udapi extends NamingService {
   private readonly name: ResolutionMethod;
   private readonly url: string;
-
-  private headers: {
+  private readonly headers: {
     [key: string]: string;
   };
 
-  constructor() {
+  constructor(url?: string) {
+    super();
     this.name = "UDAPI";
-    this.url = "https://unstoppabledomains.com/api/v1";
+    this.url = url ?? "https://unstoppabledomains.com/api/v1";
     const DefaultUserAgent = Networking.isNode()
       ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'
       : navigator.userAgent;
@@ -41,7 +44,12 @@ export default class Udapi implements NamingService {
   }
 
   namehash(domain: string): string {
-    return Namehash.hash(domain);
+    const serviceName = findNamingServiceName(domain);
+    if (serviceName === NamingServiceName.ZNS) {
+      return znsNamehash(domain);
+    }
+
+    return eip137Namehash(domain);
   }
 
   async record(domain: string, key: string): Promise<string> {
@@ -67,7 +75,7 @@ export default class Udapi implements NamingService {
   }
 
   async twitter(domain: string): Promise<string> {
-    const serviceName = findNamingServiceNameFromDomainByExtension(domain);
+    const serviceName = findNamingServiceName(domain);
     if (serviceName !== NamingServiceName.CNS) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
         domain,
@@ -124,20 +132,11 @@ export default class Udapi implements NamingService {
   }
 
   async resolve(domain: string): Promise<ResolutionResponse> {
-    try {
-      const response = await Networking.fetch(`${this.url}/${domain}`, {
-        method: 'GET',
-        headers: this.headers,
-      });
-      return await response.json();
-    } catch (error) {
-      if (error.name !== 'FetchError') {
-        throw error;
-      }
-      throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
-        method: this.name,
-      });
-    }
+    const response = await Networking.fetch(`${this.url}/${domain}`, {
+      method: 'GET',
+      headers: this.headers,
+    });
+    return response.json();
   }
 
   serviceName(): ResolutionMethod {

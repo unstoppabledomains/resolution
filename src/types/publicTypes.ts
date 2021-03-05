@@ -18,7 +18,7 @@ export type CnsConfig  = {
   proxyReaderAddress?: string
 };
 
-export type Api = { api: true };
+export type Api = { api: true, url?: string };
 
 export type EnsConfig = {
   url?: string,

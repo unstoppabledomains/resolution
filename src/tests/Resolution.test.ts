@@ -10,7 +10,7 @@ import Web3WsProvider from 'web3-providers-ws';
 import Web3V027Provider from 'web3-0.20.7/lib/web3/httpprovider';
 import {
   CryptoDomainWithAdaBchAddresses, CryptoDomainWithUsdtMultiChainRecords,
-} from '../utils/helpers';
+} from './helpers';
 
 import {
   expectResolutionErrorCode,
@@ -23,7 +23,7 @@ import {
   CryptoDomainWithTwitterVerification,
   pendingInLive,
   CryptoDomainWithIpfsRecords,
-} from '../utils/helpers';
+} from './helpers';
 import { RpcProviderTestCases } from '../utils/providerMockData';
 import fetch, { FetchError } from 'node-fetch';
 import standardKeys from '../utils/standardKeys';

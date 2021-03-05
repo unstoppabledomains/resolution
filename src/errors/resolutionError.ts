@@ -20,7 +20,6 @@ export enum ResolutionErrorCode {
   UnsupportedDomain = 'UnsupportedDomain',
   UnsupportedMethod = 'UnsupportedMethod',
   UnspecifiedCurrency = 'UnspecifiedCurrency',
-  NamingServiceDown = 'NamingServiceDown',
   UnsupportedCurrency = 'UnsupportedCurrency',
   IncorrectResolverInterface = 'IncorrectResolverInterface',
   RecordNotFound = 'RecordNotFound',
@@ -43,9 +42,6 @@ const HandlersByCode = {
     methodName: string;
     domain: string;
   }) => `Method ${params.methodName} is not supported for ${params.domain}`,
-  [ResolutionErrorCode.NamingServiceDown]: (params: {
-    method: ResolutionMethod;
-  }) => `${params.method} naming service is down at the moment`,
 
   [ResolutionErrorCode.InvalidTwitterVerification]: (params: {
     domain?: string;
@@ -69,7 +65,6 @@ const HandlersByCode = {
  * Resolution Error class is designed to control every error being thrown by Resolution
  * @param code - Error Code
  * - UnsupportedDomain - domain is not supported by current Resolution instance
- * - NamingServiceDown - blockchain API is down
  * - UnregisteredDomain - domain is not owned by any address
  * - UnspecifiedResolver - domain has no resolver specified
  * - UnspecifiedCurrency - domain resolver doesn't have any address of specified currency

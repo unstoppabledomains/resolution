@@ -1,5 +1,5 @@
 import nock from 'nock';
-import Resolution, { ResolutionErrorCode } from '../index';
+import Resolution, { NamingServiceName, ResolutionErrorCode } from '../index';
 import { NullAddress } from '../types';
 import {
   expectConfigurationErrorCode,
@@ -9,10 +9,12 @@ import {
   mockAsyncMethods,
   pendingInLive,
   protocolLink,
-} from '../utils/helpers';
+  ProviderProtocol,
+} from './helpers';
 import { ConfigurationErrorCode } from '../errors/configurationError';
-import { EnsSupportedNetworks, NamingServiceName } from '../types/publicTypes';
+import { EnsSupportedNetworks } from '../types/publicTypes';
 import Ens from '../Ens';
+
 let resolution: Resolution;
 let ens: Ens;
 
@@ -21,7 +23,7 @@ beforeEach(() => {
   jest.restoreAllMocks();
   resolution = new Resolution({
     sourceConfig: {
-      ens: { url: protocolLink(), network: "mainnet" },
+      ens: { url: protocolLink(ProviderProtocol.http, NamingServiceName.ENS), network: "mainnet" },
     },
   });
   ens = resolution.serviceMap[NamingServiceName.ENS] as Ens;
@@ -42,7 +44,7 @@ describe('ENS', () => {
   });
 
   it('resolves .eth name using blockchain', async () => {
-    expect(ens.url).toBe(protocolLink());
+    expect(ens.url).toBe(protocolLink(ProviderProtocol.http, NamingServiceName.ENS));
     expect(ens.network).toEqual(1);
 
     const eyes = mockAsyncMethods(ens, {
@@ -152,7 +154,7 @@ describe('ENS', () => {
 
   it('checks normalizeSource ens (object) #1', async () => {
     expect(ens.network).toBe(1);
-    expect(ens.url).toBe(protocolLink());
+    expect(ens.url).toBe(protocolLink(ProviderProtocol.http, NamingServiceName.ENS));
   });
 
   it('checks normalizeSource ens (object) #2', async () => {

@@ -1,7 +1,7 @@
 import nock from 'nock';
 import _ from 'lodash';
 import { Dictionary } from '../types';
-import mockData from '../tests/testData/mockData.json';
+import mockData from './testData/mockData.json';
 import ResolutionError, { ResolutionErrorCode } from '../errors/resolutionError';
 import ConfigurationError, { ConfigurationErrorCode } from '../errors/configurationError';
 import DnsRecordsError, { DnsRecordsErrorCode } from '../errors/dnsRecordsError';
