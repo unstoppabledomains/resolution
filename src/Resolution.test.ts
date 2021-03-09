@@ -3,7 +3,7 @@ import Resolution, {
   ResolutionErrorCode,
   UnclaimedDomainResponse,
 } from './index';
-import { TickerVersion, DnsRecordType, JsonRpcPayload, hasProvider } from './publicTypes';
+import { TickerVersion, DnsRecordType, JsonRpcPayload } from './publicTypes';
 import { JsonRpcProvider, InfuraProvider } from '@ethersproject/providers';
 import Web3HttpProvider from 'web3-providers-http';
 import Web3WsProvider from 'web3-providers-ws';
@@ -51,18 +51,18 @@ describe('Resolution', () => {
       const original = Resolution['getNetwork'];
       Resolution['getNetwork'] = jest.fn().mockImplementation((type, config) => {
         switch(type) {
-          case NamingServiceName.CNS: {
-            return {
-              network: "mainnet",
-              provider: new FetchProvider(type, config.url)
-            }
+        case NamingServiceName.CNS: {
+          return {
+            network: "mainnet",
+            provider: new FetchProvider(type, config.url)
           }
-          case NamingServiceName.ENS: {
-            return {
-              network: "goerli",
-              provider: new FetchProvider(type, config.url)
-            }
+        }
+        case NamingServiceName.ENS: {
+          return {
+            network: "goerli",
+            provider: new FetchProvider(type, config.url)
           }
+        }
         }
       });
       const resolution = await Resolution.autoNetwork({
