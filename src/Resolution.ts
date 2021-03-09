@@ -21,14 +21,18 @@ import {
   DnsRecord,
   CryptoRecords,
   TickerVersion,
+  AutoNetworkConfigs,
+  hasProvider,
+  EthersProvider
 } from './publicTypes';
 import { nodeHash } from './types';
-import { EthersProvider } from './publicTypes';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import NamingService from './NamingService';
 import { signedInfuraLink, isSupportedChainVersion } from './utils';
 import { Eip1993Factories } from './utils/Eip1993Factories';
 import DnsUtils from './DnsUtils';
+import FetchProvider from './FetchProvider';
+import { EthereumNamingService } from './EthereumNamingService';
 
 /**
  * Blockchain domain Resolution library - Resolution.
@@ -97,6 +101,19 @@ export default class Resolution {
       this.api = new UdApi(api);
     }
 
+  }
+
+  /**
+   * AutoConfigure the blockchain network between different testnets for ENS and CNS
+   * We make a "net_version" JSON RPC call to the blockchain either via url or with the help of given provider.
+   * @param sourceConfig - configuration object for ens and cns
+   * @returns configured Resolution object
+   */
+  static async autoNetwork(sourceConfig: AutoNetworkConfigs): Promise<Resolution> {
+    return new this({blockchain: {
+      cns: await this.getNetwork(NamingServiceName.CNS, sourceConfig.cns),
+      ens: await this.getNetwork(NamingServiceName.ENS, sourceConfig.ens)
+    }});
   }
 
   /**
@@ -487,7 +504,6 @@ export default class Resolution {
     } else {
       return options.prefix ? '0x' + hash : hash;
     }
-
   }
 
   /**
@@ -559,8 +575,35 @@ export default class Resolution {
     return records;
   }
 
+  private static async getNetwork(
+    type: NamingServiceName.CNS | NamingServiceName.ENS,
+    config?: {url: string} | {provider: Provider}
+  ): Promise<{network: string, provider: Provider} | undefined> {
+    if (!config) {
+      return undefined;
+    }
+    const provider = hasProvider(config) ? config.provider : new FetchProvider(type, config.url);
+    try {
+      const network = await provider.request({method: "net_version"}) as number;
+      return {
+        network: EthereumNamingService.NetworkIdMap[network],
+        provider
+      };
+    } catch(error) {
+      // We want to communicate that config.url is not responding instead of NamingServiceDown from our FetchProvider.
+      if (error instanceof ResolutionError && error.code === ResolutionErrorCode.NamingServiceDown) {
+        throw new ResolutionError(
+          ResolutionErrorCode.NetworkNotFound,
+          { providerMessage: `couldn't get answer from ${config['url']}` }
+        );
+      }
+      // Or pass any message from provider
+      throw new ResolutionError(ResolutionErrorCode.NetworkNotFound, {providerMessage: error.message})
+    }
+  }
+
   private async getPreferableNewRecord(domain: string, newRecord: string, oldRecord: string): Promise<string> {
-    const records = await this.records(domain, [newRecord, oldRecord]) as Record<string, string>;
+    const records = await this.records(domain, [newRecord, oldRecord]);
     return NamingService.ensureRecordPresence(domain, newRecord, records[newRecord] || records[oldRecord]);
   }
 

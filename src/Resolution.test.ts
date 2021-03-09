@@ -3,15 +3,11 @@ import Resolution, {
   ResolutionErrorCode,
   UnclaimedDomainResponse,
 } from './index';
-import { TickerVersion, DnsRecordType, JsonRpcPayload } from './publicTypes';
+import { TickerVersion, DnsRecordType, JsonRpcPayload, hasProvider } from './publicTypes';
 import { JsonRpcProvider, InfuraProvider } from '@ethersproject/providers';
 import Web3HttpProvider from 'web3-providers-http';
 import Web3WsProvider from 'web3-providers-ws';
 import Web3V027Provider from 'web3-0.20.7/lib/web3/httpprovider';
-import {
-  CryptoDomainWithAdaBchAddresses, CryptoDomainWithUsdtMultiChainRecords,
-} from './tests/helpers';
-
 import {
   expectResolutionErrorCode,
   expectSpyToBeCalled,
@@ -23,11 +19,14 @@ import {
   CryptoDomainWithTwitterVerification,
   pendingInLive,
   CryptoDomainWithIpfsRecords,
+  CryptoDomainWithUsdtMultiChainRecords,
+  CryptoDomainWithAdaBchAddresses,
 } from './tests/helpers';
 import { RpcProviderTestCases } from './tests/providerMockData';
 import fetch, { FetchError } from 'node-fetch';
 import standardKeys from './utils/standardKeys';
 import { NamingServiceName } from './publicTypes';
+import FetchProvider from './FetchProvider';
 
 let resolution: Resolution;
 
@@ -47,6 +46,56 @@ beforeEach(() => {
 
 describe('Resolution', () => {
   describe('.Basic setup', () => {
+    it('should work with autonetwork url configuration', async () => {
+      // mocking getNetwork function as there is no access to provider.request 
+      const original = Resolution['getNetwork'];
+      Resolution['getNetwork'] = jest.fn().mockImplementation((type, config) => {
+        switch(type) {
+          case NamingServiceName.CNS: {
+            return {
+              network: "mainnet",
+              provider: new FetchProvider(type, config.url)
+            }
+          }
+          case NamingServiceName.ENS: {
+            return {
+              network: "goerli",
+              provider: new FetchProvider(type, config.url)
+            }
+          }
+        }
+      });
+      const resolution = await Resolution.autoNetwork({
+        cns: { url: protocolLink()},
+        ens: { url: protocolLink().replace('mainnet', 'goerli') }
+      });
+      // We need to manually restore the function as jest.restoreAllMocks and simillar works only with spyOn
+      Resolution['getNetwork'] = original;
+      expect(resolution.cns.network).toBe(1);
+      expect(resolution.ens.network).toBe(5);
+    });
+
+
+    it('should work with autonetwork provider configuration', async () => {
+      const provider = new FetchProvider("UDAPI", protocolLink().replace('mainnet', 'rinkeby'));
+      const spy = jest.spyOn(provider, "request").mockResolvedValue("4");
+      const resolution = await Resolution.autoNetwork({
+        cns: { provider },
+        ens: { provider }
+      });
+      expect(spy).toBeCalledTimes(2);
+      expect(resolution.cns.network).toBe(4);
+      expect(resolution.ens.network).toBe(4);
+    });
+
+
+    it("should fail", async () => {
+      await expectResolutionErrorCode(Resolution.autoNetwork({
+        cns: {url: "https://google.com" }
+      }), ResolutionErrorCode.NetworkNotFound);
+    });
+
+
     it('should fail in test development',async () => {
       pendingInLive()
       try {
