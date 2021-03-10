@@ -4,20 +4,21 @@ import Zns from './Zns';
 import Cns from './Cns';
 import UdApi from './UdApi';
 import {
-  NamingServiceName,
+  Api,
+  CnsSupportedNetworks,
+  CryptoRecords,
+  DnsRecord,
+  DnsRecordType,
+  EnsSupportedNetworks,
+  EthersProvider,
   NamehashOptions,
   NamehashOptionsDefault,
-  DnsRecordType,
-  DnsRecord,
-  CryptoRecords,
-  SourceConfig,
-  EnsSupportedNetworks,
-  CnsSupportedNetworks,
+  NamingServiceName,
   Provider,
+  ResolutionMethod,
+  SourceConfig,
   Web3Version0Provider,
   Web3Version1Provider,
-  EthersProvider,
-  ResolutionMethod, Api,
 } from './types/publicTypes';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import DnsUtils from './utils/DnsUtils';
@@ -341,6 +342,26 @@ export default class Resolution {
       this.getNamingMethodOrThrow(domain).namehash(domain),
       options,
     );
+  }
+
+  /**
+   * @returns a namehash of a subdomain with name label
+   * @param parent namehash of a parent domain
+   * @param label subdomain name
+   * @param namingService "ENS", "CNS" or "ZNS"
+   * @param options formatting options
+   */
+  childhash(
+    parent: string,
+    label: string,
+    namingService: NamingServiceName,
+    options: NamehashOptions = NamehashOptionsDefault,
+  ): string {
+    const service = this.serviceMap[namingService];
+    if (!service) {
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedService, {namingService});
+    }
+    return this.formatNamehash(service.childhash(parent, label), options);
   }
 
   private formatNamehash(hash, options: NamehashOptions) {

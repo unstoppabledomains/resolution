@@ -28,7 +28,7 @@ export default class Udapi extends NamingService {
   constructor(url?: string) {
     super();
     this.name = "UDAPI";
-    this.url = url ?? "https://unstoppabledomains.com/api/v1";
+    this.url = url || "https://unstoppabledomains.com/api/v1";
     const DefaultUserAgent = Networking.isNode()
       ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'
       : navigator.userAgent;
@@ -50,6 +50,10 @@ export default class Udapi extends NamingService {
     }
 
     return eip137Namehash(domain);
+  }
+
+  childhash(parentHash: string, label: string) {
+    throw new Error('Unsupported method whe using UD Resolution API');
   }
 
   async record(domain: string, key: string): Promise<string> {

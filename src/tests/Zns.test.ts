@@ -170,6 +170,20 @@ describe('ZNS', () => {
       );
     });
 
+    it('should return a valid owner address', async () => {
+      const spies = mockAsyncMethods(zns, {
+        getRecordsAddresses: [
+          'zil194qcjskuuxh6qtg8xw3qqrr3kdc6dtq8ct6j9s',
+          '0xdac22230adfe4601f00631eae92df6d77f054891',
+        ],
+      });
+      const ownerAddress = await resolution.owner('brad.zil');
+      expectSpyToBeCalled(spies);
+      expect(ownerAddress).toBe(
+        'zil194qcjskuuxh6qtg8xw3qqrr3kdc6dtq8ct6j9s',
+      );
+    });
+
     it('should not find a resolverAddress', async () => {
       const spies = mockAsyncMethods(zns, {
         getRecordsAddresses: undefined,

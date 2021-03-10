@@ -2,7 +2,6 @@ import {
   fromBech32Address,
   toBech32Address,
   toChecksumAddress,
-  set,
 } from './utils/znsUtils';
 import { isNullAddress, constructRecords } from './utils';
 import { Dictionary, ZnsResolution, ZnsSupportedNetwork } from './types';
@@ -10,12 +9,10 @@ import {
   NamingServiceName,
   ResolutionError,
   ResolutionErrorCode,
-  ResolutionResponse,
-  UnclaimedDomainResponse,
 } from './index';
 import { CryptoRecords, Provider, ZnsSource } from './types/publicTypes';
 import FetchProvider from './FetchProvider';
-import { znsNamehash } from './utils/namehash';
+import { znsChildhash, znsNamehash } from './utils/namehash';
 import { NamingService } from './NamingService';
 import ConfigurationError, { ConfigurationErrorCode } from './errors/configurationError';
 
@@ -54,7 +51,7 @@ export default class Zns extends NamingService {
       };
     }
     if (!source.network || !ZnsSupportedNetwork.guard(source.network)) {
-      throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedNetwork, {
+      throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {
         method: NamingServiceName.ZNS,
       });
     }
@@ -72,11 +69,16 @@ export default class Zns extends NamingService {
   }
 
   async owner(domain: string): Promise<string> {
-    const data = await this.resolve(domain);
-    if (!data || !data.meta.owner) {
+    const recordAddresses = await this.getRecordsAddresses(domain);
+    if (!recordAddresses) {
       throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, { domain });
     }
-    return data.meta.owner;
+    const [ownerAddress,] = recordAddresses;
+    if (!ownerAddress) {
+      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, { domain });
+    }
+
+    return ownerAddress;
   }
 
   async resolver(domain: string): Promise<string> {
@@ -102,6 +104,10 @@ export default class Zns extends NamingService {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {domain});
     }
     return znsNamehash(domain);
+  }
+
+  childhash(parentHash: string, label: string) {
+    return znsChildhash(parentHash, label);
   }
 
   isSupportedDomain(domain: string): boolean {
@@ -145,40 +151,11 @@ export default class Zns extends NamingService {
     });
   }
 
-  private async resolve(domain: string): Promise<ResolutionResponse | null> {
-    const recordAddresses = await this.getRecordsAddresses(domain);
-    if (!recordAddresses) {
-      return UnclaimedDomainResponse;
-    }
-    const [ownerAddress, resolverAddress] = recordAddresses;
-    const resolution = this.structureResolverRecords(
-      await this.getResolverRecords(resolverAddress),
-    );
-    const addresses: Record<string, string> = {};
-    if (resolution.crypto) {
-      Object.entries(resolution.crypto).forEach(
-        ([key, v]) => v.address && (addresses[key] = v.address),
-      );
-    }
-
-    return {
-      addresses,
-      meta: {
-        namehash: this.namehash(domain),
-        resolver: resolverAddress,
-        owner: ownerAddress || null,
-        type: this.name,
-        ttl: parseInt(resolution.ttl as string) || 0,
-      },
-      records: resolution.records,
-    };
-  }
-
   private async getRecordsAddresses(
     domain: string,
   ): Promise<[string, string] | undefined> {
     if (!this.isSupportedDomain(domain)) {
-      return undefined;
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {domain});
     }
 
     const registryRecord = await this.getContractMapValue(
@@ -208,14 +185,6 @@ export default class Zns extends NamingService {
     const resolver = toChecksumAddress(resolverAddress);
     return ((await this.getContractField(resolver, 'records')) ||
       {}) as Dictionary<string>;
-  }
-
-  private structureResolverRecords(records: Dictionary<string>): ZnsResolution {
-    const result = {};
-    for (const [key, value] of Object.entries(records)) {
-      set(result, key, value);
-    }
-    return result;
   }
 
   private async fetchSubState(

@@ -12,29 +12,21 @@ export type CnsSupportedNetworks = typeof CnsSupportedNetwork.type;
 export type EnsSupportedNetworks = typeof EnsSupportedNetwork.type;
 export type ZnsSupportedNetworks = typeof ZnsSupportedNetwork.type;
 
-export type CnsConfig  = {
-  url?: string,
-  network: CnsSupportedNetworks,
-  proxyReaderAddress?: string
-};
-
 export type Api = { api: true, url?: string };
 
-export type EnsConfig = {
-  url?: string,
-  network: EnsSupportedNetworks,
-  registryAddress?: string
-}
+type NamingServiceSource = {url?: string} | {provider?: Provider};
 
-export type ZnsConfig = {
-  url?: string,
-  network: ZnsSupportedNetworks,
-  registryAddress?: string
-}
+export type CnsSource =
+  NamingServiceSource &
+  {network: CnsSupportedNetworks, proxyReaderAddress?: string}
 
-export type CnsSource = CnsConfig | { provider: Provider, network: CnsSupportedNetworks, proxyReaderAddress?: string };
-export type EnsSource = EnsConfig | { provider: Provider, network: EnsSupportedNetworks, registryAddress?: string };
-export type ZnsSource = ZnsConfig | { provider: Provider, network: ZnsSupportedNetworks, registryAddress?: string };
+export type EnsSource =
+  NamingServiceSource &
+  {network: EnsSupportedNetworks, registryAddress?: string}
+
+export type ZnsSource =
+  NamingServiceSource &
+  {network: ZnsSupportedNetworks, registryAddress?: string}
 
 export type SourceConfig = {
   cns?: CnsSource | Api;

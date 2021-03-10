@@ -23,7 +23,7 @@ const HandlersByCode = {
  * Configuration Error class is designed to control every error being thrown by wrong configurations for objects
  * @param code - Error Code
  * - IncorrectProvider - When provider doesn't have implemented send or sendAsync methods
- * - UnspecifiedNetwork - When network is not specified for naming service configurations
+ * - UnsupportedNetwork - When network is not specified or not supported
  * - UnspecifiedUrl - When url is not specified for custom naming service configurations
  * @param method - optional param to specify which namingService errored out
  */

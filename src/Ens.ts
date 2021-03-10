@@ -1,19 +1,15 @@
 import { default as ensInterface } from './contracts/ens/ens';
 import { default as resolverInterface } from './contracts/ens/resolver';
 import { formatsByCoinType } from '@ensdomains/address-encoder';
-import { EthCoinIndex, Bip44Constants, BlockhanNetworkUrlMap, EnsSupportedNetwork } from './types';
-import {
-  NamingServiceName,
-  ResolutionError,
-  ResolutionErrorCode,
-} from './index';
+import { Bip44Constants, BlockhanNetworkUrlMap, EnsSupportedNetwork, EthCoinIndex } from './types';
+import { NamingServiceName, ResolutionError, ResolutionErrorCode } from './index';
 import EthereumContract from './contracts/EthereumContract';
 import contentHash from 'content-hash';
 import EnsNetworkMap from 'ethereum-ens-network-map';
-import { Provider, EnsSource } from './types/publicTypes';
+import { EnsSource, Provider } from './types/publicTypes';
 import { constructRecords, isNullAddress } from './utils';
 import FetchProvider from './FetchProvider';
-import { eip137Namehash } from './utils/namehash';
+import { eip137Childhash, eip137Namehash } from './utils/namehash';
 import { NamingService } from './NamingService';
 import ConfigurationError, { ConfigurationErrorCode } from './errors/configurationError';
 
@@ -48,7 +44,7 @@ export default class Ens extends NamingService {
       };
     }
     if (!source.network || !EnsSupportedNetwork.guard(source.network)) {
-      throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedNetwork, {
+      throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {
         method: NamingServiceName.ENS,
       });
     }
@@ -72,6 +68,10 @@ export default class Ens extends NamingService {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {domain});
     }
     return eip137Namehash(domain);
+  }
+
+  childhash(parentHash: string, label: string) {
+    return eip137Childhash(parentHash, label);
   }
 
   isSupportedDomain(domain: string): boolean {
@@ -133,7 +133,13 @@ export default class Ens extends NamingService {
 
     const reverseAddress = address + '.addr.reverse';
     const nodeHash = this.namehash(reverseAddress);
-    const resolverAddress = await this.resolver(reverseAddress).catch(err => null);
+    const resolverAddress = await this.resolver(reverseAddress).catch((err: ResolutionError) => {
+      if (err.code === ResolutionErrorCode.UnspecifiedResolver) {
+        return null;
+      }
+      throw err;
+    });
+
     if (isNullAddress(resolverAddress)) {
       return null;
     }
@@ -197,7 +203,11 @@ export default class Ens extends NamingService {
   }
 
   private async addr(domain: string, currencyTicker: string): Promise<string | undefined> {
-    const resolver = await this.resolver(domain).catch(err => null);
+    const resolver = await this.resolver(domain).catch((err: ResolutionError) => {
+      if (err.code !== ResolutionErrorCode.UnspecifiedResolver) {
+        throw err;
+      }
+    });
     if (!resolver) {
       const owner = await this.owner(domain);
       if (isNullAddress(owner)) {

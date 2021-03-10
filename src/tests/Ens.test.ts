@@ -278,7 +278,7 @@ describe('ENS', () => {
             ens: { network: 'custom' as EnsSupportedNetworks, url: 'https://custom.notinfura.io' },
           },
         }),
-      ConfigurationErrorCode.UnspecifiedNetwork,
+      ConfigurationErrorCode.UnsupportedNetwork,
     );
   });
 

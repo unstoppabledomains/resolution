@@ -9,7 +9,7 @@ import { CnsSource, CryptoRecords, DomainData, NamingServiceName, Provider } fro
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 import NetworkConfig from './config/network-config.json';
 import FetchProvider from './FetchProvider';
-import { eip137Namehash } from './utils/namehash';
+import { eip137Childhash, eip137Namehash } from './utils/namehash';
 import { NamingService } from './NamingService';
 import ConfigurationError, { ConfigurationErrorCode } from './errors/configurationError';
 
@@ -43,12 +43,12 @@ export default class Cns extends NamingService {
       };
     }
     if (!source.network || !CnsSupportedNetwork.guard(source.network)) {
-      throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedNetwork, {
+      throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {
         method: NamingServiceName.CNS,
       });
     }
     this.network = Cns.NetworkNameMap[source.network];
-    this.url = source['url'];
+    this.url = source['url'] || Cns.UrlMap[this.network];
     this.provider = source['provider'] || new FetchProvider(this.name, this.url!);
     this.readerContract = new EthereumContract(
       proxyReaderAbi,
@@ -62,6 +62,10 @@ export default class Cns extends NamingService {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {domain});
     }
     return eip137Namehash(domain);
+  }
+
+  childhash(parentHash: string, label: string) {
+    return eip137Childhash(parentHash, label);
   }
 
   serviceName(): NamingServiceName {

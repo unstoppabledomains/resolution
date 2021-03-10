@@ -1,4 +1,4 @@
-import {eip137Namehash, znsNamehash} from '../utils/namehash';
+import { eip137Childhash, eip137Namehash, znsChildhash, znsNamehash } from '../utils/namehash';
 
 describe('Namehash', () => {
   describe('EIP-137', () => {
@@ -17,6 +17,24 @@ describe('Namehash', () => {
     it('should return namehash for .crypto domain zone', () => {
       const expectedNamehash = '0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f';
       const namehash = eip137Namehash('crypto');
+      expect(namehash).toEqual(expectedNamehash);
+    });
+
+    it('should return childhash for .crypto domain zone', () => {
+      const expectedNamehash = '0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f';
+      const childhash = eip137Childhash('0000000000000000000000000000000000000000000000000000000000000000', 'crypto');
+      expect(childhash).toEqual(expectedNamehash);
+    });
+
+    it('should return childhash', () => {
+      const expectedNamehash = '0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9';
+      const childhash = eip137Childhash('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f', 'brad');
+      expect(childhash).toEqual(expectedNamehash);
+    });
+
+    it('should return namehash for ENS domain', () => {
+      const expectedNamehash = '0x96a270260d2f9e37845776c17a47ae9b8b7e7e576b2365afd2e7f30f43e9bb49';
+      const namehash = eip137Namehash('beresnev.eth');
       expect(namehash).toEqual(expectedNamehash);
     });
   });
@@ -38,6 +56,18 @@ describe('Namehash', () => {
       const expectedNamehash = '0x9915d0456b878862e822e2361da37232f626a2e47505c8795134a95d36138ed3';
       const namehash = znsNamehash('zil');
       expect(namehash).toEqual(expectedNamehash);
+    });
+
+    it('should return childhash for .zil domain zone', () => {
+      const expectedNamehash = '0x9915d0456b878862e822e2361da37232f626a2e47505c8795134a95d36138ed3';
+      const childhash = znsChildhash('0000000000000000000000000000000000000000000000000000000000000000', 'zil');
+      expect(childhash).toEqual(expectedNamehash);
+    });
+
+    it('should return childhash', () => {
+      const expectedNamehash = '0x5fc604da00f502da70bfbc618088c0ce468ec9d18d05540935ae4118e8f50787';
+      const childhash = znsChildhash('0x9915d0456b878862e822e2361da37232f626a2e47505c8795134a95d36138ed3', 'brad');
+      expect(childhash).toEqual(expectedNamehash);
     });
   });
 });

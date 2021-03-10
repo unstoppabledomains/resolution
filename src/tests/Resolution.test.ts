@@ -708,4 +708,53 @@ describe('Resolution', () => {
       expectSpyToBeCalled([...eyes]);
     });
   });
+
+  describe('.namehash', () => {
+    it('brad.crypto', () => {
+      const expectedNamehash = '0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9';
+      const namehash = resolution.namehash('brad.crypto');
+      expect(namehash).toEqual(expectedNamehash);
+
+    });
+
+    it('brad.zil', () => {
+      const expectedNamehash = '0x5fc604da00f502da70bfbc618088c0ce468ec9d18d05540935ae4118e8f50787';
+      const namehash = resolution.namehash('brad.zil');
+      expect(namehash).toEqual(expectedNamehash);
+    });
+
+    it('brad.eth', () => {
+      const expectedNamehash = '0xe2cb672a04d6270338f15a428216ca714514dc01fdbdd76e97038a8d4080e01c';
+      const namehash = resolution.namehash('brad.eth');
+      expect(namehash).toEqual(expectedNamehash);
+    });
+
+    it('should throw error if domain is not supported', () => {
+      expect(() => resolution.namehash('google.com')).toThrowError('Domain google.com is not supported');
+    });
+  });
+
+  describe('.childhash', () => {
+    it('brad.crypto', () => {
+      const expectedNamehash = '0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9';
+      const namehash = resolution.childhash('0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f', 'brad', NamingServiceName.CNS);
+      expect(namehash).toEqual(expectedNamehash);
+    });
+
+    it('brad.zil', () => {
+      const expectedNamehash = '0x5fc604da00f502da70bfbc618088c0ce468ec9d18d05540935ae4118e8f50787';
+      const namehash = resolution.childhash('0x9915d0456b878862e822e2361da37232f626a2e47505c8795134a95d36138ed3', 'brad', NamingServiceName.ZNS);
+      expect(namehash).toEqual(expectedNamehash);
+    });
+
+    it('brad.eth', () => {
+      const expectedNamehash = '0x96a270260d2f9e37845776c17a47ae9b8b7e7e576b2365afd2e7f30f43e9bb49';
+      const namehash = resolution.childhash('0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae', 'beresnev', NamingServiceName.ENS);
+      expect(namehash).toEqual(expectedNamehash);
+    });
+
+    it('should throw error if service is not supported', () => {
+      expect(() => resolution.childhash('0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae', 'beresnev', 'COM' as NamingServiceName)).toThrowError('Naming service COM is not supported');
+    });
+  });
 });

@@ -12,12 +12,14 @@ type ResolutionErrorOptions = {
   domain?: string;
   currencyTicker?: string;
   recordName?: string;
+  namingService?: string;
 };
 
 export enum ResolutionErrorCode {
   UnregisteredDomain = 'UnregisteredDomain',
   UnspecifiedResolver = 'UnspecifiedResolver',
   UnsupportedDomain = 'UnsupportedDomain',
+  UnsupportedService = 'UnsupportedService',
   UnsupportedMethod = 'UnsupportedMethod',
   UnspecifiedCurrency = 'UnspecifiedCurrency',
   UnsupportedCurrency = 'UnsupportedCurrency',
@@ -59,6 +61,7 @@ const HandlersByCode = {
   [ResolutionErrorCode.ServiceProviderError]: (params: {
     providerMessage?: string;
   }) => `< ${params.providerMessage} >`,
+  [ResolutionErrorCode.UnsupportedService]: (params: {namingService: string}) => `Naming service ${params.namingService} is not supported`,
 };
 
 /**

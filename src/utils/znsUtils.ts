@@ -6,7 +6,7 @@
 
 import BN from 'bn.js';
 import { sha256 } from 'js-sha256';
-
+import {hexToBytes} from './index';
 
 const CHARSET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
 
@@ -195,15 +195,6 @@ function decode(bechString: string) {
   return { hrp, data: Buffer.from(data.slice(0, data.length - 6)) };
 }
 
-// Convert a hex string to a byte array
-function hexToBytes(hex) {
-  const bytes: number[] = [];
-  for (let c = 0; c < hex.length; c += 2) {
-    bytes.push(parseInt(hex.substr(c, 2), 16));
-  }
-  return bytes;
-}
-
 /**
  * toChecksumAddress
  *
@@ -245,7 +236,8 @@ export const toChecksumAddress = (address: string): string => {
  *
  * The expected format is zil1<address><checksum> where address and checksum
  * are the result of bech32 encoding a Buffer containing the address bytes.
- * @param {string} 20 byte canonical address
+ * @param {string} address 20 byte canonical address
+ * @param {boolean} testnet
  * @returns {string} 38 char bech32 encoded zilliqa address
  */
 export function toBech32Address(
@@ -274,6 +266,7 @@ export function toBech32Address(
 /**
  * fromBech32Address
  * @param {string} address - a valid Zilliqa bech32 address
+ * @param {boolean} testnet
  * @returns {string} a canonical 20-byte Ethereum-style address
  */
 export function fromBech32Address(
@@ -303,21 +296,4 @@ export function fromBech32Address(
 
 
   return toChecksumAddress(buf.toString('hex'));
-}
-/**
- * Parses object in format { "key.key2.key3" : value } into { key: { key2: {key3: value } } }
- * @param object object to parse
- * @param key string to split
- * @param value value to make it equal to
- */
-export function set<T>(object: T, key: string, value: any): T {
-  let current = object;
-  const tokens = key.split('.');
-  const last = tokens.pop()!;
-  tokens.forEach(token => {
-    current[token] = typeof current[token] == 'object' ? current[token] : {};
-    current = current[token];
-  });
-  current[last] = value;
-  return object;
 }
