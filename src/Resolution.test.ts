@@ -92,7 +92,7 @@ describe('Resolution', () => {
     it("should fail", async () => {
       await expectResolutionErrorCode(Resolution.autoNetwork({
         cns: {url: "https://google.com" }
-      }), ResolutionErrorCode.NetworkNotFound);
+      }), ResolutionErrorCode.NamingServiceDown);
     });
 
 

@@ -583,23 +583,11 @@ export default class Resolution {
       return undefined;
     }
     const provider = hasProvider(config) ? config.provider : new FetchProvider(type, config.url);
-    try {
-      const network = await provider.request({method: "net_version"}) as number;
-      return {
-        network: EthereumNamingService.NetworkIdMap[network],
-        provider
-      };
-    } catch(error) {
-      // We want to communicate that config.url is not responding instead of NamingServiceDown from our FetchProvider.
-      if (error instanceof ResolutionError && error.code === ResolutionErrorCode.NamingServiceDown) {
-        throw new ResolutionError(
-          ResolutionErrorCode.NetworkNotFound,
-          { providerMessage: `couldn't get answer from ${config['url']}` }
-        );
-      }
-      // Or pass any message from provider
-      throw new ResolutionError(ResolutionErrorCode.NetworkNotFound, {providerMessage: error.message})
-    }
+    const network = await provider.request({method: "net_version"}) as number;
+    return {
+      network: EthereumNamingService.NetworkIdMap[network],
+      provider
+    };
   }
 
   private async getPreferableNewRecord(domain: string, newRecord: string, oldRecord: string): Promise<string> {

@@ -23,7 +23,6 @@ export enum ResolutionErrorCode {
   NamingServiceDown = 'NamingServiceDown',
   UnsupportedCurrency = 'UnsupportedCurrency',
   IncorrectResolverInterface = 'IncorrectResolverInterface',
-  NetworkNotFound = "NetworkNotFound",
   RecordNotFound = 'RecordNotFound',
   ServiceProviderError = 'ServiceProviderError',
   InvalidTwitterVerification = 'InvalidTwitterVerification',
@@ -68,10 +67,7 @@ const HandlersByCode = {
   }) => `No ${params.recordName} record found for ${params.domain}`,
   [ResolutionErrorCode.ServiceProviderError]: (params: {
     providerMessage?: string;
-  }) => `< ${params.providerMessage} >`,
-  [ResolutionErrorCode.NetworkNotFound]: (params: {
-    providerMessage: string
-  }) => `JSON RPC net_version call failed with the following message: ${params.providerMessage}`
+  }) => `< ${params.providerMessage} >`
 };
 
 /**
