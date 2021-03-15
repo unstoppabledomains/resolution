@@ -100,7 +100,7 @@
     "@ethersproject/abi": "^5.0.1",
     "bip44-constants": "^8.0.5",
     "bn.js": "^4.4.0",
-    "commander": "^4.1.1",
+    "commander": "^7.1.0",
     "content-hash": "^2.5.2",
     "ethereum-ens-network-map": "^1.0.2",
     "js-sha256": "^0.9.0",
