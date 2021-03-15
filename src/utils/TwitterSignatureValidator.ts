@@ -1,9 +1,10 @@
 import { hexToBytes } from '.';
 import { keccak256 as sha3 } from 'js-sha3';
 import { recover } from './recoverSignature';
-import Cns from '../Cns';
 import standardKeys from './standardKeys';
 import BN from 'bn.js';
+
+const TwitterVerificationAddress = '0x12cfb13522F13a78b650a8bCbFCf50b7CB899d82';
 
 export const isValidTwitterSignature = ({
   tokenId,
@@ -26,7 +27,7 @@ export const isValidTwitterSignature = ({
     .map((value: string) => '0x' + sha3(value.startsWith('0x') ? hexToBytes(value) : value))
     .reduce((message, hashedValue) => message + hashedValue, '');
   const signerAddress = recover(message, validationSignature);
-  return signerAddress === Cns.TwitterVerificationAddress;
+  return signerAddress === TwitterVerificationAddress;
 };
 
 const fromHexStringToDecimals = (value: string): string => {

@@ -4,31 +4,27 @@ import Zns from './Zns';
 import Cns from './Cns';
 import UdApi from './UdApi';
 import {
-  Blockchain,
-  UnclaimedDomainResponse,
-  ResolutionResponse,
-  DefaultAPI,
-  API,
-  NamingServiceName,
-  Web3Version0Provider,
-  Web3Version1Provider,
-  Provider,
-  NamingServiceSource,
-  SourceDefinition,
+  Api,
+  CnsSupportedNetworks,
+  CryptoRecords,
+  DnsRecord,
+  DnsRecordType,
+  EnsSupportedNetworks,
+  EthersProvider,
   NamehashOptions,
   NamehashOptionsDefault,
-  DnsRecordType,
-  DnsRecord,
-  CryptoRecords,
-  TickerVersion,
-} from './publicTypes';
-import { nodeHash } from './types';
-import { EthersProvider } from './publicTypes';
+  NamingServiceName,
+  Provider,
+  ResolutionMethod,
+  SourceConfig,
+  Web3Version0Provider,
+  Web3Version1Provider,
+} from './types/publicTypes';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
-import NamingService from './NamingService';
-import { signedInfuraLink, isSupportedChainVersion } from './utils';
+import DnsUtils from './utils/DnsUtils';
+import { findNamingServiceName, signedInfuraLink } from './utils';
 import { Eip1993Factories } from './utils/Eip1993Factories';
-import DnsUtils from './DnsUtils';
+import { NamingService } from './NamingService';
 
 /**
  * Blockchain domain Resolution library - Resolution.
@@ -49,66 +45,38 @@ import DnsUtils from './DnsUtils';
  * ```
  */
 export default class Resolution {
-  /** @internal */
-  readonly blockchain: boolean;
-  /** @internal */
-  readonly ens?: Ens;
-  /** @internal */
-  readonly zns?: Zns;
-  /** @internal */
-  readonly cns?: Cns;
-  /** @internal */
-  readonly api?: UdApi;
-
+  /**
+   * @internal
+   */
+  readonly serviceMap: Record<NamingServiceName, NamingService>;
+  
   constructor({
-    blockchain = true,
-    api = DefaultAPI,
-  }: { blockchain?: Blockchain | boolean; api?: API } = {}) {
-    this.blockchain = !!blockchain;
-    if (blockchain) {
-      if (blockchain === true) {
-        blockchain = {};
-      }
-
-      const web3provider = blockchain.web3Provider;
-      if (web3provider) {
-        console.warn(
-          'Usage of `web3Provider` option is deprecated. Use `provider` option instead for each individual blockchain',
-        );
-      }
-
-      const ens = this.normalizeSource(blockchain.ens, web3provider);
-      const zns = this.normalizeSource(blockchain.zns);
-      const cns = this.normalizeSource(blockchain.cns, web3provider);
-
-      if (ens) {
-        this.ens = new Ens(ens);
-      }
-
-      if (zns) {
-        this.zns = new Zns(zns);
-      }
-
-      if (cns) {
-        this.cns = new Cns(cns);
-      }
-
-    } else {
-      this.api = new UdApi(api);
-    }
-
+    sourceConfig = undefined,
+  }: { sourceConfig?: SourceConfig } = {}) {
+    const cns = (isApi(sourceConfig?.cns) ? new UdApi(sourceConfig?.cns.url) : new Cns(sourceConfig?.cns));
+    const ens = (isApi(sourceConfig?.ens) ? new UdApi(sourceConfig?.ens.url) : new Ens(sourceConfig?.ens));
+    const zns = (isApi(sourceConfig?.zns) ? new UdApi(sourceConfig?.zns.url) : new Zns(sourceConfig?.zns));
+    this.serviceMap = {
+      [NamingServiceName.CNS]: cns,
+      [NamingServiceName.ENS]: ens,
+      [NamingServiceName.ZNS]: zns,
+    };
   }
 
   /**
    * Creates a resolution with configured infura id for ens and cns
-   * @param infura infura project id
-   * @param network ethereum network name
+   * @param infura - infura project id
+   * @param networks - an optional object that describes what network to use when connecting ENS or CNS default is mainnet
    */
-  static infura(infura: string, network = 'mainnet'): Resolution {
+  static infura(infura: string, networks?: { ens?: {
+      network: EnsSupportedNetworks 
+    }, cns?: {
+      network: CnsSupportedNetworks
+    }}): Resolution {
     return new this({
-      blockchain: {
-        ens: { url: signedInfuraLink(infura, network), network },
-        cns: { url: signedInfuraLink(infura, network), network },
+      sourceConfig: {
+        ens: { url: signedInfuraLink(infura, networks?.ens?.network), network: networks?.ens?.network || "mainnet" },
+        cns: { url: signedInfuraLink(infura, networks?.ens?.network), network: networks?.cns?.network || "mainnet" },
       },
     });
   }
@@ -116,34 +84,54 @@ export default class Resolution {
   /**
    * Creates a resolution instance with configured provider
    * @param provider - any provider compatible with EIP-1193
+   * @param networks - an optional object that describes what network to use when connecting ENS or CNS default is mainnet
    * @see https://eips.ethereum.org/EIPS/eip-1193
    */
-  static fromEip1193Provider(provider: Provider): Resolution {
+  static fromEip1193Provider(provider: Provider, networks?: { ens?: {
+    network: EnsSupportedNetworks 
+  }, cns?: {
+    network: CnsSupportedNetworks
+  }}): Resolution {
     return new this({
-      blockchain: { zns: true, ens: { provider }, cns: { provider } },
+      sourceConfig: {
+        ens: { provider, network: networks?.ens?.network || "mainnet" },
+        cns: { provider, network: networks?.cns?.network || "mainnet" },
+      },
     });
   }
 
   /**
    * Create a resolution instance from web3 0.x version provider
    * @param provider - an 0.x version provider from web3 ( must implement sendAsync(payload, callback) )
+   * @param networks - Ethereum network configuration
    * @see https://github.com/ethereum/web3.js/blob/0.20.7/lib/web3/httpprovider.js#L116
    */
-  static fromWeb3Version0Provider(provider: Web3Version0Provider): Resolution {
+  static fromWeb3Version0Provider(provider: Web3Version0Provider, networks?: { ens?: {
+    network: EnsSupportedNetworks 
+  }, cns?: {
+    network: CnsSupportedNetworks
+  }}): Resolution {
     return this.fromEip1193Provider(
       Eip1993Factories.fromWeb3Version0Provider(provider),
+      networks
     );
   }
 
   /**
    * Create a resolution instance from web3 1.x version provider
    * @param provider - an 1.x version provider from web3 ( must implement send(payload, callback) )
+   * @param networks - an optional object that describes what network to use when connecting ENS or CNS default is mainnet
    * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-core-helpers/types/index.d.ts#L165
    * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-providers-http/src/index.js#L95
    */
-  static fromWeb3Version1Provider(provider: Web3Version1Provider): Resolution {
+  static fromWeb3Version1Provider(provider: Web3Version1Provider, networks?: { ens?: {
+    network: EnsSupportedNetworks 
+  }, cns?: {
+    network: CnsSupportedNetworks
+  }}): Resolution {
     return this.fromEip1193Provider(
       Eip1993Factories.fromWeb3Version1Provider(provider),
+      networks
     );
   }
 
@@ -151,63 +139,28 @@ export default class Resolution {
    * Creates instance of resolution from provider that implements Ethers Provider#call interface.
    * This wrapper support only `eth_call` method for now, which is enough for all the current Resolution functionality
    * @param provider - provider object
+   * @param networks - an optional object that describes what network to use when connecting ENS or CNS default is mainnet
    * @see https://github.com/ethers-io/ethers.js/blob/v4-legacy/providers/abstract-provider.d.ts#L91
    * @see https://github.com/ethers-io/ethers.js/blob/v5.0.4/packages/abstract-provider/src.ts/index.ts#L224
    * @see https://docs.ethers.io/ethers.js/v5-beta/api-providers.html#jsonrpcprovider-inherits-from-provider
    * @see https://github.com/ethers-io/ethers.js/blob/master/packages/providers/src.ts/json-rpc-provider.ts
    */
-  static fromEthersProvider(provider: EthersProvider): Resolution {
+  static fromEthersProvider(provider: EthersProvider, networks?: { ens?: {
+    network: EnsSupportedNetworks 
+  }, cns?: {
+    network: CnsSupportedNetworks
+  }}): Resolution {
     return this.fromEip1193Provider(
       Eip1993Factories.fromEthersProvider(provider),
+      networks
     );
-  }
-
-  /**
-   * Resolves the given domain
-   * @async
-   * @param domain - domain name to be resolved
-   * @returns A promise that resolves in an object
-   */
-  async resolve(domain: string): Promise<ResolutionResponse> {
-    domain = this.prepareDomain(domain);
-    const method = this.getNamingMethodOrThrow(domain);
-    const result = await method.resolve(domain);
-    return result || UnclaimedDomainResponse;
   }
 
   /**
    * Resolves given domain name to a specific currency address if exists
    * @async
    * @param domain - domain name to be resolved
-   * @param currencyTicker - currency ticker like BTC, ETH, ZIL
-   * @deprecated since Resolution v1.7.0
-   * @returns A promise that resolves in an address or null
-   */
-  async address(
-    domain: string,
-    currencyTicker: string,
-  ): Promise<string | null> {
-    console.warn(
-      'Resolution#address is deprecated since v1.7.0, use Resolution#addr instead',
-    );
-    domain = this.prepareDomain(domain);
-    try {
-      return await this.addressOrThrow(domain, currencyTicker);
-    } catch (error) {
-      if (error instanceof ResolutionError) {
-        return null;
-      } else {
-        throw error;
-      }
-
-    }
-  }
-
-  /**
-   * Resolves given domain name to a specific currency address if exists
-   * @async
-   * @param domain - domain name to be resolved
-   * @param currencyTicker - currency ticker like BTC, ETH, ZIL
+   * @param ticker - currency ticker like BTC, ETH, ZIL
    * @throws [[ResolutionError]] if address is not found
    * @returns A promise that resolves in an address
    */
@@ -218,7 +171,7 @@ export default class Resolution {
     );
   }
 
-  /**
+  /** 
    * Read multi-chain currency address if exists
    * @async
    * @param domain - domain name to be resolved
@@ -226,42 +179,16 @@ export default class Resolution {
    * @param chain - chain version, usually means blockchain ( ERC20, BEP2, OMNI, etc. )
    * @throws [[ResolutionError]] if address is not found
    * @returns A promise that resolves in an adress
-   */
+  */
   async multiChainAddr(domain: string, ticker: string, chain: string): Promise<string> {
     domain = this.prepareDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
-    if (method.name === NamingServiceName.ENS) {
+    if (method.serviceName() === NamingServiceName.ENS) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod,
         { methodName: NamingServiceName.ENS, domain });
     }
 
     const recordKey = `crypto.${ticker.toUpperCase()}.version.${chain.toUpperCase()}.address`;
-    return await method.record(domain, recordKey);
-  }
-
-  /**
-   * Resolves given domain name to a specific USDT chain address if exists
-   * @deprecated 
-   * @async
-   * @param domain - domain name to be resolved
-   * @param version - chain version to look for such as ERC20, TRON, EOS, OMNI
-   * @throws [[ResolutionError]] when domain is not from ZNS or CNS or such address doesn't exist
-   * @returns A promise that resolves in an address
-   */
-  async usdt(domain: string, version: TickerVersion): Promise<string> {
-    domain = this.prepareDomain(domain);
-    const method = this.getNamingMethodOrThrow(domain);
-    if (method.name === NamingServiceName.ENS) {
-      throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, 
-        { methodName: NamingServiceName.ENS, domain });
-    }
-    
-    if (!isSupportedChainVersion(version)) {
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, 
-        { domain, recordName: `crypto.USDT.version.${version}.address` });
-    }
-
-    const recordKey = `crypto.USDT.version.${version}.address`;
     return await method.record(domain, recordKey);
   }
 
@@ -274,14 +201,6 @@ export default class Resolution {
    */
   async twitter(domain: string): Promise<string> {
     domain = this.prepareDomain(domain);
-    const namingService = this.serviceName(domain);
-    if (namingService !== 'CNS') {
-      throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
-        domain,
-        methodName: 'twitter',
-      });
-    }
-
     const method = this.getNamingMethodOrThrow(domain);
     return method.twitter(domain);
   }
@@ -313,7 +232,11 @@ export default class Resolution {
    */
   async ipfsHash(domain: string): Promise<string> {
     domain = this.prepareDomain(domain);
-    return await this.getPreferableNewRecord(domain, 'dweb.ipfs.hash', 'ipfs.html.value');
+    return await this.getPreferableNewRecord(
+      domain,
+      'dweb.ipfs.hash',
+      'ipfs.html.value',
+    );
   }
 
   /**
@@ -322,21 +245,11 @@ export default class Resolution {
    */
   async httpUrl(domain: string): Promise<string> {
     domain = this.prepareDomain(domain);
-    return await this.getPreferableNewRecord(domain, 'browser.redirect_url', 'ipfs.redirect_domain.value');
-  }
-
-  /**
-   * Resolves the ipfs redirect url for a supported domain records
-   * @deprecated since v1.0.15 use Resolution#httpUrl instead
-   * @param domain - domain name
-   * @throws [[ResolutionError]]
-   * @returns A Promise that resolves in redirect url
-   */
-  async ipfsRedirect(domain: string): Promise<string> {
-    console.warn(
-      'Resolution#ipfsRedirect is deprecated since v1.0.15, use Resolution#httpUrl instead',
+    return await this.getPreferableNewRecord(
+      domain,
+      'browser.redirect_url',
+      'ipfs.redirect_domain.value',
     );
-    return await this.record(domain, 'ipfs.redirect_domain.value');
   }
 
   /**
@@ -350,47 +263,6 @@ export default class Resolution {
   }
 
   /**
-   * @returns A specific currency address or throws an error
-   * @param domain domain name
-   * @param currencyTicker currency ticker such as
-   *  - ZIL
-   *  - BTC
-   *  - ETH
-   * @throws [[ResolutionError]] if address is not found
-   * @deprecated since v1.7.0 use Resolution#addr instead
-   */
-  async addressOrThrow(
-    domain: string,
-    currencyTicker: string,
-  ): Promise<string> {
-    console.warn(
-      'Resolution#addressOrThrow is deprecated since v1.7.0, use Resolution#addr instead',
-    );
-    domain = this.prepareDomain(domain);
-    const method = this.getNamingMethodOrThrow(domain);
-    try {
-      const addr = await method.record(
-        domain,
-        `crypto.${currencyTicker.toUpperCase()}.address`,
-      );
-      return addr;
-    } catch (error) {
-      // re-throw an error for back compatability. old method throws deprecated UnspecifiedCurrency code since before v1.7.0
-      if (
-        error instanceof ResolutionError &&
-        error.code === ResolutionErrorCode.RecordNotFound
-      ) {
-        throw new ResolutionError(ResolutionErrorCode.UnspecifiedCurrency, {
-          domain,
-          currencyTicker,
-        });
-      }
-
-      throw error;
-    }
-  }
-
-  /**
    * @returns the resolver address for a specific domain
    * @param domain - domain to look for
    */
@@ -398,7 +270,9 @@ export default class Resolution {
     domain = this.prepareDomain(domain);
     const resolver = await this.getNamingMethodOrThrow(domain).resolver(domain);
     if (!resolver) {
-      throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {domain});
+      throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
+        domain,
+      });
     }
     return resolver;
   }
@@ -446,10 +320,10 @@ export default class Resolution {
     address: string,
     currencyTicker: string,
   ): Promise<string | null> {
-    return (this.findNamingService(NamingServiceName.ENS) as Ens).reverse(
+    return (this.serviceMap[NamingServiceName.ENS].reverse(
       address,
       currencyTicker,
-    );
+    ));
   }
 
   /**
@@ -459,25 +333,35 @@ export default class Resolution {
    * @param options formatting options
    * @throws [[ResolutionError]] with UnsupportedDomain error code if domain extension is unknown
    */
-  namehash(domain: string, options: NamehashOptions = NamehashOptionsDefault): string {
+  namehash(
+    domain: string,
+    options: NamehashOptions = NamehashOptionsDefault,
+  ): string {
     domain = this.prepareDomain(domain);
-    return this.formatNamehash(this.getNamingMethodOrThrow(domain).namehash(domain), options);
+    return this.formatNamehash(
+      this.getNamingMethodOrThrow(domain).namehash(domain),
+      options,
+    );
   }
 
   /**
    * @returns a namehash of a subdomain with name label
    * @param parent namehash of a parent domain
    * @param label subdomain name
-   * @param method "ENS", "CNS" or "ZNS"
+   * @param namingService "ENS", "CNS" or "ZNS"
    * @param options formatting options
    */
   childhash(
-    parent: nodeHash,
+    parent: string,
     label: string,
-    method: NamingServiceName,
+    namingService: NamingServiceName,
     options: NamehashOptions = NamehashOptionsDefault,
-  ): nodeHash {
-    return this.formatNamehash(this.findNamingService(method).childhash(parent, label), options);
+  ): string {
+    const service = this.serviceMap[namingService];
+    if (!service) {
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedService, {namingService});
+    }
+    return this.formatNamehash(service.childhash(parent, label), options);
   }
 
   private formatNamehash(hash, options: NamehashOptions) {
@@ -487,7 +371,6 @@ export default class Resolution {
     } else {
       return options.prefix ? '0x' + hash : hash;
     }
-
   }
 
   /**
@@ -508,26 +391,16 @@ export default class Resolution {
    */
   isSupportedDomain(domain: string): boolean {
     domain = this.prepareDomain(domain);
-    return !!this.getNamingMethod(domain);
-  }
-
-  /**
-   * Checks if the domain is supported by the specified network as well as if it is in valid format
-   * @param domain - domain name to be checked
-   */
-  isSupportedDomainInNetwork(domain: string): boolean {
-    domain = this.prepareDomain(domain);
-    const method = this.getNamingMethod(domain);
-    return !!method && method.isSupportedNetwork();
+    return !!this.getNamingMethod(domain)?.isSupportedDomain(domain);
   }
 
   /**
    * Returns the name of the service for a domain ENS | CNS | ZNS
    * @param domain - domain name to look for
    */
-  serviceName(domain: string): NamingServiceName {
+  serviceName(domain: string): ResolutionMethod {
     domain = this.prepareDomain(domain);
-    return this.getNamingMethodOrThrow(domain).serviceName(domain);
+    return this.getNamingMethodOrThrow(domain).serviceName();
   }
 
   /**
@@ -552,29 +425,33 @@ export default class Resolution {
 
   private getDnsRecordKeys(types: DnsRecordType[]): string[] {
     const records = ['dns.ttl'];
-    types.forEach(type => {
+    types.forEach((type) => {
       records.push(`dns.${type}`);
       records.push(`dns.${type}.ttl`);
     });
     return records;
   }
 
-  private async getPreferableNewRecord(domain: string, newRecord: string, oldRecord: string): Promise<string> {
-    const records = await this.records(domain, [newRecord, oldRecord]) as Record<string, string>;
-    return NamingService.ensureRecordPresence(domain, newRecord, records[newRecord] || records[oldRecord]);
+  private async getPreferableNewRecord(
+    domain: string,
+    newRecord: string,
+    oldRecord: string,
+  ): Promise<string> {
+    const records = (await this.records(domain, [
+      newRecord,
+      oldRecord,
+    ]));
+    if (!records[newRecord] && !records[oldRecord]) {
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+        recordName: newRecord,
+        domain: domain,
+      });
+    }
+    return (records[newRecord] || records[oldRecord]);
   }
 
   private getNamingMethod(domain: string): NamingService | undefined {
-    return this.getResolutionMethods().find(method =>
-      method.isSupportedDomain(domain),
-    );
-  }
-
-  private getResolutionMethods(): NamingService[] {
-    return (this.blockchain
-      ? ([this.ens, this.zns, this.cns] as NamingService[])
-      : ([this.api] as NamingService[])
-    ).filter(v => v);
+    return this.serviceMap[findNamingServiceName(domain)];
   }
 
   private getNamingMethodOrThrow(domain: string): NamingService {
@@ -588,41 +465,13 @@ export default class Resolution {
     return method;
   }
 
-  private findNamingService(name: NamingServiceName): NamingService {
-    const service = this.getResolutionMethods().find(m => m.name === name);
-    if (!service) {
-      throw new ResolutionError(ResolutionErrorCode.NamingServiceDown, {
-        method: name,
-      });
-    }
-
-    return service;
-  }
-
   private prepareDomain(domain: string): string {
     return domain ? domain.trim().toLowerCase() : '';
-  }
-
-  private normalizeSource(
-    source: NamingServiceSource | undefined,
-    provider?: Provider,
-  ): SourceDefinition | false {
-    switch (typeof source) {
-    case 'undefined': {
-      return { provider };
-    }
-    case 'boolean': {
-      return source ? { provider } : false;
-    }
-    case 'string': {
-      return { url: source };
-    }
-    case 'object': {
-      return { provider, ...source };
-    }
-    }
-    throw new Error('Unsupported configuration');
   }
 }
 
 export { Resolution };
+
+function isApi(obj: any): obj is Api {
+  return obj && obj.api;
+}

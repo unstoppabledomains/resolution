@@ -1,4 +1,4 @@
-import { ResolutionMethod } from '../publicTypes';
+import { ResolutionMethod } from '../types/publicTypes';
 /**
  * Alias for Resolution error handler function
  * @internal
@@ -12,15 +12,16 @@ type ResolutionErrorOptions = {
   domain?: string;
   currencyTicker?: string;
   recordName?: string;
+  namingService?: string;
 };
 
 export enum ResolutionErrorCode {
   UnregisteredDomain = 'UnregisteredDomain',
   UnspecifiedResolver = 'UnspecifiedResolver',
   UnsupportedDomain = 'UnsupportedDomain',
+  UnsupportedService = 'UnsupportedService',
   UnsupportedMethod = 'UnsupportedMethod',
   UnspecifiedCurrency = 'UnspecifiedCurrency',
-  NamingServiceDown = 'NamingServiceDown',
   UnsupportedCurrency = 'UnsupportedCurrency',
   IncorrectResolverInterface = 'IncorrectResolverInterface',
   RecordNotFound = 'RecordNotFound',
@@ -43,14 +44,6 @@ const HandlersByCode = {
     methodName: string;
     domain: string;
   }) => `Method ${params.methodName} is not supported for ${params.domain}`,
-  [ResolutionErrorCode.UnspecifiedCurrency]: (params: {
-    domain: string;
-    currencyTicker: string;
-  }) =>
-    `Domain ${params.domain} has no ${params.currencyTicker} attached to it`,
-  [ResolutionErrorCode.NamingServiceDown]: (params: {
-    method: ResolutionMethod;
-  }) => `${params.method} naming service is down at the moment`,
 
   [ResolutionErrorCode.InvalidTwitterVerification]: (params: {
     domain?: string;
@@ -68,13 +61,13 @@ const HandlersByCode = {
   [ResolutionErrorCode.ServiceProviderError]: (params: {
     providerMessage?: string;
   }) => `< ${params.providerMessage} >`,
+  [ResolutionErrorCode.UnsupportedService]: (params: {namingService: string}) => `Naming service ${params.namingService} is not supported`,
 };
 
 /**
  * Resolution Error class is designed to control every error being thrown by Resolution
  * @param code - Error Code
  * - UnsupportedDomain - domain is not supported by current Resolution instance
- * - NamingServiceDown - blockchain API is down
  * - UnregisteredDomain - domain is not owned by any address
  * - UnspecifiedResolver - domain has no resolver specified
  * - UnspecifiedCurrency - domain resolver doesn't have any address of specified currency
@@ -93,10 +86,7 @@ export class ResolutionError extends Error {
   constructor(code: ResolutionErrorCode, options: ResolutionErrorOptions = {}) {
     const resolutionErrorHandler: ResolutionErrorHandler = HandlersByCode[code];
     const { domain, method, currencyTicker } = options;
-    let message = resolutionErrorHandler(options);
-    if (code === ResolutionErrorCode.UnspecifiedCurrency) {
-      message += `\nResolutionErrorCode ${code} is deprecated and will be removed in the future. Use RecordNotFound code instead.`;
-    }
+    const message = resolutionErrorHandler(options);
 
     super(message);
     this.code = code;

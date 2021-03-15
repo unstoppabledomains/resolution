@@ -1,7 +1,7 @@
 import nodeFetch, {Response as FetchResponse} from 'node-fetch';
 
-export default abstract class BaseConnection {
-  protected isNode(): boolean {
+export default class Networking {
+  static isNode(): boolean {
     if (typeof process === 'object') {
       // eslint-disable-next-line no-undef
       if (typeof process.versions === 'object') {
@@ -15,11 +15,11 @@ export default abstract class BaseConnection {
     return false;
   }
 
-  protected getEnv(): "NODE" | "BROWSER" {
+  static getEnv(): "NODE" | "BROWSER" {
     return this.isNode() ? "NODE" : "BROWSER";
   }
 
-  protected async fetch(url: string, options: {body?: string, headers?: Record<string, string>, method?: string}): Promise<FetchResponse | Response> {
+  static async fetch(url: string, options: {body?: string, headers?: Record<string, string>, method?: string}): Promise<FetchResponse | Response> {
     return this.isNode() ? nodeFetch(url, options) : window.fetch(url, options);
   }
 }

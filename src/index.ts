@@ -1,6 +1,6 @@
 export { Resolution, Resolution as default } from './Resolution';
-export * from './publicTypes';
-export { default as DnsUtils } from './DnsUtils';
+export * from './types/publicTypes';
+export { default as DnsUtils } from './utils/DnsUtils';
 export { ResolutionError, ResolutionErrorCode } from './errors/resolutionError';
 export {
   ConfigurationError,

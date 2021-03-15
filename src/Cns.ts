@@ -1,67 +1,111 @@
-import { EthereumNamingService } from './EthereumNamingService';
-import { BlockhanNetworkUrlMap, ProxyReaderMap } from './types';
-import { default as proxyReaderAbi } from './cns/contract/proxyReader';
-import { default as resolverInterface } from './cns/contract/resolver';
+import { BlockhanNetworkUrlMap, CnsSupportedNetwork, ProxyReaderMap } from './types';
+import { default as proxyReaderAbi } from './contracts/cns/proxyReader';
+import { default as resolverInterface } from './contracts/cns/resolver';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
-import Contract from './utils/contract';
+import EthereumContract from './contracts/EthereumContract';
 import standardKeys from './utils/standardKeys';
-import { getStartingBlock, isLegacyResolver, isNullAddress } from './utils';
-import {
-  SourceDefinition,
-  NamingServiceName,
-  ResolutionResponse,
-  CryptoRecords,
-  DomainData,
-} from './publicTypes';
+import { constructRecords, isNullAddress } from './utils';
+import { CnsSource, CryptoRecords, DomainData, NamingServiceName, Provider } from './types/publicTypes';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 import NetworkConfig from './config/network-config.json';
+import FetchProvider from './FetchProvider';
+import { eip137Childhash, eip137Namehash } from './utils/namehash';
+import { NamingService } from './NamingService';
+import ConfigurationError, { ConfigurationErrorCode } from './errors/configurationError';
 
-export default class Cns extends EthereumNamingService {
-  static TwitterVerificationAddress = '0x12cfb13522F13a78b650a8bCbFCf50b7CB899d82';
-  static ProxyReaderMap: ProxyReaderMap = getProxyReaderMap();
+/**
+ * @internal
+ */
+export default class Cns extends NamingService {
+  static readonly ProxyReaderMap: ProxyReaderMap = getProxyReaderMap();
 
-  constructor(source: SourceDefinition = {}) {
-    super(source, NamingServiceName.CNS);
+  static readonly UrlMap: BlockhanNetworkUrlMap = {
+    1: 'https://mainnet.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+    4: 'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+  };
+  static readonly NetworkNameMap = {
+    mainnet: 1,
+    rinkeby: 4
+  };
+
+  readonly name: NamingServiceName = NamingServiceName.CNS;
+  readonly network: number;
+  readonly url: string | undefined;
+  readonly provider: Provider;
+  readonly readerContract: EthereumContract;
+
+  constructor(source?: CnsSource) {
+    super();
+    if (!source) {
+      source = {
+        url: Cns.UrlMap[1],
+        network: "mainnet",
+      };
+    }
+    if (!source.network || !CnsSupportedNetwork.guard(source.network)) {
+      throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {
+        method: NamingServiceName.CNS,
+      });
+    }
+    this.network = Cns.NetworkNameMap[source.network];
+    this.url = source['url'] || Cns.UrlMap[this.network];
+    this.provider = source['provider'] || new FetchProvider(this.name, this.url!);
+    this.readerContract = new EthereumContract(
+      proxyReaderAbi,
+      source['proxyReaderAddress'] || Cns.ProxyReaderMap[this.network],
+      this.provider
+    );
   }
 
-  protected readerAbi(): any {
-    return proxyReaderAbi;
+  namehash(domain: string): string {
+    if (!this.isSupportedDomain(domain)) {
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {domain});
+    }
+    return eip137Namehash(domain);
   }
 
-  protected defaultRegistry(network: number): string | undefined {
-    return Cns.ProxyReaderMap[network];
+  childhash(parentHash: string, label: string) {
+    return eip137Childhash(parentHash, label);
   }
 
-  protected urlMap(): BlockhanNetworkUrlMap {
-    return {
-      1: 'https://mainnet.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
-      4: 'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
-    };
+  serviceName(): NamingServiceName {
+    return this.name;
   }
 
   isSupportedDomain(domain: string): boolean {
     return (
       domain === 'crypto' ||
-      (domain.indexOf('.') > 0 &&
-        /^.{1,}\.(crypto)$/.test(domain) &&
-        domain.split('.').every(v => !!v.length))
+          (/^.+\.(crypto)$/.test(domain) && // at least one character plus .crypto ending
+            domain.split('.').every(v => !!v.length))
     );
-  }
-
-  async resolver(domain: string): Promise<string> {
-    return (await this.getVerifiedData(domain)).resolver;
   }
 
   async owner(domain: string): Promise<string> {
     return (await this.getVerifiedData(domain)).owner;
   }
 
+  async resolver(domain: string): Promise<string> {
+    return (await this.getVerifiedData(domain)).resolver;
+  }
+
+  async record(domain: string, key: string): Promise<string> {
+    const returnee = (await this.records(domain, [key]))[key];
+    if (!returnee) {
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {recordName: key, domain});
+    }
+    return returnee
+  }
+
+  async records(domain: string, keys: string[]): Promise<Record<string, string>> {
+    return (await this.getVerifiedData(domain, keys)).records;
+  }
+
   async allRecords(domain: string): Promise<CryptoRecords> {
     const tokenId = this.namehash(domain);
     const resolver = await this.resolver(domain);
 
-    const resolverContract = this.buildContract(resolverInterface, resolver);
-    if (isLegacyResolver(resolver)) {
+    const resolverContract = new EthereumContract(resolverInterface, resolver, this.provider);
+    if (this.isLegacyResolver(resolver)) {
       return await this.getStandardRecords(tokenId);
     }
 
@@ -106,12 +150,10 @@ export default class Cns extends EthereumNamingService {
     return twitterHandle;
   }
 
-  async records(domain: string, keys: string[]): Promise<CryptoRecords> {
-    return (await this.getVerifiedData(domain, keys)).records;
-  }
-
-  async resolve(_: string): Promise<ResolutionResponse> {
-    throw new Error('This method is unsupported for CNS');
+  async reverse(address: string, currencyTicker: string): Promise<string | null> {
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+      methodName: 'reverse',
+    });
   }
 
   private async getVerifiedData(domain: string, keys?: string[]): Promise<DomainData> {
@@ -132,10 +174,10 @@ export default class Cns extends EthereumNamingService {
   }
 
   private async getAllRecords(
-    resolverContract: Contract,
+    resolverContract: EthereumContract,
     tokenId: string,
   ): Promise<CryptoRecords> {
-    const startingBlock = await getStartingBlock(resolverContract, tokenId);
+    const startingBlock = await this.getStartingBlock(resolverContract, tokenId);
     const logs = await resolverContract.fetchLogs(
       'NewKey',
       tokenId,
@@ -155,7 +197,7 @@ export default class Cns extends EthereumNamingService {
 
   private async getManyByHash(tokenId: string, hashes: string[]): Promise<CryptoRecords> {
     const [keys, values] = await this.readerContract.call('getManyByHash', [hashes, tokenId]) as [string[], string[]];
-    return this.constructRecords(keys, values);
+    return constructRecords(keys, values);
   }
 
   private async get(tokenId: string, keys: string[] = []): Promise<DomainData> {
@@ -163,7 +205,46 @@ export default class Cns extends EthereumNamingService {
       keys,
       tokenId,
     ]);
-    return {owner, resolver, records: this.constructRecords(keys, values)}
+    return {owner, resolver, records: constructRecords(keys, values)}
+  }
+
+  private isLegacyResolver(resolverAddress: string): boolean {
+    if (this.isWellKnownLegacyResolver(resolverAddress)) {
+      return true;
+    }
+    if (this.isUpToDateResolver(resolverAddress)) {
+      return false;
+    }
+    return false;
+  }
+
+  private isWellKnownLegacyResolver(resolverAddress: string): boolean {
+    const legacyAddresses = NetworkConfig?.networks[this.network]?.contracts?.Resolver?.legacyAddresses;
+    if (!legacyAddresses || legacyAddresses.length === 0) {
+      return false;
+    }
+    return legacyAddresses.findIndex((address) => {return address.toLowerCase() === resolverAddress.toLowerCase()}) > -1;
+  }
+
+  private isUpToDateResolver(resolverAddress: string): boolean {
+    const address = NetworkConfig?.networks[this.network]?.contracts?.Resolver?.address;
+    if (!address) {
+      return false;
+    }
+    return address.toLowerCase() === resolverAddress.toLowerCase();
+  }
+
+  private async getStartingBlock(
+    contract: EthereumContract,
+    tokenId: string,
+  ): Promise<string> {
+    const CRYPTO_RESOLVER_ADVANCED_EVENTS_STARTING_BLOCK = '0x960844';
+    const logs = await contract.fetchLogs('ResetRecords', tokenId);
+    const lastResetEvent = logs[logs.length - 1];
+    return (
+      lastResetEvent?.blockNumber ||
+      CRYPTO_RESOLVER_ADVANCED_EVENTS_STARTING_BLOCK
+    );
   }
 }
 

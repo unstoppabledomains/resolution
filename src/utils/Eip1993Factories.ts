@@ -12,7 +12,7 @@ import {
   Web3Version1Provider,
   JsonRpcResponse,
   EthersProvider,
-} from '../publicTypes';
+} from '../types/publicTypes';
 
 export const Eip1993Factories = {
   fromWeb3Version0Provider,

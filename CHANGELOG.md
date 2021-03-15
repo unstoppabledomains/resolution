@@ -1,3 +1,14 @@
+## 2.0.0
+* Remove deprecated methods
+  - Resolution#address
+  - Resolution#ipfsRedirect
+  - Resolution#addressOrThrow
+  - ResolutionErrorCode.UnspecifiedCurrency
+* Simplify constructor
+  - remove type Blockchain
+  - remove type API
+  - Introduced single config type SourceConfig
+    
 ## 1.20.0
 * Introduced Resolution#multiChainAddr(domain: string, ticker: string, chain: string) - More general method to fetch multi chain records.
 * Deprecated Resolution#usdt method in favor of multiChainAddr
