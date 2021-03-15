@@ -96,7 +96,7 @@
   "dependencies": {
     "@ensdomains/address-encoder": "0.2.6",
     "@ethersproject/abi": "^5.0.1",
-    "bip44-constants": "^8.0.5",
+    "bip44-constants": "^13.0.0",
     "bn.js": "^4.4.0",
     "commander": "^4.1.1",
     "content-hash": "^2.5.2",
