@@ -48,3 +48,17 @@ export const domainExtensionToNamingServiceName = {
 export const findNamingServiceName = (domain: string): NamingServiceName => {
   return domainExtensionToNamingServiceName[domain.split('.').pop() || ''] || '';
 }
+
+export const EthereumNetworks = {
+  "mainnet": 1,
+  "ropsten": 3,
+  "rinkeby": 4,
+  "goerli": 5,
+} as const;
+
+export const EthereumNetworksInverted = {
+  1: "mainnet",
+  3: "ropsten",
+  4: "rinkeby",
+  5: "goerli",
+} as const;

@@ -5,6 +5,7 @@ import Cns from './Cns';
 import UdApi from './UdApi';
 import {
   Api,
+  AutoNetworkConfigs,
   CnsSupportedNetworks,
   CryptoRecords,
   DnsRecord,
@@ -70,9 +71,9 @@ export default class Resolution {
    * @returns configured Resolution object
    */
   static async autoNetwork(sourceConfig: AutoNetworkConfigs): Promise<Resolution> {
-    return new this({blockchain: {
-      cns: await this.getNetwork(NamingServiceName.CNS, sourceConfig.cns),
-      ens: await this.getNetwork(NamingServiceName.ENS, sourceConfig.ens)
+    return new this({sourceConfig: {
+      cns: await Cns.getNetworkConfigs(sourceConfig.cns),
+      ens: await Ens.getNetworkConfigs(sourceConfig.ens)
     }});
   }
 
@@ -443,21 +444,6 @@ export default class Resolution {
       records.push(`dns.${type}.ttl`);
     });
     return records;
-  }
-
-  private static async getNetwork(
-    type: NamingServiceName.CNS | NamingServiceName.ENS,
-    config?: {url: string} | {provider: Provider}
-  ): Promise<{network: string, provider: Provider} | undefined> {
-    if (!config) {
-      return undefined;
-    }
-    const provider = hasProvider(config) ? config.provider : new FetchProvider(type, config.url);
-    const network = await provider.request({method: "net_version"}) as number;
-    return {
-      network: EthereumNamingService.NetworkIdMap[network],
-      provider
-    };
   }
 
   private async getPreferableNewRecord(

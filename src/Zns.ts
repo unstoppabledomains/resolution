@@ -106,7 +106,7 @@ export default class Zns extends NamingService {
     return znsNamehash(domain);
   }
 
-  childhash(parentHash: string, label: string) {
+  childhash(parentHash: string, label: string): string {
     return znsChildhash(parentHash, label);
   }
 

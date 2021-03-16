@@ -4,14 +4,15 @@ import { default as resolverInterface } from './contracts/cns/resolver';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import EthereumContract from './contracts/EthereumContract';
 import standardKeys from './utils/standardKeys';
-import { constructRecords, isNullAddress } from './utils';
-import { CnsSource, CryptoRecords, DomainData, NamingServiceName, Provider } from './types/publicTypes';
+import { constructRecords, isNullAddress, EthereumNetworksInverted, EthereumNetworks } from './utils';
+import { CnsSource, CnsSupportedNetworks, CryptoRecords, DomainData, hasProvider, NamingServiceName, Provider } from './types/publicTypes';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 import NetworkConfig from './config/network-config.json';
 import FetchProvider from './FetchProvider';
 import { eip137Childhash, eip137Namehash } from './utils/namehash';
 import { NamingService } from './NamingService';
 import ConfigurationError, { ConfigurationErrorCode } from './errors/configurationError';
+import { FetchError } from 'node-fetch';
 
 /**
  * @internal
@@ -22,10 +23,6 @@ export default class Cns extends NamingService {
   static readonly UrlMap: BlockhanNetworkUrlMap = {
     1: 'https://mainnet.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
     4: 'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
-  };
-  static readonly NetworkNameMap = {
-    mainnet: 1,
-    rinkeby: 4
   };
 
   readonly name: NamingServiceName = NamingServiceName.CNS;
@@ -47,7 +44,7 @@ export default class Cns extends NamingService {
         method: NamingServiceName.CNS,
       });
     }
-    this.network = Cns.NetworkNameMap[source.network];
+    this.network = EthereumNetworks[source.network];
     this.url = source['url'] || Cns.UrlMap[this.network];
     this.provider = source['provider'] || new FetchProvider(this.name, this.url!);
     this.readerContract = new EthereumContract(
@@ -57,6 +54,29 @@ export default class Cns extends NamingService {
     );
   }
 
+  static async getNetworkConfigs(config?: { url: string } | { provider: Provider } ): Promise<{ network: CnsSupportedNetworks, provider: Provider } | undefined> {
+    if (!config) {
+      return undefined;
+    }
+    try {
+      const provider = hasProvider(config) ? config.provider : new FetchProvider(NamingServiceName.CNS, config.url);
+      const networkId = await provider.request({method: "net_version"}) as number;
+      const networkName = EthereumNetworksInverted[networkId];
+      if (!networkName || !CnsSupportedNetwork.guard(networkName)) {
+        throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {method: NamingServiceName.CNS});
+      }
+      return {
+        network: networkName,
+        provider
+      }
+    } catch(error) {
+      if (error instanceof FetchError) {
+        throw new ConfigurationError(ConfigurationErrorCode.IncorrectBlockchainProvider, {method: NamingServiceName.CNS});
+      }
+      throw error;
+    }
+  }
+
   namehash(domain: string): string {
     if (!this.isSupportedDomain(domain)) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {domain});
@@ -64,7 +84,7 @@ export default class Cns extends NamingService {
     return eip137Namehash(domain);
   }
 
-  childhash(parentHash: string, label: string) {
+  childhash(parentHash: string, label: string): string {
     return eip137Childhash(parentHash, label);
   }
 

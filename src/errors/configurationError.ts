@@ -13,6 +13,7 @@ type ConfigurationErrorOptions = {
 export enum ConfigurationErrorCode {
   IncorrectProvider = 'IncorrectProvider',
   UnsupportedNetwork = 'UnsupportedNetwork',
+  IncorrectBlockchainProvider = 'IncorrectBlockchainProvider',
   UnspecifiedUrl = 'UnspecifiedUrl',
   MissingProviderConfigurations = 'MissingProviderConfigurations',
   DependencyMissing = 'DependencyMissing'
@@ -31,10 +32,14 @@ const HandlersByCode = {
   [ConfigurationErrorCode.UnspecifiedUrl]: (params: {
     method: ResolutionMethod;
   }) => `Unspecified url in Resolution ${params.method} configuration`,
-  [ConfigurationErrorCode.MissingProviderConfigurations]: () =>
-    `Couldn't find any configurations\n\tUse -C to configurate the library`,
-  [ConfigurationErrorCode.DependencyMissing]: (params: {dependecy: string, version: string}) => 
-    `Missing dependency for this functionality. Please install ${params.dependecy} @ ${params.version} via npm or yarn`
+  [ConfigurationErrorCode.MissingProviderConfigurations]: 
+  () => `Couldn't find any configurations\n\tUse -C to configurate the library`,
+  [ConfigurationErrorCode.DependencyMissing]: (params: {
+    dependecy: string, version: string
+  }) => `Missing dependency for this functionality. Please install ${params.dependecy} @ ${params.version} via npm or yarn`,
+  [ConfigurationErrorCode.IncorrectBlockchainProvider]: (params: {
+    method?: ResolutionMethod
+  }) => `Blockchain provider for ${params.method} couldn't answer to net_version call`
 };
 
 /**
