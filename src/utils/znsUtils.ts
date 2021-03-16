@@ -4,9 +4,9 @@
  */
 
 
-import hashjs from 'hash.js';
 import BN from 'bn.js';
-
+import { sha256 } from 'js-sha256';
+import {hexToBytes} from './index';
 
 const CHARSET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
 
@@ -209,10 +209,7 @@ export const toChecksumAddress = (address: string): string => {
 
 
   address = address.toLowerCase().replace('0x', '');
-  const hash = hashjs
-    .sha256()
-    .update(address, 'hex')
-    .digest('hex');
+  const hash = sha256(hexToBytes(address));
   const v = new BN((hash as unknown) as string, 'hex', 'be');
   let ret = '0x';
 
@@ -239,7 +236,8 @@ export const toChecksumAddress = (address: string): string => {
  *
  * The expected format is zil1<address><checksum> where address and checksum
  * are the result of bech32 encoding a Buffer containing the address bytes.
- * @param {string} 20 byte canonical address
+ * @param {string} address 20 byte canonical address
+ * @param {boolean} testnet
  * @returns {string} 38 char bech32 encoded zilliqa address
  */
 export function toBech32Address(
@@ -268,6 +266,7 @@ export function toBech32Address(
 /**
  * fromBech32Address
  * @param {string} address - a valid Zilliqa bech32 address
+ * @param {boolean} testnet
  * @returns {string} a canonical 20-byte Ethereum-style address
  */
 export function fromBech32Address(

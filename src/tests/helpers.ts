@@ -1,11 +1,11 @@
 import nock from 'nock';
 import _ from 'lodash';
 import { Dictionary } from '../types';
-import mockData from './mockData.json';
+import mockData from './testData/mockData.json';
 import ResolutionError, { ResolutionErrorCode } from '../errors/resolutionError';
 import ConfigurationError, { ConfigurationErrorCode } from '../errors/configurationError';
 import DnsRecordsError, { DnsRecordsErrorCode } from '../errors/dnsRecordsError';
-import { NamingServiceName } from '../publicTypes';
+import { NamingServiceName } from '../types/publicTypes';
 
 export const MainnetUrl = 'https://mainnet.infura.io';
 export const ZilliqaUrl = 'https://api.zilliqa.com';

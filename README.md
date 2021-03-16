@@ -235,10 +235,12 @@ or **Linux shell**).
    yarn install
    ```
 
-### Internal network config
+### Internal config
 
-Internal [network config](./src/config/network-config.json) can be updated by
-running `yarn network-config:pull` task and committing updated file.
+#### To update:
+- Network config: `$ yarn network-config:pull`
+- Supported keys: `$ yarn supported-keys:pull`
+- Both configs: `$ yarn config:pull`
 
 ## Free advertising for integrated apps
 

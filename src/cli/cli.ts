@@ -6,7 +6,6 @@ import {
   commaSeparatedList,
   tryInfo,
 } from './cli-helpers.js';
-import { TickerVersion } from '../publicTypes';
 
 (async () => {
   program
@@ -87,7 +86,7 @@ import { TickerVersion } from '../publicTypes';
       )
       return records;
     }, response, 'records'),
-    twitter: () => tryInfo(async () => await resolution.cns?.twitter(domain), response, 'twitter'),
+    twitter: () => tryInfo(async () => await resolution.twitter(domain), response, 'twitter'),
   };
 
   const resolutionProcess: Promise<boolean>[] = [];
@@ -108,7 +107,7 @@ import { TickerVersion } from '../publicTypes';
     options.usdtVersions.forEach((usdtVersion:string) => {
       resolutionProcess.push(
         tryInfo(
-          async () => await resolution.usdt(domain, usdtVersion as TickerVersion),
+          async () => await resolution.multiChainAddr(domain, "usdt", usdtVersion),
           response,
           usdtVersion,
         ),

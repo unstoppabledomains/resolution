@@ -1,4 +1,4 @@
-import { ResolutionMethod } from '../publicTypes';
+import { ResolutionMethod } from '../types/publicTypes';
 /** Alias for Resolution error handler function
  * @internal
  */
@@ -12,10 +12,10 @@ type ConfigurationErrorOptions = {
 
 export enum ConfigurationErrorCode {
   IncorrectProvider = 'IncorrectProvider',
-  UnspecifiedNetwork = 'UnspecifiedNetwork',
+  UnsupportedNetwork = 'UnsupportedNetwork',
   UnspecifiedUrl = 'UnspecifiedUrl',
   MissingProviderConfigurations = 'MissingProviderConfigurations',
-  DependencyMissing = "DependencyMissing"
+  DependencyMissing = 'DependencyMissing'
 }
 
 /**
@@ -23,15 +23,15 @@ export enum ConfigurationErrorCode {
  * Internal Mapping object from ConfigurationErrorCode to a ConfigurationErrorHandler
  */
 const HandlersByCode = {
-  [ConfigurationErrorCode.IncorrectProvider]: (params: {}) =>
+  [ConfigurationErrorCode.IncorrectProvider]: () =>
     'Provider doesn\'t implement sendAsync or send method',
-  [ConfigurationErrorCode.UnspecifiedNetwork]: (params: {
+  [ConfigurationErrorCode.UnsupportedNetwork]: (params: {
     method: ResolutionMethod;
   }) => `Unspecified network in Resolution ${params.method} configuration`,
   [ConfigurationErrorCode.UnspecifiedUrl]: (params: {
     method: ResolutionMethod;
   }) => `Unspecified url in Resolution ${params.method} configuration`,
-  [ConfigurationErrorCode.MissingProviderConfigurations]: (params: {}) =>
+  [ConfigurationErrorCode.MissingProviderConfigurations]: () =>
     `Couldn't find any configurations\n\tUse -C to configurate the library`,
   [ConfigurationErrorCode.DependencyMissing]: (params: {dependecy: string, version: string}) => 
     `Missing dependency for this functionality. Please install ${params.dependecy} @ ${params.version} via npm or yarn`
@@ -41,7 +41,7 @@ const HandlersByCode = {
  * Configuration Error class is designed to control every error being thrown by wrong configurations for objects
  * @param code - Error Code
  * - IncorrectProvider - When provider doesn't have implemented send or sendAsync methods
- * - UnspecifiedNetwork - When network is not specified for naming service configurations
+ * - UnsupportedNetwork - When network is not specified or not supported
  * - UnspecifiedUrl - When url is not specified for custom naming service configurations
  * @param method - optional param to specify which namingService errored out
  */
