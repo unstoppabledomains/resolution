@@ -58,22 +58,15 @@ export default class Cns extends NamingService {
     if (!config) {
       return undefined;
     }
-    try {
-      const provider = hasProvider(config) ? config.provider : new FetchProvider(NamingServiceName.CNS, config.url);
-      const networkId = await provider.request({method: "net_version"}) as number;
-      const networkName = EthereumNetworksInverted[networkId];
-      if (!networkName || !CnsSupportedNetwork.guard(networkName)) {
-        throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {method: NamingServiceName.CNS});
-      }
-      return {
-        network: networkName,
-        provider
-      }
-    } catch(error) {
-      if (error instanceof FetchError) {
-        throw new ConfigurationError(ConfigurationErrorCode.IncorrectBlockchainProvider, {method: NamingServiceName.CNS});
-      }
-      throw error;
+    const provider = hasProvider(config) ? config.provider : FetchProvider.factory(NamingServiceName.CNS, config.url);
+    const networkId = await provider.request({method: "net_version"}) as number;
+    const networkName = EthereumNetworksInverted[networkId];
+    if (!networkName || !CnsSupportedNetwork.guard(networkName)) {
+      throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {method: NamingServiceName.CNS});
+    }
+    return {
+      network: networkName,
+      provider
     }
   }
 

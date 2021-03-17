@@ -90,17 +90,32 @@ describe('Resolution', () => {
     });
 
     it("should fail because provided url failled net_version call", async () => {
-      // how to mock?
-      await expectConfigurationErrorCode(Resolution.autoNetwork({
-        cns: {url: "https://google.com" }
-      }), ConfigurationErrorCode.IncorrectBlockchainProvider);
+      const mockedProvider = new FetchProvider(NamingServiceName.CNS, "https://google.com");
+      const providerSpy = mockAsyncMethod(mockedProvider, "request", new FetchError("invalid json response body at https://google.com/ reason: Unexpected token < in JSON at position 0", "invalid_json"));
+      const factorySpy = mockAsyncMethod(FetchProvider, "factory", () => mockedProvider);
+      try {
+        await Resolution.autoNetwork({
+          cns: {url: "https://google.com" }
+        });
+      } catch(error) {
+        expect(error).toBeInstanceOf(FetchError);
+        expect(error.message).toBe("invalid json response body at https://google.com/ reason: Unexpected token < in JSON at position 0");
+      }
+      expectSpyToBeCalled([factorySpy, providerSpy]);
     });
 
     it('should fail because provided provider failed to make a net_version call', async () => {
-      const incorectProvider = new FetchProvider("UDAPI", "http://unstoppabledomains.com");
-      await expectConfigurationErrorCode(Resolution.autoNetwork({
-        ens: {provider: incorectProvider}
-      }), ConfigurationErrorCode.IncorrectBlockchainProvider);
+      const mockedProvider = new FetchProvider(NamingServiceName.ENS, "http://unstoppabledomains.com");
+      const providerSpy = mockAsyncMethod(mockedProvider, "request", new FetchError("invalid json response body at https://unstoppabledomains.com/ reason: Unexpected token < in JSON at position 0", "invalid_json"))
+      try {
+        await Resolution.autoNetwork({
+          ens: {provider: mockedProvider}
+        })
+      } catch(error) {
+        expect(error).toBeInstanceOf(FetchError);
+        expect(error.message).toBe("invalid json response body at https://unstoppabledomains.com/ reason: Unexpected token < in JSON at position 0");
+      }
+      expect(providerSpy).toBeCalled();
     });
 
     it('should fail because of unsupported test network for cns', async () => {

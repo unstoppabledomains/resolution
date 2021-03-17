@@ -59,23 +59,15 @@ export default class Ens extends NamingService {
     if (!config) {
       return undefined;
     }
-    const provider = hasProvider(config) ? config.provider : new FetchProvider(NamingServiceName.CNS, config.url);
-    try {
-      const networkId = await provider.request({method: "net_version"}) as number;
-  
-      const networkName = EthereumNetworksInverted[networkId];
-      if (!networkName || !EnsSupportedNetwork.guard(networkName)) {
-        throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {method: NamingServiceName.ENS});
-      }
-      return {
-        network: networkName,
-        provider
-      }
-    } catch(error) {
-      if (error instanceof FetchError) {
-        throw new ConfigurationError(ConfigurationErrorCode.IncorrectBlockchainProvider, {method: NamingServiceName.ENS});
-      }
-      throw error;
+    const provider = hasProvider(config) ? config.provider : FetchProvider.factory(NamingServiceName.CNS, config.url);
+    const networkId = await provider.request({method: "net_version"}) as number;
+    const networkName = EthereumNetworksInverted[networkId];
+    if (!networkName || !EnsSupportedNetwork.guard(networkName)) {
+      throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {method: NamingServiceName.ENS});
+    }
+    return {
+      network: networkName,
+      provider
     }
   }
 
