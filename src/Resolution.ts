@@ -26,7 +26,7 @@ import DnsUtils from './utils/DnsUtils';
 import { findNamingServiceName, signedInfuraLink } from './utils';
 import { Eip1993Factories } from './utils/Eip1993Factories';
 import { NamingService } from './NamingService';
-import ConfigurationError from '../build/errors/configurationError';
+import ConfigurationError from './errors/configurationError';
 import { ConfigurationErrorCode } from './errors/configurationError';
 
 /**
