@@ -26,6 +26,8 @@ import DnsUtils from './utils/DnsUtils';
 import { findNamingServiceName, signedInfuraLink } from './utils';
 import { Eip1993Factories } from './utils/Eip1993Factories';
 import { NamingService } from './NamingService';
+import ConfigurationError from '../build/errors/configurationError';
+import { ConfigurationErrorCode } from './errors/configurationError';
 
 /**
  * Blockchain domain Resolution library - Resolution.
@@ -71,10 +73,20 @@ export default class Resolution {
    * @returns configured Resolution object
    */
   static async autoNetwork(sourceConfig: AutoNetworkConfigs): Promise<Resolution> {
-    return new this({sourceConfig: {
-      cns: await Cns.getNetworkConfigs(sourceConfig.cns),
-      ens: await Ens.getNetworkConfigs(sourceConfig.ens)
-    }});
+    const resolution =  new this();
+    if (!sourceConfig.cns && !sourceConfig.ens) {
+      throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork);
+    }
+
+    if (sourceConfig.cns) {
+      resolution.serviceMap[NamingServiceName.CNS] = await Cns.autoNetwork(sourceConfig.cns)
+    }
+
+    if (sourceConfig.ens) {
+      resolution.serviceMap[NamingServiceName.ENS] = await Ens.autoNetwork(sourceConfig.ens);
+    }
+     
+    return resolution;
   }
 
   /**

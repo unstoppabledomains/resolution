@@ -9,10 +9,6 @@ import Web3HttpProvider from 'web3-providers-http';
 import Web3WsProvider from 'web3-providers-ws';
 import Web3V027Provider from 'web3-0.20.7/lib/web3/httpprovider';
 import {
-  CryptoDomainWithAdaBchAddresses, CryptoDomainWithUsdtMultiChainRecords, expectConfigurationErrorCode,
-} from './helpers';
-
-import {
   expectResolutionErrorCode,
   expectSpyToBeCalled,
   mockAsyncMethods,
@@ -23,7 +19,10 @@ import {
   CryptoDomainWithTwitterVerification,
   pendingInLive,
   CryptoDomainWithIpfsRecords,
-  isLive
+  isLive,
+  CryptoDomainWithAdaBchAddresses,
+  CryptoDomainWithUsdtMultiChainRecords,
+  expectConfigurationErrorCode,
 } from './helpers';
 import { RpcProviderTestCases } from '../utils/providerMockData';
 import fetch, { FetchError } from 'node-fetch';
@@ -59,19 +58,19 @@ describe('Resolution', () => {
       const mainnetUrl = protocolLink();
       const goerliUrl = mainnetUrl.replace('mainnet', 'goerli');
       // mocking getNetworkConfigs because no access to inner provider.request
-      const CnsGetNetworkOriginal = Cns.getNetworkConfigs;
-      const EnsGetNetworkOriginal = Ens.getNetworkConfigs;
+      const CnsGetNetworkOriginal = Cns.autoNetwork;
+      const EnsGetNetworkOriginal = Ens.autoNetwork;
       if (!isLive()) {
-        Cns.getNetworkConfigs = jest.fn().mockReturnValue({network: 'mainnet', provider: new FetchProvider(NamingServiceName.CNS, mainnetUrl)});
-        Ens.getNetworkConfigs = jest.fn().mockReturnValue({network: 'goerli', provider: new FetchProvider(NamingServiceName.ENS, goerliUrl)})
+        Cns.autoNetwork = jest.fn().mockReturnValue(new Cns({network: 'mainnet', provider: new FetchProvider(NamingServiceName.CNS, mainnetUrl)}));
+        Ens.autoNetwork = jest.fn().mockReturnValue(new Ens({network: 'goerli', provider: new FetchProvider(NamingServiceName.ENS, goerliUrl)}))
       }
       const resolution = await Resolution.autoNetwork({
         cns: { url: mainnetUrl},
         ens: { url: goerliUrl }
       });
       // We need to manually restore the function as jest.restoreAllMocks and simillar works only with spyOn
-      Cns.getNetworkConfigs = CnsGetNetworkOriginal;
-      Ens.getNetworkConfigs = EnsGetNetworkOriginal;
+      Cns.autoNetwork = CnsGetNetworkOriginal;
+      Ens.autoNetwork = EnsGetNetworkOriginal;
       expect((resolution.serviceMap[NamingServiceName.CNS] as Cns).network).toBe(1);
       expect((resolution.serviceMap[NamingServiceName.ENS] as Ens).network).toBe(5);
     });
@@ -79,7 +78,7 @@ describe('Resolution', () => {
 
     it('should work with autonetwork provider configuration', async () => {
       const provider = new FetchProvider("UDAPI", protocolLink().replace('mainnet', 'rinkeby'));
-      const spy = jest.spyOn(provider, "request").mockResolvedValue("4");
+      const spy =  mockAsyncMethod(provider, "request", "4");
       const resolution = await Resolution.autoNetwork({
         cns: { provider },
         ens: { provider }
@@ -95,7 +94,7 @@ describe('Resolution', () => {
       const factorySpy = mockAsyncMethod(FetchProvider, "factory", () => mockedProvider);
       try {
         await Resolution.autoNetwork({
-          cns: {url: "https://google.com" }
+          cns: {url: "https://google.com"}  
         });
       } catch(error) {
         expect(error).toBeInstanceOf(FetchError);
@@ -119,19 +118,15 @@ describe('Resolution', () => {
     });
 
     it('should fail because of unsupported test network for cns', async () => {
-      const original = Cns.getNetworkConfigs;
-      // mocking getNetworkConfig because no access to provider.request
-      if (!isLive()) {
-        Cns.getNetworkConfigs = jest.fn().mockImplementation(config => ({
-          network: 'ropsten',
-          provider: new FetchProvider(NamingServiceName.CNS, config.url)
-        }));
-      }
+      const blockchainUrl = protocolLink().replace('mainnet', 'ropsten');
+      const mockedProvider = new FetchProvider(NamingServiceName.CNS, blockchainUrl);
+      const providerSpy = mockAsyncMethod(mockedProvider, "request", () => "3");
+      const providerFactorySpy = mockAsyncMethod(FetchProvider, "factory", () => mockedProvider);
+
       await expectConfigurationErrorCode(Resolution.autoNetwork({
-        cns: { url: protocolLink().replace('mainnet', 'ropsten')}
+        cns: { url: blockchainUrl }
       }), ConfigurationErrorCode.UnsupportedNetwork);
-      // We need to manually restore the function as jest.restoreAllMocks and simillar works only with spyOn
-      Cns.getNetworkConfigs = original;
+      expectSpyToBeCalled([providerSpy, providerFactorySpy]);
     });
 
     it('should fail in test development',async () => {

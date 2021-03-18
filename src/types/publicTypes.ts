@@ -42,10 +42,6 @@ export enum NamingServiceName {
 
 export type ResolutionMethod = NamingServiceName | 'UDAPI';
 
-export function hasProvider(obj: any): obj is { provider: Provider } {
-  return obj && !!obj.provider;
-}
-
 export type AutoNetworkConfigs = {
   ens?: { url: string } | { provider: Provider },
   cns?: { url: string } | { provider: Provider }

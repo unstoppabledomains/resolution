@@ -1,18 +1,17 @@
-import { BlockhanNetworkUrlMap, CnsSupportedNetwork, ProxyReaderMap } from './types';
+import { BlockhanNetworkUrlMap, CnsSupportedNetwork, ProxyReaderMap, hasProvider } from './types';
 import { default as proxyReaderAbi } from './contracts/cns/proxyReader';
 import { default as resolverInterface } from './contracts/cns/resolver';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import EthereumContract from './contracts/EthereumContract';
 import standardKeys from './utils/standardKeys';
 import { constructRecords, isNullAddress, EthereumNetworksInverted, EthereumNetworks } from './utils';
-import { CnsSource, CnsSupportedNetworks, CryptoRecords, DomainData, hasProvider, NamingServiceName, Provider } from './types/publicTypes';
+import { CnsSource, CryptoRecords, DomainData, NamingServiceName, Provider } from './types/publicTypes';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 import NetworkConfig from './config/network-config.json';
 import FetchProvider from './FetchProvider';
 import { eip137Childhash, eip137Namehash } from './utils/namehash';
 import { NamingService } from './NamingService';
 import ConfigurationError, { ConfigurationErrorCode } from './errors/configurationError';
-import { FetchError } from 'node-fetch';
 
 /**
  * @internal
@@ -54,20 +53,24 @@ export default class Cns extends NamingService {
     );
   }
 
-  static async getNetworkConfigs(config?: { url: string } | { provider: Provider } ): Promise<{ network: CnsSupportedNetworks, provider: Provider } | undefined> {
-    if (!config) {
-      return undefined;
+  static async autoNetwork(config: { url: string } | { provider: Provider } ): Promise<Cns> {
+    let provider: Provider;
+
+    if (hasProvider(config)) {
+      provider = config.provider; 
+    } else {
+      if (!config.url) {
+        throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedUrl, {method: NamingServiceName.CNS});
+      }
+      provider = FetchProvider.factory(NamingServiceName.CNS, config.url);
     }
-    const provider = hasProvider(config) ? config.provider : FetchProvider.factory(NamingServiceName.CNS, config.url);
+    
     const networkId = await provider.request({method: "net_version"}) as number;
     const networkName = EthereumNetworksInverted[networkId];
     if (!networkName || !CnsSupportedNetwork.guard(networkName)) {
       throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {method: NamingServiceName.CNS});
     }
-    return {
-      network: networkName,
-      provider
-    }
+    return new this({network: networkName, provider: provider});
   }
 
   namehash(domain: string): string {

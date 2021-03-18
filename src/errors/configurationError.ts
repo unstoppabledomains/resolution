@@ -26,7 +26,7 @@ const HandlersByCode = {
     'Provider doesn\'t implement sendAsync or send method',
   [ConfigurationErrorCode.UnsupportedNetwork]: (params: {
     method: ResolutionMethod;
-  }) => `Unspecified network in Resolution ${params.method} configuration`,
+  }) => `Unspecified network in Resolution ${params.method || ''} configuration`,
   [ConfigurationErrorCode.UnspecifiedUrl]: (params: {
     method: ResolutionMethod;
   }) => `Unspecified url in Resolution ${params.method} configuration`,
