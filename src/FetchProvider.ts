@@ -13,7 +13,7 @@ export default class FetchProvider implements Provider {
   }
 
   // This is used for test mocking
-  static factory(name: ResolutionMethod, url: string) {
+  static factory(name: ResolutionMethod, url: string): FetchProvider {
     return new this(name, url);
   }
 
