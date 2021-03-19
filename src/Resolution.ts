@@ -5,6 +5,7 @@ import Cns from './Cns';
 import UdApi from './UdApi';
 import {
   Api,
+  AutoNetworkConfigs,
   CnsSupportedNetworks,
   CryptoRecords,
   DnsRecord,
@@ -25,6 +26,8 @@ import DnsUtils from './utils/DnsUtils';
 import { findNamingServiceName, signedInfuraLink } from './utils';
 import { Eip1993Factories } from './utils/Eip1993Factories';
 import { NamingService } from './NamingService';
+import ConfigurationError from './errors/configurationError';
+import { ConfigurationErrorCode } from './errors/configurationError';
 
 /**
  * Blockchain domain Resolution library - Resolution.
@@ -61,6 +64,29 @@ export default class Resolution {
       [NamingServiceName.ENS]: ens,
       [NamingServiceName.ZNS]: zns,
     };
+  }
+
+  /**
+   * AutoConfigure the blockchain network between different testnets for ENS and CNS
+   * We make a "net_version" JSON RPC call to the blockchain either via url or with the help of given provider.
+   * @param sourceConfig - configuration object for ens and cns
+   * @returns configured Resolution object
+   */
+  static async autoNetwork(sourceConfig: AutoNetworkConfigs): Promise<Resolution> {
+    const resolution =  new this();
+    if (!sourceConfig.cns && !sourceConfig.ens) {
+      throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork);
+    }
+
+    if (sourceConfig.cns) {
+      resolution.serviceMap[NamingServiceName.CNS] = await Cns.autoNetwork(sourceConfig.cns)
+    }
+
+    if (sourceConfig.ens) {
+      resolution.serviceMap[NamingServiceName.ENS] = await Ens.autoNetwork(sourceConfig.ens);
+    }
+     
+    return resolution;
   }
 
   /**

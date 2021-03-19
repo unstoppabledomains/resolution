@@ -1,17 +1,18 @@
 import { default as ensInterface } from './contracts/ens/ens';
 import { default as resolverInterface } from './contracts/ens/resolver';
 import { formatsByCoinType } from '@ensdomains/address-encoder';
-import { Bip44Constants, BlockhanNetworkUrlMap, EnsSupportedNetwork, EthCoinIndex } from './types';
+import { Bip44Constants, BlockhanNetworkUrlMap, EnsSupportedNetwork, EthCoinIndex, hasProvider } from './types';
 import { NamingServiceName, ResolutionError, ResolutionErrorCode } from './index';
 import EthereumContract from './contracts/EthereumContract';
 import contentHash from 'content-hash';
 import EnsNetworkMap from 'ethereum-ens-network-map';
 import { EnsSource, Provider } from './types/publicTypes';
-import { constructRecords, isNullAddress } from './utils';
+import { constructRecords, EthereumNetworksInverted, isNullAddress } from './utils';
 import FetchProvider from './FetchProvider';
 import { eip137Childhash, eip137Namehash } from './utils/namehash';
 import { NamingService } from './NamingService';
 import ConfigurationError, { ConfigurationErrorCode } from './errors/configurationError';
+import { EthereumNetworks } from './utils/index';
 
 /**
  * @internal
@@ -20,13 +21,6 @@ export default class Ens extends NamingService {
   static readonly UrlMap: BlockhanNetworkUrlMap = {
     1: 'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
     3: 'https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee'
-  };
-
-  static readonly NetworkNameMap = {
-    mainnet: 1,
-    ropsten: 3,
-    rinkeby: 4,
-    goerli: 5,
   };
 
   readonly name = NamingServiceName.ENS;
@@ -48,7 +42,7 @@ export default class Ens extends NamingService {
         method: NamingServiceName.ENS,
       });
     }
-    this.network = Ens.NetworkNameMap[source.network];
+    this.network = EthereumNetworks[source.network];
     this.url = source['url'] || Ens.UrlMap[this.network];
     this.provider = source['provider'] || new FetchProvider(this.name, this.url!);
     const registryAddress = source['registryAddress'] || EnsNetworkMap[this.network];
@@ -57,6 +51,26 @@ export default class Ens extends NamingService {
       registryAddress,
       this.provider
     );
+  }
+
+  static async autoNetwork(config: { url: string } | { provider: Provider }): Promise<Ens> {
+    let provider: Provider;
+
+    if (hasProvider(config)) {
+      provider = config.provider; 
+    } else {
+      if (!config.url) {
+        throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedUrl, {method: NamingServiceName.ENS});
+      }
+      provider = FetchProvider.factory(NamingServiceName.ENS, config.url);
+    }
+
+    const networkId = await provider.request({method: "net_version"}) as number;
+    const networkName = EthereumNetworksInverted[networkId];
+    if (!networkName || !EnsSupportedNetwork.guard(networkName)) {
+      throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {method: NamingServiceName.ENS});
+    }
+    return new this({network: networkName, provider: provider});
   }
 
   serviceName(): NamingServiceName {
@@ -70,7 +84,7 @@ export default class Ens extends NamingService {
     return eip137Namehash(domain);
   }
 
-  childhash(parentHash: string, label: string) {
+  childhash(parentHash: string, label: string): string {
     return eip137Childhash(parentHash, label);
   }
 

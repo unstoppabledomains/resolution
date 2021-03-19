@@ -52,7 +52,7 @@ export default class Udapi extends NamingService {
     return eip137Namehash(domain);
   }
 
-  childhash(parentHash: string, label: string) {
+  childhash(parentHash: string, label: string): string {
     throw new Error('Unsupported method whe using UD Resolution API');
   }
 

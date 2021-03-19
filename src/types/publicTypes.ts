@@ -42,6 +42,11 @@ export enum NamingServiceName {
 
 export type ResolutionMethod = NamingServiceName | 'UDAPI';
 
+export type AutoNetworkConfigs = {
+  ens?: { url: string } | { provider: Provider },
+  cns?: { url: string } | { provider: Provider }
+}
+
 /**
  * ResolutionResulution
  * @typedef ResolutionResponse

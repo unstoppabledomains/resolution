@@ -1,10 +1,10 @@
-import { BlockhanNetworkUrlMap, CnsSupportedNetwork, ProxyReaderMap } from './types';
+import { BlockhanNetworkUrlMap, CnsSupportedNetwork, ProxyReaderMap, hasProvider } from './types';
 import { default as proxyReaderAbi } from './contracts/cns/proxyReader';
 import { default as resolverInterface } from './contracts/cns/resolver';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import EthereumContract from './contracts/EthereumContract';
 import standardKeys from './utils/standardKeys';
-import { constructRecords, isNullAddress } from './utils';
+import { constructRecords, isNullAddress, EthereumNetworksInverted, EthereumNetworks } from './utils';
 import { CnsSource, CryptoRecords, DomainData, NamingServiceName, Provider } from './types/publicTypes';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 import NetworkConfig from './config/network-config.json';
@@ -22,10 +22,6 @@ export default class Cns extends NamingService {
   static readonly UrlMap: BlockhanNetworkUrlMap = {
     1: 'https://mainnet.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
     4: 'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
-  };
-  static readonly NetworkNameMap = {
-    mainnet: 1,
-    rinkeby: 4
   };
 
   readonly name: NamingServiceName = NamingServiceName.CNS;
@@ -47,7 +43,7 @@ export default class Cns extends NamingService {
         method: NamingServiceName.CNS,
       });
     }
-    this.network = Cns.NetworkNameMap[source.network];
+    this.network = EthereumNetworks[source.network];
     this.url = source['url'] || Cns.UrlMap[this.network];
     this.provider = source['provider'] || new FetchProvider(this.name, this.url!);
     this.readerContract = new EthereumContract(
@@ -57,6 +53,26 @@ export default class Cns extends NamingService {
     );
   }
 
+  static async autoNetwork(config: { url: string } | { provider: Provider } ): Promise<Cns> {
+    let provider: Provider;
+
+    if (hasProvider(config)) {
+      provider = config.provider; 
+    } else {
+      if (!config.url) {
+        throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedUrl, {method: NamingServiceName.CNS});
+      }
+      provider = FetchProvider.factory(NamingServiceName.CNS, config.url);
+    }
+    
+    const networkId = await provider.request({method: "net_version"}) as number;
+    const networkName = EthereumNetworksInverted[networkId];
+    if (!networkName || !CnsSupportedNetwork.guard(networkName)) {
+      throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {method: NamingServiceName.CNS});
+    }
+    return new this({network: networkName, provider: provider});
+  }
+
   namehash(domain: string): string {
     if (!this.isSupportedDomain(domain)) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {domain});
@@ -64,7 +80,7 @@ export default class Cns extends NamingService {
     return eip137Namehash(domain);
   }
 
-  childhash(parentHash: string, label: string) {
+  childhash(parentHash: string, label: string): string {
     return eip137Childhash(parentHash, label);
   }
 
@@ -223,7 +239,9 @@ export default class Cns extends NamingService {
     if (!legacyAddresses || legacyAddresses.length === 0) {
       return false;
     }
-    return legacyAddresses.findIndex((address) => {return address.toLowerCase() === resolverAddress.toLowerCase()}) > -1;
+    return legacyAddresses.findIndex((address) => {
+      return address.toLowerCase() === resolverAddress.toLowerCase()
+    }) > -1;
   }
 
   private isUpToDateResolver(resolverAddress: string): boolean {

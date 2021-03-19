@@ -14,7 +14,6 @@ export enum ConfigurationErrorCode {
   IncorrectProvider = 'IncorrectProvider',
   UnsupportedNetwork = 'UnsupportedNetwork',
   UnspecifiedUrl = 'UnspecifiedUrl',
-  MissingProviderConfigurations = 'MissingProviderConfigurations',
   DependencyMissing = 'DependencyMissing'
 }
 
@@ -27,14 +26,13 @@ const HandlersByCode = {
     'Provider doesn\'t implement sendAsync or send method',
   [ConfigurationErrorCode.UnsupportedNetwork]: (params: {
     method: ResolutionMethod;
-  }) => `Unspecified network in Resolution ${params.method} configuration`,
+  }) => `Unspecified network in Resolution ${params.method || ''} configuration`,
   [ConfigurationErrorCode.UnspecifiedUrl]: (params: {
     method: ResolutionMethod;
   }) => `Unspecified url in Resolution ${params.method} configuration`,
-  [ConfigurationErrorCode.MissingProviderConfigurations]: () =>
-    `Couldn't find any configurations\n\tUse -C to configurate the library`,
-  [ConfigurationErrorCode.DependencyMissing]: (params: {dependecy: string, version: string}) => 
-    `Missing dependency for this functionality. Please install ${params.dependecy} @ ${params.version} via npm or yarn`
+  [ConfigurationErrorCode.DependencyMissing]: (params: {
+    dependecy: string, version: string
+  }) => `Missing dependency for this functionality. Please install ${params.dependecy} @ ${params.version} via npm or yarn`,
 };
 
 /**

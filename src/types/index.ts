@@ -1,3 +1,5 @@
+import { Provider } from "./publicTypes";
+
 export type Dictionary<T> = { [k: string]: T };
 export type EnsNetworkIdMap = {
   [key: number]: string;
@@ -121,3 +123,7 @@ const StringUnion = <UnionType extends string>(...values: UnionType[]) => {
 export const CnsSupportedNetwork = StringUnion("mainnet", "rinkeby") 
 export const EnsSupportedNetwork = StringUnion("mainnet", "rinkeby", "goerli", "ropsten") 
 export const ZnsSupportedNetwork = StringUnion("mainnet") 
+
+export function hasProvider(obj: any): obj is { provider: Provider } {
+  return obj && !!obj.provider;
+}

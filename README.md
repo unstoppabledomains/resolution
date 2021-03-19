@@ -197,6 +197,19 @@ Default provider can be changed by changing constructor options
 To see all constructor options and factory methods check
 [Unstoppable API reference](https://unstoppabledomains.github.io/resolution).
 
+## Autoconfiguration of blockchain network
+In some scenarios system might not be flexible enough to easy distinguish between various Ethereum testnets on compile time.
+For this case Resolution library provide a special async constructor which should be waited for 
+`await Resolution.autonetwork(options)`. This method makes a JSON RPC "net_version" call to the provider to get the network id.
+
+This method configures only Ens and Cns, Zns is supported only on Zilliqa mainnet which is going to be used in any cases.
+You can provide a configured provider or a blockchain url as in the following example:
+```
+await Resolution.autonetwork({
+  cns: {provider},
+  ens: {url}
+});
+```
 ## Error Handling
 
 When resolution encounters an error it returns the error code instead of

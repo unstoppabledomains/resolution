@@ -12,6 +12,11 @@ export default class FetchProvider implements Provider {
     this.name = name;
   }
 
+  // This is used for test mocking
+  static factory(name: ResolutionMethod, url: string): FetchProvider {
+    return new this(name, url);
+  }
+
   async request(args: RequestArguments): Promise<unknown> {
     const json = await this.fetchJson(args);
     if (json.error) {
