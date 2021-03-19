@@ -203,10 +203,11 @@ For this case Resolution library provide a special async constructor which shoul
 `await Resolution.autonetwork(options)`. This method makes a JSON RPC "net_version" call to the provider to get the network id.
 
 This method configures only Ens and Cns, Zns is supported only on Zilliqa mainnet which is going to be used in any cases.
-You can provide a configured provider there instead of a blockchain url as in the following example:
+You can provide a configured provider or a blockchain url as in the following example:
 ```
 await Resolution.autonetwork({
-  cns: {provider}
+  cns: {provider},
+  ens: {url}
 });
 ```
 ## Error Handling
