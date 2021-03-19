@@ -1,3 +1,6 @@
+## 2.1.0
+* Introduce new factory method Resolution#autonetwork. This factory is asynchronious and allows to skip the network configuration for either ens or cns. This method is making a "net_version" call to the blockchain provider in order to configure itself.
+
 ## 2.0.0
 * Remove deprecated methods
   - Resolution#address
