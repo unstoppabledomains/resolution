@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>ConfigurationErrorCode | Unstoppabledomains resolution library</title>
+	<title>JsonRpcResponse | Unstoppabledomains resolution library</title>
 	<meta name="description" content="Documentation for Unstoppabledomains resolution library">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -52,71 +52,79 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="configurationerrorcode.html">ConfigurationErrorCode</a>
+					<a href="jsonrpcresponse.html">JsonRpcResponse</a>
 				</li>
 			</ul>
-			<h1>Enumeration ConfigurationErrorCode</h1>
+			<h1>Interface JsonRpcResponse</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<span class="target">JsonRpcResponse</span>
+					</li>
+				</ul>
+			</section>
 			<section class="tsd-panel-group tsd-index-group">
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>Enumeration members</h3>
+							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="configurationerrorcode.html#dependencymissing" class="tsd-kind-icon">Dependency<wbr>Missing</a></li>
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="configurationerrorcode.html#incorrectprovider" class="tsd-kind-icon">Incorrect<wbr>Provider</a></li>
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="configurationerrorcode.html#unspecifiedurl" class="tsd-kind-icon">Unspecified<wbr>Url</a></li>
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="configurationerrorcode.html#unsupportednetwork" class="tsd-kind-icon">Unsupported<wbr>Network</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="jsonrpcresponse.html#error" class="tsd-kind-icon">error</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="jsonrpcresponse.html#id" class="tsd-kind-icon">id</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="jsonrpcresponse.html#jsonrpc" class="tsd-kind-icon">jsonrpc</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="jsonrpcresponse.html#result" class="tsd-kind-icon">result</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Enumeration members</h2>
-				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
-					<a name="dependencymissing" class="tsd-anchor"></a>
-					<h3>Dependency<wbr>Missing</h3>
-					<div class="tsd-signature tsd-kind-icon">Dependency<wbr>Missing<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = &quot;DependencyMissing&quot;</span></div>
+				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="error" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> error</h3>
+					<div class="tsd-signature tsd-kind-icon">error<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/7095f40/src/errors/configurationError.ts#L17">src/errors/configurationError.ts:17</a></li>
+							<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/7095f40/src/types/publicTypes.ts#L113">src/types/publicTypes.ts:113</a></li>
 						</ul>
 					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
-					<a name="incorrectprovider" class="tsd-anchor"></a>
-					<h3>Incorrect<wbr>Provider</h3>
-					<div class="tsd-signature tsd-kind-icon">Incorrect<wbr>Provider<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = &quot;IncorrectProvider&quot;</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="id" class="tsd-anchor"></a>
+					<h3>id</h3>
+					<div class="tsd-signature tsd-kind-icon">id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/7095f40/src/errors/configurationError.ts#L14">src/errors/configurationError.ts:14</a></li>
+							<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/7095f40/src/types/publicTypes.ts#L111">src/types/publicTypes.ts:111</a></li>
 						</ul>
 					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
-					<a name="unspecifiedurl" class="tsd-anchor"></a>
-					<h3>Unspecified<wbr>Url</h3>
-					<div class="tsd-signature tsd-kind-icon">Unspecified<wbr>Url<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = &quot;UnspecifiedUrl&quot;</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="jsonrpc" class="tsd-anchor"></a>
+					<h3>jsonrpc</h3>
+					<div class="tsd-signature tsd-kind-icon">jsonrpc<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/7095f40/src/errors/configurationError.ts#L16">src/errors/configurationError.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/7095f40/src/types/publicTypes.ts#L110">src/types/publicTypes.ts:110</a></li>
 						</ul>
 					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
-					<a name="unsupportednetwork" class="tsd-anchor"></a>
-					<h3>Unsupported<wbr>Network</h3>
-					<div class="tsd-signature tsd-kind-icon">Unsupported<wbr>Network<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = &quot;UnsupportedNetwork&quot;</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="result" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> result</h3>
+					<div class="tsd-signature tsd-kind-icon">result<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/7095f40/src/errors/configurationError.ts#L15">src/errors/configurationError.ts:15</a></li>
+							<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/7095f40/src/types/publicTypes.ts#L112">src/types/publicTypes.ts:112</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -132,38 +140,20 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-				</ul>
-				<ul class="current">
-					<li class="current tsd-kind-enum">
-						<a href="configurationerrorcode.html" class="tsd-kind-icon">Configuration<wbr>Error<wbr>Code</a>
-						<ul>
-							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
-								<a href="configurationerrorcode.html#dependencymissing" class="tsd-kind-icon">Dependency<wbr>Missing</a>
-							</li>
-							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
-								<a href="configurationerrorcode.html#incorrectprovider" class="tsd-kind-icon">Incorrect<wbr>Provider</a>
-							</li>
-							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
-								<a href="configurationerrorcode.html#unspecifiedurl" class="tsd-kind-icon">Unspecified<wbr>Url</a>
-							</li>
-							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
-								<a href="configurationerrorcode.html#unsupportednetwork" class="tsd-kind-icon">Unsupported<wbr>Network</a>
-							</li>
-						</ul>
-					</li>
-				</ul>
-				<ul class="after-current">
 					<li class=" tsd-kind-enum">
-						<a href="dnsrecordtype.html" class="tsd-kind-icon">Dns<wbr>Record<wbr>Type</a>
+						<a href="../enums/configurationerrorcode.html" class="tsd-kind-icon">Configuration<wbr>Error<wbr>Code</a>
 					</li>
 					<li class=" tsd-kind-enum">
-						<a href="dnsrecordserrorcode.html" class="tsd-kind-icon">Dns<wbr>Records<wbr>Error<wbr>Code</a>
+						<a href="../enums/dnsrecordtype.html" class="tsd-kind-icon">Dns<wbr>Record<wbr>Type</a>
 					</li>
 					<li class=" tsd-kind-enum">
-						<a href="namingservicename.html" class="tsd-kind-icon">Naming<wbr>Service<wbr>Name</a>
+						<a href="../enums/dnsrecordserrorcode.html" class="tsd-kind-icon">Dns<wbr>Records<wbr>Error<wbr>Code</a>
 					</li>
 					<li class=" tsd-kind-enum">
-						<a href="resolutionerrorcode.html" class="tsd-kind-icon">Resolution<wbr>Error<wbr>Code</a>
+						<a href="../enums/namingservicename.html" class="tsd-kind-icon">Naming<wbr>Service<wbr>Name</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="../enums/resolutionerrorcode.html" class="tsd-kind-icon">Resolution<wbr>Error<wbr>Code</a>
 					</li>
 					<li class=" tsd-kind-class">
 						<a href="../classes/configurationerror.html" class="tsd-kind-icon">Configuration<wbr>Error</a>
@@ -178,25 +168,43 @@
 						<a href="../classes/resolutionerror.html" class="tsd-kind-icon">Resolution<wbr>Error</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="../interfaces/dnsrecord.html" class="tsd-kind-icon">Dns<wbr>Record</a>
+						<a href="dnsrecord.html" class="tsd-kind-icon">Dns<wbr>Record</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="../interfaces/ethersprovider.html" class="tsd-kind-icon">Ethers<wbr>Provider</a>
+						<a href="ethersprovider.html" class="tsd-kind-icon">Ethers<wbr>Provider</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="../interfaces/jsonrpcpayload.html" class="tsd-kind-icon">Json<wbr>Rpc<wbr>Payload</a>
+						<a href="jsonrpcpayload.html" class="tsd-kind-icon">Json<wbr>Rpc<wbr>Payload</a>
+					</li>
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-interface">
+						<a href="jsonrpcresponse.html" class="tsd-kind-icon">Json<wbr>Rpc<wbr>Response</a>
+						<ul>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="jsonrpcresponse.html#error" class="tsd-kind-icon">error</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="jsonrpcresponse.html#id" class="tsd-kind-icon">id</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="jsonrpcresponse.html#jsonrpc" class="tsd-kind-icon">jsonrpc</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="jsonrpcresponse.html#result" class="tsd-kind-icon">result</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+				<ul class="after-current">
+					<li class=" tsd-kind-interface">
+						<a href="provider.html" class="tsd-kind-icon">Provider</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="../interfaces/jsonrpcresponse.html" class="tsd-kind-icon">Json<wbr>Rpc<wbr>Response</a>
+						<a href="web3version0provider.html" class="tsd-kind-icon">Web3<wbr>Version0<wbr>Provider</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="../interfaces/provider.html" class="tsd-kind-icon">Provider</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="../interfaces/web3version0provider.html" class="tsd-kind-icon">Web3<wbr>Version0<wbr>Provider</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="../interfaces/web3version1provider.html" class="tsd-kind-icon">Web3<wbr>Version1<wbr>Provider</a>
+						<a href="web3version1provider.html" class="tsd-kind-icon">Web3<wbr>Version1<wbr>Provider</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
 						<a href="../globals.html#api" class="tsd-kind-icon">Api</a>

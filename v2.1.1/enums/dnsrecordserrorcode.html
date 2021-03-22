@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>ConfigurationErrorCode | Unstoppabledomains resolution library</title>
+	<title>DnsRecordsErrorCode | Unstoppabledomains resolution library</title>
 	<meta name="description" content="Documentation for Unstoppabledomains resolution library">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -52,10 +52,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="configurationerrorcode.html">ConfigurationErrorCode</a>
+					<a href="dnsrecordserrorcode.html">DnsRecordsErrorCode</a>
 				</li>
 			</ul>
-			<h1>Enumeration ConfigurationErrorCode</h1>
+			<h1>Enumeration DnsRecordsErrorCode</h1>
 		</div>
 	</div>
 </header>
@@ -69,10 +69,8 @@
 						<section class="tsd-index-section ">
 							<h3>Enumeration members</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="configurationerrorcode.html#dependencymissing" class="tsd-kind-icon">Dependency<wbr>Missing</a></li>
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="configurationerrorcode.html#incorrectprovider" class="tsd-kind-icon">Incorrect<wbr>Provider</a></li>
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="configurationerrorcode.html#unspecifiedurl" class="tsd-kind-icon">Unspecified<wbr>Url</a></li>
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="configurationerrorcode.html#unsupportednetwork" class="tsd-kind-icon">Unsupported<wbr>Network</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="dnsrecordserrorcode.html#dnsrecordcorrupted" class="tsd-kind-icon">Dns<wbr>Record<wbr>Corrupted</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="dnsrecordserrorcode.html#inconsistentttl" class="tsd-kind-icon">Inconsistent<wbr>Ttl</a></li>
 							</ul>
 						</section>
 					</div>
@@ -81,42 +79,22 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Enumeration members</h2>
 				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
-					<a name="dependencymissing" class="tsd-anchor"></a>
-					<h3>Dependency<wbr>Missing</h3>
-					<div class="tsd-signature tsd-kind-icon">Dependency<wbr>Missing<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = &quot;DependencyMissing&quot;</span></div>
+					<a name="dnsrecordcorrupted" class="tsd-anchor"></a>
+					<h3>Dns<wbr>Record<wbr>Corrupted</h3>
+					<div class="tsd-signature tsd-kind-icon">Dns<wbr>Record<wbr>Corrupted<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = &quot;DnsRecordCorrupted&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/7095f40/src/errors/configurationError.ts#L17">src/errors/configurationError.ts:17</a></li>
+							<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/7095f40/src/errors/dnsRecordsError.ts#L10">src/errors/dnsRecordsError.ts:10</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
-					<a name="incorrectprovider" class="tsd-anchor"></a>
-					<h3>Incorrect<wbr>Provider</h3>
-					<div class="tsd-signature tsd-kind-icon">Incorrect<wbr>Provider<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = &quot;IncorrectProvider&quot;</span></div>
+					<a name="inconsistentttl" class="tsd-anchor"></a>
+					<h3>Inconsistent<wbr>Ttl</h3>
+					<div class="tsd-signature tsd-kind-icon">Inconsistent<wbr>Ttl<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = &quot;InconsistentTtl&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/7095f40/src/errors/configurationError.ts#L14">src/errors/configurationError.ts:14</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
-					<a name="unspecifiedurl" class="tsd-anchor"></a>
-					<h3>Unspecified<wbr>Url</h3>
-					<div class="tsd-signature tsd-kind-icon">Unspecified<wbr>Url<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = &quot;UnspecifiedUrl&quot;</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/7095f40/src/errors/configurationError.ts#L16">src/errors/configurationError.ts:16</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
-					<a name="unsupportednetwork" class="tsd-anchor"></a>
-					<h3>Unsupported<wbr>Network</h3>
-					<div class="tsd-signature tsd-kind-icon">Unsupported<wbr>Network<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = &quot;UnsupportedNetwork&quot;</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/7095f40/src/errors/configurationError.ts#L15">src/errors/configurationError.ts:15</a></li>
+							<li>Defined in <a href="https://github.com/unstoppabledomains/resolution/blob/7095f40/src/errors/dnsRecordsError.ts#L9">src/errors/dnsRecordsError.ts:9</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -132,33 +110,27 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-enum">
+						<a href="configurationerrorcode.html" class="tsd-kind-icon">Configuration<wbr>Error<wbr>Code</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="dnsrecordtype.html" class="tsd-kind-icon">Dns<wbr>Record<wbr>Type</a>
+					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-enum">
-						<a href="configurationerrorcode.html" class="tsd-kind-icon">Configuration<wbr>Error<wbr>Code</a>
+						<a href="dnsrecordserrorcode.html" class="tsd-kind-icon">Dns<wbr>Records<wbr>Error<wbr>Code</a>
 						<ul>
 							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
-								<a href="configurationerrorcode.html#dependencymissing" class="tsd-kind-icon">Dependency<wbr>Missing</a>
+								<a href="dnsrecordserrorcode.html#dnsrecordcorrupted" class="tsd-kind-icon">Dns<wbr>Record<wbr>Corrupted</a>
 							</li>
 							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
-								<a href="configurationerrorcode.html#incorrectprovider" class="tsd-kind-icon">Incorrect<wbr>Provider</a>
-							</li>
-							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
-								<a href="configurationerrorcode.html#unspecifiedurl" class="tsd-kind-icon">Unspecified<wbr>Url</a>
-							</li>
-							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
-								<a href="configurationerrorcode.html#unsupportednetwork" class="tsd-kind-icon">Unsupported<wbr>Network</a>
+								<a href="dnsrecordserrorcode.html#inconsistentttl" class="tsd-kind-icon">Inconsistent<wbr>Ttl</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-enum">
-						<a href="dnsrecordtype.html" class="tsd-kind-icon">Dns<wbr>Record<wbr>Type</a>
-					</li>
-					<li class=" tsd-kind-enum">
-						<a href="dnsrecordserrorcode.html" class="tsd-kind-icon">Dns<wbr>Records<wbr>Error<wbr>Code</a>
-					</li>
 					<li class=" tsd-kind-enum">
 						<a href="namingservicename.html" class="tsd-kind-icon">Naming<wbr>Service<wbr>Name</a>
 					</li>
