@@ -12,7 +12,7 @@ import FetchProvider from './FetchProvider';
 import { eip137Childhash, eip137Namehash } from './utils/namehash';
 import { NamingService } from './NamingService';
 import ConfigurationError, { ConfigurationErrorCode } from './errors/configurationError';
-import { EthereumNetworks } from './utils/index';
+import { EthereumNetworks } from './utils';
 
 /**
  * @internal
