@@ -6,11 +6,10 @@ import {
 import { isNullAddress, constructRecords } from './utils';
 import { Dictionary, ZnsResolution, ZnsSupportedNetwork } from './types';
 import {
-  NamingServiceName,
   ResolutionError,
   ResolutionErrorCode,
-} from './index';
-import { CryptoRecords, Provider, ZnsSource } from './types/publicTypes';
+} from './errors/resolutionError';
+import { CryptoRecords, Provider, ZnsSource, NamingServiceName } from './types/publicTypes';
 import FetchProvider from './FetchProvider';
 import { znsChildhash, znsNamehash } from './utils/namehash';
 import { NamingService } from './NamingService';

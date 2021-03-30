@@ -1,15 +1,12 @@
 import { toBech32Address } from './utils/znsUtils';
 import {
-  NamingServiceName,
   ResolutionError,
   ResolutionErrorCode,
-  ResolutionMethod,
-  ResolutionResponse,
-} from './index';
+} from './errors/resolutionError';
 import pckg from './package.json';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
 import standardKeys from './utils/standardKeys';
-import { CryptoRecords } from './types/publicTypes';
+import { CryptoRecords, ResolutionResponse, ResolutionMethod, NamingServiceName } from './types/publicTypes';
 import Networking from './utils/Networking';
 import { constructRecords, findNamingServiceName } from './utils';
 import { znsNamehash, eip137Namehash } from './utils/namehash';

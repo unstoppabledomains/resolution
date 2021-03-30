@@ -1,18 +1,17 @@
 import { default as ensInterface } from './contracts/ens/ens';
 import { default as resolverInterface } from './contracts/ens/resolver';
-import { formatsByCoinType } from '@ensdomains/address-encoder';
-import { Bip44Constants, BlockhanNetworkUrlMap, EnsSupportedNetwork, EthCoinIndex, hasProvider } from './types';
-import { NamingServiceName, ResolutionError, ResolutionErrorCode } from './index';
+import { BlockhanNetworkUrlMap, EnsSupportedNetwork, EthCoinIndex, hasProvider } from './types';
+import { ResolutionError, ResolutionErrorCode } from './errors/resolutionError';
 import EthereumContract from './contracts/EthereumContract';
-import contentHash from 'content-hash';
 import EnsNetworkMap from 'ethereum-ens-network-map';
-import { EnsSource, Provider } from './types/publicTypes';
+import { EnsSource, NamingServiceName, Provider } from './types/publicTypes';
 import { constructRecords, EthereumNetworksInverted, isNullAddress } from './utils';
 import FetchProvider from './FetchProvider';
 import { eip137Childhash, eip137Namehash } from './utils/namehash';
 import { NamingService } from './NamingService';
 import ConfigurationError, { ConfigurationErrorCode } from './errors/configurationError';
 import { EthereumNetworks } from './utils';
+import { requireOrFail } from './utils/requireOrFail';
 
 /**
  * @internal
@@ -189,9 +188,9 @@ export default class Ens extends NamingService {
   }
 
   protected getCoinType(currencyTicker: string): string {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const constants: Bip44Constants[] = require('bip44-constants');
-    const coin = constants.findIndex(
+    const bip44constants = requireOrFail('bip44-constants', 'bip44-constants', '^8.0.5');
+    const formatsByCoinType = requireOrFail('@ensdomains/address-encoder', '@ensdomains/address-encoder', '>= 0.1.x <= 0.2.x').formatsByCoinType;
+    const coin = bip44constants.findIndex(
       item =>
         item[1] === currencyTicker.toUpperCase() ||
         item[2] === currencyTicker.toUpperCase(),
@@ -239,6 +238,7 @@ export default class Ens extends NamingService {
     domain: string,
     coinType: string,
   ): Promise<string | undefined> {
+    const formatsByCoinType = requireOrFail('@ensdomains/address-encoder', '@ensdomains/address-encoder', '>= 0.1.x <= 0.2.x').formatsByCoinType;
     const resolverContract = new EthereumContract(
       resolverInterface(resolver, coinType),
       resolver,
@@ -264,6 +264,7 @@ export default class Ens extends NamingService {
   }
 
   private async getContentHash(domain: string): Promise<string | undefined> {
+    const contentHash = requireOrFail('content-hash', 'content-hash', '^2.5.2')
     const nodeHash = this.namehash(domain);
     const resolverContract = await this.getResolverContract(domain);
     const contentHashEncoded = await this.callMethod(
