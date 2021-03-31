@@ -1,3 +1,11 @@
+## 3.0.0
+* ENS support is disabled by default. To enable ENS support install additional packages:
+  - `"bip44-constants": "^8.0.5"`
+  - `"@ensdomains/address-encoder": ">= 0.1.x <= 0.2.x"`
+  - `"content-hash": "^2.5.2"`
+  
+* If trying to resolve ENS domain and some package is missing the library throws `ConfigurationError` 
+
 ## 2.1.0
 * Introduce new factory method Resolution#autonetwork. This factory is asynchronious and allows to skip the network configuration for either ens or cns. This method is making a "net_version" call to the blockchain provider in order to configure itself.
 

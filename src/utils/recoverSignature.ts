@@ -28,8 +28,8 @@ const toChecksum = (address: string) => {
 };
 
 const getSecp256k1 = () => {
-    const elliptic = requireOrFail('elliptic', 'elliptic', '^6.5.3');
-    return new elliptic.ec('secp256k1');
+  const elliptic = requireOrFail('elliptic', 'elliptic', '^6.5.3');
+  return new elliptic.ec('secp256k1');
 }
 
 export const hashMessage = (message: string): string => {
