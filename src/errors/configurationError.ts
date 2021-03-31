@@ -31,8 +31,8 @@ const HandlersByCode = {
     method: ResolutionMethod;
   }) => `Unspecified url in Resolution ${params.method} configuration`,
   [ConfigurationErrorCode.DependencyMissing]: (params: {
-    dependecy: string, version: string
-  }) => `Missing dependency for this functionality. Please install ${params.dependecy} @ ${params.version} via npm or yarn`,
+    dependency: string, version: string
+  }) => `Missing dependency for this functionality. Please install ${params.dependency} @ ${params.version} via npm or yarn`,
 };
 
 /**

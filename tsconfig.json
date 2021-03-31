@@ -25,9 +25,10 @@
     "inputFiles": [
       "./src/Resolution.ts",
       "./src/index.ts",
-      "./src/publicTypes.ts",
+      "./src/types/publicTypes.ts",
       "./src/errors/configurationError.ts",
-      "./src/errors/resolutionError.ts"
+      "./src/errors/resolutionError.ts",
+      "./src/errors/dnsRecordsError.ts"
     ]
   }
 }
