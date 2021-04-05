@@ -35,7 +35,8 @@
     "size": "yarn run sizecheck -p ./package.json -l 500 -v",
     "config:pull": "yarn network-config:pull && yarn supported-keys:pull",
     "network-config:pull": "curl https://raw.githubusercontent.com/unstoppabledomains/dot-crypto/master/src/network-config/network-config.json -o src/config/network-config.json",
-    "supported-keys:pull": "curl https://raw.githubusercontent.com/unstoppabledomains/dot-crypto/master/src/supported-keys/supported-keys.json -o src/config/supported-keys.json"
+    "supported-keys:pull": "curl https://raw.githubusercontent.com/unstoppabledomains/dot-crypto/master/src/supported-keys/supported-keys.json -o src/config/supported-keys.json",
+    "prepare": "husky install"
   },
   "files": [
     "build"
@@ -80,6 +81,7 @@
     "dotenv": "^8.2.0",
     "eslint": "^7.7.0",
     "eslint-plugin-jest": "^24.1.0",
+    "husky": "^6.0.0",
     "jest": "24.9.0",
     "lodash": "^4.17.19",
     "nock": "10.0.6",
