@@ -11,14 +11,12 @@ export const MainnetUrl = 'https://mainnet.infura.io';
 export const ZilliqaUrl = 'https://api.zilliqa.com';
 export const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
 
-export const CryptoDomainWithoutResolver = 'reseller-test-paul2.crypto';
-export const CryptoDomainWithEmptyResolver = 'reseller-test-mago017.crypto';
-export const CryptoDomainWithIpfsRecords = 'reseller-test-paul019.crypto';
-export const CryptoDomainWithEmail = 'reseller-test-paul019.crypto';
-export const CryptoDomainWithAdaBchAddresses = 'reseller-test-mago0.crypto';
+export const CryptoDomainWithoutResolver = 'twistedmusic.crypto';
 export const CryptoDomainWithTwitterVerification = 'ijustwannatestsomething2.crypto';
 export const CryptoDomainWithUsdtMultiChainRecords = 'udtestdev-usdt.crypto';
 export const ZilDomainWithUsdtMultiChainRecords = 'reseller-test-udtesting-422508414817.zil';
+export const CryptoDomainWithAllRecords = 'udtestdev-reseller-test-udtesting-875948372642.crypto';
+export const CryptoDomainWithoutGunDbRecords = 'udtestdev-reseller-test-udtesting-875948372642.crypto';
 
 try {
   // eslint-disable-next-line @typescript-eslint/no-var-requires

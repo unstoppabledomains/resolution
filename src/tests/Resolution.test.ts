@@ -18,11 +18,10 @@ import {
   mockAsyncMethod,
   CryptoDomainWithTwitterVerification,
   pendingInLive,
-  CryptoDomainWithIpfsRecords,
   isLive,
-  CryptoDomainWithAdaBchAddresses,
   CryptoDomainWithUsdtMultiChainRecords,
   expectConfigurationErrorCode,
+  CryptoDomainWithAllRecords,
 } from './helpers';
 import { RpcProviderTestCases } from '../utils/providerMockData';
 import fetch, { FetchError } from 'node-fetch';
@@ -191,7 +190,7 @@ describe('Resolution', () => {
               },
             },
           });
-          const hash = await resolution.ipfsHash(CryptoDomainWithIpfsRecords);
+          const hash = await resolution.ipfsHash(CryptoDomainWithAllRecords);
           expectSpyToBeCalled(spies);
           expect(hash).toBe('new record Ipfs hash');
         });
@@ -208,7 +207,7 @@ describe('Resolution', () => {
             },
           });
           const redirectUrl = await resolution.httpUrl(
-            CryptoDomainWithIpfsRecords,
+            CryptoDomainWithAllRecords,
           );
           expectSpyToBeCalled(spies);
           expect(redirectUrl).toBe('new record redirect url');
@@ -605,7 +604,7 @@ describe('Resolution', () => {
               'gundb.username.value':
                 '0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c',
               'ipfs.html.value':
-                'Qme54oEzRkgooJbCDr78vzKAWcv6DDEZqRhhDyDtzgrZP6',
+                'QmdyBw5oTgCtTLQ18PbDvPL8iaLoEPhSyzD91q9XmgmAjb',
               'ipfs.redirect_domain.value':
                 'https://abbfe6z95qov3d40hf6j30g7auo7afhp.mypinata.cloud/ipfs/Qme54oEzRkgooJbCDr78vzKAWcv6DDEZqRhhDyDtzgrZP6',
               'crypto.ETH.address':
@@ -626,8 +625,10 @@ describe('Resolution', () => {
             const eye = mockAsyncMethod(provider, 'call', (params) =>
               Promise.resolve(caseMock(params, RpcProviderTestCases)),
             );
-            const eye2 = mockAsyncMethod(provider, 'getLogs', (params) =>
-              Promise.resolve(caseMock(params, RpcProviderTestCases)),
+            const eye2 = mockAsyncMethod(provider, 'getLogs', (params) => {
+              // console.log({params, response: caseMock(params, RpcProviderTestCases)});
+              return Promise.resolve(caseMock(params, RpcProviderTestCases));
+            }
             );
 
             const resp = await resolution.allRecords('brad.crypto');
@@ -637,7 +638,7 @@ describe('Resolution', () => {
               'gundb.username.value':
                 '0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c',
               'ipfs.html.value':
-                'Qme54oEzRkgooJbCDr78vzKAWcv6DDEZqRhhDyDtzgrZP6',
+                'QmdyBw5oTgCtTLQ18PbDvPL8iaLoEPhSyzD91q9XmgmAjb',
               'ipfs.redirect_domain.value':
                 'https://abbfe6z95qov3d40hf6j30g7auo7afhp.mypinata.cloud/ipfs/Qme54oEzRkgooJbCDr78vzKAWcv6DDEZqRhhDyDtzgrZP6',
               'crypto.ETH.address':
@@ -768,19 +769,19 @@ describe('Resolution', () => {
           records: {
             'crypto.ADA.address':
               'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
-            'crypto.ETH.address': '',
+            'crypto.ETH.address': '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
           },
         },
       });
       expect(
-        await resolution.records(CryptoDomainWithAdaBchAddresses, [
+        await resolution.records(CryptoDomainWithAllRecords, [
           'crypto.ADA.address',
           'crypto.ETH.address',
         ]),
       ).toEqual({
         'crypto.ADA.address':
           'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
-        'crypto.ETH.address': '',
+        'crypto.ETH.address': '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
       });
       expectSpyToBeCalled([...eyes]);
     });
