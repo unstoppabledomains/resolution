@@ -256,12 +256,12 @@ export default class Cns extends NamingService {
     contract: EthereumContract,
     tokenId: string,
   ): Promise<string> {
-    const CRYPTO_RESOLVER_ADVANCED_EVENTS_STARTING_BLOCK = '0x960844';
+    const defaultStartingBlock = NetworkConfig?.networks[this.network]?.contracts?.Resolver?.advancedEventsStartingBlock;
     const logs = await contract.fetchLogs('ResetRecords', tokenId);
     const lastResetEvent = logs[logs.length - 1];
     return (
       lastResetEvent?.blockNumber ||
-      CRYPTO_RESOLVER_ADVANCED_EVENTS_STARTING_BLOCK
+      defaultStartingBlock
     );
   }
 }
