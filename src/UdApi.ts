@@ -5,7 +5,6 @@ import {
 } from './errors/resolutionError';
 import pckg from './package.json';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
-import standardKeys from './utils/standardKeys';
 import { CryptoRecords, ResolutionResponse, ResolutionMethod, NamingServiceName } from './types/publicTypes';
 import Networking from './utils/Networking';
 import { constructRecords, findNamingServiceName } from './utils';
@@ -93,18 +92,18 @@ export default class Udapi extends NamingService {
     const owner = domainMetaData.meta.owner;
     const records = domainMetaData.records || {};
     const validationSignature =
-      records[standardKeys.validation_twitter_username];
-    const twitterHandle = records[standardKeys.twitter_username];
+      records['validation.social.twitter.username'];
+    const twitterHandle = records['social.twitter.username'];
 
     if (!validationSignature) {
       throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-        recordName: standardKeys.validation_twitter_username,
+        recordName: 'validation.social.twitter.username',
         domain: domain,
       });
     }
     if (!twitterHandle) {
       throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-        recordName: standardKeys.twitter_username,
+        recordName: 'social.twitter.username',
         domain: domain,
       });
     }

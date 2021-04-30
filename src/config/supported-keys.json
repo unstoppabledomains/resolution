@@ -397,7 +397,7 @@
             "deprecated": false
         },
         "crypto.XDC.address": {
-            "deprecatedKeyName:": "XDC",
+            "deprecatedKeyName": "XDC",
             "validationRegex": "^xdc[a-fA-F0-9]{40}$",
             "deprecated": false
         },
@@ -437,12 +437,12 @@
             "deprecated": false
         },
         "crypto.FUSE.version.ERC20.address": {
-            "deprecatedKeyName:": "FUSE_ERC20",
+            "deprecatedKeyName": "FUSE_ERC20",
             "validationRegex": "^0x[a-fA-F0-9]{40}$",
             "deprecated": false
         },
         "crypto.FUSE.version.FUSE.address": {
-            "deprecatedKeyName:": "FUSE_FUSE",
+            "deprecatedKeyName": "FUSE_FUSE",
             "validationRegex": "^0x[a-fA-F0-9]{40}$",
             "deprecated": false
         },

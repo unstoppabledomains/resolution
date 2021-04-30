@@ -25,7 +25,6 @@ import {
 } from './helpers';
 import { RpcProviderTestCases } from '../utils/providerMockData';
 import fetch, { FetchError } from 'node-fetch';
-import standardKeys from '../utils/standardKeys';
 import Cns from '../Cns';
 import Zns from '../Zns';
 import Ens from '../Ens';
@@ -166,7 +165,7 @@ describe('Resolution', () => {
           get: {
             resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
             records: {
-              [standardKeys.gundb_username]:
+              ['gundb.username.value']:
                 '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c',
             },
           },
@@ -185,8 +184,8 @@ describe('Resolution', () => {
             get: {
               resolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
               records: {
-                [standardKeys.dweb_hash]: 'new record Ipfs hash',
-                [standardKeys.html]: 'old record Ipfs hash',
+                ['dweb.ipfs.hash']: 'new record Ipfs hash',
+                ['ipfs.html.value']: 'old record Ipfs hash',
               },
             },
           });
@@ -201,8 +200,8 @@ describe('Resolution', () => {
             get: {
               resolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
               records: {
-                [standardKeys.browser_redirect]: 'new record redirect url',
-                [standardKeys.redirect_domain]: 'old record redirect url',
+                ['browser.redirect_url']: 'new record redirect url',
+                ['ipfs.redirect_domain.value']: 'old record redirect url',
               },
             },
           });
@@ -358,11 +357,11 @@ describe('Resolution', () => {
                 'dns.A': '["10.0.0.1","10.0.0.2"]',
                 'dns.A.ttl': '90',
                 'dns.AAAA': '["10.0.0.120"]',
-                [standardKeys.ETH]:
+                ['crypto.ETH.address']:
                   '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
-                [standardKeys.ADA]:
+                ['crypto.ADA.address']:
                   '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
-                [standardKeys.ARK]:
+                ['crypto.ARK.address']:
                   '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
               },
             },
@@ -405,7 +404,7 @@ describe('Resolution', () => {
             get: {
               resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
               records: {
-                [standardKeys.ETH]:
+                ['crypto.ETH.address']:
                   '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
               },
             },
@@ -421,7 +420,7 @@ describe('Resolution', () => {
               resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
               owner: '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
               records: {
-                [standardKeys.USDT_ERC20]: '0xe7474D07fD2FA286e7e0aa23cd107F8379085037'
+                ['crypto.USDT.version.ERC20.address']: '0xe7474D07fD2FA286e7e0aa23cd107F8379085037'
               }
             });
             const erc20 = await resolution.multiChainAddr(CryptoDomainWithUsdtMultiChainRecords, "usdt", "erc20");
@@ -434,7 +433,7 @@ describe('Resolution', () => {
               resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
               owner: '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
               records: {
-                [standardKeys.USDT_TRON]: 'TNemhXhpX7MwzZJa3oXvfCjo5pEeXrfN2h'
+                ['crypto.USDT.version.TRON.address']: 'TNemhXhpX7MwzZJa3oXvfCjo5pEeXrfN2h'
               }
             });
             const tron = await resolution.multiChainAddr(CryptoDomainWithUsdtMultiChainRecords, "usdt", "tron");
@@ -447,7 +446,7 @@ describe('Resolution', () => {
               resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
               owner: '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
               records: {
-                [standardKeys.USDT_OMNI]: '19o6LvAdCPkjLi83VsjrCsmvQZUirT4KXJ'
+                ['crypto.USDT.version.OMNI.address']: '19o6LvAdCPkjLi83VsjrCsmvQZUirT4KXJ'
               }
             });
             const omni = await resolution.multiChainAddr(CryptoDomainWithUsdtMultiChainRecords, "usdt", "omni");
@@ -460,7 +459,7 @@ describe('Resolution', () => {
               resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
               owner: '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
               records: {
-                [standardKeys.USDT_EOS]: 'letsminesome'
+                ['crypto.USDT.version.EOS.address']: 'letsminesome'
               }
             });
             const eos = await resolution.multiChainAddr(CryptoDomainWithUsdtMultiChainRecords, "usdt", "eos");
@@ -713,7 +712,7 @@ describe('Resolution', () => {
               get: {
                 resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
                 records: {
-                  [standardKeys.gundb_username]:
+                  ['gundb.username.value']:
                     '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c',
                 },
               },
@@ -735,9 +734,9 @@ describe('Resolution', () => {
                 resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
                 owner: '0x6EC0DEeD30605Bcd19342f3c30201DB263291589',
                 records: {
-                  [standardKeys.validation_twitter_username]:
+                  ['validation.social.twitter.username']:
                     '0xcd2655d9557e5535313b47107fa8f943eb1fec4da6f348668062e66233dde21b413784c4060340f48da364311c6e2549416a6a23dc6fbb48885382802826b8111b',
-                  [standardKeys.twitter_username]: 'derainberk',
+                  ['social.twitter.username']: 'derainberk',
                 },
               },
             });
