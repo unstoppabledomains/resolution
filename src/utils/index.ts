@@ -42,7 +42,8 @@ export const domainExtensionToNamingServiceName = {
   "luxe": NamingServiceName.ENS,
   "xyz": NamingServiceName.ENS,
   "kred": NamingServiceName.ENS,
-  "reverse": NamingServiceName.ENS
+  "reverse": NamingServiceName.ENS,
+  "rsk": NamingServiceName.RNS,
 }
 
 export const findNamingServiceName = (domain: string): NamingServiceName => {

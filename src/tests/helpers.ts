@@ -9,6 +9,7 @@ import { NamingServiceName } from '../types/publicTypes';
 
 export const MainnetUrl = 'https://mainnet.infura.io';
 export const ZilliqaUrl = 'https://api.zilliqa.com';
+export const RskUrl = 'https://public-node.rsk.co';
 export const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
 
 export const CryptoDomainWithoutResolver = 'twistedmusic.crypto';

@@ -94,6 +94,7 @@ export enum NullAddresses {
 }
 
 export const EthCoinIndex = '60';
+export const RskCoinIndex = '137';
 
 // TypeScript will infer a string union type from the literal values passed to
 // this function. Without `extends string`, it would instead generalize them
@@ -122,7 +123,8 @@ const StringUnion = <UnionType extends string>(...values: UnionType[]) => {
 
 export const CnsSupportedNetwork = StringUnion("mainnet", "rinkeby") 
 export const EnsSupportedNetwork = StringUnion("mainnet", "rinkeby", "goerli", "ropsten") 
-export const ZnsSupportedNetwork = StringUnion("mainnet") 
+export const ZnsSupportedNetwork = StringUnion("mainnet")
+export const RnsSupportedNetwork = StringUnion("mainnet", "testnet") 
 
 export function hasProvider(obj: any): obj is { provider: Provider } {
   return obj && !!obj.provider;

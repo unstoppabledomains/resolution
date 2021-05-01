@@ -6,11 +6,13 @@ import {
   RpcProviderLogEntry,
   TransactionRequest,
   ZnsSupportedNetwork,
+  RnsSupportedNetwork,
 } from '.';
 
 export type CnsSupportedNetworks = typeof CnsSupportedNetwork.type;
 export type EnsSupportedNetworks = typeof EnsSupportedNetwork.type;
 export type ZnsSupportedNetworks = typeof ZnsSupportedNetwork.type;
+export type RnsSupportedNetworks = typeof RnsSupportedNetwork.type;
 
 export type Api = { api: true, url?: string };
 
@@ -28,16 +30,22 @@ export type ZnsSource =
   NamingServiceSource &
   {network: ZnsSupportedNetworks, registryAddress?: string}
 
+export type RnsSource =
+  NamingServiceSource &
+  {network: RnsSupportedNetworks, registryAddress?: string}
+
 export type SourceConfig = {
   cns?: CnsSource | Api;
   zns?: ZnsSource | Api;
   ens?: EnsSource | Api;
+  rns?: RnsSource | Api;
 };
 
 export enum NamingServiceName {
   ENS = 'ENS',
   CNS = 'CNS',
   ZNS = 'ZNS',
+  RNS = 'RNS',
 }
 
 export type ResolutionMethod = NamingServiceName | 'UDAPI';

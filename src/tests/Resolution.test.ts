@@ -29,6 +29,7 @@ import standardKeys from '../utils/standardKeys';
 import Cns from '../Cns';
 import Zns from '../Zns';
 import Ens from '../Ens';
+import Rns from '../Rns';
 import FetchProvider from '../FetchProvider';
 import { ConfigurationErrorCode } from '../errors/configurationError';
 
@@ -36,6 +37,7 @@ let resolution: Resolution;
 let cns: Cns;
 let zns: Zns;
 let ens: Ens;
+let rns: Rns;
 
 beforeEach(() => {
   nock.cleanAll();
@@ -49,6 +51,7 @@ beforeEach(() => {
   cns = resolution.serviceMap[NamingServiceName.CNS] as Cns;
   ens = resolution.serviceMap[NamingServiceName.ENS] as Ens;
   zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
+  rns = resolution.serviceMap[NamingServiceName.RNS] as Rns;
 });
 
 describe('Resolution', () => {
@@ -227,6 +230,12 @@ describe('Resolution', () => {
           expect(serviceName).toBe('ZNS');
         });
 
+        it('checks rns service name', () => {
+          const resolution = new Resolution();
+          const serviceName = resolution.serviceName('domain.rsk');
+          expect(serviceName).toBe('RNS');
+        });
+
         it('checks cns service name', () => {
           const resolution = new Resolution();
           const serviceName = resolution.serviceName('domain.crypto');
@@ -305,6 +314,7 @@ describe('Resolution', () => {
           const cnsInvalidDomain = 'hello..crypto';
           const ensInvalidDomain = 'hello..eth';
           const znsInvalidDomain = 'hello..zil';
+          const rnsInvalidDomain = 'hello..rns';
           await expectResolutionErrorCode(
             () => resolution.namehash(cnsInvalidDomain),
             ResolutionErrorCode.UnsupportedDomain,
@@ -315,6 +325,10 @@ describe('Resolution', () => {
           );
           await expectResolutionErrorCode(
             () => resolution.namehash(znsInvalidDomain),
+            ResolutionErrorCode.UnsupportedDomain,
+          );
+          await expectResolutionErrorCode(
+            () => resolution.namehash(rnsInvalidDomain),
             ResolutionErrorCode.UnsupportedDomain,
           );
         });
@@ -415,6 +429,7 @@ describe('Resolution', () => {
           expectSpyToBeCalled(eyes, 2);
           expect(capital).toStrictEqual(lower);
         });
+
         describe('.multichain', () => {
           it('should work with usdt on different erc20', async () => {
             const erc20Spy = mockAsyncMethod(cns, "get", {
@@ -801,6 +816,12 @@ describe('Resolution', () => {
       expect(namehash).toEqual(expectedNamehash);
     });
 
+    it('brad.rsk', () => {
+      const expectedNamehash = '0x3e572204652a5d1fa5cea0b4aba6d226dc42a28759db32440444042ee6d7a95a';
+      const namehash = resolution.namehash('brad.rsk');
+      expect(namehash).toEqual(expectedNamehash);
+    });
+
     it('brad.eth', () => {
       const expectedNamehash = '0xe2cb672a04d6270338f15a428216ca714514dc01fdbdd76e97038a8d4080e01c';
       const namehash = resolution.namehash('brad.eth');
@@ -822,6 +843,12 @@ describe('Resolution', () => {
     it('brad.zil', () => {
       const expectedNamehash = '0x5fc604da00f502da70bfbc618088c0ce468ec9d18d05540935ae4118e8f50787';
       const namehash = resolution.childhash('0x9915d0456b878862e822e2361da37232f626a2e47505c8795134a95d36138ed3', 'brad', NamingServiceName.ZNS);
+      expect(namehash).toEqual(expectedNamehash);
+    });
+
+    it('brad.rsk', () => {
+      const expectedNamehash = '0x3e572204652a5d1fa5cea0b4aba6d226dc42a28759db32440444042ee6d7a95a';
+      const namehash = resolution.childhash('0x0cd5c10192478cd220936e91293afc15e3f6de4d419de5de7506b679cbdd8ec4', 'brad', NamingServiceName.RNS);
       expect(namehash).toEqual(expectedNamehash);
     });
 

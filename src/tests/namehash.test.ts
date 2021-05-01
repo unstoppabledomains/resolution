@@ -2,7 +2,7 @@ import { eip137Childhash, eip137Namehash, znsChildhash, znsNamehash } from '../u
 
 describe('Namehash', () => {
   describe('EIP-137', () => {
-    it('should return namehash', () => {
+    it('should return .crypto namehash', () => {
       const expectedNamehash = '0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9';
       const namehash = eip137Namehash('brad.crypto');
       expect(namehash).toEqual(expectedNamehash);
@@ -36,6 +36,24 @@ describe('Namehash', () => {
       const expectedNamehash = '0x96a270260d2f9e37845776c17a47ae9b8b7e7e576b2365afd2e7f30f43e9bb49';
       const namehash = eip137Namehash('beresnev.eth');
       expect(namehash).toEqual(expectedNamehash);
+    });
+
+    it('should return .rsk namehash', () => {
+      const expectedNamehash = '0x3e572204652a5d1fa5cea0b4aba6d226dc42a28759db32440444042ee6d7a95a';
+      const namehash = eip137Namehash('brad.rsk');
+      expect(namehash).toEqual(expectedNamehash);
+    });
+
+    it('should return namehash for .rsk domain zone', () => {
+      const expectedNamehash = '0x0cd5c10192478cd220936e91293afc15e3f6de4d419de5de7506b679cbdd8ec4';
+      const namehash = eip137Namehash('rsk');
+      expect(namehash).toEqual(expectedNamehash);
+    });
+
+    it('should return childhash for .rsk domain zone', () => {
+      const expectedNamehash = '0x0cd5c10192478cd220936e91293afc15e3f6de4d419de5de7506b679cbdd8ec4';
+      const childhash = eip137Childhash('0000000000000000000000000000000000000000000000000000000000000000', 'rsk');
+      expect(childhash).toEqual(expectedNamehash);
     });
   });
 

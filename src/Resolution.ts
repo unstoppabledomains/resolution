@@ -2,6 +2,7 @@ import BN from 'bn.js';
 import Ens from './Ens';
 import Zns from './Zns';
 import Cns from './Cns';
+import Rns from "./Rns";
 import UdApi from './UdApi';
 import {
   Api,
@@ -59,10 +60,12 @@ export default class Resolution {
     const cns = (isApi(sourceConfig?.cns) ? new UdApi(sourceConfig?.cns.url) : new Cns(sourceConfig?.cns));
     const ens = (isApi(sourceConfig?.ens) ? new UdApi(sourceConfig?.ens.url) : new Ens(sourceConfig?.ens));
     const zns = (isApi(sourceConfig?.zns) ? new UdApi(sourceConfig?.zns.url) : new Zns(sourceConfig?.zns));
+    const rns = (isApi(sourceConfig?.rns) ? new UdApi(sourceConfig?.rns.url) : new Rns(sourceConfig?.rns));
     this.serviceMap = {
       [NamingServiceName.CNS]: cns,
       [NamingServiceName.ENS]: ens,
       [NamingServiceName.ZNS]: zns,
+      [NamingServiceName.RNS]: rns,
     };
   }
 
@@ -186,7 +189,7 @@ export default class Resolution {
    * Resolves given domain name to a specific currency address if exists
    * @async
    * @param domain - domain name to be resolved
-   * @param ticker - currency ticker like BTC, ETH, ZIL
+   * @param ticker - currency ticker like BTC, ETH, ZIL, RSK
    * @throws [[ResolutionError]] if address is not found
    * @returns A promise that resolves in an address
    */
@@ -374,7 +377,7 @@ export default class Resolution {
    * @returns a namehash of a subdomain with name label
    * @param parent namehash of a parent domain
    * @param label subdomain name
-   * @param namingService "ENS", "CNS" or "ZNS"
+   * @param namingService "ENS", "CNS", "ZNS" or "RNS"
    * @param options formatting options
    */
   childhash(
@@ -421,7 +424,7 @@ export default class Resolution {
   }
 
   /**
-   * Returns the name of the service for a domain ENS | CNS | ZNS
+   * Returns the name of the service for a domain ENS | CNS | ZNS | RNS
    * @param domain - domain name to look for
    */
   serviceName(domain: string): ResolutionMethod {
