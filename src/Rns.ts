@@ -196,9 +196,6 @@ export default class Rns extends NamingService {
       const mapper = {
         'ipfs.redirect_domain.value': 'url',
         'browser.redirect_url': 'url',
-        'whois.email.value': 'email',
-        'gundb.username.value': 'gundb_username',
-        'gundb.public_key.value': 'gundb_public_key',
       };
       return mapper[record] || record;
     }

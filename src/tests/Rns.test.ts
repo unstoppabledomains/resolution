@@ -282,12 +282,12 @@ describe('RNS', () => {
   describe('.resolve', () => {
     it('should return correct resolver address', async () => {
       const spies = mockAsyncMethods(rns, {
-        resolver: '0xD87f8121D44F3717d4bAdC50b24E50044f86D64B',
+        resolver: '0x4efd25e3d348f8f25a14fb7655fba6f72edfe93a',
       });
       const resolverAddress = await resolution.resolver('riverplate.rsk');
       expectSpyToBeCalled(spies);
       expect(resolverAddress).toBe(
-        '0xD87f8121D44F3717d4bAdC50b24E50044f86D64B',
+        '0x4efd25e3d348f8f25a14fb7655fba6f72edfe93a',
       );
     });
 
@@ -365,75 +365,6 @@ describe('RNS', () => {
       });
       await expectResolutionErrorCode(
         resolution.httpUrl('matthewgould.rsk'),
-        ResolutionErrorCode.RecordNotFound,
-      );
-      expectSpyToBeCalled(eyes);
-    });
-
-    it('should return resolution error for not finding the email', async () => {
-      const eyes = mockAsyncMethods(rns, {
-        resolver: '0xD87f8121D44F3717d4bAdC50b24E50044f86D64B',
-        callMethod: '',
-      });
-      const emailPromise = resolution.email('matthewgould.rsk');
-      await expectResolutionErrorCode(
-        emailPromise,
-        ResolutionErrorCode.RecordNotFound,
-      );
-      expectSpyToBeCalled(eyes);
-    });
-
-    it('should resolve gundb id and public key', async () => {
-      const eyes = mockAsyncMethods(rns, {
-        resolver: '0xD87f8121D44F3717d4bAdC50b24E50044f86D64B',
-        callMethod:
-          '0x7e1d12f34e038a2bda3d5f6ee0809d72f668c357d9e64fd7f622513f06ea652146ab5fdee35dc4ce77f1c089fd74972691fccd48130306d9eafcc6e1437d1ab21b',
-      });
-      const chatId = await resolution
-        .chatId('riverplate.rsk')
-        .catch((err) => err.code);
-      expectSpyToBeCalled(eyes);
-      expect(chatId).toBe(
-        '0x7e1d12f34e038a2bda3d5f6ee0809d72f668c357d9e64fd7f622513f06ea652146ab5fdee35dc4ce77f1c089fd74972691fccd48130306d9eafcc6e1437d1ab21b',
-      );
-    });
-
-    it('should resolve gundb public key', async () => {
-      const eyes = mockAsyncMethods(rns, {
-        resolver: '0xD87f8121D44F3717d4bAdC50b24E50044f86D64B',
-        callMethod:
-          'yxbMDgFrzemQEcDwJYccE_TDbGmRL_iqZ2JhQxYi2s8.nBEAyMfM2ZBtOf2C-GHe3zEn42Q1vrfPAVqNzgGhXvQ',
-      });
-      const publicKey = await resolution
-        .chatPk('riverplate.rsk')
-        .catch((err) => err.code);
-      expectSpyToBeCalled(eyes);
-      expect(publicKey).toBe(
-        'yxbMDgFrzemQEcDwJYccE_TDbGmRL_iqZ2JhQxYi2s8.nBEAyMfM2ZBtOf2C-GHe3zEn42Q1vrfPAVqNzgGhXvQ',
-      );
-    });
-
-    it('should return resolution error for not finding the gundb chat id', async () => {
-      const eyes = mockAsyncMethods(rns, {
-        resolver: '0xD87f8121D44F3717d4bAdC50b24E50044f86D64B',
-        callMethod: undefined,
-      });
-      const emailPromise = resolution.chatId('test.rsk');
-      await expectResolutionErrorCode(
-        emailPromise,
-        ResolutionErrorCode.RecordNotFound,
-      );
-      expectSpyToBeCalled(eyes);
-    });
-
-    it('should return resolution error for not finding the gundb publicKey', async () => {
-      const eyes = mockAsyncMethods(rns, {
-        resolver: '0xD87f8121D44F3717d4bAdC50b24E50044f86D64B',
-        callMethod: undefined,
-      });
-      const emailPromise = resolution.chatPk('test.rsk');
-      await expectResolutionErrorCode(
-        emailPromise,
         ResolutionErrorCode.RecordNotFound,
       );
       expectSpyToBeCalled(eyes);
