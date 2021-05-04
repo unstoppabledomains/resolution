@@ -15,7 +15,6 @@ import {
 import FetchProvider from '../FetchProvider';
 import { CnsSupportedNetworks, NamingServiceName } from '../types/publicTypes';
 import Cns from '../Cns';
-import standardKeys from '../utils/standardKeys';
 import Networking from '../utils/Networking';
 import { ConfigurationErrorCode } from '../errors/configurationError';
 
@@ -69,9 +68,9 @@ describe('CNS', () => {
         resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
         owner: '0x6ec0deed30605bcd19342f3c30201db263291589',
         records: {
-          [standardKeys.validation_twitter_username]:
+          ['validation.social.twitter.username']:
             '0xcd2655d9557e5535313b47107fa8f943eb1fec4da6f348668062e66233dde21b413784c4060340f48da364311c6e2549416a6a23dc6fbb48885382802826b8111b',
-          [standardKeys.twitter_username]: 'derainberk',
+          ['social.twitter.username']: 'derainberk',
         },
       },
     });
@@ -139,7 +138,7 @@ describe('CNS', () => {
         get: {
           resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
           records: {
-            [standardKeys.BCH]: 'qzx048ez005q4yhphqu2pylpfc3hy88zzu4lu6q9j8',
+            ['crypto.BCH.address']: 'qzx048ez005q4yhphqu2pylpfc3hy88zzu4lu6q9j8',
           },
         },
       });
@@ -156,7 +155,7 @@ describe('CNS', () => {
         get: {
           resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
           records: {
-            [standardKeys.ADA]:
+            ['crypto.ADA.address']:
               'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
           },
         },
@@ -177,7 +176,7 @@ describe('CNS', () => {
           get: {
             resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
             records: {
-              [standardKeys.html]:
+              ['ipfs.html.value']:
                 'QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu',
             },
           },
@@ -192,7 +191,7 @@ describe('CNS', () => {
           get: {
             resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
             records: {
-              [standardKeys.email]: 'johnny@unstoppabledomains.com',
+              ['whois.email.value']: 'johnny@unstoppabledomains.com',
             },
           },
         });
@@ -206,7 +205,7 @@ describe('CNS', () => {
           get: {
             resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
             records: {
-              [standardKeys.redirect_domain]: 'google.com',
+              ['ipfs.redirect_domain.value']: 'google.com',
             },
           },
         });
@@ -220,7 +219,7 @@ describe('CNS', () => {
           get: {
             resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
             records: {
-              [standardKeys.gundb_username]:
+              ['gundb.username.value']:
                 '0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c',
             },
           },
@@ -249,7 +248,7 @@ describe('CNS', () => {
           get: {
             resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
             records: {
-              [standardKeys.gundb_public_key]:
+              ['gundb.public_key.value']:
                 'pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI',
             },
           },
@@ -297,7 +296,7 @@ describe('CNS', () => {
         get: {
           resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
           records: {
-            [standardKeys.html]:
+            ['ipfs.html.value']:
               'QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu',
           },
         },
@@ -368,7 +367,7 @@ describe('CNS', () => {
         get: {
           resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
           records: {
-            [standardKeys.ETH]: '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+            ['crypto.ETH.address']: '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
           },
         },
       });
@@ -383,7 +382,7 @@ describe('CNS', () => {
           get: {
             resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
             records: {
-              [standardKeys.html]:
+              ['ipfs.html.value']:
                 'QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu',
             },
           },
@@ -397,7 +396,7 @@ describe('CNS', () => {
         const spies = mockAsyncMethods(cns, {
           get: {
             resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
-            records: { [standardKeys.email]: 'johnny@unstoppabledomains.com' },
+            records: { ['whois.email.value']: 'johnny@unstoppabledomains.com' },
           },
         });
         const email = await resolution.email(CryptoDomainWithAllRecords);
@@ -410,7 +409,7 @@ describe('CNS', () => {
           get: {
             resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
             records: {
-              [standardKeys.redirect_domain]: 'https://unstoppabledomains.com/',
+              ['ipfs.redirect_domain.value']: 'https://unstoppabledomains.com/',
             },
           },
         });
@@ -424,7 +423,7 @@ describe('CNS', () => {
           get: {
             resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
             records: {
-              [standardKeys.gundb_username]:
+              ['gundb.username.value']:
                 '0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c',
             },
           },
@@ -455,7 +454,7 @@ describe('CNS', () => {
           get: {
             resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
             records: {
-              [standardKeys.gundb_public_key]:
+              ['gundb.public_key.value']:
                 'pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI',
             },
           },

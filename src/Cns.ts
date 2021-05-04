@@ -3,7 +3,6 @@ import { default as proxyReaderAbi } from './contracts/cns/proxyReader';
 import { default as resolverInterface } from './contracts/cns/resolver';
 import ResolutionError, { ResolutionErrorCode } from './errors/resolutionError';
 import EthereumContract from './contracts/EthereumContract';
-import standardKeys from './utils/standardKeys';
 import { constructRecords, isNullAddress, EthereumNetworksInverted, EthereumNetworks } from './utils';
 import { CnsSource, CryptoRecords, DomainData, NamingServiceName, Provider } from './types/publicTypes';
 import { isValidTwitterSignature } from './utils/TwitterSignatureValidator';
@@ -12,6 +11,7 @@ import FetchProvider from './FetchProvider';
 import { eip137Childhash, eip137Namehash } from './utils/namehash';
 import { NamingService } from './NamingService';
 import ConfigurationError, { ConfigurationErrorCode } from './errors/configurationError';
+import SupportedKeys from './config/supported-keys.json';
 
 /**
  * @internal
@@ -131,19 +131,19 @@ export default class Cns extends NamingService {
   async twitter(domain: string): Promise<string> {
     const tokenId = this.namehash(domain);
     const keys = [
-      standardKeys.validation_twitter_username,
-      standardKeys.twitter_username,
+      'validation.social.twitter.username',
+      'social.twitter.username',
     ];
     const data = await this.getVerifiedData(domain, keys);
     const {records} = data;
-    const validationSignature = records[standardKeys.validation_twitter_username];
-    const twitterHandle = records[standardKeys.twitter_username];
+    const validationSignature = records['validation.social.twitter.username'];
+    const twitterHandle = records['social.twitter.username'];
     if (isNullAddress(validationSignature)) {
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {domain, recordName: standardKeys.validation_twitter_username})
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {domain, recordName: 'validation.social.twitter.username'})
     }
 
     if (!twitterHandle) {
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {domain, recordName: standardKeys.twitter_username})
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {domain, recordName: 'social.twitter.username'})
     }
 
     const owner = data.owner;
@@ -185,7 +185,7 @@ export default class Cns extends NamingService {
   }
 
   private async getStandardRecords(tokenId: string): Promise<CryptoRecords> {
-    const keys = Object.values(standardKeys);
+    const keys = Object.keys(SupportedKeys.keys);
     return await this.getMany(tokenId, keys);
   }
 
@@ -256,12 +256,12 @@ export default class Cns extends NamingService {
     contract: EthereumContract,
     tokenId: string,
   ): Promise<string> {
-    const CRYPTO_RESOLVER_ADVANCED_EVENTS_STARTING_BLOCK = '0x960844';
+    const defaultStartingBlock = NetworkConfig?.networks[this.network]?.contracts?.Resolver?.advancedEventsStartingBlock;
     const logs = await contract.fetchLogs('ResetRecords', tokenId);
     const lastResetEvent = logs[logs.length - 1];
     return (
       lastResetEvent?.blockNumber ||
-      CRYPTO_RESOLVER_ADVANCED_EVENTS_STARTING_BLOCK
+      defaultStartingBlock
     );
   }
 }

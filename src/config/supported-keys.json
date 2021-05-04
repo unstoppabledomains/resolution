@@ -194,7 +194,7 @@
         "crypto.DGB.address": {
             "deprecatedKeyName": "DGB",
             "deprecated": false,
-            "validationRegex": "^[a-km-zA-HJ-NP-Z1-9]{34}$|^[a-zA-Z1-9]{42}$"
+            "validationRegex": "(^[a-km-zA-HJ-NP-Z1-9]{34}$)|(^[a-zA-Z1-9]{42}$)|(^dgb1[a-zA-Z0-9]{39}$)"
         },
         "crypto.XZC.address": {
             "deprecatedKeyName": "XZC",
@@ -397,7 +397,7 @@
             "deprecated": false
         },
         "crypto.XDC.address": {
-            "deprecatedKeyName:": "XDC",
+            "deprecatedKeyName": "XDC",
             "validationRegex": "^xdc[a-fA-F0-9]{40}$",
             "deprecated": false
         },
@@ -421,28 +421,28 @@
             "validationRegex": "^(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,39}$",
             "deprecated": false
         },
-        "crypto.FTM.version.ERC20.address" : {
+        "crypto.FTM.version.ERC20.address": {
             "deprecatedKeyName": "FTM_ERC20",
             "validationRegex": "^0x[a-fA-F0-9]{40}$",
             "deprecated": false
         },
-        "crypto.FTM.version.BEP2.address" : {
+        "crypto.FTM.version.BEP2.address": {
             "deprecatedKeyName": "FTM_BEP2",
             "validationRegex": "^(bnb|tbnb)[a-zA-HJ-NP-Z0-9]{39}$",
             "deprecated": false
         },
-        "crypto.FTM.version.OPERA.address" : {
+        "crypto.FTM.version.OPERA.address": {
             "deprecatedKeyName": "FTM_OPERA",
             "validationRegex": "^0x[a-fA-F0-9]{40}$",
             "deprecated": false
         },
         "crypto.FUSE.version.ERC20.address": {
-            "deprecatedKeyName:": "FUSE_ERC20",
+            "deprecatedKeyName": "FUSE_ERC20",
             "validationRegex": "^0x[a-fA-F0-9]{40}$",
             "deprecated": false
         },
         "crypto.FUSE.version.FUSE.address": {
-            "deprecatedKeyName:": "FUSE_FUSE",
+            "deprecatedKeyName": "FUSE_FUSE",
             "validationRegex": "^0x[a-fA-F0-9]{40}$",
             "deprecated": false
         },
@@ -512,477 +512,477 @@
             "deprecated": false
         },
         "dns.ttl": {
-            "deprecatedKeyName": "ttl",
+            "deprecatedKeyName": "dns_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.A": {
-            "deprecatedKeyName": "A",
+            "deprecatedKeyName": "dns_A",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.A.ttl": {
-            "deprecatedKeyName": "A_ttl",
+            "deprecatedKeyName": "dns_A_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.AAAA": {
-            "deprecatedKeyName": "AAAA",
+            "deprecatedKeyName": "dns_AAAA",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.AAAA.ttl": {
-            "deprecatedKeyName": "AAAA_ttl",
+            "deprecatedKeyName": "dns_AAAA_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.AFSDB": {
-            "deprecatedKeyName": "AFSDB",
+            "deprecatedKeyName": "dns_AFSDB",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.AFSDB.ttl": {
-            "deprecatedKeyName": "AFSDB_ttl",
+            "deprecatedKeyName": "dns_AFSDB_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.APL": {
-            "deprecatedKeyName": "APL",
+            "deprecatedKeyName": "dns_APL",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.APL.ttl": {
-            "deprecatedKeyName": "APL_ttl",
+            "deprecatedKeyName": "dns_APL_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.CAA": {
-            "deprecatedKeyName": "CAA",
+            "deprecatedKeyName": "dns_CAA",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.CAA.ttl": {
-            "deprecatedKeyName": "CAA_ttl",
+            "deprecatedKeyName": "dns_CAA_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.CDNSKEY": {
-            "deprecatedKeyName": "CDNSKEY",
+            "deprecatedKeyName": "dns_CDNSKEY",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.CDNSKEY.ttl": {
-            "deprecatedKeyName": "CDNSKEY_ttl",
+            "deprecatedKeyName": "dns_CDNSKEY_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.CDS": {
-            "deprecatedKeyName": "CDS",
+            "deprecatedKeyName": "dns_CDS",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.CDS.ttl": {
-            "deprecatedKeyName": "CDS_ttl",
+            "deprecatedKeyName": "dns_CDS_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.CERT": {
-            "deprecatedKeyName": "CERT",
+            "deprecatedKeyName": "dns_CERT",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.CERT.ttl": {
-            "deprecatedKeyName": "CERT_ttl",
+            "deprecatedKeyName": "dns_CERT_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.CNAME": {
-            "deprecatedKeyName": "CNAME",
+            "deprecatedKeyName": "dns_CNAME",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.CNAME.ttl": {
-            "deprecatedKeyName": "CNAME_ttl",
+            "deprecatedKeyName": "dns_CNAME_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.CSYNC": {
-            "deprecatedKeyName": "CSYNC",
+            "deprecatedKeyName": "dns_CSYNC",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.CSYNC.ttl": {
-            "deprecatedKeyName": "CSYNC_ttl",
+            "deprecatedKeyName": "dns_CSYNC_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.DHCID": {
-            "deprecatedKeyName": "DHCID",
+            "deprecatedKeyName": "dns_DHCID",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.DHCID.ttl": {
-            "deprecatedKeyName": "DHCID_ttl",
+            "deprecatedKeyName": "dns_DHCID_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.DLV": {
-            "deprecatedKeyName": "DLV",
+            "deprecatedKeyName": "dns_DLV",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.DLV.ttl": {
-            "deprecatedKeyName": "DLV_ttl",
+            "deprecatedKeyName": "dns_DLV_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.DNAME": {
-            "deprecatedKeyName": "DNAME",
+            "deprecatedKeyName": "dns_DNAME",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.DNAME.ttl": {
-            "deprecatedKeyName": "DNAME_ttl",
+            "deprecatedKeyName": "dns_DNAME_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.DNSKEY": {
-            "deprecatedKeyName": "DNSKEY",
+            "deprecatedKeyName": "dns_DNSKEY",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.DNSKEY.ttl": {
-            "deprecatedKeyName": "DNSKEY_ttl",
+            "deprecatedKeyName": "dns_DNSKEY_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.DS": {
-            "deprecatedKeyName": "DS",
+            "deprecatedKeyName": "dns_DS",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.DS.ttl": {
-            "deprecatedKeyName": "DS_ttl",
+            "deprecatedKeyName": "dns_DS_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.EUI48": {
-            "deprecatedKeyName": "EUI48",
+            "deprecatedKeyName": "dns_EUI48",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.EUI48.ttl": {
-            "deprecatedKeyName": "EUI48_ttl",
+            "deprecatedKeyName": "dns_EUI48_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.EUI64": {
-            "deprecatedKeyName": "EUI64",
+            "deprecatedKeyName": "dns_EUI64",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.EUI64.ttl": {
-            "deprecatedKeyName": "EUI64_ttl",
+            "deprecatedKeyName": "dns_EUI64_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.HINFO": {
-            "deprecatedKeyName": "HINFO",
+            "deprecatedKeyName": "dns_HINFO",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.HINFO.ttl": {
-            "deprecatedKeyName": "HINFO_ttl",
+            "deprecatedKeyName": "dns_HINFO_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.HIP": {
-            "deprecatedKeyName": "HIP",
+            "deprecatedKeyName": "dns_HIP",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.HIP.ttl": {
-            "deprecatedKeyName": "HIP_ttl",
+            "deprecatedKeyName": "dns_HIP_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.HTTPS": {
-            "deprecatedKeyName": "HTTPS",
+            "deprecatedKeyName": "dns_HTTPS",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.HTTPS.ttl": {
-            "deprecatedKeyName": "HTTPS_ttl",
+            "deprecatedKeyName": "dns_HTTPS_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.IPSECKEY": {
-            "deprecatedKeyName": "IPSECKEY",
+            "deprecatedKeyName": "dns_IPSECKEY",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.IPSECKEY.ttl": {
-            "deprecatedKeyName": "IPSECKEY_ttl",
+            "deprecatedKeyName": "dns_IPSECKEY_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.KEY": {
-            "deprecatedKeyName": "KEY",
+            "deprecatedKeyName": "dns_KEY",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.KEY.ttl": {
-            "deprecatedKeyName": "KEY_ttl",
+            "deprecatedKeyName": "dns_KEY_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.KX": {
-            "deprecatedKeyName": "KX",
+            "deprecatedKeyName": "dns_KX",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.KX.ttl": {
-            "deprecatedKeyName": "KX_ttl",
+            "deprecatedKeyName": "dns_KX_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.LOC": {
-            "deprecatedKeyName": "LOC",
+            "deprecatedKeyName": "dns_LOC",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.LOC.ttl": {
-            "deprecatedKeyName": "LOC_ttl",
+            "deprecatedKeyName": "dns_LOC_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.MX": {
-            "deprecatedKeyName": "MX",
+            "deprecatedKeyName": "dns_MX",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.MX.ttl": {
-            "deprecatedKeyName": "MX_ttl",
+            "deprecatedKeyName": "dns_MX_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.NAPTR": {
-            "deprecatedKeyName": "NAPTR",
+            "deprecatedKeyName": "dns_NAPTR",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.NAPTR.ttl": {
-            "deprecatedKeyName": "NAPTR_ttl",
+            "deprecatedKeyName": "dns_NAPTR_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.NS": {
-            "deprecatedKeyName": "NS",
+            "deprecatedKeyName": "dns_NS",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.NS.ttl": {
-            "deprecatedKeyName": "NS_ttl",
+            "deprecatedKeyName": "dns_NS_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.NSEC": {
-            "deprecatedKeyName": "NSEC",
+            "deprecatedKeyName": "dns_NSEC",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.NSEC.ttl": {
-            "deprecatedKeyName": "NSEC_ttl",
+            "deprecatedKeyName": "dns_NSEC_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.NSEC3": {
-            "deprecatedKeyName": "NSEC3",
+            "deprecatedKeyName": "dns_NSEC3",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.NSEC3.ttl": {
-            "deprecatedKeyName": "NSEC3_ttl",
+            "deprecatedKeyName": "dns_NSEC3_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.NSEC3PARAM": {
-            "deprecatedKeyName": "NSEC3PARAM",
+            "deprecatedKeyName": "dns_NSEC3PARAM",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.NSEC3PARAM.ttl": {
-            "deprecatedKeyName": "NSEC3PARAM_ttl",
+            "deprecatedKeyName": "dns_NSEC3PARAM_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.OPENPGPKEY": {
-            "deprecatedKeyName": "OPENPGPKEY",
+            "deprecatedKeyName": "dns_OPENPGPKEY",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.OPENPGPKEY.ttl": {
-            "deprecatedKeyName": "OPENPGPKEY_ttl",
+            "deprecatedKeyName": "dns_OPENPGPKEY_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.PTR": {
-            "deprecatedKeyName": "PTR",
+            "deprecatedKeyName": "dns_PTR",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.PTR.ttl": {
-            "deprecatedKeyName": "PTR_ttl",
+            "deprecatedKeyName": "dns_PTR_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.RP": {
-            "deprecatedKeyName": "RP",
+            "deprecatedKeyName": "dns_RP",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.RP.ttl": {
-            "deprecatedKeyName": "RP_ttl",
+            "deprecatedKeyName": "dns_RP_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.RRSIG": {
-            "deprecatedKeyName": "RRSIG",
+            "deprecatedKeyName": "dns_RRSIG",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.RRSIG.ttl": {
-            "deprecatedKeyName": "RRSIG_ttl",
+            "deprecatedKeyName": "dns_RRSIG_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.SIG": {
-            "deprecatedKeyName": "SIG",
+            "deprecatedKeyName": "dns_SIG",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.SIG.ttl": {
-            "deprecatedKeyName": "SIG_ttl",
+            "deprecatedKeyName": "dns_SIG_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.SMIMEA": {
-            "deprecatedKeyName": "SMIMEA",
+            "deprecatedKeyName": "dns_SMIMEA",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.SMIMEA.ttl": {
-            "deprecatedKeyName": "SMIMEA_ttl",
+            "deprecatedKeyName": "dns_SMIMEA_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.SOA": {
-            "deprecatedKeyName": "SOA",
+            "deprecatedKeyName": "dns_SOA",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.SOA.ttl": {
-            "deprecatedKeyName": "SOA_ttl",
+            "deprecatedKeyName": "dns_SOA_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.SRV": {
-            "deprecatedKeyName": "SRV",
+            "deprecatedKeyName": "dns_SRV",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.SRV.ttl": {
-            "deprecatedKeyName": "SRV_ttl",
+            "deprecatedKeyName": "dns_SRV_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.SSHFP": {
-            "deprecatedKeyName": "SSHFP",
+            "deprecatedKeyName": "dns_SSHFP",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.SSHFP.ttl": {
-            "deprecatedKeyName": "SSHFP_ttl",
+            "deprecatedKeyName": "dns_SSHFP_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.SVCB": {
-            "deprecatedKeyName": "SVCB",
+            "deprecatedKeyName": "dns_SVCB",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.SVCB.ttl": {
-            "deprecatedKeyName": "SVCB_ttl",
+            "deprecatedKeyName": "dns_SVCB_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.TA": {
-            "deprecatedKeyName": "TA",
+            "deprecatedKeyName": "dns_TA",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.TA.ttl": {
-            "deprecatedKeyName": "TA_ttl",
+            "deprecatedKeyName": "dns_TA_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.TKEY": {
-            "deprecatedKeyName": "TKEY",
+            "deprecatedKeyName": "dns_TKEY",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.TKEY.ttl": {
-            "deprecatedKeyName": "TKEY_ttl",
+            "deprecatedKeyName": "dns_TKEY_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.TLSA": {
-            "deprecatedKeyName": "TLSA",
+            "deprecatedKeyName": "dns_TLSA",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.TLSA.ttl": {
-            "deprecatedKeyName": "TLSA_ttl",
+            "deprecatedKeyName": "dns_TLSA_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.TSIG": {
-            "deprecatedKeyName": "TSIG",
+            "deprecatedKeyName": "dns_TSIG",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.TSIG.ttl": {
-            "deprecatedKeyName": "TSIG_ttl",
+            "deprecatedKeyName": "dns_TSIG_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.TXT": {
-            "deprecatedKeyName": "TXT",
+            "deprecatedKeyName": "dns_TXT",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.TXT.ttl": {
-            "deprecatedKeyName": "TXT_ttl",
+            "deprecatedKeyName": "dns_TXT_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.URI": {
-            "deprecatedKeyName": "URI",
+            "deprecatedKeyName": "dns_URI",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.URI.ttl": {
-            "deprecatedKeyName": "URI_ttl",
+            "deprecatedKeyName": "dns_URI_ttl",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.ZONEMD": {
-            "deprecatedKeyName": "ZONEMD",
+            "deprecatedKeyName": "dns_ZONEMD",
             "validationRegex": null,
             "deprecated": false
         },
         "dns.ZONEMD.ttl": {
-            "deprecatedKeyName": "ZONEMD_ttl",
+            "deprecatedKeyName": "dns_ZONEMD_ttl",
             "validationRegex": null,
             "deprecated": false
         }

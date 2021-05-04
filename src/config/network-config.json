@@ -32,7 +32,8 @@
                     "legacyAddresses": [
                         "0xa1cac442be6673c49f8e74ffc7c4fd746f3cbd0d",
                         "0x878bc2f3f717766ab69c0a5f9a6144931e61aed3"
-                    ]
+                    ],
+                    "advancedEventsStartingBlock": "0x960844"
                 },
                 "ProxyReader": {
                     "address": "0xa6E7cEf2EDDEA66352Fd68E5915b60BDbb7309f5",
@@ -78,7 +79,8 @@
                 },
                 "Resolver": {
                     "address": "0x95AE1515367aa64C462c71e87157771165B1287A",
-                    "legacyAddresses": []
+                    "legacyAddresses": [],
+                    "advancedEventsStartingBlock": "0x7232CF"
                 },
                 "ProxyReader": {
                     "address": "0x3A2e74CF832cbA3d77E72708d55370119E4323a6",
