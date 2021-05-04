@@ -21,7 +21,8 @@ import {
     .option('-i, --ipfs', 'get IpfsHash')
     .option('-r, --resolver', 'get resolver address')
     .option('-e, --email', 'get email')
-    .option('-n, --namehash', `returns domain's namehash`)
+    .option('-n, --namehash', `returns domain's namehash (hex)`)
+    .option('-N, --namehash-decimal', `returns domain's namehash (decimal)`)
     .option('-o, --owner', `returns domain's owner`)
     .option('-g, --gundb', `returns gundb chat id`)
     .option('-m, --meta', 'shortcut for all meta data options (-siren)')
@@ -70,6 +71,7 @@ import {
     resolver: () => tryInfo(async () => await resolution.resolver(domain), response, 'resolver'),
     service: () => tryInfo(() => resolution.serviceName(domain), response, 'service'),
     namehash: () => tryInfo(() => resolution.namehash(domain), response, 'namehash'),
+    namehashDecimal: () => tryInfo(() => resolution.namehash(domain, {format: "dec"}), response, 'namehash-decimal'),
     owner: () => tryInfo(async () => await resolution.owner(domain), response, 'owner'),
     gundb: () => tryInfo(async () => {
       const result = {};
