@@ -157,13 +157,6 @@ function resolveCustomRecord(domain, record) {
 resolveCustomRecord('homecakes.crypto', 'custom.record.value');
 ```
 
-Execute the script.
-
-```shell
-$ node gundb.js
-Domain homecakes.crypto has a GunDB chat ID: 0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c
-```
-
 ### Command Line Interface
 
 To use resolution via the command line install the package globally.
