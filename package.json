@@ -16,6 +16,7 @@
     "release:major": "RELEASE=major yarn release:run",
     "release:run": "yarn build && yarn size && yarn publish --$RELEASE && yarn release:tag && yarn docs:deploy",
     "release:tag": "git push origin v$npm_package_version",
+    "fix": "yarn prettier:fix && yarn lint:fix --ext ts src",
     "lint": "eslint --ext ts src",
     "lint:fix": "eslint --fix --ext ts src",
     "test": "jest",
@@ -36,6 +37,7 @@
     "config:pull": "yarn network-config:pull && yarn supported-keys:pull",
     "network-config:pull": "curl https://raw.githubusercontent.com/unstoppabledomains/dot-crypto/master/src/network-config/network-config.json -o src/config/network-config.json",
     "supported-keys:pull": "curl https://raw.githubusercontent.com/unstoppabledomains/dot-crypto/master/src/supported-keys/supported-keys.json -o src/config/supported-keys.json",
+    "prettier:fix": "prettier --write -l \"src/**/*.{ts,tsx,js,jsx,json,md}\"",
     "prepare": "husky install"
   },
   "files": [

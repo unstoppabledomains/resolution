@@ -1,11 +1,9 @@
-import { RequestArguments } from '../types';
+import {RequestArguments} from '../types';
 import {
   ConfigurationError,
   ConfigurationErrorCode,
 } from '../errors/configurationError';
-import ResolutionError, {
-  ResolutionErrorCode,
-} from '../errors/resolutionError';
+import ResolutionError, {ResolutionErrorCode} from '../errors/resolutionError';
 import {
   Web3Version0Provider,
   Provider,
