@@ -84,7 +84,7 @@ describe('Resolution', () => {
       const resolution = await Resolution.autoNetwork({
         cns: {provider},
       });
-      expect(spy).toBeCalledTimes(2);
+      expect(spy).toBeCalledTimes(1);
       expect(
         (resolution.serviceMap[NamingServiceName.CNS] as Cns).network,
       ).toBe(4);
@@ -831,13 +831,6 @@ describe('Resolution', () => {
       const expectedNamehash =
         '0x5fc604da00f502da70bfbc618088c0ce468ec9d18d05540935ae4118e8f50787';
       const namehash = resolution.namehash('brad.zil');
-      expect(namehash).toEqual(expectedNamehash);
-    });
-
-    it('brad.eth', () => {
-      const expectedNamehash =
-        '0xe2cb672a04d6270338f15a428216ca714514dc01fdbdd76e97038a8d4080e01c';
-      const namehash = resolution.namehash('brad.eth');
       expect(namehash).toEqual(expectedNamehash);
     });
 
