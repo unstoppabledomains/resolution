@@ -17,7 +17,6 @@ beforeEach(() => {
   resolution = new Resolution({
     sourceConfig: {
       zns: {api: true},
-      ens: {api: true},
       cns: {api: true},
     },
   });
