@@ -66,7 +66,6 @@
   },
   "homepage": "https://github.com/unstoppabledomains/resolution.git#readme",
   "devDependencies": {
-    "@ensdomains/address-encoder": "0.2.6",
     "@ethersproject/providers": "^5.0.2",
     "@types/bn.js": "^4.11.6",
     "@types/jest": "24.0.23",
