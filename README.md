@@ -31,11 +31,6 @@ Resolution supports decentralized domains across three main zones:
 - Zilliqa Name Service (ZNS)
   - `.zil`
 
-### Required packages
-
-- `"bip44-constants": "^8.0.5"`
-- `"content-hash": "^2.5.2"`
-
 For more information, see our detailed
 [API Referrence](https://unstoppabledomains.github.io/resolution/).
 
