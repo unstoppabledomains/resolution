@@ -47,13 +47,6 @@ describe('Namehash', () => {
       );
       expect(childhash).toEqual(expectedNamehash);
     });
-
-    it('should return namehash for ENS domain', () => {
-      const expectedNamehash =
-        '0x96a270260d2f9e37845776c17a47ae9b8b7e7e576b2365afd2e7f30f43e9bb49';
-      const namehash = eip137Namehash('beresnev.eth');
-      expect(namehash).toEqual(expectedNamehash);
-    });
   });
 
   describe('ZNS', () => {
