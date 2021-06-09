@@ -1,3 +1,8 @@
+## 4.0.1
+
+- No changes made. Version bump so that it would appear as latest version on
+  NPM.
+
 ## 4.0.0
 
 - Remove ENS support
