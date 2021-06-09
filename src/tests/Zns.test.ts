@@ -255,6 +255,25 @@ describe('ZNS', () => {
     });
   });
 
+  describe('.isRegistered', () => {
+    it('should return true', async () => {
+      const spies = mockAsyncMethods(zns, {
+        getRecordsAddresses: ['zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz'],
+      });
+      const isRegistered = await resolution.isRegistered('ryan.zil');
+      expectSpyToBeCalled(spies);
+      expect(isRegistered).toBe(true);
+    });
+    it('should return false', async () => {
+      const spies = mockAsyncMethods(zns, {
+        getRecordsAddresses: [''],
+      });
+      const isRegistered = await resolution.isRegistered('ryan.zil');
+      expectSpyToBeCalled(spies);
+      expect(isRegistered).toBe(false);
+    });
+  });
+
   describe('.Hashing', () => {
     describe('.Namehash', () => {
       it('supports standard domain', () => {

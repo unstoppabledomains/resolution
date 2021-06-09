@@ -1,5 +1,6 @@
 import nock from 'nock';
 import Resolution from '../index';
+import Udapi from '../UdApi';
 import Networking from '../utils/Networking';
 import {
   DefaultUrl,
@@ -8,8 +9,10 @@ import {
   expectSpyToBeCalled,
   CryptoDomainWithTwitterVerification,
 } from './helpers';
+import {NamingServiceName} from '../types/publicTypes';
 
 let resolution: Resolution;
+let cnsApi: Udapi;
 
 beforeEach(() => {
   nock.cleanAll();
@@ -20,6 +23,7 @@ beforeEach(() => {
       cns: {api: true},
     },
   });
+  cnsApi = resolution.serviceMap[NamingServiceName.CNS] as Udapi;
 });
 
 describe('Unstoppable API', () => {
@@ -148,6 +152,22 @@ describe('Unstoppable API', () => {
     const email = await resolution.email('ergergergerg.zil');
     expectSpyToBeCalled([eyes]);
     expect(email).toBe('matt+test@unstoppabledomains.com');
+  });
+
+  it('should return true for registered domain', async () => {
+    const spies = mockAsyncMethod(cnsApi, 'resolve', {
+      meta: {owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2'},
+    });
+    const isRegistered = await cnsApi.isRegistered('ryan.crypto');
+    expectSpyToBeCalled([spies]);
+    expect(isRegistered).toBe(true);
+  });
+
+  it('should return false for unregistered domain', async () => {
+    const spies = mockAsyncMethod(cnsApi, 'resolve', {meta: {owner: ''}});
+    const isRegistered = await resolution.isRegistered('ryan.crypto');
+    expectSpyToBeCalled([spies]);
+    expect(isRegistered).toBe(false);
   });
 
   it('should return a valid httpUrl from API', async () => {

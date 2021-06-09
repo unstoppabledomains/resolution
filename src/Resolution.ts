@@ -347,6 +347,16 @@ export default class Resolution {
   }
 
   /**
+   * @param domain domain name
+   * @returns A Promise that resolves true or false
+   */
+  async isRegistered(domain: string): Promise<Boolean> {
+    domain = this.prepareDomain(domain);
+    const method = this.getNamingMethodOrThrow(domain);
+    return await method.isRegistered(domain);
+  }
+
+  /**
    * @returns Produces a namehash from supported naming service in hex format with 0x prefix.
    * Corresponds to ERC721 token id in case of Ethereum based naming service like CNS.
    * @param domain domain name to be converted

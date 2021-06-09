@@ -167,6 +167,11 @@ export default class Zns extends NamingService {
     });
   }
 
+  async isRegistered(domain: string): Promise<boolean> {
+    const recordAddresses = await this.getRecordsAddresses(domain);
+    return Boolean(recordAddresses && recordAddresses[0]);
+  }
+
   private async getRecordsAddresses(
     domain: string,
   ): Promise<[string, string] | undefined> {
