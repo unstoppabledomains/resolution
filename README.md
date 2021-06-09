@@ -1,4 +1,4 @@
-[Current Version v4.0.0](https://unstoppabledomains.github.io/resolution/v4.0.0/globals.html)
+[Current Version v4.0.1](https://unstoppabledomains.github.io/resolution/v4.0.1/globals.html)
 
 ## Older Versions
 
