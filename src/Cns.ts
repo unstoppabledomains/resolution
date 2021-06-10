@@ -228,8 +228,15 @@ export default class Cns extends NamingService {
   }
 
   async getTokenUri(tokenId: string): Promise<string> {
-    const [tokenUri] = await this.readerContract.call('tokenURI', [tokenId]);
-    return tokenUri;
+    try {
+      const [tokenUri] = await this.readerContract.call('tokenURI', [tokenId]);
+      return tokenUri;
+    } catch (error) {
+      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+        method: NamingServiceName.CNS,
+        methodName: 'getTokenUri',
+      });
+    }
   }
 
   private async getVerifiedData(

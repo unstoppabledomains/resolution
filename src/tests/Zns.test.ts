@@ -365,4 +365,35 @@ describe('ZNS', () => {
       });
     });
   });
+
+  describe('.tokenURI', () => {
+    it('should throw an unsupported method error', async () => {
+      await expectResolutionErrorCode(
+        () => resolution.tokenURI('test.zil'),
+        ResolutionErrorCode.UnsupportedMethod,
+      );
+    });
+  });
+
+  describe('.tokenURIMetadata', () => {
+    it('should throw an unsupported method error', async () => {
+      await expectResolutionErrorCode(
+        () => resolution.tokenURIMetadata('test.zil'),
+        ResolutionErrorCode.UnsupportedMethod,
+      );
+    });
+  });
+
+  describe('.unhash', () => {
+    it('should throw an unsupported method error', async () => {
+      await expectResolutionErrorCode(
+        () =>
+          resolution.unhash(
+            '0x9915d0456b878862e822e2361da37232f626a2e47505c8795134a95d36138ed3',
+            NamingServiceName.ZNS,
+          ),
+        ResolutionErrorCode.UnsupportedMethod,
+      );
+    });
+  });
 });

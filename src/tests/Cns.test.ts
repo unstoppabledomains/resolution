@@ -1,5 +1,5 @@
 import Resolution from '../index';
-import {ResolutionErrorCode} from '../errors/resolutionError';
+import ResolutionError, {ResolutionErrorCode} from '../errors/resolutionError';
 import {NullAddress} from '../types';
 import {
   CryptoDomainWithoutResolver,
@@ -17,6 +17,7 @@ import {CnsSupportedNetworks, NamingServiceName} from '../types/publicTypes';
 import Cns from '../Cns';
 import Networking from '../utils/Networking';
 import {ConfigurationErrorCode} from '../errors/configurationError';
+import {TokenUriMetadata} from '../../build/types/publicTypes';
 
 let resolution: Resolution;
 let cns: Cns;
@@ -603,6 +604,109 @@ describe('CNS', () => {
       await expect(
         resolution.record(CryptoDomainWithAllRecords, 'No.such.record'),
       ).rejects.toEqual(new Error('error_up'));
+    });
+  });
+
+  describe('.tokenURI', () => {
+    it('should return token URI', async () => {
+      const spies = mockAsyncMethods(cns.readerContract, {
+        call: ['testuri'],
+      });
+
+      const uri = await resolution.tokenURI('test.crypto');
+
+      expectSpyToBeCalled(spies);
+      expect(uri).toEqual('testuri');
+    });
+
+    it('should throw error if domain is not found', async () => {
+      const spies = mockAsyncMethods(cns.readerContract, {
+        call: new ResolutionError(ResolutionErrorCode.ServiceProviderError),
+      });
+
+      await expectResolutionErrorCode(
+        () => resolution.tokenURI('test.crypto'),
+        ResolutionErrorCode.UnregisteredDomain,
+      );
+      expectSpyToBeCalled(spies);
+    });
+  });
+
+  describe('.tokenURIMetadata', () => {
+    it('should return token metadata', async () => {
+      const testMeta: TokenUriMetadata = {
+        name: 'test.crypto',
+        description: 'Test token',
+        image: 'Fake image',
+        external_url: 'external',
+      };
+
+      const cnsSpies = mockAsyncMethods(cns.readerContract, {
+        call: ['testuri'],
+      });
+      const fetchSpies = mockAsyncMethods(Networking, {
+        fetch: {
+          ok: true,
+          json: () => testMeta,
+        },
+      });
+
+      const metadata = await resolution.tokenURIMetadata('test.crypto');
+
+      expectSpyToBeCalled(cnsSpies);
+      expectSpyToBeCalled(fetchSpies);
+      expect(metadata).toEqual(testMeta);
+    });
+
+    it('should throw error if domain is not found', async () => {
+      const spies = mockAsyncMethods(cns.readerContract, {
+        call: new ResolutionError(ResolutionErrorCode.ServiceProviderError),
+      });
+
+      await expectResolutionErrorCode(
+        () => resolution.tokenURIMetadata('test.crypto'),
+        ResolutionErrorCode.UnregisteredDomain,
+      );
+      expectSpyToBeCalled(spies);
+    });
+  });
+
+  describe('.unhash', () => {
+    it('should unhash token', async () => {
+      const testMeta: TokenUriMetadata = {
+        name: 'test.crypto',
+        description: 'Test token',
+        image: 'Fake image',
+        external_url: 'external',
+      };
+
+      const cnsSpies = mockAsyncMethods(cns.readerContract, {
+        call: ['testuri'],
+      });
+      const fetchSpies = mockAsyncMethods(Networking, {
+        fetch: {
+          ok: true,
+          json: () => testMeta,
+        },
+      });
+
+      const domain = await resolution.unhash('somehash', NamingServiceName.CNS);
+
+      expectSpyToBeCalled(cnsSpies);
+      expectSpyToBeCalled(fetchSpies);
+      expect(domain).toEqual(testMeta.name);
+    });
+
+    it('should throw error if domain is not found', async () => {
+      const spies = mockAsyncMethods(cns.readerContract, {
+        call: new ResolutionError(ResolutionErrorCode.ServiceProviderError),
+      });
+
+      await expectResolutionErrorCode(
+        () => resolution.unhash('somehash', NamingServiceName.CNS),
+        ResolutionErrorCode.UnregisteredDomain,
+      );
+      expectSpyToBeCalled(spies);
     });
   });
 });
