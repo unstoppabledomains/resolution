@@ -163,4 +163,10 @@ export default class Udapi extends NamingService {
 
     return !isNullAddress(record.meta.owner);
   }
+
+  async getTokenUri(tokenId: string): Promise<string> {
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+      methodName: 'getTokenUri',
+    });
+  }
 }
