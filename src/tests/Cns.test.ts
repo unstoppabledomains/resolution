@@ -690,11 +690,41 @@ describe('CNS', () => {
         },
       });
 
-      const domain = await resolution.unhash('somehash', NamingServiceName.CNS);
+      const domain = await resolution.unhash(
+        '0xb72f443a17edf4a55f766cf3c83469e6f96494b16823a41a4acb25800f303103',
+        NamingServiceName.CNS,
+      );
 
       expectSpyToBeCalled(cnsSpies);
       expectSpyToBeCalled(fetchSpies);
       expect(domain).toEqual(testMeta.name);
+    });
+
+    it('should throw error if hash does not match', async () => {
+      const testMeta: TokenUriMetadata = {
+        name: 'test.crypto',
+        description: 'Test token',
+        image: 'Fake image',
+        external_url: 'external',
+      };
+
+      const cnsSpies = mockAsyncMethods(cns.readerContract, {
+        call: ['testuri'],
+      });
+      const fetchSpies = mockAsyncMethods(Networking, {
+        fetch: {
+          ok: true,
+          json: () => testMeta,
+        },
+      });
+
+      await expectResolutionErrorCode(
+        () => resolution.unhash('0xdeaddeaddead', NamingServiceName.CNS),
+        ResolutionErrorCode.RecordNotFound,
+      );
+
+      expectSpyToBeCalled(cnsSpies);
+      expectSpyToBeCalled(fetchSpies);
     });
 
     it('should throw error if domain is not found', async () => {

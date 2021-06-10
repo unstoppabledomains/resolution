@@ -485,6 +485,13 @@ export default class Resolution {
   async unhash(hash: string, service: NamingServiceName): Promise<string> {
     const tokenUri = await this.serviceMap[service].getTokenUri(hash);
     const metadata = await this.getMetadataFromTokenURI(tokenUri);
+    const receivedHash = this.namehash(metadata.name);
+    if (receivedHash !== hash) {
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+        methodName: 'unhash',
+        domain: metadata.name,
+      });
+    }
     return metadata.name;
   }
 
