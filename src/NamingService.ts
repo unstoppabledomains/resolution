@@ -21,4 +21,5 @@ export abstract class NamingService {
     currencyTicker: string,
   ): Promise<string | null>;
   abstract allRecords(domain: string): Promise<Record<string, string>>;
+  abstract isRegistered(domain: string): Promise<boolean>;
 }
