@@ -183,3 +183,38 @@ export type DomainData = {
   resolver: string;
   records: CryptoRecords;
 };
+
+export interface Erc721Metadata {
+  name: string;
+  description: string;
+  image: string;
+  external_url: string;
+}
+
+export type TokenUriMetadataAttribute =
+  | {
+      value: string | number;
+    }
+  | {
+      trait_type: string;
+      value: string | number;
+    }
+  | {
+      display_type:
+        | 'number'
+        | 'date'
+        | 'boost_number'
+        | 'boost_percentage'
+        | 'ranking';
+      trait_type: string;
+      value: number;
+    };
+
+export interface TokenUriMetadata extends Erc721Metadata {
+  external_link?: string;
+  image_data?: string;
+  attributes?: Array<TokenUriMetadataAttribute>;
+  background_color?: string;
+  animation_url?: string;
+  youtube_url?: string;
+}

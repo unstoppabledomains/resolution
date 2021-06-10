@@ -172,6 +172,12 @@ export default class Zns extends NamingService {
     return Boolean(recordAddresses && recordAddresses[0]);
   }
 
+  async getTokenUri(tokenId: string): Promise<string> {
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+      methodName: 'getTokenUri',
+    });
+  }
+
   private async getRecordsAddresses(
     domain: string,
   ): Promise<[string, string] | undefined> {

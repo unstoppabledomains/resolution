@@ -227,6 +227,11 @@ export default class Cns extends NamingService {
     return !isNullAddress(data.owner);
   }
 
+  async getTokenUri(tokenId: string): Promise<string> {
+    const [tokenUri] = await this.readerContract.call('tokenURI', [tokenId]);
+    return tokenUri;
+  }
+
   private async getVerifiedData(
     domain: string,
     keys?: string[],
