@@ -348,7 +348,7 @@ export default class Resolution {
 
   /**
    * @param domain domain name
-   * @returns A Promise that resolves true or false
+   * @returns A Promise of whether or not the domain belongs to a wallet
    */
   async isRegistered(domain: string): Promise<Boolean> {
     domain = this.prepareDomain(domain);
