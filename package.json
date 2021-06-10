@@ -88,7 +88,7 @@
     "prettier": "2.3.0",
     "pretty-quick": "^3.1.0",
     "ts-jest": "^27.0.3",
-    "ts-loader": "6.2.1",
+    "ts-loader": "9.2.3",
     "ts-node": "^8.6.2",
     "typedoc": "0.17.8",
     "typescript": "3.8.3",
