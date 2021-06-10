@@ -487,7 +487,7 @@ export default class Resolution {
     const metadata = await this.getMetadataFromTokenURI(tokenUri);
     const receivedHash = this.namehash(metadata.name);
     if (receivedHash !== hash) {
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+      throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
         methodName: 'unhash',
         domain: metadata.name,
       });
