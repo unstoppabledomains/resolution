@@ -118,10 +118,11 @@ export default class Cns extends NamingService {
   }
 
   isSupportedDomain(domain: string): boolean {
+    const tokens = domain.split('.');
     return (
-      domain === 'crypto' ||
-      (/^.+\.(crypto)$/.test(domain) && // at least one character plus .crypto ending
-        domain.split('.').every((v) => !!v.length))
+      !!tokens.length &&
+      tokens[tokens.length - 1] !== 'zil' &&
+      tokens.every((v) => !!v.length)
     );
   }
 
