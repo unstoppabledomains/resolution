@@ -227,6 +227,10 @@ export default class Cns extends NamingService {
     return !isNullAddress(data.owner);
   }
 
+  async isAvailable(domain: string): Promise<boolean> {
+    return !(await this.isRegistered(domain));
+  }
+
   private async getVerifiedData(
     domain: string,
     keys?: string[],

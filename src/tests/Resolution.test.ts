@@ -866,6 +866,53 @@ describe('Resolution', () => {
     });
   });
 
+  describe('.isAvailable', () => {
+    it('should return false', async () => {
+      const spies = mockAsyncMethods(cns, {
+        get: {
+          owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
+          resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
+          records: {
+            ['ipfs.html.value']:
+              'QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu',
+          },
+        },
+      });
+      const isAvailable = await resolution.isAvailable('ryan.crypto');
+      expectSpyToBeCalled(spies);
+      expect(isAvailable).toBe(false);
+    });
+
+    it('should return true', async () => {
+      const spies = mockAsyncMethods(cns, {
+        get: {
+          owner: '',
+          resolver: '',
+          records: {},
+        },
+      });
+      const isAvailable = await resolution.isAvailable('ryan.crypto');
+      expectSpyToBeCalled(spies);
+      expect(isAvailable).toBe(true);
+    });
+    it('should return false', async () => {
+      const spies = mockAsyncMethods(zns, {
+        getRecordsAddresses: ['zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz'],
+      });
+      const isAvailable = await resolution.isAvailable('ryan.zil');
+      expectSpyToBeCalled(spies);
+      expect(isAvailable).toBe(false);
+    });
+    it('should return true', async () => {
+      const spies = mockAsyncMethods(zns, {
+        getRecordsAddresses: [''],
+      });
+      const isAvailable = await resolution.isAvailable('ryan.zil');
+      expectSpyToBeCalled(spies);
+      expect(isAvailable).toBe(true);
+    });
+  });
+
   describe('.namehash', () => {
     it('brad.crypto', () => {
       const expectedNamehash =
