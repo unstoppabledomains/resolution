@@ -831,7 +831,7 @@ describe('Resolution', () => {
           },
         },
       });
-      const isRegistered = await resolution.isRegistered('ryan.crypto');
+      const isRegistered = await resolution.isRegistered('brad.crypto');
       expectSpyToBeCalled(spies);
       expect(isRegistered).toBe(true);
     });
@@ -844,7 +844,9 @@ describe('Resolution', () => {
           records: {},
         },
       });
-      const isRegistered = await resolution.isRegistered('ryan.crypto');
+      const isRegistered = await resolution.isRegistered(
+        'thisdomainisdefinitelynotregistered123.crypto',
+      );
       expectSpyToBeCalled(spies);
       expect(isRegistered).toBe(false);
     });
@@ -852,7 +854,7 @@ describe('Resolution', () => {
       const spies = mockAsyncMethods(zns, {
         getRecordsAddresses: ['zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz'],
       });
-      const isRegistered = await resolution.isRegistered('ryan.zil');
+      const isRegistered = await resolution.isRegistered('brad.zil');
       expectSpyToBeCalled(spies);
       expect(isRegistered).toBe(true);
     });
@@ -860,7 +862,9 @@ describe('Resolution', () => {
       const spies = mockAsyncMethods(zns, {
         getRecordsAddresses: [''],
       });
-      const isRegistered = await resolution.isRegistered('ryan.zil');
+      const isRegistered = await resolution.isRegistered(
+        'thisdomainisdefinitelynotregistered123.zil',
+      );
       expectSpyToBeCalled(spies);
       expect(isRegistered).toBe(false);
     });

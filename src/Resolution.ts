@@ -490,6 +490,7 @@ export default class Resolution {
       throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
         methodName: 'unhash',
         domain: metadata.name,
+        providerMessage: 'Service provider returned an invalid domain name',
       });
     }
     return metadata.name;

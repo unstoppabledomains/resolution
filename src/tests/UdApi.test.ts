@@ -165,7 +165,9 @@ describe('Unstoppable API', () => {
 
   it('should return false for unregistered domain', async () => {
     const spies = mockAsyncMethod(cnsApi, 'resolve', {meta: {owner: ''}});
-    const isRegistered = await resolution.isRegistered('ryan.crypto');
+    const isRegistered = await resolution.isRegistered(
+      'thisdomainisdefinitelynotregistered123.crypto',
+    );
     expectSpyToBeCalled([spies]);
     expect(isRegistered).toBe(false);
   });
