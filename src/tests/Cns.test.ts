@@ -109,6 +109,16 @@ describe('CNS', () => {
     expect(resolverAddress).toBe('0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842');
   });
 
+  it('should return true for supported domain', async () => {
+    expect(cns.isSupportedDomain('example.test')).toBe(true);
+    expect(cns.isSupportedDomain('example.tqwdest')).toBe(true);
+    expect(cns.isSupportedDomain('example.qwdqwdq.wd.tqwdest')).toBe(true);
+  });
+
+  it('should return false for unsupported domain', async () => {
+    expect(cns.isSupportedDomain('example.zil')).toBe(false);
+  });
+
   it('should not find a resolver address', async () => {
     const spies = mockAsyncMethods(cns, {
       get: {
