@@ -172,6 +172,10 @@ export default class Zns extends NamingService {
     return Boolean(recordAddresses && recordAddresses[0]);
   }
 
+  async isAvailable(domain: string): Promise<boolean> {
+    return !(await this.isRegistered(domain));
+  }
+
   private async getRecordsAddresses(
     domain: string,
   ): Promise<[string, string] | undefined> {

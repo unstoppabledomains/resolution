@@ -274,6 +274,25 @@ describe('ZNS', () => {
     });
   });
 
+  describe('.isAvailable', () => {
+    it('should return false', async () => {
+      const spies = mockAsyncMethods(zns, {
+        getRecordsAddresses: ['zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz'],
+      });
+      const isAvailable = await zns.isAvailable('ryan.zil');
+      expectSpyToBeCalled(spies);
+      expect(isAvailable).toBe(false);
+    });
+    it('should return true', async () => {
+      const spies = mockAsyncMethods(zns, {
+        getRecordsAddresses: [''],
+      });
+      const isAvailable = await zns.isAvailable('ryan.zil');
+      expectSpyToBeCalled(spies);
+      expect(isAvailable).toBe(true);
+    });
+  });
+
   describe('.Hashing', () => {
     describe('.Namehash', () => {
       it('supports standard domain', () => {
