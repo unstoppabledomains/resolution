@@ -341,7 +341,7 @@ export default class Cns extends NamingService {
   ): Promise<string> {
     const defaultStartingBlock =
       NetworkConfig?.networks[this.network]?.contracts?.Resolver
-        ?.advancedEventsStartingBlock;
+        ?.deploymentBlock;
     const logs = await contract.fetchLogs('ResetRecords', tokenId);
     const lastResetEvent = logs[logs.length - 1];
     return lastResetEvent?.blockNumber || defaultStartingBlock;
