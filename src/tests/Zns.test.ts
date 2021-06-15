@@ -306,13 +306,6 @@ describe('ZNS', () => {
           '0x9915d0456b878862e822e2361da37232f626a2e47505c8795134a95d36138ed3',
         );
       });
-
-      it('raises ResoltuionError when domain is not supported', async () => {
-        await expectResolutionErrorCode(
-          () => resolution.namehash('hello.world'),
-          ResolutionErrorCode.UnsupportedDomain,
-        );
-      });
     });
   });
 

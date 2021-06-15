@@ -41,10 +41,18 @@ export const domainExtensionToNamingServiceName = {
   zil: NamingServiceName.ZNS,
 };
 
-export const findNamingServiceName = (domain: string): NamingServiceName => {
-  return (
-    domainExtensionToNamingServiceName[domain.split('.').pop() || ''] || ''
-  );
+export const findNamingServiceName = (
+  domain: string,
+): NamingServiceName | '' => {
+  const extension = domain.split('.').pop();
+
+  if (!extension) {
+    return '';
+  } else if (extension === 'zil') {
+    return domainExtensionToNamingServiceName.zil;
+  } else {
+    return domainExtensionToNamingServiceName.crypto;
+  }
 };
 
 export const EthereumNetworks = {
