@@ -228,6 +228,10 @@ export default class Cns extends NamingService {
     return !isNullAddress(data.owner);
   }
 
+  async isAvailable(domain: string): Promise<boolean> {
+    return !(await this.isRegistered(domain));
+  }
+
   private async getVerifiedData(
     domain: string,
     keys?: string[],
@@ -338,7 +342,7 @@ export default class Cns extends NamingService {
   ): Promise<string> {
     const defaultStartingBlock =
       NetworkConfig?.networks[this.network]?.contracts?.Resolver
-        ?.advancedEventsStartingBlock;
+        ?.deploymentBlock;
     const logs = await contract.fetchLogs('ResetRecords', tokenId);
     const lastResetEvent = logs[logs.length - 1];
     return lastResetEvent?.blockNumber || defaultStartingBlock;

@@ -163,4 +163,8 @@ export default class Udapi extends NamingService {
 
     return !isNullAddress(record.meta.owner);
   }
+
+  async isAvailable(domain: string): Promise<boolean> {
+    return !(await this.isRegistered(domain));
+  }
 }
