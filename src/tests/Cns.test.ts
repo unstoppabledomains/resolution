@@ -17,6 +17,7 @@ import {CnsSupportedNetworks, NamingServiceName} from '../types/publicTypes';
 import Cns from '../Cns';
 import Networking from '../utils/Networking';
 import {ConfigurationErrorCode} from '../errors/configurationError';
+import NetworkConfig from '../config/network-config.json';
 
 let resolution: Resolution;
 let cns: Cns;
@@ -549,6 +550,15 @@ describe('CNS', () => {
         );
         expectSpyToBeCalled(eyes);
       });
+    });
+  });
+
+  describe('.registryAddress', () => {
+    it('should return mainnet registry address', async () => {
+      const registryAddress = await cns.registryAddress('some-domaine.crypto');
+      expect(registryAddress).toBe(
+        NetworkConfig.networks[1].contracts.Registry.address,
+      );
     });
   });
 

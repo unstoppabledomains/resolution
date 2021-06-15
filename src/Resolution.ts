@@ -463,6 +463,11 @@ export default class Resolution {
     return dnsUtils.toList(blockchainData);
   }
 
+  async registryAddress(domain: string): Promise<string> {
+    const method = this.getNamingMethodOrThrow(domain);
+    return method.registryAddress(domain);
+  }
+
   private getDnsRecordKeys(types: DnsRecordType[]): string[] {
     const records = ['dns.ttl'];
     types.forEach((type) => {

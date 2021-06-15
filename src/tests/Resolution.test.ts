@@ -33,6 +33,7 @@ import Cns from '../Cns';
 import Zns from '../Zns';
 import FetchProvider from '../FetchProvider';
 import {ConfigurationErrorCode} from '../errors/configurationError';
+import NetworkConfig from '../config/network-config.json';
 
 let resolution: Resolution;
 let cns: Cns;
@@ -791,6 +792,20 @@ describe('Resolution', () => {
       });
     });
   });
+
+  describe('.registryAddress',()=>{
+    it('should return zns mainnet registry address', async () => {
+      const registryAddress = await resolution.registryAddress('testi.zil');
+      expect(registryAddress).toBe('zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz');
+    });
+  
+    it('should return cns mainnet registry address #1', async () => {
+      const registryAddress = await resolution.registryAddress('testi.crypto');
+      expect(registryAddress).toBe(
+        NetworkConfig.networks[1].contracts.Registry.address,
+      );
+    });
+  })
 
   describe('.records', () => {
     it('works', async () => {

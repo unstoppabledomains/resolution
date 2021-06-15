@@ -101,7 +101,7 @@ describe('ZNS', () => {
       });
       zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
       expect(zns.network).toBe(1);
-      expect(zns.registryAddress).toBe(
+      expect(zns.registryAddr).toBe(
         'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
       );
       expect(zns.url).toBe('https://api.zilliqa.com');
@@ -119,8 +119,17 @@ describe('ZNS', () => {
       zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
       expect(zns.network).toBe(1);
       expect(zns.url).toBe('https://api.zilliqa.com');
-      expect(zns.registryAddress).toBe(
+      expect(zns.registryAddr).toBe(
         'zil1408llufrzkrrfqv5lj4malcjxyjqyd8urd7xz6',
+      );
+    });
+  });
+
+  describe('.registryAddress', () => {
+    it('should return mainnet registry address', async () => {
+      const registryAddress = await zns.registryAddress('some-domaine.zil');
+      expect(registryAddress).toBe(
+        'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
       );
     });
   });
