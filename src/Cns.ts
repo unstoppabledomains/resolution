@@ -232,10 +232,17 @@ export default class Cns extends NamingService {
       const [tokenUri] = await this.readerContract.call('tokenURI', [tokenId]);
       return tokenUri;
     } catch (error) {
-      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-        method: NamingServiceName.CNS,
-        methodName: 'getTokenUri',
-      });
+      if (
+        error instanceof ResolutionError &&
+        error.code === ResolutionErrorCode.ServiceProviderError &&
+        error.message === '< execution reverted >'
+      ) {
+        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+          method: NamingServiceName.CNS,
+          methodName: 'getTokenUri',
+        });
+      }
+      throw error;
     }
   }
 

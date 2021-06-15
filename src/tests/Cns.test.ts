@@ -627,12 +627,27 @@ describe('CNS', () => {
 
     it('should throw error if domain is not found', async () => {
       const spies = mockAsyncMethods(cns.readerContract, {
-        call: new ResolutionError(ResolutionErrorCode.ServiceProviderError),
+        call: new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
+          providerMessage: 'execution reverted',
+        }),
       });
 
       await expectResolutionErrorCode(
         () => resolution.tokenURI('fakedomainthatdoesnotexist.crypto'),
         ResolutionErrorCode.UnregisteredDomain,
+      );
+      expectSpyToBeCalled(spies);
+    });
+
+    it('should throw the same internal error', async () => {
+      pendingInLive();
+      const spies = mockAsyncMethods(cns.readerContract, {
+        call: new ResolutionError(ResolutionErrorCode.ServiceProviderError),
+      });
+
+      await expectResolutionErrorCode(
+        () => resolution.tokenURI('fakedomainthatdoesnotexist.crypto'),
+        ResolutionErrorCode.ServiceProviderError,
       );
       expectSpyToBeCalled(spies);
     });
@@ -661,7 +676,9 @@ describe('CNS', () => {
 
     it('should throw error if domain is not found', async () => {
       const spies = mockAsyncMethods(cns.readerContract, {
-        call: new ResolutionError(ResolutionErrorCode.ServiceProviderError),
+        call: new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
+          providerMessage: 'execution reverted',
+        }),
       });
 
       await expectResolutionErrorCode(
@@ -721,7 +738,9 @@ describe('CNS', () => {
 
     it('should throw error if domain is not found', async () => {
       const spies = mockAsyncMethods(cns.readerContract, {
-        call: new ResolutionError(ResolutionErrorCode.ServiceProviderError),
+        call: new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
+          providerMessage: 'execution reverted',
+        }),
       });
 
       await expectResolutionErrorCode(
