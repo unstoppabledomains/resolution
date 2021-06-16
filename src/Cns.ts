@@ -232,6 +232,10 @@ export default class Cns extends NamingService {
     return !(await this.isRegistered(domain));
   }
 
+  async registryAddress(domain: string): Promise<string> {
+    return NetworkConfig.networks[this.network].contracts.Registry.address;
+  }
+
   private async getVerifiedData(
     domain: string,
     keys?: string[],
