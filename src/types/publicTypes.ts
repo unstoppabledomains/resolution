@@ -74,6 +74,7 @@ export interface Web3Version1Provider {
 export interface Provider {
   request: (request: RequestArguments) => Promise<unknown>;
 }
+
 type ProviderMethod = (
   payload: JsonRpcPayload,
   callback: (error: Error | null, result?: JsonRpcResponse) => void,
