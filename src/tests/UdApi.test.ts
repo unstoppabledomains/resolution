@@ -10,6 +10,7 @@ import {
   CryptoDomainWithTwitterVerification,
 } from './helpers';
 import {NamingServiceName} from '../types/publicTypes';
+import NetworkConfig from '../config/network-config.json';
 
 let resolution: Resolution;
 let cnsApi: Udapi;
@@ -27,6 +28,18 @@ beforeEach(() => {
 });
 
 describe('Unstoppable API', () => {
+  it('should return zns mainnet registry address', async () => {
+    const registryAddress = await resolution.registryAddress('testi.zil');
+    expect(registryAddress).toBe('zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz');
+  });
+
+  it('should return cns mainnet registry address #1', async () => {
+    const registryAddress = await resolution.registryAddress('testi.crypto');
+    expect(registryAddress).toBe(
+      NetworkConfig.networks[1].contracts.Registry.address,
+    );
+  });
+
   it('namehashes zil domain', async () => {
     expect(resolution.namehash('cofounding.zil')).toEqual(
       '0x1cc365ffd60bb50538e01d24c1f1e26c887c36f26a0de250660b8a1465c60667',

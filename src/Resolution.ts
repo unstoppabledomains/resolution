@@ -359,6 +359,16 @@ export default class Resolution {
   }
 
   /**
+   * @param domain domain name
+   * @returns A Promise of whether or not the domain is available
+   */
+  async isAvailable(domain: string): Promise<Boolean> {
+    domain = this.prepareDomain(domain);
+    const method = this.getNamingMethodOrThrow(domain);
+    return await method.isAvailable(domain);
+  }
+
+  /**
    * @returns Produces a namehash from supported naming service in hex format with 0x prefix.
    * Corresponds to ERC721 token id in case of Ethereum based naming service like CNS.
    * @param domain domain name to be converted
@@ -509,6 +519,11 @@ export default class Resolution {
       method: 'UDAPI',
       methodName: 'tokenURIMetadata',
     });
+  }
+
+  async registryAddress(domain: string): Promise<string> {
+    const method = this.getNamingMethodOrThrow(domain);
+    return method.registryAddress(domain);
   }
 
   private getDnsRecordKeys(types: DnsRecordType[]): string[] {

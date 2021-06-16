@@ -101,7 +101,7 @@ describe('ZNS', () => {
       });
       zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
       expect(zns.network).toBe(1);
-      expect(zns.registryAddress).toBe(
+      expect(zns.registryAddr).toBe(
         'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
       );
       expect(zns.url).toBe('https://api.zilliqa.com');
@@ -119,8 +119,17 @@ describe('ZNS', () => {
       zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
       expect(zns.network).toBe(1);
       expect(zns.url).toBe('https://api.zilliqa.com');
-      expect(zns.registryAddress).toBe(
+      expect(zns.registryAddr).toBe(
         'zil1408llufrzkrrfqv5lj4malcjxyjqyd8urd7xz6',
+      );
+    });
+  });
+
+  describe('.registryAddress', () => {
+    it('should return mainnet registry address', async () => {
+      const registryAddress = await zns.registryAddress('some-domaine.zil');
+      expect(registryAddress).toBe(
+        'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
       );
     });
   });
@@ -273,6 +282,25 @@ describe('ZNS', () => {
       );
       expectSpyToBeCalled(spies);
       expect(isRegistered).toBe(false);
+    });
+  });
+
+  describe('.isAvailable', () => {
+    it('should return false', async () => {
+      const spies = mockAsyncMethods(zns, {
+        getRecordsAddresses: ['zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz'],
+      });
+      const isAvailable = await zns.isAvailable('ryan.zil');
+      expectSpyToBeCalled(spies);
+      expect(isAvailable).toBe(false);
+    });
+    it('should return true', async () => {
+      const spies = mockAsyncMethods(zns, {
+        getRecordsAddresses: [''],
+      });
+      const isAvailable = await zns.isAvailable('ryan.zil');
+      expectSpyToBeCalled(spies);
+      expect(isAvailable).toBe(true);
     });
   });
 

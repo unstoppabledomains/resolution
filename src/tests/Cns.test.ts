@@ -20,6 +20,7 @@ import Networking from '../utils/Networking';
 import {ConfigurationErrorCode} from '../errors/configurationError';
 import {TokenUriMetadata} from '../../build/types/publicTypes';
 import liveData from './testData/liveData.json';
+import NetworkConfig from '../config/network-config.json';
 
 let resolution: Resolution;
 let cns: Cns;
@@ -110,6 +111,16 @@ describe('CNS', () => {
     );
     expectSpyToBeCalled(spies);
     expect(resolverAddress).toBe('0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842');
+  });
+
+  it('should return true for supported domain', async () => {
+    expect(cns.isSupportedDomain('example.test')).toBe(true);
+    expect(cns.isSupportedDomain('example.tqwdest')).toBe(true);
+    expect(cns.isSupportedDomain('example.qwdqwdq.wd.tqwdest')).toBe(true);
+  });
+
+  it('should return false for unsupported domain', async () => {
+    expect(cns.isSupportedDomain('example.zil')).toBe(false);
   });
 
   it('should not find a resolver address', async () => {
@@ -545,6 +556,15 @@ describe('CNS', () => {
     });
   });
 
+  describe('.registryAddress', () => {
+    it('should return mainnet registry address', async () => {
+      const registryAddress = await cns.registryAddress('some-domaine.crypto');
+      expect(registryAddress).toBe(
+        NetworkConfig.networks[1].contracts.Registry.address,
+      );
+    });
+  });
+
   describe('.isRegistered', () => {
     it('should return true', async () => {
       const spies = mockAsyncMethods(cns, {
@@ -576,6 +596,37 @@ describe('CNS', () => {
       expect(isRegistered).toBe(false);
     });
   });
+
+  describe('.isAvailable', () => {
+    it('should return false', async () => {
+      const spies = mockAsyncMethods(cns, {
+        get: {
+          owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
+          resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
+          records: {
+            ['ipfs.html.value']:
+              'QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu',
+          },
+        },
+      });
+      const isAvailable = await cns.isAvailable('ryan.crypto');
+      expectSpyToBeCalled(spies);
+      expect(isAvailable).toBe(false);
+    });
+    it('should return true', async () => {
+      const spies = mockAsyncMethods(cns, {
+        get: {
+          owner: '',
+          resolver: '',
+          records: {},
+        },
+      });
+      const isAvailable = await cns.isAvailable('ryan.crypto');
+      expectSpyToBeCalled(spies);
+      expect(isAvailable).toBe(true);
+    });
+  });
+
   describe('#namehash', () => {
     it('supports options', async () => {
       expect(resolution.namehash('operadingo4.crypto')).toEqual(

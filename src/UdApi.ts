@@ -12,6 +12,7 @@ import Networking from './utils/Networking';
 import {constructRecords, findNamingServiceName, isNullAddress} from './utils';
 import {znsNamehash, eip137Namehash} from './utils/namehash';
 import {NamingService} from './NamingService';
+import NetworkConfig from './config/network-config.json';
 
 /**
  * @internal
@@ -21,6 +22,9 @@ export default class Udapi extends NamingService {
   private readonly url: string;
   private readonly headers: {
     [key: string]: string;
+  };
+  static readonly ZnsRegistryMap = {
+    1: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
   };
 
   constructor(url?: string) {
@@ -167,6 +171,23 @@ export default class Udapi extends NamingService {
   async getTokenUri(tokenId: string): Promise<string> {
     throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
       methodName: 'getTokenUri',
+    });
+  }
+
+  async isAvailable(domain: string): Promise<boolean> {
+    return !(await this.isRegistered(domain));
+  }
+
+  async registryAddress(domain: string): Promise<string> {
+    const serviceName = findNamingServiceName(domain);
+
+    if (serviceName === 'CNS') {
+      return NetworkConfig.networks[1].contracts.Registry.address;
+    } else if (serviceName === 'ZNS') {
+      return Udapi.ZnsRegistryMap[1];
+    }
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedService, {
+      namingService: serviceName,
     });
   }
 }

@@ -42,7 +42,7 @@ export default class Zns extends NamingService {
   readonly name: NamingServiceName = NamingServiceName.ZNS;
   readonly network: number;
   readonly url: string | undefined;
-  readonly registryAddress: string;
+  readonly registryAddr: string;
   readonly provider: Provider;
 
   constructor(source?: ZnsSource) {
@@ -62,10 +62,10 @@ export default class Zns extends NamingService {
     this.url = source['url'] || Zns.UrlMap[this.network];
     this.provider =
       source['provider'] || new FetchProvider(this.name, this.url!);
-    this.registryAddress =
+    this.registryAddr =
       source['registryAddress'] || Zns.RegistryMap[this.network];
-    if (this.registryAddress.startsWith('0x')) {
-      this.registryAddress = toBech32Address(this.registryAddress);
+    if (this.registryAddr.startsWith('0x')) {
+      this.registryAddr = toBech32Address(this.registryAddr);
     }
   }
 
@@ -178,6 +178,14 @@ export default class Zns extends NamingService {
     });
   }
 
+  async isAvailable(domain: string): Promise<boolean> {
+    return !(await this.isRegistered(domain));
+  }
+
+  async registryAddress(domain: string): Promise<string> {
+    return this.registryAddr;
+  }
+
   private async getRecordsAddresses(
     domain: string,
   ): Promise<[string, string] | undefined> {
@@ -188,7 +196,7 @@ export default class Zns extends NamingService {
     }
 
     const registryRecord = await this.getContractMapValue(
-      this.registryAddress,
+      this.registryAddr,
       'records',
       this.namehash(domain),
     );
