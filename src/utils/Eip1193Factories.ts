@@ -10,8 +10,8 @@ import {
   Web3Version1Provider,
   JsonRpcResponse,
   EthersProvider,
+  ZilliqaProvider,
 } from '../types/publicTypes';
-import {Provider as ZilliqaProvider} from '@zilliqa-js/core';
 
 export const Eip1193Factories = {
   fromWeb3Version0Provider,

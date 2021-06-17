@@ -114,7 +114,7 @@ export default class Resolution {
   /**
    * Creates a resolution instance with configured provider
    * @param provider - any provider compatible with EIP-1193
-   * @param networks - an optional object that describes what network to use when connecting CNS default is mainnet
+   * @param networks - an optional object that describes what network to use when connecting default is mainnet
    * @see https://eips.ethereum.org/EIPS/eip-1193
    */
   static fromEip1193Provider(

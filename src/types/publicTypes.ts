@@ -68,6 +68,17 @@ export interface Web3Version1Provider {
   send: ProviderMethod;
 }
 
+export interface ZilliqaProvider {
+  middleware: any;
+  send<R = any, E = string>(method: string, ...params: any[]): Promise<any>;
+  sendBatch<R = any, E = string>(
+    method: string,
+    ...params: any[]
+  ): Promise<any>;
+  subscribe?(event: string, subscriber: any): symbol;
+  unsubscribe?(token: symbol): void;
+}
+
 /**
  * @see https://eips.ethereum.org/EIPS/eip-1193
  */
