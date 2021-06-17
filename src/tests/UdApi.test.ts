@@ -79,13 +79,6 @@ describe('Unstoppable API', () => {
     expect(twitterHandle).toBe('derainberk');
   });
 
-  it('should throw unsupported domain', async () => {
-    const handle = 'ryan.eth';
-    await expect(resolution.twitter(handle)).rejects.toThrowError(
-      `Domain ${handle} is not supported`,
-    );
-  });
-
   it('returns owner of the domain', async () => {
     mockAPICalls('ud_api_generic_test', DefaultUrl);
     expect(await resolution.owner('cofounding.zil')).toEqual(

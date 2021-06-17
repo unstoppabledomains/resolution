@@ -253,13 +253,6 @@ describe('Resolution', () => {
         expectSpyToBeCalled(spy);
       });
 
-      it('resolves non-existing domain zone with throw', async () => {
-        await expectResolutionErrorCode(
-          resolution.addr('bogdangusiev.qq', 'ZIL'),
-          ResolutionErrorCode.UnsupportedDomain,
-        );
-      });
-
       it('checks error for email on brad.zil', async () => {
         const spies = mockAsyncMethods(zns, {
           allRecords: {
@@ -284,28 +277,7 @@ describe('Resolution', () => {
       });
 
       describe('.Namehash errors', () => {
-        it('checks namehash for unsupported domain', async () => {
-          await expectResolutionErrorCode(
-            () => resolution.namehash('something.hello.com'),
-            ResolutionErrorCode.UnsupportedDomain,
-          );
-        });
-
         it('should be invalid domain', async () => {
-          await expectResolutionErrorCode(
-            () => resolution.namehash('-hello.eth'),
-            ResolutionErrorCode.UnsupportedDomain,
-          );
-        });
-
-        it('should be invalid domain 2', async () => {
-          await expectResolutionErrorCode(
-            () => resolution.namehash('whatever-.eth'),
-            ResolutionErrorCode.UnsupportedDomain,
-          );
-        });
-
-        it('should be invalid domain 3', async () => {
           const cnsInvalidDomain = 'hello..crypto';
           const znsInvalidDomain = 'hello..zil';
           await expectResolutionErrorCode(
@@ -943,12 +915,6 @@ describe('Resolution', () => {
         '0x5fc604da00f502da70bfbc618088c0ce468ec9d18d05540935ae4118e8f50787';
       const namehash = resolution.namehash('brad.zil');
       expect(namehash).toEqual(expectedNamehash);
-    });
-
-    it('should throw error if domain is not supported', () => {
-      expect(() => resolution.namehash('google.com')).toThrowError(
-        'Domain google.com is not supported',
-      );
     });
   });
 
