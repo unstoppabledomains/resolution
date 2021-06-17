@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import program from 'commander';
 import pckg from '../package.json';
+import {NamingServiceName} from '../types/publicTypes';
 import {
   buildResolutionPackage,
   commaSeparatedList,
@@ -41,6 +42,15 @@ import {
       '--ethereum-url <ethereumUrl>',
       'specify custom ethereum provider/url',
     )
+    .option('--token-uri', `returns the token metadata URI`)
+    .option(
+      '--token-uri-meta',
+      `returns the token metadata retrieved from the metadata URI`,
+    )
+    .option(
+      '-u, --unhash <hash>',
+      `gets the domain name by hash from token metadata (only for CNS)`,
+    )
     .description(
       'resolution cli exports main usage of @unstoppabledomains/resolution library',
     );
@@ -60,7 +70,7 @@ import {
     delete options.meta;
   }
 
-  if (!options.domain) {
+  if (!options.domain && !options.unhash) {
     return;
   }
 
@@ -142,6 +152,25 @@ import {
         async () => await resolution.twitter(domain),
         response,
         'twitter',
+      ),
+    tokenUri: () =>
+      tryInfo(
+        async () => await resolution.tokenURI(domain),
+        response,
+        'token-uri',
+      ),
+    tokenUriMeta: () =>
+      tryInfo(
+        async () => await resolution.tokenURIMetadata(domain),
+        response,
+        'token-uri-meta',
+      ),
+    unhash: () =>
+      tryInfo(
+        async () =>
+          await resolution.unhash(options.unhash, NamingServiceName.CNS),
+        response,
+        'unhash',
       ),
   };
 

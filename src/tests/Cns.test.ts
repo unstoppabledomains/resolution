@@ -1,5 +1,5 @@
 import Resolution from '../index';
-import {ResolutionErrorCode} from '../errors/resolutionError';
+import ResolutionError, {ResolutionErrorCode} from '../errors/resolutionError';
 import {NullAddress} from '../types';
 import {
   CryptoDomainWithoutResolver,
@@ -11,12 +11,15 @@ import {
   expectConfigurationErrorCode,
   CryptoDomainWithoutGunDbRecords,
   CryptoDomainWithAllRecords,
+  pendingInLive,
 } from './helpers';
 import FetchProvider from '../FetchProvider';
 import {CnsSupportedNetworks, NamingServiceName} from '../types/publicTypes';
 import Cns from '../Cns';
 import Networking from '../utils/Networking';
 import {ConfigurationErrorCode} from '../errors/configurationError';
+import {TokenUriMetadata} from '../../build/types/publicTypes';
+import liveData from './testData/liveData.json';
 import NetworkConfig from '../config/network-config.json';
 
 let resolution: Resolution;
@@ -574,7 +577,7 @@ describe('CNS', () => {
           },
         },
       });
-      const isRegistered = await cns.isRegistered('ryan.crypto');
+      const isRegistered = await cns.isRegistered('brad.crypto');
       expectSpyToBeCalled(spies);
       expect(isRegistered).toBe(true);
     });
@@ -586,7 +589,9 @@ describe('CNS', () => {
           records: {},
         },
       });
-      const isRegistered = await cns.isRegistered('ryan.crypto');
+      const isRegistered = await cns.isRegistered(
+        'thisdomainisdefinitelynotregistered123.crypto',
+      );
       expectSpyToBeCalled(spies);
       expect(isRegistered).toBe(false);
     });
@@ -654,6 +659,146 @@ describe('CNS', () => {
       await expect(
         resolution.record(CryptoDomainWithAllRecords, 'No.such.record'),
       ).rejects.toEqual(new Error('error_up'));
+    });
+  });
+
+  describe('.tokenURI', () => {
+    it('should return token URI', async () => {
+      const spies = mockAsyncMethods(cns.readerContract, {
+        call: ['https://metadata.unstoppabledomains.com/metadata/brad.crypto'],
+      });
+
+      const uri = await resolution.tokenURI('brad.crypto');
+
+      expectSpyToBeCalled(spies);
+      expect(uri).toEqual(
+        'https://metadata.unstoppabledomains.com/metadata/brad.crypto',
+      );
+    });
+
+    it('should throw error if domain is not found', async () => {
+      const spies = mockAsyncMethods(cns.readerContract, {
+        call: new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
+          providerMessage: 'execution reverted',
+        }),
+      });
+
+      await expectResolutionErrorCode(
+        () => resolution.tokenURI('fakedomainthatdoesnotexist.crypto'),
+        ResolutionErrorCode.UnregisteredDomain,
+      );
+      expectSpyToBeCalled(spies);
+    });
+
+    it('should throw the same internal error', async () => {
+      pendingInLive();
+      const spies = mockAsyncMethods(cns.readerContract, {
+        call: new ResolutionError(ResolutionErrorCode.ServiceProviderError),
+      });
+
+      await expectResolutionErrorCode(
+        () => resolution.tokenURI('fakedomainthatdoesnotexist.crypto'),
+        ResolutionErrorCode.ServiceProviderError,
+      );
+      expectSpyToBeCalled(spies);
+    });
+  });
+
+  describe('.tokenURIMetadata', () => {
+    it('should return token metadata', async () => {
+      const testMeta: TokenUriMetadata = liveData.bradCryptoMetadata;
+
+      const cnsSpies = mockAsyncMethods(cns.readerContract, {
+        call: ['https://metadata.unstoppabledomains.com/metadata/brad.crypto'],
+      });
+      const fetchSpies = mockAsyncMethods(Networking, {
+        fetch: {
+          ok: true,
+          json: () => testMeta,
+        },
+      });
+
+      const metadata = await resolution.tokenURIMetadata('brad.crypto');
+
+      expectSpyToBeCalled(cnsSpies);
+      expectSpyToBeCalled(fetchSpies);
+      expect(metadata).toEqual(testMeta);
+    });
+
+    it('should throw error if domain is not found', async () => {
+      const spies = mockAsyncMethods(cns.readerContract, {
+        call: new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
+          providerMessage: 'execution reverted',
+        }),
+      });
+
+      await expectResolutionErrorCode(
+        () => resolution.tokenURIMetadata('fakedomainthatdoesnotexist.crypto'),
+        ResolutionErrorCode.UnregisteredDomain,
+      );
+      expectSpyToBeCalled(spies);
+    });
+  });
+
+  describe('.unhash', () => {
+    it('should unhash token', async () => {
+      const testMeta: TokenUriMetadata = liveData.bradCryptoMetadata;
+
+      const cnsSpies = mockAsyncMethods(cns.readerContract, {
+        call: ['https://metadata.unstoppabledomains.com/metadata/brad.crypto'],
+      });
+      const fetchSpies = mockAsyncMethods(Networking, {
+        fetch: {
+          ok: true,
+          json: () => testMeta,
+        },
+      });
+
+      const domain = await resolution.unhash(
+        '0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9',
+        NamingServiceName.CNS,
+      );
+
+      expectSpyToBeCalled(cnsSpies);
+      expectSpyToBeCalled(fetchSpies);
+      expect(domain).toEqual(testMeta.name);
+    });
+
+    it('should throw error if hash does not match', async () => {
+      pendingInLive();
+      const testMeta: TokenUriMetadata = liveData.bradCryptoMetadata;
+
+      const cnsSpies = mockAsyncMethods(cns.readerContract, {
+        call: ['https://metadata.unstoppabledomains.com/metadata/brad.crypto'],
+      });
+      const fetchSpies = mockAsyncMethods(Networking, {
+        fetch: {
+          ok: true,
+          json: () => testMeta,
+        },
+      });
+
+      await expectResolutionErrorCode(
+        () => resolution.unhash('0x0123456789abcdef', NamingServiceName.CNS),
+        ResolutionErrorCode.ServiceProviderError,
+      );
+
+      expectSpyToBeCalled(cnsSpies);
+      expectSpyToBeCalled(fetchSpies);
+    });
+
+    it('should throw error if domain is not found', async () => {
+      const spies = mockAsyncMethods(cns.readerContract, {
+        call: new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
+          providerMessage: 'execution reverted',
+        }),
+      });
+
+      await expectResolutionErrorCode(
+        () => resolution.unhash('0xdeaddeaddead', NamingServiceName.CNS),
+        ResolutionErrorCode.UnregisteredDomain,
+      );
+      expectSpyToBeCalled(spies);
     });
   });
 });

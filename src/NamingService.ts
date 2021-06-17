@@ -22,6 +22,9 @@ export abstract class NamingService {
   ): Promise<string | null>;
   abstract allRecords(domain: string): Promise<Record<string, string>>;
   abstract isRegistered(domain: string): Promise<boolean>;
+
+  abstract getTokenUri(tokenId: string): Promise<string>;
+
   abstract isAvailable(domain: string): Promise<boolean>;
   abstract registryAddress(domain: string): Promise<string>;
 }

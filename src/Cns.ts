@@ -228,6 +228,25 @@ export default class Cns extends NamingService {
     return !isNullAddress(data.owner);
   }
 
+  async getTokenUri(tokenId: string): Promise<string> {
+    try {
+      const [tokenUri] = await this.readerContract.call('tokenURI', [tokenId]);
+      return tokenUri;
+    } catch (error) {
+      if (
+        error instanceof ResolutionError &&
+        error.code === ResolutionErrorCode.ServiceProviderError &&
+        error.message === '< execution reverted >'
+      ) {
+        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+          method: NamingServiceName.CNS,
+          methodName: 'getTokenUri',
+        });
+      }
+      throw error;
+    }
+  }
+
   async isAvailable(domain: string): Promise<boolean> {
     return !(await this.isRegistered(domain));
   }

@@ -18,6 +18,7 @@ import {
   SourceConfig,
   Web3Version0Provider,
   Web3Version1Provider,
+  TokenUriMetadata,
 } from './types/publicTypes';
 import ResolutionError, {ResolutionErrorCode} from './errors/resolutionError';
 import DnsUtils from './utils/DnsUtils';
@@ -26,6 +27,7 @@ import {Eip1993Factories} from './utils/Eip1993Factories';
 import {NamingService} from './NamingService';
 import ConfigurationError from './errors/configurationError';
 import {ConfigurationErrorCode} from './errors/configurationError';
+import Networking from './utils/Networking';
 
 /**
  * Blockchain domain Resolution library - Resolution.
@@ -461,6 +463,62 @@ export default class Resolution {
     const dnsRecordKeys = this.getDnsRecordKeys(types);
     const blockchainData = await method.records(domain, dnsRecordKeys);
     return dnsUtils.toList(blockchainData);
+  }
+
+  /**
+   * Retrieves the tokenURI from the registry smart contract.
+   * @returns the ERC721Metadata#tokenURI contract method result
+   * @param domain - domain name
+   */
+  async tokenURI(domain: string): Promise<string> {
+    const namehash = this.namehash(domain);
+    return this.getNamingMethodOrThrow(domain).getTokenUri(namehash);
+  }
+
+  /**
+   * Retrieves the data from the endpoint provided by tokenURI from the registry smart contract.
+   * @returns the JSON response of the token URI endpoint
+   * @param domain - domain name
+   */
+  async tokenURIMetadata(domain: string): Promise<TokenUriMetadata> {
+    const tokenUri = await this.tokenURI(domain);
+    return this.getMetadataFromTokenURI(tokenUri);
+  }
+
+  /**
+   * Retrieves the domain name from token metadata that is provided by tokenURI from the registry smart contract.
+   * The function will throw an error if the domain in the metadata does not match the hash (e.g. if the metadata is outdated).
+   * @returns the domain name retrieved from token metadata
+   * @param hash - domain hash
+   * @param service - nameservice which is used for lookup
+   */
+  async unhash(hash: string, service: NamingServiceName): Promise<string> {
+    const tokenUri = await this.serviceMap[service].getTokenUri(hash);
+    const metadata = await this.getMetadataFromTokenURI(tokenUri);
+    const receivedHash = this.namehash(metadata.name);
+    if (receivedHash !== hash) {
+      throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
+        methodName: 'unhash',
+        domain: metadata.name,
+        providerMessage: 'Service provider returned an invalid domain name',
+      });
+    }
+    return metadata.name;
+  }
+
+  private async getMetadataFromTokenURI(
+    tokenUri: string,
+  ): Promise<TokenUriMetadata> {
+    const resp = await Networking.fetch(tokenUri, {});
+    if (resp.ok) {
+      return await resp.json();
+    }
+
+    throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
+      providerMessage: await resp.text(),
+      method: 'UDAPI',
+      methodName: 'tokenURIMetadata',
+    });
   }
 
   async registryAddress(domain: string): Promise<string> {
