@@ -33,6 +33,8 @@ import Cns from '../Cns';
 import Zns from '../Zns';
 import FetchProvider from '../FetchProvider';
 import {ConfigurationErrorCode} from '../errors/configurationError';
+import {HTTPProvider} from '@zilliqa-js/core';
+import {Eip1193Factories} from '../utils/Eip1193Factories';
 
 let resolution: Resolution;
 let cns: Cns;
@@ -54,7 +56,6 @@ describe('Resolution', () => {
   describe('.Basic setup', () => {
     it('should work with autonetwork url configuration', async () => {
       const mainnetUrl = protocolLink();
-      const goerliUrl = mainnetUrl.replace('mainnet', 'goerli');
       // mocking getNetworkConfigs because no access to inner provider.request
       const CnsGetNetworkOriginal = Cns.autoNetwork;
       if (!isLive()) {
@@ -161,6 +162,31 @@ describe('Resolution', () => {
       });
       cns = resolution.serviceMap[NamingServiceName.CNS] as Cns;
       expect(cns.url).toBe(`https://mainnet.infura.io/v3/api-key`);
+    });
+
+    it('should create resolution instance from Zilliqa provider', async () => {
+      const zilliqaProvider = new HTTPProvider('https://api.zilliqa.com');
+      const provider = Eip1193Factories.fromZilliqaProvider(zilliqaProvider);
+      const resolution = Resolution.fromEip1193Provider(provider);
+      expect(
+        resolution.serviceMap[NamingServiceName.ZNS].serviceName() ===
+          NamingServiceName.ZNS,
+      );
+    });
+
+    it('should retrieve record using resolution instance created from Zilliqa provider', async () => {
+      const zilliqaProvider = new HTTPProvider('https://api.zilliqa.com');
+      const provider = Eip1193Factories.fromZilliqaProvider(zilliqaProvider);
+      const resolution = Resolution.fromEip1193Provider(provider);
+      zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
+      const spies = mockAsyncMethods(zns, {
+        allRecords: {
+          'crypto.ETH.address': '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
+        },
+      });
+      const ethAddress = await resolution.addr('brad.zil', 'ETH');
+      expectSpyToBeCalled(spies);
+      expect(ethAddress).toBe('0x45b31e01AA6f42F0549aD482BE81635ED3149abb');
     });
 
     it('provides empty response constant', async () => {

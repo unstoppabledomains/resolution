@@ -18,6 +18,7 @@ import {
   SourceConfig,
   Web3Version0Provider,
   Web3Version1Provider,
+  ZnsSupportedNetworks,
 } from './types/publicTypes';
 import ResolutionError, {ResolutionErrorCode} from './errors/resolutionError';
 import DnsUtils from './utils/DnsUtils';
@@ -122,11 +123,15 @@ export default class Resolution {
       cns?: {
         network: CnsSupportedNetworks;
       };
+      zns?: {
+        network: ZnsSupportedNetworks;
+      };
     },
   ): Resolution {
     return new this({
       sourceConfig: {
         cns: {provider, network: networks?.cns?.network || 'mainnet'},
+        zns: {provider, network: networks?.zns?.network || 'mainnet'},
       },
     });
   }
