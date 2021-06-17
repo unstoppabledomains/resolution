@@ -844,7 +844,9 @@ describe('Resolution', () => {
           records: {},
         },
       });
-      const isRegistered = await resolution.isRegistered('ryan.crypto');
+      const isRegistered = await resolution.isRegistered(
+        'ryanqwdqwdqwdqdwqd.crypto',
+      );
       expectSpyToBeCalled(spies);
       expect(isRegistered).toBe(false);
     });
@@ -852,7 +854,7 @@ describe('Resolution', () => {
       const spies = mockAsyncMethods(zns, {
         getRecordsAddresses: ['zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz'],
       });
-      const isRegistered = await resolution.isRegistered('ryan.zil');
+      const isRegistered = await resolution.isRegistered('brad.zil');
       expectSpyToBeCalled(spies);
       expect(isRegistered).toBe(true);
     });
@@ -891,7 +893,9 @@ describe('Resolution', () => {
           records: {},
         },
       });
-      const isAvailable = await resolution.isAvailable('ryan.crypto');
+      const isAvailable = await resolution.isAvailable(
+        'qwdqwdjkqhdkqdqwjd.crypto',
+      );
       expectSpyToBeCalled(spies);
       expect(isAvailable).toBe(true);
     });
@@ -899,7 +903,7 @@ describe('Resolution', () => {
       const spies = mockAsyncMethods(zns, {
         getRecordsAddresses: ['zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz'],
       });
-      const isAvailable = await resolution.isAvailable('ryan.zil');
+      const isAvailable = await resolution.isAvailable('brad.zil');
       expectSpyToBeCalled(spies);
       expect(isAvailable).toBe(false);
     });

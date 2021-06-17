@@ -566,7 +566,7 @@ describe('CNS', () => {
           records: {},
         },
       });
-      const isRegistered = await cns.isRegistered('ryan.crypto');
+      const isRegistered = await cns.isRegistered('ryqwdqwdqwdqwdan.crypto');
       expectSpyToBeCalled(spies);
       expect(isRegistered).toBe(false);
     });
@@ -596,7 +596,7 @@ describe('CNS', () => {
           records: {},
         },
       });
-      const isAvailable = await cns.isAvailable('ryan.crypto');
+      const isAvailable = await cns.isAvailable('ryqwdqwdqwdqdqdwan.crypto');
       expectSpyToBeCalled(spies);
       expect(isAvailable).toBe(true);
     });
