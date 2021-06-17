@@ -7,4 +7,4 @@ export {
   ConfigurationErrorCode,
 } from './errors/configurationError';
 export {DnsRecordsError, DnsRecordsErrorCode} from './errors/dnsRecordsError';
-export {Eip1993Factories} from './utils/Eip1993Factories';
+export {Eip1193Factories} from './utils/Eip1193Factories';

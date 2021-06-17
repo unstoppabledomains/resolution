@@ -22,7 +22,7 @@ import {
 import ResolutionError, {ResolutionErrorCode} from './errors/resolutionError';
 import DnsUtils from './utils/DnsUtils';
 import {findNamingServiceName, signedInfuraLink} from './utils';
-import {Eip1993Factories} from './utils/Eip1993Factories';
+import {Eip1193Factories} from './utils/Eip1193Factories';
 import {NamingService} from './NamingService';
 import ConfigurationError from './errors/configurationError';
 import {ConfigurationErrorCode} from './errors/configurationError';
@@ -146,7 +146,7 @@ export default class Resolution {
     },
   ): Resolution {
     return this.fromEip1193Provider(
-      Eip1993Factories.fromWeb3Version0Provider(provider),
+      Eip1193Factories.fromWeb3Version0Provider(provider),
       networks,
     );
   }
@@ -167,7 +167,7 @@ export default class Resolution {
     },
   ): Resolution {
     return this.fromEip1193Provider(
-      Eip1993Factories.fromWeb3Version1Provider(provider),
+      Eip1193Factories.fromWeb3Version1Provider(provider),
       networks,
     );
   }
@@ -191,7 +191,7 @@ export default class Resolution {
     },
   ): Resolution {
     return this.fromEip1193Provider(
-      Eip1993Factories.fromEthersProvider(provider),
+      Eip1193Factories.fromEthersProvider(provider),
       networks,
     );
   }

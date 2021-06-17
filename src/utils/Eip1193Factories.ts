@@ -13,7 +13,7 @@ import {
 } from '../types/publicTypes';
 import {Provider as ZilliqaProvider} from '@zilliqa-js/core';
 
-export const Eip1993Factories = {
+export const Eip1193Factories = {
   fromWeb3Version0Provider,
   fromWeb3Version1Provider,
   fromEthersProvider,
@@ -112,17 +112,17 @@ function fromEthersProvider(provider: EthersProvider): Provider {
     request: async (request: RequestArguments) => {
       try {
         switch (request.method) {
-        case 'eth_call':
-          return await provider.call(request.params![0]);
-        case 'eth_getLogs':
-          return await provider.getLogs(request.params![0]);
-        default:
-          throw new ResolutionError(
-            ResolutionErrorCode.ServiceProviderError,
-            {
-              providerMessage: `Unsupported provider method ${request.method}`,
-            },
-          );
+          case 'eth_call':
+            return await provider.call(request.params![0]);
+          case 'eth_getLogs':
+            return await provider.getLogs(request.params![0]);
+          default:
+            throw new ResolutionError(
+              ResolutionErrorCode.ServiceProviderError,
+              {
+                providerMessage: `Unsupported provider method ${request.method}`,
+              },
+            );
         }
       } catch (error) {
         throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
@@ -144,7 +144,7 @@ function fromZilliqaProvider(provider: ZilliqaProvider): Provider {
   return {
     request: async (request: RequestArguments) => {
       try {
-        return await provider.send(request.method, request.params![0] || []);
+        return provider.send(request.method, request.params![0] || []);
       } catch (error) {
         throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
           providerMessage: error.message,
