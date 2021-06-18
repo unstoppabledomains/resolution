@@ -13,7 +13,7 @@ import {
   ZilliqaProvider,
 } from '../types/publicTypes';
 
-export const Eip1193Factories = {
+export const Eip1993Factories = {
   fromWeb3Version0Provider,
   fromWeb3Version1Provider,
   fromEthersProvider,

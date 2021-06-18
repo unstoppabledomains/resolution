@@ -1,6 +1,6 @@
 import {HTTPProvider} from '@zilliqa-js/core';
 import {ResolutionErrorCode} from '../errors/resolutionError';
-import {Eip1193Factories} from '../utils/Eip1193Factories';
+import {Eip1993Factories as Eip1193Factories} from '../utils/Eip1993Factories';
 import {
   mockAsyncMethods,
   expectSpyToBeCalled,

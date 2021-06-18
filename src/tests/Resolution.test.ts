@@ -34,7 +34,7 @@ import Zns from '../Zns';
 import FetchProvider from '../FetchProvider';
 import {ConfigurationErrorCode} from '../errors/configurationError';
 import {HTTPProvider} from '@zilliqa-js/core';
-import {Eip1193Factories} from '../utils/Eip1193Factories';
+import {Eip1993Factories as Eip1193Factories} from '../utils/Eip1993Factories';
 
 let resolution: Resolution;
 let cns: Cns;

@@ -23,7 +23,7 @@ import {
 import ResolutionError, {ResolutionErrorCode} from './errors/resolutionError';
 import DnsUtils from './utils/DnsUtils';
 import {findNamingServiceName, signedInfuraLink} from './utils';
-import {Eip1193Factories} from './utils/Eip1193Factories';
+import {Eip1993Factories as Eip1193Factories} from './utils/Eip1993Factories';
 import {NamingService} from './NamingService';
 import ConfigurationError from './errors/configurationError';
 import {ConfigurationErrorCode} from './errors/configurationError';
