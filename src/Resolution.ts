@@ -432,9 +432,10 @@ export default class Resolution {
    * for valid domain names.
    * @param domain - domain name to be checked
    */
-  isSupportedDomain(domain: string): boolean {
+  async isSupportedDomain(domain: string): Promise<boolean> {
     domain = this.prepareDomain(domain);
-    return !!this.getNamingMethod(domain)?.isSupportedDomain(domain);
+    const namingMethod = this.getNamingMethod(domain);
+    return namingMethod ? await namingMethod.isSupportedDomain(domain) : false;
   }
 
   /**

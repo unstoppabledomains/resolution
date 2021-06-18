@@ -51,6 +51,7 @@ import {
       '-u, --unhash <hash>',
       `gets the domain name by hash from token metadata (only for CNS)`,
     )
+    .option('--supported', `checks if the domain name is supported`)
     .description(
       'resolution cli exports main usage of @unstoppabledomains/resolution library',
     );
@@ -171,6 +172,12 @@ import {
           await resolution.unhash(options.unhash, NamingServiceName.CNS),
         response,
         'unhash',
+      ),
+    supported: () =>
+      tryInfo(
+        async () => await resolution.isSupportedDomain(domain),
+        response,
+        'supported',
       ),
   };
 

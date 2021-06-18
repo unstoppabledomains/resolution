@@ -39,7 +39,7 @@ export default class Udapi extends NamingService {
     this.headers = {'X-user-agent': CustomUserAgent};
   }
 
-  isSupportedDomain(domain: string): boolean {
+  async isSupportedDomain(domain: string): Promise<boolean> {
     throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
       methodName: 'isSupportedDomain',
     });

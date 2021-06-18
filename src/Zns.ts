@@ -109,7 +109,7 @@ export default class Zns extends NamingService {
   }
 
   namehash(domain: string): string {
-    if (!this.isSupportedDomain(domain)) {
+    if (!this.checkDomain(domain)) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
         domain,
       });
@@ -121,13 +121,8 @@ export default class Zns extends NamingService {
     return znsChildhash(parentHash, label);
   }
 
-  isSupportedDomain(domain: string): boolean {
-    const tokens = domain.split('.');
-    return (
-      !!tokens.length &&
-      tokens[tokens.length - 1] === 'zil' &&
-      tokens.every((v) => !!v.length)
-    );
+  async isSupportedDomain(domain: string): Promise<boolean> {
+    return this.checkDomain(domain);
   }
 
   async record(domain: string, key: string): Promise<string> {
@@ -255,5 +250,14 @@ export default class Zns extends NamingService {
   ): Promise<any> {
     const record = await this.getContractField(contractAddress, field, [key]);
     return (record && record[key]) || null;
+  }
+
+  private checkDomain(domain: String): boolean {
+    const tokens = domain.split('.');
+    return (
+      !!tokens.length &&
+      tokens[tokens.length - 1] === 'zil' &&
+      tokens.every((v) => !!v.length)
+    );
   }
 }

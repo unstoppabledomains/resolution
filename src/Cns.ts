@@ -23,6 +23,7 @@ import {
 } from './types/publicTypes';
 import {isValidTwitterSignature} from './utils/TwitterSignatureValidator';
 import NetworkConfig from './config/network-config.json';
+import UnsConfig from './config/uns-config.json';
 import FetchProvider from './FetchProvider';
 import {eip137Childhash, eip137Namehash} from './utils/namehash';
 import {NamingService} from './NamingService';
@@ -101,7 +102,7 @@ export default class Cns extends NamingService {
   }
 
   namehash(domain: string): string {
-    if (!this.isSupportedDomain(domain)) {
+    if (!this.checkDomain(domain)) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
         domain,
       });
@@ -117,13 +118,19 @@ export default class Cns extends NamingService {
     return this.name;
   }
 
-  isSupportedDomain(domain: string): boolean {
-    const tokens = domain.split('.');
-    return (
-      !!tokens.length &&
-      tokens[tokens.length - 1] !== 'zil' &&
-      tokens.every((v) => !!v.length)
-    );
+  async isSupportedDomain(domain: string): Promise<boolean> {
+    if (!this.checkDomain(domain)) {
+      return false;
+    }
+
+    const tld = domain.split('.').pop();
+    if (!tld) {
+      return false;
+    }
+    const [exists] = await this.readerContract.call('exists', [
+      this.namehash(tld),
+    ]);
+    return exists;
   }
 
   async owner(domain: string): Promise<string> {
@@ -252,7 +259,7 @@ export default class Cns extends NamingService {
   }
 
   async registryAddress(domain: string): Promise<string> {
-    return NetworkConfig.networks[this.network].contracts.Registry.address;
+    return UnsConfig.networks[this.network].contracts.Registry.address;
   }
 
   private async getVerifiedData(
@@ -370,13 +377,22 @@ export default class Cns extends NamingService {
     const lastResetEvent = logs[logs.length - 1];
     return lastResetEvent?.blockNumber || defaultStartingBlock;
   }
+
+  private checkDomain(domain: string): boolean {
+    const tokens = domain.split('.');
+    return (
+      !!tokens.length &&
+      tokens[tokens.length - 1] !== 'zil' &&
+      tokens.every((v) => !!v.length)
+    );
+  }
 }
 
 function getProxyReaderMap(): ProxyReaderMap {
   const map: ProxyReaderMap = {};
-  for (const id of Object.keys(NetworkConfig.networks)) {
+  for (const id of Object.keys(UnsConfig.networks)) {
     map[id] =
-      NetworkConfig.networks[id].contracts.ProxyReader.address.toLowerCase();
+      UnsConfig.networks[id].contracts.ProxyReader.address.toLowerCase();
   }
   return map;
 }
