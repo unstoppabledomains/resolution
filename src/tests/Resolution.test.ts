@@ -75,6 +75,18 @@ describe('Resolution', () => {
       ).toBe(1);
     });
 
+    it('should work with custom network configuration', async () => {
+      const mainnetUrl = protocolLink();
+      const customNetwork = 'goerli';
+      const goerliUrl = mainnetUrl.replace('mainnet', customNetwork);
+      const cns = new Cns({
+        network: customNetwork,
+        url: goerliUrl,
+        proxyReaderAddress: '0x012312931293',
+      });
+      expect(cns).toBeDefined();
+    });
+
     it('should work with autonetwork provider configuration', async () => {
       const provider = new FetchProvider(
         'UDAPI',
@@ -120,27 +132,18 @@ describe('Resolution', () => {
       }
       expectSpyToBeCalled([factorySpy, providerSpy]);
     });
-
-    it('should fail because of unsupported test network for cns', async () => {
-      const blockchainUrl = protocolLink().replace('mainnet', 'ropsten');
-      const mockedProvider = new FetchProvider(
-        NamingServiceName.CNS,
-        blockchainUrl,
-      );
-      const providerSpy = mockAsyncMethod(mockedProvider, 'request', () => '3');
-      const providerFactorySpy = mockAsyncMethod(
-        FetchProvider,
-        'factory',
-        () => mockedProvider,
-      );
-
+    it('should work with custom network configuration', async () => {
+      const mainnetUrl = protocolLink();
+      const customNetwork = 'goerli';
+      const goerliUrl = mainnetUrl.replace('mainnet', customNetwork);
       await expectConfigurationErrorCode(
-        Resolution.autoNetwork({
-          cns: {url: blockchainUrl},
-        }),
-        ConfigurationErrorCode.UnsupportedNetwork,
+        () =>
+          new Cns({
+            network: customNetwork,
+            url: goerliUrl,
+          }),
+        ConfigurationErrorCode.CustomNetworkConfigMissing,
       );
-      expectSpyToBeCalled([providerSpy, providerFactorySpy]);
     });
 
     it('should fail in test development', async () => {

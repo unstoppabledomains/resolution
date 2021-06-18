@@ -56,11 +56,7 @@ export default class Cns extends NamingService {
         network: 'mainnet',
       };
     }
-    if (!source.network || !CnsSupportedNetwork.guard(source.network)) {
-      throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {
-        method: NamingServiceName.CNS,
-      });
-    }
+    this.checkNetworkConfig(source);
     this.network = EthereumNetworks[source.network];
     this.url = source['url'] || Cns.UrlMap[this.network];
     this.provider =
@@ -92,8 +88,8 @@ export default class Cns extends NamingService {
       method: 'net_version',
     })) as number;
     const networkName = EthereumNetworksInverted[networkId];
-    if (!networkName || !CnsSupportedNetwork.guard(networkName)) {
-      throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {
+    if (!networkName) {
+      throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedNetwork, {
         method: NamingServiceName.CNS,
       });
     }
@@ -345,6 +341,38 @@ export default class Cns extends NamingService {
     const logs = await contract.fetchLogs('ResetRecords', tokenId);
     const lastResetEvent = logs[logs.length - 1];
     return lastResetEvent?.blockNumber || defaultStartingBlock;
+  }
+
+  private checkNetworkConfig(source: CnsSource): void {
+    if (!source.network) {
+      throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedNetwork, {
+        method: NamingServiceName.CNS,
+      });
+    }
+    if (!CnsSupportedNetwork.guard(source.network)) {
+      this.checkCustomNetworkConfig(source);
+    }
+  }
+
+  private checkCustomNetworkConfig(source: CnsSource): void {
+    if (!source.proxyReaderAddress) {
+      throw new ConfigurationError(
+        ConfigurationErrorCode.CustomNetworkConfigMissing,
+        {
+          method: NamingServiceName.CNS,
+          config: 'proxyReaderAddress',
+        },
+      );
+    }
+    if (!source['url'] && source['provider']) {
+      throw new ConfigurationError(
+        ConfigurationErrorCode.CustomNetworkConfigMissing,
+        {
+          method: NamingServiceName.CNS,
+          config: 'url or provider',
+        },
+      );
+    }
   }
 }
 

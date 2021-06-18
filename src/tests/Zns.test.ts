@@ -69,16 +69,23 @@ describe('ZNS', () => {
           new Resolution({
             sourceConfig: {zns: {network: '42' as ZnsSupportedNetworks}},
           }),
-      ).toThrowError('Unspecified network in Resolution ZNS configuration');
+      ).toThrowError(
+        'Missing configuration in Resolution CNS. Please specify registryAddress when using a custom network',
+      );
     });
 
     it('checks normalizeSource zns (object) #7', async () => {
       expect(
         () =>
           new Resolution({
-            sourceConfig: {zns: {network: 'invalid' as ZnsSupportedNetworks}},
+            sourceConfig: {
+              zns: {
+                network: 'random-network' as ZnsSupportedNetworks,
+                registryAddress: '0x0123123',
+              },
+            },
           }),
-      ).toThrowError('Unspecified network in Resolution ZNS configuration');
+      ).toThrowError('Invalid address format.');
     });
 
     it('checks normalizeSource zns (object) #8', async () => {

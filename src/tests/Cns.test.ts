@@ -36,7 +36,7 @@ describe('CNS', () => {
     expect(cns.url).toBe(protocolLink());
   });
 
-  it('should not allow ropsten as testnet', async () => {
+  it('should not allow missing config for custom network', async () => {
     await expectConfigurationErrorCode(
       () =>
         new Resolution({
@@ -44,7 +44,7 @@ describe('CNS', () => {
             cns: {network: 'ropsten' as CnsSupportedNetworks},
           },
         }),
-      ConfigurationErrorCode.UnsupportedNetwork,
+      ConfigurationErrorCode.CustomNetworkConfigMissing,
     );
   });
 

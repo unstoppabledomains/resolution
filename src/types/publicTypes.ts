@@ -15,7 +15,7 @@ export type Api = {api: true; url?: string};
 type NamingServiceSource = {url?: string} | {provider?: Provider};
 
 export type CnsSource = NamingServiceSource & {
-  network: CnsSupportedNetworks;
+  network: string;
   proxyReaderAddress?: string;
 };
 

@@ -7,14 +7,16 @@ type ConfigurationErrorHandler = (error: ConfigurationErrorOptions) => string;
 type ConfigurationErrorOptions = {
   method?: ResolutionMethod;
   dependency?: string;
+  config?: string;
   version?: string;
 };
 
 export enum ConfigurationErrorCode {
   IncorrectProvider = 'IncorrectProvider',
-  UnsupportedNetwork = 'UnsupportedNetwork',
+  UnspecifiedNetwork = 'UnspecifiedNetwork',
   UnspecifiedUrl = 'UnspecifiedUrl',
   DependencyMissing = 'DependencyMissing',
+  CustomNetworkConfigMissing = 'CustomNetworkConfigMissing',
 }
 
 /**
@@ -24,7 +26,7 @@ export enum ConfigurationErrorCode {
 const HandlersByCode = {
   [ConfigurationErrorCode.IncorrectProvider]: () =>
     "Provider doesn't implement sendAsync or send method",
-  [ConfigurationErrorCode.UnsupportedNetwork]: (params: {
+  [ConfigurationErrorCode.UnspecifiedNetwork]: (params: {
     method: ResolutionMethod;
   }) =>
     `Unspecified network in Resolution ${params.method || ''} configuration`,
@@ -36,6 +38,11 @@ const HandlersByCode = {
     version: string;
   }) =>
     `Missing dependency for this functionality. Please install ${params.dependency} @ ${params.version} via npm or yarn`,
+  [ConfigurationErrorCode.CustomNetworkConfigMissing]: (params: {
+    method: ResolutionMethod;
+    config: string;
+  }) =>
+    `Missing configuration in Resolution ${params.method}. Please specify ${params.config} when using a custom network`,
 };
 
 /**

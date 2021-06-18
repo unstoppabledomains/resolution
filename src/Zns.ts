@@ -53,11 +53,12 @@ export default class Zns extends NamingService {
         network: 'mainnet',
       };
     }
-    if (!source.network || !ZnsSupportedNetwork.guard(source.network)) {
-      throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {
+    if (!source.network) {
+      throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedNetwork, {
         method: NamingServiceName.ZNS,
       });
     }
+    this.checkNetworkConfig(source);
     this.network = Zns.NetworkNameMap[source.network];
     this.url = source['url'] || Zns.UrlMap[this.network];
     this.provider =
@@ -245,5 +246,37 @@ export default class Zns extends NamingService {
   ): Promise<any> {
     const record = await this.getContractField(contractAddress, field, [key]);
     return (record && record[key]) || null;
+  }
+
+  private checkNetworkConfig(source: ZnsSource): void {
+    if (!source.network) {
+      throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedNetwork, {
+        method: NamingServiceName.CNS,
+      });
+    }
+    if (!ZnsSupportedNetwork.guard(source.network)) {
+      this.checkCustomNetworkConfig(source);
+    }
+  }
+
+  private checkCustomNetworkConfig(source: ZnsSource): void {
+    if (!source.registryAddress) {
+      throw new ConfigurationError(
+        ConfigurationErrorCode.CustomNetworkConfigMissing,
+        {
+          method: NamingServiceName.CNS,
+          config: 'registryAddress',
+        },
+      );
+    }
+    if (!source['url'] && source['provider']) {
+      throw new ConfigurationError(
+        ConfigurationErrorCode.CustomNetworkConfigMissing,
+        {
+          method: NamingServiceName.CNS,
+          config: 'url or provider',
+        },
+      );
+    }
   }
 }
