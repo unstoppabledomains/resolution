@@ -13,7 +13,7 @@ type ConfigurationErrorOptions = {
 
 export enum ConfigurationErrorCode {
   IncorrectProvider = 'IncorrectProvider',
-  UnspecifiedNetwork = 'UnspecifiedNetwork',
+  UnsupportedNetwork = 'UnsupportedNetwork',
   UnspecifiedUrl = 'UnspecifiedUrl',
   DependencyMissing = 'DependencyMissing',
   CustomNetworkConfigMissing = 'CustomNetworkConfigMissing',
@@ -26,10 +26,10 @@ export enum ConfigurationErrorCode {
 const HandlersByCode = {
   [ConfigurationErrorCode.IncorrectProvider]: () =>
     "Provider doesn't implement sendAsync or send method",
-  [ConfigurationErrorCode.UnspecifiedNetwork]: (params: {
+  [ConfigurationErrorCode.UnsupportedNetwork]: (params: {
     method: ResolutionMethod;
   }) =>
-    `Unspecified network in Resolution ${params.method || ''} configuration`,
+    `Unsupported network in Resolution ${params.method || ''} configuration`,
   [ConfigurationErrorCode.UnspecifiedUrl]: (params: {
     method: ResolutionMethod;
   }) => `Unspecified url in Resolution ${params.method} configuration`,
@@ -51,6 +51,7 @@ const HandlersByCode = {
  * - IncorrectProvider - When provider doesn't have implemented send or sendAsync methods
  * - UnsupportedNetwork - When network is not specified or not supported
  * - UnspecifiedUrl - When url is not specified for custom naming service configurations
+ * - CustomNetworkConfigMissing - When configuration is missing for custom network configurations
  * @param method - optional param to specify which namingService errored out
  */
 export class ConfigurationError extends Error {

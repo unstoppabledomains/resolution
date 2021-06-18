@@ -54,7 +54,7 @@ export default class Zns extends NamingService {
       };
     }
     if (!source.network) {
-      throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedNetwork, {
+      throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {
         method: NamingServiceName.ZNS,
       });
     }
@@ -250,7 +250,7 @@ export default class Zns extends NamingService {
 
   private checkNetworkConfig(source: ZnsSource): void {
     if (!source.network) {
-      throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedNetwork, {
+      throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {
         method: NamingServiceName.CNS,
       });
     }

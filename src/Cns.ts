@@ -89,7 +89,7 @@ export default class Cns extends NamingService {
     })) as number;
     const networkName = EthereumNetworksInverted[networkId];
     if (!networkName) {
-      throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedNetwork, {
+      throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {
         method: NamingServiceName.CNS,
       });
     }
@@ -345,7 +345,7 @@ export default class Cns extends NamingService {
 
   private checkNetworkConfig(source: CnsSource): void {
     if (!source.network) {
-      throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedNetwork, {
+      throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {
         method: NamingServiceName.CNS,
       });
     }
