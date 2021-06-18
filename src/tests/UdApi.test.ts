@@ -10,7 +10,7 @@ import {
   CryptoDomainWithTwitterVerification,
 } from './helpers';
 import {NamingServiceName} from '../types/publicTypes';
-import NetworkConfig from '../config/network-config.json';
+import UnsConfig from '../config/uns-config.json';
 
 let resolution: Resolution;
 let cnsApi: Udapi;
@@ -36,7 +36,7 @@ describe('Unstoppable API', () => {
   it('should return cns mainnet registry address #1', async () => {
     const registryAddress = await resolution.registryAddress('testi.crypto');
     expect(registryAddress).toBe(
-      NetworkConfig.networks[1].contracts.Registry.address,
+      UnsConfig.networks[1].contracts.CNSRegistry.address,
     );
   });
 

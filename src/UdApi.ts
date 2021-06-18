@@ -12,7 +12,7 @@ import Networking from './utils/Networking';
 import {constructRecords, findNamingServiceName, isNullAddress} from './utils';
 import {znsNamehash, eip137Namehash} from './utils/namehash';
 import {NamingService} from './NamingService';
-import NetworkConfig from './config/network-config.json';
+import UnsConfig from './config/uns-config.json';
 
 /**
  * @internal
@@ -179,15 +179,19 @@ export default class Udapi extends NamingService {
   }
 
   async registryAddress(domain: string): Promise<string> {
-    const serviceName = findNamingServiceName(domain);
-
-    if (serviceName === 'CNS') {
-      return NetworkConfig.networks[1].contracts.Registry.address;
-    } else if (serviceName === 'ZNS') {
-      return Udapi.ZnsRegistryMap[1];
+    const tld = domain.split('.').pop();
+    if (tld === undefined) {
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedService, {
+        namingService: tld,
+      });
     }
-    throw new ResolutionError(ResolutionErrorCode.UnsupportedService, {
-      namingService: serviceName,
-    });
+
+    if (tld === 'crypto') {
+      return UnsConfig.networks[1].contracts.CNSRegistry.address;
+    } else if (tld === 'zil') {
+      return Udapi.ZnsRegistryMap[1];
+    } else {
+      return UnsConfig.networks[1].contracts.UNSRegistry.address;
+    }
   }
 }

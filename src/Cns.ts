@@ -22,7 +22,6 @@ import {
   Provider,
 } from './types/publicTypes';
 import {isValidTwitterSignature} from './utils/TwitterSignatureValidator';
-import NetworkConfig from './config/network-config.json';
 import UnsConfig from './config/uns-config.json';
 import FetchProvider from './FetchProvider';
 import {eip137Childhash, eip137Namehash} from './utils/namehash';
@@ -259,7 +258,17 @@ export default class Cns extends NamingService {
   }
 
   async registryAddress(domain: string): Promise<string> {
-    return UnsConfig.networks[this.network].contracts.Registry.address;
+    if (!this.checkDomain(domain)) {
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
+        domain,
+      });
+    }
+
+    const tld = domain.split('.').pop();
+    const [address] = await this.readerContract.call('registryOf', [
+      this.namehash(tld!),
+    ]);
+    return address;
   }
 
   private async getVerifiedData(
@@ -345,8 +354,7 @@ export default class Cns extends NamingService {
 
   private isWellKnownLegacyResolver(resolverAddress: string): boolean {
     const legacyAddresses =
-      NetworkConfig?.networks[this.network]?.contracts?.Resolver
-        ?.legacyAddresses;
+      UnsConfig?.networks[this.network]?.contracts?.Resolver?.legacyAddresses;
     if (!legacyAddresses || legacyAddresses.length === 0) {
       return false;
     }
@@ -359,7 +367,7 @@ export default class Cns extends NamingService {
 
   private isUpToDateResolver(resolverAddress: string): boolean {
     const address =
-      NetworkConfig?.networks[this.network]?.contracts?.Resolver?.address;
+      UnsConfig?.networks[this.network]?.contracts?.Resolver?.address;
     if (!address) {
       return false;
     }
@@ -371,8 +379,7 @@ export default class Cns extends NamingService {
     tokenId: string,
   ): Promise<string> {
     const defaultStartingBlock =
-      NetworkConfig?.networks[this.network]?.contracts?.Resolver
-        ?.deploymentBlock;
+      UnsConfig?.networks[this.network]?.contracts?.Resolver?.deploymentBlock;
     const logs = await contract.fetchLogs('ResetRecords', tokenId);
     const lastResetEvent = logs[logs.length - 1];
     return lastResetEvent?.blockNumber || defaultStartingBlock;
