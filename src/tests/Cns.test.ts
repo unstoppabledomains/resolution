@@ -12,6 +12,7 @@ import {
   CryptoDomainWithoutGunDbRecords,
   CryptoDomainWithAllRecords,
   pendingInLive,
+  mockAPICalls,
 } from './helpers';
 import FetchProvider from '../FetchProvider';
 import {CnsSupportedNetworks, NamingServiceName} from '../types/publicTypes';
@@ -20,7 +21,8 @@ import Networking from '../utils/Networking';
 import {ConfigurationErrorCode} from '../errors/configurationError';
 import {TokenUriMetadata} from '../../build/types/publicTypes';
 import liveData from './testData/liveData.json';
-import NetworkConfig from '../config/network-config.json';
+import UnsConfig from '../config/uns-config.json';
+import nock from 'nock';
 
 let resolution: Resolution;
 let cns: Cns;
@@ -114,13 +116,16 @@ describe('CNS', () => {
   });
 
   it('should return true for supported domain', async () => {
-    expect(cns.isSupportedDomain('example.test')).toBe(true);
-    expect(cns.isSupportedDomain('example.tqwdest')).toBe(true);
-    expect(cns.isSupportedDomain('example.qwdqwdq.wd.tqwdest')).toBe(true);
+    mockAPICalls('cns_domain_exists_test', protocolLink());
+    expect(await cns.isSupportedDomain('brad.crypto')).toBe(true);
+    expect(await cns.isSupportedDomain('brad.blockchain')).toBe(true);
+    expect(await cns.isSupportedDomain('brad.888')).toBe(true);
   });
 
   it('should return false for unsupported domain', async () => {
-    expect(cns.isSupportedDomain('example.zil')).toBe(false);
+    mockAPICalls('cns_domain_exists_test', protocolLink());
+    expect(await cns.isSupportedDomain('brad.zil')).toBe(false);
+    expect(await cns.isSupportedDomain('brad.invalid')).toBe(false);
   });
 
   it('should not find a resolver address', async () => {
@@ -515,28 +520,24 @@ describe('CNS', () => {
   describe('.Hashing', () => {
     describe('.Namehash', () => {
       it('supports root node', async () => {
-        expect(resolution.isSupportedDomain('crypto')).toEqual(true);
         expect(resolution.namehash('crypto')).toEqual(
           '0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f',
         );
       });
 
       it('starts with -', async () => {
-        expect(resolution.isSupportedDomain('-hello.crypto')).toEqual(true);
         expect(resolution.namehash('-hello.crypto')).toBe(
           '0xc4ad028bcae9b201104e15f872d3e85b182939b06829f75a128275177f2ff9b2',
         );
       });
 
       it('ends with -', async () => {
-        expect(resolution.isSupportedDomain('hello-.crypto')).toEqual(true);
         expect(resolution.namehash('hello-.crypto')).toBe(
           '0x82eaa6ef14e438940bfd7747e0e4c4fec42af20cee28ddd0a7d79f52b1c59b72',
         );
       });
 
       it('starts and ends with -', async () => {
-        expect(resolution.isSupportedDomain('-hello-.crypto')).toEqual(true);
         expect(resolution.namehash('-hello-.crypto')).toBe(
           '0x90cc1963ff09ce95ee2dbb3830df4f2115da9756e087a50283b3e65f6ffe2a4e',
         );
@@ -560,7 +561,7 @@ describe('CNS', () => {
     it('should return mainnet registry address', async () => {
       const registryAddress = await cns.registryAddress('some-domaine.crypto');
       expect(registryAddress).toBe(
-        NetworkConfig.networks[1].contracts.Registry.address,
+        UnsConfig.networks[1].contracts.Registry.address,
       );
     });
   });
