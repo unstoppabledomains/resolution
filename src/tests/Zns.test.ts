@@ -85,6 +85,23 @@ describe('ZNS', () => {
               },
             },
           }),
+      ).toThrowError(
+        'Missing configuration in Resolution CNS. Please specify url or provider when using a custom network',
+      );
+    });
+
+    it('checks normalizeSource zns (object) #7', async () => {
+      expect(
+        () =>
+          new Resolution({
+            sourceConfig: {
+              zns: {
+                network: 'random-network' as ZnsSupportedNetworks,
+                url: 'https://api.zilliqa.com',
+                registryAddress: '0x0123123',
+              },
+            },
+          }),
       ).toThrowError('Invalid address format.');
     });
 

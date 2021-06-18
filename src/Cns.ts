@@ -364,7 +364,7 @@ export default class Cns extends NamingService {
         },
       );
     }
-    if (!source['url'] && source['provider']) {
+    if (!source['url'] && !source['provider']) {
       throw new ConfigurationError(
         ConfigurationErrorCode.CustomNetworkConfigMissing,
         {

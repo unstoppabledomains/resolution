@@ -41,7 +41,7 @@ describe('CNS', () => {
       () =>
         new Resolution({
           sourceConfig: {
-            cns: {network: 'ropsten' as CnsSupportedNetworks},
+            cns: {network: 'ropsten'},
           },
         }),
       ConfigurationErrorCode.CustomNetworkConfigMissing,

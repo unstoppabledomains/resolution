@@ -87,6 +87,18 @@ describe('Resolution', () => {
       expect(cns).toBeDefined();
     });
 
+    it('should work with custom network configuration with provider', async () => {
+      const mainnetUrl = protocolLink();
+      const customNetwork = 'goerli';
+      const provider = new FetchProvider(NamingServiceName.CNS, mainnetUrl);
+      const cns = new Cns({
+        network: customNetwork,
+        provider,
+        proxyReaderAddress: '0x012312931293',
+      });
+      expect(cns).toBeDefined();
+    });
+
     it('should work with autonetwork provider configuration', async () => {
       const provider = new FetchProvider(
         'UDAPI',
