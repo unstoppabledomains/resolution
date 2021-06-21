@@ -22,7 +22,6 @@ import {ConfigurationErrorCode} from '../errors/configurationError';
 import {TokenUriMetadata} from '../../build/types/publicTypes';
 import liveData from './testData/liveData.json';
 import UnsConfig from '../config/uns-config.json';
-import nock from 'nock';
 
 let resolution: Resolution;
 let cns: Cns;
@@ -559,9 +558,34 @@ describe('CNS', () => {
 
   describe('.registryAddress', () => {
     it('should return mainnet registry address', async () => {
-      const registryAddress = await cns.registryAddress('some-domaine.crypto');
+      mockAPICalls('cns_registry_address_tests', protocolLink());
+      const registryAddress = await cns.registryAddress('some-domain.crypto');
       expect(registryAddress).toBe(
-        UnsConfig.networks[1].contracts.Registry.address,
+        UnsConfig.networks[1].contracts.CNSRegistry.address,
+      );
+    });
+
+    it('should return uns registry address', async () => {
+      mockAPICalls('cns_registry_address_tests', protocolLink());
+      const registryAddress = await cns.registryAddress('some-domain.888');
+      expect(registryAddress).toBe(
+        UnsConfig.networks[1].contracts.UNSRegistry.address,
+      );
+    });
+
+    it('should throw error if tld is not supported', async () => {
+      mockAPICalls('cns_registry_address_tests', protocolLink());
+      await expectResolutionErrorCode(
+        () => cns.registryAddress('some-domain.zil'),
+        ResolutionErrorCode.UnsupportedDomain,
+      );
+    });
+
+    it('should throw error if tld does not exist', async () => {
+      mockAPICalls('cns_registry_address_tests', protocolLink());
+      await expectResolutionErrorCode(
+        () => cns.registryAddress('some-domain.unknown'),
+        ResolutionErrorCode.ServiceProviderError,
       );
     });
   });

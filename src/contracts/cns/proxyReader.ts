@@ -468,6 +468,25 @@ export default [
         type: 'uint256',
       },
     ],
+    name: 'registryOf',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
     name: 'resolverOf',
     outputs: [
       {
