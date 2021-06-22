@@ -8,6 +8,7 @@ type ConfigurationErrorOptions = {
   method?: ResolutionMethod;
   dependency?: string;
   config?: string;
+  field?: string;
   version?: string;
 };
 
@@ -17,6 +18,7 @@ export enum ConfigurationErrorCode {
   UnspecifiedUrl = 'UnspecifiedUrl',
   DependencyMissing = 'DependencyMissing',
   CustomNetworkConfigMissing = 'CustomNetworkConfigMissing',
+  InvalidConfigurationField = 'InvalidProxyReader',
 }
 
 /**
@@ -43,6 +45,10 @@ const HandlersByCode = {
     config: string;
   }) =>
     `Missing configuration in Resolution ${params.method}. Please specify ${params.config} when using a custom network`,
+  [ConfigurationErrorCode.InvalidConfigurationField]: (params: {
+    method: ResolutionMethod;
+    field: string;
+  }) => `Invalid '${params.field}' in Resolution ${params.method}`,
 };
 
 /**

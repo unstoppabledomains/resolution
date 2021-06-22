@@ -346,7 +346,7 @@ export default class Cns extends NamingService {
   private checkNetworkConfig(source: CnsSource): void {
     if (!source.network) {
       throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {
-        method: NamingServiceName.CNS,
+        method: this.name,
       });
     }
     if (!CnsSupportedNetwork.guard(source.network)) {
@@ -355,12 +355,12 @@ export default class Cns extends NamingService {
   }
 
   private checkCustomNetworkConfig(source: CnsSource): void {
-    if (!source.proxyReaderAddress) {
+    if (!this.isValidProxyReader(source.proxyReaderAddress)) {
       throw new ConfigurationError(
-        ConfigurationErrorCode.CustomNetworkConfigMissing,
+        ConfigurationErrorCode.InvalidConfigurationField,
         {
-          method: NamingServiceName.CNS,
-          config: 'proxyReaderAddress',
+          method: this.name,
+          field: 'proxyReaderAddress',
         },
       );
     }
@@ -368,11 +368,25 @@ export default class Cns extends NamingService {
       throw new ConfigurationError(
         ConfigurationErrorCode.CustomNetworkConfigMissing,
         {
-          method: NamingServiceName.CNS,
+          method: this.name,
           config: 'url or provider',
         },
       );
     }
+  }
+
+  private isValidProxyReader(address?: string): boolean {
+    if (!address) {
+      throw new ConfigurationError(
+        ConfigurationErrorCode.CustomNetworkConfigMissing,
+        {
+          method: this.name,
+          config: 'proxyReaderAddress',
+        },
+      );
+    }
+    const ethLikePattern = new RegExp('^0x[a-fA-F0-9]{40}$');
+    return ethLikePattern.test(address);
   }
 }
 
