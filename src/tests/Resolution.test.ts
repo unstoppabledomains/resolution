@@ -75,16 +75,42 @@ describe('Resolution', () => {
       ).toBe(1);
     });
 
-    it('should work with custom network configuration', async () => {
+    it('should not work with invalid proxyReader configuration', async () => {
+      const mainnetUrl = protocolLink();
+      const customNetwork = 'goerli';
+      const goerliUrl = mainnetUrl.replace('mainnet', customNetwork);
+      expectConfigurationErrorCode(() => {
+        new Cns({
+          network: customNetwork,
+          url: goerliUrl,
+          proxyReaderAddress: '0x012312931293',
+        });
+      }, ConfigurationErrorCode.InvalidConfigurationField);
+    });
+
+    it('should work with proxyReader configuration', async () => {
       const mainnetUrl = protocolLink();
       const customNetwork = 'goerli';
       const goerliUrl = mainnetUrl.replace('mainnet', customNetwork);
       const cns = new Cns({
         network: customNetwork,
         url: goerliUrl,
-        proxyReaderAddress: '0x012312931293',
+        proxyReaderAddress: '0xe7474D07fD2FA286e7e0aa23cd107F8379025037',
       });
       expect(cns).toBeDefined();
+    });
+
+    it('should not work with invalid proxyReader configuration 2', async () => {
+      const mainnetUrl = protocolLink();
+      const customNetwork = 'goerli';
+      const provider = new FetchProvider(NamingServiceName.CNS, mainnetUrl);
+      expectConfigurationErrorCode(() => {
+        new Cns({
+          network: customNetwork,
+          provider,
+          proxyReaderAddress: '0x012312931293',
+        });
+      }, ConfigurationErrorCode.InvalidConfigurationField);
     });
 
     it('should work with custom network configuration with provider', async () => {
@@ -94,7 +120,7 @@ describe('Resolution', () => {
       const cns = new Cns({
         network: customNetwork,
         provider,
-        proxyReaderAddress: '0x012312931293',
+        proxyReaderAddress: '0xe7447Fdd52FA286e7e0aa23cd107F83790250897',
       });
       expect(cns).toBeDefined();
     });

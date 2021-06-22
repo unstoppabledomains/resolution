@@ -4,10 +4,12 @@ import {
   expectSpyToBeCalled,
   expectResolutionErrorCode,
   mockAsyncMethods,
+  expectConfigurationErrorCode,
 } from './helpers';
 import {NullAddress} from '../types';
 import {NamingServiceName, ZnsSupportedNetworks} from '../types/publicTypes';
 import Zns from '../Zns';
+import {ConfigurationErrorCode} from '../errors/configurationError';
 
 let resolution: Resolution;
 let zns: Zns;
@@ -70,28 +72,12 @@ describe('ZNS', () => {
             sourceConfig: {zns: {network: '42' as ZnsSupportedNetworks}},
           }),
       ).toThrowError(
-        'Missing configuration in Resolution CNS. Please specify registryAddress when using a custom network',
+        'Missing configuration in Resolution ZNS. Please specify registryAddress when using a custom network',
       );
     });
 
     it('checks normalizeSource zns (object) #7', async () => {
-      expect(
-        () =>
-          new Resolution({
-            sourceConfig: {
-              zns: {
-                network: 'random-network' as ZnsSupportedNetworks,
-                registryAddress: '0x0123123',
-              },
-            },
-          }),
-      ).toThrowError(
-        'Missing configuration in Resolution CNS. Please specify url or provider when using a custom network',
-      );
-    });
-
-    it('checks normalizeSource zns (object) #7', async () => {
-      expect(
+      await expectConfigurationErrorCode(
         () =>
           new Resolution({
             sourceConfig: {
@@ -102,7 +88,52 @@ describe('ZNS', () => {
               },
             },
           }),
-      ).toThrowError('Invalid address format.');
+        ConfigurationErrorCode.InvalidConfigurationField,
+      );
+    });
+
+    it('checks normalizeSource zns (object) #7.1', async () => {
+      const validResolution = new Resolution({
+        sourceConfig: {
+          zns: {
+            network: 'random-network' as ZnsSupportedNetworks,
+            url: 'https://api.zilliqa.com',
+            registryAddress: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
+          },
+        },
+      });
+      expect(validResolution).toBeDefined();
+    });
+
+    it('checks normalizeSource zns (object) #7.2', async () => {
+      await expectConfigurationErrorCode(
+        () =>
+          new Resolution({
+            sourceConfig: {
+              zns: {
+                network: 'random-network' as ZnsSupportedNetworks,
+                registryAddress: '0x0123123',
+              },
+            },
+          }),
+        ConfigurationErrorCode.CustomNetworkConfigMissing,
+      );
+    });
+
+    it('checks normalizeSource zns (object) #7.3', async () => {
+      await expectConfigurationErrorCode(
+        () =>
+          new Resolution({
+            sourceConfig: {
+              zns: {
+                network: 'random-network' as ZnsSupportedNetworks,
+                url: 'example.com',
+                registryAddress: '0x0123123',
+              },
+            },
+          }),
+        ConfigurationErrorCode.InvalidConfigurationField,
+      );
     });
 
     it('checks normalizeSource zns (object) #8', async () => {
