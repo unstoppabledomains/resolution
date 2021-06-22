@@ -3,6 +3,7 @@ import {
   CnsSupportedNetwork,
   ProxyReaderMap,
   hasProvider,
+  EventData,
 } from './types';
 import {default as proxyReaderAbi} from './contracts/cns/proxyReader';
 import {default as resolverInterface} from './contracts/cns/resolver';
@@ -259,10 +260,10 @@ export default class Cns extends NamingService {
       resolverContract,
       tokenId,
     );
-    const logs = await resolverContract.fetchLogs(
-      'NewKey',
+    const logs = await this.getNewKeyEvents(
+      resolverContract,
       tokenId,
-      startingBlock,
+      startingBlock || 'earliest',
     );
     const keyTopics = logs.map((event) => event.topics[2]);
     // If there are no NewKey events we want to check the standardRecords
@@ -299,13 +300,7 @@ export default class Cns extends NamingService {
   }
 
   private isLegacyResolver(resolverAddress: string): boolean {
-    if (this.isWellKnownLegacyResolver(resolverAddress)) {
-      return true;
-    }
-    if (this.isUpToDateResolver(resolverAddress)) {
-      return false;
-    }
-    return false;
+    return this.isWellKnownLegacyResolver(resolverAddress);
   }
 
   private isWellKnownLegacyResolver(resolverAddress: string): boolean {
@@ -322,25 +317,24 @@ export default class Cns extends NamingService {
     );
   }
 
-  private isUpToDateResolver(resolverAddress: string): boolean {
-    const address =
-      NetworkConfig?.networks[this.network]?.contracts?.Resolver?.address;
-    if (!address) {
-      return false;
-    }
-    return address.toLowerCase() === resolverAddress.toLowerCase();
-  }
-
   private async getStartingBlock(
     contract: EthereumContract,
     tokenId: string,
-  ): Promise<string> {
+  ): Promise<string | undefined> {
     const defaultStartingBlock =
       NetworkConfig?.networks[this.network]?.contracts?.Resolver
         ?.deploymentBlock;
     const logs = await contract.fetchLogs('ResetRecords', tokenId);
     const lastResetEvent = logs[logs.length - 1];
     return lastResetEvent?.blockNumber || defaultStartingBlock;
+  }
+
+  private async getNewKeyEvents(
+    resolverContract: EthereumContract,
+    tokenId: string,
+    startingBlock: string,
+  ): Promise<EventData[]> {
+    return resolverContract.fetchLogs('NewKey', tokenId, startingBlock);
   }
 
   private checkNetworkConfig(source: CnsSource): void {

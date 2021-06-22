@@ -7,7 +7,7 @@ import {
   expectConfigurationErrorCode,
 } from './helpers';
 import {NullAddress} from '../types';
-import {NamingServiceName, ZnsSupportedNetworks} from '../types/publicTypes';
+import {NamingServiceName} from '../types/publicTypes';
 import Zns from '../Zns';
 import {ConfigurationErrorCode} from '../errors/configurationError';
 
@@ -69,7 +69,7 @@ describe('ZNS', () => {
       expect(
         () =>
           new Resolution({
-            sourceConfig: {zns: {network: '42' as ZnsSupportedNetworks}},
+            sourceConfig: {zns: {network: '42'}},
           }),
       ).toThrowError(
         'Missing configuration in Resolution ZNS. Please specify registryAddress when using a custom network',
@@ -82,7 +82,7 @@ describe('ZNS', () => {
           new Resolution({
             sourceConfig: {
               zns: {
-                network: 'random-network' as ZnsSupportedNetworks,
+                network: 'random-network',
                 url: 'https://api.zilliqa.com',
                 registryAddress: '0x0123123',
               },
@@ -96,7 +96,7 @@ describe('ZNS', () => {
       const validResolution = new Resolution({
         sourceConfig: {
           zns: {
-            network: 'random-network' as ZnsSupportedNetworks,
+            network: 'random-network',
             url: 'https://api.zilliqa.com',
             registryAddress: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
           },
@@ -111,7 +111,7 @@ describe('ZNS', () => {
           new Resolution({
             sourceConfig: {
               zns: {
-                network: 'random-network' as ZnsSupportedNetworks,
+                network: 'random-network',
                 registryAddress: '0x0123123',
               },
             },
@@ -126,7 +126,7 @@ describe('ZNS', () => {
           new Resolution({
             sourceConfig: {
               zns: {
-                network: 'random-network' as ZnsSupportedNetworks,
+                network: 'random-network',
                 url: 'example.com',
                 registryAddress: '0x0123123',
               },
@@ -307,44 +307,6 @@ describe('ZNS', () => {
 
     it('starts and ends with -', () => {
       expect(resolution.isSupportedDomain('-hello-.zil')).toEqual(true);
-    });
-  });
-
-  describe('.isRegistered', () => {
-    it('should return true', async () => {
-      const spies = mockAsyncMethods(zns, {
-        getRecordsAddresses: ['zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz'],
-      });
-      const isRegistered = await resolution.isRegistered('brad.zil');
-      expectSpyToBeCalled(spies);
-      expect(isRegistered).toBe(true);
-    });
-    it('should return false', async () => {
-      const spies = mockAsyncMethods(zns, {
-        getRecordsAddresses: [''],
-      });
-      const isRegistered = await resolution.isRegistered('ryan.zil');
-      expectSpyToBeCalled(spies);
-      expect(isRegistered).toBe(false);
-    });
-  });
-
-  describe('.isAvailable', () => {
-    it('should return false', async () => {
-      const spies = mockAsyncMethods(zns, {
-        getRecordsAddresses: ['zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz'],
-      });
-      const isAvailable = await zns.isAvailable('brad.zil');
-      expectSpyToBeCalled(spies);
-      expect(isAvailable).toBe(false);
-    });
-    it('should return true', async () => {
-      const spies = mockAsyncMethods(zns, {
-        getRecordsAddresses: [''],
-      });
-      const isAvailable = await zns.isAvailable('ryan.zil');
-      expectSpyToBeCalled(spies);
-      expect(isAvailable).toBe(true);
     });
   });
 

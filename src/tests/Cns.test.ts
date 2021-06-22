@@ -13,7 +13,7 @@ import {
   CryptoDomainWithAllRecords,
 } from './helpers';
 import FetchProvider from '../FetchProvider';
-import {CnsSupportedNetworks, NamingServiceName} from '../types/publicTypes';
+import {NamingServiceName} from '../types/publicTypes';
 import Cns from '../Cns';
 import Networking from '../utils/Networking';
 import {ConfigurationErrorCode} from '../errors/configurationError';
