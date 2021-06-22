@@ -3,6 +3,7 @@ import {
   CnsSupportedNetwork,
   ProxyReaderMap,
   hasProvider,
+  NullAddress,
 } from './types';
 import {default as proxyReaderAbi} from './contracts/cns/proxyReader';
 import {default as resolverInterface} from './contracts/cns/resolver';
@@ -268,6 +269,12 @@ export default class Cns extends NamingService {
     const [address] = await this.readerContract.call('registryOf', [
       this.namehash(tld!),
     ]);
+
+    if (address === NullAddress) {
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
+        domain,
+      });
+    }
     return address;
   }
 

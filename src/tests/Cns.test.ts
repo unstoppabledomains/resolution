@@ -585,7 +585,7 @@ describe('CNS', () => {
       mockAPICalls('cns_registry_address_tests', protocolLink());
       await expectResolutionErrorCode(
         () => cns.registryAddress('some-domain.unknown'),
-        ResolutionErrorCode.ServiceProviderError,
+        ResolutionErrorCode.UnsupportedDomain,
       );
     });
   });

@@ -4,7 +4,7 @@
     "1": {
       "contracts": {
         "UNSRegistry": {
-          "address": "0x0000000000000000000000000000000000000000",
+          "address": "0x0000000000000000000000000000000000000001",
           "implementation": "",
           "legacyAddresses": [],
           "deploymentBlock": ""
