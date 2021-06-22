@@ -3,6 +3,7 @@ import {
   CnsSupportedNetwork,
   ProxyReaderMap,
   hasProvider,
+  EventData,
 } from './types';
 import {default as proxyReaderAbi} from './contracts/cns/proxyReader';
 import {default as resolverInterface} from './contracts/cns/resolver';
@@ -56,11 +57,7 @@ export default class Cns extends NamingService {
         network: 'mainnet',
       };
     }
-    if (!source.network || !CnsSupportedNetwork.guard(source.network)) {
-      throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {
-        method: NamingServiceName.CNS,
-      });
-    }
+    this.checkNetworkConfig(source);
     this.network = EthereumNetworks[source.network];
     this.url = source['url'] || Cns.UrlMap[this.network];
     this.provider =
@@ -92,7 +89,7 @@ export default class Cns extends NamingService {
       method: 'net_version',
     })) as number;
     const networkName = EthereumNetworksInverted[networkId];
-    if (!networkName || !CnsSupportedNetwork.guard(networkName)) {
+    if (!networkName) {
       throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {
         method: NamingServiceName.CNS,
       });
@@ -263,10 +260,10 @@ export default class Cns extends NamingService {
       resolverContract,
       tokenId,
     );
-    const logs = await resolverContract.fetchLogs(
-      'NewKey',
+    const logs = await this.getNewKeyEvents(
+      resolverContract,
       tokenId,
-      startingBlock,
+      startingBlock || 'earliest',
     );
     const keyTopics = logs.map((event) => event.topics[2]);
     // If there are no NewKey events we want to check the standardRecords
@@ -303,13 +300,7 @@ export default class Cns extends NamingService {
   }
 
   private isLegacyResolver(resolverAddress: string): boolean {
-    if (this.isWellKnownLegacyResolver(resolverAddress)) {
-      return true;
-    }
-    if (this.isUpToDateResolver(resolverAddress)) {
-      return false;
-    }
-    return false;
+    return this.isWellKnownLegacyResolver(resolverAddress);
   }
 
   private isWellKnownLegacyResolver(resolverAddress: string): boolean {
@@ -326,25 +317,70 @@ export default class Cns extends NamingService {
     );
   }
 
-  private isUpToDateResolver(resolverAddress: string): boolean {
-    const address =
-      NetworkConfig?.networks[this.network]?.contracts?.Resolver?.address;
-    if (!address) {
-      return false;
-    }
-    return address.toLowerCase() === resolverAddress.toLowerCase();
-  }
-
   private async getStartingBlock(
     contract: EthereumContract,
     tokenId: string,
-  ): Promise<string> {
+  ): Promise<string | undefined> {
     const defaultStartingBlock =
       NetworkConfig?.networks[this.network]?.contracts?.Resolver
         ?.deploymentBlock;
     const logs = await contract.fetchLogs('ResetRecords', tokenId);
     const lastResetEvent = logs[logs.length - 1];
     return lastResetEvent?.blockNumber || defaultStartingBlock;
+  }
+
+  private async getNewKeyEvents(
+    resolverContract: EthereumContract,
+    tokenId: string,
+    startingBlock: string,
+  ): Promise<EventData[]> {
+    return resolverContract.fetchLogs('NewKey', tokenId, startingBlock);
+  }
+
+  private checkNetworkConfig(source: CnsSource): void {
+    if (!source.network) {
+      throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {
+        method: this.name,
+      });
+    }
+    if (!CnsSupportedNetwork.guard(source.network)) {
+      this.checkCustomNetworkConfig(source);
+    }
+  }
+
+  private checkCustomNetworkConfig(source: CnsSource): void {
+    if (!this.isValidProxyReader(source.proxyReaderAddress)) {
+      throw new ConfigurationError(
+        ConfigurationErrorCode.InvalidConfigurationField,
+        {
+          method: this.name,
+          field: 'proxyReaderAddress',
+        },
+      );
+    }
+    if (!source['url'] && !source['provider']) {
+      throw new ConfigurationError(
+        ConfigurationErrorCode.CustomNetworkConfigMissing,
+        {
+          method: this.name,
+          config: 'url or provider',
+        },
+      );
+    }
+  }
+
+  private isValidProxyReader(address?: string): boolean {
+    if (!address) {
+      throw new ConfigurationError(
+        ConfigurationErrorCode.CustomNetworkConfigMissing,
+        {
+          method: this.name,
+          config: 'proxyReaderAddress',
+        },
+      );
+    }
+    const ethLikePattern = new RegExp('^0x[a-fA-F0-9]{40}$');
+    return ethLikePattern.test(address);
   }
 }
 

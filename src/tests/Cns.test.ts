@@ -13,7 +13,7 @@ import {
   CryptoDomainWithAllRecords,
 } from './helpers';
 import FetchProvider from '../FetchProvider';
-import {CnsSupportedNetworks, NamingServiceName} from '../types/publicTypes';
+import {NamingServiceName} from '../types/publicTypes';
 import Cns from '../Cns';
 import Networking from '../utils/Networking';
 import {ConfigurationErrorCode} from '../errors/configurationError';
@@ -36,15 +36,15 @@ describe('CNS', () => {
     expect(cns.url).toBe(protocolLink());
   });
 
-  it('should not allow ropsten as testnet', async () => {
+  it('should not allow missing config for custom network', async () => {
     await expectConfigurationErrorCode(
       () =>
         new Resolution({
           sourceConfig: {
-            cns: {network: 'ropsten' as CnsSupportedNetworks},
+            cns: {network: 'ropsten'},
           },
         }),
-      ConfigurationErrorCode.UnsupportedNetwork,
+      ConfigurationErrorCode.CustomNetworkConfigMissing,
     );
   });
 

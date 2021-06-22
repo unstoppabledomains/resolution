@@ -5,7 +5,6 @@ import UdApi from './UdApi';
 import {
   Api,
   AutoNetworkConfigs,
-  CnsSupportedNetworks,
   CryptoRecords,
   DnsRecord,
   DnsRecordType,
@@ -96,7 +95,7 @@ export default class Resolution {
     infura: string,
     networks?: {
       cns?: {
-        network: CnsSupportedNetworks;
+        network: string;
       };
     },
   ): Resolution {
@@ -120,7 +119,7 @@ export default class Resolution {
     provider: Provider,
     networks?: {
       cns?: {
-        network: CnsSupportedNetworks;
+        network: string;
       };
     },
   ): Resolution {
@@ -141,7 +140,7 @@ export default class Resolution {
     provider: Web3Version0Provider,
     networks?: {
       cns?: {
-        network: CnsSupportedNetworks;
+        network: string;
       };
     },
   ): Resolution {
@@ -162,7 +161,7 @@ export default class Resolution {
     provider: Web3Version1Provider,
     networks?: {
       cns?: {
-        network: CnsSupportedNetworks;
+        network: string;
       };
     },
   ): Resolution {
@@ -186,7 +185,7 @@ export default class Resolution {
     provider: EthersProvider,
     networks?: {
       cns?: {
-        network: CnsSupportedNetworks;
+        network: string;
       };
     },
   ): Resolution {

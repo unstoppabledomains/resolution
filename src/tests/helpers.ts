@@ -17,8 +17,6 @@ export const CryptoDomainWithoutResolver = 'twistedmusic.crypto';
 export const CryptoDomainWithTwitterVerification =
   'ijustwannatestsomething2.crypto';
 export const CryptoDomainWithUsdtMultiChainRecords = 'udtestdev-usdt.crypto';
-export const ZilDomainWithUsdtMultiChainRecords =
-  'reseller-test-udtesting-422508414817.zil';
 export const CryptoDomainWithAllRecords =
   'udtestdev-reseller-test-udtesting-875948372642.crypto';
 export const CryptoDomainWithoutGunDbRecords =
@@ -152,14 +150,12 @@ export function mockAPICalls(testName: string, url = MainnetUrl): void {
     switch (METHOD) {
     case 'POST': {
       nock(url)
-      // .log()
         .post('/', JSON.stringify(REQUEST), undefined)
         .reply(200, JSON.stringify(RESPONSE));
       break;
     }
     default: {
       nock(url)
-      // .log()
         .get(REQUEST as string, undefined, undefined)
         .reply(200, RESPONSE);
     }

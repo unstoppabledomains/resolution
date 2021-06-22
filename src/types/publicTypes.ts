@@ -1,26 +1,21 @@
 import {
-  CnsSupportedNetwork,
   EventFilter,
   RequestArguments,
   RpcProviderLogEntry,
   TransactionRequest,
-  ZnsSupportedNetwork,
 } from '.';
-
-export type CnsSupportedNetworks = typeof CnsSupportedNetwork.type;
-export type ZnsSupportedNetworks = typeof ZnsSupportedNetwork.type;
 
 export type Api = {api: true; url?: string};
 
 type NamingServiceSource = {url?: string} | {provider?: Provider};
 
 export type CnsSource = NamingServiceSource & {
-  network: CnsSupportedNetworks;
+  network: string;
   proxyReaderAddress?: string;
 };
 
 export type ZnsSource = NamingServiceSource & {
-  network: ZnsSupportedNetworks;
+  network: string;
   registryAddress?: string;
 };
 
