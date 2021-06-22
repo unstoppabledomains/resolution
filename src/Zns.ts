@@ -31,17 +31,17 @@ export default class Zns extends NamingService {
     testnet: 333,
     localnet: 111,
   };
-  
+
   static readonly RegistryMap = {
     1: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
   };
-  
+
   readonly name: NamingServiceName = NamingServiceName.ZNS;
   readonly network: number;
   readonly url: string | undefined;
   readonly registryAddress: string;
   readonly provider: Provider;
-  
+
   constructor(source?: ZnsSource) {
     super();
     if (!source) {
@@ -50,15 +50,13 @@ export default class Zns extends NamingService {
         network: "mainnet"
       };
     }
-    if (!source.network || !ZnsSupportedNetwork.guard(source.network)) {
-      throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {
-        method: NamingServiceName.ZNS,
-      });
-    }
+    this.checkNetworkConfig(source);
     this.network = Zns.NetworkNameMap[source.network];
     this.url = source['url'] || Zns.UrlMap[this.network];
     this.provider = source['provider'] || new FetchProvider(this.name, this.url!);
     this.registryAddress = source['registryAddress'] || Zns.RegistryMap[this.network];
+
+    this.checkRegistryAddress(this.registryAddress);
     if (this.registryAddress.startsWith("0x")) {
       this.registryAddress = toBech32Address(this.registryAddress);
     }
@@ -216,5 +214,53 @@ export default class Zns extends NamingService {
   ): Promise<any> {
     const record = await this.getContractField(contractAddress, field, [key]);
     return (record && record[key]) || null;
+  }
+
+  private checkNetworkConfig(source: ZnsSource): void {
+    if (!source.network) {
+      throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {
+        method: NamingServiceName.ZNS,
+      });
+    }
+    if (!ZnsSupportedNetwork.guard(source.network)) {
+      this.checkCustomNetworkConfig(source);
+    }
+  }
+
+  private checkRegistryAddress(address: string): void {
+    // Represents both versions of Zilliqa addresses eth-like and bech32 zil-like
+    const addressValidator = new RegExp(
+      '^0x[a-fA-F0-9]{40}$|^zil1[qpzry9x8gf2tvdw0s3jn54khce6mua7l]{38}$',
+    );
+    if (!addressValidator.test(address)) {
+      throw new ConfigurationError(
+        ConfigurationErrorCode.InvalidConfigurationField,
+        {
+          method: this.name,
+          field: 'registryAddress',
+        },
+      );
+    }
+  }
+
+  private checkCustomNetworkConfig(source: ZnsSource): void {
+    if (!source.registryAddress) {
+      throw new ConfigurationError(
+        ConfigurationErrorCode.CustomNetworkConfigMissing,
+        {
+          method: NamingServiceName.ZNS,
+          config: 'registryAddress',
+        },
+      );
+    }
+    if (!source['url'] && !source['provider']) {
+      throw new ConfigurationError(
+        ConfigurationErrorCode.CustomNetworkConfigMissing,
+        {
+          method: NamingServiceName.ZNS,
+          config: 'url or provider',
+        },
+      );
+    }
   }
 }
