@@ -6,7 +6,6 @@ import UdApi from './UdApi';
 import {
   Api,
   AutoNetworkConfigs,
-  CnsSupportedNetworks,
   CryptoRecords,
   DnsRecord,
   DnsRecordType,
@@ -52,7 +51,7 @@ export default class Resolution {
    * @internal
    */
   readonly serviceMap: Record<NamingServiceName, NamingService>;
-  
+
   constructor({
     sourceConfig = undefined,
   }: { sourceConfig?: SourceConfig } = {}) {
@@ -85,7 +84,7 @@ export default class Resolution {
     if (sourceConfig.ens) {
       resolution.serviceMap[NamingServiceName.ENS] = await Ens.autoNetwork(sourceConfig.ens);
     }
-     
+
     return resolution;
   }
 
@@ -94,11 +93,17 @@ export default class Resolution {
    * @param infura - infura project id
    * @param networks - an optional object that describes what network to use when connecting ENS or CNS default is mainnet
    */
-  static infura(infura: string, networks?: { ens?: {
-      network: EnsSupportedNetworks 
-    }, cns?: {
-      network: CnsSupportedNetworks
-    }}): Resolution {
+  static infura(
+    infura: string,
+    networks?: {
+      ens?: {
+        network: EnsSupportedNetworks
+      },
+      cns?: {
+        network: string;
+      };
+    },
+  ): Resolution {
     return new this({
       sourceConfig: {
         ens: { url: signedInfuraLink(infura, networks?.ens?.network), network: networks?.ens?.network || "mainnet" },
@@ -113,11 +118,17 @@ export default class Resolution {
    * @param networks - an optional object that describes what network to use when connecting ENS or CNS default is mainnet
    * @see https://eips.ethereum.org/EIPS/eip-1193
    */
-  static fromEip1193Provider(provider: Provider, networks?: { ens?: {
-    network: EnsSupportedNetworks 
-  }, cns?: {
-    network: CnsSupportedNetworks
-  }}): Resolution {
+  static fromEip1193Provider(
+    provider: Provider,
+    networks?: {
+      ens?: {
+        network: EnsSupportedNetworks
+      },
+      cns?: {
+        network: string;
+      };
+    },
+  ): Resolution {
     return new this({
       sourceConfig: {
         ens: { provider, network: networks?.ens?.network || "mainnet" },
@@ -132,11 +143,17 @@ export default class Resolution {
    * @param networks - Ethereum network configuration
    * @see https://github.com/ethereum/web3.js/blob/0.20.7/lib/web3/httpprovider.js#L116
    */
-  static fromWeb3Version0Provider(provider: Web3Version0Provider, networks?: { ens?: {
-    network: EnsSupportedNetworks 
-  }, cns?: {
-    network: CnsSupportedNetworks
-  }}): Resolution {
+  static fromWeb3Version0Provider(
+    provider: Web3Version0Provider,
+    networks?: {
+      cns?: {
+        network: string;
+      };
+      ens?: {
+        network: EnsSupportedNetworks
+      }
+    },
+  ): Resolution {
     return this.fromEip1193Provider(
       Eip1993Factories.fromWeb3Version0Provider(provider),
       networks
@@ -150,11 +167,17 @@ export default class Resolution {
    * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-core-helpers/types/index.d.ts#L165
    * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-providers-http/src/index.js#L95
    */
-  static fromWeb3Version1Provider(provider: Web3Version1Provider, networks?: { ens?: {
-    network: EnsSupportedNetworks 
-  }, cns?: {
-    network: CnsSupportedNetworks
-  }}): Resolution {
+  static fromWeb3Version1Provider(
+    provider: Web3Version1Provider,
+    networks?: {
+      cns?: {
+        network: string;
+      },
+      ens?: {
+        network: EnsSupportedNetworks
+      },
+    },
+  ): Resolution {
     return this.fromEip1193Provider(
       Eip1993Factories.fromWeb3Version1Provider(provider),
       networks
@@ -171,11 +194,17 @@ export default class Resolution {
    * @see https://docs.ethers.io/ethers.js/v5-beta/api-providers.html#jsonrpcprovider-inherits-from-provider
    * @see https://github.com/ethers-io/ethers.js/blob/master/packages/providers/src.ts/json-rpc-provider.ts
    */
-  static fromEthersProvider(provider: EthersProvider, networks?: { ens?: {
-    network: EnsSupportedNetworks 
-  }, cns?: {
-    network: CnsSupportedNetworks
-  }}): Resolution {
+  static fromEthersProvider(
+    provider: EthersProvider,
+    networks?: {
+      cns?: {
+        network: string;
+      },
+      ens?: {
+        network: EnsSupportedNetworks
+      }
+    },
+  ): Resolution {
     return this.fromEip1193Provider(
       Eip1993Factories.fromEthersProvider(provider),
       networks
@@ -197,11 +226,11 @@ export default class Resolution {
     );
   }
 
-  /** 
+  /**
    * Read multi-chain currency address if exists
    * @async
    * @param domain - domain name to be resolved
-   * @param ticker - currency ticker (USDT, FTM, etc.) 
+   * @param ticker - currency ticker (USDT, FTM, etc.)
    * @param chain - chain version, usually means blockchain ( ERC20, BEP2, OMNI, etc. )
    * @throws [[ResolutionError]] if address is not found
    * @returns A promise that resolves in an adress

@@ -18,6 +18,10 @@ export const CryptoDomainWithEmail = 'reseller-test-paul019.crypto';
 export const CryptoDomainWithAdaBchAddresses = 'reseller-test-mago0.crypto';
 export const CryptoDomainWithTwitterVerification = 'ijustwannatestsomething2.crypto';
 export const CryptoDomainWithUsdtMultiChainRecords = 'udtestdev-usdt.crypto';
+export const CryptoDomainWithAllRecords =
+  'udtestdev-reseller-test-udtesting-875948372642.crypto';
+export const CryptoDomainWithoutGunDbRecords =
+  'udtestdev-reseller-test-udtesting-875948372642.crypto';
 export const ZilDomainWithUsdtMultiChainRecords = 'reseller-test-udtesting-422508414817.zil';
 
 try {
@@ -138,14 +142,12 @@ export function mockAPICalls(testName: string, url = MainnetUrl): void {
     switch (METHOD) {
     case 'POST': {
       nock(url)
-      // .log()
         .post('/', JSON.stringify(REQUEST), undefined)
         .reply(200, JSON.stringify(RESPONSE));
       break;
     }
     default: {
       nock(url)
-      // .log()
         .get(REQUEST as string, undefined, undefined)
         .reply(200, RESPONSE);
     }
@@ -183,7 +185,7 @@ export const caseMock = <T, U>(params: T, cases: { request: T, response: U }[]):
       return response;
     }
   }
-  
+
   throw new Error(`got unexpected params ${JSON.stringify(params)}`);
 };
 

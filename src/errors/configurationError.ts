@@ -7,6 +7,8 @@ type ConfigurationErrorHandler = (error: ConfigurationErrorOptions) => string;
 type ConfigurationErrorOptions = {
   method?: ResolutionMethod;
   dependency?: string;
+  config?: string;
+  field?: string;
   version?: string;
 };
 
@@ -14,7 +16,9 @@ export enum ConfigurationErrorCode {
   IncorrectProvider = 'IncorrectProvider',
   UnsupportedNetwork = 'UnsupportedNetwork',
   UnspecifiedUrl = 'UnspecifiedUrl',
-  DependencyMissing = 'DependencyMissing'
+  DependencyMissing = 'DependencyMissing',
+  CustomNetworkConfigMissing = 'CustomNetworkConfigMissing',
+  InvalidConfigurationField = 'InvalidProxyReader',
 }
 
 /**
@@ -26,13 +30,22 @@ const HandlersByCode = {
     'Provider doesn\'t implement sendAsync or send method',
   [ConfigurationErrorCode.UnsupportedNetwork]: (params: {
     method: ResolutionMethod;
-  }) => `Unspecified network in Resolution ${params.method || ''} configuration`,
+  }) => `Unsupported network in Resolution ${params.method || ''} configuration`,
   [ConfigurationErrorCode.UnspecifiedUrl]: (params: {
     method: ResolutionMethod;
   }) => `Unspecified url in Resolution ${params.method} configuration`,
   [ConfigurationErrorCode.DependencyMissing]: (params: {
     dependecy: string, version: string
   }) => `Missing dependency for this functionality. Please install ${params.dependecy} @ ${params.version} via npm or yarn`,
+  [ConfigurationErrorCode.CustomNetworkConfigMissing]: (params: {
+    method: ResolutionMethod;
+    config: string;
+  }) =>
+    `Missing configuration in Resolution ${params.method}. Please specify ${params.config} when using a custom network`,
+  [ConfigurationErrorCode.InvalidConfigurationField]: (params: {
+    method: ResolutionMethod;
+    field: string;
+  }) => `Invalid '${params.field}' in Resolution ${params.method}`,
 };
 
 /**
@@ -41,6 +54,7 @@ const HandlersByCode = {
  * - IncorrectProvider - When provider doesn't have implemented send or sendAsync methods
  * - UnsupportedNetwork - When network is not specified or not supported
  * - UnspecifiedUrl - When url is not specified for custom naming service configurations
+ * - CustomNetworkConfigMissing - When configuration is missing for custom network configurations
  * @param method - optional param to specify which namingService errored out
  */
 export class ConfigurationError extends Error {

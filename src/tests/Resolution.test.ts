@@ -32,6 +32,7 @@ import Zns from '../Zns';
 import Ens from '../Ens';
 import FetchProvider from '../FetchProvider';
 import { ConfigurationErrorCode } from '../errors/configurationError';
+import EthereumContract from '../contracts/EthereumContract';
 
 let resolution: Resolution;
 let cns: Cns;
@@ -56,7 +57,6 @@ describe('Resolution', () => {
   describe('.Basic setup', () => {
     it('should work with autonetwork url configuration', async () => {
       const mainnetUrl = protocolLink();
-      const goerliUrl = mainnetUrl.replace('mainnet', 'goerli');
       // mocking getNetworkConfigs because no access to inner provider.request
       const CnsGetNetworkOriginal = Cns.autoNetwork;
       const EnsGetNetworkOriginal = Ens.autoNetwork;
@@ -76,6 +76,56 @@ describe('Resolution', () => {
     });
 
 
+    it('should not work with invalid proxyReader configuration', async () => {
+      const mainnetUrl = protocolLink();
+      const customNetwork = 'goerli';
+      const goerliUrl = mainnetUrl.replace('mainnet', customNetwork);
+      expectConfigurationErrorCode(() => {
+        new Cns({
+          network: customNetwork,
+          url: goerliUrl,
+          proxyReaderAddress: '0x012312931293',
+        });
+      }, ConfigurationErrorCode.InvalidConfigurationField);
+    });
+
+    it('should work with proxyReader configuration', async () => {
+      const mainnetUrl = protocolLink();
+      const customNetwork = 'goerli';
+      const goerliUrl = mainnetUrl.replace('mainnet', customNetwork);
+      const cns = new Cns({
+        network: customNetwork,
+        url: goerliUrl,
+        proxyReaderAddress: '0xe7474D07fD2FA286e7e0aa23cd107F8379025037',
+      });
+      expect(cns).toBeDefined();
+    });
+
+    it('should not work with invalid proxyReader configuration 2', async () => {
+      const mainnetUrl = protocolLink();
+      const customNetwork = 'goerli';
+      const provider = new FetchProvider(NamingServiceName.CNS, mainnetUrl);
+      expectConfigurationErrorCode(() => {
+        new Cns({
+          network: customNetwork,
+          provider,
+          proxyReaderAddress: '0x012312931293',
+        });
+      }, ConfigurationErrorCode.InvalidConfigurationField);
+    });
+
+    it('should work with custom network configuration with provider', async () => {
+      const mainnetUrl = protocolLink();
+      const customNetwork = 'goerli';
+      const provider = new FetchProvider(NamingServiceName.CNS, mainnetUrl);
+      const cns = new Cns({
+        network: customNetwork,
+        provider,
+        proxyReaderAddress: '0xe7447Fdd52FA286e7e0aa23cd107F83790250897',
+      });
+      expect(cns).toBeDefined();
+    });
+
     it('should work with autonetwork provider configuration', async () => {
       const provider = new FetchProvider("UDAPI", protocolLink().replace('mainnet', 'rinkeby'));
       const spy =  mockAsyncMethod(provider, "request", "4");
@@ -94,7 +144,7 @@ describe('Resolution', () => {
       const factorySpy = mockAsyncMethod(FetchProvider, "factory", () => mockedProvider);
       try {
         await Resolution.autoNetwork({
-          cns: {url: "https://google.com"}  
+          cns: {url: "https://google.com"}
         });
       } catch(error) {
         expect(error).toBeInstanceOf(FetchError);
@@ -103,30 +153,18 @@ describe('Resolution', () => {
       expectSpyToBeCalled([factorySpy, providerSpy]);
     });
 
-    it('should fail because provided provider failed to make a net_version call', async () => {
-      const mockedProvider = new FetchProvider(NamingServiceName.ENS, "http://unstoppabledomains.com");
-      const providerSpy = mockAsyncMethod(mockedProvider, "request", new FetchError("invalid json response body at https://unstoppabledomains.com/ reason: Unexpected token < in JSON at position 0", "invalid_json"))
-      try {
-        await Resolution.autoNetwork({
-          ens: {provider: mockedProvider}
-        })
-      } catch(error) {
-        expect(error).toBeInstanceOf(FetchError);
-        expect(error.message).toBe("invalid json response body at https://unstoppabledomains.com/ reason: Unexpected token < in JSON at position 0");
-      }
-      expect(providerSpy).toBeCalled();
-    });
-
-    it('should fail because of unsupported test network for cns', async () => {
-      const blockchainUrl = protocolLink().replace('mainnet', 'ropsten');
-      const mockedProvider = new FetchProvider(NamingServiceName.CNS, blockchainUrl);
-      const providerSpy = mockAsyncMethod(mockedProvider, "request", () => "3");
-      const providerFactorySpy = mockAsyncMethod(FetchProvider, "factory", () => mockedProvider);
-
-      await expectConfigurationErrorCode(Resolution.autoNetwork({
-        cns: { url: blockchainUrl }
-      }), ConfigurationErrorCode.UnsupportedNetwork);
-      expectSpyToBeCalled([providerSpy, providerFactorySpy]);
+    it('should work with custom network configuration', async () => {
+      const mainnetUrl = protocolLink();
+      const customNetwork = 'goerli';
+      const goerliUrl = mainnetUrl.replace('mainnet', customNetwork);
+      await expectConfigurationErrorCode(
+        () =>
+          new Cns({
+            network: customNetwork,
+            url: goerliUrl,
+          }),
+        ConfigurationErrorCode.CustomNetworkConfigMissing,
+      );
     });
 
     it('should fail in test development',async () => {
@@ -676,6 +714,66 @@ describe('Resolution', () => {
             });
           });
         });
+
+        it('should get all records using custom networks', async () => {
+          const resolution = new Resolution({
+            sourceConfig: {
+              cns: {
+                network: 'custom',
+                proxyReaderAddress:
+                  '0xa6E7cEf2EDDEA66352Fd68E5915b60BDbb7309f5',
+                url: 'https://mainnet.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+              },
+              zns: {
+                network: 'custom',
+                registryAddress: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
+                url: 'https://api.zilliqa.com',
+              },
+            },
+          });
+          const cns = resolution.serviceMap['CNS'] as Cns;
+          const zns = resolution.serviceMap['ZNS'] as Zns;
+          const cnsAllRecordsMock = mockAsyncMethods(cns, {
+            getStartingBlock: undefined,
+            resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+            getStandardRecords: {
+              'crypto.ETH.address':
+                '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
+            },
+          });
+          const cnsGetNewKeyMock = mockAsyncMethod(cns, 'getNewKeyEvents', []);
+          const znsAllRecordsMock = mockAsyncMethods(zns, {
+            resolver: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
+            getResolverRecords: {
+              'crypto.ZIL.address':
+                'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
+            },
+          });
+          const znsRecords = await resolution.allRecords('brad.zil');
+          const cnsRecords = await resolution.allRecords('brad.crypto');
+
+          expectSpyToBeCalled(znsAllRecordsMock);
+          expectSpyToBeCalled(cnsAllRecordsMock);
+          expect(cnsRecords['crypto.ETH.address']).toEqual(
+            '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
+          );
+          expect(znsRecords['crypto.ZIL.address']).toEqual(
+            'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
+          );
+          if (isLive()) {
+            expect(cnsGetNewKeyMock).toBeCalledWith(
+              expect.any(EthereumContract),
+              resolution.namehash('brad.crypto'),
+              '0x99a587',
+            );
+          } else {
+            expect(cnsGetNewKeyMock).toBeCalledWith(
+              expect.any(EthereumContract),
+              resolution.namehash('brad.crypto'),
+              'earliest',
+            );
+          }
+        });
       });
 
       describe('.Dweb', () => {
@@ -749,8 +847,8 @@ describe('Resolution', () => {
 
           it('should throw unsupported method', async () => {
             const resolution = new Resolution();
-            expectResolutionErrorCode(
-              resolution.twitter('ryan.eth'),
+            await expectResolutionErrorCode(
+              resolution.twitter('ryan.zil'),
               ResolutionErrorCode.UnsupportedMethod,
             );
           });
