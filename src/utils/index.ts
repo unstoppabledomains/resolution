@@ -53,8 +53,8 @@ export const findNamingServiceName = (
 
   if (!extension) {
     return '';
-  } else if (extension === 'zil') {
-    return domainExtensionToNamingServiceName.zil;
+  } else if (extension in domainExtensionToNamingServiceName) {
+    return domainExtensionToNamingServiceName[extension];
   } else {
     return domainExtensionToNamingServiceName.crypto;
   }

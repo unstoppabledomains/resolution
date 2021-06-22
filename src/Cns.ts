@@ -122,6 +122,7 @@ export default class Cns extends NamingService {
     return (
       !!tokens.length &&
       tokens[tokens.length - 1] !== 'zil' &&
+      !(domain === 'eth' || /^[^-]*[^-]*\.(eth|luxe|xyz|kred|addr\.reverse)$/.test(domain)) &&
       tokens.every((v) => !!v.length)
     );
   }

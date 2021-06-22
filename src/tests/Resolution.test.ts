@@ -993,12 +993,6 @@ describe('Resolution', () => {
       const namehash = resolution.namehash('brad.eth');
       expect(namehash).toEqual(expectedNamehash);
     });
-
-    it('should throw error if domain is not supported', () => {
-      expect(() => resolution.namehash('google.com')).toThrowError(
-        'Domain google.com is not supported',
-      );
-    });
   });
 
   describe('.childhash', () => {
