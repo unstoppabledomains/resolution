@@ -884,7 +884,7 @@ describe('Resolution', () => {
 
           it('should throw unsupported method', async () => {
             const resolution = new Resolution();
-            expectResolutionErrorCode(
+            await expectResolutionErrorCode(
               resolution.twitter('ryan.eth'),
               ResolutionErrorCode.UnsupportedMethod,
             );
