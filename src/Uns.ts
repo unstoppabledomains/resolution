@@ -1,12 +1,12 @@
 import {
   BlockhanNetworkUrlMap,
-  CnsSupportedNetwork,
+  UnsSupportedNetwork,
   ProxyReaderMap,
   hasProvider,
   NullAddress,
 } from './types';
-import {default as proxyReaderAbi} from './contracts/cns/proxyReader';
-import {default as resolverInterface} from './contracts/cns/resolver';
+import {default as proxyReaderAbi} from './contracts/uns/proxyReader';
+import {default as resolverInterface} from './contracts/uns/resolver';
 import ResolutionError, {ResolutionErrorCode} from './errors/resolutionError';
 import EthereumContract from './contracts/EthereumContract';
 import {
@@ -16,7 +16,7 @@ import {
   EthereumNetworks,
 } from './utils';
 import {
-  CnsSource,
+  UnsSource,
   CryptoRecords,
   DomainData,
   NamingServiceName,
@@ -35,7 +35,7 @@ import SupportedKeys from './config/supported-keys.json';
 /**
  * @internal
  */
-export default class Cns extends NamingService {
+export default class Uns extends NamingService {
   static readonly ProxyReaderMap: ProxyReaderMap = getProxyReaderMap();
 
   static readonly UrlMap: BlockhanNetworkUrlMap = {
@@ -43,39 +43,39 @@ export default class Cns extends NamingService {
     4: 'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
   };
 
-  readonly name: NamingServiceName = NamingServiceName.CNS;
+  readonly name: NamingServiceName = NamingServiceName.UNS;
   readonly network: number;
   readonly url: string | undefined;
   readonly provider: Provider;
   readonly readerContract: EthereumContract;
 
-  constructor(source?: CnsSource) {
+  constructor(source?: UnsSource) {
     super();
     if (!source) {
       source = {
-        url: Cns.UrlMap[1],
+        url: Uns.UrlMap[1],
         network: 'mainnet',
       };
     }
-    if (!source.network || !CnsSupportedNetwork.guard(source.network)) {
+    if (!source.network || !UnsSupportedNetwork.guard(source.network)) {
       throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {
-        method: NamingServiceName.CNS,
+        method: NamingServiceName.UNS,
       });
     }
     this.network = EthereumNetworks[source.network];
-    this.url = source['url'] || Cns.UrlMap[this.network];
+    this.url = source['url'] || Uns.UrlMap[this.network];
     this.provider =
       source['provider'] || new FetchProvider(this.name, this.url!);
     this.readerContract = new EthereumContract(
       proxyReaderAbi,
-      source['proxyReaderAddress'] || Cns.ProxyReaderMap[this.network],
+      source['proxyReaderAddress'] || Uns.ProxyReaderMap[this.network],
       this.provider,
     );
   }
 
   static async autoNetwork(
     config: {url: string} | {provider: Provider},
-  ): Promise<Cns> {
+  ): Promise<Uns> {
     let provider: Provider;
 
     if (hasProvider(config)) {
@@ -83,19 +83,19 @@ export default class Cns extends NamingService {
     } else {
       if (!config.url) {
         throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedUrl, {
-          method: NamingServiceName.CNS,
+          method: NamingServiceName.UNS,
         });
       }
-      provider = FetchProvider.factory(NamingServiceName.CNS, config.url);
+      provider = FetchProvider.factory(NamingServiceName.UNS, config.url);
     }
 
     const networkId = (await provider.request({
       method: 'net_version',
     })) as number;
     const networkName = EthereumNetworksInverted[networkId];
-    if (!networkName || !CnsSupportedNetwork.guard(networkName)) {
+    if (!networkName || !UnsSupportedNetwork.guard(networkName)) {
       throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {
-        method: NamingServiceName.CNS,
+        method: NamingServiceName.UNS,
       });
     }
     return new this({network: networkName, provider: provider});
@@ -246,7 +246,7 @@ export default class Cns extends NamingService {
         error.message === '< execution reverted >'
       ) {
         throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-          method: NamingServiceName.CNS,
+          method: NamingServiceName.UNS,
           methodName: 'getTokenUri',
         });
       }

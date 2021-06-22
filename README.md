@@ -30,6 +30,16 @@ Resolution supports decentralized domains across three main zones:
   - `.crypto`
 - Zilliqa Name Service (ZNS)
   - `.zil`
+- Unstoppable Name Service (UNS)
+  - `.nft`
+  - `.blockchain`
+  - `.bitcoin`
+  - `.coin`
+  - `.wallet`
+  - `.888`
+  - `.dao`
+  - `.x`
+  - ...
 
 For more information, see our detailed
 [API Referrence](https://unstoppabledomains.github.io/resolution/).
