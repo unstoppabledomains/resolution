@@ -199,13 +199,13 @@ describe('ENS', () => {
   it('checks normalizeSource ens (object) #6', async () => {
     expect(
       () => new Resolution({ sourceConfig: { ens: { network: "notRealNetwork" as EnsSupportedNetworks } } }),
-    ).toThrowError('Unspecified network in Resolution ENS configuration');
+    ).toThrowError('Unsupported network in Resolution ENS configuration');
   });
 
   it('checks normalizeSource ens (object) #7', async () => {
     expect(
       () => new Resolution({ sourceConfig: { ens: { network: 'invalid' as EnsSupportedNetworks } } }),
-    ).toThrowError('Unspecified network in Resolution ENS configuration');
+    ).toThrowError('Unsupported network in Resolution ENS configuration');
   });
 
   it('checks normalizeSource ens (object) #8', async () => {

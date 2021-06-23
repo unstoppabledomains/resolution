@@ -107,7 +107,7 @@ export default class Resolution {
     return new this({
       sourceConfig: {
         ens: { url: signedInfuraLink(infura, networks?.ens?.network), network: networks?.ens?.network || "mainnet" },
-        cns: { url: signedInfuraLink(infura, networks?.ens?.network), network: networks?.cns?.network || "mainnet" },
+        cns: { url: signedInfuraLink(infura, networks?.cns?.network), network: networks?.cns?.network || "mainnet" },
       },
     });
   }

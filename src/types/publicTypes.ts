@@ -18,7 +18,7 @@ type NamingServiceSource = {url?: string} | {provider?: Provider};
 
 export type CnsSource =
   NamingServiceSource &
-  {network: CnsSupportedNetworks, proxyReaderAddress?: string}
+  {network: string, proxyReaderAddress?: string}
 
 export type EnsSource =
   NamingServiceSource &
@@ -26,7 +26,7 @@ export type EnsSource =
 
 export type ZnsSource =
   NamingServiceSource &
-  {network: ZnsSupportedNetworks, registryAddress?: string}
+  {network: string, registryAddress?: string}
 
 export type SourceConfig = {
   cns?: CnsSource | Api;
