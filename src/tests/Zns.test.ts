@@ -251,16 +251,16 @@ describe('ZNS', () => {
   });
 
   describe('.isSupportedDomain', () => {
-    it('starts with -', () => {
-      expect(resolution.isSupportedDomain('-hello.zil')).toEqual(true);
+    it('starts with -', async () => {
+      expect(await resolution.isSupportedDomain('-hello.zil')).toEqual(true);
     });
 
-    it('ends with -', () => {
-      expect(resolution.isSupportedDomain('hello-.zil')).toEqual(true);
+    it('ends with -', async () => {
+      expect(await resolution.isSupportedDomain('hello-.zil')).toEqual(true);
     });
 
-    it('starts and ends with -', () => {
-      expect(resolution.isSupportedDomain('-hello-.zil')).toEqual(true);
+    it('starts and ends with -', async () => {
+      expect(await resolution.isSupportedDomain('-hello-.zil')).toEqual(true);
     });
   });
 

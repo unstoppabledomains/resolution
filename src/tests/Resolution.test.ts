@@ -33,7 +33,7 @@ import Cns from '../Cns';
 import Zns from '../Zns';
 import FetchProvider from '../FetchProvider';
 import {ConfigurationErrorCode} from '../errors/configurationError';
-import NetworkConfig from '../config/network-config.json';
+import UnsConfig from '../config/uns-config.json';
 
 let resolution: Resolution;
 let cns: Cns;
@@ -774,9 +774,24 @@ describe('Resolution', () => {
     });
 
     it('should return cns mainnet registry address #1', async () => {
+      const spies = mockAsyncMethods(cns, {
+        registryAddress: UnsConfig.networks[1].contracts.CNSRegistry.address,
+      });
       const registryAddress = await resolution.registryAddress('testi.crypto');
+      expectSpyToBeCalled(spies);
       expect(registryAddress).toBe(
-        NetworkConfig.networks[1].contracts.Registry.address,
+        UnsConfig.networks[1].contracts.CNSRegistry.address,
+      );
+    });
+
+    it('should return uns mainnet registry address', async () => {
+      const spies = mockAsyncMethods(cns, {
+        registryAddress: UnsConfig.networks[1].contracts.UNSRegistry.address,
+      });
+      const registryAddress = await resolution.registryAddress('testi.888');
+      expectSpyToBeCalled(spies);
+      expect(registryAddress).toBe(
+        UnsConfig.networks[1].contracts.UNSRegistry.address,
       );
     });
   });

@@ -8,9 +8,10 @@ import {
   mockAsyncMethod,
   expectSpyToBeCalled,
   CryptoDomainWithTwitterVerification,
+  expectResolutionErrorCode,
 } from './helpers';
 import {NamingServiceName} from '../types/publicTypes';
-import NetworkConfig from '../config/network-config.json';
+import {ResolutionErrorCode} from '../errors/resolutionError';
 
 let resolution: Resolution;
 let cnsApi: Udapi;
@@ -28,15 +29,10 @@ beforeEach(() => {
 });
 
 describe('Unstoppable API', () => {
-  it('should return zns mainnet registry address', async () => {
-    const registryAddress = await resolution.registryAddress('testi.zil');
-    expect(registryAddress).toBe('zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz');
-  });
-
-  it('should return cns mainnet registry address #1', async () => {
-    const registryAddress = await resolution.registryAddress('testi.crypto');
-    expect(registryAddress).toBe(
-      NetworkConfig.networks[1].contracts.Registry.address,
+  it('should throw error for registryAddress', async () => {
+    await expectResolutionErrorCode(
+      () => resolution.registryAddress('test.crypto'),
+      ResolutionErrorCode.UnsupportedMethod,
     );
   });
 

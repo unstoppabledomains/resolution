@@ -55,10 +55,10 @@ export default class Resolution {
 
   constructor({sourceConfig = undefined}: {sourceConfig?: SourceConfig} = {}) {
     const cns = isApi(sourceConfig?.cns)
-      ? new UdApi(sourceConfig?.cns.url)
+      ? new UdApi(sourceConfig?.cns)
       : new Cns(sourceConfig?.cns);
     const zns = isApi(sourceConfig?.zns)
-      ? new UdApi(sourceConfig?.zns.url)
+      ? new UdApi(sourceConfig?.zns)
       : new Zns(sourceConfig?.zns);
     this.serviceMap = {
       [NamingServiceName.CNS]: cns,
@@ -432,9 +432,10 @@ export default class Resolution {
    * for valid domain names.
    * @param domain - domain name to be checked
    */
-  isSupportedDomain(domain: string): boolean {
+  async isSupportedDomain(domain: string): Promise<boolean> {
     domain = this.prepareDomain(domain);
-    return !!this.getNamingMethod(domain)?.isSupportedDomain(domain);
+    const namingMethod = this.getNamingMethod(domain);
+    return namingMethod ? await namingMethod.isSupportedDomain(domain) : false;
   }
 
   /**
