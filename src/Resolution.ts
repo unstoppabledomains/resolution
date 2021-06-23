@@ -486,24 +486,13 @@ export default class Resolution {
   }
 
   /**
-   * Retrieves the domain name from token metadata that is provided by tokenURI from the registry smart contract.
-   * The function will throw an error if the domain in the metadata does not match the hash (e.g. if the metadata is outdated).
+   * Retrieves the domain name from tokenId by parsing registry smart contract event logs.
    * @returns the domain name retrieved from token metadata
    * @param hash - domain hash
    * @param service - nameservice which is used for lookup
    */
   async unhash(hash: string, service: NamingServiceName): Promise<string> {
-    const tokenUri = await this.serviceMap[service].getTokenUri(hash);
-    const metadata = await this.getMetadataFromTokenURI(tokenUri);
-    const receivedHash = this.namehash(metadata.name);
-    if (receivedHash !== hash) {
-      throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
-        methodName: 'unhash',
-        domain: metadata.name,
-        providerMessage: 'Service provider returned an invalid domain name',
-      });
-    }
-    return metadata.name;
+    return await this.serviceMap[service].getDomainFromTokenId(hash);
   }
 
   private async getMetadataFromTokenURI(

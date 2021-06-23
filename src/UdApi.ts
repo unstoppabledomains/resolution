@@ -137,6 +137,10 @@ export default class Udapi extends NamingService {
     return (await this.resolve(domain)).records || {};
   }
 
+  getDomainFromTokenId(tokenId: string): Promise<string> {
+    throw new Error('Method not implemented.');
+  }
+
   async resolve(domain: string): Promise<ResolutionResponse> {
     const response = await Networking.fetch(`${this.url}/${domain}`, {
       method: 'GET',

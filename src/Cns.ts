@@ -5,6 +5,7 @@ import {
   hasProvider,
 } from './types';
 import {default as proxyReaderAbi} from './contracts/cns/proxyReader';
+import {default as registryAbi} from './contracts/cns/registry';
 import {default as resolverInterface} from './contracts/cns/resolver';
 import ResolutionError, {ResolutionErrorCode} from './errors/resolutionError';
 import EthereumContract from './contracts/EthereumContract';
@@ -30,6 +31,7 @@ import ConfigurationError, {
   ConfigurationErrorCode,
 } from './errors/configurationError';
 import SupportedKeys from './config/supported-keys.json';
+import { Interface } from '@ethersproject/abi';
 
 /**
  * @internal
@@ -253,6 +255,18 @@ export default class Cns extends NamingService {
 
   async registryAddress(domain: string): Promise<string> {
     return NetworkConfig.networks[this.network].contracts.Registry.address;
+  }
+
+  async getDomainFromTokenId(tokenId: string): Promise<string> {
+    const registryAddress = await this.registryAddress("");
+    const registryContract = new EthereumContract(registryAbi, registryAddress, this.provider);
+    const newURIEvents = await registryContract.fetchLogs("NewURI", tokenId, "0x8A958B");
+    if (!newURIEvents || newURIEvents.length === 0) {
+      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain)
+    }
+    const rawData = newURIEvents[newURIEvents.length - 1].data;
+    const decoded = Interface.getAbiCoder().decode(["string"], rawData);
+    return decoded[decoded.length - 1];
   }
 
   private async getVerifiedData(
