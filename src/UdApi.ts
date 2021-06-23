@@ -13,7 +13,6 @@ import Networking from './utils/Networking';
 import {constructRecords, findNamingServiceName, isNullAddress} from './utils';
 import {znsNamehash, eip137Namehash} from './utils/namehash';
 import {NamingService} from './NamingService';
-import UnsConfig from './config/uns-config.json';
 
 /**
  * @internal
@@ -182,19 +181,9 @@ export default class Udapi extends NamingService {
   }
 
   async registryAddress(domain: string): Promise<string> {
-    const tld = domain.split('.').pop();
-    if (tld === undefined) {
-      throw new ResolutionError(ResolutionErrorCode.UnsupportedService, {
-        namingService: tld,
-      });
-    }
-
-    if (tld === 'crypto') {
-      return UnsConfig.networks[this.network].contracts.CNSRegistry.address;
-    } else if (tld === 'zil') {
-      return Udapi.ZnsRegistryMap[this.network];
-    } else {
-      return UnsConfig.networks[this.network].contracts.UNSRegistry.address;
-    }
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+      domain,
+      methodName: 'registryAddress',
+    });
   }
 }
