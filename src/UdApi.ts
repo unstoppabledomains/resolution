@@ -7,6 +7,7 @@ import {
   ResolutionResponse,
   ResolutionMethod,
   NamingServiceName,
+  Api,
 } from './types/publicTypes';
 import Networking from './utils/Networking';
 import {constructRecords, findNamingServiceName, isNullAddress} from './utils';
@@ -26,17 +27,19 @@ export default class Udapi extends NamingService {
   static readonly ZnsRegistryMap = {
     1: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
   };
+  readonly network: number;
 
-  constructor(url?: string) {
+  constructor(api?: Api) {
     super();
     this.name = 'UDAPI';
-    this.url = url || 'https://unstoppabledomains.com/api/v1';
+    this.url = api?.url || 'https://unstoppabledomains.com/api/v1';
     const DefaultUserAgent = Networking.isNode()
       ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'
       : navigator.userAgent;
     const version = pckg.version;
     const CustomUserAgent = `${DefaultUserAgent} Resolution/${version}`;
     this.headers = {'X-user-agent': CustomUserAgent};
+    this.network = api?.network || 1;
   }
 
   async isSupportedDomain(domain: string): Promise<boolean> {
@@ -187,11 +190,11 @@ export default class Udapi extends NamingService {
     }
 
     if (tld === 'crypto') {
-      return UnsConfig.networks[1].contracts.CNSRegistry.address;
+      return UnsConfig.networks[this.network].contracts.CNSRegistry.address;
     } else if (tld === 'zil') {
-      return Udapi.ZnsRegistryMap[1];
+      return Udapi.ZnsRegistryMap[this.network];
     } else {
-      return UnsConfig.networks[1].contracts.UNSRegistry.address;
+      return UnsConfig.networks[this.network].contracts.UNSRegistry.address;
     }
   }
 }

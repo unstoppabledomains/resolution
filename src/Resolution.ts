@@ -55,10 +55,10 @@ export default class Resolution {
 
   constructor({sourceConfig = undefined}: {sourceConfig?: SourceConfig} = {}) {
     const cns = isApi(sourceConfig?.cns)
-      ? new UdApi(sourceConfig?.cns.url)
+      ? new UdApi(sourceConfig?.cns)
       : new Cns(sourceConfig?.cns);
     const zns = isApi(sourceConfig?.zns)
-      ? new UdApi(sourceConfig?.zns.url)
+      ? new UdApi(sourceConfig?.zns)
       : new Zns(sourceConfig?.zns);
     this.serviceMap = {
       [NamingServiceName.CNS]: cns,
