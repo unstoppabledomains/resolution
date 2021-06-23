@@ -65,12 +65,7 @@ export function isLive(): boolean {
   return !!process.env.LIVE;
 }
 
-export function pendingInLive(): void {
-  if (isLive()) {
-    // eslint-disable-next-line no-undef
-    pending('Disabled in LIVE mode');
-  }
-}
+export const skipItInLive = isLive() ? it.skip : it;
 
 export function expectSpyToBeCalled(
   spies: jest.SpyInstance[],

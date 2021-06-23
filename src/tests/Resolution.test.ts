@@ -21,7 +21,7 @@ import {
   caseMock,
   mockAsyncMethod,
   CryptoDomainWithTwitterVerification,
-  pendingInLive,
+  skipItInLive,
   isLive,
   CryptoDomainWithUsdtMultiChainRecords,
   expectConfigurationErrorCode,
@@ -144,8 +144,7 @@ describe('Resolution', () => {
       expectSpyToBeCalled([providerSpy, providerFactorySpy]);
     });
 
-    it('should fail in test development', async () => {
-      pendingInLive();
+    skipItInLive('should fail in test development', async () => {
       try {
         await fetch('https://pokeres.bastionbot.org/images/pokemon/10.png');
       } catch (err) {
@@ -189,39 +188,43 @@ describe('Resolution', () => {
       });
 
       describe('.ipfsHash', () => {
-        it('should prioritize new keys over depricated ones', async () => {
-          pendingInLive();
-          const spies = mockAsyncMethods(uns, {
-            get: {
-              resolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
-              records: {
-                ['dweb.ipfs.hash']: 'new record Ipfs hash',
-                ['ipfs.html.value']: 'old record Ipfs hash',
+        skipItInLive(
+          'should prioritize new keys over depricated ones',
+          async () => {
+            const spies = mockAsyncMethods(uns, {
+              get: {
+                resolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
+                records: {
+                  ['dweb.ipfs.hash']: 'new record Ipfs hash',
+                  ['ipfs.html.value']: 'old record Ipfs hash',
+                },
               },
-            },
-          });
-          const hash = await resolution.ipfsHash(CryptoDomainWithAllRecords);
-          expectSpyToBeCalled(spies);
-          expect(hash).toBe('new record Ipfs hash');
-        });
+            });
+            const hash = await resolution.ipfsHash(CryptoDomainWithAllRecords);
+            expectSpyToBeCalled(spies);
+            expect(hash).toBe('new record Ipfs hash');
+          },
+        );
 
-        it('should prioritize browser record key over ipfs.redirect_url one', async () => {
-          pendingInLive();
-          const spies = mockAsyncMethods(uns, {
-            get: {
-              resolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
-              records: {
-                ['browser.redirect_url']: 'new record redirect url',
-                ['ipfs.redirect_domain.value']: 'old record redirect url',
+        skipItInLive(
+          'should prioritize browser record key over ipfs.redirect_url one',
+          async () => {
+            const spies = mockAsyncMethods(uns, {
+              get: {
+                resolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
+                records: {
+                  ['browser.redirect_url']: 'new record redirect url',
+                  ['ipfs.redirect_domain.value']: 'old record redirect url',
+                },
               },
-            },
-          });
-          const redirectUrl = await resolution.httpUrl(
-            CryptoDomainWithAllRecords,
-          );
-          expectSpyToBeCalled(spies);
-          expect(redirectUrl).toBe('new record redirect url');
-        });
+            });
+            const redirectUrl = await resolution.httpUrl(
+              CryptoDomainWithAllRecords,
+            );
+            expectSpyToBeCalled(spies);
+            expect(redirectUrl).toBe('new record redirect url');
+          },
+        );
       });
 
       describe('serviceName', () => {
@@ -294,8 +297,7 @@ describe('Resolution', () => {
 
     describe('.Records', () => {
       describe('.DNS', () => {
-        it('getting dns get', async () => {
-          pendingInLive();
+        skipItInLive('getting dns get', async () => {
           const spies = mockAsyncMethods(uns, {
             get: {
               resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
@@ -319,8 +321,7 @@ describe('Resolution', () => {
           ]);
         });
 
-        it('should work with others records', async () => {
-          pendingInLive();
+        skipItInLive('should work with others records', async () => {
           const spies = mockAsyncMethods(uns, {
             get: {
               resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',

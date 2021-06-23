@@ -11,7 +11,7 @@ import {
   expectConfigurationErrorCode,
   CryptoDomainWithoutGunDbRecords,
   CryptoDomainWithAllRecords,
-  pendingInLive,
+  skipItInLive,
   mockAPICalls,
 } from './helpers';
 import FetchProvider from '../FetchProvider';
@@ -715,8 +715,7 @@ describe('UNS', () => {
       expectSpyToBeCalled(spies);
     });
 
-    it('should throw the same internal error', async () => {
-      pendingInLive();
+    skipItInLive('should throw the same internal error', async () => {
       const spies = mockAsyncMethods(uns.readerContract, {
         call: new ResolutionError(ResolutionErrorCode.ServiceProviderError),
       });
@@ -789,8 +788,7 @@ describe('UNS', () => {
       expect(domain).toEqual(testMeta.name);
     });
 
-    it('should throw error if hash does not match', async () => {
-      pendingInLive();
+    skipItInLive('should throw error if hash does not match', async () => {
       const testMeta: TokenUriMetadata = liveData.bradCryptoMetadata;
 
       const unsSpies = mockAsyncMethods(uns.readerContract, {
