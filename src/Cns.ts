@@ -46,8 +46,8 @@ export default class Cns extends NamingService {
 
   static readonly RegistryStartBlock = {
     1: '0x8A958B',
-    4: '0x7232BC'
-  }
+    4: '0x7232BC',
+  };
 
   readonly name: NamingServiceName = NamingServiceName.CNS;
   readonly network: number;
@@ -269,14 +269,16 @@ export default class Cns extends NamingService {
       registryAddress,
       this.provider,
     );
-    const startingBlock = Cns.RegistryStartBlock[this.network] ?? 'earliest'; 
+    const startingBlock = Cns.RegistryStartBlock[this.network] ?? 'earliest';
     const newURIEvents = await registryContract.fetchLogs(
       'NewURI',
       tokenId,
       startingBlock,
     );
     if (!newURIEvents || newURIEvents.length === 0) {
-      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {domain: `with tokenId ${tokenId}`});
+      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+        domain: `with tokenId ${tokenId}`,
+      });
     }
     const rawData = newURIEvents[newURIEvents.length - 1].data;
     const decoded = Interface.getAbiCoder().decode(['string'], rawData);

@@ -816,18 +816,20 @@ describe('CNS', () => {
     });
 
     it('should throw error if domain is not found', async () => {
-      const unregisteredhash = resolution.namehash("test34230131207328144694.crypto");
+      const unregisteredhash = resolution.namehash(
+        'test34230131207328144694.crypto',
+      );
       const spy = mockAsyncMethods(Networking, {
         fetch: {
           ok: true,
-          json: () => ({"jsonrpc":"2.0","id":"1","result":[]})
-        }
+          json: () => ({jsonrpc: '2.0', id: '1', result: []}),
+        },
       });
       await expectResolutionErrorCode(
         () => resolution.unhash(unregisteredhash, NamingServiceName.CNS),
-        ResolutionErrorCode.UnregisteredDomain
+        ResolutionErrorCode.UnregisteredDomain,
       );
       expectSpyToBeCalled(spy);
-    })
+    });
   });
 });
