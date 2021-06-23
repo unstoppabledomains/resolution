@@ -153,7 +153,7 @@ export function mockAPICalls(testName: string, url = MainnetUrl): void {
     case 'POST': {
       nock(url)
       // .log()
-        .post('/', JSON.stringify(REQUEST), undefined)
+        .post('', JSON.stringify(REQUEST), undefined)
         .reply(200, JSON.stringify(RESPONSE));
       break;
     }

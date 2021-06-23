@@ -12,7 +12,7 @@ export type CnsSupportedNetworks = typeof CnsSupportedNetwork.type;
 export type EnsSupportedNetworks = typeof EnsSupportedNetwork.type;
 export type ZnsSupportedNetworks = typeof ZnsSupportedNetwork.type;
 
-export type Api = {api: true; url?: string};
+export type Api = {api: true; url?: string; network?: number};
 
 type NamingServiceSource = {url?: string} | {provider?: Provider};
 

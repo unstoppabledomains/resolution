@@ -2,17 +2,20 @@ export default [
   {
     inputs: [
       {
-        internalType: 'contract Registry',
-        name: 'registry',
+        internalType: 'contract IRegistry',
+        name: 'unsRegistry',
+        type: 'address',
+      },
+      {
+        internalType: 'contract ICryptoRegistry',
+        name: 'cnsRegistry',
         type: 'address',
       },
     ],
-    payable: false,
     stateMutability: 'nonpayable',
     type: 'constructor',
   },
   {
-    constant: true,
     inputs: [],
     name: 'NAME',
     outputs: [
@@ -22,12 +25,10 @@ export default [
         type: 'string',
       },
     ],
-    payable: false,
     stateMutability: 'view',
     type: 'function',
   },
   {
-    constant: true,
     inputs: [],
     name: 'VERSION',
     outputs: [
@@ -37,131 +38,29 @@ export default [
         type: 'string',
       },
     ],
-    payable: false,
     stateMutability: 'view',
     type: 'function',
   },
   {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'bytes4',
-        name: 'interfaceId',
-        type: 'bytes4',
-      },
-    ],
-    name: 'supportsInterface',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: 'name',
-    outputs: [
-      {
-        internalType: 'string',
-        name: '',
-        type: 'string',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: 'symbol',
-    outputs: [
-      {
-        internalType: 'string',
-        name: '',
-        type: 'string',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: 'tokenId',
-        type: 'uint256',
-      },
-    ],
-    name: 'tokenURI',
-    outputs: [
-      {
-        internalType: 'string',
-        name: '',
-        type: 'string',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
     inputs: [
       {
         internalType: 'address',
-        name: 'spender',
+        name: 'owner',
         type: 'address',
       },
+    ],
+    name: 'balanceOf',
+    outputs: [
       {
         internalType: 'uint256',
-        name: 'tokenId',
+        name: '',
         type: 'uint256',
       },
     ],
-    name: 'isApprovedOrOwner',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: false,
     stateMutability: 'view',
     type: 'function',
   },
   {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: 'tokenId',
-        type: 'uint256',
-      },
-    ],
-    name: 'resolverOf',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
     inputs: [
       {
         internalType: 'uint256',
@@ -182,20 +81,18 @@ export default [
         type: 'uint256',
       },
     ],
-    payable: false,
     stateMutability: 'view',
     type: 'function',
   },
   {
-    constant: true,
     inputs: [
       {
-        internalType: 'address',
-        name: 'account',
-        type: 'address',
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
       },
     ],
-    name: 'isController',
+    name: 'exists',
     outputs: [
       {
         internalType: 'bool',
@@ -203,152 +100,10 @@ export default [
         type: 'bool',
       },
     ],
-    payable: false,
     stateMutability: 'view',
     type: 'function',
   },
   {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'owner',
-        type: 'address',
-      },
-    ],
-    name: 'balanceOf',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: 'tokenId',
-        type: 'uint256',
-      },
-    ],
-    name: 'ownerOf',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: 'tokenId',
-        type: 'uint256',
-      },
-    ],
-    name: 'getApproved',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'owner',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: 'operator',
-        type: 'address',
-      },
-    ],
-    name: 'isApprovedForAll',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: 'root',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: 'tokenId',
-        type: 'uint256',
-      },
-    ],
-    name: 'nonceOf',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: 'registry',
-    outputs: [
-      {
-        internalType: 'address',
-        name: '',
-        type: 'address',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
     inputs: [
       {
         internalType: 'string',
@@ -365,42 +120,33 @@ export default [
     outputs: [
       {
         internalType: 'string',
-        name: '',
+        name: 'value',
         type: 'string',
       },
     ],
-    payable: false,
     stateMutability: 'view',
     type: 'function',
   },
   {
-    constant: true,
     inputs: [
-      {
-        internalType: 'string[]',
-        name: 'keys',
-        type: 'string[]',
-      },
       {
         internalType: 'uint256',
         name: 'tokenId',
         type: 'uint256',
       },
     ],
-    name: 'getMany',
+    name: 'getApproved',
     outputs: [
       {
-        internalType: 'string[]',
+        internalType: 'address',
         name: '',
-        type: 'string[]',
+        type: 'address',
       },
     ],
-    payable: false,
     stateMutability: 'view',
     type: 'function',
   },
   {
-    constant: true,
     inputs: [
       {
         internalType: 'uint256',
@@ -426,43 +172,10 @@ export default [
         type: 'string',
       },
     ],
-    payable: false,
     stateMutability: 'view',
     type: 'function',
   },
   {
-    constant: true,
-    inputs: [
-      {
-        internalType: 'uint256[]',
-        name: 'keyHashes',
-        type: 'uint256[]',
-      },
-      {
-        internalType: 'uint256',
-        name: 'tokenId',
-        type: 'uint256',
-      },
-    ],
-    name: 'getManyByHash',
-    outputs: [
-      {
-        internalType: 'string[]',
-        name: 'keys',
-        type: 'string[]',
-      },
-      {
-        internalType: 'string[]',
-        name: 'values',
-        type: 'string[]',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
     inputs: [
       {
         internalType: 'string[]',
@@ -493,12 +206,10 @@ export default [
         type: 'string[]',
       },
     ],
-    payable: false,
     stateMutability: 'view',
     type: 'function',
   },
   {
-    constant: true,
     inputs: [
       {
         internalType: 'uint256[]',
@@ -534,7 +245,294 @@ export default [
         type: 'string[]',
       },
     ],
-    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256[]',
+        name: 'keyHashes',
+        type: 'uint256[]',
+      },
+      {
+        internalType: 'uint256[]',
+        name: 'tokenIds',
+        type: 'uint256[]',
+      },
+    ],
+    name: 'getDataByHashForMany',
+    outputs: [
+      {
+        internalType: 'address[]',
+        name: 'resolvers',
+        type: 'address[]',
+      },
+      {
+        internalType: 'address[]',
+        name: 'owners',
+        type: 'address[]',
+      },
+      {
+        internalType: 'string[][]',
+        name: 'keys',
+        type: 'string[][]',
+      },
+      {
+        internalType: 'string[][]',
+        name: 'values',
+        type: 'string[][]',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'string[]',
+        name: 'keys',
+        type: 'string[]',
+      },
+      {
+        internalType: 'uint256[]',
+        name: 'tokenIds',
+        type: 'uint256[]',
+      },
+    ],
+    name: 'getDataForMany',
+    outputs: [
+      {
+        internalType: 'address[]',
+        name: 'resolvers',
+        type: 'address[]',
+      },
+      {
+        internalType: 'address[]',
+        name: 'owners',
+        type: 'address[]',
+      },
+      {
+        internalType: 'string[][]',
+        name: 'values',
+        type: 'string[][]',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'string[]',
+        name: 'keys',
+        type: 'string[]',
+      },
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    name: 'getMany',
+    outputs: [
+      {
+        internalType: 'string[]',
+        name: 'values',
+        type: 'string[]',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256[]',
+        name: 'keyHashes',
+        type: 'uint256[]',
+      },
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    name: 'getManyByHash',
+    outputs: [
+      {
+        internalType: 'string[]',
+        name: 'keys',
+        type: 'string[]',
+      },
+      {
+        internalType: 'string[]',
+        name: 'values',
+        type: 'string[]',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    name: 'isApprovedForAll',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'pure',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'spender',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    name: 'isApprovedOrOwner',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    name: 'ownerOf',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256[]',
+        name: 'tokenIds',
+        type: 'uint256[]',
+      },
+    ],
+    name: 'ownerOfForMany',
+    outputs: [
+      {
+        internalType: 'address[]',
+        name: 'owners',
+        type: 'address[]',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    name: 'registryOf',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    name: 'resolverOf',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'bytes4',
+        name: 'interfaceId',
+        type: 'bytes4',
+      },
+    ],
+    name: 'supportsInterface',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    name: 'tokenURI',
+    outputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
+    ],
     stateMutability: 'view',
     type: 'function',
   },
