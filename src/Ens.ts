@@ -203,22 +203,22 @@ export default class Ens extends NamingService {
     return await this.resolverCallToName(resolverContract, nodeHash);
   }
 
-  async getTokenUri(tokenId: string): Promise<string>{
+  async getTokenUri(tokenId: string): Promise<string> {
     throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
       method: NamingServiceName.ENS,
       methodName: 'getTokenUri',
     });
   }
 
-  async isAvailable(domain: string): Promise<boolean>{
+  async isAvailable(domain: string): Promise<boolean> {
     return !(await this.isRegistered(domain));
   }
 
-  async registryAddress(domain: string): Promise<string>{
+  async registryAddress(domain: string): Promise<string> {
     return this.readerContract.address;
   }
 
-  async isRegistered(domain: string): Promise<boolean>{
+  async isRegistered(domain: string): Promise<boolean> {
     const address = await this.owner(domain);
     return !isNullAddress(address);
   }
