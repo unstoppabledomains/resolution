@@ -84,8 +84,11 @@
           "deploymentBlock": "0x85e629"
         },
         "ProxyReader": {
-          "address": "0x9F19473F6a98a715176291c930558E1954fd3D1e",
-          "legacyAddresses": ["0x3A2e74CF832cbA3d77E72708d55370119E4323a6"],
+          "address": "0x299974AeD8911bcbd2C61262605b89F591a53E83",
+          "legacyAddresses": [
+            "0x9F19473F6a98a715176291c930558E1954fd3D1e",
+            "0x3A2e74CF832cbA3d77E72708d55370119E4323a6"
+          ],
           "deploymentBlock": "0x85e62c"
         },
         "ProxyAdmin": {
