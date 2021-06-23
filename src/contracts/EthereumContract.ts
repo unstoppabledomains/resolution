@@ -1,4 +1,4 @@
-import {AbiCoder, Interface, JsonFragment} from '@ethersproject/abi';
+import {Interface, JsonFragment} from '@ethersproject/abi';
 import {RequestArguments, EventData} from '../types';
 import {Provider} from '../types/publicTypes';
 

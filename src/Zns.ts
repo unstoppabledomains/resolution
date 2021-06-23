@@ -180,7 +180,7 @@ export default class Zns extends NamingService {
 
   async getDomainFromTokenId(tokenId: string): Promise<string> {
     throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
-      methodName: 'getDomainFromTokenId'
+      methodName: 'getDomainFromTokenId',
     });
   }
 

@@ -31,7 +31,7 @@ import ConfigurationError, {
   ConfigurationErrorCode,
 } from './errors/configurationError';
 import SupportedKeys from './config/supported-keys.json';
-import { Interface } from '@ethersproject/abi';
+import {Interface} from '@ethersproject/abi';
 
 /**
  * @internal
@@ -258,14 +258,22 @@ export default class Cns extends NamingService {
   }
 
   async getDomainFromTokenId(tokenId: string): Promise<string> {
-    const registryAddress = await this.registryAddress("");
-    const registryContract = new EthereumContract(registryAbi, registryAddress, this.provider);
-    const newURIEvents = await registryContract.fetchLogs("NewURI", tokenId, "0x8A958B");
+    const registryAddress = await this.registryAddress('');
+    const registryContract = new EthereumContract(
+      registryAbi,
+      registryAddress,
+      this.provider,
+    );
+    const newURIEvents = await registryContract.fetchLogs(
+      'NewURI',
+      tokenId,
+      '0x8A958B',
+    );
     if (!newURIEvents || newURIEvents.length === 0) {
-      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain)
+      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
     }
     const rawData = newURIEvents[newURIEvents.length - 1].data;
-    const decoded = Interface.getAbiCoder().decode(["string"], rawData);
+    const decoded = Interface.getAbiCoder().decode(['string'], rawData);
     return decoded[decoded.length - 1];
   }
 
