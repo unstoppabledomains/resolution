@@ -44,6 +44,11 @@ export default class Cns extends NamingService {
     4: 'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
   };
 
+  static readonly RegistryStartBlock = {
+    1: '0x8A958B',
+    4: '0x7232BC'
+  }
+
   readonly name: NamingServiceName = NamingServiceName.CNS;
   readonly network: number;
   readonly url: string | undefined;
@@ -264,13 +269,14 @@ export default class Cns extends NamingService {
       registryAddress,
       this.provider,
     );
+    const startingBlock = Cns.RegistryStartBlock[this.network] ?? 'earliest'; 
     const newURIEvents = await registryContract.fetchLogs(
       'NewURI',
       tokenId,
-      '0x8A958B',
+      startingBlock,
     );
     if (!newURIEvents || newURIEvents.length === 0) {
-      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
+      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {domain: `with tokenId ${tokenId}`});
     }
     const rawData = newURIEvents[newURIEvents.length - 1].data;
     const decoded = Interface.getAbiCoder().decode(['string'], rawData);

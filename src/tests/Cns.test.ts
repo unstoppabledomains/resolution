@@ -787,16 +787,8 @@ describe('CNS', () => {
       expect(domain).toEqual(testMeta.name);
     });
 
-    it('should throw error if domain is not found', async () => {
+    it('should throw error if hash is wrong', async () => {
       const provider = new FetchProvider(NamingServiceName.CNS, protocolLink());
-      resolution = new Resolution({
-        sourceConfig: {
-          cns: {
-            provider,
-            network: 'mainnet',
-          },
-        },
-      });
       resolution = new Resolution({
         sourceConfig: {
           cns: {
@@ -822,5 +814,20 @@ describe('CNS', () => {
       );
       expectSpyToBeCalled(providerSpy);
     });
+
+    it('should throw error if domain is not found', async () => {
+      const unregisteredhash = resolution.namehash("test34230131207328144694.crypto");
+      const spy = mockAsyncMethods(Networking, {
+        fetch: {
+          ok: true,
+          json: () => ({"jsonrpc":"2.0","id":"1","result":[]})
+        }
+      });
+      await expectResolutionErrorCode(
+        () => resolution.unhash(unregisteredhash, NamingServiceName.CNS),
+        ResolutionErrorCode.UnregisteredDomain
+      );
+      expectSpyToBeCalled(spy);
+    })
   });
 });
