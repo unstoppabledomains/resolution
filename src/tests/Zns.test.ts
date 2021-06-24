@@ -437,5 +437,25 @@ describe('ZNS', () => {
       );
       expectSpyToBeCalled(spies);
     });
+
+    it('should resolve testnet domain', async () => {
+      const resolution = new Resolution({
+        sourceConfig: {
+          zns: {
+            network: 'testnet',
+          },
+        },
+      });
+      const znsService = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
+      const spies = mockAsyncMethods(znsService, {
+        getRecordsAddresses: [
+          'zil1tcucw4w5uqgwz38y2na4249adzeg4rvl94kwhm',
+          '0xba45a60fa2a12060ba4caf4f9f842fae0a66cbf4',
+        ],
+      });
+      const owner = await resolution.owner('zero.zil');
+      expectSpyToBeCalled(spies);
+      expect(owner).toBe('zil1tcucw4w5uqgwz38y2na4249adzeg4rvl94kwhm');
+    });
   });
 });
