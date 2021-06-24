@@ -26,10 +26,19 @@ Resolution is primarily built and maintained by
 
 Resolution supports decentralized domains across three main zones:
 
-- Crypto Name Service (CNS)
-  - `.crypto`
 - Zilliqa Name Service (ZNS)
   - `.zil`
+- Unstoppable Name Service (UNS)
+  - `.crypto`
+  - `.nft`
+  - `.blockchain`
+  - `.bitcoin`
+  - `.coin`
+  - `.wallet`
+  - `.888`
+  - `.dao`
+  - `.x`
+  - ...
 
 For more information, see our detailed
 [API Referrence](https://unstoppabledomains.github.io/resolution/).

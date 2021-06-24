@@ -85,7 +85,7 @@ export default class Udapi extends NamingService {
 
   async twitter(domain: string): Promise<string> {
     const serviceName = findNamingServiceName(domain);
-    if (serviceName !== NamingServiceName.CNS) {
+    if (serviceName !== NamingServiceName.UNS) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
         domain,
         methodName: 'twitter',

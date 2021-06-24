@@ -70,7 +70,7 @@
       }
     }
   ],
-  "cns_domain_exists_test": [
+  "uns_domain_exists_test": [
     {
       "METHOD": "POST",
       "REQUEST": {
@@ -152,7 +152,7 @@
       }
     }
   ],
-  "cns_registry_address_tests": [
+  "uns_registry_address_tests": [
     {
       "METHOD": "POST",
       "REQUEST": {

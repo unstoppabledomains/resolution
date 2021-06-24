@@ -8,7 +8,7 @@ export default [
       },
       {
         internalType: 'contract ICryptoRegistry',
-        name: 'cnsRegistry',
+        name: 'unsRegistry',
         type: 'address',
       },
     ],
