@@ -487,6 +487,7 @@ export default class Resolution {
 
   /**
    * Retrieves the domain name from tokenId by parsing registry smart contract event logs.
+   * @throws {ResolutionError} if returned domain name doesn't match the original namhash.
    * @returns the domain name retrieved from token metadata
    * @param hash - domain hash
    * @param service - nameservice which is used for lookup
