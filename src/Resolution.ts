@@ -28,7 +28,6 @@ import {NamingService} from './NamingService';
 import ConfigurationError from './errors/configurationError';
 import {ConfigurationErrorCode} from './errors/configurationError';
 import Networking from './utils/Networking';
-import { domain } from 'process';
 
 /**
  * Blockchain domain Resolution library - Resolution.
@@ -498,7 +497,7 @@ export default class Resolution {
       throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
         methodName: 'unhash',
         domain: name,
-        providerMessage: 'Service provider returned an invalid domain name'
+        providerMessage: 'Service provider returned an invalid domain name',
       });
     }
     return name;
