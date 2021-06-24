@@ -98,7 +98,7 @@ export default class Ens extends NamingService {
   }
 
   namehash(domain: string): string {
-    if (!this.isSupportedDomain(domain)) {
+    if (!this.checkSupportedDomain(domain)) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
         domain,
       });
@@ -110,12 +110,8 @@ export default class Ens extends NamingService {
     return eip137Childhash(parentHash, label);
   }
 
-  isSupportedDomain(domain: string): boolean {
-    return (
-      domain === 'eth' ||
-      (/^[^-]*[^-]*\.(eth|luxe|xyz|kred|addr\.reverse)$/.test(domain) &&
-        domain.split('.').every((v) => !!v.length))
-    );
+  async isSupportedDomain(domain: string): Promise<boolean> {
+    return this.checkSupportedDomain(domain);
   }
 
   async owner(domain: string): Promise<string> {
@@ -376,5 +372,13 @@ export default class Ens extends NamingService {
   ): Promise<any> {
     const result = await contract.call(method, params);
     return result[0];
+  }
+
+  private checkSupportedDomain(domain: string) : boolean {
+    return (
+      domain === 'eth' ||
+      (/^[^-]*[^-]*\.(eth|luxe|xyz|kred|addr\.reverse)$/.test(domain) &&
+        domain.split('.').every((v) => !!v.length))
+    );
   }
 }

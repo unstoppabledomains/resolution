@@ -33,7 +33,7 @@ import {
     .option('-m, --meta', 'shortcut for all meta data options (-siren)')
     .option(
       '-t, --twitter',
-      'returns verified Twitter handle (only available for cns domains)',
+      'returns verified Twitter handle (only available for uns domains)',
     )
     .option('-d, --domain <domain>', 'domain you wish to resolve')
     .option('-k, --recordKey <recordkey>', 'custom domain record')
@@ -49,7 +49,7 @@ import {
     )
     .option(
       '-u, --unhash <hash>',
-      `gets the domain name by hash from token metadata (only for CNS)`,
+      `gets the domain name by hash from token metadata (only for UNS)`,
     )
     .option('--supported', `checks if the domain name is supported`)
     .description(
@@ -169,7 +169,7 @@ import {
     unhash: () =>
       tryInfo(
         async () =>
-          await resolution.unhash(options.unhash, NamingServiceName.CNS),
+          await resolution.unhash(options.unhash, NamingServiceName.UNS),
         response,
         'unhash',
       ),

@@ -26,28 +26,38 @@ Resolution is primarily built and maintained by
 
 Resolution supports decentralized domains across three main zones:
 
-- Crypto Name Service (CNS)
-  - `.crypto`
 - Zilliqa Name Service (ZNS)
   - `.zil`
-    
-## ENS support
-**Note: Ethereum Name Service requires installing additional packages 
-otherwise library throws error when trying to resolve ENS domain.**
 
-### Required packages
-- `"bip44-constants": "^8.0.5"`
-- `"@ensdomains/address-encoder": ">= 0.1.x <= 0.2.x"`
-- `"content-hash": "^2.5.2"`
-
-### Supported domain zones
+- Ethereum Name Service (ENS)
   - `.eth`
   - `.kred`
   - `.xyz`
   - `.luxe`
 
+- Unstoppable Name Service (UNS)
+  - `.crypto`
+  - `.nft`
+  - `.blockchain`
+  - `.bitcoin`
+  - `.coin`
+  - `.wallet`
+  - `.888`
+  - `.dao`
+  - `.x`
+  - ...
+
 For more information, see our detailed
 [API Referrence](https://unstoppabledomains.github.io/resolution/).
+
+### ENS support
+**Note: Ethereum Name Service requires installing additional packages 
+otherwise library throws error when trying to resolve ENS domain.**
+
+#### Required packages
+- `"bip44-constants": "^8.0.5"`
+- `"@ensdomains/address-encoder": ">= 0.1.x <= 0.2.x"`
+- `"content-hash": "^2.5.2"`
 
 ## Installing Resolution
 

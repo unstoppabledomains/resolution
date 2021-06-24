@@ -124,7 +124,7 @@ const StringUnion = <UnionType extends string>(...values: UnionType[]) => {
   );
 };
 
-export const CnsSupportedNetwork = StringUnion('mainnet', 'rinkeby');
+export const UnsSupportedNetwork = StringUnion('mainnet', 'rinkeby');
 export const EnsSupportedNetwork = StringUnion(
   'mainnet',
   'rinkeby',

@@ -1,5 +1,5 @@
 import {
-  CnsSupportedNetwork,
+  UnsSupportedNetwork,
   EnsSupportedNetwork,
   EventFilter,
   RequestArguments,
@@ -8,7 +8,7 @@ import {
   ZnsSupportedNetwork,
 } from '.';
 
-export type CnsSupportedNetworks = typeof CnsSupportedNetwork.type;
+export type UnsSupportedNetworks = typeof UnsSupportedNetwork.type;
 export type EnsSupportedNetworks = typeof EnsSupportedNetwork.type;
 export type ZnsSupportedNetworks = typeof ZnsSupportedNetwork.type;
 
@@ -16,8 +16,8 @@ export type Api = {api: true; url?: string; network?: number};
 
 type NamingServiceSource = {url?: string} | {provider?: Provider};
 
-export type CnsSource = NamingServiceSource & {
-  network: CnsSupportedNetworks;
+export type UnsSource = NamingServiceSource & {
+  network: UnsSupportedNetworks;
   proxyReaderAddress?: string;
 };
 
@@ -32,22 +32,22 @@ export type ZnsSource = NamingServiceSource & {
 };
 
 export type SourceConfig = {
-  cns?: CnsSource | Api;
+  uns?: UnsSource | Api;
   zns?: ZnsSource | Api;
   ens?: EnsSource | Api;
 };
 
 export enum NamingServiceName {
+  UNS = 'UNS',
   ENS = 'ENS',
-  CNS = 'CNS',
   ZNS = 'ZNS',
 }
 
 export type ResolutionMethod = NamingServiceName | 'UDAPI';
 
 export type AutoNetworkConfigs = {
+  uns?: {url: string} | {provider: Provider};
   ens?: {url: string} | {provider: Provider};
-  cns?: {url: string} | {provider: Provider};
 };
 
 /**
