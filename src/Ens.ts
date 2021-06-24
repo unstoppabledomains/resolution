@@ -374,7 +374,7 @@ export default class Ens extends NamingService {
     return result[0];
   }
 
-  private checkSupportedDomain(domain: string) : boolean {
+  private checkSupportedDomain(domain: string): boolean {
     return (
       domain === 'eth' ||
       (/^[^-]*[^-]*\.(eth|luxe|xyz|kred|addr\.reverse)$/.test(domain) &&

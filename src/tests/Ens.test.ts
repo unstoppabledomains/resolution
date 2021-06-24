@@ -442,7 +442,9 @@ describe('ENS', () => {
 
       describe('.domain invalid format', () => {
         it('starts with -', async () => {
-          expect(await resolution.isSupportedDomain('-hello.eth')).toEqual(false);
+          expect(await resolution.isSupportedDomain('-hello.eth')).toEqual(
+            false,
+          );
           await expectResolutionErrorCode(
             () => resolution.namehash('-hello.eth'),
             ResolutionErrorCode.UnsupportedDomain,
@@ -450,7 +452,9 @@ describe('ENS', () => {
         });
 
         it('ends with -', async () => {
-          expect(await resolution.isSupportedDomain('hello-.eth')).toEqual(false);
+          expect(await resolution.isSupportedDomain('hello-.eth')).toEqual(
+            false,
+          );
           await expectResolutionErrorCode(
             () => resolution.namehash('hello-.eth'),
             ResolutionErrorCode.UnsupportedDomain,
@@ -458,7 +462,9 @@ describe('ENS', () => {
         });
 
         it('starts and ends with -', async () => {
-          expect(await resolution.isSupportedDomain('-hello-.eth')).toEqual(false);
+          expect(await resolution.isSupportedDomain('-hello-.eth')).toEqual(
+            false,
+          );
           await expectResolutionErrorCode(
             () => resolution.namehash('-hello-.eth'),
             ResolutionErrorCode.UnsupportedDomain,

@@ -32,7 +32,7 @@ export function buildResolutionPackage(ethereumUrl?: string): Resolution {
         sourceConfig: {
           uns: {url, network: 'mainnet'},
           ens: {url, network: 'mainnet'},
-        }
+        },
       });
     } catch (e) {
       if (e instanceof TypeError) {
