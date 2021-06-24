@@ -401,4 +401,41 @@ describe('ZNS', () => {
       });
     });
   });
+
+  describe('ZnsTestnet', () => {
+    it('should reach to the testnet', async () => {
+      const resolution = new Resolution({
+        sourceConfig: {
+          zns: {
+            network: 'testnet',
+          },
+        },
+      });
+      const znsService = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
+
+      expect(znsService.network).toBe(333);
+      expect(znsService.registryAddress).toBe(
+        'zil1hyj6m5w4atcn7s806s69r0uh5g4t84e8gp6nps',
+      );
+    });
+
+    it('should not find a real domain in test network', async () => {
+      const resolution = new Resolution({
+        sourceConfig: {
+          zns: {
+            network: 'testnet',
+          },
+        },
+      });
+      const znsService = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
+      const spies = mockAsyncMethods(znsService, {
+        getRecordsAddresses: undefined,
+      });
+      await expectResolutionErrorCode(
+        () => resolution.owner('johnnyjumper.zil'),
+        ResolutionErrorCode.UnregisteredDomain,
+      );
+      expectSpyToBeCalled(spies);
+    });
+  });
 });
