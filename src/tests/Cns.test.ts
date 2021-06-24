@@ -831,5 +831,21 @@ describe('CNS', () => {
       );
       expectSpyToBeCalled(spy);
     });
+
+    it('should throw an error if hash returned from the network is not equal to the hash provided', async () => {
+      pendingInLive();
+      const someHash = resolution.namehash('somehash.crypto');
+      const spy = mockAsyncMethods(Networking, {
+        fetch: {
+          ok: true,
+          json: () => ({"jsonrpc":"2.0","id":"1","result":[{"address":"0xd1e5b0ff1287aa9f9a268759062e4ab08b9dacbe","blockHash":"0xd716309f77e2ab9a089dd33765652c5a45adaf08cebda1497de462c9b2487e3e","blockNumber":"0x8b344c","data":"0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000b627261642e63727970746f000000000000000000000000000000000000000000","logIndex":"0x56","removed":false,"topics":["0xc5beef08f693b11c316c0c8394a377a0033c9cf701b8cd8afd79cecef60c3952","0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9"],"transactionHash":"0x4ddc930c0d511de217d6ba7d6a7dd979ab3668f33ac2cd31f20147557ff9955b","transactionIndex":"0x30"}]})
+        }
+      })
+      await expectResolutionErrorCode(
+        () => resolution.unhash(someHash, NamingServiceName.CNS),
+        ResolutionErrorCode.ServiceProviderError
+      );
+      expectSpyToBeCalled(spy);
+    })
   });
 });

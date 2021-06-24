@@ -258,12 +258,13 @@ export default class Cns extends NamingService {
     return !(await this.isRegistered(domain));
   }
 
-  async registryAddress(domain: string): Promise<string> {
+  // todo make a query to the network to determine the registryAddress associated with domain or tokenID
+  async registryAddress(domainOrToken: string): Promise<string> {
     return NetworkConfig.networks[this.network].contracts.Registry.address;
   }
 
   async getDomainFromTokenId(tokenId: string): Promise<string> {
-    const registryAddress = await this.registryAddress('');
+    const registryAddress = await this.registryAddress(tokenId);
     const registryContract = new EthereumContract(
       registryAbi,
       registryAddress,

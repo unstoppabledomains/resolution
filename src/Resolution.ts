@@ -28,6 +28,7 @@ import {NamingService} from './NamingService';
 import ConfigurationError from './errors/configurationError';
 import {ConfigurationErrorCode} from './errors/configurationError';
 import Networking from './utils/Networking';
+import { domain } from 'process';
 
 /**
  * Blockchain domain Resolution library - Resolution.
@@ -492,7 +493,15 @@ export default class Resolution {
    * @param service - nameservice which is used for lookup
    */
   async unhash(hash: string, service: NamingServiceName): Promise<string> {
-    return await this.serviceMap[service].getDomainFromTokenId(hash);
+    const name = await this.serviceMap[service].getDomainFromTokenId(hash);
+    if (this.namehash(name) !== hash) {
+      throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
+        methodName: 'unhash',
+        domain: name,
+        providerMessage: 'Service provider returned an invalid domain name'
+      });
+    }
+    return name;
   }
 
   private async getMetadataFromTokenURI(
