@@ -1,5 +1,6 @@
 import nock from 'nock';
 import Resolution, {
+  ResolutionError,
   ResolutionErrorCode,
   UnclaimedDomainResponse,
 } from '../index';
@@ -98,10 +99,10 @@ describe('Resolution', () => {
       const providerSpy = mockAsyncMethod(
         mockedProvider,
         'request',
-        new FetchError(
-          'invalid json response body at https://google.com/ reason: Unexpected token < in JSON at position 0',
-          'invalid_json',
-        ),
+        new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
+          providerMessage:
+            'Request to https://google.com failed with responce status 405',
+        }),
       );
       const factorySpy = mockAsyncMethod(
         FetchProvider,
@@ -113,9 +114,9 @@ describe('Resolution', () => {
           uns: {url: 'https://google.com'},
         });
       } catch (error) {
-        expect(error).toBeInstanceOf(FetchError);
+        expect(error).toBeInstanceOf(ResolutionError);
         expect(error.message).toBe(
-          'invalid json response body at https://google.com/ reason: Unexpected token < in JSON at position 0',
+          '< Request to https://google.com failed with responce status 405 >',
         );
       }
       expectSpyToBeCalled([factorySpy, providerSpy]);
