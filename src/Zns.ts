@@ -60,9 +60,9 @@ export default class Zns extends NamingService {
       source['provider'] || new FetchProvider(this.name, this.url!);
     this.registryAddr =
       source['registryAddress'] || Zns.RegistryMap[this.network];
-    this.checkRegistryAddress(this.registryAddress);
-    if (this.registryAddress.startsWith('0x')) {
-      this.registryAddress = toBech32Address(this.registryAddress);
+    this.checkRegistryAddress(this.registryAddr);
+    if (this.registryAddr.startsWith('0x')) {
+      this.registryAddr = toBech32Address(this.registryAddr);
     }
   }
 

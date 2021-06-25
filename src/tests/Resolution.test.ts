@@ -60,6 +60,7 @@ describe('Resolution', () => {
   describe('.Basic setup', () => {
     it('should work with autonetwork url configuration', async () => {
       const mainnetUrl = protocolLink();
+      const goerliUrl = protocolLink().replace('mainnet', 'goerli');
       // mocking getNetworkConfigs because no access to inner provider.request
       const UnsGetNetworkOriginal = Uns.autoNetwork;
       const EnsGetNetworkOriginal = Ens.autoNetwork;
@@ -97,7 +98,7 @@ describe('Resolution', () => {
       const customNetwork = 'goerli';
       const goerliUrl = mainnetUrl.replace('mainnet', customNetwork);
       expectConfigurationErrorCode(() => {
-        new Cns({
+        new Uns({
           network: customNetwork,
           url: goerliUrl,
           proxyReaderAddress: '0x012312931293',
@@ -109,20 +110,20 @@ describe('Resolution', () => {
       const mainnetUrl = protocolLink();
       const customNetwork = 'goerli';
       const goerliUrl = mainnetUrl.replace('mainnet', customNetwork);
-      const cns = new Cns({
+      const uns = new Uns({
         network: customNetwork,
         url: goerliUrl,
         proxyReaderAddress: '0xe7474D07fD2FA286e7e0aa23cd107F8379025037',
       });
-      expect(cns).toBeDefined();
+      expect(uns).toBeDefined();
     });
 
     it('should not work with invalid proxyReader configuration 2', async () => {
       const mainnetUrl = protocolLink();
       const customNetwork = 'goerli';
-      const provider = new FetchProvider(NamingServiceName.CNS, mainnetUrl);
+      const provider = new FetchProvider(NamingServiceName.UNS, mainnetUrl);
       expectConfigurationErrorCode(() => {
-        new Cns({
+        new Uns({
           network: customNetwork,
           provider,
           proxyReaderAddress: '0x012312931293',
@@ -133,13 +134,13 @@ describe('Resolution', () => {
     it('should work with custom network configuration with provider', async () => {
       const mainnetUrl = protocolLink();
       const customNetwork = 'goerli';
-      const provider = new FetchProvider(NamingServiceName.CNS, mainnetUrl);
-      const cns = new Cns({
+      const provider = new FetchProvider(NamingServiceName.UNS, mainnetUrl);
+      const uns = new Uns({
         network: customNetwork,
         provider,
         proxyReaderAddress: '0xe7447Fdd52FA286e7e0aa23cd107F83790250897',
       });
-      expect(cns).toBeDefined();
+      expect(uns).toBeDefined();
     });
 
     it('should work with autonetwork provider configuration', async () => {
@@ -801,7 +802,7 @@ describe('Resolution', () => {
         it('should get all records using custom networks', async () => {
           const resolution = new Resolution({
             sourceConfig: {
-              cns: {
+              uns: {
                 network: 'custom',
                 proxyReaderAddress:
                   '0xa6E7cEf2EDDEA66352Fd68E5915b60BDbb7309f5',
@@ -814,9 +815,9 @@ describe('Resolution', () => {
               },
             },
           });
-          const cns = resolution.serviceMap['CNS'] as Cns;
+          const uns = resolution.serviceMap['UNS'] as Uns;
           const zns = resolution.serviceMap['ZNS'] as Zns;
-          const cnsAllRecordsMock = mockAsyncMethods(cns, {
+          const unsAllRecordsMock = mockAsyncMethods(uns, {
             getStartingBlock: undefined,
             resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
             getStandardRecords: {
@@ -824,7 +825,7 @@ describe('Resolution', () => {
                 '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
             },
           });
-          const cnsGetNewKeyMock = mockAsyncMethod(cns, 'getNewKeyEvents', []);
+          const unsGetNewKeyMock = mockAsyncMethod(uns, 'getNewKeyEvents', []);
           const znsAllRecordsMock = mockAsyncMethods(zns, {
             resolver: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
             getResolverRecords: {
@@ -833,24 +834,24 @@ describe('Resolution', () => {
             },
           });
           const znsRecords = await resolution.allRecords('brad.zil');
-          const cnsRecords = await resolution.allRecords('brad.crypto');
+          const unsRecords = await resolution.allRecords('brad.crypto');
 
           expectSpyToBeCalled(znsAllRecordsMock);
-          expectSpyToBeCalled(cnsAllRecordsMock);
-          expect(cnsRecords['crypto.ETH.address']).toEqual(
+          expectSpyToBeCalled(unsAllRecordsMock);
+          expect(unsRecords['crypto.ETH.address']).toEqual(
             '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
           );
           expect(znsRecords['crypto.ZIL.address']).toEqual(
             'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
           );
           if (isLive()) {
-            expect(cnsGetNewKeyMock).toBeCalledWith(
+            expect(unsGetNewKeyMock).toBeCalledWith(
               expect.any(EthereumContract),
               resolution.namehash('brad.crypto'),
               '0x99a587',
             );
           } else {
-            expect(cnsGetNewKeyMock).toBeCalledWith(
+            expect(unsGetNewKeyMock).toBeCalledWith(
               expect.any(EthereumContract),
               resolution.namehash('brad.crypto'),
               'earliest',

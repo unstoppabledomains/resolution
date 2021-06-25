@@ -5,7 +5,7 @@ import {
   TransactionRequest,
 } from '.';
 
-export type Api = {api: true; url?: string};
+export type Api = {api: true; url?: string; network?: number};
 
 type NamingServiceSource = {url?: string} | {provider?: Provider};
 
