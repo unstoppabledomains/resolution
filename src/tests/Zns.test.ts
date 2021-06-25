@@ -290,7 +290,7 @@ describe('ZNS', () => {
       const spies = mockAsyncMethods(zns, {
         getRecordsAddresses: ['zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz'],
       });
-      const isAvailable = await zns.isAvailable('ryan.zil');
+      const isAvailable = await zns.isAvailable('brad.zil');
       expectSpyToBeCalled(spies);
       expect(isAvailable).toBe(false);
     });

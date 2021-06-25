@@ -51,20 +51,20 @@ describe('Unstoppable API', () => {
         gundb: {},
         social: {},
         meta: {
-          domain: 'ijustwannatestsomething2.crypto',
+          domain: 'reseller-test-udtesting-052523593694.crypto',
           namehash:
-            '0xcbef5c2009359c88519191d7c0d00f3973f76f24bdb0fc8d5254de26a44e0903',
+            '0x0ef61568699a847f9994473ba65185dc75906121d3e10cb9deb37bc722ce6334',
           tokenId:
-            '92242420535237173873666448151646428182056687247223888232110666318291334465795',
-          owner: '0x6ec0deed30605bcd19342f3c30201db263291589',
+            '6767172009730303435244989139041815165136673026550796813275243310476136702772',
+          owner: '0x499dd6d875787869670900a2130223d85d4f6aa7',
           resolver: '0xb66dce2da6afaaa98f2013446dbcb0f4b0ab2842',
-          type: 'UNS',
+          type: 'CNS',
           ttl: 0,
         },
         records: {
-          'social.twitter.username': 'derainberk',
+          'social.twitter.username': 'Marlene12Bob',
           'validation.social.twitter.username':
-            '0xcd2655d9557e5535313b47107fa8f943eb1fec4da6f348668062e66233dde21b413784c4060340f48da364311c6e2549416a6a23dc6fbb48885382802826b8111b',
+            '0x01882395ce631866b76f43535843451444ef4a8ff44db0a9432d5d00658a510512c7519a87c78ba9cad7553e26262ada55c254434a1a3784cd98d06fb4946cfb1b',
         },
       }),
     });
@@ -72,7 +72,7 @@ describe('Unstoppable API', () => {
       CryptoDomainWithTwitterVerification,
     );
     expectSpyToBeCalled([eyes]);
-    expect(twitterHandle).toBe('derainberk');
+    expect(twitterHandle).toBe('Marlene12Bob');
   });
 
   it('returns owner of the domain', async () => {
