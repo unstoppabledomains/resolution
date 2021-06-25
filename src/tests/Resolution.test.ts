@@ -59,7 +59,8 @@ beforeEach(() => {
 describe('Resolution', () => {
   describe('.Basic setup', () => {
     it('should work with autonetwork url configuration', async () => {
-      const mainnetUrl = protocolLink();
+      const rinkebyUrl = protocolLink();
+      const goerliUrl = rinkebyUrl.replace('rinkeby', 'goerli');
       // mocking getNetworkConfigs because no access to inner provider.request
       const UnsGetNetworkOriginal = Uns.autoNetwork;
       const EnsGetNetworkOriginal = Ens.autoNetwork;
@@ -67,7 +68,7 @@ describe('Resolution', () => {
         Uns.autoNetwork = jest.fn().mockReturnValue(
           new Uns({
             network: 'rinkeby',
-            provider: new FetchProvider(NamingServiceName.UNS, mainnetUrl),
+            provider: new FetchProvider(NamingServiceName.UNS, rinkebyUrl),
           }),
         );
         Ens.autoNetwork = jest.fn().mockReturnValue(
@@ -78,7 +79,7 @@ describe('Resolution', () => {
         );
       }
       const resolution = await Resolution.autoNetwork({
-        uns: {url: mainnetUrl},
+        uns: {url: rinkebyUrl},
         ens: {url: goerliUrl},
       });
       // We need to manually restore the function as jest.restoreAllMocks and simillar works only with spyOn
@@ -108,7 +109,7 @@ describe('Resolution', () => {
       ).toBe(1);
       expect(
         (resolution.serviceMap[NamingServiceName.ENS] as Ens).network,
-      ).toBe(4);
+      ).toBe(1);
     });
 
     it('should fail because provided url failled net_version call', async () => {
