@@ -169,7 +169,9 @@ export function mockAPICalls(testName: string, url = MainnetUrl): void {
  */
 export function protocolLink(
   providerProtocol: ProviderProtocol = ProviderProtocol.http,
-  namingService: NamingServiceName = NamingServiceName.UNS,
+  namingService:
+    | NamingServiceName.ENS
+    | NamingServiceName.UNS = NamingServiceName.UNS,
 ): string {
   const secret =
     process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID ?? undefined;
@@ -207,5 +209,11 @@ const ethereumDefaultProviders = {
       'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
     [ProviderProtocol.wss]:
       'wss://rinkeby.infura.io/ws/v3/c4bb906ed6904c42b19c95825fe55f39',
+  },
+  [NamingServiceName.ENS]: {
+    [ProviderProtocol.http]:
+      'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
+    [ProviderProtocol.wss]:
+      'wss://mainnet.infura.io/ws/v3/d423cf2499584d7fbe171e33b42cfbee',
   },
 };

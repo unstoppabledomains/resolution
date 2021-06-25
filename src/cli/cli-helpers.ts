@@ -31,6 +31,7 @@ export function buildResolutionPackage(ethereumUrl?: string): Resolution {
       return new Resolution({
         sourceConfig: {
           uns: {url, network: 'mainnet'},
+          ens: {url, network: 'mainnet'},
         },
       });
     } catch (e) {
