@@ -23,6 +23,7 @@ beforeEach(() => {
     sourceConfig: {
       zns: {api: true},
       uns: {api: true},
+      ens: {api: true},
     },
   });
   unsApi = resolution.serviceMap[NamingServiceName.UNS] as Udapi;
@@ -73,6 +74,13 @@ describe('Unstoppable API', () => {
     );
     expectSpyToBeCalled([eyes]);
     expect(twitterHandle).toBe('derainberk');
+  });
+
+  it('should throw unsupported method', async () => {
+    const handle = 'ryan.eth';
+    await expect(resolution.twitter(handle)).rejects.toThrowError(
+      `Method twitter is not supported for ${handle}`,
+    );
   });
 
   it('returns owner of the domain', async () => {
