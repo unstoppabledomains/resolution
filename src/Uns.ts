@@ -4,6 +4,7 @@ import {
   ProxyReaderMap,
   hasProvider,
   NullAddress,
+  EventData,
 } from './types';
 import {default as proxyReaderAbi} from './contracts/uns/proxyReader';
 import {default as resolverInterface} from './contracts/uns/resolver';
@@ -57,11 +58,7 @@ export default class Uns extends NamingService {
         network: 'mainnet',
       };
     }
-    if (!source.network || !UnsSupportedNetwork.guard(source.network)) {
-      throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {
-        method: NamingServiceName.UNS,
-      });
-    }
+    this.checkNetworkConfig(source);
     this.network = EthereumNetworks[source.network];
     this.url = source['url'] || Uns.UrlMap[this.network];
     this.provider =
@@ -310,10 +307,10 @@ export default class Uns extends NamingService {
       resolverContract,
       tokenId,
     );
-    const logs = await resolverContract.fetchLogs(
-      'NewKey',
+    const logs = await this.getNewKeyEvents(
+      resolverContract,
       tokenId,
-      startingBlock,
+      startingBlock || 'earliest',
     );
     const keyTopics = logs.map((event) => event.topics[2]);
     // If there are no NewKey events we want to check the standardRecords
@@ -350,13 +347,7 @@ export default class Uns extends NamingService {
   }
 
   private isLegacyResolver(resolverAddress: string): boolean {
-    if (this.isWellKnownLegacyResolver(resolverAddress)) {
-      return true;
-    }
-    if (this.isUpToDateResolver(resolverAddress)) {
-      return false;
-    }
-    return false;
+    return this.isWellKnownLegacyResolver(resolverAddress);
   }
 
   private isWellKnownLegacyResolver(resolverAddress: string): boolean {
@@ -384,7 +375,7 @@ export default class Uns extends NamingService {
   private async getStartingBlock(
     contract: EthereumContract,
     tokenId: string,
-  ): Promise<string> {
+  ): Promise<string | undefined> {
     const defaultStartingBlock =
       UnsConfig?.networks[this.network]?.contracts?.Resolver?.deploymentBlock;
     const logs = await contract.fetchLogs('ResetRecords', tokenId);
@@ -403,6 +394,60 @@ export default class Uns extends NamingService {
       ) &&
       tokens.every((v) => !!v.length)
     );
+  }
+
+  private async getNewKeyEvents(
+    resolverContract: EthereumContract,
+    tokenId: string,
+    startingBlock: string,
+  ): Promise<EventData[]> {
+    return resolverContract.fetchLogs('NewKey', tokenId, startingBlock);
+  }
+
+  private checkNetworkConfig(source: UnsSource): void {
+    if (!source.network) {
+      throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {
+        method: this.name,
+      });
+    }
+    if (!UnsSupportedNetwork.guard(source.network)) {
+      this.checkCustomNetworkConfig(source);
+    }
+  }
+
+  private checkCustomNetworkConfig(source: UnsSource): void {
+    if (!this.isValidProxyReader(source.proxyReaderAddress)) {
+      throw new ConfigurationError(
+        ConfigurationErrorCode.InvalidConfigurationField,
+        {
+          method: this.name,
+          field: 'proxyReaderAddress',
+        },
+      );
+    }
+    if (!source['url'] && !source['provider']) {
+      throw new ConfigurationError(
+        ConfigurationErrorCode.CustomNetworkConfigMissing,
+        {
+          method: this.name,
+          config: 'url or provider',
+        },
+      );
+    }
+  }
+
+  private isValidProxyReader(address?: string): boolean {
+    if (!address) {
+      throw new ConfigurationError(
+        ConfigurationErrorCode.CustomNetworkConfigMissing,
+        {
+          method: this.name,
+          config: 'proxyReaderAddress',
+        },
+      );
+    }
+    const ethLikePattern = new RegExp('^0x[a-fA-F0-9]{40}$');
+    return ethLikePattern.test(address);
   }
 }
 

@@ -1,33 +1,26 @@
 import {
-  UnsSupportedNetwork,
-  EnsSupportedNetwork,
   EventFilter,
   RequestArguments,
   RpcProviderLogEntry,
   TransactionRequest,
-  ZnsSupportedNetwork,
 } from '.';
 
-export type UnsSupportedNetworks = typeof UnsSupportedNetwork.type;
-export type EnsSupportedNetworks = typeof EnsSupportedNetwork.type;
-export type ZnsSupportedNetworks = typeof ZnsSupportedNetwork.type;
-
-export type Api = {api: true; url?: string; network?: number};
+export type Api = {api: true; url?: string};
 
 type NamingServiceSource = {url?: string} | {provider?: Provider};
 
 export type UnsSource = NamingServiceSource & {
-  network: UnsSupportedNetworks;
+  network: string;
   proxyReaderAddress?: string;
 };
 
 export type EnsSource = NamingServiceSource & {
-  network: EnsSupportedNetworks;
+  network: string;
   registryAddress?: string;
 };
 
 export type ZnsSource = NamingServiceSource & {
-  network: ZnsSupportedNetworks;
+  network: string;
   registryAddress?: string;
 };
 

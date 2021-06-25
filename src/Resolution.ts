@@ -6,7 +6,6 @@ import UdApi from './UdApi';
 import {
   Api,
   AutoNetworkConfigs,
-  UnsSupportedNetworks,
   CryptoRecords,
   DnsRecord,
   DnsRecordType,
@@ -113,7 +112,7 @@ export default class Resolution {
         network: EnsSupportedNetworks;
       };
       uns?: {
-        network: UnsSupportedNetworks;
+        network: string;
       };
     },
   ): Resolution {
@@ -144,7 +143,7 @@ export default class Resolution {
         network: EnsSupportedNetworks;
       };
       uns?: {
-        network: UnsSupportedNetworks;
+        network: string;
       };
     },
   ): Resolution {
@@ -169,7 +168,7 @@ export default class Resolution {
         network: EnsSupportedNetworks;
       };
       uns?: {
-        network: UnsSupportedNetworks;
+        network: string;
       };
     },
   ): Resolution {
@@ -193,7 +192,7 @@ export default class Resolution {
         network: EnsSupportedNetworks;
       };
       uns?: {
-        network: UnsSupportedNetworks;
+        network: string;
       };
     },
   ): Resolution {
@@ -220,7 +219,7 @@ export default class Resolution {
         network: EnsSupportedNetworks;
       };
       uns?: {
-        network: UnsSupportedNetworks;
+        network: string;
       };
     },
   ): Resolution {
