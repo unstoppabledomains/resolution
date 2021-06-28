@@ -267,7 +267,7 @@ export default class Uns extends NamingService {
 
   async registryAddress(domain: string): Promise<string> {
     let namehash: string;
-    if (domain.startsWith("0x")) {
+    if (domain.startsWith('0x')) {
       namehash = this.namehash(domain);
     } else {
       if (!this.checkDomain(domain)) {
@@ -279,9 +279,7 @@ export default class Uns extends NamingService {
       const tld = domain.split('.').pop();
       namehash = this.namehash(tld!);
     }
-    const [address] = await this.readerContract.call('registryOf', [
-      namehash,
-    ]);
+    const [address] = await this.readerContract.call('registryOf', [namehash]);
 
     if (address === NullAddress) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {

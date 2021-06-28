@@ -59,6 +59,7 @@ describe('Resolution', () => {
   describe('.Basic setup', () => {
     it('should work with autonetwork url configuration', async () => {
       const mainnetUrl = protocolLink();
+      const goerliUrl = mainnetUrl.replace('mainnet', 'goerli');
       // mocking getNetworkConfigs because no access to inner provider.request
       const UnsGetNetworkOriginal = Uns.autoNetwork;
       const EnsGetNetworkOriginal = Ens.autoNetwork;

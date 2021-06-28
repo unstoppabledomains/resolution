@@ -15,7 +15,11 @@ import {
   mockAPICalls,
 } from './helpers';
 import FetchProvider from '../FetchProvider';
-import {UnsSupportedNetworks, NamingServiceName, TokenUriMetadata, } from '../types/publicTypes';
+import {
+  UnsSupportedNetworks,
+  NamingServiceName,
+  TokenUriMetadata,
+} from '../types/publicTypes';
 import Uns from '../Uns';
 import Networking from '../utils/Networking';
 import {ConfigurationErrorCode} from '../errors/configurationError';
@@ -768,7 +772,7 @@ describe('UNS', () => {
   describe('.unhash', () => {
     it('should unhash token', async () => {
       const testMeta: TokenUriMetadata = liveData.bradCryptoMetadata;
-      mockAPICalls("unhash", protocolLink());
+      mockAPICalls('unhash', protocolLink());
       const domain = await resolution.unhash(
         '0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9',
         NamingServiceName.UNS,

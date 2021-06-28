@@ -219,6 +219,13 @@ export default class Ens extends NamingService {
     return !isNullAddress(address);
   }
 
+  async getDomainFromTokenId(tokenId: string): Promise<string> {
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+      method: NamingServiceName.ENS,
+      methodName: 'getDomainFromTokenId',
+    });
+  }
+
   /**
    * This was done to make automated tests more configurable
    */
