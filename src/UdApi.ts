@@ -7,12 +7,12 @@ import {
   ResolutionResponse,
   ResolutionMethod,
   NamingServiceName,
+  Api,
 } from './types/publicTypes';
 import Networking from './utils/Networking';
 import {constructRecords, findNamingServiceName, isNullAddress} from './utils';
 import {znsNamehash, eip137Namehash} from './utils/namehash';
 import {NamingService} from './NamingService';
-import NetworkConfig from './config/network-config.json';
 
 /**
  * @internal
@@ -26,20 +26,22 @@ export default class Udapi extends NamingService {
   static readonly ZnsRegistryMap = {
     1: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
   };
+  readonly network: number;
 
-  constructor(url?: string) {
+  constructor(api?: Api) {
     super();
     this.name = 'UDAPI';
-    this.url = url || 'https://unstoppabledomains.com/api/v1';
+    this.url = api?.url || 'https://unstoppabledomains.com/api/v1';
     const DefaultUserAgent = Networking.isNode()
       ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'
       : navigator.userAgent;
     const version = pckg.version;
     const CustomUserAgent = `${DefaultUserAgent} Resolution/${version}`;
     this.headers = {'X-user-agent': CustomUserAgent};
+    this.network = api?.network || 1;
   }
 
-  isSupportedDomain(domain: string): boolean {
+  async isSupportedDomain(domain: string): Promise<boolean> {
     throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
       methodName: 'isSupportedDomain',
     });
@@ -83,7 +85,7 @@ export default class Udapi extends NamingService {
 
   async twitter(domain: string): Promise<string> {
     const serviceName = findNamingServiceName(domain);
-    if (serviceName !== NamingServiceName.CNS) {
+    if (serviceName !== NamingServiceName.UNS) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
         domain,
         methodName: 'twitter',
@@ -183,15 +185,9 @@ export default class Udapi extends NamingService {
   }
 
   async registryAddress(domain: string): Promise<string> {
-    const serviceName = findNamingServiceName(domain);
-
-    if (serviceName === 'CNS') {
-      return NetworkConfig.networks[1].contracts.Registry.address;
-    } else if (serviceName === 'ZNS') {
-      return Udapi.ZnsRegistryMap[1];
-    }
-    throw new ResolutionError(ResolutionErrorCode.UnsupportedService, {
-      namingService: serviceName,
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+      domain,
+      methodName: 'registryAddress',
     });
   }
 }

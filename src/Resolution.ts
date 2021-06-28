@@ -1,14 +1,16 @@
 import BN from 'bn.js';
+import Ens from './Ens';
 import Zns from './Zns';
-import Cns from './Cns';
+import Uns from './Uns';
 import UdApi from './UdApi';
 import {
   Api,
   AutoNetworkConfigs,
-  CnsSupportedNetworks,
+  UnsSupportedNetworks,
   CryptoRecords,
   DnsRecord,
   DnsRecordType,
+  EnsSupportedNetworks,
   EthersProvider,
   NamehashOptions,
   NamehashOptionsDefault,
@@ -36,7 +38,7 @@ import Networking from './utils/Networking';
  * import Resolution from '@unstoppabledomains/resolution';
  *
  * let resolution = new Resolution({ blockchain: {
- *        cns: {
+ *        uns: {
  *           url: "https://mainnet.infura.io/v3/12351245223",
  *           network: "mainnet"
  *        }
@@ -54,35 +56,45 @@ export default class Resolution {
   readonly serviceMap: Record<NamingServiceName, NamingService>;
 
   constructor({sourceConfig = undefined}: {sourceConfig?: SourceConfig} = {}) {
-    const cns = isApi(sourceConfig?.cns)
-      ? new UdApi(sourceConfig?.cns.url)
-      : new Cns(sourceConfig?.cns);
+    const ens = isApi(sourceConfig?.ens)
+      ? new UdApi(sourceConfig?.ens)
+      : new Ens(sourceConfig?.ens);
+    const uns = isApi(sourceConfig?.uns)
+      ? new UdApi(sourceConfig?.uns)
+      : new Uns(sourceConfig?.uns);
     const zns = isApi(sourceConfig?.zns)
-      ? new UdApi(sourceConfig?.zns.url)
+      ? new UdApi(sourceConfig?.zns)
       : new Zns(sourceConfig?.zns);
     this.serviceMap = {
-      [NamingServiceName.CNS]: cns,
+      [NamingServiceName.UNS]: uns,
       [NamingServiceName.ZNS]: zns,
+      [NamingServiceName.ENS]: ens,
     };
   }
 
   /**
-   * AutoConfigure the blockchain network between different testnets for CNS
+   * AutoConfigure the blockchain network between different testnets for ENS and UNS
    * We make a "net_version" JSON RPC call to the blockchain either via url or with the help of given provider.
-   * @param sourceConfig - configuration object for cns
+   * @param sourceConfig - configuration object for ens and uns
    * @returns configured Resolution object
    */
   static async autoNetwork(
     sourceConfig: AutoNetworkConfigs,
   ): Promise<Resolution> {
     const resolution = new this();
-    if (!sourceConfig.cns) {
+    if (!sourceConfig.uns && !sourceConfig.ens) {
       throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork);
     }
 
-    if (sourceConfig.cns) {
-      resolution.serviceMap[NamingServiceName.CNS] = await Cns.autoNetwork(
-        sourceConfig.cns,
+    if (sourceConfig.uns) {
+      resolution.serviceMap[NamingServiceName.UNS] = await Uns.autoNetwork(
+        sourceConfig.uns,
+      );
+    }
+
+    if (sourceConfig.ens) {
+      resolution.serviceMap[NamingServiceName.ENS] = await Ens.autoNetwork(
+        sourceConfig.ens,
       );
     }
 
@@ -90,23 +102,30 @@ export default class Resolution {
   }
 
   /**
-   * Creates a resolution with configured infura id for cns
+   * Creates a resolution with configured infura id for ens and uns
    * @param infura - infura project id
-   * @param networks - an optional object that describes what network to use when connecting CNS default is mainnet
+   * @param networks - an optional object that describes what network to use when connecting ENS or UNS default is mainnet
    */
   static infura(
     infura: string,
     networks?: {
-      cns?: {
-        network: CnsSupportedNetworks;
+      ens?: {
+        network: EnsSupportedNetworks;
+      };
+      uns?: {
+        network: UnsSupportedNetworks;
       };
     },
   ): Resolution {
     return new this({
       sourceConfig: {
-        cns: {
-          url: signedInfuraLink(infura, networks?.cns?.network),
-          network: networks?.cns?.network || 'mainnet',
+        ens: {
+          url: signedInfuraLink(infura, networks?.ens?.network),
+          network: networks?.ens?.network || 'mainnet',
+        },
+        uns: {
+          url: signedInfuraLink(infura, networks?.uns?.network),
+          network: networks?.uns?.network || 'mainnet',
         },
       },
     });
@@ -115,20 +134,24 @@ export default class Resolution {
   /**
    * Creates a resolution instance with configured provider
    * @param provider - any provider compatible with EIP-1193
-   * @param networks - an optional object that describes what network to use when connecting CNS default is mainnet
+   * @param networks - an optional object that describes what network to use when connecting ENS or UNS default is mainnet
    * @see https://eips.ethereum.org/EIPS/eip-1193
    */
   static fromEip1193Provider(
     provider: Provider,
     networks?: {
-      cns?: {
-        network: CnsSupportedNetworks;
+      ens?: {
+        network: EnsSupportedNetworks;
+      };
+      uns?: {
+        network: UnsSupportedNetworks;
       };
     },
   ): Resolution {
     return new this({
       sourceConfig: {
-        cns: {provider, network: networks?.cns?.network || 'mainnet'},
+        ens: {provider, network: networks?.ens?.network || 'mainnet'},
+        uns: {provider, network: networks?.uns?.network || 'mainnet'},
       },
     });
   }
@@ -142,8 +165,11 @@ export default class Resolution {
   static fromWeb3Version0Provider(
     provider: Web3Version0Provider,
     networks?: {
-      cns?: {
-        network: CnsSupportedNetworks;
+      ens?: {
+        network: EnsSupportedNetworks;
+      };
+      uns?: {
+        network: UnsSupportedNetworks;
       };
     },
   ): Resolution {
@@ -156,15 +182,18 @@ export default class Resolution {
   /**
    * Create a resolution instance from web3 1.x version provider
    * @param provider - an 1.x version provider from web3 ( must implement send(payload, callback) )
-   * @param networks - an optional object that describes what network to use when connecting CNS default is mainnet
+   * @param networks - an optional object that describes what network to use when connecting ENS or UNS default is mainnet
    * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-core-helpers/types/index.d.ts#L165
    * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-providers-http/src/index.js#L95
    */
   static fromWeb3Version1Provider(
     provider: Web3Version1Provider,
     networks?: {
-      cns?: {
-        network: CnsSupportedNetworks;
+      ens?: {
+        network: EnsSupportedNetworks;
+      };
+      uns?: {
+        network: UnsSupportedNetworks;
       };
     },
   ): Resolution {
@@ -178,7 +207,7 @@ export default class Resolution {
    * Creates instance of resolution from provider that implements Ethers Provider#call interface.
    * This wrapper support only `eth_call` method for now, which is enough for all the current Resolution functionality
    * @param provider - provider object
-   * @param networks - an optional object that describes what network to use when connecting CNS default is mainnet
+   * @param networks - an optional object that describes what network to use when connecting ENS or UNS default is mainnet
    * @see https://github.com/ethers-io/ethers.js/blob/v4-legacy/providers/abstract-provider.d.ts#L91
    * @see https://github.com/ethers-io/ethers.js/blob/v5.0.4/packages/abstract-provider/src.ts/index.ts#L224
    * @see https://docs.ethers.io/ethers.js/v5-beta/api-providers.html#jsonrpcprovider-inherits-from-provider
@@ -187,8 +216,11 @@ export default class Resolution {
   static fromEthersProvider(
     provider: EthersProvider,
     networks?: {
-      cns?: {
-        network: CnsSupportedNetworks;
+      ens?: {
+        network: EnsSupportedNetworks;
+      };
+      uns?: {
+        network: UnsSupportedNetworks;
       };
     },
   ): Resolution {
@@ -226,6 +258,12 @@ export default class Resolution {
   ): Promise<string> {
     domain = this.prepareDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
+    if (method.serviceName() === NamingServiceName.ENS) {
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+        methodName: NamingServiceName.ENS,
+        domain,
+      });
+    }
 
     const recordKey = `crypto.${ticker.toUpperCase()}.version.${chain.toUpperCase()}.address`;
     return await method.record(domain, recordKey);
@@ -369,8 +407,25 @@ export default class Resolution {
   }
 
   /**
+   * This method is only for ens at the moment. Reverse the ens address to a ens registered domain name
+   * @async
+   * @param address - address you wish to reverse
+   * @param currencyTicker - currency ticker like BTC, ETH, ZIL
+   * @returns Domain name attached to this address
+   */
+  async reverse(
+    address: string,
+    currencyTicker: string,
+  ): Promise<string | null> {
+    return this.serviceMap[NamingServiceName.ENS].reverse(
+      address,
+      currencyTicker,
+    );
+  }
+
+  /**
    * @returns Produces a namehash from supported naming service in hex format with 0x prefix.
-   * Corresponds to ERC721 token id in case of Ethereum based naming service like CNS.
+   * Corresponds to ERC721 token id in case of Ethereum based naming service like ENS or UNS.
    * @param domain domain name to be converted
    * @param options formatting options
    * @throws [[ResolutionError]] with UnsupportedDomain error code if domain extension is unknown
@@ -390,7 +445,7 @@ export default class Resolution {
    * @returns a namehash of a subdomain with name label
    * @param parent namehash of a parent domain
    * @param label subdomain name
-   * @param namingService "CNS" or "ZNS"
+   * @param namingService "ENS", "UNS" or "ZNS"
    * @param options formatting options
    */
   childhash(
@@ -430,15 +485,17 @@ export default class Resolution {
   /**
    * Checks if the domain name is valid according to naming service rules
    * for valid domain names.
+   * Example: ENS doesn't allow domains that start from '-' symbol.
    * @param domain - domain name to be checked
    */
-  isSupportedDomain(domain: string): boolean {
+  async isSupportedDomain(domain: string): Promise<boolean> {
     domain = this.prepareDomain(domain);
-    return !!this.getNamingMethod(domain)?.isSupportedDomain(domain);
+    const namingMethod = this.getNamingMethod(domain);
+    return namingMethod ? await namingMethod.isSupportedDomain(domain) : false;
   }
 
   /**
-   * Returns the name of the service for a domain CNS | ZNS
+   * Returns the name of the service for a domain ENS | UNS | ZNS
    * @param domain - domain name to look for
    */
   serviceName(domain: string): ResolutionMethod {
@@ -449,6 +506,7 @@ export default class Resolution {
   /**
    * Returns all record keys of the domain.
    * This method is strongly unrecommended for production use due to lack of support for many ethereum service providers and low performance
+   * Method is not supported by ENS
    * @param domain - domain name
    */
   async allRecords(domain: string): Promise<CryptoRecords> {

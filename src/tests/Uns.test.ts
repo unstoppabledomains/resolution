@@ -12,35 +12,33 @@ import {
   CryptoDomainWithoutGunDbRecords,
   CryptoDomainWithAllRecords,
   pendingInLive,
+  mockAPICalls,
 } from './helpers';
 import FetchProvider from '../FetchProvider';
-import {
-  CnsSupportedNetworks,
-  NamingServiceName,
-  TokenUriMetadata,
-} from '../types/publicTypes';
-import Cns from '../Cns';
+import {UnsSupportedNetworks, NamingServiceName, TokenUriMetadata, } from '../types/publicTypes';
+import Uns from '../Uns';
 import Networking from '../utils/Networking';
 import {ConfigurationErrorCode} from '../errors/configurationError';
 import liveData from './testData/liveData.json';
-import NetworkConfig from '../config/network-config.json';
+import UnsConfig from '../config/uns-config.json';
+import nock from 'nock';
 
 let resolution: Resolution;
-let cns: Cns;
+let uns: Uns;
 
 beforeEach(async () => {
   jest.restoreAllMocks();
   resolution = new Resolution({
-    sourceConfig: {cns: {url: protocolLink(), network: 'mainnet'}},
+    sourceConfig: {uns: {url: protocolLink(), network: 'mainnet'}},
   });
-  cns = resolution.serviceMap[NamingServiceName.CNS] as Cns;
+  uns = resolution.serviceMap[NamingServiceName.UNS] as Uns;
 });
 
-describe('CNS', () => {
-  it('should define the default cns contract', () => {
-    expect(cns).toBeDefined();
-    expect(cns.network).toBe(1);
-    expect(cns.url).toBe(protocolLink());
+describe('UNS', () => {
+  it('should define the default uns contract', () => {
+    expect(uns).toBeDefined();
+    expect(uns.network).toBe(1);
+    expect(uns.url).toBe(protocolLink());
   });
 
   it('should not allow ropsten as testnet', async () => {
@@ -48,7 +46,7 @@ describe('CNS', () => {
       () =>
         new Resolution({
           sourceConfig: {
-            cns: {network: 'ropsten' as CnsSupportedNetworks},
+            uns: {network: 'ropsten' as UnsSupportedNetworks},
           },
         }),
       ConfigurationErrorCode.UnsupportedNetwork,
@@ -56,7 +54,7 @@ describe('CNS', () => {
   });
 
   it('checks the record by key', async () => {
-    const eyes = mockAsyncMethods(cns, {
+    const eyes = mockAsyncMethods(uns, {
       get: {
         resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
         records: {
@@ -73,7 +71,7 @@ describe('CNS', () => {
   });
 
   it('should return verified twitter handle', async () => {
-    const spies = mockAsyncMethods(cns, {
+    const spies = mockAsyncMethods(uns, {
       get: {
         resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
         owner: '0x6ec0deed30605bcd19342f3c30201db263291589',
@@ -85,14 +83,14 @@ describe('CNS', () => {
       },
     });
     const twitterHandle = await resolution.serviceMap[
-      NamingServiceName.CNS
+      NamingServiceName.UNS
     ].twitter(CryptoDomainWithTwitterVerification);
     expectSpyToBeCalled(spies);
     expect(twitterHandle).toBe('derainberk');
   });
 
   it('should return NoRecord Resolution error', async () => {
-    const spies = mockAsyncMethods(cns, {
+    const spies = mockAsyncMethods(uns, {
       get: {
         resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
         records: {},
@@ -106,7 +104,7 @@ describe('CNS', () => {
   }, 20000);
 
   it('should return a valid resolver address', async () => {
-    const spies = mockAsyncMethods(cns, {
+    const spies = mockAsyncMethods(uns, {
       get: {resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842'},
     });
     const resolverAddress = await resolution.resolver(
@@ -117,17 +115,20 @@ describe('CNS', () => {
   });
 
   it('should return true for supported domain', async () => {
-    expect(cns.isSupportedDomain('example.test')).toBe(true);
-    expect(cns.isSupportedDomain('example.tqwdest')).toBe(true);
-    expect(cns.isSupportedDomain('example.qwdqwdq.wd.tqwdest')).toBe(true);
+    mockAPICalls('uns_domain_exists_test', protocolLink());
+    expect(await uns.isSupportedDomain('brad.crypto')).toBe(true);
+    expect(await uns.isSupportedDomain('brad.blockchain')).toBe(true);
+    expect(await uns.isSupportedDomain('brad.888')).toBe(true);
   });
 
   it('should return false for unsupported domain', async () => {
-    expect(cns.isSupportedDomain('example.zil')).toBe(false);
+    mockAPICalls('uns_domain_exists_test', protocolLink());
+    expect(await uns.isSupportedDomain('brad.zil')).toBe(false);
+    expect(await uns.isSupportedDomain('brad.invalid')).toBe(false);
   });
 
   it('should not find a resolver address', async () => {
-    const spies = mockAsyncMethods(cns, {
+    const spies = mockAsyncMethods(uns, {
       get: {
         owner: '0x0000000000000000000000000000000000000000',
         resolver: undefined,
@@ -142,7 +143,7 @@ describe('CNS', () => {
   });
 
   it('should throw ResolutionError.UnspecifiedResolver', async () => {
-    const spies = mockAsyncMethods(cns, {
+    const spies = mockAsyncMethods(uns, {
       get: {owner: 'someowneraddress', resolver: NullAddress},
     });
     await expectResolutionErrorCode(
@@ -154,7 +155,7 @@ describe('CNS', () => {
 
   describe('.Crypto', () => {
     it(`checks the BCH address on ${CryptoDomainWithAllRecords}`, async () => {
-      const eyes = mockAsyncMethods(cns, {
+      const eyes = mockAsyncMethods(uns, {
         get: {
           resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
           records: {
@@ -169,7 +170,7 @@ describe('CNS', () => {
     });
 
     it(`checks the ADA address on ${CryptoDomainWithAllRecords}`, async () => {
-      const eyes = mockAsyncMethods(cns, {
+      const eyes = mockAsyncMethods(uns, {
         get: {
           resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
           records: {
@@ -186,8 +187,8 @@ describe('CNS', () => {
     });
 
     describe('.Metadata', () => {
-      it('should resolve with ipfs stored on cns', async () => {
-        const spies = mockAsyncMethods(cns, {
+      it('should resolve with ipfs stored on uns', async () => {
+        const spies = mockAsyncMethods(uns, {
           get: {
             resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
             records: {
@@ -201,8 +202,8 @@ describe('CNS', () => {
         expect(ipfsHash).toBe('QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu');
       });
 
-      it('should resolve with email stored on cns', async () => {
-        const spies = mockAsyncMethods(cns, {
+      it('should resolve with email stored on uns', async () => {
+        const spies = mockAsyncMethods(uns, {
           get: {
             resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
             records: {
@@ -215,8 +216,8 @@ describe('CNS', () => {
         expect(email).toBe('johnny@unstoppabledomains.com');
       });
 
-      it('should resolve with httpUrl stored on cns', async () => {
-        const eyes = mockAsyncMethods(cns, {
+      it('should resolve with httpUrl stored on uns', async () => {
+        const eyes = mockAsyncMethods(uns, {
           get: {
             resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
             records: {
@@ -229,8 +230,8 @@ describe('CNS', () => {
         expect(httpUrl).toBe('google.com');
       });
 
-      it('should resolve with the gundb chatId stored on cns', async () => {
-        const eyes = mockAsyncMethods(cns, {
+      it('should resolve with the gundb chatId stored on uns', async () => {
+        const eyes = mockAsyncMethods(uns, {
           get: {
             resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
             records: {
@@ -247,7 +248,7 @@ describe('CNS', () => {
       });
 
       it('should throw UnspecifiedResolver for chatId', async () => {
-        mockAsyncMethods(cns, {
+        mockAsyncMethods(uns, {
           get: {
             owner: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
           },
@@ -258,8 +259,8 @@ describe('CNS', () => {
         );
       });
 
-      it('should resolve with the gundb public key stored on cns', async () => {
-        const eyes = mockAsyncMethods(cns, {
+      it('should resolve with the gundb public key stored on uns', async () => {
+        const eyes = mockAsyncMethods(uns, {
           get: {
             resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
             records: {
@@ -275,8 +276,8 @@ describe('CNS', () => {
         );
       });
 
-      it('should error out for gundb public key stored on cns', async () => {
-        const eyes = mockAsyncMethods(cns, {
+      it('should error out for gundb public key stored on uns', async () => {
+        const eyes = mockAsyncMethods(uns, {
           get: {
             resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
             records: {},
@@ -289,8 +290,8 @@ describe('CNS', () => {
         expectSpyToBeCalled(eyes);
       });
 
-      it('should error out for gundb chatId stored on cns', async () => {
-        const eyes = mockAsyncMethods(cns, {
+      it('should error out for gundb chatId stored on uns', async () => {
+        const eyes = mockAsyncMethods(uns, {
           get: {
             resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
             records: {},
@@ -307,7 +308,7 @@ describe('CNS', () => {
 
   describe('.Crypto ProxyReader', () => {
     it('should return record by key', async () => {
-      const eyes = mockAsyncMethods(cns, {
+      const eyes = mockAsyncMethods(uns, {
         get: {
           resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
           records: {
@@ -325,7 +326,7 @@ describe('CNS', () => {
     });
 
     it('should return NoRecord Resolution error when value not found', async () => {
-      const spies = mockAsyncMethods(cns, {
+      const spies = mockAsyncMethods(uns, {
         get: {
           resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
           records: {},
@@ -339,7 +340,7 @@ describe('CNS', () => {
     });
 
     it('should return a valid resolver address', async () => {
-      const spies = mockAsyncMethods(cns, {
+      const spies = mockAsyncMethods(uns, {
         get: {
           resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
           records: {},
@@ -355,7 +356,7 @@ describe('CNS', () => {
     });
 
     it('should return UnregisteredDomain error when owner address not found', async () => {
-      const spies = mockAsyncMethods(cns, {
+      const spies = mockAsyncMethods(uns, {
         get: {owner: NullAddress},
       });
       await expectResolutionErrorCode(
@@ -366,7 +367,7 @@ describe('CNS', () => {
     });
 
     it('should return UnspecifiedResolver error when resolver address not found', async () => {
-      const spies = mockAsyncMethods(cns, {
+      const spies = mockAsyncMethods(uns, {
         get: {owner: '0x000000000000000000000000000000000000dead'},
       });
       await expectResolutionErrorCode(
@@ -379,7 +380,7 @@ describe('CNS', () => {
     it('should work without any configs', async () => {
       resolution = new Resolution();
       const eyes = mockAsyncMethods(
-        resolution.serviceMap[NamingServiceName.CNS],
+        resolution.serviceMap[NamingServiceName.UNS],
         {
           get: {
             resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
@@ -396,8 +397,8 @@ describe('CNS', () => {
     });
 
     describe('.Metadata', () => {
-      it('should resolve with ipfs stored on cns', async () => {
-        const spies = mockAsyncMethods(cns, {
+      it('should resolve with ipfs stored on uns', async () => {
+        const spies = mockAsyncMethods(uns, {
           get: {
             resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
             records: {
@@ -411,8 +412,8 @@ describe('CNS', () => {
         expect(ipfsHash).toBe('QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu');
       });
 
-      it('should resolve with email stored on cns', async () => {
-        const spies = mockAsyncMethods(cns, {
+      it('should resolve with email stored on uns', async () => {
+        const spies = mockAsyncMethods(uns, {
           get: {
             resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
             records: {['whois.email.value']: 'johnny@unstoppabledomains.com'},
@@ -423,8 +424,8 @@ describe('CNS', () => {
         expect(email).toBe('johnny@unstoppabledomains.com');
       });
 
-      it.skip('should resolve with httpUrl stored on cns', async () => {
-        const spies = mockAsyncMethods(cns, {
+      it.skip('should resolve with httpUrl stored on uns', async () => {
+        const spies = mockAsyncMethods(uns, {
           get: {
             resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
             records: {
@@ -437,8 +438,8 @@ describe('CNS', () => {
         expect(httpUrl).toBe('https://unstoppabledomains.com/');
       });
 
-      it('should resolve with the gundb chatId stored on cns', async () => {
-        const spies = mockAsyncMethods(cns, {
+      it('should resolve with the gundb chatId stored on uns', async () => {
+        const spies = mockAsyncMethods(uns, {
           get: {
             resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
             records: {
@@ -455,7 +456,7 @@ describe('CNS', () => {
       });
 
       it('should throw UnspecifiedResolver for chatId', async () => {
-        mockAsyncMethods(cns, {
+        mockAsyncMethods(uns, {
           get: {
             owner: '0x000000000000000000000000000000000000dead',
             records: {},
@@ -468,8 +469,8 @@ describe('CNS', () => {
         );
       });
 
-      it('should resolve with the gundb public key stored on cns', async () => {
-        const spies = mockAsyncMethods(cns, {
+      it('should resolve with the gundb public key stored on uns', async () => {
+        const spies = mockAsyncMethods(uns, {
           get: {
             resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
             records: {
@@ -485,8 +486,8 @@ describe('CNS', () => {
         );
       });
 
-      it('should error out for gundb public key stored on cns', async () => {
-        const spies = mockAsyncMethods(cns, {
+      it('should error out for gundb public key stored on uns', async () => {
+        const spies = mockAsyncMethods(uns, {
           get: {
             resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
             records: {},
@@ -499,8 +500,8 @@ describe('CNS', () => {
         expectSpyToBeCalled(spies);
       });
 
-      it('should error out for gundb chatId stored on cns', async () => {
-        const spies = mockAsyncMethods(cns, {
+      it('should error out for gundb chatId stored on uns', async () => {
+        const spies = mockAsyncMethods(uns, {
           get: {
             resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
             records: {},
@@ -518,35 +519,31 @@ describe('CNS', () => {
   describe('.Hashing', () => {
     describe('.Namehash', () => {
       it('supports root node', async () => {
-        expect(resolution.isSupportedDomain('crypto')).toEqual(true);
         expect(resolution.namehash('crypto')).toEqual(
           '0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f',
         );
       });
 
       it('starts with -', async () => {
-        expect(resolution.isSupportedDomain('-hello.crypto')).toEqual(true);
         expect(resolution.namehash('-hello.crypto')).toBe(
           '0xc4ad028bcae9b201104e15f872d3e85b182939b06829f75a128275177f2ff9b2',
         );
       });
 
       it('ends with -', async () => {
-        expect(resolution.isSupportedDomain('hello-.crypto')).toEqual(true);
         expect(resolution.namehash('hello-.crypto')).toBe(
           '0x82eaa6ef14e438940bfd7747e0e4c4fec42af20cee28ddd0a7d79f52b1c59b72',
         );
       });
 
       it('starts and ends with -', async () => {
-        expect(resolution.isSupportedDomain('-hello-.crypto')).toEqual(true);
         expect(resolution.namehash('-hello-.crypto')).toBe(
           '0x90cc1963ff09ce95ee2dbb3830df4f2115da9756e087a50283b3e65f6ffe2a4e',
         );
       });
 
       it('should throw UnregisteredDomain', async () => {
-        const eyes = mockAsyncMethods(cns, {
+        const eyes = mockAsyncMethods(uns, {
           get: {owner: NullAddress},
         });
 
@@ -560,17 +557,42 @@ describe('CNS', () => {
   });
 
   describe('.registryAddress', () => {
-    it('should return mainnet registry address', async () => {
-      const registryAddress = await cns.registryAddress('some-domaine.crypto');
+    it('should return cns registry address', async () => {
+      mockAPICalls('uns_registry_address_tests', protocolLink());
+      const registryAddress = await uns.registryAddress('some-domain.crypto');
       expect(registryAddress).toBe(
-        NetworkConfig.networks[1].contracts.Registry.address,
+        UnsConfig.networks[1].contracts.CNSRegistry.address,
+      );
+    });
+
+    it('should return uns registry address', async () => {
+      mockAPICalls('uns_registry_address_tests', protocolLink());
+      const registryAddress = await uns.registryAddress('some-domain.888');
+      expect(registryAddress).toBe(
+        UnsConfig.networks[1].contracts.UNSRegistry.address,
+      );
+    });
+
+    it('should throw error if tld is not supported', async () => {
+      mockAPICalls('uns_registry_address_tests', protocolLink());
+      await expectResolutionErrorCode(
+        () => uns.registryAddress('some-domain.zil'),
+        ResolutionErrorCode.UnsupportedDomain,
+      );
+    });
+
+    it('should throw error if tld does not exist', async () => {
+      mockAPICalls('uns_registry_address_tests', protocolLink());
+      await expectResolutionErrorCode(
+        () => uns.registryAddress('some-domain.unknown'),
+        ResolutionErrorCode.UnsupportedDomain,
       );
     });
   });
 
   describe('.isRegistered', () => {
     it('should return true', async () => {
-      const spies = mockAsyncMethods(cns, {
+      const spies = mockAsyncMethods(uns, {
         get: {
           owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
           resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
@@ -580,19 +602,19 @@ describe('CNS', () => {
           },
         },
       });
-      const isRegistered = await cns.isRegistered('brad.crypto');
+      const isRegistered = await uns.isRegistered('brad.crypto');
       expectSpyToBeCalled(spies);
       expect(isRegistered).toBe(true);
     });
     it('should return false', async () => {
-      const spies = mockAsyncMethods(cns, {
+      const spies = mockAsyncMethods(uns, {
         get: {
           owner: '',
           resolver: '',
           records: {},
         },
       });
-      const isRegistered = await cns.isRegistered(
+      const isRegistered = await uns.isRegistered(
         'thisdomainisdefinitelynotregistered123.crypto',
       );
       expectSpyToBeCalled(spies);
@@ -602,7 +624,7 @@ describe('CNS', () => {
 
   describe('.isAvailable', () => {
     it('should return false', async () => {
-      const spies = mockAsyncMethods(cns, {
+      const spies = mockAsyncMethods(uns, {
         get: {
           owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
           resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
@@ -612,19 +634,19 @@ describe('CNS', () => {
           },
         },
       });
-      const isAvailable = await cns.isAvailable('ryan.crypto');
+      const isAvailable = await uns.isAvailable('ryan.crypto');
       expectSpyToBeCalled(spies);
       expect(isAvailable).toBe(false);
     });
     it('should return true', async () => {
-      const spies = mockAsyncMethods(cns, {
+      const spies = mockAsyncMethods(uns, {
         get: {
           owner: '',
           resolver: '',
           records: {},
         },
       });
-      const isAvailable = await cns.isAvailable('ryan.crypto');
+      const isAvailable = await uns.isAvailable('ryan.crypto');
       expectSpyToBeCalled(spies);
       expect(isAvailable).toBe(true);
     });
@@ -653,9 +675,9 @@ describe('CNS', () => {
   describe('Providers', () => {
     it('should throw error when FetchProvider throws Error', async () => {
       const url = protocolLink();
-      const provider = new FetchProvider(NamingServiceName.CNS, url);
+      const provider = new FetchProvider(NamingServiceName.UNS, url);
       resolution = new Resolution({
-        sourceConfig: {cns: {url, provider, network: 'mainnet'}},
+        sourceConfig: {uns: {url, provider, network: 'mainnet'}},
       });
       jest.spyOn(Networking, 'fetch').mockRejectedValue(new Error('error_up'));
 
@@ -667,7 +689,7 @@ describe('CNS', () => {
 
   describe('.tokenURI', () => {
     it('should return token URI', async () => {
-      const spies = mockAsyncMethods(cns.readerContract, {
+      const spies = mockAsyncMethods(uns.readerContract, {
         call: ['https://metadata.unstoppabledomains.com/metadata/brad.crypto'],
       });
 
@@ -680,7 +702,7 @@ describe('CNS', () => {
     });
 
     it('should throw error if domain is not found', async () => {
-      const spies = mockAsyncMethods(cns.readerContract, {
+      const spies = mockAsyncMethods(uns.readerContract, {
         call: new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
           providerMessage: 'execution reverted',
         }),
@@ -695,7 +717,7 @@ describe('CNS', () => {
 
     it('should throw the same internal error', async () => {
       pendingInLive();
-      const spies = mockAsyncMethods(cns.readerContract, {
+      const spies = mockAsyncMethods(uns.readerContract, {
         call: new ResolutionError(ResolutionErrorCode.ServiceProviderError),
       });
 
@@ -711,7 +733,7 @@ describe('CNS', () => {
     it('should return token metadata', async () => {
       const testMeta: TokenUriMetadata = liveData.bradCryptoMetadata;
 
-      const cnsSpies = mockAsyncMethods(cns.readerContract, {
+      const unsSpies = mockAsyncMethods(uns.readerContract, {
         call: ['https://metadata.unstoppabledomains.com/metadata/brad.crypto'],
       });
       const fetchSpies = mockAsyncMethods(Networking, {
@@ -723,13 +745,13 @@ describe('CNS', () => {
 
       const metadata = await resolution.tokenURIMetadata('brad.crypto');
 
-      expectSpyToBeCalled(cnsSpies);
+      expectSpyToBeCalled(unsSpies);
       expectSpyToBeCalled(fetchSpies);
       expect(metadata).toEqual(testMeta);
     });
 
     it('should throw error if domain is not found', async () => {
-      const spies = mockAsyncMethods(cns.readerContract, {
+      const spies = mockAsyncMethods(uns.readerContract, {
         call: new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
           providerMessage: 'execution reverted',
         }),
@@ -746,52 +768,19 @@ describe('CNS', () => {
   describe('.unhash', () => {
     it('should unhash token', async () => {
       const testMeta: TokenUriMetadata = liveData.bradCryptoMetadata;
-      const provider = new FetchProvider(NamingServiceName.CNS, protocolLink());
-      resolution = new Resolution({
-        sourceConfig: {
-          cns: {
-            provider,
-            network: 'mainnet',
-          },
-        },
-      });
-      const providerSpy = mockAsyncMethods(provider, {
-        fetchJson: {
-          jsonrpc: '2.0',
-          id: '1',
-          result: [
-            {
-              address: '0xd1e5b0ff1287aa9f9a268759062e4ab08b9dacbe',
-              blockHash:
-                '0xd716309f77e2ab9a089dd33765652c5a45adaf08cebda1497de462c9b2487e3e',
-              blockNumber: '0x8b344c',
-              data: '0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000b627261642e63727970746f000000000000000000000000000000000000000000',
-              logIndex: '0x56',
-              removed: false,
-              topics: [
-                '0xc5beef08f693b11c316c0c8394a377a0033c9cf701b8cd8afd79cecef60c3952',
-                '0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9',
-              ],
-              transactionHash:
-                '0x4ddc930c0d511de217d6ba7d6a7dd979ab3668f33ac2cd31f20147557ff9955b',
-              transactionIndex: '0x30',
-            },
-          ],
-        },
-      });
+      mockAPICalls("unhash", protocolLink());
       const domain = await resolution.unhash(
         '0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9',
-        NamingServiceName.CNS,
+        NamingServiceName.UNS,
       );
-      expectSpyToBeCalled(providerSpy);
       expect(domain).toEqual(testMeta.name);
     });
 
     it('should throw error if hash is wrong', async () => {
-      const provider = new FetchProvider(NamingServiceName.CNS, protocolLink());
+      const provider = new FetchProvider(NamingServiceName.UNS, protocolLink());
       resolution = new Resolution({
         sourceConfig: {
-          cns: {
+          uns: {
             provider,
             network: 'mainnet',
           },
@@ -809,7 +798,7 @@ describe('CNS', () => {
       });
 
       await expectResolutionErrorCode(
-        () => resolution.unhash('0xdeaddeaddead', NamingServiceName.CNS),
+        () => resolution.unhash('0xdeaddeaddead', NamingServiceName.UNS),
         ResolutionErrorCode.ServiceProviderError,
       );
       expectSpyToBeCalled(providerSpy);
@@ -819,54 +808,21 @@ describe('CNS', () => {
       const unregisteredhash = resolution.namehash(
         'test34230131207328144694.crypto',
       );
-      const spy = mockAsyncMethods(Networking, {
-        fetch: {
-          ok: true,
-          json: () => ({jsonrpc: '2.0', id: '1', result: []}),
-        },
-      });
+      mockAPICalls('unhash', protocolLink());
       await expectResolutionErrorCode(
-        () => resolution.unhash(unregisteredhash, NamingServiceName.CNS),
+        () => resolution.unhash(unregisteredhash, NamingServiceName.UNS),
         ResolutionErrorCode.UnregisteredDomain,
       );
-      expectSpyToBeCalled(spy);
     });
 
     it('should throw an error if hash returned from the network is not equal to the hash provided', async () => {
       pendingInLive();
-      const someHash = resolution.namehash('somehash.crypto');
-      const spy = mockAsyncMethods(Networking, {
-        fetch: {
-          ok: true,
-          json: () => ({
-            jsonrpc: '2.0',
-            id: '1',
-            result: [
-              {
-                address: '0xd1e5b0ff1287aa9f9a268759062e4ab08b9dacbe',
-                blockHash:
-                  '0xd716309f77e2ab9a089dd33765652c5a45adaf08cebda1497de462c9b2487e3e',
-                blockNumber: '0x8b344c',
-                data: '0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000b627261642e63727970746f000000000000000000000000000000000000000000',
-                logIndex: '0x56',
-                removed: false,
-                topics: [
-                  '0xc5beef08f693b11c316c0c8394a377a0033c9cf701b8cd8afd79cecef60c3952',
-                  '0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9',
-                ],
-                transactionHash:
-                  '0x4ddc930c0d511de217d6ba7d6a7dd979ab3668f33ac2cd31f20147557ff9955b',
-                transactionIndex: '0x30',
-              },
-            ],
-          }),
-        },
-      });
+      const someHash = resolution.namehash('test34230131207328144693.crypto');
+      mockAPICalls('unhash', protocolLink());
       await expectResolutionErrorCode(
-        () => resolution.unhash(someHash, NamingServiceName.CNS),
+        () => resolution.unhash(someHash, NamingServiceName.UNS),
         ResolutionErrorCode.ServiceProviderError,
       );
-      expectSpyToBeCalled(spy);
     });
   });
 });

@@ -1,5 +1,6 @@
 import {
-  CnsSupportedNetwork,
+  UnsSupportedNetwork,
+  EnsSupportedNetwork,
   EventFilter,
   RequestArguments,
   RpcProviderLogEntry,
@@ -7,16 +8,22 @@ import {
   ZnsSupportedNetwork,
 } from '.';
 
-export type CnsSupportedNetworks = typeof CnsSupportedNetwork.type;
+export type UnsSupportedNetworks = typeof UnsSupportedNetwork.type;
+export type EnsSupportedNetworks = typeof EnsSupportedNetwork.type;
 export type ZnsSupportedNetworks = typeof ZnsSupportedNetwork.type;
 
-export type Api = {api: true; url?: string};
+export type Api = {api: true; url?: string; network?: number};
 
 type NamingServiceSource = {url?: string} | {provider?: Provider};
 
-export type CnsSource = NamingServiceSource & {
-  network: CnsSupportedNetworks;
+export type UnsSource = NamingServiceSource & {
+  network: UnsSupportedNetworks;
   proxyReaderAddress?: string;
+};
+
+export type EnsSource = NamingServiceSource & {
+  network: EnsSupportedNetworks;
+  registryAddress?: string;
 };
 
 export type ZnsSource = NamingServiceSource & {
@@ -25,19 +32,22 @@ export type ZnsSource = NamingServiceSource & {
 };
 
 export type SourceConfig = {
-  cns?: CnsSource | Api;
+  uns?: UnsSource | Api;
   zns?: ZnsSource | Api;
+  ens?: EnsSource | Api;
 };
 
 export enum NamingServiceName {
-  CNS = 'CNS',
+  UNS = 'UNS',
+  ENS = 'ENS',
   ZNS = 'ZNS',
 }
 
 export type ResolutionMethod = NamingServiceName | 'UDAPI';
 
 export type AutoNetworkConfigs = {
-  cns?: {url: string} | {provider: Provider};
+  uns?: {url: string} | {provider: Provider};
+  ens?: {url: string} | {provider: Provider};
 };
 
 /**
