@@ -25,7 +25,6 @@ import Networking from '../utils/Networking';
 import {ConfigurationErrorCode} from '../errors/configurationError';
 import liveData from './testData/liveData.json';
 import UnsConfig from '../config/uns-config.json';
-import nock from 'nock';
 
 let resolution: Resolution;
 let uns: Uns;
