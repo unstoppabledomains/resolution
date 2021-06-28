@@ -45,11 +45,6 @@ export default class Uns extends NamingService {
     4: 'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
   };
 
-  static readonly RegistryStartBlock = {
-    1: '0x8A958B',
-    4: '0x7232BC',
-  };
-
   readonly name: NamingServiceName = NamingServiceName.UNS;
   readonly network: number;
   readonly url: string | undefined;
@@ -296,7 +291,7 @@ export default class Uns extends NamingService {
       registryAddress,
       this.provider,
     );
-    const startingBlock = Uns.RegistryStartBlock[this.network] ?? 'earliest';
+    const startingBlock = UnsConfig.networks[this.network].contracts.CNSRegistry.deploymentBlock ?? 'earliest';
     const newURIEvents = await registryContract.fetchLogs(
       'NewURI',
       tokenId,

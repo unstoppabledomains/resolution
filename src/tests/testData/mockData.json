@@ -243,7 +243,7 @@
         "method": "eth_getLogs",
         "params": [
           {
-            "fromBlock": "0x8A958B",
+            "fromBlock": "0x8a958b",
             "toBlock": "latest",
             "address": "0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe",
             "topics": [
@@ -302,7 +302,7 @@
         "method": "eth_getLogs",
         "params": [
           {
-            "fromBlock": "0x8A958B",
+            "fromBlock": "0x8a958b",
             "toBlock": "latest",
             "address": "0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe",
             "topics": [
@@ -346,7 +346,7 @@
         "method": "eth_getLogs",
         "params": [
           {
-            "fromBlock": "0x8A958B",
+            "fromBlock": "0x8a958b",
             "toBlock": "latest",
             "address": "0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe",
             "topics": [
