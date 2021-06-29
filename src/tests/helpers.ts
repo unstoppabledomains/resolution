@@ -17,8 +17,6 @@ export const CryptoDomainWithoutResolver = 'twistedmusic.crypto';
 export const CryptoDomainWithTwitterVerification =
   'ijustwannatestsomething2.crypto';
 export const CryptoDomainWithUsdtMultiChainRecords = 'udtestdev-usdt.crypto';
-export const ZilDomainWithUsdtMultiChainRecords =
-  'reseller-test-udtesting-422508414817.zil';
 export const CryptoDomainWithAllRecords =
   'udtestdev-reseller-test-udtesting-875948372642.crypto';
 export const CryptoDomainWithoutGunDbRecords =
@@ -152,14 +150,12 @@ export function mockAPICalls(testName: string, url = MainnetUrl): void {
     switch (METHOD) {
     case 'POST': {
       nock(url)
-      // .log()
-        .post('/', JSON.stringify(REQUEST), undefined)
+        .post('', JSON.stringify(REQUEST), undefined)
         .reply(200, JSON.stringify(RESPONSE));
       break;
     }
     default: {
       nock(url)
-      // .log()
         .get(REQUEST as string, undefined, undefined)
         .reply(200, RESPONSE);
     }
@@ -174,7 +170,9 @@ export function mockAPICalls(testName: string, url = MainnetUrl): void {
  */
 export function protocolLink(
   providerProtocol: ProviderProtocol = ProviderProtocol.http,
-  namingService: NamingServiceName.CNS = NamingServiceName.CNS,
+  namingService:
+    | NamingServiceName.ENS
+    | NamingServiceName.UNS = NamingServiceName.UNS,
 ): string {
   const secret =
     process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID ?? undefined;
@@ -207,10 +205,16 @@ export const caseMock = <T, U>(
 };
 
 const ethereumDefaultProviders = {
-  [NamingServiceName.CNS]: {
+  [NamingServiceName.UNS]: {
     [ProviderProtocol.http]:
       'https://mainnet.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
     [ProviderProtocol.wss]:
       'wss://mainnet.infura.io/ws/v3/c4bb906ed6904c42b19c95825fe55f39',
+  },
+  [NamingServiceName.ENS]: {
+    [ProviderProtocol.http]:
+      'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
+    [ProviderProtocol.wss]:
+      'wss://mainnet.infura.io/ws/v3/d423cf2499584d7fbe171e33b42cfbee',
   },
 };

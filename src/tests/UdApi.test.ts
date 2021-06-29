@@ -8,11 +8,13 @@ import {
   mockAsyncMethod,
   expectSpyToBeCalled,
   CryptoDomainWithTwitterVerification,
+  expectResolutionErrorCode,
 } from './helpers';
 import {NamingServiceName} from '../types/publicTypes';
+import {ResolutionErrorCode} from '../errors/resolutionError';
 
 let resolution: Resolution;
-let cnsApi: Udapi;
+let unsApi: Udapi;
 
 beforeEach(() => {
   nock.cleanAll();
@@ -20,13 +22,21 @@ beforeEach(() => {
   resolution = new Resolution({
     sourceConfig: {
       zns: {api: true},
-      cns: {api: true},
+      uns: {api: true},
+      ens: {api: true},
     },
   });
-  cnsApi = resolution.serviceMap[NamingServiceName.CNS] as Udapi;
+  unsApi = resolution.serviceMap[NamingServiceName.UNS] as Udapi;
 });
 
 describe('Unstoppable API', () => {
+  it('should throw error for registryAddress', async () => {
+    await expectResolutionErrorCode(
+      () => resolution.registryAddress('test.crypto'),
+      ResolutionErrorCode.UnsupportedMethod,
+    );
+  });
+
   it('namehashes zil domain', async () => {
     expect(resolution.namehash('cofounding.zil')).toEqual(
       '0x1cc365ffd60bb50538e01d24c1f1e26c887c36f26a0de250660b8a1465c60667',
@@ -49,7 +59,7 @@ describe('Unstoppable API', () => {
             '92242420535237173873666448151646428182056687247223888232110666318291334465795',
           owner: '0x6ec0deed30605bcd19342f3c30201db263291589',
           resolver: '0xb66dce2da6afaaa98f2013446dbcb0f4b0ab2842',
-          type: 'CNS',
+          type: 'UNS',
           ttl: 0,
         },
         records: {
@@ -66,10 +76,10 @@ describe('Unstoppable API', () => {
     expect(twitterHandle).toBe('derainberk');
   });
 
-  it('should throw unsupported domain', async () => {
+  it('should throw unsupported method', async () => {
     const handle = 'ryan.eth';
     await expect(resolution.twitter(handle)).rejects.toThrowError(
-      `Domain ${handle} is not supported`,
+      `Method twitter is not supported for ${handle}`,
     );
   });
 
@@ -155,17 +165,19 @@ describe('Unstoppable API', () => {
   });
 
   it('should return true for registered domain', async () => {
-    const spies = mockAsyncMethod(cnsApi, 'resolve', {
+    const spies = mockAsyncMethod(unsApi, 'resolve', {
       meta: {owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2'},
     });
-    const isRegistered = await cnsApi.isRegistered('ryan.crypto');
+    const isRegistered = await unsApi.isRegistered('ryan.crypto');
     expectSpyToBeCalled([spies]);
     expect(isRegistered).toBe(true);
   });
 
   it('should return false for unregistered domain', async () => {
-    const spies = mockAsyncMethod(cnsApi, 'resolve', {meta: {owner: ''}});
-    const isRegistered = await resolution.isRegistered('ryan.crypto');
+    const spies = mockAsyncMethod(unsApi, 'resolve', {meta: {owner: ''}});
+    const isRegistered = await resolution.isRegistered(
+      'thisdomainisdefinitelynotregistered123.crypto',
+    );
     expectSpyToBeCalled([spies]);
     expect(isRegistered).toBe(false);
   });

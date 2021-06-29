@@ -4,10 +4,12 @@ import {
   expectSpyToBeCalled,
   expectResolutionErrorCode,
   mockAsyncMethods,
+  expectConfigurationErrorCode,
 } from './helpers';
 import {NullAddress} from '../types';
-import {NamingServiceName, ZnsSupportedNetworks} from '../types/publicTypes';
+import {NamingServiceName} from '../types/publicTypes';
 import Zns from '../Zns';
+import {ConfigurationErrorCode} from '../errors/configurationError';
 
 let resolution: Resolution;
 let zns: Zns;
@@ -67,18 +69,71 @@ describe('ZNS', () => {
       expect(
         () =>
           new Resolution({
-            sourceConfig: {zns: {network: '42' as ZnsSupportedNetworks}},
+            sourceConfig: {zns: {network: '42'}},
           }),
-      ).toThrowError('Unspecified network in Resolution ZNS configuration');
+      ).toThrowError(
+        'Missing configuration in Resolution ZNS. Please specify registryAddress when using a custom network',
+      );
     });
 
     it('checks normalizeSource zns (object) #7', async () => {
-      expect(
+      await expectConfigurationErrorCode(
         () =>
           new Resolution({
-            sourceConfig: {zns: {network: 'invalid' as ZnsSupportedNetworks}},
+            sourceConfig: {
+              zns: {
+                network: 'random-network',
+                url: 'https://api.zilliqa.com',
+                registryAddress: '0x0123123',
+              },
+            },
           }),
-      ).toThrowError('Unspecified network in Resolution ZNS configuration');
+        ConfigurationErrorCode.InvalidConfigurationField,
+      );
+    });
+
+    it('checks normalizeSource zns (object) #7.1', async () => {
+      const validResolution = new Resolution({
+        sourceConfig: {
+          zns: {
+            network: 'random-network',
+            url: 'https://api.zilliqa.com',
+            registryAddress: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
+          },
+        },
+      });
+      expect(validResolution).toBeDefined();
+    });
+
+    it('checks normalizeSource zns (object) #7.2', async () => {
+      await expectConfigurationErrorCode(
+        () =>
+          new Resolution({
+            sourceConfig: {
+              zns: {
+                network: 'random-network',
+                registryAddress: '0x0123123',
+              },
+            },
+          }),
+        ConfigurationErrorCode.CustomNetworkConfigMissing,
+      );
+    });
+
+    it('checks normalizeSource zns (object) #7.3', async () => {
+      await expectConfigurationErrorCode(
+        () =>
+          new Resolution({
+            sourceConfig: {
+              zns: {
+                network: 'random-network',
+                url: 'example.com',
+                registryAddress: '0x0123123',
+              },
+            },
+          }),
+        ConfigurationErrorCode.InvalidConfigurationField,
+      );
     });
 
     it('checks normalizeSource zns (object) #8', async () => {
@@ -101,7 +156,7 @@ describe('ZNS', () => {
       });
       zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
       expect(zns.network).toBe(1);
-      expect(zns.registryAddress).toBe(
+      expect(zns.registryAddr).toBe(
         'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
       );
       expect(zns.url).toBe('https://api.zilliqa.com');
@@ -119,8 +174,17 @@ describe('ZNS', () => {
       zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
       expect(zns.network).toBe(1);
       expect(zns.url).toBe('https://api.zilliqa.com');
-      expect(zns.registryAddress).toBe(
+      expect(zns.registryAddr).toBe(
         'zil1408llufrzkrrfqv5lj4malcjxyjqyd8urd7xz6',
+      );
+    });
+  });
+
+  describe('.registryAddress', () => {
+    it('should return mainnet registry address', async () => {
+      const registryAddress = await zns.registryAddress('some-domaine.zil');
+      expect(registryAddress).toBe(
+        'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
       );
     });
   });
@@ -242,16 +306,16 @@ describe('ZNS', () => {
   });
 
   describe('.isSupportedDomain', () => {
-    it('starts with -', () => {
-      expect(resolution.isSupportedDomain('-hello.zil')).toEqual(true);
+    it('starts with -', async () => {
+      expect(await resolution.isSupportedDomain('-hello.zil')).toEqual(true);
     });
 
-    it('ends with -', () => {
-      expect(resolution.isSupportedDomain('hello-.zil')).toEqual(true);
+    it('ends with -', async () => {
+      expect(await resolution.isSupportedDomain('hello-.zil')).toEqual(true);
     });
 
-    it('starts and ends with -', () => {
-      expect(resolution.isSupportedDomain('-hello-.zil')).toEqual(true);
+    it('starts and ends with -', async () => {
+      expect(await resolution.isSupportedDomain('-hello-.zil')).toEqual(true);
     });
   });
 
@@ -260,7 +324,7 @@ describe('ZNS', () => {
       const spies = mockAsyncMethods(zns, {
         getRecordsAddresses: ['zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz'],
       });
-      const isRegistered = await resolution.isRegistered('ryan.zil');
+      const isRegistered = await resolution.isRegistered('brad.zil');
       expectSpyToBeCalled(spies);
       expect(isRegistered).toBe(true);
     });
@@ -268,7 +332,9 @@ describe('ZNS', () => {
       const spies = mockAsyncMethods(zns, {
         getRecordsAddresses: [''],
       });
-      const isRegistered = await resolution.isRegistered('ryan.zil');
+      const isRegistered = await resolution.isRegistered(
+        'thisdomainisdefinitelynotregistered123.zil',
+      );
       expectSpyToBeCalled(spies);
       expect(isRegistered).toBe(false);
     });
@@ -304,13 +370,6 @@ describe('ZNS', () => {
       it('supports root "zil" domain', () => {
         expect(resolution.namehash('zil')).toEqual(
           '0x9915d0456b878862e822e2361da37232f626a2e47505c8795134a95d36138ed3',
-        );
-      });
-
-      it('raises ResoltuionError when domain is not supported', async () => {
-        await expectResolutionErrorCode(
-          () => resolution.namehash('hello.world'),
-          ResolutionErrorCode.UnsupportedDomain,
         );
       });
     });
@@ -382,6 +441,37 @@ describe('ZNS', () => {
         'ipfs.html.value': 'QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu',
         'whois.email.value': 'jeyhunt@gmail.com',
       });
+    });
+  });
+
+  describe('.tokenURI', () => {
+    it('should throw an unsupported method error', async () => {
+      await expectResolutionErrorCode(
+        () => resolution.tokenURI('test.zil'),
+        ResolutionErrorCode.UnsupportedMethod,
+      );
+    });
+  });
+
+  describe('.tokenURIMetadata', () => {
+    it('should throw an unsupported method error', async () => {
+      await expectResolutionErrorCode(
+        () => resolution.tokenURIMetadata('test.zil'),
+        ResolutionErrorCode.UnsupportedMethod,
+      );
+    });
+  });
+
+  describe('.unhash', () => {
+    it('should throw an unsupported method error', async () => {
+      await expectResolutionErrorCode(
+        () =>
+          resolution.unhash(
+            '0x9915d0456b878862e822e2361da37232f626a2e47505c8795134a95d36138ed3',
+            NamingServiceName.ZNS,
+          ),
+        ResolutionErrorCode.UnsupportedMethod,
+      );
     });
   });
 });

@@ -29,26 +29,32 @@ import {
 } from './helpers';
 import {RpcProviderTestCases} from '../utils/providerMockData';
 import fetch, {FetchError} from 'node-fetch';
-import Cns from '../Cns';
+import Uns from '../Uns';
 import Zns from '../Zns';
+import Ens from '../Ens';
 import FetchProvider from '../FetchProvider';
 import {ConfigurationErrorCode} from '../errors/configurationError';
 import {HTTPProvider} from '@zilliqa-js/core';
 import {Eip1993Factories as Eip1193Factories} from '../utils/Eip1993Factories';
+import UnsConfig from '../config/uns-config.json';
+import EthereumContract from '../contracts/EthereumContract';
 
 let resolution: Resolution;
-let cns: Cns;
+let uns: Uns;
 let zns: Zns;
+let ens: Ens;
 
 beforeEach(() => {
   nock.cleanAll();
   jest.restoreAllMocks();
   resolution = new Resolution({
     sourceConfig: {
-      cns: {url: protocolLink(), network: 'mainnet'},
+      uns: {url: protocolLink(), network: 'mainnet'},
+      ens: {url: protocolLink(), network: 'mainnet'},
     },
   });
-  cns = resolution.serviceMap[NamingServiceName.CNS] as Cns;
+  uns = resolution.serviceMap[NamingServiceName.UNS] as Uns;
+  ens = resolution.serviceMap[NamingServiceName.ENS] as Ens;
   zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
 });
 
@@ -56,24 +62,87 @@ describe('Resolution', () => {
   describe('.Basic setup', () => {
     it('should work with autonetwork url configuration', async () => {
       const mainnetUrl = protocolLink();
+      const goerliUrl = protocolLink().replace('mainnet', 'goerli');
       // mocking getNetworkConfigs because no access to inner provider.request
-      const CnsGetNetworkOriginal = Cns.autoNetwork;
+      const UnsGetNetworkOriginal = Uns.autoNetwork;
+      const EnsGetNetworkOriginal = Ens.autoNetwork;
       if (!isLive()) {
-        Cns.autoNetwork = jest.fn().mockReturnValue(
-          new Cns({
+        Uns.autoNetwork = jest.fn().mockReturnValue(
+          new Uns({
             network: 'mainnet',
-            provider: new FetchProvider(NamingServiceName.CNS, mainnetUrl),
+            provider: new FetchProvider(NamingServiceName.UNS, mainnetUrl),
+          }),
+        );
+        Ens.autoNetwork = jest.fn().mockReturnValue(
+          new Ens({
+            network: 'goerli',
+            provider: new FetchProvider(NamingServiceName.ENS, goerliUrl),
           }),
         );
       }
       const resolution = await Resolution.autoNetwork({
-        cns: {url: mainnetUrl},
+        uns: {url: mainnetUrl},
+        ens: {url: goerliUrl},
       });
       // We need to manually restore the function as jest.restoreAllMocks and simillar works only with spyOn
-      Cns.autoNetwork = CnsGetNetworkOriginal;
+      Uns.autoNetwork = UnsGetNetworkOriginal;
+      Ens.autoNetwork = EnsGetNetworkOriginal;
       expect(
-        (resolution.serviceMap[NamingServiceName.CNS] as Cns).network,
+        (resolution.serviceMap[NamingServiceName.UNS] as Uns).network,
       ).toBe(1);
+      expect(
+        (resolution.serviceMap[NamingServiceName.ENS] as Ens).network,
+      ).toBe(5);
+    });
+
+    it('should not work with invalid proxyReader configuration', async () => {
+      const mainnetUrl = protocolLink();
+      const customNetwork = 'goerli';
+      const goerliUrl = mainnetUrl.replace('mainnet', customNetwork);
+      expectConfigurationErrorCode(() => {
+        new Uns({
+          network: customNetwork,
+          url: goerliUrl,
+          proxyReaderAddress: '0x012312931293',
+        });
+      }, ConfigurationErrorCode.InvalidConfigurationField);
+    });
+
+    it('should work with proxyReader configuration', async () => {
+      const mainnetUrl = protocolLink();
+      const customNetwork = 'goerli';
+      const goerliUrl = mainnetUrl.replace('mainnet', customNetwork);
+      const uns = new Uns({
+        network: customNetwork,
+        url: goerliUrl,
+        proxyReaderAddress: '0xe7474D07fD2FA286e7e0aa23cd107F8379025037',
+      });
+      expect(uns).toBeDefined();
+    });
+
+    it('should not work with invalid proxyReader configuration 2', async () => {
+      const mainnetUrl = protocolLink();
+      const customNetwork = 'goerli';
+      const provider = new FetchProvider(NamingServiceName.UNS, mainnetUrl);
+      expectConfigurationErrorCode(() => {
+        new Uns({
+          network: customNetwork,
+          provider,
+          proxyReaderAddress: '0x012312931293',
+        });
+      }, ConfigurationErrorCode.InvalidConfigurationField);
+    });
+
+    it('should work with custom network configuration with provider', async () => {
+      const mainnetUrl = protocolLink();
+      const customNetwork = 'goerli';
+      const provider = new FetchProvider(NamingServiceName.UNS, mainnetUrl);
+      const uns = new Uns({
+        network: customNetwork,
+        provider,
+        proxyReaderAddress: '0xe7447Fdd52FA286e7e0aa23cd107F83790250897',
+      });
+      expect(uns).toBeDefined();
     });
 
     it('should work with autonetwork provider configuration', async () => {
@@ -83,17 +152,21 @@ describe('Resolution', () => {
       );
       const spy = mockAsyncMethod(provider, 'request', '4');
       const resolution = await Resolution.autoNetwork({
-        cns: {provider},
+        uns: {provider},
+        ens: {provider},
       });
-      expect(spy).toBeCalledTimes(1);
+      expect(spy).toBeCalledTimes(2);
       expect(
-        (resolution.serviceMap[NamingServiceName.CNS] as Cns).network,
+        (resolution.serviceMap[NamingServiceName.UNS] as Uns).network,
+      ).toBe(4);
+      expect(
+        (resolution.serviceMap[NamingServiceName.ENS] as Ens).network,
       ).toBe(4);
     });
 
     it('should fail because provided url failled net_version call', async () => {
       const mockedProvider = new FetchProvider(
-        NamingServiceName.CNS,
+        NamingServiceName.UNS,
         'https://google.com',
       );
       const providerSpy = mockAsyncMethod(
@@ -111,7 +184,7 @@ describe('Resolution', () => {
       );
       try {
         await Resolution.autoNetwork({
-          cns: {url: 'https://google.com'},
+          uns: {url: 'https://google.com'},
         });
       } catch (error) {
         expect(error).toBeInstanceOf(FetchError);
@@ -122,10 +195,36 @@ describe('Resolution', () => {
       expectSpyToBeCalled([factorySpy, providerSpy]);
     });
 
-    it('should fail because of unsupported test network for cns', async () => {
+    it('should fail because provided provider failed to make a net_version call', async () => {
+      const mockedProvider = new FetchProvider(
+        NamingServiceName.ENS,
+        'http://unstoppabledomains.com',
+      );
+      const providerSpy = mockAsyncMethod(
+        mockedProvider,
+        'request',
+        new FetchError(
+          'invalid json response body at https://unstoppabledomains.com/ reason: Unexpected token < in JSON at position 0',
+          'invalid_json',
+        ),
+      );
+      try {
+        await Resolution.autoNetwork({
+          ens: {provider: mockedProvider},
+        });
+      } catch (error) {
+        expect(error).toBeInstanceOf(FetchError);
+        expect(error.message).toBe(
+          'invalid json response body at https://unstoppabledomains.com/ reason: Unexpected token < in JSON at position 0',
+        );
+      }
+      expect(providerSpy).toBeCalled();
+    });
+
+    it('should fail because of unsupported test network for uns', async () => {
       const blockchainUrl = protocolLink().replace('mainnet', 'ropsten');
       const mockedProvider = new FetchProvider(
-        NamingServiceName.CNS,
+        NamingServiceName.UNS,
         blockchainUrl,
       );
       const providerSpy = mockAsyncMethod(mockedProvider, 'request', () => '3');
@@ -137,11 +236,10 @@ describe('Resolution', () => {
 
       await expectConfigurationErrorCode(
         Resolution.autoNetwork({
-          cns: {url: blockchainUrl},
+          uns: {url: blockchainUrl},
         }),
         ConfigurationErrorCode.UnsupportedNetwork,
       );
-      expectSpyToBeCalled([providerSpy, providerFactorySpy]);
     });
 
     it('should fail in test development', async () => {
@@ -158,10 +256,13 @@ describe('Resolution', () => {
 
     it('should get a valid resolution instance', async () => {
       const resolution = Resolution.infura('api-key', {
-        cns: {network: 'mainnet'},
+        uns: {network: 'mainnet'},
+        ens: {network: 'mainnet'},
       });
-      cns = resolution.serviceMap[NamingServiceName.CNS] as Cns;
-      expect(cns.url).toBe(`https://mainnet.infura.io/v3/api-key`);
+      uns = resolution.serviceMap[NamingServiceName.UNS] as Uns;
+      ens = resolution.serviceMap[NamingServiceName.ENS] as Ens;
+      expect(uns.url).toBe(`https://mainnet.infura.io/v3/api-key`);
+      expect(ens.url).toBe(`https://mainnet.infura.io/v3/api-key`);
     });
 
     it('should create resolution instance from Zilliqa provider', async () => {
@@ -196,8 +297,14 @@ describe('Resolution', () => {
     });
 
     describe('.ServiceName', () => {
+      it('checks ens service name', () => {
+        const resolution = new Resolution();
+        const serviceName = resolution.serviceName('domain.eth');
+        expect(serviceName).toBe('ENS');
+      });
+
       it('should resolve gundb chat id', async () => {
-        const eyes = mockAsyncMethods(cns, {
+        const eyes = mockAsyncMethods(uns, {
           get: {
             resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
             records: {
@@ -216,7 +323,7 @@ describe('Resolution', () => {
       describe('.ipfsHash', () => {
         it('should prioritize new keys over depricated ones', async () => {
           pendingInLive();
-          const spies = mockAsyncMethods(cns, {
+          const spies = mockAsyncMethods(uns, {
             get: {
               resolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
               records: {
@@ -232,7 +339,7 @@ describe('Resolution', () => {
 
         it('should prioritize browser record key over ipfs.redirect_url one', async () => {
           pendingInLive();
-          const spies = mockAsyncMethods(cns, {
+          const spies = mockAsyncMethods(uns, {
             get: {
               resolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
               records: {
@@ -250,16 +357,22 @@ describe('Resolution', () => {
       });
 
       describe('serviceName', () => {
+        it('checks ens service name', () => {
+          const resolution = new Resolution();
+          const serviceName = resolution.serviceName('domain.eth');
+          expect(serviceName).toBe('ENS');
+        });
+
         it('checks zns service name', () => {
           const resolution = new Resolution();
           const serviceName = resolution.serviceName('domain.zil');
           expect(serviceName).toBe('ZNS');
         });
 
-        it('checks cns service name', () => {
+        it('checks uns service name', () => {
           const resolution = new Resolution();
           const serviceName = resolution.serviceName('domain.crypto');
-          expect(serviceName).toBe('CNS');
+          expect(serviceName).toBe('UNS');
         });
       });
     });
@@ -276,13 +389,6 @@ describe('Resolution', () => {
           ResolutionErrorCode.UnregisteredDomain,
         );
         expectSpyToBeCalled(spy);
-      });
-
-      it('resolves non-existing domain zone with throw', async () => {
-        await expectResolutionErrorCode(
-          resolution.addr('bogdangusiev.qq', 'ZIL'),
-          ResolutionErrorCode.UnsupportedDomain,
-        );
       });
 
       it('checks error for email on brad.zil', async () => {
@@ -309,32 +415,16 @@ describe('Resolution', () => {
       });
 
       describe('.Namehash errors', () => {
-        it('checks namehash for unsupported domain', async () => {
-          await expectResolutionErrorCode(
-            () => resolution.namehash('something.hello.com'),
-            ResolutionErrorCode.UnsupportedDomain,
-          );
-        });
-
         it('should be invalid domain', async () => {
-          await expectResolutionErrorCode(
-            () => resolution.namehash('-hello.eth'),
-            ResolutionErrorCode.UnsupportedDomain,
-          );
-        });
-
-        it('should be invalid domain 2', async () => {
-          await expectResolutionErrorCode(
-            () => resolution.namehash('whatever-.eth'),
-            ResolutionErrorCode.UnsupportedDomain,
-          );
-        });
-
-        it('should be invalid domain 3', async () => {
-          const cnsInvalidDomain = 'hello..crypto';
+          const unsInvalidDomain = 'hello..crypto';
+          const ensInvalidDomain = 'hello..eth';
           const znsInvalidDomain = 'hello..zil';
           await expectResolutionErrorCode(
-            () => resolution.namehash(cnsInvalidDomain),
+            () => resolution.namehash(unsInvalidDomain),
+            ResolutionErrorCode.UnsupportedDomain,
+          );
+          await expectResolutionErrorCode(
+            () => resolution.namehash(ensInvalidDomain),
             ResolutionErrorCode.UnsupportedDomain,
           );
           await expectResolutionErrorCode(
@@ -349,7 +439,7 @@ describe('Resolution', () => {
       describe('.DNS', () => {
         it('getting dns get', async () => {
           pendingInLive();
-          const spies = mockAsyncMethods(cns, {
+          const spies = mockAsyncMethods(uns, {
             get: {
               resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
               records: {
@@ -374,7 +464,7 @@ describe('Resolution', () => {
 
         it('should work with others records', async () => {
           pendingInLive();
-          const spies = mockAsyncMethods(cns, {
+          const spies = mockAsyncMethods(uns, {
             get: {
               resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
               records: {
@@ -425,7 +515,7 @@ describe('Resolution', () => {
 
       describe('.Crypto', () => {
         it(`domains "brad.crypto" and "Brad.crypto" should return the same results`, async () => {
-          const eyes = mockAsyncMethods(cns, {
+          const eyes = mockAsyncMethods(uns, {
             get: {
               resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
               records: {
@@ -441,7 +531,7 @@ describe('Resolution', () => {
         });
         describe('.multichain', () => {
           it('should work with usdt on different erc20', async () => {
-            const erc20Spy = mockAsyncMethod(cns, 'get', {
+            const erc20Spy = mockAsyncMethod(uns, 'get', {
               resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
               owner: '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
               records: {
@@ -459,7 +549,7 @@ describe('Resolution', () => {
           });
 
           it('should work with usdt tron chain', async () => {
-            const tronSpy = mockAsyncMethod(cns, 'get', {
+            const tronSpy = mockAsyncMethod(uns, 'get', {
               resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
               owner: '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
               records: {
@@ -477,7 +567,7 @@ describe('Resolution', () => {
           });
 
           it('should work with usdt omni chain', async () => {
-            const omniSpy = mockAsyncMethod(cns, 'get', {
+            const omniSpy = mockAsyncMethod(uns, 'get', {
               resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
               owner: '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
               records: {
@@ -495,7 +585,7 @@ describe('Resolution', () => {
           });
 
           it('should work with usdt eos chain', async () => {
-            const eosSpy = mockAsyncMethod(cns, 'get', {
+            const eosSpy = mockAsyncMethod(uns, 'get', {
               resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
               owner: '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
               records: {
@@ -538,7 +628,7 @@ describe('Resolution', () => {
             },
           );
           const resolution = Resolution.fromWeb3Version1Provider(provider, {
-            cns: {network: 'mainnet'},
+            uns: {network: 'mainnet'},
           });
           const ethAddress = await resolution.addr('brad.crypto', 'ETH');
 
@@ -563,7 +653,7 @@ describe('Resolution', () => {
           });
 
           const resolution = Resolution.fromWeb3Version1Provider(provider, {
-            cns: {network: 'mainnet'},
+            uns: {network: 'mainnet'},
           });
           const ethAddress = await resolution.addr('brad.crypto', 'ETH');
           provider.disconnect(1000, 'end of test');
@@ -577,7 +667,7 @@ describe('Resolution', () => {
             'mainnet',
           );
           const resolution = Resolution.fromEthersProvider(provider, {
-            cns: {network: 'mainnet'},
+            uns: {network: 'mainnet'},
           });
           const eye = mockAsyncMethod(provider, 'call', (params) =>
             Promise.resolve(caseMock(params, RpcProviderTestCases)),
@@ -597,7 +687,7 @@ describe('Resolution', () => {
             Promise.resolve(caseMock(params, RpcProviderTestCases)),
           );
           const resolution = Resolution.fromEthersProvider(provider, {
-            cns: {network: 'mainnet'},
+            uns: {network: 'mainnet'},
           });
           const ethAddress = await resolution.addr('brad.crypto', 'eth');
           expectSpyToBeCalled([eye]);
@@ -628,7 +718,7 @@ describe('Resolution', () => {
             },
           );
           const resolution = Resolution.fromWeb3Version0Provider(provider, {
-            cns: {network: 'mainnet'},
+            uns: {network: 'mainnet'},
           });
           const ethAddress = await resolution.addr('brad.crypto', 'eth');
           expectSpyToBeCalled([eye]);
@@ -650,7 +740,7 @@ describe('Resolution', () => {
             );
 
             const resolution = Resolution.fromEthersProvider(provider, {
-              cns: {network: 'mainnet'},
+              uns: {network: 'mainnet'},
             });
             const resp = await resolution.allRecords('brad.crypto');
             expectSpyToBeCalled([eye], 2);
@@ -677,7 +767,7 @@ describe('Resolution', () => {
               'mainnet',
             );
             const resolution = Resolution.fromEthersProvider(provider, {
-              cns: {network: 'mainnet'},
+              uns: {network: 'mainnet'},
             });
             const eye = mockAsyncMethod(provider, 'call', (params) =>
               Promise.resolve(caseMock(params, RpcProviderTestCases)),
@@ -716,7 +806,7 @@ describe('Resolution', () => {
             );
 
             const resolution = Resolution.fromEthersProvider(provider, {
-              cns: {network: 'mainnet'},
+              uns: {network: 'mainnet'},
             });
             const resp = await resolution.allRecords('monmouthcounty.crypto');
 
@@ -734,6 +824,66 @@ describe('Resolution', () => {
                 'https://abbfe6z95qov3d40hf6j30g7auo7afhp.mypinata.cloud/ipfs/QmYqX8D8SkaF5YcpaWMyi5xM43UEteFiSNKYsjLcdvCWud',
             });
           });
+        });
+
+        it('should get all records using custom networks', async () => {
+          const resolution = new Resolution({
+            sourceConfig: {
+              uns: {
+                network: 'custom',
+                proxyReaderAddress:
+                  '0xa6E7cEf2EDDEA66352Fd68E5915b60BDbb7309f5',
+                url: 'https://mainnet.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+              },
+              zns: {
+                network: 'custom',
+                registryAddress: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
+                url: 'https://api.zilliqa.com',
+              },
+            },
+          });
+          const uns = resolution.serviceMap['UNS'] as Uns;
+          const zns = resolution.serviceMap['ZNS'] as Zns;
+          const unsAllRecordsMock = mockAsyncMethods(uns, {
+            getStartingBlock: undefined,
+            resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+            getStandardRecords: {
+              'crypto.ETH.address':
+                '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
+            },
+          });
+          const unsGetNewKeyMock = mockAsyncMethod(uns, 'getNewKeyEvents', []);
+          const znsAllRecordsMock = mockAsyncMethods(zns, {
+            resolver: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
+            getResolverRecords: {
+              'crypto.ZIL.address':
+                'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
+            },
+          });
+          const znsRecords = await resolution.allRecords('brad.zil');
+          const unsRecords = await resolution.allRecords('brad.crypto');
+
+          expectSpyToBeCalled(znsAllRecordsMock);
+          expectSpyToBeCalled(unsAllRecordsMock);
+          expect(unsRecords['crypto.ETH.address']).toEqual(
+            '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
+          );
+          expect(znsRecords['crypto.ZIL.address']).toEqual(
+            'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
+          );
+          if (isLive()) {
+            expect(unsGetNewKeyMock).toBeCalledWith(
+              expect.any(EthereumContract),
+              resolution.namehash('brad.crypto'),
+              '0x99a587',
+            );
+          } else {
+            expect(unsGetNewKeyMock).toBeCalledWith(
+              expect.any(EthereumContract),
+              resolution.namehash('brad.crypto'),
+              'earliest',
+            );
+          }
         });
       });
 
@@ -767,7 +917,7 @@ describe('Resolution', () => {
 
         describe('.Gundb', () => {
           it('should resolve gundb chat id', async () => {
-            const eyes = mockAsyncMethods(cns, {
+            const eyes = mockAsyncMethods(uns, {
               get: {
                 resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
                 records: {
@@ -788,7 +938,7 @@ describe('Resolution', () => {
       describe('.Verifications', () => {
         describe('.Twitter', () => {
           it('should return verified twitter handle', async () => {
-            const readerSpies = mockAsyncMethods(cns, {
+            const readerSpies = mockAsyncMethods(uns, {
               get: {
                 resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
                 owner: '0x6EC0DEeD30605Bcd19342f3c30201DB263291589',
@@ -808,8 +958,8 @@ describe('Resolution', () => {
 
           it('should throw unsupported method', async () => {
             const resolution = new Resolution();
-            expectResolutionErrorCode(
-              resolution.twitter('ryan.eth'),
+            await expectResolutionErrorCode(
+              resolution.twitter('ryan.zil'),
               ResolutionErrorCode.UnsupportedMethod,
             );
           });
@@ -818,9 +968,40 @@ describe('Resolution', () => {
     });
   });
 
+  describe('.registryAddress', () => {
+    it('should return zns mainnet registry address', async () => {
+      const registryAddress = await resolution.registryAddress('testi.zil');
+      expect(registryAddress).toBe(
+        'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
+      );
+    });
+
+    it('should return cns mainnet registry address #1', async () => {
+      const spies = mockAsyncMethods(uns, {
+        registryAddress: UnsConfig.networks[1].contracts.CNSRegistry.address,
+      });
+      const registryAddress = await resolution.registryAddress('testi.crypto');
+      expectSpyToBeCalled(spies);
+      expect(registryAddress).toBe(
+        UnsConfig.networks[1].contracts.CNSRegistry.address,
+      );
+    });
+
+    it('should return uns mainnet registry address', async () => {
+      const spies = mockAsyncMethods(uns, {
+        registryAddress: UnsConfig.networks[1].contracts.UNSRegistry.address,
+      });
+      const registryAddress = await resolution.registryAddress('testi.888');
+      expectSpyToBeCalled(spies);
+      expect(registryAddress).toBe(
+        UnsConfig.networks[1].contracts.UNSRegistry.address,
+      );
+    });
+  });
+
   describe('.records', () => {
     it('works', async () => {
-      const eyes = mockAsyncMethods(cns, {
+      const eyes = mockAsyncMethods(uns, {
         get: {
           owner: '0x6EC0DEeD30605Bcd19342f3c30201DB263291589',
           resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
@@ -847,7 +1028,7 @@ describe('Resolution', () => {
 
   describe('.isRegistered', () => {
     it('should return true', async () => {
-      const spies = mockAsyncMethods(cns, {
+      const spies = mockAsyncMethods(uns, {
         get: {
           owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
           resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
@@ -857,36 +1038,42 @@ describe('Resolution', () => {
           },
         },
       });
-      const isRegistered = await resolution.isRegistered('ryan.crypto');
+      const isRegistered = await resolution.isRegistered('brad.crypto');
       expectSpyToBeCalled(spies);
       expect(isRegistered).toBe(true);
     });
 
     it('should return false', async () => {
-      const spies = mockAsyncMethods(cns, {
+      const spies = mockAsyncMethods(uns, {
         get: {
           owner: '',
           resolver: '',
           records: {},
         },
       });
-      const isRegistered = await resolution.isRegistered('ryan.crypto');
+      const isRegistered = await resolution.isRegistered(
+        'thisdomainisdefinitelynotregistered123.crypto',
+      );
       expectSpyToBeCalled(spies);
       expect(isRegistered).toBe(false);
     });
+
     it('should return true', async () => {
       const spies = mockAsyncMethods(zns, {
         getRecordsAddresses: ['zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz'],
       });
-      const isRegistered = await resolution.isRegistered('ryan.zil');
+      const isRegistered = await resolution.isRegistered('brad.zil');
       expectSpyToBeCalled(spies);
       expect(isRegistered).toBe(true);
     });
+
     it('should return false', async () => {
       const spies = mockAsyncMethods(zns, {
         getRecordsAddresses: [''],
       });
-      const isRegistered = await resolution.isRegistered('ryan.zil');
+      const isRegistered = await resolution.isRegistered(
+        'thisdomainisdefinitelynotregistered123.zil',
+      );
       expectSpyToBeCalled(spies);
       expect(isRegistered).toBe(false);
     });
@@ -894,7 +1081,7 @@ describe('Resolution', () => {
 
   describe('.isAvailable', () => {
     it('should return false', async () => {
-      const spies = mockAsyncMethods(cns, {
+      const spies = mockAsyncMethods(uns, {
         get: {
           owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
           resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
@@ -910,25 +1097,29 @@ describe('Resolution', () => {
     });
 
     it('should return true', async () => {
-      const spies = mockAsyncMethods(cns, {
+      const spies = mockAsyncMethods(uns, {
         get: {
           owner: '',
           resolver: '',
           records: {},
         },
       });
-      const isAvailable = await resolution.isAvailable('ryan.crypto');
+      const isAvailable = await resolution.isAvailable(
+        'qwdqwdjkqhdkqdqwjd.crypto',
+      );
       expectSpyToBeCalled(spies);
       expect(isAvailable).toBe(true);
     });
+
     it('should return false', async () => {
       const spies = mockAsyncMethods(zns, {
         getRecordsAddresses: ['zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz'],
       });
-      const isAvailable = await resolution.isAvailable('ryan.zil');
+      const isAvailable = await resolution.isAvailable('brad.zil');
       expectSpyToBeCalled(spies);
       expect(isAvailable).toBe(false);
     });
+
     it('should return true', async () => {
       const spies = mockAsyncMethods(zns, {
         getRecordsAddresses: [''],
@@ -954,10 +1145,11 @@ describe('Resolution', () => {
       expect(namehash).toEqual(expectedNamehash);
     });
 
-    it('should throw error if domain is not supported', () => {
-      expect(() => resolution.namehash('google.com')).toThrowError(
-        'Domain google.com is not supported',
-      );
+    it('brad.eth', () => {
+      const expectedNamehash =
+        '0xe2cb672a04d6270338f15a428216ca714514dc01fdbdd76e97038a8d4080e01c';
+      const namehash = resolution.namehash('brad.eth');
+      expect(namehash).toEqual(expectedNamehash);
     });
   });
 
@@ -968,7 +1160,7 @@ describe('Resolution', () => {
       const namehash = resolution.childhash(
         '0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f',
         'brad',
-        NamingServiceName.CNS,
+        NamingServiceName.UNS,
       );
       expect(namehash).toEqual(expectedNamehash);
     });
@@ -980,6 +1172,17 @@ describe('Resolution', () => {
         '0x9915d0456b878862e822e2361da37232f626a2e47505c8795134a95d36138ed3',
         'brad',
         NamingServiceName.ZNS,
+      );
+      expect(namehash).toEqual(expectedNamehash);
+    });
+
+    it('brad.eth', () => {
+      const expectedNamehash =
+        '0x96a270260d2f9e37845776c17a47ae9b8b7e7e576b2365afd2e7f30f43e9bb49';
+      const namehash = resolution.childhash(
+        '0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae',
+        'beresnev',
+        NamingServiceName.ENS,
       );
       expect(namehash).toEqual(expectedNamehash);
     });
