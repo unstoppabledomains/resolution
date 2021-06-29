@@ -15,7 +15,7 @@ import {
   mockAPICalls,
 } from './helpers';
 import FetchProvider from '../FetchProvider';
-import {NamingServiceName} from '../types/publicTypes';
+import {UnsSupportedNetworks, NamingServiceName} from '../types/publicTypes';
 import Uns from '../Uns';
 import Networking from '../utils/Networking';
 import {ConfigurationErrorCode} from '../errors/configurationError';
@@ -41,15 +41,15 @@ describe('UNS', () => {
     expect(uns.url).toBe(protocolLink());
   });
 
-  it('should not allow missing config for custom network', async () => {
+  it('should not allow ropsten as testnet', async () => {
     await expectConfigurationErrorCode(
       () =>
         new Resolution({
           sourceConfig: {
-            uns: {network: 'ropsten'},
+            uns: {network: 'ropsten' as UnsSupportedNetworks},
           },
         }),
-      ConfigurationErrorCode.CustomNetworkConfigMissing,
+      ConfigurationErrorCode.UnsupportedNetwork,
     );
   });
 
@@ -646,9 +646,7 @@ describe('UNS', () => {
           records: {},
         },
       });
-      const isAvailable = await uns.isAvailable(
-        'thisdomainisdefinitelynotregistered123.crypto',
-      );
+      const isAvailable = await uns.isAvailable('ryan.crypto');
       expectSpyToBeCalled(spies);
       expect(isAvailable).toBe(true);
     });

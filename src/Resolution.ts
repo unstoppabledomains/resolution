@@ -6,9 +6,11 @@ import UdApi from './UdApi';
 import {
   Api,
   AutoNetworkConfigs,
+  UnsSupportedNetworks,
   CryptoRecords,
   DnsRecord,
   DnsRecordType,
+  EnsSupportedNetworks,
   EthersProvider,
   NamehashOptions,
   NamehashOptionsDefault,
@@ -108,10 +110,10 @@ export default class Resolution {
     infura: string,
     networks?: {
       ens?: {
-        network: string;
+        network: EnsSupportedNetworks;
       };
       uns?: {
-        network: string;
+        network: UnsSupportedNetworks;
       };
     },
   ): Resolution {
@@ -139,10 +141,10 @@ export default class Resolution {
     provider: Provider,
     networks?: {
       ens?: {
-        network: string;
+        network: EnsSupportedNetworks;
       };
       uns?: {
-        network: string;
+        network: UnsSupportedNetworks;
       };
     },
   ): Resolution {
@@ -164,10 +166,10 @@ export default class Resolution {
     provider: Web3Version0Provider,
     networks?: {
       ens?: {
-        network: string;
+        network: EnsSupportedNetworks;
       };
       uns?: {
-        network: string;
+        network: UnsSupportedNetworks;
       };
     },
   ): Resolution {
@@ -188,10 +190,10 @@ export default class Resolution {
     provider: Web3Version1Provider,
     networks?: {
       ens?: {
-        network: string;
+        network: EnsSupportedNetworks;
       };
       uns?: {
-        network: string;
+        network: UnsSupportedNetworks;
       };
     },
   ): Resolution {
@@ -215,10 +217,10 @@ export default class Resolution {
     provider: EthersProvider,
     networks?: {
       ens?: {
-        network: string;
+        network: EnsSupportedNetworks;
       };
       uns?: {
-        network: string;
+        network: UnsSupportedNetworks;
       };
     },
   ): Resolution {
