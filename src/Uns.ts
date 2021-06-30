@@ -291,8 +291,8 @@ export default class Uns extends NamingService {
       this.provider,
     );
     const startingBlock =
-      UnsConfig?.networks[this.network]?.contracts?.CNSRegistry?.deploymentBlock ??
-      'earliest';
+      UnsConfig?.networks[this.network]?.contracts?.CNSRegistry
+        ?.deploymentBlock ?? 'earliest';
     const newURIEvents = await registryContract.fetchLogs(
       'NewURI',
       tokenId,
