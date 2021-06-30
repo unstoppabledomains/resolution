@@ -290,9 +290,7 @@ export default class Uns extends NamingService {
       registryAddress,
       this.provider,
     );
-    const startingBlock =
-      UnsConfig?.networks[this.network]?.contracts?.CNSRegistry
-        ?.deploymentBlock ?? 'earliest';
+    const startingBlock = this.getStartingBlockFromRegistry(registryAddress);
     const newURIEvents = await registryContract.fetchLogs(
       'NewURI',
       tokenId,
@@ -306,6 +304,20 @@ export default class Uns extends NamingService {
     const rawData = newURIEvents[newURIEvents.length - 1].data;
     const decoded = Interface.getAbiCoder().decode(['string'], rawData);
     return decoded[decoded.length - 1];
+  }
+
+  private getStartingBlockFromRegistry(registryAddress: string): string { 
+    const contracts = UnsConfig?.networks[this.network]?.contracts as {[key in string]: {
+      address: string,
+      deploymentBlock: string,
+      implementation: string,
+      legacyAddress: never[]
+    }};
+    if (!contracts) {
+      return 'earliest';
+    }
+    const contract = Object.values(contracts).find(c => c.address?.toLowerCase() === registryAddress.toLowerCase());
+    return contract?.deploymentBlock ?? 'earliest';
   }
 
   private async getVerifiedData(
