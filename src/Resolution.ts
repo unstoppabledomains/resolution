@@ -23,7 +23,7 @@ import {
 import ResolutionError, {ResolutionErrorCode} from './errors/resolutionError';
 import DnsUtils from './utils/DnsUtils';
 import {findNamingServiceName, signedInfuraLink} from './utils';
-import {Eip1993Factories} from './utils/Eip1993Factories';
+import {Eip1993Factories as Eip1193Factories} from './utils/Eip1993Factories';
 import {NamingService} from './NamingService';
 import ConfigurationError from './errors/configurationError';
 import {ConfigurationErrorCode} from './errors/configurationError';
@@ -132,10 +132,41 @@ export default class Resolution {
   /**
    * Creates a resolution instance with configured provider
    * @param provider - any provider compatible with EIP-1193
+   * @param networks - an object that describes what network to use when connecting ENS, UNS, or ZNS default is mainnet
+   * @see https://eips.ethereum.org/EIPS/eip-1193
+   */
+  static fromResolutionProvider(
+    provider: Provider,
+    networks: {
+      ens?: {
+        network: string;
+      };
+      uns?: {
+        network: string;
+      };
+      zns?: {
+        network: string;
+      };
+    },
+  ): Resolution {
+    if (networks.ens || networks.uns) {
+      return this.fromEthereumEip1193Provider(provider, networks);
+    }
+    if (networks.zns) {
+      return this.fromZilliqaProvider(provider, networks);
+    }
+    throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
+      providerMessage: 'Must specify network for ens, uns, or zns',
+    });
+  }
+
+  /**
+   * Creates a resolution instance with configured provider
+   * @param provider - any provider compatible with EIP-1193
    * @param networks - an optional object that describes what network to use when connecting ENS or UNS default is mainnet
    * @see https://eips.ethereum.org/EIPS/eip-1193
    */
-  static fromEip1193Provider(
+  static fromEthereumEip1193Provider(
     provider: Provider,
     networks?: {
       ens?: {
@@ -150,6 +181,27 @@ export default class Resolution {
       sourceConfig: {
         ens: {provider, network: networks?.ens?.network || 'mainnet'},
         uns: {provider, network: networks?.uns?.network || 'mainnet'},
+      },
+    });
+  }
+
+  /**
+   * Creates a resolution instance with configured provider
+   * @param provider - any provider compatible with EIP-1193
+   * @param networks - an optional object that describes what network to use when connecting ZNS default is mainnet
+   * @see https://eips.ethereum.org/EIPS/eip-1193
+   */
+  static fromZilliqaProvider(
+    provider: Provider,
+    networks?: {
+      zns?: {
+        network: string;
+      };
+    },
+  ): Resolution {
+    return new this({
+      sourceConfig: {
+        zns: {provider, network: networks?.zns?.network || 'mainnet'},
       },
     });
   }
@@ -171,8 +223,8 @@ export default class Resolution {
       };
     },
   ): Resolution {
-    return this.fromEip1193Provider(
-      Eip1993Factories.fromWeb3Version0Provider(provider),
+    return this.fromEthereumEip1193Provider(
+      Eip1193Factories.fromWeb3Version0Provider(provider),
       networks,
     );
   }
@@ -195,8 +247,8 @@ export default class Resolution {
       };
     },
   ): Resolution {
-    return this.fromEip1193Provider(
-      Eip1993Factories.fromWeb3Version1Provider(provider),
+    return this.fromEthereumEip1193Provider(
+      Eip1193Factories.fromWeb3Version1Provider(provider),
       networks,
     );
   }
@@ -222,8 +274,8 @@ export default class Resolution {
       };
     },
   ): Resolution {
-    return this.fromEip1193Provider(
-      Eip1993Factories.fromEthersProvider(provider),
+    return this.fromEthereumEip1193Provider(
+      Eip1193Factories.fromEthersProvider(provider),
       networks,
     );
   }

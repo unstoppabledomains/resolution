@@ -19,7 +19,7 @@ import {NamingServiceName} from '../types/publicTypes';
 import Uns from '../Uns';
 import Networking from '../utils/Networking';
 import {ConfigurationErrorCode} from '../errors/configurationError';
-import {TokenUriMetadata} from '../../build/types/publicTypes';
+import {TokenUriMetadata} from '../types/publicTypes';
 import liveData from './testData/liveData.json';
 import UnsConfig from '../config/uns-config.json';
 

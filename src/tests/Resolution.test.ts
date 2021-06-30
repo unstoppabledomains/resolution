@@ -35,6 +35,8 @@ import Zns from '../Zns';
 import Ens from '../Ens';
 import FetchProvider from '../FetchProvider';
 import {ConfigurationErrorCode} from '../errors/configurationError';
+import {HTTPProvider} from '@zilliqa-js/core';
+import {Eip1993Factories as Eip1193Factories} from '../utils/Eip1993Factories';
 import UnsConfig from '../config/uns-config.json';
 import EthereumContract from '../contracts/EthereumContract';
 
@@ -261,6 +263,55 @@ describe('Resolution', () => {
       ens = resolution.serviceMap[NamingServiceName.ENS] as Ens;
       expect(uns.url).toBe(`https://rinkeby.infura.io/v3/api-key`);
       expect(ens.url).toBe(`https://rinkeby.infura.io/v3/api-key`);
+    });
+
+    it('should throw on unspecified network', async () => {
+      const zilliqaProvider = new HTTPProvider('https://api.zilliqa.com');
+      const provider = Eip1193Factories.fromZilliqaProvider(zilliqaProvider);
+      expect(() =>
+        Resolution.fromResolutionProvider(provider, {}),
+      ).toThrowError('< Must specify network for ens, uns, or zns >');
+    });
+
+    it('should create resolution instance from Zilliqa provider', async () => {
+      const zilliqaProvider = new HTTPProvider('https://api.zilliqa.com');
+      const provider = Eip1193Factories.fromZilliqaProvider(zilliqaProvider);
+      const resolutionFromZilliqaProvider =
+        Resolution.fromZilliqaProvider(provider);
+      const resolution = new Resolution({
+        sourceConfig: {
+          zns: {url: 'https://api.zilliqa.com', network: 'mainnet'},
+        },
+      });
+      expect(
+        (resolutionFromZilliqaProvider.serviceMap[NamingServiceName.ZNS] as Zns)
+          .url,
+      ).toEqual((resolution.serviceMap[NamingServiceName.ZNS] as Zns).url);
+      expect(
+        (resolutionFromZilliqaProvider.serviceMap[NamingServiceName.ZNS] as Zns)
+          .network,
+      ).toEqual((resolution.serviceMap[NamingServiceName.ZNS] as Zns).network);
+      expect(
+        (resolutionFromZilliqaProvider.serviceMap[NamingServiceName.ZNS] as Zns)
+          .registryAddr,
+      ).toEqual(
+        (resolution.serviceMap[NamingServiceName.ZNS] as Zns).registryAddr,
+      );
+    });
+
+    it('should retrieve record using resolution instance created from Zilliqa provider', async () => {
+      const zilliqaProvider = new HTTPProvider('https://api.zilliqa.com');
+      const provider = Eip1193Factories.fromZilliqaProvider(zilliqaProvider);
+      const resolution = Resolution.fromZilliqaProvider(provider);
+      zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
+      const spies = mockAsyncMethods(zns, {
+        allRecords: {
+          'crypto.ETH.address': '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
+        },
+      });
+      const ethAddress = await resolution.addr('brad.zil', 'ETH');
+      expectSpyToBeCalled(spies);
+      expect(ethAddress).toBe('0x45b31e01AA6f42F0549aD482BE81635ED3149abb');
     });
 
     it('provides empty response constant', async () => {

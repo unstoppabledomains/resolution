@@ -41,6 +41,7 @@ export type ResolutionMethod = NamingServiceName | 'UDAPI';
 export type AutoNetworkConfigs = {
   uns?: {url: string} | {provider: Provider};
   ens?: {url: string} | {provider: Provider};
+  zns?: {url: string} | {provider: Provider};
 };
 
 /**
@@ -71,12 +72,24 @@ export interface Web3Version1Provider {
   send: ProviderMethod;
 }
 
+export interface ZilliqaProvider {
+  middleware: any;
+  send<R = any, E = string>(method: string, ...params: any[]): Promise<any>;
+  sendBatch<R = any, E = string>(
+    method: string,
+    ...params: any[]
+  ): Promise<any>;
+  subscribe?(event: string, subscriber: any): symbol;
+  unsubscribe?(token: symbol): void;
+}
+
 /**
  * @see https://eips.ethereum.org/EIPS/eip-1193
  */
 export interface Provider {
   request: (request: RequestArguments) => Promise<unknown>;
 }
+
 type ProviderMethod = (
   payload: JsonRpcPayload,
   callback: (error: Error | null, result?: JsonRpcResponse) => void,
