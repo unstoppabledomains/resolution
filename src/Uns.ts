@@ -260,25 +260,24 @@ export default class Uns extends NamingService {
     return !(await this.isRegistered(domain));
   }
 
-  async registryAddress(domain: string): Promise<string> {
+  async registryAddress(domainOrNamehash: string): Promise<string> {
     let namehash: string;
-    if (domain.startsWith('0x')) {
-      namehash = this.namehash(domain);
-    } else {
-      if (!this.checkDomain(domain)) {
-        throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
-          domain,
-        });
-      }
-
-      const tld = domain.split('.').pop();
-      namehash = this.namehash(tld!);
+    if (domainOrNamehash.startsWith('0x')) {
+      namehash = this.namehash(domainOrNamehash);
+    } else if (!this.checkDomain(domainOrNamehash)) {
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
+        domain: domainOrNamehash,
+      });
     }
+
+    const tld = domainOrNamehash.split('.').pop();
+    namehash = this.namehash(tld!);
+
     const [address] = await this.readerContract.call('registryOf', [namehash]);
 
     if (address === NullAddress) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
-        domain,
+        domain: domainOrNamehash,
       });
     }
     return address;
@@ -292,7 +291,7 @@ export default class Uns extends NamingService {
       this.provider,
     );
     const startingBlock =
-      UnsConfig.networks[this.network].contracts.CNSRegistry.deploymentBlock ??
+      UnsConfig?.networks[this.network]?.contracts?.CNSRegistry?.deploymentBlock ??
       'earliest';
     const newURIEvents = await registryContract.fetchLogs(
       'NewURI',
