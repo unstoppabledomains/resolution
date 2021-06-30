@@ -41,6 +41,7 @@ export type ResolutionMethod = NamingServiceName | 'UDAPI';
 export type AutoNetworkConfigs = {
   uns?: {url: string} | {provider: Provider};
   ens?: {url: string} | {provider: Provider};
+  zns?: {url: string} | {provider: Provider};
 };
 
 /**

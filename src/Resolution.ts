@@ -132,12 +132,12 @@ export default class Resolution {
   /**
    * Creates a resolution instance with configured provider
    * @param provider - any provider compatible with EIP-1193
-   * @param networks - an optional object that describes what network to use when connecting ENS or UNS default is mainnet
+   * @param networks - an object that describes what network to use when connecting ENS, UNS, or ZNS default is mainnet
    * @see https://eips.ethereum.org/EIPS/eip-1193
    */
-  static fromEip1193Provider(
+  static fromResolutionProvider(
     provider: Provider,
-    networks?: {
+    networks: {
       ens?: {
         network: string;
       };
@@ -149,10 +149,59 @@ export default class Resolution {
       };
     },
   ): Resolution {
+    if (networks.ens || networks.uns) {
+      return this.fromEthereumEip1193Provider(provider, networks);
+    }
+    if (networks.zns) {
+      return this.fromZilliqaProvider(provider, networks);
+    }
+    throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
+      providerMessage: 'Must specify network for ens, uns, or zns',
+    });
+  }
+
+  /**
+   * Creates a resolution instance with configured provider
+   * @param provider - any provider compatible with EIP-1193
+   * @param networks - an optional object that describes what network to use when connecting ENS or UNS default is mainnet
+   * @see https://eips.ethereum.org/EIPS/eip-1193
+   */
+  static fromEthereumEip1193Provider(
+    provider: Provider,
+    networks?: {
+      ens?: {
+        network: string;
+      };
+      uns?: {
+        network: string;
+      };
+    },
+  ): Resolution {
     return new this({
       sourceConfig: {
         ens: {provider, network: networks?.ens?.network || 'mainnet'},
         uns: {provider, network: networks?.uns?.network || 'mainnet'},
+      },
+    });
+  }
+
+  /**
+   * Creates a resolution instance with configured provider
+   * @param provider - any provider compatible with EIP-1193
+   * @param networks - an optional object that describes what network to use when connecting ZNS default is mainnet
+   * @see https://eips.ethereum.org/EIPS/eip-1193
+   */
+  static fromZilliqaProvider(
+    provider: Provider,
+    networks?: {
+      zns?: {
+        network: string;
+      };
+    },
+  ): Resolution {
+    return new this({
+      sourceConfig: {
+        zns: {provider, network: networks?.zns?.network || 'mainnet'},
       },
     });
   }
@@ -174,7 +223,7 @@ export default class Resolution {
       };
     },
   ): Resolution {
-    return this.fromEip1193Provider(
+    return this.fromEthereumEip1193Provider(
       Eip1193Factories.fromWeb3Version0Provider(provider),
       networks,
     );
@@ -198,7 +247,7 @@ export default class Resolution {
       };
     },
   ): Resolution {
-    return this.fromEip1193Provider(
+    return this.fromEthereumEip1193Provider(
       Eip1193Factories.fromWeb3Version1Provider(provider),
       networks,
     );
@@ -225,7 +274,7 @@ export default class Resolution {
       };
     },
   ): Resolution {
-    return this.fromEip1193Provider(
+    return this.fromEthereumEip1193Provider(
       Eip1193Factories.fromEthersProvider(provider),
       networks,
     );

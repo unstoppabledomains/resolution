@@ -265,20 +265,44 @@ describe('Resolution', () => {
       expect(ens.url).toBe(`https://mainnet.infura.io/v3/api-key`);
     });
 
+    it('should throw on unspecified network', async () => {
+      const zilliqaProvider = new HTTPProvider('https://api.zilliqa.com');
+      const provider = Eip1193Factories.fromZilliqaProvider(zilliqaProvider);
+      expect(() =>
+        Resolution.fromResolutionProvider(provider, {}),
+      ).toThrowError('< Must specify network for ens, uns, or zns >');
+    });
+
     it('should create resolution instance from Zilliqa provider', async () => {
       const zilliqaProvider = new HTTPProvider('https://api.zilliqa.com');
       const provider = Eip1193Factories.fromZilliqaProvider(zilliqaProvider);
-      const resolution = Resolution.fromEip1193Provider(provider);
+      const resolutionFromZilliqaProvider =
+        Resolution.fromZilliqaProvider(provider);
+      const resolution = new Resolution({
+        sourceConfig: {
+          zns: {url: 'https://api.zilliqa.com', network: 'mainnet'},
+        },
+      });
       expect(
-        resolution.serviceMap[NamingServiceName.ZNS].serviceName() ===
-          NamingServiceName.ZNS,
+        (resolutionFromZilliqaProvider.serviceMap[NamingServiceName.ZNS] as Zns)
+          .url,
+      ).toEqual((resolution.serviceMap[NamingServiceName.ZNS] as Zns).url);
+      expect(
+        (resolutionFromZilliqaProvider.serviceMap[NamingServiceName.ZNS] as Zns)
+          .network,
+      ).toEqual((resolution.serviceMap[NamingServiceName.ZNS] as Zns).network);
+      expect(
+        (resolutionFromZilliqaProvider.serviceMap[NamingServiceName.ZNS] as Zns)
+          .registryAddr,
+      ).toEqual(
+        (resolution.serviceMap[NamingServiceName.ZNS] as Zns).registryAddr,
       );
     });
 
     it('should retrieve record using resolution instance created from Zilliqa provider', async () => {
       const zilliqaProvider = new HTTPProvider('https://api.zilliqa.com');
       const provider = Eip1193Factories.fromZilliqaProvider(zilliqaProvider);
-      const resolution = Resolution.fromEip1193Provider(provider);
+      const resolution = Resolution.fromZilliqaProvider(provider);
       zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
       const spies = mockAsyncMethods(zns, {
         allRecords: {
