@@ -12,7 +12,6 @@ import {
   skipItInLive,
 } from './helpers';
 import {ConfigurationErrorCode} from '../errors/configurationError';
-import {EnsSupportedNetworks} from '../types/publicTypes';
 import Ens from '../Ens';
 
 let resolution: Resolution;
@@ -207,19 +206,19 @@ describe('ENS', () => {
       () =>
         new Resolution({
           sourceConfig: {
-            ens: {network: 'notRealNetwork' as EnsSupportedNetworks},
+            ens: {network: 'notRealNetwork'},
           },
         }),
-    ).toThrowError('Unspecified network in Resolution ENS configuration');
+    ).toThrowError('Unsupported network in Resolution ENS configuration');
   });
 
   it('checks normalizeSource ens (object) #7', async () => {
     expect(
       () =>
         new Resolution({
-          sourceConfig: {ens: {network: 'invalid' as EnsSupportedNetworks}},
+          sourceConfig: {ens: {network: 'invalid'}},
         }),
-    ).toThrowError('Unspecified network in Resolution ENS configuration');
+    ).toThrowError('Unsupported network in Resolution ENS configuration');
   });
 
   it('checks normalizeSource ens (object) #8', async () => {
@@ -296,7 +295,7 @@ describe('ENS', () => {
         new Resolution({
           sourceConfig: {
             ens: {
-              network: 'custom' as EnsSupportedNetworks,
+              network: 'custom',
               url: 'https://custom.notinfura.io',
             },
           },
