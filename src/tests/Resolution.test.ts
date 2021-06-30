@@ -1,5 +1,6 @@
 import nock from 'nock';
 import Resolution, {
+  ResolutionError,
   ResolutionErrorCode,
   UnclaimedDomainResponse,
 } from '../index';
@@ -21,7 +22,7 @@ import {
   caseMock,
   mockAsyncMethod,
   CryptoDomainWithTwitterVerification,
-  pendingInLive,
+  skipItInLive,
   isLive,
   CryptoDomainWithUsdtMultiChainRecords,
   expectConfigurationErrorCode,
@@ -47,8 +48,8 @@ beforeEach(() => {
   jest.restoreAllMocks();
   resolution = new Resolution({
     sourceConfig: {
-      uns: {url: protocolLink(), network: 'mainnet'},
-      ens: {url: protocolLink(), network: 'mainnet'},
+      uns: {url: protocolLink(), network: 'rinkeby'},
+      ens: {url: protocolLink(), network: 'rinkeby'},
     },
   });
   uns = resolution.serviceMap[NamingServiceName.UNS] as Uns;
@@ -59,16 +60,16 @@ beforeEach(() => {
 describe('Resolution', () => {
   describe('.Basic setup', () => {
     it('should work with autonetwork url configuration', async () => {
-      const mainnetUrl = protocolLink();
-      const goerliUrl = protocolLink().replace('mainnet', 'goerli');
+      const rinkebyUrl = protocolLink();
+      const goerliUrl = rinkebyUrl.replace('rinkeby', 'goerli');
       // mocking getNetworkConfigs because no access to inner provider.request
       const UnsGetNetworkOriginal = Uns.autoNetwork;
       const EnsGetNetworkOriginal = Ens.autoNetwork;
       if (!isLive()) {
         Uns.autoNetwork = jest.fn().mockReturnValue(
           new Uns({
-            network: 'mainnet',
-            provider: new FetchProvider(NamingServiceName.UNS, mainnetUrl),
+            network: 'rinkeby',
+            provider: new FetchProvider(NamingServiceName.UNS, rinkebyUrl),
           }),
         );
         Ens.autoNetwork = jest.fn().mockReturnValue(
@@ -79,7 +80,7 @@ describe('Resolution', () => {
         );
       }
       const resolution = await Resolution.autoNetwork({
-        uns: {url: mainnetUrl},
+        uns: {url: rinkebyUrl},
         ens: {url: goerliUrl},
       });
       // We need to manually restore the function as jest.restoreAllMocks and simillar works only with spyOn
@@ -87,7 +88,7 @@ describe('Resolution', () => {
       Ens.autoNetwork = EnsGetNetworkOriginal;
       expect(
         (resolution.serviceMap[NamingServiceName.UNS] as Uns).network,
-      ).toBe(1);
+      ).toBe(4);
       expect(
         (resolution.serviceMap[NamingServiceName.ENS] as Ens).network,
       ).toBe(5);
@@ -146,9 +147,9 @@ describe('Resolution', () => {
     it('should work with autonetwork provider configuration', async () => {
       const provider = new FetchProvider(
         'UDAPI',
-        protocolLink().replace('mainnet', 'rinkeby'),
+        protocolLink().replace('rinkeby', 'mainnet'),
       );
-      const spy = mockAsyncMethod(provider, 'request', '4');
+      const spy = mockAsyncMethod(provider, 'request', '1');
       const resolution = await Resolution.autoNetwork({
         uns: {provider},
         ens: {provider},
@@ -156,10 +157,10 @@ describe('Resolution', () => {
       expect(spy).toBeCalledTimes(2);
       expect(
         (resolution.serviceMap[NamingServiceName.UNS] as Uns).network,
-      ).toBe(4);
+      ).toBe(1);
       expect(
         (resolution.serviceMap[NamingServiceName.ENS] as Ens).network,
-      ).toBe(4);
+      ).toBe(1);
     });
 
     it('should fail because provided url failled net_version call', async () => {
@@ -170,10 +171,10 @@ describe('Resolution', () => {
       const providerSpy = mockAsyncMethod(
         mockedProvider,
         'request',
-        new FetchError(
-          'invalid json response body at https://google.com/ reason: Unexpected token < in JSON at position 0',
-          'invalid_json',
-        ),
+        new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
+          providerMessage:
+            'Request to https://google.com failed with responce status 405',
+        }),
       );
       const factorySpy = mockAsyncMethod(
         FetchProvider,
@@ -185,9 +186,9 @@ describe('Resolution', () => {
           uns: {url: 'https://google.com'},
         });
       } catch (error) {
-        expect(error).toBeInstanceOf(FetchError);
+        expect(error).toBeInstanceOf(ResolutionError);
         expect(error.message).toBe(
-          'invalid json response body at https://google.com/ reason: Unexpected token < in JSON at position 0',
+          '< Request to https://google.com failed with responce status 405 >',
         );
       }
       expectSpyToBeCalled([factorySpy, providerSpy]);
@@ -220,7 +221,7 @@ describe('Resolution', () => {
     });
 
     it('should fail because of unsupported test network for uns', async () => {
-      const blockchainUrl = protocolLink().replace('mainnet', 'ropsten');
+      const blockchainUrl = protocolLink().replace('rinkeby', 'ropsten');
       const mockedProvider = new FetchProvider(
         NamingServiceName.UNS,
         blockchainUrl,
@@ -240,8 +241,7 @@ describe('Resolution', () => {
       );
     });
 
-    it('should fail in test development', async () => {
-      pendingInLive();
+    skipItInLive('should fail in test development', async () => {
       try {
         await fetch('https://pokeres.bastionbot.org/images/pokemon/10.png');
       } catch (err) {
@@ -254,13 +254,13 @@ describe('Resolution', () => {
 
     it('should get a valid resolution instance', async () => {
       const resolution = Resolution.infura('api-key', {
-        uns: {network: 'mainnet'},
-        ens: {network: 'mainnet'},
+        uns: {network: 'rinkeby'},
+        ens: {network: 'rinkeby'},
       });
       uns = resolution.serviceMap[NamingServiceName.UNS] as Uns;
       ens = resolution.serviceMap[NamingServiceName.ENS] as Ens;
-      expect(uns.url).toBe(`https://mainnet.infura.io/v3/api-key`);
-      expect(ens.url).toBe(`https://mainnet.infura.io/v3/api-key`);
+      expect(uns.url).toBe(`https://rinkeby.infura.io/v3/api-key`);
+      expect(ens.url).toBe(`https://rinkeby.infura.io/v3/api-key`);
     });
 
     it('provides empty response constant', async () => {
@@ -294,39 +294,43 @@ describe('Resolution', () => {
       });
 
       describe('.ipfsHash', () => {
-        it('should prioritize new keys over depricated ones', async () => {
-          pendingInLive();
-          const spies = mockAsyncMethods(uns, {
-            get: {
-              resolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
-              records: {
-                ['dweb.ipfs.hash']: 'new record Ipfs hash',
-                ['ipfs.html.value']: 'old record Ipfs hash',
+        skipItInLive(
+          'should prioritize new keys over depricated ones',
+          async () => {
+            const spies = mockAsyncMethods(uns, {
+              get: {
+                resolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
+                records: {
+                  ['dweb.ipfs.hash']: 'new record Ipfs hash',
+                  ['ipfs.html.value']: 'old record Ipfs hash',
+                },
               },
-            },
-          });
-          const hash = await resolution.ipfsHash(CryptoDomainWithAllRecords);
-          expectSpyToBeCalled(spies);
-          expect(hash).toBe('new record Ipfs hash');
-        });
+            });
+            const hash = await resolution.ipfsHash(CryptoDomainWithAllRecords);
+            expectSpyToBeCalled(spies);
+            expect(hash).toBe('new record Ipfs hash');
+          },
+        );
 
-        it('should prioritize browser record key over ipfs.redirect_url one', async () => {
-          pendingInLive();
-          const spies = mockAsyncMethods(uns, {
-            get: {
-              resolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
-              records: {
-                ['browser.redirect_url']: 'new record redirect url',
-                ['ipfs.redirect_domain.value']: 'old record redirect url',
+        skipItInLive(
+          'should prioritize browser record key over ipfs.redirect_url one',
+          async () => {
+            const spies = mockAsyncMethods(uns, {
+              get: {
+                resolver: '0xA1cAc442Be6673C49f8E74FFC7c4fD746f3cBD0D',
+                records: {
+                  ['browser.redirect_url']: 'new record redirect url',
+                  ['ipfs.redirect_domain.value']: 'old record redirect url',
+                },
               },
-            },
-          });
-          const redirectUrl = await resolution.httpUrl(
-            CryptoDomainWithAllRecords,
-          );
-          expectSpyToBeCalled(spies);
-          expect(redirectUrl).toBe('new record redirect url');
-        });
+            });
+            const redirectUrl = await resolution.httpUrl(
+              CryptoDomainWithAllRecords,
+            );
+            expectSpyToBeCalled(spies);
+            expect(redirectUrl).toBe('new record redirect url');
+          },
+        );
       });
 
       describe('serviceName', () => {
@@ -410,8 +414,7 @@ describe('Resolution', () => {
 
     describe('.Records', () => {
       describe('.DNS', () => {
-        it('getting dns get', async () => {
-          pendingInLive();
+        skipItInLive('getting dns get', async () => {
           const spies = mockAsyncMethods(uns, {
             get: {
               resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
@@ -435,8 +438,7 @@ describe('Resolution', () => {
           ]);
         });
 
-        it('should work with others records', async () => {
-          pendingInLive();
+        skipItInLive('should work with others records', async () => {
           const spies = mockAsyncMethods(uns, {
             get: {
               resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
@@ -505,7 +507,7 @@ describe('Resolution', () => {
         describe('.multichain', () => {
           it('should work with usdt on different erc20', async () => {
             const erc20Spy = mockAsyncMethod(uns, 'get', {
-              resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
+              resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
               owner: '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
               records: {
                 ['crypto.USDT.version.ERC20.address']:
@@ -523,7 +525,7 @@ describe('Resolution', () => {
 
           it('should work with usdt tron chain', async () => {
             const tronSpy = mockAsyncMethod(uns, 'get', {
-              resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
+              resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
               owner: '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
               records: {
                 ['crypto.USDT.version.TRON.address']:
@@ -541,7 +543,7 @@ describe('Resolution', () => {
 
           it('should work with usdt omni chain', async () => {
             const omniSpy = mockAsyncMethod(uns, 'get', {
-              resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
+              resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
               owner: '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
               records: {
                 ['crypto.USDT.version.OMNI.address']:
@@ -559,7 +561,7 @@ describe('Resolution', () => {
 
           it('should work with usdt eos chain', async () => {
             const eosSpy = mockAsyncMethod(uns, 'get', {
-              resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
+              resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
               owner: '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
               records: {
                 ['crypto.USDT.version.EOS.address']: 'letsminesome',
@@ -601,7 +603,7 @@ describe('Resolution', () => {
             },
           );
           const resolution = Resolution.fromWeb3Version1Provider(provider, {
-            uns: {network: 'mainnet'},
+            uns: {network: 'rinkeby'},
           });
           const ethAddress = await resolution.addr('brad.crypto', 'ETH');
 
@@ -626,7 +628,7 @@ describe('Resolution', () => {
           });
 
           const resolution = Resolution.fromWeb3Version1Provider(provider, {
-            uns: {network: 'mainnet'},
+            uns: {network: 'rinkeby'},
           });
           const ethAddress = await resolution.addr('brad.crypto', 'ETH');
           provider.disconnect(1000, 'end of test');
@@ -637,10 +639,10 @@ describe('Resolution', () => {
         it('should work for ethers jsonrpc provider', async () => {
           const provider = new JsonRpcProvider(
             protocolLink(ProviderProtocol.http),
-            'mainnet',
+            'rinkeby',
           );
           const resolution = Resolution.fromEthersProvider(provider, {
-            uns: {network: 'mainnet'},
+            uns: {network: 'rinkeby'},
           });
           const eye = mockAsyncMethod(provider, 'call', (params) =>
             Promise.resolve(caseMock(params, RpcProviderTestCases)),
@@ -652,7 +654,7 @@ describe('Resolution', () => {
 
         it('should work with ethers default provider', async () => {
           const provider = new InfuraProvider(
-            'mainnet',
+            'rinkeby',
             '213fff28936343858ca9c5115eff1419',
           );
 
@@ -660,7 +662,7 @@ describe('Resolution', () => {
             Promise.resolve(caseMock(params, RpcProviderTestCases)),
           );
           const resolution = Resolution.fromEthersProvider(provider, {
-            uns: {network: 'mainnet'},
+            uns: {network: 'rinkeby'},
           });
           const ethAddress = await resolution.addr('brad.crypto', 'eth');
           expectSpyToBeCalled([eye]);
@@ -691,7 +693,7 @@ describe('Resolution', () => {
             },
           );
           const resolution = Resolution.fromWeb3Version0Provider(provider, {
-            uns: {network: 'mainnet'},
+            uns: {network: 'rinkeby'},
           });
           const ethAddress = await resolution.addr('brad.crypto', 'eth');
           expectSpyToBeCalled([eye]);
@@ -701,7 +703,7 @@ describe('Resolution', () => {
         describe('.All-get', () => {
           it('should be able to get logs with ethers default provider', async () => {
             const provider = new InfuraProvider(
-              'mainnet',
+              'rinkeby',
               '213fff28936343858ca9c5115eff1419',
             );
 
@@ -713,7 +715,7 @@ describe('Resolution', () => {
             );
 
             const resolution = Resolution.fromEthersProvider(provider, {
-              uns: {network: 'mainnet'},
+              uns: {network: 'rinkeby'},
             });
             const resp = await resolution.allRecords('brad.crypto');
             expectSpyToBeCalled([eye], 2);
@@ -737,10 +739,10 @@ describe('Resolution', () => {
           it('should be able to get logs with jsonProvider', async () => {
             const provider = new JsonRpcProvider(
               protocolLink(ProviderProtocol.http),
-              'mainnet',
+              'rinkeby',
             );
             const resolution = Resolution.fromEthersProvider(provider, {
-              uns: {network: 'mainnet'},
+              uns: {network: 'rinkeby'},
             });
             const eye = mockAsyncMethod(provider, 'call', (params) =>
               Promise.resolve(caseMock(params, RpcProviderTestCases)),
@@ -770,6 +772,7 @@ describe('Resolution', () => {
           });
 
           it('should get standard keys from legacy resolver', async () => {
+            // There are no legacy providers on testnet
             const provider = new InfuraProvider(
               'mainnet',
               '213fff28936343858ca9c5115eff1419',
@@ -913,12 +916,12 @@ describe('Resolution', () => {
           it('should return verified twitter handle', async () => {
             const readerSpies = mockAsyncMethods(uns, {
               get: {
-                resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
-                owner: '0x6EC0DEeD30605Bcd19342f3c30201DB263291589',
+                resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
+                owner: '0x499dd6d875787869670900a2130223d85d4f6aa7',
                 records: {
                   ['validation.social.twitter.username']:
-                    '0xcd2655d9557e5535313b47107fa8f943eb1fec4da6f348668062e66233dde21b413784c4060340f48da364311c6e2549416a6a23dc6fbb48885382802826b8111b',
-                  ['social.twitter.username']: 'derainberk',
+                    '0x01882395ce631866b76f43535843451444ef4a8ff44db0a9432d5d00658a510512c7519a87c78ba9cad7553e26262ada55c254434a1a3784cd98d06fb4946cfb1b',
+                  ['social.twitter.username']: 'Marlene12Bob',
                 },
               },
             });
@@ -926,7 +929,7 @@ describe('Resolution', () => {
               CryptoDomainWithTwitterVerification,
             );
             expectSpyToBeCalled(readerSpies);
-            expect(twitterHandle).toBe('derainberk');
+            expect(twitterHandle).toBe('Marlene12Bob');
           });
 
           it('should throw unsupported method', async () => {
@@ -951,23 +954,23 @@ describe('Resolution', () => {
 
     it('should return cns mainnet registry address #1', async () => {
       const spies = mockAsyncMethods(uns, {
-        registryAddress: UnsConfig.networks[1].contracts.CNSRegistry.address,
+        registryAddress: UnsConfig.networks[4].contracts.CNSRegistry.address,
       });
       const registryAddress = await resolution.registryAddress('testi.crypto');
       expectSpyToBeCalled(spies);
       expect(registryAddress).toBe(
-        UnsConfig.networks[1].contracts.CNSRegistry.address,
+        UnsConfig.networks[4].contracts.CNSRegistry.address,
       );
     });
 
     it('should return uns mainnet registry address', async () => {
       const spies = mockAsyncMethods(uns, {
-        registryAddress: UnsConfig.networks[1].contracts.UNSRegistry.address,
+        registryAddress: UnsConfig.networks[4].contracts.UNSRegistry.address,
       });
       const registryAddress = await resolution.registryAddress('testi.888');
       expectSpyToBeCalled(spies);
       expect(registryAddress).toBe(
-        UnsConfig.networks[1].contracts.UNSRegistry.address,
+        UnsConfig.networks[4].contracts.UNSRegistry.address,
       );
     });
   });
@@ -1004,7 +1007,7 @@ describe('Resolution', () => {
       const spies = mockAsyncMethods(uns, {
         get: {
           owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
-          resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
+          resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
           records: {
             ['ipfs.html.value']:
               'QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu',
@@ -1057,14 +1060,14 @@ describe('Resolution', () => {
       const spies = mockAsyncMethods(uns, {
         get: {
           owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
-          resolver: '0xb66DcE2DA6afAAa98F2013446dBCB0f4B0ab2842',
+          resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
           records: {
             ['ipfs.html.value']:
               'QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu',
           },
         },
       });
-      const isAvailable = await resolution.isAvailable('ryan.crypto');
+      const isAvailable = await resolution.isAvailable('brad.crypto');
       expectSpyToBeCalled(spies);
       expect(isAvailable).toBe(false);
     });

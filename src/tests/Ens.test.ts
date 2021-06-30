@@ -7,9 +7,9 @@ import {
   expectSpyToBeCalled,
   mockAsyncMethod,
   mockAsyncMethods,
-  pendingInLive,
   protocolLink,
   ProviderProtocol,
+  skipItInLive,
 } from './helpers';
 import {ConfigurationErrorCode} from '../errors/configurationError';
 import Ens from '../Ens';
@@ -68,8 +68,7 @@ describe('ENS', () => {
     expectSpyToBeCalled(spy, 1);
   });
 
-  it('reverses address to ENS domain', async () => {
-    pendingInLive();
+  skipItInLive('reverses address to ENS domain', async () => {
     const eyes = mockAsyncMethods(ens, {
       resolverCallToName: 'adrian.argent.xyz',
       resolver: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
