@@ -54,9 +54,9 @@ beforeEach(() => {
       ens: {url: protocolLink(), network: 'rinkeby'},
     },
   });
-  uns = resolution.serviceMap[NamingServiceName.UNS] as Uns;
-  ens = resolution.serviceMap[NamingServiceName.ENS] as Ens;
-  zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
+  uns = resolution.serviceMap[NamingServiceName.UNS] as unknown as Uns;
+  ens = resolution.serviceMap[NamingServiceName.ENS] as unknown as Ens;
+  zns = resolution.serviceMap[NamingServiceName.ZNS] as unknown as Zns;
 });
 
 describe('Resolution', () => {
@@ -89,10 +89,12 @@ describe('Resolution', () => {
       Uns.autoNetwork = UnsGetNetworkOriginal;
       Ens.autoNetwork = EnsGetNetworkOriginal;
       expect(
-        (resolution.serviceMap[NamingServiceName.UNS] as Uns).network,
+        (resolution.serviceMap[NamingServiceName.UNS] as unknown as Uns)
+          .network,
       ).toBe(4);
       expect(
-        (resolution.serviceMap[NamingServiceName.ENS] as Ens).network,
+        (resolution.serviceMap[NamingServiceName.ENS] as unknown as Ens)
+          .network,
       ).toBe(5);
     });
 
@@ -158,10 +160,12 @@ describe('Resolution', () => {
       });
       expect(spy).toBeCalledTimes(2);
       expect(
-        (resolution.serviceMap[NamingServiceName.UNS] as Uns).network,
+        (resolution.serviceMap[NamingServiceName.UNS] as unknown as Uns)
+          .network,
       ).toBe(1);
       expect(
-        (resolution.serviceMap[NamingServiceName.ENS] as Ens).network,
+        (resolution.serviceMap[NamingServiceName.ENS] as unknown as Ens)
+          .network,
       ).toBe(1);
     });
 
@@ -259,8 +263,8 @@ describe('Resolution', () => {
         uns: {network: 'rinkeby'},
         ens: {network: 'rinkeby'},
       });
-      uns = resolution.serviceMap[NamingServiceName.UNS] as Uns;
-      ens = resolution.serviceMap[NamingServiceName.ENS] as Ens;
+      uns = resolution.serviceMap[NamingServiceName.UNS] as unknown as Uns;
+      ens = resolution.serviceMap[NamingServiceName.ENS] as unknown as Ens;
       expect(uns.url).toBe(`https://rinkeby.infura.io/v3/api-key`);
       expect(ens.url).toBe(`https://rinkeby.infura.io/v3/api-key`);
     });
@@ -284,18 +288,33 @@ describe('Resolution', () => {
         },
       });
       expect(
-        (resolutionFromZilliqaProvider.serviceMap[NamingServiceName.ZNS] as Zns)
-          .url,
-      ).toEqual((resolution.serviceMap[NamingServiceName.ZNS] as Zns).url);
-      expect(
-        (resolutionFromZilliqaProvider.serviceMap[NamingServiceName.ZNS] as Zns)
-          .network,
-      ).toEqual((resolution.serviceMap[NamingServiceName.ZNS] as Zns).network);
-      expect(
-        (resolutionFromZilliqaProvider.serviceMap[NamingServiceName.ZNS] as Zns)
-          .registryAddr,
+        (
+          resolutionFromZilliqaProvider.serviceMap[
+            NamingServiceName.ZNS
+          ] as unknown as Zns
+        ).url,
       ).toEqual(
-        (resolution.serviceMap[NamingServiceName.ZNS] as Zns).registryAddr,
+        (resolution.serviceMap[NamingServiceName.ZNS] as unknown as Zns).url,
+      );
+      expect(
+        (
+          resolutionFromZilliqaProvider.serviceMap[
+            NamingServiceName.ZNS
+          ] as unknown as Zns
+        ).network,
+      ).toEqual(
+        (resolution.serviceMap[NamingServiceName.ZNS] as unknown as Zns)
+          .network,
+      );
+      expect(
+        (
+          resolutionFromZilliqaProvider.serviceMap[
+            NamingServiceName.ZNS
+          ] as unknown as Zns
+        ).registryAddr,
+      ).toEqual(
+        (resolution.serviceMap[NamingServiceName.ZNS] as unknown as Zns)
+          .registryAddr,
       );
     });
 
@@ -303,7 +322,7 @@ describe('Resolution', () => {
       const zilliqaProvider = new HTTPProvider('https://api.zilliqa.com');
       const provider = Eip1193Factories.fromZilliqaProvider(zilliqaProvider);
       const resolution = Resolution.fromZilliqaProvider(provider);
-      zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
+      zns = resolution.serviceMap[NamingServiceName.ZNS] as unknown as Zns;
       const spies = mockAsyncMethods(zns, {
         allRecords: {
           'crypto.ETH.address': '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
@@ -408,7 +427,7 @@ describe('Resolution', () => {
     describe('.Errors', () => {
       it('checks Resolution#addr error #1', async () => {
         const resolution = new Resolution();
-        zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
+        zns = resolution.serviceMap[NamingServiceName.ZNS] as unknown as Zns;
         const spy = mockAsyncMethods(zns, {
           getRecordsAddresses: undefined,
         });
@@ -869,8 +888,8 @@ describe('Resolution', () => {
               },
             },
           });
-          const uns = resolution.serviceMap['UNS'] as Uns;
-          const zns = resolution.serviceMap['ZNS'] as Zns;
+          const uns = resolution.serviceMap['UNS'] as unknown as Uns;
+          const zns = resolution.serviceMap['ZNS'] as unknown as Zns;
           const unsAllRecordsMock = mockAsyncMethods(uns, {
             getStartingBlock: undefined,
             resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
