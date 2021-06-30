@@ -306,17 +306,21 @@ export default class Uns extends NamingService {
     return decoded[decoded.length - 1];
   }
 
-  private getStartingBlockFromRegistry(registryAddress: string): string { 
-    const contracts = UnsConfig?.networks[this.network]?.contracts as {[key in string]: {
-      address: string,
-      deploymentBlock: string,
-      implementation: string,
-      legacyAddress: never[]
-    }};
+  private getStartingBlockFromRegistry(registryAddress: string): string {
+    const contracts = UnsConfig?.networks[this.network]?.contracts as {
+      [key in string]: {
+        address: string;
+        deploymentBlock: string;
+        implementation: string;
+        legacyAddress: never[];
+      };
+    };
     if (!contracts) {
       return 'earliest';
     }
-    const contract = Object.values(contracts).find(c => c.address?.toLowerCase() === registryAddress.toLowerCase());
+    const contract = Object.values(contracts).find(
+      (c) => c.address?.toLowerCase() === registryAddress.toLowerCase(),
+    );
     return contract?.deploymentBlock ?? 'earliest';
   }
 
