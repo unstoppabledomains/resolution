@@ -273,7 +273,6 @@ export default class Uns extends NamingService {
       namehash = this.namehash(tld!);
     }
     const [address] = await this.readerContract.call('registryOf', [namehash]);
-
     if (address === NullAddress) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
         domain: domainOrNamehash,

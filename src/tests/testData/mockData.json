@@ -223,7 +223,7 @@
         "method": "eth_call",
         "params": [
           {
-            "data": "0xa81ce6f97d6599fec65b69e387f753a45e748fbd689463c9fe233487189c54212c8c8b00",
+            "data": "0xa81ce6f9756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9",
             "to": "0x299974aed8911bcbd2c61262605b89f591a53e83"
           },
           "latest"
@@ -282,7 +282,7 @@
         "method": "eth_call",
         "params": [
           {
-            "data": "0xa81ce6f96288ee7a7405212a1ae061542ac992807777483103a9f13c6be6b75a0d7e4266",
+            "data": "0xa81ce6f900e7a897c7a37ae79beea20a9bbb0a2a84ab2cff2f11a7e2c1912bd063407fa2",
             "to": "0x299974aed8911bcbd2c61262605b89f591a53e83"
           },
           "latest"
@@ -291,7 +291,7 @@
       "RESPONSE": {
         "jsonrpc": "2.0",
         "id": 1,
-        "result": "0x000000000000000000000000d1e5b0ff1287aa9f9a268759062e4ab08b9dacbe"
+        "result": "0x0000000000000000000000000000000000000000000000000000000000000000"
       }
     },
     {
@@ -326,7 +326,7 @@
         "method": "eth_call",
         "params": [
           {
-            "data": "0xa81ce6f9d69fe92c7d3017bf98a2f297ba044b7394f390aab0854b258a7ad2f5ad0edb2d",
+            "data": "0xa81ce6f90b680a1cb8fe02507e74d78fbd5fdeef7b7be5cb793211ad9362c5547e76ce90",
             "to": "0x299974aed8911bcbd2c61262605b89f591a53e83"
           },
           "latest"
