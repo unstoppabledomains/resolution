@@ -38,7 +38,7 @@
     "network-config:pull": "curl https://raw.githubusercontent.com/unstoppabledomains/uns/main/uns-config.json -o src/config/uns-config.json",
     "supported-keys:pull": "curl https://raw.githubusercontent.com/unstoppabledomains/dot-crypto/master/src/supported-keys/supported-keys.json -o src/config/supported-keys.json",
     "prettier:fix": "prettier --write -l \"src/**/*.{ts,tsx,js,jsx,json,md}\"",
-    "postinstall": "[ -d ./.git ] && husky install",
+    "postinstall": "([ -d ./.git ] && husky install) || echo \"Skip husky install since package does not have .git folder\"",
     "prepare": "yarn build"
   },
   "files": [
