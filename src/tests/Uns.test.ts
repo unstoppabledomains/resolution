@@ -811,7 +811,6 @@ describe('UNS', () => {
       const unregisteredhash = resolution.namehash(
         'test34230131207328144694.crypto',
       );
-      console.log({unregisteredhash});
       mockAPICalls('unhash', protocolLink());
       await expectResolutionErrorCode(
         () => resolution.unhash(unregisteredhash, NamingServiceName.UNS),
