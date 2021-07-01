@@ -1,33 +1,26 @@
 import {
-  UnsSupportedNetwork,
-  EnsSupportedNetwork,
   EventFilter,
   RequestArguments,
   RpcProviderLogEntry,
   TransactionRequest,
-  ZnsSupportedNetwork,
 } from '.';
-
-export type UnsSupportedNetworks = typeof UnsSupportedNetwork.type;
-export type EnsSupportedNetworks = typeof EnsSupportedNetwork.type;
-export type ZnsSupportedNetworks = typeof ZnsSupportedNetwork.type;
 
 export type Api = {api: true; url?: string; network?: number};
 
 type NamingServiceSource = {url?: string} | {provider?: Provider};
 
 export type UnsSource = NamingServiceSource & {
-  network: UnsSupportedNetworks;
+  network: string;
   proxyReaderAddress?: string;
 };
 
 export type EnsSource = NamingServiceSource & {
-  network: EnsSupportedNetworks;
+  network: string;
   registryAddress?: string;
 };
 
 export type ZnsSource = NamingServiceSource & {
-  network: ZnsSupportedNetworks;
+  network: string;
   registryAddress?: string;
 };
 
@@ -48,6 +41,7 @@ export type ResolutionMethod = NamingServiceName | 'UDAPI';
 export type AutoNetworkConfigs = {
   uns?: {url: string} | {provider: Provider};
   ens?: {url: string} | {provider: Provider};
+  zns?: {url: string} | {provider: Provider};
 };
 
 /**
@@ -78,12 +72,24 @@ export interface Web3Version1Provider {
   send: ProviderMethod;
 }
 
+export interface ZilliqaProvider {
+  middleware: any;
+  send<R = any, E = string>(method: string, ...params: any[]): Promise<any>;
+  sendBatch<R = any, E = string>(
+    method: string,
+    ...params: any[]
+  ): Promise<any>;
+  subscribe?(event: string, subscriber: any): symbol;
+  unsubscribe?(token: symbol): void;
+}
+
 /**
  * @see https://eips.ethereum.org/EIPS/eip-1193
  */
 export interface Provider {
   request: (request: RequestArguments) => Promise<unknown>;
 }
+
 type ProviderMethod = (
   payload: JsonRpcPayload,
   callback: (error: Error | null, result?: JsonRpcResponse) => void,

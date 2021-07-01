@@ -7,12 +7,11 @@ import {
   expectSpyToBeCalled,
   mockAsyncMethod,
   mockAsyncMethods,
-  pendingInLive,
   protocolLink,
   ProviderProtocol,
+  skipItInLive,
 } from './helpers';
 import {ConfigurationErrorCode} from '../errors/configurationError';
-import {EnsSupportedNetworks} from '../types/publicTypes';
 import Ens from '../Ens';
 
 let resolution: Resolution;
@@ -46,7 +45,7 @@ describe('ENS', () => {
     expect(ens.network).toEqual(1);
   });
 
-  it('resolves .eth name using blockchain', async () => {
+  it.only('resolves .eth name using blockchain', async () => {
     expect(ens.url).toBe(
       protocolLink(ProviderProtocol.http, NamingServiceName.ENS),
     );
@@ -69,8 +68,7 @@ describe('ENS', () => {
     expectSpyToBeCalled(spy, 1);
   });
 
-  it('reverses address to ENS domain', async () => {
-    pendingInLive();
+  skipItInLive('reverses address to ENS domain', async () => {
     const eyes = mockAsyncMethods(ens, {
       resolverCallToName: 'adrian.argent.xyz',
       resolver: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
@@ -208,19 +206,19 @@ describe('ENS', () => {
       () =>
         new Resolution({
           sourceConfig: {
-            ens: {network: 'notRealNetwork' as EnsSupportedNetworks},
+            ens: {network: 'notRealNetwork'},
           },
         }),
-    ).toThrowError('Unspecified network in Resolution ENS configuration');
+    ).toThrowError('Unsupported network in Resolution ENS configuration');
   });
 
   it('checks normalizeSource ens (object) #7', async () => {
     expect(
       () =>
         new Resolution({
-          sourceConfig: {ens: {network: 'invalid' as EnsSupportedNetworks}},
+          sourceConfig: {ens: {network: 'invalid'}},
         }),
-    ).toThrowError('Unspecified network in Resolution ENS configuration');
+    ).toThrowError('Unsupported network in Resolution ENS configuration');
   });
 
   it('checks normalizeSource ens (object) #8', async () => {
@@ -297,7 +295,7 @@ describe('ENS', () => {
         new Resolution({
           sourceConfig: {
             ens: {
-              network: 'custom' as EnsSupportedNetworks,
+              network: 'custom',
               url: 'https://custom.notinfura.io',
             },
           },

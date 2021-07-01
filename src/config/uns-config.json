@@ -4,15 +4,27 @@
     "1": {
       "contracts": {
         "UNSRegistry": {
-          "address": "0x0000000000000000000000000000000000000001",
-          "implementation": "",
+          "address": "0x0000000000000000000000000000000000000000",
+          "implementation": "0x0000000000000000000000000000000000000000",
           "legacyAddresses": [],
-          "deploymentBlock": ""
+          "deploymentBlock": "0x0"
         },
         "CNSRegistry": {
           "address": "0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe",
           "legacyAddresses": [],
           "deploymentBlock": "0x8a958b"
+        },
+        "MintingManager": {
+          "address": "0x0000000000000000000000000000000000000000",
+          "implementation": "0x0000000000000000000000000000000000000000",
+          "legacyAddresses": [],
+          "deploymentBlock": "0x0"
+        },
+        "ProxyAdmin": {
+          "address": "0x0000000000000000000000000000000000000000",
+          "implementation": "0x0000000000000000000000000000000000000000",
+          "legacyAddresses": [],
+          "deploymentBlock": "0x0"
         },
         "SignatureController": {
           "address": "0x82EF94294C95aD0930055f31e53A34509227c5f7",
@@ -79,7 +91,7 @@
         },
         "MintingManager": {
           "address": "0xdAAf99A920D31F4f5720e4667b12b24e54A03070",
-          "implementation": "0xf709D8b2c9881378d50653521a9fB64E45419914",
+          "implementation": "0xb8efb23b97408147ca63ae0494b2242c5029ffc4",
           "legacyAddresses": [],
           "deploymentBlock": "0x85e629"
         },
@@ -89,10 +101,11 @@
             "0x9F19473F6a98a715176291c930558E1954fd3D1e",
             "0x3A2e74CF832cbA3d77E72708d55370119E4323a6"
           ],
-          "deploymentBlock": "0x85e62c"
+          "deploymentBlock": "0x8671b4"
         },
         "ProxyAdmin": {
           "address": "0xaf9815005A208d1460b6fC60B4f90B9f2185E88c",
+          "legacyAddresses": [],
           "deploymentBlock": "0x85e627"
         },
         "SignatureController": {
@@ -130,9 +143,9 @@
           "deploymentBlock": "0x7232cf"
         },
         "TwitterValidationOperator": {
-          "address": "0x1CB337b3b208dc29a6AcE8d11Bb591b66c5Dd83d",
-          "legacyAddresses": [],
-          "deploymentBlock": "0x7232d3"
+          "address": "0x9ea4A63184ebE9CBA55CD1af473D98075Aa02b4C",
+          "legacyAddresses": ["0x1CB337b3b208dc29a6AcE8d11Bb591b66c5Dd83d"],
+          "deploymentBlock": "0x86935e"
         },
         "FreeMinter": {
           "address": "0x84214215904cDEbA9044ECf95F3eBF009185AAf4",

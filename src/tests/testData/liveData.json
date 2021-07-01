@@ -2,7 +2,7 @@
   "bradCryptoMetadata": {
     "name": "brad.crypto",
     "description": "A .crypto blockchain domain. Use it to resolve your cryptocurrency addresses and decentralized websites.\nhttps://gateway.pinata.cloud/ipfs/QmdyBw5oTgCtTLQ18PbDvPL8iaLoEPhSyzD91q9XmgmAjb",
-    "external_url": "https://unstoppabledomains.com/search?searchTerm=brad.crypto",
+    "external_url": "https://staging:Staging-4-Unstoppable-3-2-1@staging.unstoppabledomains.com/search?searchTerm=brad.crypto",
     "image": "https://storage.googleapis.com/dot-crypto-metadata-api/unstoppabledomains_crypto.png",
     "attributes": [
       {
