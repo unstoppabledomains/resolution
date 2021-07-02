@@ -258,23 +258,19 @@ export default class Uns extends NamingService {
   }
 
   async registryAddress(domainOrNamehash: string): Promise<string> {
-    let namehash: string;
-
-    if (domainOrNamehash.startsWith('0x')) {
-      namehash = domainOrNamehash;
-    } else {
-      if (!this.checkDomain(domainOrNamehash)) {
-        throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
-          domain: domainOrNamehash,
-        });
-      }
-
-      const tld = domainOrNamehash.split('.').pop();
-      namehash = this.namehash(tld!);
+    if (
+      !this.checkDomain(domainOrNamehash, domainOrNamehash.startsWith('0x'))
+    ) {
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
+        domain: domainOrNamehash,
+      });
     }
+    const namehash = domainOrNamehash.startsWith('0x')
+      ? domainOrNamehash
+      : this.namehash(domainOrNamehash);
     const [address] = await this.readerContract.call('registryOf', [namehash]);
     if (address === NullAddress) {
-      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
+      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
         domain: domainOrNamehash,
       });
     }
@@ -437,7 +433,10 @@ export default class Uns extends NamingService {
     return lastResetEvent?.blockNumber || defaultStartingBlock;
   }
 
-  private checkDomain(domain: string): boolean {
+  private checkDomain(domain: string, passIfTokenID = false): boolean {
+    if (passIfTokenID) {
+      return true;
+    }
     const tokens = domain.split('.');
     return (
       !!tokens.length &&
