@@ -161,7 +161,7 @@
         "method": "eth_call",
         "params": [
           {
-            "data": "0xa81ce6f90f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f",
+            "data": "0xa81ce6f970702ccf2d95c2c8ff666f5e4dde0ed0e83d7d7407fff6f593d4e277aac0a40c",
             "to": "0x299974aed8911bcbd2c61262605b89f591a53e83"
           },
           "latest"
@@ -181,7 +181,7 @@
         "method": "eth_call",
         "params": [
           {
-            "data": "0xa81ce6f95c828ec285c0bf152a30a325b3963661a80cb87641d60920344caf04d4a0f31e",
+            "data": "0xa81ce6f98e3f4a48d9806259e049ea529c5be0c6433ff147ad781caf8014d196c388e1df",
             "to": "0x299974aed8911bcbd2c61262605b89f591a53e83"
           },
           "latest"
@@ -201,7 +201,7 @@
         "method": "eth_call",
         "params": [
           {
-            "data": "0xa81ce6f999140b022179d52bbdec6856ab7deae20ff32ae688e229f6c92bcc454a7b3a63",
+            "data": "0xa81ce6f99319b0a972ee595115c81afa667fc78253ff07a82fc635b39d528c759c979ebc",
             "to": "0x299974aed8911bcbd2c61262605b89f591a53e83"
           },
           "latest"

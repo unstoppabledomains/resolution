@@ -559,13 +559,16 @@ describe('UNS', () => {
   describe('.registryAddress', () => {
     it('should return cns registry address', async () => {
       mockAPICalls('uns_registry_address_tests', protocolLink());
-      const registryAddress = await uns.registryAddress('some-domain.crypto');
+      const registryAddress = await uns.registryAddress(
+        'udtestdev-265f8f.crypto',
+      );
       expect(registryAddress).toBe(
         UnsConfig.networks[4].contracts.CNSRegistry.address,
       );
     });
 
-    it('should return uns registry address', async () => {
+    //todo Replace the domain with existed test domain ending on .888
+    skipItInLive('should return uns registry address', async () => {
       mockAPICalls('uns_registry_address_tests', protocolLink());
       const registryAddress = await uns.registryAddress('some-domain.888');
       expect(registryAddress).toBe(
@@ -585,7 +588,7 @@ describe('UNS', () => {
       mockAPICalls('uns_registry_address_tests', protocolLink());
       await expectResolutionErrorCode(
         () => uns.registryAddress('some-domain.unknown'),
-        ResolutionErrorCode.UnsupportedDomain,
+        ResolutionErrorCode.UnregisteredDomain,
       );
     });
   });
@@ -705,7 +708,7 @@ describe('UNS', () => {
       );
     });
 
-    it('should throw error if domain is not found', async () => {
+    it('should throw error', async () => {
       const spies = mockAsyncMethods(uns.readerContract, {
         call: new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
           providerMessage: 'execution reverted',
@@ -751,20 +754,6 @@ describe('UNS', () => {
       expectSpyToBeCalled(unsSpies);
       expectSpyToBeCalled(fetchSpies);
       expect(metadata).toEqual(testMeta);
-    });
-
-    it('should throw error if domain is not found', async () => {
-      const spies = mockAsyncMethods(uns.readerContract, {
-        call: new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
-          providerMessage: 'execution reverted',
-        }),
-      });
-
-      await expectResolutionErrorCode(
-        () => resolution.tokenURIMetadata('fakedomainthatdoesnotexist.crypto'),
-        ResolutionErrorCode.UnregisteredDomain,
-      );
-      expectSpyToBeCalled(spies);
     });
   });
 
@@ -814,7 +803,7 @@ describe('UNS', () => {
       mockAPICalls('unhash', protocolLink());
       await expectResolutionErrorCode(
         () => resolution.unhash(unregisteredhash, NamingServiceName.UNS),
-        ResolutionErrorCode.UnsupportedDomain,
+        ResolutionErrorCode.UnregisteredDomain,
       );
     });
 
