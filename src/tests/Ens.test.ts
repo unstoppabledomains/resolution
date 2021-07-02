@@ -45,7 +45,7 @@ describe('ENS', () => {
     expect(ens.network).toEqual(1);
   });
 
-  it.only('resolves .eth name using blockchain', async () => {
+  it('resolves .eth name using blockchain', async () => {
     expect(ens.url).toBe(
       protocolLink(ProviderProtocol.http, NamingServiceName.ENS),
     );
