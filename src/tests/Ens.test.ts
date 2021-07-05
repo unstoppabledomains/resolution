@@ -2,7 +2,6 @@ import nock from 'nock';
 import Resolution, {NamingServiceName, ResolutionErrorCode} from '../index';
 import {NullAddress} from '../types';
 import {
-  expectConfigurationErrorCode,
   expectResolutionErrorCode,
   expectSpyToBeCalled,
   mockAsyncMethod,
@@ -11,8 +10,9 @@ import {
   ProviderProtocol,
   skipItInLive,
 } from './helpers';
-import {ConfigurationErrorCode} from '../errors/configurationError';
 import Ens from '../Ens';
+import FetchProvider from '../FetchProvider';
+import EnsNetworkMap from 'ethereum-ens-network-map';
 
 let resolution: Resolution;
 let ens: Ens;
@@ -209,7 +209,9 @@ describe('ENS', () => {
             ens: {network: 'notRealNetwork'},
           },
         }),
-    ).toThrowError('Unsupported network in Resolution ENS configuration');
+    ).toThrowError(
+      'Missing configuration in Resolution ENS. Please specify registryAddress when using a custom network',
+    );
   });
 
   it('checks normalizeSource ens (object) #7', async () => {
@@ -218,7 +220,93 @@ describe('ENS', () => {
         new Resolution({
           sourceConfig: {ens: {network: 'invalid'}},
         }),
-    ).toThrowError('Unsupported network in Resolution ENS configuration');
+    ).toThrowError(
+      'Missing configuration in Resolution ENS. Please specify registryAddress when using a custom network',
+    );
+  });
+
+  it('checks custom network config without url or provider', async () => {
+    expect(
+      () =>
+        new Resolution({
+          sourceConfig: {
+            ens: {
+              network: 'custom',
+              registryAddress: '0x314159265dd8dbb310642f98f50c066173c1259b',
+            },
+          },
+        }),
+    ).toThrowError(
+      'Missing configuration in Resolution ENS. Please specify url or provider when using a custom network',
+    );
+  });
+
+  it('checks custom network config without with url', async () => {
+    const resolution = new Resolution({
+      sourceConfig: {
+        ens: {
+          network: 'custom',
+          registryAddress: '0x314159265dd8dbb310642f98f50c066173c1259b',
+          url: 'https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
+        },
+      },
+    });
+    const ens = resolution.serviceMap[NamingServiceName.ENS] as Ens;
+    expect(ens.network).toBeUndefined();
+    expect(await ens.registryAddress('test.ens')).toBe(
+      '0x314159265dd8dbb310642f98f50c066173c1259b',
+    );
+    expect(ens.url).toBe(
+      'https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
+    );
+  });
+
+  it('checks custom network config without with provider', async () => {
+    const provider = new FetchProvider(
+      NamingServiceName.ENS,
+      'https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
+    );
+    const resolution = new Resolution({
+      sourceConfig: {
+        ens: {
+          network: 'custom',
+          registryAddress: '0x314159265dd8dbb310642f98f50c066173c1259b',
+          provider: new FetchProvider(
+            NamingServiceName.ENS,
+            'https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
+          ),
+        },
+      },
+    });
+    const ens = resolution.serviceMap[NamingServiceName.ENS] as Ens;
+    expect(ens.network).toBeUndefined();
+    expect(await ens.registryAddress('test.ens')).toBe(
+      '0x314159265dd8dbb310642f98f50c066173c1259b',
+    );
+    expect(ens.provider).toMatchObject(provider);
+  });
+
+  it('resolve record with custom network', async () => {
+    const networkId = 1;
+    const resolution = new Resolution({
+      sourceConfig: {
+        ens: {
+          network: 'custom',
+          url: Ens.UrlMap[networkId],
+          registryAddress: EnsNetworkMap[networkId],
+        },
+      },
+    });
+    const eyes = mockAsyncMethods(
+      resolution.serviceMap[NamingServiceName.ENS],
+      {
+        resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+        callMethod: '0x76a9144620b70031f0e9437e374a2100934fba4911046088ac',
+      },
+    );
+    const doge = await resolution.addr('testthing.eth', 'DOGE');
+    expectSpyToBeCalled(eyes);
+    expect(doge).toBe('DBXu2kgc3xtvCUWFcxFE3r9hEYgmuaaCyD');
   });
 
   it('checks normalizeSource ens (object) #8', async () => {
@@ -290,17 +378,15 @@ describe('ENS', () => {
   });
 
   it('checks normalizeSource ens (object) #13', async () => {
-    expectConfigurationErrorCode(
+    expect(
       () =>
         new Resolution({
           sourceConfig: {
-            ens: {
-              network: 'custom',
-              url: 'https://custom.notinfura.io',
-            },
+            ens: {network: 'custom', url: 'https://custom.notinfura.io'},
           },
         }),
-      ConfigurationErrorCode.UnsupportedNetwork,
+    ).toThrowError(
+      'Missing configuration in Resolution ENS. Please specify registryAddress when using a custom network',
     );
   });
 

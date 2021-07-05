@@ -47,11 +47,7 @@ export default class Ens extends NamingService {
         network: 'mainnet',
       };
     }
-    if (!source.network || !EnsSupportedNetwork.guard(source.network)) {
-      throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {
-        method: NamingServiceName.ENS,
-      });
-    }
+    this.checkNetworkConfig(source);
     this.network = EthereumNetworks[source.network];
     this.url = source['url'] || Ens.UrlMap[this.network];
     this.provider =
@@ -380,5 +376,51 @@ export default class Ens extends NamingService {
       (/^[^-]*[^-]*\.(eth|luxe|xyz|kred|addr\.reverse)$/.test(domain) &&
         domain.split('.').every((v) => !!v.length))
     );
+  }
+
+  private checkNetworkConfig(source: EnsSource): void {
+    if (!source.network) {
+      throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {
+        method: this.name,
+      });
+    }
+    if (!EnsSupportedNetwork.guard(source.network)) {
+      this.checkCustomNetworkConfig(source);
+    }
+  }
+
+  private checkCustomNetworkConfig(source: EnsSource): void {
+    if (!this.isValidRegistryAddress(source.registryAddress)) {
+      throw new ConfigurationError(
+        ConfigurationErrorCode.InvalidConfigurationField,
+        {
+          method: this.name,
+          field: 'registryAddress',
+        },
+      );
+    }
+    if (!source['url'] && !source['provider']) {
+      throw new ConfigurationError(
+        ConfigurationErrorCode.CustomNetworkConfigMissing,
+        {
+          method: this.name,
+          config: 'url or provider',
+        },
+      );
+    }
+  }
+
+  private isValidRegistryAddress(address?: string): boolean {
+    if (!address) {
+      throw new ConfigurationError(
+        ConfigurationErrorCode.CustomNetworkConfigMissing,
+        {
+          method: this.name,
+          config: 'registryAddress',
+        },
+      );
+    }
+    const ethLikePattern = new RegExp('^0x[a-fA-F0-9]{40}$');
+    return ethLikePattern.test(address);
   }
 }
