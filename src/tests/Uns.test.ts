@@ -22,6 +22,7 @@ import {ConfigurationErrorCode} from '../errors/configurationError';
 import {TokenUriMetadata} from '../types/publicTypes';
 import liveData from './testData/liveData.json';
 import UnsConfig from '../config/uns-config.json';
+import nock from 'nock';
 
 let resolution: Resolution;
 let uns: Uns;
@@ -818,5 +819,52 @@ describe('UNS', () => {
         );
       },
     );
+
+    skipItInLive(
+      'getStartingBlockFromRegistry shouild return earliest for custom network',
+      async () => {
+        resolution = new Resolution({
+          sourceConfig: {
+            uns: {
+              network: 'custom',
+              url: protocolLink(),
+              proxyReaderAddress:
+                UnsConfig.networks[4].contracts.ProxyReader.address,
+            },
+          },
+        });
+        const someHash = resolution.namehash('test.coin');
+        // We need to make sure there is no mocks in the queque before we create new ones
+        nock.cleanAll();
+        mockAPICalls('unhashGetStartingBlockTest', protocolLink());
+        await expectResolutionErrorCode(
+          () => resolution.unhash(someHash, NamingServiceName.UNS),
+          ResolutionErrorCode.UnregisteredDomain,
+        );
+        // If the getStartingBlockFromRegistry function won't return "earliest" then one of the mocks will not be fired
+        // Giving us an indicator that something has changed in the function output
+        if (!nock.isDone()) {
+          throw new Error(
+            'Not all mocks have been called, getStartingBlockFromRegistry is misbehaving?',
+          );
+        }
+      },
+    );
+
+    it('should return a .wallet domain', async () => {
+      const walletDomain = 'udtestdev-johnnywallet.wallet';
+      const hash = resolution.namehash(walletDomain);
+      mockAPICalls('unhash', protocolLink());
+      const result = await resolution.unhash(hash, NamingServiceName.UNS);
+      expect(result).toBe(walletDomain);
+    });
+
+    it('should return a .coin domain', async () => {
+      const walletDomain = 'udtestdev-johnnycoin.coin';
+      const hash = resolution.namehash(walletDomain);
+      mockAPICalls('unhash', protocolLink());
+      const result = await resolution.unhash(hash, NamingServiceName.UNS);
+      expect(result).toBe(walletDomain);
+    });
   });
 });
