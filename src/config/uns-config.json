@@ -4,10 +4,10 @@
     "1": {
       "contracts": {
         "UNSRegistry": {
-          "address": "0x0000000000000000000000000000000000000000",
-          "implementation": "0x0000000000000000000000000000000000000000",
+          "address": "0x049aba7510f45BA5b64ea9E658E342F904DB358D",
+          "implementation": "0x6d4FaFcD5B4A8b360c80eAca8D91e3Bc814ecc39",
           "legacyAddresses": [],
-          "deploymentBlock": "0x0"
+          "deploymentBlock": "0xc2fede"
         },
         "CNSRegistry": {
           "address": "0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe",
@@ -15,16 +15,15 @@
           "deploymentBlock": "0x8a958b"
         },
         "MintingManager": {
-          "address": "0x0000000000000000000000000000000000000000",
-          "implementation": "0x0000000000000000000000000000000000000000",
+          "address": "0x2a7084870bB724175a3C96Da8FaA55128fa3E19D",
+          "implementation": "0x2f133a06fe4fc845E41261aCFF6831a727ea9062",
           "legacyAddresses": [],
-          "deploymentBlock": "0x0"
+          "deploymentBlock": "0xc2fee0"
         },
         "ProxyAdmin": {
-          "address": "0x0000000000000000000000000000000000000000",
-          "implementation": "0x0000000000000000000000000000000000000000",
+          "address": "0xAA16DA78110D9A9742c760a1a064F28654Ab93de",
           "legacyAddresses": [],
-          "deploymentBlock": "0x0"
+          "deploymentBlock": "0xc2fedc"
         },
         "SignatureController": {
           "address": "0x82EF94294C95aD0930055f31e53A34509227c5f7",
@@ -60,14 +59,17 @@
           "deploymentBlock": "0x960844"
         },
         "ProxyReader": {
-          "address": "0xa6E7cEf2EDDEA66352Fd68E5915b60BDbb7309f5",
-          "legacyAddresses": ["0x7ea9Ee21077F84339eDa9C80048ec6db678642B1"],
-          "deploymentBlock": "0xaa1644"
+          "address": "0xfEe4D4F0aDFF8D84c12170306507554bC7045878",
+          "legacyAddresses": [
+            "0xa6E7cEf2EDDEA66352Fd68E5915b60BDbb7309f5",
+            "0x7ea9Ee21077F84339eDa9C80048ec6db678642B1"
+          ],
+          "deploymentBlock": "0xc300b4"
         },
         "TwitterValidationOperator": {
-          "address": "0xbb486C6E9cF1faA86a6E3eAAFE2e5665C0507855",
-          "legacyAddresses": [],
-          "deploymentBlock": "0xa77b56"
+          "address": "0x2F659766E3D08561CA3408FbAba7C0749ab2c402",
+          "legacyAddresses": ["0xbb486C6E9cF1faA86a6E3eAAFE2e5665C0507855"],
+          "deploymentBlock": "0xc300b5"
         },
         "FreeMinter": {
           "address": "0x1fC985cAc641ED5846b631f96F35d9b48Bc3b834",

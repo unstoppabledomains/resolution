@@ -1,4 +1,14 @@
-## 4.0.1
+## 5.0.0
+- Added support for new TLD's ( .888, .nft, .coin, .blockchain, .wallet, .x, .bitcoin, .dao )
+- Replace CNS with UNS
+- Rename Eip1993Factories -> Eip1193Factories
+- Introduce ZilliqaProvider for ZNS
+- Add new method `Resolution#registryAddress(domain: string): Promise<string>` 
+- Return Ens support
+- Updated network-config
+- Add custom network support for ENS
+- Revert @zilliqa-js/core version that supports node version 10
+## 4.0.1 - 4.0.2
 
 - No changes made. Version bump so that it would appear as latest version on
   NPM.

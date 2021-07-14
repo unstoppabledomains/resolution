@@ -28,7 +28,7 @@ import {
   expectConfigurationErrorCode,
   CryptoDomainWithAllRecords,
 } from './helpers';
-import {RpcProviderTestCases} from '../utils/providerMockData';
+import {RpcProviderTestCases} from './providerMockData';
 import fetch, {FetchError} from 'node-fetch';
 import Uns from '../Uns';
 import Zns from '../Zns';
