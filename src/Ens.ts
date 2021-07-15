@@ -31,6 +31,7 @@ export default class Ens extends NamingService {
   static readonly UrlMap: BlockhanNetworkUrlMap = {
     1: 'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
     3: 'https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
+    4: 'https://rinkeby.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
   };
 
   readonly name = NamingServiceName.ENS;
