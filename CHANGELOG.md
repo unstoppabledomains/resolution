@@ -1,11 +1,17 @@
 ## 5.0.0
 - Added support for new TLD's ( .888, .nft, .coin, .blockchain, .wallet, .x, .bitcoin, .dao )
-- Replace CNS with UNS
+- Constructor is changed. If you used cns configurations rename "cns" it to "uns" instead.
+- Resolution#isSupportedDomain is now calls proxy reader contract "exists" method
 - Rename Eip1993Factories -> Eip1193Factories
 - Introduce ZilliqaProvider for ZNS
-- Add new method `Resolution#registryAddress(domain: string): Promise<string>` 
+- Introduced new method `Resolution#registryAddress -> Retrieves address of registry contract used for domain`
+- Introduced new method `Resolution#unhash -> Retrieves the domain name from tokenId by parsing registry smart contract event logs`
+- Introduced new method `Resolution#reverse -> This method is only for ens at the moment. Reverse the ens address to a ens registered domain name`
+- Introduced new method `Resolution#tokenURI -> Retrieves the tokenURI from the registry smart contract`
+- Introduced new method `Resolution#tokenURIMetadata -> etrieves the data from the endpoint provided by tokenURI from the registry smart contract`
+- Introduced new static method `Resolution#fromZilliqaProvider -> Creates a resolution instance with configured provider`
 - Return Ens support
-- Updated network-config
+- Updated network-config file for latest default contract addresses
 - Add custom network support for ENS
 - Revert @zilliqa-js/core version that supports node version 10
 ## 4.0.1 - 4.0.2

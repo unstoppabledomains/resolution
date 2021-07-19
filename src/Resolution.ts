@@ -594,6 +594,16 @@ export default class Resolution {
   }
 
   /**
+   * Retrieves address of registry contract used for domain
+   * @param domain - domain name
+   * @returns Registry contract address
+   */
+  async registryAddress(domain: string): Promise<string> {
+    const method = this.getNamingMethodOrThrow(domain);
+    return method.registryAddress(domain);
+  }
+
+  /**
    * Retrieves the domain name from tokenId by parsing registry smart contract event logs.
    * @throws {ResolutionError} if returned domain name doesn't match the original namhash.
    * @returns the domain name retrieved from token metadata
@@ -625,11 +635,6 @@ export default class Resolution {
       method: 'UDAPI',
       methodName: 'tokenURIMetadata',
     });
-  }
-
-  async registryAddress(domain: string): Promise<string> {
-    const method = this.getNamingMethodOrThrow(domain);
-    return method.registryAddress(domain);
   }
 
   private getDnsRecordKeys(types: DnsRecordType[]): string[] {
