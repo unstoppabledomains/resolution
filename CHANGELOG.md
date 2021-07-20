@@ -1,7 +1,8 @@
 ## 5.0.0
 - Added support for new TLD's ( .888, .nft, .coin, .blockchain, .wallet, .x, .bitcoin, .dao )
-- Constructor is changed. If you used cns configurations rename "cns" it to "uns" instead.
-- Resolution#isSupportedDomain is now calls proxy reader contract "exists" method
+- Constructor is changed. If you used cns configurations rename "cns" it to "uns" instead.      
+    - For example: `new Resolution({sourceConfig: {uns: {...uns config}}})`
+- Resolution#isSupportedDomain is now asynchronous
 - Rename Eip1993Factories -> Eip1193Factories
 - Introduce ZilliqaProvider for ZNS
 - Introduced new method `Resolution#registryAddress -> Retrieves address of registry contract used for domain`
@@ -9,11 +10,12 @@
 - Introduced new method `Resolution#reverse -> This method is only for ens at the moment. Reverse the ens address to a ens registered domain name`
 - Introduced new method `Resolution#tokenURI -> Retrieves the tokenURI from the registry smart contract`
 - Introduced new method `Resolution#tokenURIMetadata -> etrieves the data from the endpoint provided by tokenURI from the registry smart contract`
-- Introduced new static method `Resolution#fromZilliqaProvider -> Creates a resolution instance with configured provider`
-- Return Ens support
+- Introduced new factory method `Resolution#fromZilliqaProvider -> Creates a resolution instance with configured provider from Zilliqa provider`
+- Introduced new factory method `Resolution#fromResolutionProvider -> Creates a resolution from Resolution compatitable provider`
+- Introduced new factory method `Resolution#fromEthereumEip1193Provider -> Creates a resolution from EIP-1193 compatitable provider`
+- Return ENS support
 - Updated network-config file for latest default contract addresses
 - Add custom network support for ENS
-- Revert @zilliqa-js/core version that supports node version 10
 ## 4.0.1 - 4.0.2
 
 - No changes made. Version bump so that it would appear as latest version on
