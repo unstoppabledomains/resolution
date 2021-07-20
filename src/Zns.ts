@@ -37,6 +37,7 @@ export default class Zns extends NamingService {
 
   static readonly RegistryMap = {
     1: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
+    333: 'zil1hyj6m5w4atcn7s806s69r0uh5g4t84e8gp6nps',
   };
 
   readonly name: NamingServiceName = NamingServiceName.ZNS;

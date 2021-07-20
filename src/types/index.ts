@@ -131,7 +131,7 @@ export const EnsSupportedNetwork = StringUnion(
   'goerli',
   'ropsten',
 );
-export const ZnsSupportedNetwork = StringUnion('mainnet');
+export const ZnsSupportedNetwork = StringUnion('mainnet', 'testnet');
 
 export function hasProvider(obj: any): obj is {provider: Provider} {
   return obj && !!obj.provider;
