@@ -487,7 +487,7 @@ describe('ZNS', () => {
       const znsService = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
 
       expect(znsService.network).toBe(333);
-      expect(znsService.registryAddress).toBe(
+      expect(await znsService.registryAddress('fff.zil')).toBe(
         'zil1hyj6m5w4atcn7s806s69r0uh5g4t84e8gp6nps',
       );
     });

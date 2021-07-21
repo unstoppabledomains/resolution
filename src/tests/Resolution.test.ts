@@ -232,12 +232,8 @@ describe('Resolution', () => {
         NamingServiceName.UNS,
         blockchainUrl,
       );
-      const providerSpy = mockAsyncMethod(mockedProvider, 'request', () => '3');
-      const providerFactorySpy = mockAsyncMethod(
-        FetchProvider,
-        'factory',
-        () => mockedProvider,
-      );
+      mockAsyncMethod(mockedProvider, 'request', () => '3');
+      mockAsyncMethod(FetchProvider, 'factory', () => mockedProvider);
 
       await expectConfigurationErrorCode(
         Resolution.autoNetwork({
@@ -1026,7 +1022,9 @@ describe('Resolution', () => {
       const spies = mockAsyncMethods(uns, {
         registryAddress: UnsConfig.networks[4].contracts.CNSRegistry.address,
       });
-      const registryAddress = await resolution.registryAddress('testi.crypto');
+      const registryAddress = await resolution.registryAddress(
+        'udtestdev-crewe.crypto',
+      );
       expectSpyToBeCalled(spies);
       expect(registryAddress).toBe(
         UnsConfig.networks[4].contracts.CNSRegistry.address,
@@ -1037,7 +1035,9 @@ describe('Resolution', () => {
       const spies = mockAsyncMethods(uns, {
         registryAddress: UnsConfig.networks[4].contracts.UNSRegistry.address,
       });
-      const registryAddress = await resolution.registryAddress('testi.888');
+      const registryAddress = await resolution.registryAddress(
+        'udtestdev-check.wallet',
+      );
       expectSpyToBeCalled(spies);
       expect(registryAddress).toBe(
         UnsConfig.networks[4].contracts.UNSRegistry.address,
