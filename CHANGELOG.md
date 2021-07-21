@@ -1,4 +1,33 @@
-## 4.0.1
+## 5.0.0
+### Breaking changes
+ - Constructor has changed. If you used cns configurations rename "cns" it to "uns" instead.
+    - For example: `new Resolution({sourceConfig: {uns: {...uns config}}})`
+ - Method `Resolution#fromEip1193Provider` was renamed to `Resolution#fromEthereumEip1193Provider`  
+ - Factory methods has changed. All of them requires `{uns: {... uns config}}` in parameters instead of `cns`.
+   - The list of affected factory methods:
+     - `Resolution#autoNetwork` 
+     - `Resolution#infura` 
+     - `Resolution#fromEthereumEip1193Provider` (former `Resolution#fromEip1193Provider`)
+     - `Resolution#fromWeb3Version0Provider`
+     - `Resolution#fromWeb3Version1Provider`
+     - `Resolution#fromEthersProvider`
+ - `Resolution#isSupportedDomain` method is now asynchronous
+
+### New methods and features
+- 🎉 🎉 🎉 Added support for new TLD's ( .888, .nft, .coin, .blockchain, .wallet, .x, .bitcoin, .dao )
+- Typo fix: Rename `Eip1993Factories()` -> `Eip1193Factories()`. Old name is still available under the alias `Eip1993Factories`
+- Introduced new method `Resolution#registryAddress -> Retrieves address of registry contract used for domain`
+- Introduced new method `Resolution#unhash -> Retrieves the domain name from tokenId by parsing registry smart contract event logs`
+- Introduced new method `Resolution#reverse -> This method is only for ens at the moment. Reverse the ens address to a ens registered domain name`
+- Introduced new method `Resolution#tokenURI -> Retrieves the tokenURI from the registry smart contract`
+- Introduced new method `Resolution#tokenURIMetadata -> etrieves the data from the endpoint provided by tokenURI from the registry smart contract`
+- Introduced new factory method `Resolution#fromZilliqaProvider -> Creates a resolution instance with configured provider from Zilliqa provider`
+- Introduced new factory method `Resolution#fromResolutionProvider -> Creates a resolution from Resolution compatitable provider`
+- Introduced new factory method `Resolution#fromEthereumEip1193Provider -> Creates a resolution from EIP-1193 compatitable provider`
+- Return ENS support
+- Add custom network support for ENS
+
+## 4.0.1 - 4.0.2
 
 - No changes made. Version bump so that it would appear as latest version on
   NPM.
