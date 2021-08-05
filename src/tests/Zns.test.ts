@@ -17,52 +17,58 @@ let zns: Zns;
 describe('ZNS', () => {
   beforeEach(() => {
     jest.restoreAllMocks();
-    resolution = new Resolution();
+    resolution = new Resolution({
+      sourceConfig: {
+        zns: {
+          network: 'testnet',
+        },
+      },
+    });
     zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
   });
 
   describe('.NormalizeSource', () => {
     it('checks normalizeSource zns (boolean)', async () => {
-      expect(zns.network).toBe(1);
-      expect(zns.url).toBe('https://api.zilliqa.com');
+      expect(zns.network).toBe(333);
+      expect(zns.url).toBe('https://dev-api.zilliqa.com');
     });
 
     it('checks normalizeSource zns (string)', async () => {
-      expect(zns.network).toBe(1);
-      expect(zns.url).toBe('https://api.zilliqa.com');
+      expect(zns.network).toBe(333);
+      expect(zns.url).toBe('https://dev-api.zilliqa.com');
     });
 
     it('checks normalizeSource zns (object) #1', async () => {
       const resolution = new Resolution({
         sourceConfig: {
-          zns: {url: 'https://api.zilliqa.com', network: 'mainnet'},
+          zns: {url: 'https://dev-api.zilliqa.com', network: 'testnet'},
         },
       });
       zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
-      expect(zns.network).toBe(1);
-      expect(zns.url).toBe('https://api.zilliqa.com');
+      expect(zns.network).toBe(333);
+      expect(zns.url).toBe('https://dev-api.zilliqa.com');
     });
 
     it('checks normalizeSource zns (object) #3', async () => {
       const resolution = new Resolution({
         sourceConfig: {
-          zns: {url: 'https://api.zilliqa.com', network: 'mainnet'},
+          zns: {url: 'https://dev-api.zilliqa.com', network: 'testnet'},
         },
       });
       zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
-      expect(zns.network).toBe(1);
-      expect(zns.url).toBe('https://api.zilliqa.com');
+      expect(zns.network).toBe(333);
+      expect(zns.url).toBe('https://dev-api.zilliqa.com');
     });
 
     it('checks normalizeSource zns (object) #4', async () => {
       const resolution = new Resolution({
         sourceConfig: {
-          zns: {url: 'https://api.zilliqa.com', network: 'mainnet'},
+          zns: {url: 'https://dev-api.zilliqa.com', network: 'testnet'},
         },
       });
       zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
-      expect(zns.network).toBe(1);
-      expect(zns.url).toBe('https://api.zilliqa.com');
+      expect(zns.network).toBe(333);
+      expect(zns.url).toBe('https://dev-api.zilliqa.com');
     });
 
     it('checks normalizeSource zns (object) #6', async () => {
@@ -83,7 +89,7 @@ describe('ZNS', () => {
             sourceConfig: {
               zns: {
                 network: 'random-network',
-                url: 'https://api.zilliqa.com',
+                url: 'https://dev-api.zilliqa.com',
                 registryAddress: '0x0123123',
               },
             },
@@ -97,7 +103,7 @@ describe('ZNS', () => {
         sourceConfig: {
           zns: {
             network: 'random-network',
-            url: 'https://api.zilliqa.com',
+            url: 'https://dev-api.zilliqa.com',
             registryAddress: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
           },
         },
@@ -138,53 +144,53 @@ describe('ZNS', () => {
 
     it('checks normalizeSource zns (object) #8', async () => {
       const resolution = new Resolution({
-        sourceConfig: {zns: {network: 'mainnet'}},
+        sourceConfig: {zns: {network: 'testnet'}},
       });
       zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
-      expect(zns.network).toBe(1);
-      expect(zns.url).toBe('https://api.zilliqa.com');
+      expect(zns.network).toBe(333);
+      expect(zns.url).toBe('https://dev-api.zilliqa.com');
     });
 
     it('checks normalizeSource zns (object) #10', async () => {
       const resolution = new Resolution({
         sourceConfig: {
           zns: {
-            registryAddress: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
-            network: 'mainnet',
+            registryAddress: 'zil1hyj6m5w4atcn7s806s69r0uh5g4t84e8gp6nps',
+            network: 'testnet',
           },
         },
       });
       zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
-      expect(zns.network).toBe(1);
+      expect(zns.network).toBe(333);
       expect(zns.registryAddr).toBe(
-        'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
+        'zil1hyj6m5w4atcn7s806s69r0uh5g4t84e8gp6nps',
       );
-      expect(zns.url).toBe('https://api.zilliqa.com');
+      expect(zns.url).toBe('https://dev-api.zilliqa.com');
     });
 
     it('checks normalizeSource zns (object) #11', async () => {
       const resolution = new Resolution({
         sourceConfig: {
           zns: {
-            registryAddress: '0xabcffff1231586348194fcabbeff1231240234fc',
-            network: 'mainnet',
+            registryAddress: '0xb925add1d5eaf13f40efd43451bf97a22ab3d727',
+            network: 'testnet',
           },
         },
       });
       zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
-      expect(zns.network).toBe(1);
-      expect(zns.url).toBe('https://api.zilliqa.com');
+      expect(zns.network).toBe(333);
+      expect(zns.url).toBe('https://dev-api.zilliqa.com');
       expect(zns.registryAddr).toBe(
-        'zil1408llufrzkrrfqv5lj4malcjxyjqyd8urd7xz6',
+        'zil1hyj6m5w4atcn7s806s69r0uh5g4t84e8gp6nps',
       );
     });
   });
 
   describe('.registryAddress', () => {
-    it('should return mainnet registry address', async () => {
-      const registryAddress = await zns.registryAddress('some-domaine.zil');
+    it('should return testnet registry address', async () => {
+      const registryAddress = await zns.registryAddress('testing.zil');
       expect(registryAddress).toBe(
-        'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
+        'zil1hyj6m5w4atcn7s806s69r0uh5g4t84e8gp6nps',
       );
     });
   });
@@ -201,7 +207,7 @@ describe('ZNS', () => {
           'crypto.ETH.address': '0xaa91734f90795e80751c96e682a321bb3c1a4186',
         },
       });
-      const result = await resolution.allRecords('cofounding.zil');
+      const result = await resolution.allRecords('testing.zil');
       expectSpyToBeCalled(eyes);
       expect(result).toBeDefined();
       expect(result['crypto.ETH.address']).toEqual(
@@ -227,7 +233,7 @@ describe('ZNS', () => {
           'whois.for_sale.value': 'true',
         },
       });
-      const result = await resolution.allRecords('test-manage-one.zil');
+      const result = await resolution.allRecords('testing.zil');
       expectSpyToBeCalled(spyes);
       expect(result).toEqual({
         'crypto.BURST.address': 'BURST-R7KK-SBSY-FENX-AWYMW',
@@ -246,7 +252,7 @@ describe('ZNS', () => {
           '0xdac22230adfe4601f00631eae92df6d77f054891',
         ],
       });
-      const resolverAddress = await resolution.resolver('brad.zil');
+      const resolverAddress = await resolution.resolver('testing.zil');
       expectSpyToBeCalled(spies);
       expect(resolverAddress).toBe(
         '0xdac22230adfe4601f00631eae92df6d77f054891',
@@ -260,7 +266,7 @@ describe('ZNS', () => {
           '0xdac22230adfe4601f00631eae92df6d77f054891',
         ],
       });
-      const ownerAddress = await resolution.owner('brad.zil');
+      const ownerAddress = await resolution.owner('testing.zil');
       expectSpyToBeCalled(spies);
       expect(ownerAddress).toBe('zil194qcjskuuxh6qtg8xw3qqrr3kdc6dtq8ct6j9s');
     });
@@ -324,7 +330,7 @@ describe('ZNS', () => {
       const spies = mockAsyncMethods(zns, {
         getRecordsAddresses: ['zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz'],
       });
-      const isRegistered = await resolution.isRegistered('brad.zil');
+      const isRegistered = await resolution.isRegistered('testing.zil');
       expectSpyToBeCalled(spies);
       expect(isRegistered).toBe(true);
     });
@@ -345,7 +351,7 @@ describe('ZNS', () => {
       const spies = mockAsyncMethods(zns, {
         getRecordsAddresses: ['zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz'],
       });
-      const isAvailable = await zns.isAvailable('brad.zil');
+      const isAvailable = await zns.isAvailable('testing.zil');
       expectSpyToBeCalled(spies);
       expect(isAvailable).toBe(false);
     });
@@ -353,7 +359,7 @@ describe('ZNS', () => {
       const spies = mockAsyncMethods(zns, {
         getRecordsAddresses: [''],
       });
-      const isAvailable = await zns.isAvailable('ryan.zil');
+      const isAvailable = await zns.isAvailable('ryawefawefan.zil');
       expectSpyToBeCalled(spies);
       expect(isAvailable).toBe(true);
     });
@@ -392,7 +398,7 @@ describe('ZNS', () => {
         'whois.email.value': 'matt+test@unstoppabledomains.com',
         'whois.for_sale.value': 'true',
       });
-      const hash = await resolution.ipfsHash('ergergergerg.zil');
+      const hash = await resolution.ipfsHash('testing.zil');
       expectSpyToBeCalled([eye, secondEye]);
       expect(hash).toStrictEqual(
         'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu',
@@ -415,7 +421,7 @@ describe('ZNS', () => {
         'whois.email.value': 'matt+test@unstoppabledomains.com',
         'whois.for_sale.value': 'true',
       });
-      const httpUrl = await resolution.httpUrl('ergergergerg.zil');
+      const httpUrl = await resolution.httpUrl('testing.zil');
       expectSpyToBeCalled([eye, secondEye]);
       expect(httpUrl).toBe('www.unstoppabledomains.com');
     });
@@ -434,7 +440,7 @@ describe('ZNS', () => {
         'ipfs.html.value': 'QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu',
         'whois.email.value': 'jeyhunt@gmail.com',
       });
-      const records = await resolution.allRecords('johnnyjumper.zil');
+      const records = await resolution.allRecords('testing.zil');
       expectSpyToBeCalled([eye, secondEye]);
       expect(records).toMatchObject({
         'crypto.ETH.address': '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
@@ -472,63 +478,6 @@ describe('ZNS', () => {
           ),
         ResolutionErrorCode.UnsupportedMethod,
       );
-    });
-  });
-
-  describe('ZnsTestnet', () => {
-    it('should reach to the testnet', async () => {
-      const resolution = new Resolution({
-        sourceConfig: {
-          zns: {
-            network: 'testnet',
-          },
-        },
-      });
-      const znsService = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
-
-      expect(znsService.network).toBe(333);
-      expect(await znsService.registryAddress('fff.zil')).toBe(
-        'zil1hyj6m5w4atcn7s806s69r0uh5g4t84e8gp6nps',
-      );
-    });
-
-    it('should not find a real domain in test network', async () => {
-      const resolution = new Resolution({
-        sourceConfig: {
-          zns: {
-            network: 'testnet',
-          },
-        },
-      });
-      const znsService = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
-      const spies = mockAsyncMethods(znsService, {
-        getRecordsAddresses: undefined,
-      });
-      await expectResolutionErrorCode(
-        () => resolution.owner('johnnyjumper.zil'),
-        ResolutionErrorCode.UnregisteredDomain,
-      );
-      expectSpyToBeCalled(spies);
-    });
-
-    it('should resolve testnet domain', async () => {
-      const resolution = new Resolution({
-        sourceConfig: {
-          zns: {
-            network: 'testnet',
-          },
-        },
-      });
-      const znsService = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
-      const spies = mockAsyncMethods(znsService, {
-        getRecordsAddresses: [
-          'zil1tcucw4w5uqgwz38y2na4249adzeg4rvl94kwhm',
-          '0xba45a60fa2a12060ba4caf4f9f842fae0a66cbf4',
-        ],
-      });
-      const owner = await resolution.owner('zero.zil');
-      expectSpyToBeCalled(spies);
-      expect(owner).toBe('zil1tcucw4w5uqgwz38y2na4249adzeg4rvl94kwhm');
     });
   });
 });
