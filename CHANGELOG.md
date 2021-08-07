@@ -1,3 +1,6 @@
+## 5.0.1
+- Add `elliptic` package dependency in order to enable twitter verification support by default
+
 ## 5.0.0
 ### Breaking changes
  - Constructor has changed. If you used cns configurations rename "cns" it to "uns" instead.

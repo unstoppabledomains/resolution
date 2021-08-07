@@ -1,7 +1,8 @@
 /* eslint-disable no-undef */
 import {keccak256 as sha3} from 'js-sha3';
 import {hexToBytes} from '.';
-import {requireOrFail} from './requireOrFail';
+import {ec} from 'elliptic';
+const secp256k1 = new ec('secp256k1');
 
 const bytesLength = (a: string) => (a.length - 2) / 2;
 const bytesSlice = (i: number, j: number, bs: string) =>
@@ -27,11 +28,6 @@ const toChecksum = (address: string) => {
   return checksumAddress;
 };
 
-const getSecp256k1 = () => {
-  const elliptic = requireOrFail('elliptic', 'elliptic', '^6.5.3');
-  return new elliptic.ec('secp256k1');
-};
-
 export const hashMessage = (message: string): string => {
   const messageBytes = hexToBytes(Buffer.from(message, 'utf8').toString('hex'));
   const messageBuffer = Buffer.from(messageBytes);
@@ -42,7 +38,6 @@ export const hashMessage = (message: string): string => {
 };
 
 export const recover = (message: string, signature: string): string => {
-  const secp256k1 = getSecp256k1();
   const hash = hashMessage(message);
   const vals = decodeSignature(signature);
   const vrs = {
