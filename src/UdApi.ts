@@ -141,7 +141,7 @@ export default class Udapi extends NamingService {
 
   getDomainFromTokenId(tokenId: string): Promise<string> {
     throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
-      methodName: 'isSupportedDomain',
+      methodName: 'getDomainFromTokenId',
     });
   }
 
