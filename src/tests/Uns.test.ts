@@ -697,7 +697,7 @@ describe('UNS', () => {
     it('should return token URI', async () => {
       const spies = mockAsyncMethods(uns.readerContract, {
         call: [
-          'https://staging-dot-dot-crypto-metadata.appspot.com/metadata/brad.crypto',
+          'https://metadata.staging.unstoppabledomains.com/metadata/brad.crypto',
         ],
       });
 
@@ -705,7 +705,7 @@ describe('UNS', () => {
 
       expectSpyToBeCalled(spies);
       expect(uri).toEqual(
-        'https://staging-dot-dot-crypto-metadata.appspot.com/metadata/brad.crypto',
+        'https://metadata.staging.unstoppabledomains.com/metadata/brad.crypto',
       );
     });
 
