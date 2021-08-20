@@ -5,6 +5,7 @@ import Resolution, {
   UnclaimedDomainResponse,
 } from '../index';
 import {
+  BlockchainType,
   DnsRecordType,
   JsonRpcPayload,
   NamingServiceName,
@@ -1241,6 +1242,62 @@ describe('Resolution', () => {
           'COM' as NamingServiceName,
         ),
       ).toThrowError('Naming service COM is not supported');
+    });
+  });
+
+  describe('.location', () => {
+    it('should get location for .crypto domains', async () => {
+      const mockValues = {
+        registryAddress: '0xAad76bea7CFEc82927239415BB18D2e93518ecBB',
+        resolver: '0x95ae1515367aa64c462c71e87157771165b1287a',
+        owner: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
+      };
+
+      mockAsyncMethods(uns, mockValues);
+      const location = await resolution.location('brad.crypto');
+      expect(location).toEqual({
+        registry: mockValues.registryAddress,
+        resolver: mockValues.resolver,
+        networkId: 4,
+        blockchain: BlockchainType.ETH,
+        owner: mockValues.owner,
+      });
+    });
+
+    it('should get location for uns domains', async () => {
+      const mockValues = {
+        registryAddress: '0x7fb83000b8ed59d3ead22f0d584df3a85fbc0086',
+        resolver: '0x7fb83000b8ed59d3ead22f0d584df3a85fbc0086',
+        owner: '0x0e43f36e4b986dfbe1a75cacfa60ca2bd44ae962',
+      };
+
+      mockAsyncMethods(uns, mockValues);
+      const location = await resolution.location('udtestdev-check.wallet');
+      expect(location).toEqual({
+        registry: mockValues.registryAddress,
+        resolver: mockValues.resolver,
+        networkId: 4,
+        blockchain: BlockchainType.ETH,
+        owner: mockValues.owner,
+      });
+    });
+
+    it('should get location for zns domains', async () => {
+      const mockValues = {
+        registryAddress: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
+        resolver: '0x02621c64a57e1424adfe122569f2356145f05d4f',
+        owner: '0x003e3cdfeceae96efe007f8196a1b1b1df547eee',
+      };
+
+      mockAsyncMethods(zns, mockValues);
+      const location = await resolution.location('testing.zil');
+      expect(location).toEqual({
+        registry: mockValues.registryAddress,
+        resolver: mockValues.resolver,
+        networkId: 1,
+        blockchain: BlockchainType.ZIL,
+        owner: mockValues.owner,
+      });
     });
   });
 });
