@@ -23,6 +23,7 @@ import {
   DomainData,
   NamingServiceName,
   Provider,
+  BlockchainType,
 } from './types/publicTypes';
 import {isValidTwitterSignature} from './utils/TwitterSignatureValidator';
 import UnsConfig from './config/uns-config.json';
@@ -47,21 +48,13 @@ export default class Uns extends NamingService {
   };
 
   readonly name: NamingServiceName = NamingServiceName.UNS;
-  readonly network: number;
   readonly url: string | undefined;
   readonly provider: Provider;
   readonly readerContract: EthereumContract;
 
-  constructor(source?: UnsSource) {
-    super();
-    if (!source) {
-      source = {
-        url: Uns.UrlMap[1],
-        network: 'mainnet',
-      };
-    }
+  constructor(source: UnsSource = {url: Uns.UrlMap[1], network: 'mainnet'}) {
+    super(EthereumNetworks[source.network], BlockchainType.ETH);
     this.checkNetworkConfig(source);
-    this.network = EthereumNetworks[source.network];
     this.url = source['url'] || Uns.UrlMap[this.network];
     this.provider =
       source['provider'] || new FetchProvider(this.name, this.url!);

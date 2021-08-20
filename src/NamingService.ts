@@ -1,9 +1,21 @@
-import {ResolutionMethod} from './types/publicTypes';
+import {
+  BlockchainType,
+  DomainLoaction,
+  ResolutionMethod,
+} from './types/publicTypes';
 
 /**
  * @internal
  */
 export abstract class NamingService {
+  readonly network: number;
+  readonly blockchain: BlockchainType;
+
+  constructor(network: number, blockchain: BlockchainType) {
+    this.network = network;
+    this.blockchain = blockchain;
+  }
+
   abstract owner(domain: string): Promise<string>;
   abstract resolver(domain: string): Promise<string>;
   abstract namehash(domain: string): string;

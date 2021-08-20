@@ -11,6 +11,7 @@ import {
   Provider,
   ZnsSource,
   NamingServiceName,
+  BlockchainType,
 } from './types/publicTypes';
 import FetchProvider from './FetchProvider';
 import {znsChildhash, znsNamehash} from './utils/namehash';
@@ -41,21 +42,18 @@ export default class Zns extends NamingService {
   };
 
   readonly name: NamingServiceName = NamingServiceName.ZNS;
-  readonly network: number;
   readonly url: string | undefined;
   readonly registryAddr: string;
   readonly provider: Provider;
 
-  constructor(source?: ZnsSource) {
-    super();
-    if (!source) {
-      source = {
-        url: Zns.UrlMap[1],
-        network: 'mainnet',
-      };
-    }
+  constructor(
+    source: ZnsSource = {
+      url: Zns.UrlMap[1],
+      network: 'mainnet',
+    },
+  ) {
+    super(Zns.NetworkNameMap[source.network], BlockchainType.ZIL);
     this.checkNetworkConfig(source);
-    this.network = Zns.NetworkNameMap[source.network];
     this.url = source['url'] || Zns.UrlMap[this.network];
     this.provider =
       source['provider'] || new FetchProvider(this.name, this.url!);

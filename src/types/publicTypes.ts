@@ -234,3 +234,16 @@ export interface TokenUriMetadata extends Erc721Metadata {
   animation_url?: string;
   youtube_url?: string;
 }
+
+export enum BlockchainType {
+  ETH = 'ETH',
+  ZIL = 'ZIL',
+}
+
+export type DomainLoaction = {
+  registry: string;
+  resolver: string;
+  networkId: number;
+  blockchain: BlockchainType;
+  owner: string;
+};
