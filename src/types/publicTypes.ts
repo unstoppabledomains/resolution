@@ -236,6 +236,7 @@ export interface TokenUriMetadata extends Erc721Metadata {
 }
 
 export enum BlockchainType {
+  ANYCHAIN = 'ANYCHAIN',
   ETH = 'ETH',
   ZIL = 'ZIL',
 }

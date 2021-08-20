@@ -8,6 +8,7 @@ import {
   ResolutionMethod,
   NamingServiceName,
   Api,
+  BlockchainType,
 } from './types/publicTypes';
 import Networking from './utils/Networking';
 import {constructRecords, findNamingServiceName, isNullAddress} from './utils';
@@ -26,10 +27,9 @@ export default class Udapi extends NamingService {
   static readonly ZnsRegistryMap = {
     1: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
   };
-  readonly network: number;
 
   constructor(api?: Api) {
-    super();
+    super(api?.network || 1, BlockchainType.ANYCHAIN);
     this.name = 'UDAPI';
     this.url = api?.url || 'https://unstoppabledomains.com/api/v1';
     const DefaultUserAgent = Networking.isNode()
@@ -38,7 +38,6 @@ export default class Udapi extends NamingService {
     const version = pckg.version;
     const CustomUserAgent = `${DefaultUserAgent} Resolution/${version}`;
     this.headers = {'X-user-agent': CustomUserAgent};
-    this.network = api?.network || 1;
   }
 
   async isSupportedDomain(domain: string): Promise<boolean> {

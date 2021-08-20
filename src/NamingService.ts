@@ -1,8 +1,4 @@
-import {
-  BlockchainType,
-  DomainLoaction,
-  ResolutionMethod,
-} from './types/publicTypes';
+import {BlockchainType, ResolutionMethod} from './types/publicTypes';
 
 /**
  * @internal

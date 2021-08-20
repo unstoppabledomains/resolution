@@ -9,7 +9,12 @@ import {
 import {ResolutionError, ResolutionErrorCode} from './errors/resolutionError';
 import EthereumContract from './contracts/EthereumContract';
 import EnsNetworkMap from 'ethereum-ens-network-map';
-import {EnsSource, NamingServiceName, Provider} from './types/publicTypes';
+import {
+  BlockchainType,
+  EnsSource,
+  NamingServiceName,
+  Provider,
+} from './types/publicTypes';
 import {
   constructRecords,
   EthereumNetworksInverted,
@@ -40,16 +45,14 @@ export default class Ens extends NamingService {
   readonly provider: Provider;
   readonly readerContract: EthereumContract;
 
-  constructor(source?: EnsSource) {
-    super();
-    if (!source) {
-      source = {
-        url: Ens.UrlMap[1],
-        network: 'mainnet',
-      };
-    }
+  constructor(
+    source: EnsSource = {
+      url: Ens.UrlMap[1],
+      network: 'mainnet',
+    },
+  ) {
+    super(EthereumNetworks[source.network], BlockchainType.ETH);
     this.checkNetworkConfig(source);
-    this.network = EthereumNetworks[source.network];
     this.url = source['url'] || Ens.UrlMap[this.network];
     this.provider =
       source['provider'] || new FetchProvider(this.name, this.url!);
