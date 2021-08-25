@@ -564,6 +564,17 @@ export default class Resolution {
     return await this.getNamingMethodOrThrow(domain).allRecords(domain);
   }
 
+  async allNonEmptyRecords(domain: string): Promise<CryptoRecords> {
+    const records = await this.allRecords(domain);
+    const nonEmptyRecords: CryptoRecords = {};
+    for (const [key, value] of Object.entries(records)) {
+      if (value) {
+        nonEmptyRecords[key] = value;
+      }
+    }
+    return nonEmptyRecords;
+  }
+
   async dns(domain: string, types: DnsRecordType[]): Promise<DnsRecord[]> {
     const dnsUtils = new DnsUtils();
     domain = this.prepareDomain(domain);

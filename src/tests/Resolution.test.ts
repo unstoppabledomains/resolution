@@ -837,6 +837,29 @@ describe('Resolution', () => {
             });
           });
 
+          it('should return allNonEmptyRecords', async () => {
+            const provider = new JsonRpcProvider(
+              protocolLink(ProviderProtocol.http),
+              'rinkeby',
+            );
+            const resolution = Resolution.fromEthersProvider(provider, {
+              uns: {network: 'rinkeby'},
+            });
+            const eye = mockAsyncMethod(provider, 'call', (params) =>
+              Promise.resolve(caseMock(params, RpcProviderTestCases)),
+            );
+            const eye2 = mockAsyncMethod(provider, 'getLogs', (params) => {
+              return Promise.resolve(caseMock(params, RpcProviderTestCases));
+            });
+            // udtestdev-emptyrecords.crypto have 1 empty record and 1 record with value
+            const response = await resolution.allNonEmptyRecords(
+              'udtestdev-emptyrecords.crypto',
+            );
+            expectSpyToBeCalled([eye], 2);
+            expectSpyToBeCalled([eye2], 2);
+            expect(Object.keys(response).length).toBe(1);
+          });
+
           it('should get standard keys from legacy resolver', async () => {
             // There are no legacy providers on testnet
             const provider = new InfuraProvider(
