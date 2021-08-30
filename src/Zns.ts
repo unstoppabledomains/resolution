@@ -12,6 +12,7 @@ import {
   ZnsSource,
   NamingServiceName,
   BlockchainType,
+  DomainLocation,
 } from './types/publicTypes';
 import FetchProvider from './FetchProvider';
 import {znsChildhash, znsNamehash} from './utils/namehash';
@@ -41,6 +42,7 @@ export default class Zns extends NamingService {
     333: 'zil1hyj6m5w4atcn7s806s69r0uh5g4t84e8gp6nps',
   };
 
+  readonly network: number;
   readonly name: NamingServiceName = NamingServiceName.ZNS;
   readonly url: string | undefined;
   readonly registryAddr: string;
@@ -52,8 +54,9 @@ export default class Zns extends NamingService {
       network: 'mainnet',
     },
   ) {
-    super(Zns.NetworkNameMap[source.network], BlockchainType.ZIL);
+    super();
     this.checkNetworkConfig(source);
+    this.network = Zns.NetworkNameMap[source.network];
     this.url = source['url'] || Zns.UrlMap[this.network];
     this.provider =
       source['provider'] || new FetchProvider(this.name, this.url!);
@@ -181,6 +184,22 @@ export default class Zns extends NamingService {
 
   async registryAddress(domain: string): Promise<string> {
     return this.registryAddr;
+  }
+
+  async location(domain: string): Promise<DomainLocation> {
+    const [registry, resolver, owner] = await Promise.all([
+      this.registryAddress(domain),
+      this.resolver(domain),
+      this.owner(domain),
+    ]);
+
+    return {
+      registry,
+      resolver,
+      networkId: this.network,
+      blockchain: BlockchainType.ZIL,
+      owner,
+    };
   }
 
   private async getRecordsAddresses(

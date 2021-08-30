@@ -9,6 +9,7 @@ import {
   NamingServiceName,
   Api,
   BlockchainType,
+  DomainLocation,
 } from './types/publicTypes';
 import Networking from './utils/Networking';
 import {constructRecords, findNamingServiceName, isNullAddress} from './utils';
@@ -19,6 +20,7 @@ import {NamingService} from './NamingService';
  * @internal
  */
 export default class Udapi extends NamingService {
+  private readonly network: number;
   private readonly name: ResolutionMethod;
   private readonly url: string;
   private readonly headers: {
@@ -29,7 +31,7 @@ export default class Udapi extends NamingService {
   };
 
   constructor(api?: Api) {
-    super(api?.network || 1, BlockchainType.ANYCHAIN);
+    super();
     this.name = 'UDAPI';
     this.url = api?.url || 'https://unstoppabledomains.com/api/v1';
     const DefaultUserAgent = Networking.isNode()
@@ -38,6 +40,7 @@ export default class Udapi extends NamingService {
     const version = pckg.version;
     const CustomUserAgent = `${DefaultUserAgent} Resolution/${version}`;
     this.headers = {'X-user-agent': CustomUserAgent};
+    this.network = api?.network || 1;
   }
 
   async isSupportedDomain(domain: string): Promise<boolean> {
@@ -190,5 +193,23 @@ export default class Udapi extends NamingService {
       domain,
       methodName: 'registryAddress',
     });
+  }
+
+  async location(domain: string): Promise<DomainLocation> {
+    const [registry, resolver, owner] = await Promise.all([
+      this.registryAddress(domain),
+      this.resolver(domain),
+      this.owner(domain),
+    ]);
+
+    return {
+      registry,
+      resolver,
+      networkId: this.network,
+      blockchain: domain.endsWith('.zil')
+        ? BlockchainType.ZIL
+        : BlockchainType.ETH,
+      owner,
+    };
   }
 }

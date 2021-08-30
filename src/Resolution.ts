@@ -19,7 +19,7 @@ import {
   Web3Version0Provider,
   Web3Version1Provider,
   TokenUriMetadata,
-  DomainLoaction,
+  DomainLocation,
 } from './types/publicTypes';
 import ResolutionError, {ResolutionErrorCode} from './errors/resolutionError';
 import DnsUtils from './utils/DnsUtils';
@@ -628,22 +628,9 @@ export default class Resolution {
    * @param domain - domain name
    * @returns Registry contract address
    */
-  async location(domain: string): Promise<DomainLoaction> {
+  async location(domain: string): Promise<DomainLocation> {
     const method = this.getNamingMethodOrThrow(domain);
-
-    const [registry, resolver, owner] = await Promise.all([
-      method.registryAddress(domain),
-      method.resolver(domain),
-      method.owner(domain),
-    ]);
-
-    return {
-      registry,
-      resolver,
-      networkId: method.network,
-      blockchain: method.blockchain,
-      owner,
-    };
+    return method.location(domain);
   }
 
   private async getMetadataFromTokenURI(

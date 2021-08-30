@@ -24,6 +24,7 @@ import {
   NamingServiceName,
   Provider,
   BlockchainType,
+  DomainLocation,
 } from './types/publicTypes';
 import {isValidTwitterSignature} from './utils/TwitterSignatureValidator';
 import UnsConfig from './config/uns-config.json';
@@ -47,14 +48,16 @@ export default class Uns extends NamingService {
     4: 'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
   };
 
+  readonly network: number;
   readonly name: NamingServiceName = NamingServiceName.UNS;
   readonly url: string | undefined;
   readonly provider: Provider;
   readonly readerContract: EthereumContract;
 
   constructor(source: UnsSource = {url: Uns.UrlMap[1], network: 'mainnet'}) {
-    super(EthereumNetworks[source.network], BlockchainType.ETH);
+    super();
     this.checkNetworkConfig(source);
+    this.network = EthereumNetworks[source.network];
     this.url = source['url'] || Uns.UrlMap[this.network];
     this.provider =
       source['provider'] || new FetchProvider(this.name, this.url!);
@@ -291,6 +294,22 @@ export default class Uns extends NamingService {
     const rawData = newURIEvents[newURIEvents.length - 1].data;
     const decoded = Interface.getAbiCoder().decode(['string'], rawData);
     return decoded[decoded.length - 1];
+  }
+
+  async location(domain: string): Promise<DomainLocation> {
+    const [registry, resolver, owner] = await Promise.all([
+      this.registryAddress(domain),
+      this.resolver(domain),
+      this.owner(domain),
+    ]);
+
+    return {
+      registry,
+      resolver,
+      networkId: this.network,
+      blockchain: BlockchainType.ETH,
+      owner,
+    };
   }
 
   private getStartingBlockFromRegistry(registryAddress: string): string {

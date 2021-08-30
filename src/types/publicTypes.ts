@@ -241,7 +241,7 @@ export enum BlockchainType {
   ZIL = 'ZIL',
 }
 
-export type DomainLoaction = {
+export type DomainLocation = {
   registry: string;
   resolver: string;
   networkId: number;

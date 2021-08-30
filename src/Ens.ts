@@ -11,6 +11,7 @@ import EthereumContract from './contracts/EthereumContract';
 import EnsNetworkMap from 'ethereum-ens-network-map';
 import {
   BlockchainType,
+  DomainLocation,
   EnsSource,
   NamingServiceName,
   Provider,
@@ -51,8 +52,9 @@ export default class Ens extends NamingService {
       network: 'mainnet',
     },
   ) {
-    super(EthereumNetworks[source.network], BlockchainType.ETH);
+    super();
     this.checkNetworkConfig(source);
+    this.network = EthereumNetworks[source.network];
     this.url = source['url'] || Ens.UrlMap[this.network];
     this.provider =
       source['provider'] || new FetchProvider(this.name, this.url!);
@@ -224,6 +226,22 @@ export default class Ens extends NamingService {
       method: NamingServiceName.ENS,
       methodName: 'getDomainFromTokenId',
     });
+  }
+
+  async location(domain: string): Promise<DomainLocation> {
+    const [registry, resolver, owner] = await Promise.all([
+      this.registryAddress(domain),
+      this.resolver(domain),
+      this.owner(domain),
+    ]);
+
+    return {
+      registry,
+      resolver,
+      networkId: this.network,
+      blockchain: BlockchainType.ETH,
+      owner,
+    };
   }
 
   /**
