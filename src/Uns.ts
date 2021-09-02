@@ -297,10 +297,10 @@ export default class Uns extends NamingService {
   }
 
   async location(domain: string): Promise<DomainLocation> {
-    const [registry, resolver, owner] = await Promise.all([
+    const tokenId = this.namehash(domain);
+    const [registry, {resolver, owner}] = await Promise.all([
       this.registryAddress(domain),
-      this.resolver(domain),
-      this.owner(domain),
+      this.get(tokenId),
     ]);
 
     return {

@@ -1244,36 +1244,40 @@ describe('Resolution', () => {
     it('should get location for .crypto domains', async () => {
       const mockValues = {
         registryAddress: '0xAad76bea7CFEc82927239415BB18D2e93518ecBB',
-        resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
-        owner: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
+        get: {
+          resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
+          owner: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
+        },
       };
 
       mockAsyncMethods(uns, mockValues);
       const location = await resolution.location('brad.crypto');
       expect(location).toEqual({
         registry: mockValues.registryAddress,
-        resolver: mockValues.resolver,
+        resolver: mockValues.get.resolver,
         networkId: 4,
         blockchain: BlockchainType.ETH,
-        owner: mockValues.owner,
+        owner: mockValues.get.owner,
       });
     });
 
     it('should get location for uns domains', async () => {
       const mockValues = {
         registryAddress: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
-        resolver: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
-        owner: '0x0e43F36e4B986dfbE1a75cacfA60cA2bD44Ae962',
+        get: {
+          resolver: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
+          owner: '0x0e43F36e4B986dfbE1a75cacfA60cA2bD44Ae962',
+        },
       };
 
       mockAsyncMethods(uns, mockValues);
       const location = await resolution.location('udtestdev-check.wallet');
       expect(location).toEqual({
         registry: mockValues.registryAddress,
-        resolver: mockValues.resolver,
+        resolver: mockValues.get.resolver,
         networkId: 4,
         blockchain: BlockchainType.ETH,
-        owner: mockValues.owner,
+        owner: mockValues.get.owner,
       });
     });
 
