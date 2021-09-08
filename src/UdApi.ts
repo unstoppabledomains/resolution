@@ -8,6 +8,8 @@ import {
   ResolutionMethod,
   NamingServiceName,
   Api,
+  BlockchainType,
+  DomainLocation,
 } from './types/publicTypes';
 import Networking from './utils/Networking';
 import {constructRecords, findNamingServiceName, isNullAddress} from './utils';
@@ -18,6 +20,7 @@ import {NamingService} from './NamingService';
  * @internal
  */
 export default class Udapi extends NamingService {
+  private readonly network: number;
   private readonly name: ResolutionMethod;
   private readonly url: string;
   private readonly headers: {
@@ -26,7 +29,6 @@ export default class Udapi extends NamingService {
   static readonly ZnsRegistryMap = {
     1: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
   };
-  readonly network: number;
 
   constructor(api?: Api) {
     super();
@@ -191,5 +193,23 @@ export default class Udapi extends NamingService {
       domain,
       methodName: 'registryAddress',
     });
+  }
+
+  async location(domain: string): Promise<DomainLocation> {
+    const [registry, resolver, owner] = await Promise.all([
+      this.registryAddress(domain),
+      this.resolver(domain),
+      this.owner(domain),
+    ]);
+
+    return {
+      registry,
+      resolver,
+      networkId: this.network,
+      blockchain: domain.endsWith('.zil')
+        ? BlockchainType.ZIL
+        : BlockchainType.ETH,
+      owner,
+    };
   }
 }

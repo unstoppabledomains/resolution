@@ -17,6 +17,8 @@ import {
   NamingServiceName,
   Provider,
   UnsLocation,
+  DomainLocation,
+  BlockchainType,
 } from './types/publicTypes';
 import {isValidTwitterSignature} from './utils/TwitterSignatureValidator';
 import UnsConfig from './config/uns-config.json';
@@ -38,7 +40,14 @@ export default class Uns extends NamingService {
   public unsl2: UnsInternal;
   readonly name: NamingServiceName = NamingServiceName.UNS;
 
-  constructor(source?: UnsSource) {
+  constructor(
+    source: UnsSource = {
+      locations: {
+        Layer1: {url: UnsInternal.UrlMap[1], network: 'mainnet'},
+        Layer2: {url: UnsInternal.UrlMap[137], network: 'polygon'},
+      },
+    },
+  ) {
     super();
     if (!source) {
       source = {
@@ -309,6 +318,22 @@ export default class Uns extends NamingService {
     return promiseL1;
   }
 
+  async location(domain: string): Promise<DomainLocation> {
+    const tokenId = this.namehash(domain);
+    const [registry, {resolver, owner}] = await Promise.all([
+      this.registryAddress(domain),
+      this.get(tokenId),
+    ]);
+
+    return {
+      registry,
+      resolver,
+      networkId: this.unsl1.network,
+      blockchain: BlockchainType.ETH,
+      owner,
+    };
+  }
+
   private async getVerifiedData(
     domain: string,
     keys?: string[],
@@ -341,7 +366,7 @@ export default class Uns extends NamingService {
         });
       }
     });
-    return responseL2 ? responseL2 : promiseL1;
+    return responseL2 || promiseL1;
   }
 
   private async get(tokenId: string, keys: string[] = []): Promise<DomainData> {
