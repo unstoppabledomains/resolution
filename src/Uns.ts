@@ -34,7 +34,7 @@ import {NamingService} from './NamingService';
 import ConfigurationError, {
   ConfigurationErrorCode,
 } from './errors/configurationError';
-import SupportedKeys from './config/supported-keys.json';
+import ResolverKeys from './config/resolver-keys.json';
 import {Interface} from '@ethersproject/abi';
 
 /**
@@ -357,7 +357,7 @@ export default class Uns extends NamingService {
   }
 
   private async getStandardRecords(tokenId: string): Promise<CryptoRecords> {
-    const keys = Object.keys(SupportedKeys.keys);
+    const keys = Object.keys(ResolverKeys.keys);
     return await this.getMany(tokenId, keys);
   }
 
@@ -423,15 +423,6 @@ export default class Uns extends NamingService {
         return address.toLowerCase() === resolverAddress.toLowerCase();
       }) > -1
     );
-  }
-
-  private isUpToDateResolver(resolverAddress: string): boolean {
-    const address =
-      UnsConfig?.networks[this.network]?.contracts?.Resolver?.address;
-    if (!address) {
-      return false;
-    }
-    return address.toLowerCase() === resolverAddress.toLowerCase();
   }
 
   private async getStartingBlock(

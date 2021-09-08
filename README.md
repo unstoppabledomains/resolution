@@ -265,7 +265,7 @@ or **Linux shell**).
 
 #### To update:
 - Network config: `$ yarn network-config:pull`
-- Supported keys: `$ yarn supported-keys:pull`
+- Resolver keys: `$ yarn resolver-keys:pull`
 - Both configs: `$ yarn config:pull`
 
 ## Free advertising for integrated apps

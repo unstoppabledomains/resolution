@@ -174,7 +174,7 @@
     "crypto.IOTA.address": {
       "deprecatedKeyName": "IOTA",
       "deprecated": false,
-      "validationRegex": "^[A-Z0-9]{90}$"
+      "validationRegex": "^[A-Z0-9]{90}$|^iota1[a-z0-9]{59}$"
     },
     "crypto.VET.address": {
       "deprecatedKeyName": "VET",
