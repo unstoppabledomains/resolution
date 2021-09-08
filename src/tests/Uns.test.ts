@@ -13,6 +13,7 @@ import {
   CryptoDomainWithAllRecords,
   skipItInLive,
   mockAPICalls,
+  ProviderProtocol,
 } from './helpers';
 import FetchProvider from '../FetchProvider';
 import {NamingServiceName} from '../types/publicTypes';
@@ -30,7 +31,20 @@ let uns: Uns;
 beforeEach(async () => {
   jest.restoreAllMocks();
   resolution = new Resolution({
-    sourceConfig: {uns: {url: protocolLink(), network: 'rinkeby'}},
+    sourceConfig: {
+      uns: {
+        locations: {
+          Layer1: {
+            url: protocolLink(ProviderProtocol.http, 'UNSL1'),
+            network: 'rinkeby',
+          },
+          Layer2: {
+            url: protocolLink(ProviderProtocol.http, 'UNSL2'),
+            network: 'polygon-mumbai',
+          },
+        },
+      },
+    },
   });
   uns = resolution.serviceMap[NamingServiceName.UNS] as Uns;
 });
@@ -38,8 +52,10 @@ beforeEach(async () => {
 describe('UNS', () => {
   it('should define the default uns contract', () => {
     expect(uns).toBeDefined();
-    expect(uns.network).toBe(4);
-    expect(uns.url).toBe(protocolLink());
+    expect(uns.unsl1.network).toBe(4);
+    expect(uns.unsl1.url).toBe(protocolLink());
+    expect(uns.unsl2.network).toBe(80001);
+    expect(uns.unsl2.url).toBe(protocolLink(ProviderProtocol.http, 'UNSL2'));
   });
 
   it('should not allow missing config for custom network', async () => {
@@ -47,7 +63,12 @@ describe('UNS', () => {
       () =>
         new Resolution({
           sourceConfig: {
-            uns: {network: 'ropsten'},
+            uns: {
+              locations: {
+                Layer1: {network: 'ropsten'},
+                Layer2: {network: 'polygon-mumbai'},
+              },
+            },
           },
         }),
       ConfigurationErrorCode.CustomNetworkConfigMissing,
@@ -117,9 +138,16 @@ describe('UNS', () => {
 
   it('should return true for supported domain', async () => {
     mockAPICalls('uns_domain_exists_test', protocolLink());
+    mockAPICalls(
+      'uns_domain_exists_test',
+      protocolLink(ProviderProtocol.http, 'UNSL2'),
+    );
     expect(await uns.isSupportedDomain('brad.crypto')).toBe(true);
     expect(await uns.isSupportedDomain('brad.blockchain')).toBe(true);
     expect(await uns.isSupportedDomain('brad.888')).toBe(true);
+    expect(
+      await uns.isSupportedDomain('udtestdev-test-l2-domain-784391.wallet'),
+    ).toBe(true);
   });
 
   it('should return false for unsupported domain', async () => {
@@ -683,7 +711,14 @@ describe('UNS', () => {
       const url = protocolLink();
       const provider = new FetchProvider(NamingServiceName.UNS, url);
       resolution = new Resolution({
-        sourceConfig: {uns: {url, provider, network: 'rinkeby'}},
+        sourceConfig: {
+          uns: {
+            locations: {
+              Layer1: {url, provider, network: 'rinkeby'},
+              Layer2: {network: 'polygon-mumbai'},
+            },
+          },
+        },
       });
       jest.spyOn(Networking, 'fetch').mockRejectedValue(new Error('error_up'));
 
@@ -695,7 +730,7 @@ describe('UNS', () => {
 
   describe('.tokenURI', () => {
     it('should return token URI', async () => {
-      const spies = mockAsyncMethods(uns.readerContract, {
+      const spies = mockAsyncMethods(uns.unsl1.readerContract, {
         call: [
           'https://staging-dot-dot-crypto-metadata.appspot.com/metadata/brad.crypto',
         ],
@@ -710,7 +745,7 @@ describe('UNS', () => {
     });
 
     it('should throw error', async () => {
-      const spies = mockAsyncMethods(uns.readerContract, {
+      const spies = mockAsyncMethods(uns.unsl1.readerContract, {
         call: new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
           providerMessage: 'execution reverted',
         }),
@@ -724,7 +759,7 @@ describe('UNS', () => {
     });
 
     skipItInLive('should throw the same internal error', async () => {
-      const spies = mockAsyncMethods(uns.readerContract, {
+      const spies = mockAsyncMethods(uns.unsl1.readerContract, {
         call: new ResolutionError(ResolutionErrorCode.ServiceProviderError),
       });
 
@@ -740,7 +775,7 @@ describe('UNS', () => {
     it('should return token metadata', async () => {
       const testMeta: TokenUriMetadata = liveData.bradCryptoMetadata;
 
-      const unsSpies = mockAsyncMethods(uns.readerContract, {
+      const unsSpies = mockAsyncMethods(uns.unsl1.readerContract, {
         call: ['https://metadata.unstoppabledomains.com/metadata/brad.crypto'],
       });
       const fetchSpies = mockAsyncMethods(Networking, {
@@ -774,8 +809,15 @@ describe('UNS', () => {
       resolution = new Resolution({
         sourceConfig: {
           uns: {
-            provider,
-            network: 'mainnet',
+            locations: {
+              Layer1: {
+                provider,
+                network: 'mainnet',
+              },
+              Layer2: {
+                network: 'polygon-mumbai',
+              },
+            },
           },
         },
       });
@@ -826,10 +868,17 @@ describe('UNS', () => {
         resolution = new Resolution({
           sourceConfig: {
             uns: {
-              network: 'custom',
-              url: protocolLink(),
-              proxyReaderAddress:
-                UnsConfig.networks[4].contracts.ProxyReader.address,
+              locations: {
+                Layer1: {
+                  network: 'custom',
+                  url: protocolLink(),
+                  proxyReaderAddress:
+                    UnsConfig.networks[4].contracts.ProxyReader.address,
+                },
+                Layer2: {
+                  network: 'polygon-mumbai',
+                },
+              },
             },
           },
         });

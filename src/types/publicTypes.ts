@@ -9,9 +9,13 @@ export type Api = {api: true; url?: string; network?: number};
 
 type NamingServiceSource = {url?: string} | {provider?: Provider};
 
-export type UnsSource = NamingServiceSource & {
+export type UnsLayerSource = NamingServiceSource & {
   network: string;
   proxyReaderAddress?: string;
+};
+
+export type UnsSource = {
+  locations: {Layer1: UnsLayerSource; Layer2: UnsLayerSource};
 };
 
 export type EnsSource = NamingServiceSource & {
@@ -30,16 +34,26 @@ export type SourceConfig = {
   ens?: EnsSource | Api;
 };
 
+export enum UnsLocation {
+  Layer1 = 'UNSLayer1',
+  Layer2 = 'UNSLayer2',
+}
+
 export enum NamingServiceName {
   UNS = 'UNS',
   ENS = 'ENS',
   ZNS = 'ZNS',
 }
 
-export type ResolutionMethod = NamingServiceName | 'UDAPI';
+export type ResolutionMethod = NamingServiceName | UnsLocation | 'UDAPI';
 
 export type AutoNetworkConfigs = {
-  uns?: {url: string} | {provider: Provider};
+  uns?: {
+    locations: {
+      Layer1: {url: string} | {provider: Provider};
+      Layer2: {url: string} | {provider: Provider};
+    };
+  };
   ens?: {url: string} | {provider: Provider};
   zns?: {url: string} | {provider: Provider};
 };

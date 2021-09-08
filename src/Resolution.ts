@@ -111,7 +111,14 @@ export default class Resolution {
         network: string;
       };
       uns?: {
-        network: string;
+        locations: {
+          Layer1: {
+            network: string;
+          };
+          Layer2: {
+            network: string;
+          };
+        };
       };
     },
   ): Resolution {
@@ -122,8 +129,22 @@ export default class Resolution {
           network: networks?.ens?.network || 'mainnet',
         },
         uns: {
-          url: signedInfuraLink(infura, networks?.uns?.network),
-          network: networks?.uns?.network || 'mainnet',
+          locations: {
+            Layer1: {
+              url: signedInfuraLink(
+                infura,
+                networks?.uns?.locations.Layer1.network,
+              ),
+              network: networks?.uns?.locations.Layer1.network || 'mainnet',
+            },
+            Layer2: {
+              url: signedInfuraLink(
+                infura,
+                networks?.uns?.locations.Layer2.network,
+              ),
+              network: networks?.uns?.locations.Layer2.network || 'polygon',
+            },
+          },
         },
       },
     });
@@ -142,7 +163,14 @@ export default class Resolution {
         network: string;
       };
       uns?: {
-        network: string;
+        locations: {
+          Layer1: {
+            network: string;
+          };
+          Layer2: {
+            network: string;
+          };
+        };
       };
       zns?: {
         network: string;
@@ -173,14 +201,32 @@ export default class Resolution {
         network: string;
       };
       uns?: {
-        network: string;
+        locations: {
+          Layer1: {
+            network: string;
+          };
+          Layer2: {
+            network: string;
+          };
+        };
       };
     },
   ): Resolution {
     return new this({
       sourceConfig: {
         ens: {provider, network: networks?.ens?.network || 'mainnet'},
-        uns: {provider, network: networks?.uns?.network || 'mainnet'},
+        uns: {
+          locations: {
+            Layer1: {
+              provider,
+              network: networks?.uns?.locations.Layer1.network || 'mainnet',
+            },
+            Layer2: {
+              provider,
+              network: networks?.uns?.locations.Layer2.network || 'polygon',
+            },
+          },
+        },
       },
     });
   }
@@ -219,7 +265,14 @@ export default class Resolution {
         network: string;
       };
       uns?: {
-        network: string;
+        locations: {
+          Layer1: {
+            network: string;
+          };
+          Layer2: {
+            network: string;
+          };
+        };
       };
     },
   ): Resolution {
@@ -243,7 +296,14 @@ export default class Resolution {
         network: string;
       };
       uns?: {
-        network: string;
+        locations: {
+          Layer1: {
+            network: string;
+          };
+          Layer2: {
+            network: string;
+          };
+        };
       };
     },
   ): Resolution {
@@ -270,7 +330,14 @@ export default class Resolution {
         network: string;
       };
       uns?: {
-        network: string;
+        locations: {
+          Layer1: {
+            network: string;
+          };
+          Layer2: {
+            network: string;
+          };
+        };
       };
     },
   ): Resolution {

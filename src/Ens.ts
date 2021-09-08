@@ -1,7 +1,7 @@
 import {default as ensInterface} from './contracts/ens/ens';
 import {default as resolverInterface} from './contracts/ens/resolver';
 import {
-  BlockhanNetworkUrlMap,
+  BlockhainNetworkUrlMap,
   EnsSupportedNetwork,
   EthCoinIndex,
   hasProvider,
@@ -28,7 +28,7 @@ import {requireOrFail} from './utils/requireOrFail';
  * @internal
  */
 export default class Ens extends NamingService {
-  static readonly UrlMap: BlockhanNetworkUrlMap = {
+  static readonly UrlMap: BlockhainNetworkUrlMap = {
     1: 'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
     3: 'https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
     4: 'https://rinkeby.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',

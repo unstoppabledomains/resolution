@@ -13,6 +13,7 @@ type ResolutionErrorOptions = {
   currencyTicker?: string;
   recordName?: string;
   namingService?: string;
+  networkMessage?: string;
 };
 
 export enum ResolutionErrorCode {
@@ -26,6 +27,7 @@ export enum ResolutionErrorCode {
   IncorrectResolverInterface = 'IncorrectResolverInterface',
   RecordNotFound = 'RecordNotFound',
   ServiceProviderError = 'ServiceProviderError',
+  NetworkError = 'NetworkError',
   InvalidTwitterVerification = 'InvalidTwitterVerification',
 }
 
@@ -61,6 +63,8 @@ const HandlersByCode = {
   [ResolutionErrorCode.ServiceProviderError]: (params: {
     providerMessage?: string;
   }) => `< ${params.providerMessage} >`,
+  [ResolutionErrorCode.NetworkError]: (params: {networkMessage?: string}) =>
+    `< ${params.networkMessage} >`,
   [ResolutionErrorCode.UnsupportedService]: (params: {namingService: string}) =>
     `Naming service ${params.namingService} is not supported`,
 };

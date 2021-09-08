@@ -167,15 +167,19 @@ export function mockAPICalls(testName: string, url = MainnetUrl): void {
  */
 export function protocolLink(
   providerProtocol: ProviderProtocol = ProviderProtocol.http,
-  namingService:
-    | NamingServiceName.ENS
-    | NamingServiceName.UNS = NamingServiceName.UNS,
+  namingService: NamingServiceName.ENS | 'UNSL1' | 'UNSL2' = 'UNSL1',
 ): string {
   const secret =
     process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID ?? undefined;
 
   if (!secret) {
     return ethereumDefaultProviders[namingService][providerProtocol];
+  }
+
+  if (namingService === 'UNSL2') {
+    return providerProtocol === ProviderProtocol.wss
+      ? `wss://polygon-mumbai.infura.io/ws/v3/${secret}`
+      : `https://polygon-mumbai.infura.io/v3/${secret}`;
   }
 
   return providerProtocol === ProviderProtocol.wss
@@ -202,11 +206,17 @@ export const caseMock = <T, U>(
 };
 
 const ethereumDefaultProviders = {
-  [NamingServiceName.UNS]: {
+  UNSL1: {
     [ProviderProtocol.http]:
       'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
     [ProviderProtocol.wss]:
       'wss://rinkeby.infura.io/ws/v3/c4bb906ed6904c42b19c95825fe55f39',
+  },
+  UNSL2: {
+    [ProviderProtocol.http]:
+      'https://polygon-mumbai.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+    [ProviderProtocol.wss]:
+      'wss://polygon-mumbai.infura.io/ws/v3/c4bb906ed6904c42b19c95825fe55f39',
   },
   [NamingServiceName.ENS]: {
     [ProviderProtocol.http]:
