@@ -1,4 +1,4 @@
-import {ResolutionMethod} from './types/publicTypes';
+import {DomainLocation, ResolutionMethod} from './types/publicTypes';
 
 /**
  * @internal
@@ -28,4 +28,5 @@ export abstract class NamingService {
 
   abstract isAvailable(domain: string): Promise<boolean>;
   abstract registryAddress(domain: string): Promise<string>;
+  abstract location(domain: string): Promise<DomainLocation>;
 }
