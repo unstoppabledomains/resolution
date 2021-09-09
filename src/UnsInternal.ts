@@ -20,7 +20,7 @@ import registryL1 from './contracts/uns/registryL1';
 import registryL2 from './contracts/uns/registryL2';
 import {Interface} from '@ethersproject/abi';
 import {default as resolverInterface} from './contracts/uns/resolver';
-import SupportedKeys from './config/supported-keys.json';
+import SupportedKeys from './config/resolver-keys.json';
 
 export default class UnsInternal {
   static readonly ProxyReaderMap: ProxyReaderMap = getProxyReaderMap();

@@ -34,9 +34,9 @@
     "docs:readme": "./docs-readme.sh",
     "docs:deploy": "yarn docs && ./deploy-docs.sh",
     "size": "yarn run sizecheck -p ./package.json -l 500 -v",
-    "config:pull": "yarn network-config:pull && yarn supported-keys:pull",
+    "config:pull": "yarn network-config:pull && yarn resolver-keys:pull",
     "network-config:pull": "curl https://raw.githubusercontent.com/unstoppabledomains/uns/main/uns-config.json -o src/config/uns-config.json",
-    "supported-keys:pull": "curl https://raw.githubusercontent.com/unstoppabledomains/dot-crypto/master/src/supported-keys/supported-keys.json -o src/config/supported-keys.json",
+    "resolver-keys:pull": "curl https://raw.githubusercontent.com/unstoppabledomains/uns/main/resolver-keys.json -o src/config/resolver-keys.json",
     "prettier:fix": "prettier --write -l \"src/**/*.{ts,tsx,js,jsx,json,md}\"",
     "prepare": "([ -d ./.git ] && husky install) || echo \"Skip husky install since package does not have .git folder\""
   },
