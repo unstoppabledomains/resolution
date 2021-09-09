@@ -900,7 +900,7 @@ describe('Resolution', () => {
               },
             });
             const resp = await resolution.allRecords('brad.crypto');
-            expectSpyToBeCalled([eye], 2);
+            expectSpyToBeCalled([eye], 3);
             expectSpyToBeCalled([eye2], 2);
             expect(resp).toMatchObject({
               'gundb.username.value':
@@ -940,7 +940,7 @@ describe('Resolution', () => {
             });
 
             const resp = await resolution.allRecords('brad.crypto');
-            expectSpyToBeCalled([eye], 2);
+            expectSpyToBeCalled([eye], 3);
             expectSpyToBeCalled([eye2], 2);
             expect(resp).toMatchObject({
               'gundb.username.value':
@@ -981,7 +981,7 @@ describe('Resolution', () => {
             const response = await resolution.allNonEmptyRecords(
               'udtestdev-emptyrecords.crypto',
             );
-            expectSpyToBeCalled([eye], 2);
+            expectSpyToBeCalled([eye], 3);
             expectSpyToBeCalled([eye2], 2);
             expect(Object.keys(response).length).toBe(1);
           });
@@ -1006,7 +1006,7 @@ describe('Resolution', () => {
             });
             const resp = await resolution.allRecords('monmouthcounty.crypto');
 
-            expectSpyToBeCalled([eye], 2);
+            expectSpyToBeCalled([eye], 3);
             expect(resp).toMatchObject({
               'crypto.BTC.address': '3NwuV8nVT2VKbtCs8evChdiW6kHTHcVpdn',
               'crypto.ETH.address':

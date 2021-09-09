@@ -197,7 +197,6 @@ describe('UNS', () => {
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('qzx048ez005q4yhphqu2pylpfc3hy88zzu4lu6q9j8');
     });
-
     it(`checks the ADA address on ${CryptoDomainWithAllRecords}`, async () => {
       const eyes = mockAsyncMethods(uns, {
         get: {
@@ -210,6 +209,28 @@ describe('UNS', () => {
       });
       const addr = await resolution.addr(CryptoDomainWithAllRecords, 'ADA');
       expectSpyToBeCalled(eyes);
+      expect(addr).toBe(
+        'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
+      );
+    });
+
+    it(`checks the ADA address on ${CryptoDomainWithAllRecords} L2`, async () => {
+      const unsl1 = uns.unsl1;
+      const unsl2 = uns.unsl2;
+      mockAsyncMethods(unsl1, {
+        callReaderContract: [],
+      });
+      const eyesL2 = mockAsyncMethods(unsl2, {
+        callReaderContract: [
+          '0x95AE1515367aa64C462c71e87157771165B1287A',
+          '0xd1D5eb96f36A7605b0cED801fF497E81F6245106',
+          [
+            'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
+          ],
+        ],
+      });
+      const addr = await resolution.addr(CryptoDomainWithAllRecords, 'ADA');
+      expectSpyToBeCalled(eyesL2);
       expect(addr).toBe(
         'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
       );

@@ -149,7 +149,10 @@ export default class Uns extends NamingService {
     if (!tld) {
       return false;
     }
-    return this.unsl1.getExists(this.namehash(tld));
+    const [exists] = await this.unsl1.callReaderContract('exists', [
+      this.namehash(tld),
+    ]);
+    return exists;
   }
 
   async owner(domain: string): Promise<string> {
@@ -357,8 +360,8 @@ export default class Uns extends NamingService {
     methodName: string,
     methodParams: any[],
   ): Promise<readonly any[]> {
-    const promiseL1 = this.unsl1.readerContract.call(methodName, methodParams);
-    const promiseL2 = this.unsl2.readerContract.call(methodName, methodParams);
+    const promiseL1 = this.unsl1.callReaderContract(methodName, methodParams);
+    const promiseL2 = this.unsl2.callReaderContract(methodName, methodParams);
     const responseL2 = await promiseL2.catch((error) => {
       if (error.message === 'Network error related') {
         throw new ResolutionError(ResolutionErrorCode.NetworkError, {
@@ -374,7 +377,6 @@ export default class Uns extends NamingService {
       'getData',
       [keys, tokenId],
     );
-
     return {owner, resolver, records: constructRecords(keys, values)};
   }
 

@@ -52,9 +52,8 @@ export default class UnsInternal {
     );
   }
 
-  async getExists(node: string): Promise<boolean> {
-    const [exists] = await this.readerContract.call('exists', [node]);
-    return exists;
+  async callReaderContract(method: string, params: string[]): Promise<any[]> {
+    return this.readerContract.call(method, params);
   }
 
   async resolver(domain: string): Promise<string> {
