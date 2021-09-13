@@ -113,17 +113,27 @@ describe('UNS', () => {
   });
 
   it('should return NoRecord Resolution error', async () => {
-    const spies = mockAsyncMethods(uns, {
-      get: {
-        resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
-        records: {},
-      },
+    const uns = resolution.serviceMap[NamingServiceName.UNS] as Uns;
+    const spies = mockAsyncMethods(uns.unsl2.readerContract, {
+      call: [
+        '0x0000000000000000000000000000000000000000',
+        '0x0000000000000000000000000000000000000000',
+        [],
+      ],
+    });
+    const spies2 = mockAsyncMethods(uns.unsl1.readerContract, {
+      call: [
+        '0x95AE1515367aa64C462c71e87157771165B1287A',
+        '0x8aad44321a86b170879d7a244c1e8d360c99dda8',
+        [],
+      ],
     });
     await expectResolutionErrorCode(
       resolution.record(CryptoDomainWithAllRecords, 'No.such.record'),
       ResolutionErrorCode.RecordNotFound,
     );
     expectSpyToBeCalled(spies);
+    expectSpyToBeCalled(spies2);
   }, 20000);
 
   it('should return a valid resolver address', async () => {
@@ -139,10 +149,10 @@ describe('UNS', () => {
 
   it('should return true for supported domain', async () => {
     mockAPICalls('uns_domain_exists_test', protocolLink());
-    mockAPICalls(
-      'uns_domain_exists_test',
-      protocolLink(ProviderProtocol.http, 'UNSL2'),
-    );
+    const uns = resolution.serviceMap[NamingServiceName.UNS] as Uns;
+    mockAsyncMethods(uns.unsl2.readerContract, {
+      call: [false],
+    });
     expect(await uns.isSupportedDomain('brad.crypto')).toBe(true);
     expect(await uns.isSupportedDomain('brad.blockchain')).toBe(true);
     expect(await uns.isSupportedDomain('brad.888')).toBe(true);
@@ -153,6 +163,10 @@ describe('UNS', () => {
 
   it('should return false for unsupported domain', async () => {
     mockAPICalls('uns_domain_exists_test', protocolLink());
+    const uns = resolution.serviceMap[NamingServiceName.UNS] as Uns;
+    mockAsyncMethods(uns.unsl2.readerContract, {
+      call: [false],
+    });
     expect(await uns.isSupportedDomain('brad.zil')).toBe(false);
     expect(await uns.isSupportedDomain('brad.invalid')).toBe(false);
   });
