@@ -261,7 +261,6 @@ export default class Uns extends NamingService {
   }
 
   async getTokenUri(tokenId: string): Promise<string> {
-    const promiseL1 = this.unsl1.readerContract.call('tokenURI', [tokenId]);
     const [tokenURIL2] = await this.unsl2.readerContract
       .call('tokenURI', [tokenId])
       .catch((error) => {
@@ -278,6 +277,7 @@ export default class Uns extends NamingService {
     if (tokenURIL2) {
       return tokenURIL2;
     }
+    const promiseL1 = this.unsl1.readerContract.call('tokenURI', [tokenId]);
     const [tokenURIL1] = await promiseL1.catch((error) => {
       if (
         error instanceof ResolutionError &&
@@ -328,8 +328,6 @@ export default class Uns extends NamingService {
 
   async getDomainFromTokenId(tokenId: string): Promise<string> {
     const promiseL2 = this.unsl2.getDomainFromTokenId(tokenId);
-    const promiseL1 = this.unsl1.getDomainFromTokenId(tokenId);
-
     const domain = await promiseL2.catch((error) => {
       if (error.code === ResolutionErrorCode.UnregisteredDomain) {
         return null;
@@ -339,6 +337,7 @@ export default class Uns extends NamingService {
     if (domain) {
       return domain;
     }
+    const promiseL1 = this.unsl1.getDomainFromTokenId(tokenId);
     return promiseL1;
   }
 

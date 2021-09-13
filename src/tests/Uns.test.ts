@@ -925,35 +925,38 @@ describe('UNS', () => {
   });
 
   describe('Providers', () => {
-    it('should throw error when FetchProvider throws Error', async () => {
-      const url = protocolLink();
-      const provider = new FetchProvider(NamingServiceName.UNS, url);
-      const polygonProvider = new FetchProvider(
-        NamingServiceName.UNS,
-        protocolLink(ProviderProtocol.http, 'UNSL2'),
-      );
-      resolution = new Resolution({
-        sourceConfig: {
-          uns: {
-            locations: {
-              Layer1: {url, provider, network: 'rinkeby'},
-              Layer2: {network: 'polygon-mumbai', provider: polygonProvider},
+    skipItInLive(
+      'should throw error when FetchProvider throws Error',
+      async () => {
+        const url = protocolLink();
+        const provider = new FetchProvider(NamingServiceName.UNS, url);
+        const polygonProvider = new FetchProvider(
+          NamingServiceName.UNS,
+          protocolLink(ProviderProtocol.http, 'UNSL2'),
+        );
+        resolution = new Resolution({
+          sourceConfig: {
+            uns: {
+              locations: {
+                Layer1: {url, provider, network: 'rinkeby'},
+                Layer2: {network: 'polygon-mumbai', provider: polygonProvider},
+              },
             },
           },
-        },
-      });
-      const uns = resolution.serviceMap['UNS'] as unknown as Uns;
-      mockAsyncMethods(uns.unsl1.readerContract, {
-        call: () => null,
-      });
-      mockAsyncMethods(uns.unsl2.readerContract, {
-        call: () => Promise.reject(new Error('error_up')),
-      });
+        });
+        const uns = resolution.serviceMap['UNS'] as unknown as Uns;
+        mockAsyncMethods(uns.unsl1.readerContract, {
+          call: () => null,
+        });
+        mockAsyncMethods(uns.unsl2.readerContract, {
+          call: () => Promise.reject(new Error('error_up')),
+        });
 
-      await expect(
-        resolution.record(CryptoDomainWithAllRecords, 'No.such.record'),
-      ).rejects.toThrow(new Error('error_up'));
-    });
+        await expect(
+          resolution.record(CryptoDomainWithAllRecords, 'No.such.record'),
+        ).rejects.toThrow(new Error('error_up'));
+      },
+    );
   });
 
   describe('.tokenURI', () => {
@@ -976,6 +979,24 @@ describe('UNS', () => {
       );
     });
 
+    it('should return token URI from L2', async () => {
+      const spies = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [
+          'https://metadata.staging.unstoppabledomains.com/metadata/brad.crypto',
+        ],
+      });
+      mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [],
+      });
+
+      const uri = await resolution.tokenURI('brad.crypto');
+
+      expectSpyToBeCalled(spies);
+      expect(uri).toEqual(
+        'https://metadata.staging.unstoppabledomains.com/metadata/brad.crypto',
+      );
+    });
+
     it('should throw error', async () => {
       const spies = mockAsyncMethods(uns.unsl1.readerContract, {
         call: new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
@@ -988,9 +1009,10 @@ describe('UNS', () => {
         }),
       });
 
-      await expectResolutionErrorCode(
-        () => resolution.tokenURI('fakedomainthatdoesnotexist.crypto'),
-        ResolutionErrorCode.UnregisteredDomain,
+      await expect(
+        resolution.tokenURI('fakedomainthatdoesnotexist.crypto'),
+      ).rejects.toThrow(
+        new ResolutionError(ResolutionErrorCode.UnregisteredDomain),
       );
       expectSpyToBeCalled(spies);
       expectSpyToBeCalled(polygonSpies);
@@ -1003,9 +1025,7 @@ describe('UNS', () => {
         }),
       });
       const polygonSpies = mockAsyncMethods(uns.unsl2.readerContract, {
-        call: new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
-          providerMessage: 'execution reverted',
-        }),
+        call: [],
       });
 
       await expectResolutionErrorCode(
@@ -1114,9 +1134,12 @@ describe('UNS', () => {
           new ResolutionError(ResolutionErrorCode.UnregisteredDomain),
         ),
       );
-      await expectResolutionErrorCode(
-        () => resolution.unhash(unregisteredhash, NamingServiceName.UNS),
-        ResolutionErrorCode.UnregisteredDomain,
+      await expect(
+        resolution.unhash(unregisteredhash, NamingServiceName.UNS),
+      ).rejects.toThrow(
+        new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+          domain: unregisteredhash,
+        }),
       );
     });
 

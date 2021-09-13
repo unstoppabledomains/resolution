@@ -530,7 +530,7 @@ describe('Resolution', () => {
         expectSpyToBeCalled(spy);
       });
 
-      it('checks error for email on brad.zil', async () => {
+      it('checks error for email on ryan-testing.zil', async () => {
         const spies = mockAsyncMethods(zns, {
           allRecords: {
             'crypto.ETH.address': '0xc101679df8e2d6092da6d7ca9bced5bfeeb5abd8',
@@ -538,7 +538,7 @@ describe('Resolution', () => {
           },
         });
         await expectResolutionErrorCode(
-          resolution.email('merenkov.zil'),
+          resolution.email('ryan-testing.zil'),
           ResolutionErrorCode.RecordNotFound,
         );
         expectSpyToBeCalled(spies);
@@ -843,7 +843,7 @@ describe('Resolution', () => {
           );
           const polygonProvider = new InfuraProvider(
             'maticmum',
-            '213fff28936343858ca9c5115eff1419',
+            'c4bb906ed6904c42b19c95825fe55f39',
           );
 
           const eye = mockAsyncMethod(provider, 'call', (params) =>
@@ -917,7 +917,7 @@ describe('Resolution', () => {
             );
             const polygonProvider = new InfuraProvider(
               'maticmum',
-              '213fff28936343858ca9c5115eff1419',
+              'c4bb906ed6904c42b19c95825fe55f39',
             );
 
             const eye = mockAsyncMethod(provider, 'call', (params) =>
@@ -1046,14 +1046,14 @@ describe('Resolution', () => {
               Promise.resolve(caseMock(params, RpcProviderTestCases)),
             );
             const polygonProvider = new InfuraProvider(
-              'matic',
-              '213fff28936343858ca9c5115eff1419',
+              'maticmum',
+              'c4bb906ed6904c42b19c95825fe55f39',
             );
 
             const resolution = Resolution.unsFomEthersProvider({
               locations: {
                 Layer1: {network: 'mainnet', provider},
-                Layer2: {network: 'polygon-mainnet', provider: polygonProvider},
+                Layer2: {network: 'polygon-mumbai', provider: polygonProvider},
               },
             });
             const uns = resolution.serviceMap['UNS'] as unknown as Uns;
