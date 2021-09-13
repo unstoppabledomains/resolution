@@ -115,11 +115,7 @@ describe('UNS', () => {
   it('should return NoRecord Resolution error', async () => {
     const uns = resolution.serviceMap[NamingServiceName.UNS] as Uns;
     const spies = mockAsyncMethods(uns.unsl2.readerContract, {
-      call: [
-        '0x0000000000000000000000000000000000000000',
-        '0x0000000000000000000000000000000000000000',
-        [],
-      ],
+      call: [NullAddress, NullAddress, []],
     });
     const spies2 = mockAsyncMethods(uns.unsl1.readerContract, {
       call: [
@@ -174,7 +170,7 @@ describe('UNS', () => {
   it('should not find a resolver address', async () => {
     const spies = mockAsyncMethods(uns, {
       get: {
-        owner: '0x0000000000000000000000000000000000000000',
+        owner: NullAddress,
         resolver: undefined,
       },
     });
@@ -230,12 +226,10 @@ describe('UNS', () => {
     });
 
     it(`checks the ADA address on ${CryptoDomainWithAllRecords} L2`, async () => {
-      const unsl1 = uns.unsl1;
-      const unsl2 = uns.unsl2;
-      mockAsyncMethods(unsl1.readerContract, {
-        call: [],
+      mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [NullAddress, NullAddress, []],
       });
-      const eyesL2 = mockAsyncMethods(unsl2.readerContract, {
+      const eyesL2 = mockAsyncMethods(uns.unsl2.readerContract, {
         call: [
           '0x95AE1515367aa64C462c71e87157771165B1287A',
           '0xd1D5eb96f36A7605b0cED801fF497E81F6245106',
@@ -391,73 +385,179 @@ describe('UNS', () => {
     });
 
     it('should return NoRecord Resolution error when value not found', async () => {
-      const spies = mockAsyncMethods(uns, {
-        get: {
-          resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
-          records: {},
-        },
+      const spies = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [NullAddress, NullAddress, []],
       });
+      const spies2 = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [
+          '0x95AE1515367aa64C462c71e87157771165B1287A',
+          '0x8aad44321a86b170879d7a244c1e8d360c99dda8',
+          [],
+        ],
+      });
+
       await expectResolutionErrorCode(
         resolution.record(CryptoDomainWithAllRecords, 'No.such.record'),
         ResolutionErrorCode.RecordNotFound,
       );
       expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
     });
 
     it('should return a valid resolver address', async () => {
-      const spies = mockAsyncMethods(uns, {
-        get: {
-          resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
-          records: {},
-        },
+      const spies = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [NullAddress, NullAddress, []],
       });
+      const spies2 = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [
+          '0x95AE1515367aa64C462c71e87157771165B1287A',
+          '0x8aad44321a86b170879d7a244c1e8d360c99dda8',
+          [],
+        ],
+      });
+
       const resolverAddress = await resolution.resolver(
         CryptoDomainWithAllRecords,
       );
       expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
+      expect(resolverAddress).toBe(
+        '0x95AE1515367aa64C462c71e87157771165B1287A',
+      );
+    });
+
+    it('should return a valid resolver address from L2', async () => {
+      const spies = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [NullAddress, NullAddress, []],
+      });
+      const spies2 = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [
+          '0x95AE1515367aa64C462c71e87157771165B1287A',
+          '0x8aad44321a86b170879d7a244c1e8d360c99dda8',
+          [],
+        ],
+      });
+
+      const resolverAddress = await resolution.resolver(
+        CryptoDomainWithAllRecords,
+      );
+      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
+      expect(resolverAddress).toBe(
+        '0x95AE1515367aa64C462c71e87157771165B1287A',
+      );
+    });
+
+    it('should return a valid resolver address from L2 and ignore L1', async () => {
+      const spies = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [
+          '0x8aad44321a86b170879d7a244c1e8d360c99dda8',
+          '0x95AE1515367aa64C462c71e87157771165B1287A',
+          [],
+        ],
+      });
+      const spies2 = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [
+          '0x95AE1515367aa64C462c71e87157771165B1287A',
+          '0x8aad44321a86b170879d7a244c1e8d360c99dda8',
+          [],
+        ],
+      });
+
+      const resolverAddress = await resolution.resolver(
+        CryptoDomainWithAllRecords,
+      );
+      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
       expect(resolverAddress).toBe(
         '0x95AE1515367aa64C462c71e87157771165B1287A',
       );
     });
 
     it('should return UnregisteredDomain error when owner address not found', async () => {
-      const spies = mockAsyncMethods(uns, {
-        get: {owner: NullAddress},
+      const spies = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [NullAddress, NullAddress, []],
+      });
+      const spies2 = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [NullAddress, NullAddress, []],
       });
       await expectResolutionErrorCode(
         resolution.resolver('unknown-unknown-938388383.crypto'),
         ResolutionErrorCode.UnregisteredDomain,
       );
       expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
+    });
+
+    it('should return UnregisteredDomain error when owner address not found on L2', async () => {
+      const spies = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [NullAddress, NullAddress, []],
+      });
+      const spies2 = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: ['0x95AE1515367aa64C462c71e87157771165B1287A', NullAddress, []],
+      });
+      await expectResolutionErrorCode(
+        resolution.resolver('unknown-unknown-938388383.crypto'),
+        ResolutionErrorCode.UnregisteredDomain,
+      );
+      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
     });
 
     it('should return UnspecifiedResolver error when resolver address not found', async () => {
-      const spies = mockAsyncMethods(uns, {
-        get: {owner: '0x000000000000000000000000000000000000dead'},
+      const spies = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [NullAddress, '0x000000000000000000000000000000000000dead', []],
+      });
+      const spies2 = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [NullAddress, '0x000000000000000000000000000000000000dead', []],
       });
       await expectResolutionErrorCode(
         resolution.resolver(CryptoDomainWithoutResolver),
         ResolutionErrorCode.UnspecifiedResolver,
       );
       expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
     });
 
     skipItInLive('should work without any configs', async () => {
       resolution = new Resolution();
-      const eyes = mockAsyncMethods(
-        resolution.serviceMap[NamingServiceName.UNS],
-        {
-          get: {
-            resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
-            records: {
-              ['crypto.ETH.address']:
-                '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
-            },
-          },
-        },
-      );
+
+      const uns = resolution.serviceMap['UNS'] as unknown as Uns;
+
+      const spies = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [
+          '0x95AE1515367aa64C462c71e87157771165B1287A',
+          '0x000000000000000000000000000000000000dead',
+          ['0xe7474D07fD2FA286e7e0aa23cd107F8379085037'],
+        ],
+      });
+      const spies2 = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [NullAddress, NullAddress, []],
+      });
       const address = await resolution.addr(CryptoDomainWithAllRecords, 'eth');
-      expectSpyToBeCalled(eyes);
+      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
+      expect(address).toBe('0xe7474D07fD2FA286e7e0aa23cd107F8379085037');
+    });
+
+    skipItInLive('should work without any configs for L2', async () => {
+      resolution = new Resolution();
+
+      const uns = resolution.serviceMap['UNS'] as unknown as Uns;
+
+      const spies = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [
+          '0x95AE1515367aa64C462c71e87157771165B1287A',
+          '0x000000000000000000000000000000000000dead',
+          ['0xe7474D07fD2FA286e7e0aa23cd107F8379085037'],
+        ],
+      });
+      const spies2 = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [NullAddress, NullAddress, []],
+      });
+      const address = await resolution.addr(CryptoDomainWithAllRecords, 'eth');
+      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
       expect(address).toBe('0xe7474D07fD2FA286e7e0aa23cd107F8379085037');
     });
 
@@ -474,6 +574,23 @@ describe('UNS', () => {
         });
         const ipfsHash = await resolution.ipfsHash(CryptoDomainWithAllRecords);
         expectSpyToBeCalled(spies);
+        expect(ipfsHash).toBe('QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu');
+      });
+
+      it('should resolve with ipfs stored on l2', async () => {
+        const spies = mockAsyncMethods(uns.unsl2.readerContract, {
+          call: [
+            '0x95AE1515367aa64C462c71e87157771165B1287A',
+            '0x000000000000000000000000000000000000dead',
+            ['QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu'],
+          ],
+        });
+        const spies2 = mockAsyncMethods(uns.unsl1.readerContract, {
+          call: [NullAddress, NullAddress, []],
+        });
+        const ipfsHash = await resolution.ipfsHash(CryptoDomainWithAllRecords);
+        expectSpyToBeCalled(spies);
+        expectSpyToBeCalled(spies2);
         expect(ipfsHash).toBe('QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu');
       });
 
@@ -625,7 +742,7 @@ describe('UNS', () => {
     it('should return cns registry address', async () => {
       const unsl2 = uns.unsl2;
       mockAsyncMethod(unsl2.readerContract, 'call', (params) =>
-        Promise.resolve(['0x0000000000000000000000000000000000000000']),
+        Promise.resolve([NullAddress]),
       );
       mockAPICalls('uns_registry_address_tests', protocolLink());
       const registryAddress = await uns.registryAddress(
@@ -640,7 +757,7 @@ describe('UNS', () => {
     skipItInLive('should return uns registry address', async () => {
       const unsl2 = uns.unsl2;
       mockAsyncMethod(unsl2.readerContract, 'call', (params) =>
-        Promise.resolve(['0x0000000000000000000000000000000000000000']),
+        Promise.resolve([NullAddress]),
       );
       mockAPICalls('uns_registry_address_tests', protocolLink());
       const registryAddress = await uns.registryAddress('some-domain.888');
@@ -668,7 +785,7 @@ describe('UNS', () => {
       mockAPICalls('uns_registry_address_tests', protocolLink());
       const unsl2 = uns.unsl2;
       mockAsyncMethod(unsl2.readerContract, 'call', (params) =>
-        Promise.resolve(['0x0000000000000000000000000000000000000000']),
+        Promise.resolve([NullAddress]),
       );
       await expectResolutionErrorCode(
         () => uns.registryAddress('some-domain.zil'),
@@ -679,7 +796,7 @@ describe('UNS', () => {
     it('should throw error if tld does not exist', async () => {
       const unsl2 = uns.unsl2;
       mockAsyncMethod(unsl2.readerContract, 'call', (params) =>
-        Promise.resolve(['0x0000000000000000000000000000000000000000']),
+        Promise.resolve([NullAddress]),
       );
       mockAPICalls('uns_registry_address_tests', protocolLink());
       await expectResolutionErrorCode(
@@ -691,64 +808,98 @@ describe('UNS', () => {
 
   describe('.isRegistered', () => {
     it('should return true', async () => {
-      const spies = mockAsyncMethods(uns, {
-        get: {
-          owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
-          resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
-          records: {
-            ['ipfs.html.value']:
-              'QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu',
-          },
-        },
+      const spies = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [
+          '0x95AE1515367aa64C462c71e87157771165B1287A',
+          '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
+          ['QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu'],
+        ],
+      });
+      const spies2 = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [NullAddress, NullAddress, []],
       });
       const isRegistered = await uns.isRegistered('brad.crypto');
       expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
+      expect(isRegistered).toBe(true);
+    });
+    it('should return true if registered on L2', async () => {
+      const spies = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [
+          '0x95AE1515367aa64C462c71e87157771165B1287A',
+          '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
+          ['QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu'],
+        ],
+      });
+      const spies2 = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [NullAddress, NullAddress, []],
+      });
+      const isRegistered = await uns.isRegistered('brad.crypto');
+      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
       expect(isRegistered).toBe(true);
     });
     it('should return false', async () => {
-      const spies = mockAsyncMethods(uns, {
-        get: {
-          owner: '',
-          resolver: '',
-          records: {},
-        },
+      const spies = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [NullAddress, NullAddress, []],
+      });
+      const spies2 = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [NullAddress, NullAddress, []],
       });
       const isRegistered = await uns.isRegistered(
         'thisdomainisdefinitelynotregistered123.crypto',
       );
       expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
       expect(isRegistered).toBe(false);
     });
   });
 
   describe('.isAvailable', () => {
     it('should return false', async () => {
-      const spies = mockAsyncMethods(uns, {
-        get: {
-          owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
-          resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
-          records: {
-            ['ipfs.html.value']:
-              'QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu',
-          },
-        },
+      const spies = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [
+          '0x95AE1515367aa64C462c71e87157771165B1287A',
+          '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
+          [],
+        ],
+      });
+      const spies2 = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [NullAddress, NullAddress, []],
       });
       const isAvailable = await uns.isAvailable('brad.crypto');
       expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
+      expect(isAvailable).toBe(false);
+    });
+    it('should return false if exists on L2', async () => {
+      const spies = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [
+          '0x95AE1515367aa64C462c71e87157771165B1287A',
+          '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
+          [],
+        ],
+      });
+      const spies2 = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [NullAddress, NullAddress, []],
+      });
+      const isAvailable = await uns.isAvailable('brad.crypto');
+      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
       expect(isAvailable).toBe(false);
     });
     it('should return true', async () => {
-      const spies = mockAsyncMethods(uns, {
-        get: {
-          owner: '',
-          resolver: '',
-          records: {},
-        },
+      const spies = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [NullAddress, NullAddress, []],
+      });
+      const spies2 = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [NullAddress, NullAddress, []],
       });
       const isAvailable = await uns.isAvailable(
         'thisdomainisdefinitelynotregistered123.crypto',
       );
       expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
       expect(isAvailable).toBe(true);
     });
   });
