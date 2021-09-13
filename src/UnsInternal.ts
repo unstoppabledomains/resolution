@@ -11,13 +11,11 @@ import {CryptoRecords, DomainData, UnsLocation} from './types/publicTypes';
 import {constructRecords, EthereumNetworks, isNullAddress} from './utils';
 import FetchProvider from './FetchProvider';
 import EthereumContract from './contracts/EthereumContract';
-import proxyReaderL1 from './contracts/uns/proxyReaderL1';
+import proxyReader from './contracts/uns/proxyReader';
 import UnsConfig from './config/uns-config.json';
-import proxyReaderL2 from './contracts/uns/proxyReaderL2';
 import ResolutionError, {ResolutionErrorCode} from './errors/resolutionError';
 import {eip137Namehash} from './utils/namehash';
-import registryL1 from './contracts/uns/registryL1';
-import registryL2 from './contracts/uns/registryL2';
+import registry from './contracts/uns/registry';
 import {Interface} from '@ethersproject/abi';
 import {default as resolverInterface} from './contracts/uns/resolver';
 import SupportedKeys from './config/resolver-keys.json';
@@ -25,35 +23,33 @@ import SupportedKeys from './config/resolver-keys.json';
 export default class UnsInternal {
   static readonly ProxyReaderMap: ProxyReaderMap = getProxyReaderMap();
   static readonly UrlMap: BlockhainNetworkUrlMap = {
-    1: 'https://mainnet.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
-    4: 'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
-    137: 'https://polygon.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
-    80001:
+    mainnet: 'https://mainnet.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+    rinkeby: 'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+    'polygon-mainnet':
+      'https://polygon.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+    'polygon-mumbai':
       'https://polygon-mumbai.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
   };
 
-  readonly network;
-  readonly url;
-  readonly provider;
-  readonly readerContract;
+  readonly network: string;
+  readonly url: string;
+  readonly provider: FetchProvider;
+  readonly readerContract: EthereumContract;
   readonly location: UnsLocation;
 
   constructor(location: UnsLocation, source: UnsLayerSource) {
     this.checkNetworkConfig(location, source);
     this.location = location;
-    this.network = EthereumNetworks[source.network];
+    this.network = source.network;
     this.url = source['url'] || UnsInternal.UrlMap[this.network];
     this.provider =
       source['provider'] || new FetchProvider(this.location, this.url);
     this.readerContract = new EthereumContract(
-      this.location === UnsLocation.Layer1 ? proxyReaderL1 : proxyReaderL2,
-      source.proxyReaderAddress || UnsInternal.ProxyReaderMap[this.network],
+      proxyReader,
+      source.proxyReaderAddress ||
+        UnsInternal.ProxyReaderMap[EthereumNetworks[this.network]],
       this.provider,
     );
-  }
-
-  async callReaderContract(method: string, params: string[]): Promise<any[]> {
-    return this.readerContract.call(method, params);
   }
 
   async resolver(domain: string): Promise<string> {
@@ -82,7 +78,7 @@ export default class UnsInternal {
   async getDomainFromTokenId(tokenId: string): Promise<string> {
     const registryAddress = await this.registryAddress(tokenId);
     const registryContract = new EthereumContract(
-      this.location === UnsLocation.Layer1 ? registryL1 : registryL2,
+      registry,
       registryAddress,
       this.provider,
     );
@@ -92,6 +88,7 @@ export default class UnsInternal {
       tokenId,
       startingBlock,
     );
+
     if (!newURIEvents || newURIEvents.length === 0) {
       throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
         domain: `with tokenId ${tokenId}`,
@@ -108,7 +105,8 @@ export default class UnsInternal {
 
   private isWellKnownLegacyResolver(resolverAddress: string): boolean {
     const legacyAddresses =
-      UnsConfig?.networks[this.network]?.contracts?.Resolver?.legacyAddresses;
+      UnsConfig?.networks[EthereumNetworks[this.network]]?.contracts?.Resolver
+        ?.legacyAddresses;
     if (!legacyAddresses || legacyAddresses.length === 0) {
       return false;
     }
@@ -283,7 +281,8 @@ export default class UnsInternal {
     tokenId: string,
   ): Promise<string | undefined> {
     const defaultStartingBlock =
-      UnsConfig?.networks[this.network]?.contracts?.Resolver?.deploymentBlock;
+      UnsConfig?.networks[EthereumNetworks[this.network]]?.contracts?.Resolver
+        ?.deploymentBlock;
     const logs = await contract.fetchLogs('ResetRecords', tokenId);
     const lastResetEvent = logs[logs.length - 1];
     return lastResetEvent?.blockNumber || defaultStartingBlock;

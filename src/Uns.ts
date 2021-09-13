@@ -9,6 +9,7 @@ import {
   constructRecords,
   isNullAddress,
   EthereumNetworksInverted,
+  EthereumNetworks,
 } from './utils';
 import {
   UnsSource,
@@ -40,25 +41,18 @@ export default class Uns extends NamingService {
   public unsl2: UnsInternal;
   readonly name: NamingServiceName = NamingServiceName.UNS;
 
-  constructor(
-    source: UnsSource = {
-      locations: {
-        Layer1: {url: UnsInternal.UrlMap[1], network: 'mainnet'},
-        Layer2: {url: UnsInternal.UrlMap[137], network: 'polygon'},
-      },
-    },
-  ) {
+  constructor(source?: UnsSource) {
     super();
     if (!source) {
       source = {
         locations: {
           Layer1: {
-            url: UnsInternal.UrlMap[1],
+            url: UnsInternal.UrlMap['mainnet'],
             network: 'mainnet',
           },
           Layer2: {
-            url: UnsInternal.UrlMap[137],
-            network: 'polygon',
+            url: UnsInternal.UrlMap['polygon-mainnet'],
+            network: 'polygon-mainnet',
           },
         },
       };
@@ -149,7 +143,7 @@ export default class Uns extends NamingService {
     if (!tld) {
       return false;
     }
-    const [exists] = await this.unsl1.callReaderContract('exists', [
+    const [exists] = await this.unsl1.readerContract.call('exists', [
       this.namehash(tld),
     ]);
     return exists;
@@ -185,13 +179,15 @@ export default class Uns extends NamingService {
     const promiseL2 = this.unsl2.allRecords(domain);
     const promiseL1 = this.unsl1.allRecords(domain);
     const recordsL2 = await promiseL2.catch((error) => {
-      if (error.message === 'Network error related') {
-        throw new ResolutionError(ResolutionErrorCode.NetworkError, {
-          networkMessage: 'Failed to connect to Layer2',
-        });
+      if (
+        error.code === ResolutionErrorCode.UnspecifiedResolver ||
+        error.code === ResolutionErrorCode.UnregisteredDomain
+      ) {
+        return null;
       }
+      throw error;
     });
-    if (recordsL2 && Object.keys(recordsL2).length) {
+    if (recordsL2 && recordsL2.owner && recordsL2.owner !== NullAddress) {
       return recordsL2;
     }
     return promiseL1;
@@ -258,12 +254,24 @@ export default class Uns extends NamingService {
   }
 
   async getTokenUri(tokenId: string): Promise<string> {
-    try {
-      const [tokenUri] = await this.callReaderContractOnBothLayers('tokenURI', [
-        tokenId,
-      ]);
-      return tokenUri;
-    } catch (error) {
+    const promiseL1 = this.unsl1.readerContract.call('tokenURI', [tokenId]);
+    const [tokenURIL2] = await this.unsl2.readerContract
+      .call('tokenURI', [tokenId])
+      .catch((error) => {
+        if (
+          error instanceof ResolutionError &&
+          error.code === ResolutionErrorCode.ServiceProviderError &&
+          error.message === '< execution reverted >'
+        ) {
+          return [null];
+        }
+        throw error;
+      });
+
+    if (tokenURIL2) {
+      return tokenURIL2;
+    }
+    const [tokenURIL1] = await promiseL1.catch((error) => {
       if (
         error instanceof ResolutionError &&
         error.code === ResolutionErrorCode.ServiceProviderError &&
@@ -275,7 +283,8 @@ export default class Uns extends NamingService {
         });
       }
       throw error;
-    }
+    });
+    return tokenURIL1;
   }
 
   async isAvailable(domain: string): Promise<boolean> {
@@ -293,15 +302,21 @@ export default class Uns extends NamingService {
     const namehash = domainOrNamehash.startsWith('0x')
       ? domainOrNamehash
       : this.namehash(domainOrNamehash);
-    const [address] = await this.callReaderContractOnBothLayers('registryOf', [
+    const promiseL1 = this.unsl1.readerContract.call('registryOf', [namehash]);
+    const [addressL2] = await this.unsl2.readerContract.call('registryOf', [
       namehash,
     ]);
-    if (address === NullAddress) {
-      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-        domain: domainOrNamehash,
-      });
+
+    if (addressL2 !== NullAddress) {
+      return addressL2;
     }
-    return address;
+    const [addressL1] = await promiseL1;
+    if (addressL1 !== NullAddress) {
+      return addressL1;
+    }
+    throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+      domain: domainOrNamehash,
+    });
   }
 
   async getDomainFromTokenId(tokenId: string): Promise<string> {
@@ -309,11 +324,10 @@ export default class Uns extends NamingService {
     const promiseL1 = this.unsl1.getDomainFromTokenId(tokenId);
 
     const domain = await promiseL2.catch((error) => {
-      if (error.message === 'Network error related') {
-        throw new ResolutionError(ResolutionErrorCode.NetworkError, {
-          networkMessage: 'Failed to connect to Layer2',
-        });
+      if (error.code === ResolutionErrorCode.UnregisteredDomain) {
+        return null;
       }
+      throw error;
     });
     if (domain) {
       return domain;
@@ -331,7 +345,7 @@ export default class Uns extends NamingService {
     return {
       registry,
       resolver,
-      networkId: this.unsl1.network,
+      networkId: EthereumNetworks[this.unsl1.network],
       blockchain: BlockchainType.ETH,
       owner,
     };
@@ -356,28 +370,26 @@ export default class Uns extends NamingService {
     return data;
   }
 
-  private async callReaderContractOnBothLayers(
-    methodName: string,
-    methodParams: any[],
-  ): Promise<readonly any[]> {
-    const promiseL1 = this.unsl1.callReaderContract(methodName, methodParams);
-    const promiseL2 = this.unsl2.callReaderContract(methodName, methodParams);
-    const responseL2 = await promiseL2.catch((error) => {
-      if (error.message === 'Network error related') {
-        throw new ResolutionError(ResolutionErrorCode.NetworkError, {
-          networkMessage: 'Failed to connect to Layer2',
-        });
-      }
-    });
-    return responseL2 || promiseL1;
-  }
-
   private async get(tokenId: string, keys: string[] = []): Promise<DomainData> {
-    const [resolver, owner, values] = await this.callReaderContractOnBothLayers(
-      'getData',
-      [keys, tokenId],
-    );
-    return {owner, resolver, records: constructRecords(keys, values)};
+    const promiseL1 = this.unsl1.readerContract.call('getData', [
+      keys,
+      tokenId,
+    ]);
+    const [resolverL2, ownerL2, recordsL2] =
+      await this.unsl2.readerContract.call('getData', [keys, tokenId]);
+    if (ownerL2 !== NullAddress && resolverL2 !== NullAddress) {
+      return {
+        resolver: resolverL2,
+        owner: ownerL2,
+        records: constructRecords(keys, recordsL2),
+      };
+    }
+    const [resolverL1, ownerL1, recordsL1] = await promiseL1;
+    return {
+      resolver: resolverL1,
+      owner: ownerL1,
+      records: constructRecords(keys, recordsL1),
+    };
   }
 
   private checkDomain(domain: string, passIfTokenID = false): boolean {

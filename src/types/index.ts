@@ -127,7 +127,7 @@ const StringUnion = <UnionType extends string>(...values: UnionType[]) => {
 export const UnsSupportedNetwork = StringUnion(
   'mainnet',
   'rinkeby',
-  'polygon',
+  'polygon-mainnet',
   'polygon-mumbai',
 );
 
