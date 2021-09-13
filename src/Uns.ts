@@ -143,10 +143,17 @@ export default class Uns extends NamingService {
     if (!tld) {
       return false;
     }
-    const [exists] = await this.unsl1.readerContract.call('exists', [
+    const promiseL1 = this.unsl1.readerContract.call('exists', [
       this.namehash(tld),
     ]);
-    return exists;
+    const [existsL2] = await this.unsl2.readerContract.call('exists', [
+      this.namehash(tld),
+    ]);
+    if (existsL2) {
+      return existsL2;
+    }
+    const [existsL1] = await promiseL1;
+    return existsL1;
   }
 
   async owner(domain: string): Promise<string> {
