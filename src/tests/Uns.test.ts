@@ -11,6 +11,7 @@ import {
   expectConfigurationErrorCode,
   CryptoDomainWithoutGunDbRecords,
   CryptoDomainWithAllRecords,
+  WalletDomainLayerTwoWithAllRecords,
   skipItInLive,
   mockAPICalls,
   ProviderProtocol,
@@ -132,6 +133,26 @@ describe('UNS', () => {
     expectSpyToBeCalled(spies2);
   }, 20000);
 
+  it('should return NoRecord Resolution error for L2', async () => {
+    const uns = resolution.serviceMap[NamingServiceName.UNS] as Uns;
+    const spies = mockAsyncMethods(uns.unsl2.readerContract, {
+      call: [NullAddress, NullAddress, []],
+    });
+    const spies2 = mockAsyncMethods(uns.unsl1.readerContract, {
+      call: [
+        '0x95AE1515367aa64C462c71e87157771165B1287A',
+        '0x8aad44321a86b170879d7a244c1e8d360c99dda8',
+        [],
+      ],
+    });
+    await expectResolutionErrorCode(
+      resolution.record(WalletDomainLayerTwoWithAllRecords, 'No.such.record'),
+      ResolutionErrorCode.RecordNotFound,
+    );
+    expectSpyToBeCalled(spies);
+    expectSpyToBeCalled(spies2);
+  }, 20000);
+
   it('should return a valid resolver address', async () => {
     const spies = mockAsyncMethods(uns, {
       get: {resolver: '0x95AE1515367aa64C462c71e87157771165B1287A'},
@@ -153,7 +174,7 @@ describe('UNS', () => {
     expect(await uns.isSupportedDomain('brad.blockchain')).toBe(true);
     expect(await uns.isSupportedDomain('brad.888')).toBe(true);
     expect(
-      await uns.isSupportedDomain('udtestdev-test-l2-domain-784391.wallet'),
+      await uns.isSupportedDomain(WalletDomainLayerTwoWithAllRecords),
     ).toBe(true);
   });
 
@@ -225,7 +246,7 @@ describe('UNS', () => {
       );
     });
 
-    it(`checks the ADA address on ${CryptoDomainWithAllRecords} L2`, async () => {
+    it(`checks the LINK address on ${WalletDomainLayerTwoWithAllRecords} L2`, async () => {
       mockAsyncMethods(uns.unsl1.readerContract, {
         call: [NullAddress, NullAddress, []],
       });
@@ -233,16 +254,15 @@ describe('UNS', () => {
         call: [
           '0x95AE1515367aa64C462c71e87157771165B1287A',
           '0xd1D5eb96f36A7605b0cED801fF497E81F6245106',
-          [
-            'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
-          ],
+          ['0x6A1fd9a073256f14659fe59613bbf169Ed27CdcC'],
         ],
       });
-      const addr = await resolution.addr(CryptoDomainWithAllRecords, 'ADA');
-      expectSpyToBeCalled(eyesL2);
-      expect(addr).toBe(
-        'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
+      const addr = await resolution.addr(
+        WalletDomainLayerTwoWithAllRecords,
+        'LINK',
       );
+      expectSpyToBeCalled(eyesL2);
+      expect(addr).toBe('0x6A1fd9a073256f14659fe59613bbf169Ed27CdcC');
     });
 
     describe('.Metadata', () => {
@@ -432,19 +452,19 @@ describe('UNS', () => {
       });
       const spies2 = mockAsyncMethods(uns.unsl2.readerContract, {
         call: [
-          '0x95AE1515367aa64C462c71e87157771165B1287A',
+          '0xecb7AaC995C284970A347342F5d04dB81fdB436F',
           '0x8aad44321a86b170879d7a244c1e8d360c99dda8',
           [],
         ],
       });
 
       const resolverAddress = await resolution.resolver(
-        CryptoDomainWithAllRecords,
+        WalletDomainLayerTwoWithAllRecords,
       );
       expectSpyToBeCalled(spies);
       expectSpyToBeCalled(spies2);
       expect(resolverAddress).toBe(
-        '0x95AE1515367aa64C462c71e87157771165B1287A',
+        '0xecb7AaC995C284970A347342F5d04dB81fdB436F',
       );
     });
 
@@ -458,19 +478,19 @@ describe('UNS', () => {
       });
       const spies2 = mockAsyncMethods(uns.unsl2.readerContract, {
         call: [
-          '0x95AE1515367aa64C462c71e87157771165B1287A',
+          '0xecb7AaC995C284970A347342F5d04dB81fdB436F',
           '0x8aad44321a86b170879d7a244c1e8d360c99dda8',
           [],
         ],
       });
 
       const resolverAddress = await resolution.resolver(
-        CryptoDomainWithAllRecords,
+        WalletDomainLayerTwoWithAllRecords,
       );
       expectSpyToBeCalled(spies);
       expectSpyToBeCalled(spies2);
       expect(resolverAddress).toBe(
-        '0x95AE1515367aa64C462c71e87157771165B1287A',
+        '0xecb7AaC995C284970A347342F5d04dB81fdB436F',
       );
     });
 
@@ -497,7 +517,7 @@ describe('UNS', () => {
         call: ['0x95AE1515367aa64C462c71e87157771165B1287A', NullAddress, []],
       });
       await expectResolutionErrorCode(
-        resolution.resolver('unknown-unknown-938388383.crypto'),
+        resolution.resolver('unknown-unknown-938388383w.crypto'),
         ResolutionErrorCode.UnregisteredDomain,
       );
       expectSpyToBeCalled(spies);
@@ -555,7 +575,10 @@ describe('UNS', () => {
       const spies2 = mockAsyncMethods(uns.unsl1.readerContract, {
         call: [NullAddress, NullAddress, []],
       });
-      const address = await resolution.addr(CryptoDomainWithAllRecords, 'eth');
+      const address = await resolution.addr(
+        WalletDomainLayerTwoWithAllRecords,
+        'eth',
+      );
       expectSpyToBeCalled(spies);
       expectSpyToBeCalled(spies2);
       expect(address).toBe('0xe7474D07fD2FA286e7e0aa23cd107F8379085037');
@@ -582,16 +605,18 @@ describe('UNS', () => {
           call: [
             '0x95AE1515367aa64C462c71e87157771165B1287A',
             '0x000000000000000000000000000000000000dead',
-            ['QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu'],
+            ['QmfRXG3CcM1eWiCUA89uzimCvQUnw4HzTKLo6hRZ47PYsN'],
           ],
         });
         const spies2 = mockAsyncMethods(uns.unsl1.readerContract, {
           call: [NullAddress, NullAddress, []],
         });
-        const ipfsHash = await resolution.ipfsHash(CryptoDomainWithAllRecords);
+        const ipfsHash = await resolution.ipfsHash(
+          WalletDomainLayerTwoWithAllRecords,
+        );
         expectSpyToBeCalled(spies);
         expectSpyToBeCalled(spies2);
-        expect(ipfsHash).toBe('QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu');
+        expect(ipfsHash).toBe('QmfRXG3CcM1eWiCUA89uzimCvQUnw4HzTKLo6hRZ47PYsN');
       });
 
       it('should resolve with email stored on uns', async () => {
@@ -775,7 +800,9 @@ describe('UNS', () => {
           UnsConfig.networks[80001].contracts.UNSRegistry.address,
         ]),
       );
-      const registryAddress = await uns.registryAddress('test-domain.888');
+      const registryAddress = await uns.registryAddress(
+        WalletDomainLayerTwoWithAllRecords,
+      );
       expect(registryAddress).toBe(
         UnsConfig.networks[80001].contracts.UNSRegistry.address,
       );
@@ -834,7 +861,9 @@ describe('UNS', () => {
       const spies2 = mockAsyncMethods(uns.unsl1.readerContract, {
         call: [NullAddress, NullAddress, []],
       });
-      const isRegistered = await uns.isRegistered('brad.crypto');
+      const isRegistered = await uns.isRegistered(
+        WalletDomainLayerTwoWithAllRecords,
+      );
       expectSpyToBeCalled(spies);
       expectSpyToBeCalled(spies2);
       expect(isRegistered).toBe(true);

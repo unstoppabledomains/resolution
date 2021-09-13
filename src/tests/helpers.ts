@@ -21,6 +21,8 @@ export const CryptoDomainWithUsdtMultiChainRecords =
 export const ZilDomainWithUsdtMultiChainRecords =
   'reseller-test-udtesting-422508414817.zil';
 export const CryptoDomainWithAllRecords = 'test-usdt-and-dns-records.crypto';
+export const WalletDomainLayerTwoWithAllRecords =
+  'udtestdev-test-l2-domain-784391.wallet';
 export const CryptoDomainWithoutGunDbRecords =
   'test-usdt-and-dns-records.crypto';
 
