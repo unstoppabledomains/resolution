@@ -1,4 +1,4 @@
-import {ResolutionMethod} from '../types/publicTypes';
+import {ResolutionMethod, UnsLocation} from '../types/publicTypes';
 /**
  * Alias for Resolution error handler function
  * @internal
@@ -13,8 +13,7 @@ type ResolutionErrorOptions = {
   currencyTicker?: string;
   recordName?: string;
   namingService?: string;
-  errorMessage?: string;
-  errorCode?: string;
+  location?: UnsLocation;
 };
 
 export enum ResolutionErrorCode {
@@ -38,8 +37,13 @@ export enum ResolutionErrorCode {
 const HandlersByCode = {
   [ResolutionErrorCode.UnregisteredDomain]: (params: {domain: string}) =>
     `Domain ${params.domain} is not registered`,
-  [ResolutionErrorCode.UnspecifiedResolver]: (params: {domain: string}) =>
-    `Domain ${params.domain} is not configured`,
+  [ResolutionErrorCode.UnspecifiedResolver]: (params: {
+    domain: string;
+    location?: UnsLocation;
+  }) =>
+    `${params.location ? `${params.location}: ` : ''}Domain ${
+      params.domain
+    } is not configured`,
   [ResolutionErrorCode.UnsupportedDomain]: (params: {domain: string}) =>
     `Domain ${params.domain} is not supported`,
   [ResolutionErrorCode.UnsupportedMethod]: (params: {
@@ -49,7 +53,11 @@ const HandlersByCode = {
 
   [ResolutionErrorCode.InvalidTwitterVerification]: (params: {
     domain?: string;
-  }) => `Domain ${params.domain} has invalid Twitter signature verification`,
+    location?: UnsLocation;
+  }) =>
+    `${params.location ? `${params.location}: ` : ''}Domain ${
+      params.domain
+    } has invalid Twitter signature verification`,
   [ResolutionErrorCode.UnsupportedCurrency]: (params: {
     currencyTicker: string;
   }) => `${params.currencyTicker} is not supported`,
@@ -59,7 +67,11 @@ const HandlersByCode = {
   [ResolutionErrorCode.RecordNotFound]: (params: {
     recordName: string;
     domain: string;
-  }) => `No ${params.recordName} record found for ${params.domain}`,
+    location?: UnsLocation;
+  }) =>
+    `${params.location ? `${params.location}: ` : ''}No ${
+      params.recordName
+    } record found for ${params.domain}`,
   [ResolutionErrorCode.ServiceProviderError]: (params: {
     providerMessage?: string;
   }) => `< ${params.providerMessage} >`,

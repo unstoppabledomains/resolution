@@ -130,6 +130,7 @@ export default class UnsInternal {
         });
       }
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
+        location: this.location,
         domain,
       });
     }
@@ -261,7 +262,12 @@ export default class UnsInternal {
       [keys, tokenId],
     );
 
-    return {owner, resolver, records: constructRecords(keys, values)};
+    return {
+      owner,
+      resolver,
+      records: constructRecords(keys, values),
+      location: this.location,
+    };
   }
 
   private async getStandardRecords(tokenId: string): Promise<CryptoRecords> {

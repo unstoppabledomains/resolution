@@ -212,6 +212,7 @@ export type DomainData = {
   owner: string;
   resolver: string;
   records: CryptoRecords;
+  location: UnsLocation;
 };
 
 export interface Erc721Metadata {

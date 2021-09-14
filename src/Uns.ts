@@ -370,6 +370,7 @@ export default class Uns extends NamingService {
         });
       }
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
+        location: data.location,
         domain,
       });
     }
@@ -383,11 +384,12 @@ export default class Uns extends NamingService {
     ]);
     const [resolverL2, ownerL2, recordsL2] =
       await this.unsl2.readerContract.call('getData', [keys, tokenId]);
-    if (ownerL2 !== NullAddress && resolverL2 !== NullAddress) {
+    if (ownerL2 !== NullAddress) {
       return {
         resolver: resolverL2,
         owner: ownerL2,
         records: constructRecords(keys, recordsL2),
+        location: UnsLocation.Layer2,
       };
     }
     const [resolverL1, ownerL1, recordsL1] = await promiseL1;
@@ -395,6 +397,7 @@ export default class Uns extends NamingService {
       resolver: resolverL1,
       owner: ownerL1,
       records: constructRecords(keys, recordsL1),
+      location: UnsLocation.Layer1,
     };
   }
 
