@@ -975,7 +975,7 @@ describe('UNS', () => {
         });
         const uns = resolution.serviceMap['UNS'] as unknown as Uns;
         mockAsyncMethods(uns.unsl1.readerContract, {
-          call: () => null,
+          call: () => Promise.reject(new Error('error_up')),
         });
         mockAsyncMethods(uns.unsl2.readerContract, {
           call: () => Promise.reject(new Error('error_up')),

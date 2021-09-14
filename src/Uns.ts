@@ -143,16 +143,25 @@ export default class Uns extends NamingService {
     if (!tld) {
       return false;
     }
-    const promiseL1 = this.unsl1.readerContract.call('exists', [
-      this.namehash(tld),
+    const [resultOrErrorL1, resultOrErrorL2] = await Promise.all([
+      this.unsl1.readerContract
+        .call('exists', [this.namehash(tld)])
+        .catch((err) => err),
+      this.unsl2.readerContract
+        .call('exists', [this.namehash(tld)])
+        .catch((err) => err),
     ]);
-    const [existsL2] = await this.unsl2.readerContract.call('exists', [
-      this.namehash(tld),
-    ]);
+    if (resultOrErrorL2 instanceof Error) {
+      throw resultOrErrorL2;
+    }
+    const [existsL2] = resultOrErrorL2;
     if (existsL2) {
       return existsL2;
     }
-    const [existsL1] = await promiseL1;
+    if (resultOrErrorL1 instanceof Error) {
+      throw resultOrErrorL1;
+    }
+    const [existsL1] = await resultOrErrorL1;
     return existsL1;
   }
 
@@ -183,21 +192,27 @@ export default class Uns extends NamingService {
   }
 
   async allRecords(domain: string): Promise<CryptoRecords> {
-    const promiseL2 = this.unsl2.allRecords(domain);
-    const promiseL1 = this.unsl1.allRecords(domain);
-    const recordsL2 = await promiseL2.catch((error) => {
+    const [resultOrErrorL1, resultOrErrorL2] = await Promise.all([
+      this.unsl1.allRecords(domain).catch((err) => err),
+      this.unsl2.allRecords(domain).catch((err) => err),
+    ]);
+    if (resultOrErrorL2 instanceof ResolutionError) {
       if (
-        error.code === ResolutionErrorCode.UnspecifiedResolver ||
-        error.code === ResolutionErrorCode.UnregisteredDomain
+        resultOrErrorL2.code !== ResolutionErrorCode.UnspecifiedResolver &&
+        resultOrErrorL2.code !== ResolutionErrorCode.UnregisteredDomain
       ) {
-        return null;
+        throw resultOrErrorL2;
       }
-      throw error;
-    });
-    if (recordsL2 && recordsL2.owner && recordsL2.owner !== NullAddress) {
-      return recordsL2;
+      return resultOrErrorL1;
     }
-    return promiseL1;
+    if (
+      resultOrErrorL2 &&
+      resultOrErrorL2.owner &&
+      resultOrErrorL2.owner !== NullAddress
+    ) {
+      return resultOrErrorL2;
+    }
+    return resultOrErrorL1;
   }
 
   async twitter(domain: string): Promise<string> {
@@ -327,18 +342,21 @@ export default class Uns extends NamingService {
   }
 
   async getDomainFromTokenId(tokenId: string): Promise<string> {
-    const promiseL2 = this.unsl2.getDomainFromTokenId(tokenId);
-    const domain = await promiseL2.catch((error) => {
-      if (error.code === ResolutionErrorCode.UnregisteredDomain) {
-        return null;
+    const [resultOrErrorL1, resultOrErrorL2] = await Promise.all([
+      this.unsl1.getDomainFromTokenId(tokenId).catch((err) => err),
+      this.unsl2.getDomainFromTokenId(tokenId).catch((err) => err),
+    ]);
+
+    if (resultOrErrorL2 instanceof ResolutionError) {
+      if (resultOrErrorL2.code !== ResolutionErrorCode.UnregisteredDomain) {
+        throw resultOrErrorL2;
       }
-      throw error;
-    });
-    if (domain) {
-      return domain;
+      if (resultOrErrorL1 instanceof ResolutionError) {
+        throw resultOrErrorL1;
+      }
+      return resultOrErrorL1;
     }
-    const promiseL1 = this.unsl1.getDomainFromTokenId(tokenId);
-    return promiseL1;
+    return resultOrErrorL2;
   }
 
   async location(domain: string): Promise<DomainLocation> {
@@ -382,12 +400,18 @@ export default class Uns extends NamingService {
   }
 
   private async get(tokenId: string, keys: string[] = []): Promise<DomainData> {
-    const promiseL1 = this.unsl1.readerContract.call('getData', [
-      keys,
-      tokenId,
+    const [resultOrErrorL1, resultOrErrorL2] = await Promise.all([
+      this.unsl1.readerContract
+        .call('getData', [keys, tokenId])
+        .catch((err) => err),
+      this.unsl2.readerContract
+        .call('getData', [keys, tokenId])
+        .catch((err) => err),
     ]);
-    const [resolverL2, ownerL2, recordsL2] =
-      await this.unsl2.readerContract.call('getData', [keys, tokenId]);
+    if (resultOrErrorL2 instanceof Error) {
+      throw resultOrErrorL2;
+    }
+    const [resolverL2, ownerL2, recordsL2] = resultOrErrorL2;
     if (ownerL2 !== NullAddress) {
       return {
         resolver: resolverL2,
@@ -396,7 +420,10 @@ export default class Uns extends NamingService {
         location: UnsLocation.Layer2,
       };
     }
-    const [resolverL1, ownerL1, recordsL1] = await promiseL1;
+    if (resultOrErrorL1 instanceof Error) {
+      throw resultOrErrorL1;
+    }
+    const [resolverL1, ownerL1, recordsL1] = resultOrErrorL1;
     return {
       resolver: resolverL1,
       owner: ownerL1,
