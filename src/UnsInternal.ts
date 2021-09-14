@@ -99,6 +99,15 @@ export default class UnsInternal {
     return decoded[decoded.length - 1];
   }
 
+  namehash(domain: string): string {
+    if (!this.checkDomain(domain)) {
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
+        domain,
+      });
+    }
+    return eip137Namehash(domain);
+  }
+
   private isLegacyResolver(resolverAddress: string): boolean {
     return this.isWellKnownLegacyResolver(resolverAddress);
   }
@@ -231,15 +240,6 @@ export default class UnsInternal {
         },
       );
     }
-  }
-
-  namehash(domain: string): string {
-    if (!this.checkDomain(domain)) {
-      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
-        domain,
-      });
-    }
-    return eip137Namehash(domain);
   }
 
   private isValidProxyReader(address?: string): boolean {
