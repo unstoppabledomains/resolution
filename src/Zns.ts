@@ -142,7 +142,7 @@ export default class Zns extends NamingService {
 
   async allRecords(domain: string): Promise<CryptoRecords> {
     const resolverAddress = await this.resolver(domain);
-    return await this.getResolverRecords(resolverAddress);
+    return this.getResolverRecords(resolverAddress);
   }
 
   async twitter(domain: string): Promise<string> {
@@ -249,7 +249,7 @@ export default class Zns extends NamingService {
   ): Promise<any> {
     const params = [contractAddress.replace('0x', ''), field, keys];
     const method = 'GetSmartContractSubState';
-    return await this.provider.request({method, params});
+    return this.provider.request({method, params});
   }
 
   private async getContractField(

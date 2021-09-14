@@ -310,9 +310,9 @@ export default class UnsInternal {
     const keyTopics = logs.map((event) => event.topics[2]);
     // If there are no NewKey events we want to check the standardRecords
     if (keyTopics.length === 0) {
-      return await this.getStandardRecords(tokenId);
+      return this.getStandardRecords(tokenId);
     }
-    return await this.getManyByHash(tokenId, keyTopics);
+    return this.getManyByHash(tokenId, keyTopics);
   }
 
   private async getManyByHash(

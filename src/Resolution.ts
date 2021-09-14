@@ -509,7 +509,7 @@ export default class Resolution {
     }
 
     const recordKey = `crypto.${ticker.toUpperCase()}.version.${chain.toUpperCase()}.address`;
-    return await method.record(domain, recordKey);
+    return method.record(domain, recordKey);
   }
 
   /**
@@ -532,7 +532,7 @@ export default class Resolution {
    * @returns A promise that resolves in chatId
    */
   async chatId(domain: string): Promise<string> {
-    return await this.record(domain, 'gundb.username.value');
+    return this.record(domain, 'gundb.username.value');
   }
 
   /**
@@ -542,7 +542,7 @@ export default class Resolution {
    * @returns a promise that resolves in gundb public key
    */
   async chatPk(domain: string): Promise<string> {
-    return await this.record(domain, 'gundb.public_key.value');
+    return this.record(domain, 'gundb.public_key.value');
   }
 
   /**
@@ -552,7 +552,7 @@ export default class Resolution {
    */
   async ipfsHash(domain: string): Promise<string> {
     domain = this.prepareDomain(domain);
-    return await this.getPreferableNewRecord(
+    return this.getPreferableNewRecord(
       domain,
       'dweb.ipfs.hash',
       'ipfs.html.value',
@@ -565,7 +565,7 @@ export default class Resolution {
    */
   async httpUrl(domain: string): Promise<string> {
     domain = this.prepareDomain(domain);
-    return await this.getPreferableNewRecord(
+    return this.getPreferableNewRecord(
       domain,
       'browser.redirect_url',
       'ipfs.redirect_domain.value',
@@ -579,7 +579,7 @@ export default class Resolution {
    * @returns A Promise that resolves in an email address configured for this domain whois
    */
   async email(domain: string): Promise<string> {
-    return await this.record(domain, 'whois.email.value');
+    return this.record(domain, 'whois.email.value');
   }
 
   /**
@@ -626,7 +626,7 @@ export default class Resolution {
   async records(domain: string, keys: string[]): Promise<CryptoRecords> {
     domain = this.prepareDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
-    return await method.records(domain, keys);
+    return method.records(domain, keys);
   }
 
   /**
@@ -636,7 +636,7 @@ export default class Resolution {
   async isRegistered(domain: string): Promise<Boolean> {
     domain = this.prepareDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
-    return await method.isRegistered(domain);
+    return method.isRegistered(domain);
   }
 
   /**
@@ -646,7 +646,7 @@ export default class Resolution {
   async isAvailable(domain: string): Promise<Boolean> {
     domain = this.prepareDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
-    return await method.isAvailable(domain);
+    return method.isAvailable(domain);
   }
 
   /**
@@ -754,7 +754,7 @@ export default class Resolution {
    */
   async allRecords(domain: string): Promise<CryptoRecords> {
     domain = this.prepareDomain(domain);
-    return await this.getNamingMethodOrThrow(domain).allRecords(domain);
+    return this.getNamingMethodOrThrow(domain).allRecords(domain);
   }
 
   async allNonEmptyRecords(domain: string): Promise<CryptoRecords> {
@@ -841,7 +841,7 @@ export default class Resolution {
   ): Promise<TokenUriMetadata> {
     const resp = await Networking.fetch(tokenUri, {});
     if (resp.ok) {
-      return await resp.json();
+      return resp.json();
     }
 
     throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
