@@ -343,15 +343,19 @@ export default class Uns extends NamingService {
 
   async location(domain: string): Promise<DomainLocation> {
     const tokenId = this.namehash(domain);
-    const [registry, {resolver, owner}] = await Promise.all([
+    const [registry, {resolver, owner, location}] = await Promise.all([
       this.registryAddress(domain),
       this.get(tokenId),
     ]);
 
+    let networkId = EthereumNetworks[this.unsl1.network];
+    if (location === UnsLocation.Layer2) {
+      networkId = EthereumNetworks[this.unsl2.network];
+    }
     return {
       registry,
       resolver,
-      networkId: EthereumNetworks[this.unsl1.network],
+      networkId,
       blockchain: BlockchainType.ETH,
       owner,
     };
