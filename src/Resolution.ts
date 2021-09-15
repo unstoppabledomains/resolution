@@ -153,109 +153,85 @@ export default class Resolution {
 
   /**
    * Creates a resolution instance with configured provider
-   * @param provider - any provider compatible with EIP-1193
-   * @param networks - an object that describes what network to use when connecting ENS or ZNS default is mainnet
+   * @param networks - an object that describes what network to use when connecting UNS, ENS, or ZNS default is mainnet
    * @see https://eips.ethereum.org/EIPS/eip-1193
    */
-  static fromResolutionProvider(
-    provider: Provider,
-    networks: {
-      ens?: {
-        network: string;
+  static fromResolutionProvider(networks: {
+    ens?: {
+      provider: Provider;
+      network: string;
+    };
+    uns?: {
+      locations: {
+        Layer1: {provider: Provider; network: string};
+        Layer2: {provider: Provider; network: string};
       };
-      zns?: {
-        network: string;
-      };
-    },
-  ): Resolution {
-    if (networks.ens) {
-      return this.fromEthereumEip1193Provider(provider, networks);
+    };
+    zns?: {
+      provider: Provider;
+      network: string;
+    };
+  }): Resolution {
+    if (networks.ens || networks.uns) {
+      return this.fromEthereumEip1193Provider({
+        ens: networks.ens,
+        uns: networks.uns,
+      });
     }
     if (networks.zns) {
-      return this.fromZilliqaProvider(provider, networks);
+      return this.fromZilliqaProvider(networks.zns.provider, networks);
     }
     throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
-      providerMessage: 'Must specify network for ens or zns',
-    });
-  }
-
-  /**
-   * Creates a resolution instance with configured providers
-   * @param config - an object that describes L1 and L2 provider compatible with EIP-1193 and what network to use when connecting UNS default is mainnet
-   * @see https://eips.ethereum.org/EIPS/eip-1193
-   */
-  static unsFromResolutionProvider(config: {
-    locations: {
-      Layer1: {
-        provider: Provider;
-        network: string;
-      };
-      Layer2: {
-        provider: Provider;
-        network: string;
-      };
-    };
-  }): Resolution {
-    return this.unsFromEthereumEip1193Provider(config);
-  }
-
-  /**
-   * Creates a resolution instance with configured provider
-   * @param provider - any provider compatible with EIP-1193
-   * @param networks - an optional object that describes what network to use when connecting ENS default is mainnet
-   * @see https://eips.ethereum.org/EIPS/eip-1193
-   */
-  static fromEthereumEip1193Provider(
-    provider: Provider,
-    networks?: {
-      ens?: {
-        network: string;
-      };
-    },
-  ): Resolution {
-    return new this({
-      sourceConfig: {
-        ens: {provider, network: networks?.ens?.network || 'mainnet'},
-      },
+      providerMessage: 'Must specify network for uns, ens, or zns',
     });
   }
 
   /**
    * Creates a resolution instance with configured provider
-   * @param config - an object that describes L1 and L2 provider compatible with EIP-1193 and what network to use when connecting UNS default is mainnet
+   * @param networks - an object that describes what network to use when connecting UNS and ENS default is mainnet
    * @see https://eips.ethereum.org/EIPS/eip-1193
    */
-  static unsFromEthereumEip1193Provider(config: {
-    locations: {
-      Layer1: {
-        provider: Provider;
-        network: string;
-      };
-      Layer2: {
-        provider: Provider;
-        network: string;
+  static fromEthereumEip1193Provider(networks: {
+    ens?: {
+      network?: string;
+      provider: Provider;
+    };
+    uns?: {
+      locations: {
+        Layer1: {
+          provider: Provider;
+          network?: string;
+        };
+        Layer2: {
+          provider: Provider;
+          network?: string;
+        };
       };
     };
   }): Resolution {
-    return new this({
-      sourceConfig: {
-        ens: {
-          provider: config.locations.Layer1.provider,
-          network: config.locations.Layer1.network || 'mainnet',
-        },
-        uns: {
-          locations: {
-            Layer1: {
-              provider: config.locations.Layer1.provider,
-              network: config.locations.Layer1.network || 'mainnet',
-            },
-            Layer2: {
-              provider: config.locations.Layer2.provider,
-              network: config.locations.Layer2.network || 'polygon-mainnet',
-            },
+    const sourceConfig: SourceConfig = {};
+    if (networks.ens) {
+      sourceConfig.ens = {
+        provider: networks.ens.provider,
+        network: networks?.ens?.network || 'mainnet',
+      };
+    }
+    if (networks.uns) {
+      sourceConfig.uns = {
+        locations: {
+          Layer1: {
+            provider: networks.uns.locations.Layer1.provider,
+            network: networks.uns.locations.Layer1.network || 'mainnet',
+          },
+          Layer2: {
+            provider: networks.uns.locations.Layer2.provider,
+            network: networks.uns.locations.Layer2.network || 'polygon-mainnet',
           },
         },
-      },
+      };
+    }
+    return new this({
+      sourceConfig,
     });
   }
 
@@ -282,194 +258,165 @@ export default class Resolution {
 
   /**
    * Create a resolution instance from web3 0.x version provider
-   * @param provider - an 0.x version provider from web3 ( must implement sendAsync(payload, callback) )
-   * @param networks - Ethereum network configuration
+   * @param networks - Ethereum network configuration with 0.x version provider from web3 ( must implement sendAsync(payload, callback) )
    * @see https://github.com/ethereum/web3.js/blob/0.20.7/lib/web3/httpprovider.js#L116
    */
-  static fromWeb3Version0Provider(
-    provider: Web3Version0Provider,
-    networks?: {
-      ens?: {
-        network: string;
-      };
-    },
-  ): Resolution {
-    return this.fromEthereumEip1193Provider(
-      Eip1193Factories.fromWeb3Version0Provider(provider),
-      networks,
-    );
-  }
-
-  /**
-   * Create a resolution instance from web3 0.x version provider
-   * @param config - Ethereum network configuration with an 0.x version provider from web3 ( must implement sendAsync(payload, callback) )
-   * @see https://github.com/ethereum/web3.js/blob/0.20.7/lib/web3/httpprovider.js#L116
-   */
-  static unsFromWeb3Version0Provider(config: {
-    locations: {
-      Layer1: {
-        provider: Web3Version0Provider;
-        network: string;
-      };
-      Layer2: {
-        provider: Web3Version0Provider;
-        network: string;
-      };
+  static fromWeb3Version0Provider(networks: {
+    ens?: {
+      provider: Web3Version0Provider;
+      network: string;
     };
-  }): Resolution {
-    return this.unsFromEthereumEip1193Provider({
-      ...config,
+    uns?: {
       locations: {
-        ...config.locations,
         Layer1: {
-          ...config.locations.Layer1,
-          provider: Eip1193Factories.fromWeb3Version0Provider(
-            config.locations.Layer1.provider,
-          ),
-        },
+          provider: Web3Version0Provider;
+          network: string;
+        };
         Layer2: {
-          ...config.locations.Layer2,
-          provider: Eip1193Factories.fromWeb3Version0Provider(
-            config.locations.Layer2.provider,
-          ),
-        },
-      },
-    });
-  }
-
-  /**
-   * Create a resolution instance from web3 1.x version provider
-   * @param provider - an 1.x version provider from web3 ( must implement send(payload, callback) )
-   * @param networks - an optional object that describes what network to use when connecting ENS or UNS default is mainnet
-   * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-core-helpers/types/index.d.ts#L165
-   * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-providers-http/src/index.js#L95
-   */
-  static fromWeb3Version1Provider(
-    provider: Web3Version1Provider,
-    networks?: {
-      ens?: {
-        network: string;
-      };
-      uns?: {
-        locations: {
-          Layer1: {
-            network: string;
-          };
-          Layer2: {
-            network: string;
-          };
+          provider: Web3Version0Provider;
+          network: string;
         };
       };
-    },
-  ): Resolution {
-    return this.fromEthereumEip1193Provider(
-      Eip1193Factories.fromWeb3Version1Provider(provider),
-      networks,
-    );
+    };
+  }): Resolution {
+    return this.fromEthereumEip1193Provider({
+      ens: networks.ens
+        ? {
+          network: networks.ens.network,
+          provider: Eip1193Factories.fromWeb3Version0Provider(
+            networks.ens.provider,
+          ),
+        }
+        : undefined,
+      uns: networks.uns
+        ? {
+          locations: {
+            Layer1: {
+              network: networks.uns.locations.Layer1.network,
+              provider: Eip1193Factories.fromWeb3Version0Provider(
+                networks.uns.locations.Layer1.provider,
+              ),
+            },
+            Layer2: {
+              network: networks.uns.locations.Layer2.network,
+              provider: Eip1193Factories.fromWeb3Version0Provider(
+                networks.uns.locations.Layer2.provider,
+              ),
+            },
+          },
+        }
+        : undefined,
+    });
   }
 
   /**
    * Create a resolution instance from web3 1.x version provider
-   * @param provider - an 1.x version provider from web3 ( must implement send(payload, callback) )
-   * @param networks - an optional object that describes what network to use when connecting ENS or UNS default is mainnet
+   * @param networks - an optional object with 1.x version provider from web3 ( must implement send(payload, callback) ) that describes what network to use when connecting ENS or UNS default is mainnet
    * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-core-helpers/types/index.d.ts#L165
    * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-providers-http/src/index.js#L95
    */
-  static unsFromWeb3Version1Provider(config: {
-    locations: {
-      Layer1: {
-        provider: Web3Version1Provider;
-        network: string;
-      };
-      Layer2: {
-        provider: Web3Version1Provider;
-        network: string;
+  static fromWeb3Version1Provider(networks: {
+    ens?: {
+      provider: Web3Version1Provider;
+      network: string;
+    };
+    uns?: {
+      locations: {
+        Layer1: {
+          provider: Web3Version1Provider;
+          network: string;
+        };
+        Layer2: {
+          provider: Web3Version1Provider;
+          network: string;
+        };
       };
     };
   }): Resolution {
-    return this.unsFromEthereumEip1193Provider({
-      ...config,
-      locations: {
-        ...config.locations,
-        Layer1: {
-          ...config.locations.Layer1,
+    return this.fromEthereumEip1193Provider({
+      ens: networks.ens
+        ? {
+          network: networks.ens.network,
           provider: Eip1193Factories.fromWeb3Version1Provider(
-            config.locations.Layer1.provider,
+            networks.ens.provider,
           ),
-        },
-        Layer2: {
-          ...config.locations.Layer2,
-          provider: Eip1193Factories.fromWeb3Version1Provider(
-            config.locations.Layer2.provider,
-          ),
-        },
-      },
+        }
+        : undefined,
+      uns: networks.uns
+        ? {
+          locations: {
+            Layer1: {
+              network: networks.uns.locations.Layer1.network,
+              provider: Eip1193Factories.fromWeb3Version1Provider(
+                networks.uns.locations.Layer1.provider,
+              ),
+            },
+            Layer2: {
+              network: networks.uns.locations.Layer2.network,
+              provider: Eip1193Factories.fromWeb3Version1Provider(
+                networks.uns.locations.Layer2.provider,
+              ),
+            },
+          },
+        }
+        : undefined,
     });
   }
 
   /**
    * Creates instance of resolution from provider that implements Ethers Provider#call interface.
    * This wrapper support only `eth_call` method for now, which is enough for all the current Resolution functionality
-   * @param provider - provider object
-   * @param networks - an optional object that describes what network to use when connecting ENS or UNS default is mainnet
+   * @param networks - an object that describes what network to use when connecting ENS or UNS default is mainnet
    * @see https://github.com/ethers-io/ethers.js/blob/v4-legacy/providers/abstract-provider.d.ts#L91
    * @see https://github.com/ethers-io/ethers.js/blob/v5.0.4/packages/abstract-provider/src.ts/index.ts#L224
    * @see https://docs.ethers.io/ethers.js/v5-beta/api-providers.html#jsonrpcprovider-inherits-from-provider
    * @see https://github.com/ethers-io/ethers.js/blob/master/packages/providers/src.ts/json-rpc-provider.ts
    */
-  static fromEthersProvider(
-    provider: EthersProvider,
-    networks?: {
-      ens?: {
-        network: string;
-      };
-    },
-  ): Resolution {
-    return this.fromEthereumEip1193Provider(
-      Eip1193Factories.fromEthersProvider(provider),
-      networks,
-    );
-  }
-
-  /**
-   * Creates instance of resolution from provider that implements Ethers Provider#call interface.
-   * This wrapper support only `eth_call` method for now, which is enough for all the current Resolution functionality
-   * @param provider - provider object
-   * @param networks - an optional object that describes what network to use when connecting ENS or UNS default is mainnet
-   * @see https://github.com/ethers-io/ethers.js/blob/v4-legacy/providers/abstract-provider.d.ts#L91
-   * @see https://github.com/ethers-io/ethers.js/blob/v5.0.4/packages/abstract-provider/src.ts/index.ts#L224
-   * @see https://docs.ethers.io/ethers.js/v5-beta/api-providers.html#jsonrpcprovider-inherits-from-provider
-   * @see https://github.com/ethers-io/ethers.js/blob/master/packages/providers/src.ts/json-rpc-provider.ts
-   */
-  static unsFomEthersProvider(config: {
-    locations: {
-      Layer1: {
-        provider: EthersProvider;
-        network: string;
-      };
-      Layer2: {
-        provider: EthersProvider;
-        network: string;
+  static fromEthersProvider(networks: {
+    ens?: {
+      network: string;
+      provider: EthersProvider;
+    };
+    uns?: {
+      locations: {
+        Layer1: {
+          network: string;
+          provider: EthersProvider;
+        };
+        Layer2: {
+          network: string;
+          provider: EthersProvider;
+        };
       };
     };
   }): Resolution {
-    return this.unsFromEthereumEip1193Provider({
-      ...config,
-      locations: {
-        ...config.locations,
-        Layer1: {
-          ...config.locations.Layer1,
+    return this.fromEthereumEip1193Provider({
+      ens: networks.ens
+        ? {
+          network: networks.ens.network,
           provider: Eip1193Factories.fromEthersProvider(
-            config.locations.Layer1.provider,
+            networks.ens.provider,
           ),
-        },
-        Layer2: {
-          ...config.locations.Layer2,
-          provider: Eip1193Factories.fromEthersProvider(
-            config.locations.Layer2.provider,
-          ),
-        },
-      },
+        }
+        : undefined,
+      uns: networks.uns
+        ? {
+          locations: {
+            Layer1: {
+              network: networks.uns.locations.Layer1.network,
+              provider: Eip1193Factories.fromEthersProvider(
+                networks.uns.locations.Layer1.provider,
+              ),
+            },
+            Layer2: {
+              network: networks.uns.locations.Layer2.network,
+              provider: Eip1193Factories.fromEthersProvider(
+                networks.uns.locations.Layer2.provider,
+              ),
+            },
+          },
+        }
+        : undefined,
     });
   }
 

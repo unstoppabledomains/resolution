@@ -362,11 +362,9 @@ describe('Resolution', () => {
     });
 
     it('should throw on unspecified network', async () => {
-      const zilliqaProvider = new HTTPProvider('https://api.zilliqa.com');
-      const provider = Eip1193Factories.fromZilliqaProvider(zilliqaProvider);
-      expect(() =>
-        Resolution.fromResolutionProvider(provider, {}),
-      ).toThrowError('< Must specify network for ens or zns >');
+      expect(() => Resolution.fromResolutionProvider({})).toThrowError(
+        '< Must specify network for uns, ens, or zns >',
+      );
     });
 
     it('should create resolution instance from Zilliqa provider', async () => {
@@ -758,10 +756,12 @@ describe('Resolution', () => {
                 });
             },
           );
-          const resolution = Resolution.unsFromWeb3Version1Provider({
-            locations: {
-              Layer1: {network: 'rinkeby', provider},
-              Layer2: {network: 'polygon-mumbai', provider: polygonProvider},
+          const resolution = Resolution.fromWeb3Version1Provider({
+            uns: {
+              locations: {
+                Layer1: {network: 'rinkeby', provider},
+                Layer2: {network: 'polygon-mumbai', provider: polygonProvider},
+              },
             },
           });
           const uns = resolution.serviceMap['UNS'] as unknown as Uns;
@@ -793,10 +793,12 @@ describe('Resolution', () => {
             });
           });
 
-          const resolution = Resolution.unsFromWeb3Version1Provider({
-            locations: {
-              Layer1: {network: 'rinkeby', provider},
-              Layer2: {network: 'polygon-mumbai', provider: polygonProvider},
+          const resolution = Resolution.fromWeb3Version1Provider({
+            uns: {
+              locations: {
+                Layer1: {network: 'rinkeby', provider},
+                Layer2: {network: 'polygon-mumbai', provider: polygonProvider},
+              },
             },
           });
           const uns = resolution.serviceMap['UNS'] as unknown as Uns;
@@ -818,10 +820,12 @@ describe('Resolution', () => {
             protocolLink(ProviderProtocol.http),
             'maticmum',
           );
-          const resolution = Resolution.unsFomEthersProvider({
-            locations: {
-              Layer1: {network: 'rinkeby', provider},
-              Layer2: {network: 'polygon-mumbai', provider: polygonProvider},
+          const resolution = Resolution.fromEthersProvider({
+            uns: {
+              locations: {
+                Layer1: {network: 'rinkeby', provider},
+                Layer2: {network: 'polygon-mumbai', provider: polygonProvider},
+              },
             },
           });
           const uns = resolution.serviceMap['UNS'] as unknown as Uns;
@@ -849,10 +853,12 @@ describe('Resolution', () => {
           const eye = mockAsyncMethod(provider, 'call', (params) =>
             Promise.resolve(caseMock(params, RpcProviderTestCases)),
           );
-          const resolution = Resolution.unsFomEthersProvider({
-            locations: {
-              Layer1: {network: 'rinkeby', provider},
-              Layer2: {network: 'polygon-mumbai', provider: polygonProvider},
+          const resolution = Resolution.fromEthersProvider({
+            uns: {
+              locations: {
+                Layer1: {network: 'rinkeby', provider},
+                Layer2: {network: 'polygon-mumbai', provider: polygonProvider},
+              },
             },
           });
           const uns = resolution.serviceMap['UNS'] as unknown as Uns;
@@ -894,10 +900,12 @@ describe('Resolution', () => {
               });
             },
           );
-          const resolution = Resolution.unsFromWeb3Version0Provider({
-            locations: {
-              Layer1: {network: 'rinkeby', provider},
-              Layer2: {network: 'polygon-mumbai', provider: polygonProvider},
+          const resolution = Resolution.fromWeb3Version0Provider({
+            uns: {
+              locations: {
+                Layer1: {network: 'rinkeby', provider},
+                Layer2: {network: 'polygon-mumbai', provider: polygonProvider},
+              },
             },
           });
           const uns = resolution.serviceMap['UNS'] as unknown as Uns;
@@ -927,10 +935,15 @@ describe('Resolution', () => {
               Promise.resolve(caseMock(params, RpcProviderTestCases)),
             );
 
-            const resolution = Resolution.unsFomEthersProvider({
-              locations: {
-                Layer1: {network: 'rinkeby', provider},
-                Layer2: {network: 'polygon-mumbai', provider: polygonProvider},
+            const resolution = Resolution.fromEthersProvider({
+              uns: {
+                locations: {
+                  Layer1: {network: 'rinkeby', provider},
+                  Layer2: {
+                    network: 'polygon-mumbai',
+                    provider: polygonProvider,
+                  },
+                },
               },
             });
             const uns = resolution.serviceMap['UNS'] as unknown as Uns;
@@ -965,10 +978,15 @@ describe('Resolution', () => {
               protocolLink(ProviderProtocol.http),
               'maticmum',
             );
-            const resolution = Resolution.unsFomEthersProvider({
-              locations: {
-                Layer1: {network: 'rinkeby', provider},
-                Layer2: {network: 'polygon-mumbai', provider: polygonProvider},
+            const resolution = Resolution.fromEthersProvider({
+              uns: {
+                locations: {
+                  Layer1: {network: 'rinkeby', provider},
+                  Layer2: {
+                    network: 'polygon-mumbai',
+                    provider: polygonProvider,
+                  },
+                },
               },
             });
             const eye = mockAsyncMethod(provider, 'call', (params) =>
@@ -1010,10 +1028,15 @@ describe('Resolution', () => {
               protocolLink(ProviderProtocol.http),
               'maticmum',
             );
-            const resolution = Resolution.unsFomEthersProvider({
-              locations: {
-                Layer1: {network: 'rinkeby', provider},
-                Layer2: {network: 'polygon-mumbai', provider: polygonProvider},
+            const resolution = Resolution.fromEthersProvider({
+              uns: {
+                locations: {
+                  Layer1: {network: 'rinkeby', provider},
+                  Layer2: {
+                    network: 'polygon-mumbai',
+                    provider: polygonProvider,
+                  },
+                },
               },
             });
             const eye = mockAsyncMethod(provider, 'call', (params) =>
@@ -1050,10 +1073,15 @@ describe('Resolution', () => {
               'c4bb906ed6904c42b19c95825fe55f39',
             );
 
-            const resolution = Resolution.unsFomEthersProvider({
-              locations: {
-                Layer1: {network: 'mainnet', provider},
-                Layer2: {network: 'polygon-mumbai', provider: polygonProvider},
+            const resolution = Resolution.fromEthersProvider({
+              uns: {
+                locations: {
+                  Layer1: {network: 'mainnet', provider},
+                  Layer2: {
+                    network: 'polygon-mumbai',
+                    provider: polygonProvider,
+                  },
+                },
               },
             });
             const uns = resolution.serviceMap['UNS'] as unknown as Uns;
