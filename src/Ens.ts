@@ -241,6 +241,7 @@ export default class Ens extends NamingService {
       networkId: this.network,
       blockchain: BlockchainType.ETH,
       owner,
+      providerUrl: this.url,
     };
   }
 

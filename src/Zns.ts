@@ -199,6 +199,7 @@ export default class Zns extends NamingService {
       networkId: this.network,
       blockchain: BlockchainType.ZIL,
       owner,
+      providerUrl: this.url,
     };
   }
 

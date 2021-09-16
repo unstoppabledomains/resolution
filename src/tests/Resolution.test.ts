@@ -29,6 +29,7 @@ import {
   CryptoDomainWithUsdtMultiChainRecords,
   expectConfigurationErrorCode,
   CryptoDomainWithAllRecords,
+  WalletDomainLayerTwoWithAllRecords,
 } from './helpers';
 import {RpcProviderTestCases} from './providerMockData';
 import fetch, {FetchError} from 'node-fetch';
@@ -1522,6 +1523,8 @@ describe('Resolution', () => {
         registry: mockValues.registryAddress,
         resolver: mockValues.get.resolver,
         networkId: 4,
+        providerUrl:
+          'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
         blockchain: BlockchainType.ETH,
         owner: mockValues.get.owner,
       });
@@ -1544,6 +1547,33 @@ describe('Resolution', () => {
         networkId: 4,
         blockchain: BlockchainType.ETH,
         owner: mockValues.get.owner,
+        providerUrl:
+          'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+      });
+    });
+
+    it('should get location for uns L2 domain', async () => {
+      const mockValues = {
+        registryAddress: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
+        get: {
+          resolver: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
+          owner: '0x0e43F36e4B986dfbE1a75cacfA60cA2bD44Ae962',
+          location: UnsLocation.Layer2,
+        },
+      };
+
+      mockAsyncMethods(uns, mockValues);
+      const location = await resolution.location(
+        WalletDomainLayerTwoWithAllRecords,
+      );
+      expect(location).toEqual({
+        registry: mockValues.registryAddress,
+        resolver: mockValues.get.resolver,
+        networkId: 80001,
+        blockchain: BlockchainType.ETH,
+        owner: mockValues.get.owner,
+        providerUrl:
+          'https://polygon-mumbai.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
       });
     });
 
@@ -1562,6 +1592,7 @@ describe('Resolution', () => {
         networkId: 333,
         blockchain: BlockchainType.ZIL,
         owner: mockValues.owner,
+        providerUrl: 'https://dev-api.zilliqa.com',
       });
     });
   });

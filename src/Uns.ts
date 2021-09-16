@@ -367,8 +367,10 @@ export default class Uns extends NamingService {
     ]);
 
     let networkId = EthereumNetworks[this.unsl1.network];
+    let providerUrl = this.unsl1.url;
     if (location === UnsLocation.Layer2) {
       networkId = EthereumNetworks[this.unsl2.network];
+      providerUrl = this.unsl2.url;
     }
     return {
       registry,
@@ -376,6 +378,7 @@ export default class Uns extends NamingService {
       networkId,
       blockchain: BlockchainType.ETH,
       owner,
+      providerUrl,
     };
   }
 

@@ -262,4 +262,5 @@ export type DomainLocation = {
   networkId: number;
   blockchain: BlockchainType;
   owner: string;
+  providerUrl?: string;
 };
