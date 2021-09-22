@@ -43,6 +43,19 @@ export default class Uns extends NamingService {
 
   constructor(source?: UnsSource) {
     super();
+    if (
+      source &&
+      source.locations &&
+      (!source.locations.Layer1 || !source.locations.Layer2)
+    ) {
+      throw new ConfigurationError(
+        ConfigurationErrorCode.NetworkConfigMissing,
+        {
+          method: NamingServiceName.UNS,
+          config: !source.locations.Layer1 ? 'Layer1' : 'Layer2',
+        },
+      );
+    }
     if (!source) {
       source = {
         locations: {

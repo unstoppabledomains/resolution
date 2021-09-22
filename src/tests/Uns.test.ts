@@ -26,6 +26,7 @@ import {TokenUriMetadata} from '../types/publicTypes';
 import liveData from './testData/liveData.json';
 import UnsConfig from '../config/uns-config.json';
 import nock from 'nock';
+import UnsInternal from '../UnsInternal';
 
 let resolution: Resolution;
 let uns: Uns;
@@ -74,6 +75,42 @@ describe('UNS', () => {
           },
         }),
       ConfigurationErrorCode.CustomNetworkConfigMissing,
+    );
+  });
+  it('should not allow missing Layer1 config', async () => {
+    await expectConfigurationErrorCode(
+      () =>
+        new Resolution({
+          sourceConfig: {
+            uns: {
+              locations: {
+                Layer2: {
+                  url: UnsInternal.UrlMap['mainnet'],
+                  network: 'mainnet',
+                },
+              } as any,
+            },
+          },
+        }),
+      ConfigurationErrorCode.NetworkConfigMissing,
+    );
+  });
+  it('should not allow missing Layer2 config', async () => {
+    await expectConfigurationErrorCode(
+      () =>
+        new Resolution({
+          sourceConfig: {
+            uns: {
+              locations: {
+                Layer1: {
+                  url: UnsInternal.UrlMap['mainnet'],
+                  network: 'mainnet',
+                },
+              } as any,
+            },
+          },
+        }),
+      ConfigurationErrorCode.NetworkConfigMissing,
     );
   });
 
