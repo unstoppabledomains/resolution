@@ -39,13 +39,13 @@ describe('UnsInternal', () => {
   });
   it('should return valid resolver on L2', async () => {
     const spies = mockAsyncMethods(unsInternalL2.readerContract, {
-      call: ['0xecb7AaC995C284970A347342F5d04dB81fdB436F', NullAddress, []],
+      call: ['0x2a93C52E7B6E7054870758e15A1446E769EdfB93', NullAddress, []],
     });
     const resolverAddress = await unsInternalL2.resolver(
       WalletDomainLayerTwoWithAllRecords,
     );
     expectSpyToBeCalled(spies);
-    expect(resolverAddress).toBe('0xecb7AaC995C284970A347342F5d04dB81fdB436F');
+    expect(resolverAddress).toBe('0x2a93C52E7B6E7054870758e15A1446E769EdfB93');
   });
   it('should get domain from tokenId', async () => {
     const spies = mockAsyncMethods(unsInternalL1, {

@@ -164,7 +164,7 @@ describe('Resolution', () => {
           Layer2: {
             network: 'polygon-mumbai',
             url: polygonUrl,
-            proxyReaderAddress: '0x8F4870e8aD6F0307CD3AAE3ED1d66FffCB873F3A',
+            proxyReaderAddress: '0x332a8191905fa8e6eea7350b5799f225b8ed30a9',
           },
         },
       });
@@ -188,7 +188,7 @@ describe('Resolution', () => {
             Layer2: {
               network: 'polygon-mumbai',
               provider: polygonProvider,
-              proxyReaderAddress: '0x8F4870e8aD6F0307CD3AAE3ED1d66FffCB873F3A',
+              proxyReaderAddress: '0x332a8191905fa8e6eea7350b5799f225b8ed30a9',
             },
           },
         });
@@ -211,7 +211,7 @@ describe('Resolution', () => {
           Layer2: {
             network: 'polygon-mumbai',
             provider: polygonProvider,
-            proxyReaderAddress: '0x8F4870e8aD6F0307CD3AAE3ED1d66FffCB873F3A',
+            proxyReaderAddress: '0x332a8191905fa8e6eea7350b5799f225b8ed30a9',
           },
         },
       });
@@ -1117,13 +1117,13 @@ describe('Resolution', () => {
                   Layer1: {
                     network: 'custom',
                     proxyReaderAddress:
-                      '0xa6E7cEf2EDDEA66352Fd68E5915b60BDbb7309f5',
+                      '0xfee4d4f0adff8d84c12170306507554bc7045878',
                     url: 'https://mainnet.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
                   },
                   Layer2: {
                     network: 'custom',
                     proxyReaderAddress:
-                      '0x8F4870e8aD6F0307CD3AAE3ED1d66FffCB873F3A',
+                      '0x332a8191905fa8e6eea7350b5799f225b8ed30a9',
                     url: 'https://polygon-mumbai.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
                   },
                 },

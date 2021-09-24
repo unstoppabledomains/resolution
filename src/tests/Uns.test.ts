@@ -489,7 +489,7 @@ describe('UNS', () => {
       });
       const spies2 = mockAsyncMethods(uns.unsl2.readerContract, {
         call: [
-          '0xecb7AaC995C284970A347342F5d04dB81fdB436F',
+          '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
           '0x8aad44321a86b170879d7a244c1e8d360c99dda8',
           [],
         ],
@@ -501,7 +501,7 @@ describe('UNS', () => {
       expectSpyToBeCalled(spies);
       expectSpyToBeCalled(spies2);
       expect(resolverAddress).toBe(
-        '0xecb7AaC995C284970A347342F5d04dB81fdB436F',
+        '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
       );
     });
 
@@ -515,7 +515,7 @@ describe('UNS', () => {
       });
       const spies2 = mockAsyncMethods(uns.unsl2.readerContract, {
         call: [
-          '0xecb7AaC995C284970A347342F5d04dB81fdB436F',
+          '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
           '0x8aad44321a86b170879d7a244c1e8d360c99dda8',
           [],
         ],
@@ -527,7 +527,7 @@ describe('UNS', () => {
       expectSpyToBeCalled(spies);
       expectSpyToBeCalled(spies2);
       expect(resolverAddress).toBe(
-        '0xecb7AaC995C284970A347342F5d04dB81fdB436F',
+        '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
       );
     });
 
@@ -1237,7 +1237,7 @@ describe('UNS', () => {
                   network: 'custom',
                   url: protocolLink(),
                   proxyReaderAddress:
-                    UnsConfig.networks[4].contracts.ProxyReader.address,
+                    UnsConfig.networks[4].contracts.ProxyReader.address.toLowerCase(),
                 },
                 Layer2: {
                   network: 'polygon-mumbai',
