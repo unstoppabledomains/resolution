@@ -1509,71 +1509,143 @@ describe('Resolution', () => {
 
   describe('.location', () => {
     it('should get location for .crypto domains', async () => {
-      const mockValues = {
-        registryAddress: '0xAad76bea7CFEc82927239415BB18D2e93518ecBB',
-        get: {
+      const domain = 'brad.crypto';
+
+      const mockValuesL1 = {
+        location: {
+          registry: '0xAad76bea7CFEc82927239415BB18D2e93518ecBB',
           resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
+          networkId: 4,
           owner: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
+          blockchain: BlockchainType.ETH,
+          providerUrl:
+            'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
         },
       };
 
-      mockAsyncMethods(uns, mockValues);
-      const location = await resolution.location('brad.crypto');
+      mockAsyncMethods(uns.unsl1, mockValuesL1);
+      mockAsyncMethod(
+        uns.unsl2,
+        'registryAddress',
+        new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+          domain,
+        }),
+      );
+
+      const location = await resolution.location(domain);
       expect(location).toEqual({
-        registry: mockValues.registryAddress,
-        resolver: mockValues.get.resolver,
+        registry: mockValuesL1.location.registry,
+        resolver: mockValuesL1.location.resolver,
         networkId: 4,
-        providerUrl:
-          'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
         blockchain: BlockchainType.ETH,
-        owner: mockValues.get.owner,
+        owner: mockValuesL1.location.owner,
+        providerUrl: mockValuesL1.location.providerUrl,
       });
     });
 
     it('should get location for uns domains', async () => {
-      const mockValues = {
-        registryAddress: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
-        get: {
+      const domain = 'udtestdev-check.wallet';
+      const mockValuesL1 = {
+        location: {
+          registry: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
           resolver: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
+          networkId: 4,
           owner: '0x0e43F36e4B986dfbE1a75cacfA60cA2bD44Ae962',
+          blockchain: BlockchainType.ETH,
+          providerUrl:
+            'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
         },
       };
 
-      mockAsyncMethods(uns, mockValues);
-      const location = await resolution.location('udtestdev-check.wallet');
+      mockAsyncMethods(uns.unsl1, mockValuesL1);
+      mockAsyncMethod(
+        uns.unsl2,
+        'registryAddress',
+        new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+          domain,
+        }),
+      );
+      const location = await resolution.location(domain);
       expect(location).toEqual({
-        registry: mockValues.registryAddress,
-        resolver: mockValues.get.resolver,
+        registry: mockValuesL1.location.registry,
+        resolver: mockValuesL1.location.resolver,
         networkId: 4,
         blockchain: BlockchainType.ETH,
-        owner: mockValues.get.owner,
-        providerUrl:
-          'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+        owner: mockValuesL1.location.owner,
+        providerUrl: mockValuesL1.location.providerUrl,
       });
     });
 
     it('should get location for uns L2 domain', async () => {
-      const mockValues = {
-        registryAddress: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
-        get: {
+      const mockValuesL1 = {
+        location: {
+          registry: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
           resolver: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
+          networkId: 4,
           owner: '0x0e43F36e4B986dfbE1a75cacfA60cA2bD44Ae962',
-          location: UnsLocation.Layer2,
+          blockchain: BlockchainType.ETH,
+          providerUrl:
+            'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+        },
+      };
+      const mockValuesL2 = {
+        location: {
+          registry: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
+          resolver: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
+          networkId: 80001,
+          owner: '0x0e43F36e4B986dfbE1a75cacfA60cA2bD44Ae962',
+          blockchain: BlockchainType.MATIC,
+          providerUrl:
+            'https://polygon-mumbai.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
         },
       };
 
-      mockAsyncMethods(uns, mockValues);
+      mockAsyncMethods(uns.unsl1, mockValuesL1);
+      mockAsyncMethods(uns.unsl2, mockValuesL2);
       const location = await resolution.location(
         WalletDomainLayerTwoWithAllRecords,
       );
       expect(location).toEqual({
-        registry: mockValues.registryAddress,
-        resolver: mockValues.get.resolver,
+        registry: mockValuesL2.location.registry,
+        resolver: mockValuesL2.location.resolver,
         networkId: 80001,
-        blockchain: BlockchainType.ETH,
-        owner: mockValues.get.owner,
-        providerUrl:
-          'https://polygon-mumbai.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+        blockchain: BlockchainType.MATIC,
+        owner: mockValuesL2.location.owner,
+        providerUrl: mockValuesL2.location.providerUrl,
+      });
+    });
+
+    it('should get location for uns L2 domain when L1 throws', async () => {
+      const mockValuesL2 = {
+        location: {
+          registry: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
+          resolver: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
+          networkId: 80001,
+          owner: '0x0e43F36e4B986dfbE1a75cacfA60cA2bD44Ae962',
+          blockchain: BlockchainType.MATIC,
+          providerUrl:
+            'https://polygon-mumbai.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+        },
+      };
+
+      mockAsyncMethod(
+        uns.unsl1,
+        'registryAddress',
+        new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+          domain: WalletDomainLayerTwoWithAllRecords,
+        }),
+      );
+      mockAsyncMethods(uns.unsl2, mockValuesL2);
+      const location = await resolution.location(
+        WalletDomainLayerTwoWithAllRecords,
+      );
+      expect(location).toEqual({
+        registry: mockValuesL2.location.registry,
+        resolver: mockValuesL2.location.resolver,
+        networkId: 80001,
+        blockchain: BlockchainType.MATIC,
+        owner: mockValuesL2.location.owner,
+        providerUrl: mockValuesL2.location.providerUrl,
       });
     });
 

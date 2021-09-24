@@ -2,12 +2,17 @@ import {
   BlockhainNetworkUrlMap,
   UnsSupportedNetwork,
   ProxyReaderMap,
-  NullAddress,
   EventData,
 } from './types';
 import {UnsLayerSource} from '.';
 import {ConfigurationError, ConfigurationErrorCode} from '.';
-import {CryptoRecords, DomainData, UnsLocation} from './types/publicTypes';
+import {
+  CryptoRecords,
+  DomainData,
+  UnsLocation,
+  DomainLocation,
+  BlockchainType,
+} from './types/publicTypes';
 import {constructRecords, EthereumNetworks, isNullAddress} from './utils';
 import FetchProvider from './FetchProvider';
 import EthereumContract from './contracts/EthereumContract';
@@ -35,21 +40,75 @@ export default class UnsInternal {
   readonly url: string;
   readonly provider: FetchProvider;
   readonly readerContract: EthereumContract;
-  readonly location: UnsLocation;
+  readonly unsLocation: UnsLocation;
 
-  constructor(location: UnsLocation, source: UnsLayerSource) {
-    this.checkNetworkConfig(location, source);
-    this.location = location;
+  constructor(unsLocation: UnsLocation, source: UnsLayerSource) {
+    this.checkNetworkConfig(unsLocation, source);
+    this.unsLocation = unsLocation;
     this.network = source.network;
     this.url = source['url'] || UnsInternal.UrlMap[this.network];
     this.provider =
-      source['provider'] || new FetchProvider(this.location, this.url);
+      source['provider'] || new FetchProvider(this.unsLocation, this.url);
     this.readerContract = new EthereumContract(
       proxyReader,
       source.proxyReaderAddress ||
         UnsInternal.ProxyReaderMap[EthereumNetworks[this.network]],
       this.provider,
     );
+  }
+
+  async exists(domain: string): Promise<boolean> {
+    const [exists] = await this.readerContract.call('exists', [
+      this.namehash(domain),
+    ]);
+    return exists;
+  }
+
+  async getTokenUri(tokenId: string): Promise<string> {
+    const [tokenURI] = await this.readerContract.call('tokenURI', [tokenId]);
+    return tokenURI;
+  }
+
+  async registryAddress(domainOrNamehash: string): Promise<string> {
+    if (
+      !this.checkDomain(domainOrNamehash, domainOrNamehash.startsWith('0x'))
+    ) {
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
+        domain: domainOrNamehash,
+      });
+    }
+    const namehash = domainOrNamehash.startsWith('0x')
+      ? domainOrNamehash
+      : this.namehash(domainOrNamehash);
+    const [address] = await this.readerContract.call('registryOf', [namehash]);
+    if (isNullAddress(address)) {
+      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+        domain: domainOrNamehash,
+      });
+    }
+    return address;
+  }
+
+  async location(domain: string): Promise<DomainLocation> {
+    const tokenId = this.namehash(domain);
+    const [registry, {resolver, owner}] = await Promise.all([
+      this.registryAddress(domain),
+      this.get(tokenId),
+    ]);
+
+    const networkId = EthereumNetworks[this.network];
+    const providerUrl = this.url;
+    return {
+      registry,
+      resolver,
+      networkId,
+      blockchain:
+        this.unsLocation === UnsLocation.Layer1
+          ? BlockchainType.ETH
+          : BlockchainType.MATIC,
+      owner,
+      providerUrl,
+    };
   }
 
   async resolver(domain: string): Promise<string> {
@@ -99,6 +158,20 @@ export default class UnsInternal {
     return decoded[decoded.length - 1];
   }
 
+  async get(tokenId: string, keys: string[] = []): Promise<DomainData> {
+    const [resolver, owner, values] = await this.readerContract.call(
+      'getData',
+      [keys, tokenId],
+    );
+
+    return {
+      owner,
+      resolver,
+      records: constructRecords(keys, values),
+      location: this.unsLocation,
+    };
+  }
+
   namehash(domain: string): string {
     if (!this.checkDomain(domain)) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
@@ -139,7 +212,7 @@ export default class UnsInternal {
         });
       }
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
-        location: this.location,
+        location: this.unsLocation,
         domain,
       });
     }
@@ -187,26 +260,6 @@ export default class UnsInternal {
     );
   }
 
-  private async registryAddress(domainOrNamehash: string): Promise<string> {
-    if (
-      !this.checkDomain(domainOrNamehash, domainOrNamehash.startsWith('0x'))
-    ) {
-      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
-        domain: domainOrNamehash,
-      });
-    }
-    const namehash = domainOrNamehash.startsWith('0x')
-      ? domainOrNamehash
-      : this.namehash(domainOrNamehash);
-    const [address] = await this.readerContract.call('registryOf', [namehash]);
-    if (address === NullAddress) {
-      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-        domain: domainOrNamehash,
-      });
-    }
-    return address;
-  }
-
   private checkNetworkConfig(
     location: UnsLocation,
     source: UnsLayerSource,
@@ -226,7 +279,7 @@ export default class UnsInternal {
       throw new ConfigurationError(
         ConfigurationErrorCode.InvalidConfigurationField,
         {
-          method: this.location,
+          method: this.unsLocation,
           field: 'proxyReaderAddress',
         },
       );
@@ -235,7 +288,7 @@ export default class UnsInternal {
       throw new ConfigurationError(
         ConfigurationErrorCode.CustomNetworkConfigMissing,
         {
-          method: this.location,
+          method: this.unsLocation,
           config: 'url or provider',
         },
       );
@@ -247,27 +300,13 @@ export default class UnsInternal {
       throw new ConfigurationError(
         ConfigurationErrorCode.CustomNetworkConfigMissing,
         {
-          method: this.location,
+          method: this.unsLocation,
           config: 'proxyReaderAddress',
         },
       );
     }
     const ethLikePattern = new RegExp('^0x[a-fA-F0-9]{40}$');
     return ethLikePattern.test(address);
-  }
-
-  private async get(tokenId: string, keys: string[] = []): Promise<DomainData> {
-    const [resolver, owner, values] = await this.readerContract.call(
-      'getData',
-      [keys, tokenId],
-    );
-
-    return {
-      owner,
-      resolver,
-      records: constructRecords(keys, values),
-      location: this.location,
-    };
   }
 
   private async getStandardRecords(tokenId: string): Promise<CryptoRecords> {

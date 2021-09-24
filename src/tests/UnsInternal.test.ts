@@ -57,4 +57,36 @@ describe('UnsInternal', () => {
     expectSpyToBeCalled(spies);
     expect(domainName).toBe(CryptoDomainWithAllRecords);
   });
+  it('should return true for tld exists', async () => {
+    mockAPICalls('uns_domain_exists_test', protocolLink());
+    const exists = await unsInternalL1.exists(
+      CryptoDomainWithAllRecords.split('.')[1],
+    );
+    expect(exists).toBe(true);
+  });
+  it('should return true for domain exists', async () => {
+    mockAPICalls('uns_domain_exists_test', protocolLink());
+    const exists = await unsInternalL1.exists(CryptoDomainWithAllRecords);
+    expect(exists).toBe(true);
+  });
+  it('should return true for tld exists on L2', async () => {
+    mockAPICalls(
+      'uns_l2_domain_exists_test',
+      protocolLink(ProviderProtocol.http, 'UNSL2'),
+    );
+    const exists = await unsInternalL2.exists(
+      WalletDomainLayerTwoWithAllRecords.split('.')[1],
+    );
+    expect(exists).toBe(true);
+  });
+  it('should return true for domain exists on L2', async () => {
+    mockAPICalls(
+      'uns_l2_domain_exists_test',
+      protocolLink(ProviderProtocol.http, 'UNSL2'),
+    );
+    const exists = await unsInternalL2.exists(
+      WalletDomainLayerTwoWithAllRecords,
+    );
+    expect(exists).toBe(true);
+  });
 });

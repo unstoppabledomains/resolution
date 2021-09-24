@@ -143,7 +143,8 @@ export default class Resolution {
                 infura,
                 networks?.uns?.locations.Layer2.network,
               ),
-              network: networks?.uns?.locations.Layer2.network || 'polygon',
+              network:
+                networks?.uns?.locations.Layer2.network || 'polygon-mainnet',
             },
           },
         },

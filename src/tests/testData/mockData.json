@@ -70,6 +70,48 @@
       }
     }
   ],
+  "uns_l2_domain_exists_test": [
+    {
+      "METHOD": "POST",
+      "REQUEST": {
+        "jsonrpc": "2.0",
+        "id": "1",
+        "method": "eth_call",
+        "params": [
+          {
+            "data": "0x4f558e791e3f482b3363eb4710dae2cb2183128e272eafbe137f686851c1caea32502230",
+            "to": "0x8f4870e8ad6f0307cd3aae3ed1d66fffcb873f3a"
+          },
+          "latest"
+        ]
+      },
+      "RESPONSE": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": "0x0000000000000000000000000000000000000000000000000000000000000001"
+      }
+    },
+    {
+      "METHOD": "POST",
+      "REQUEST": {
+        "jsonrpc": "2.0",
+        "id": "1",
+        "method": "eth_call",
+        "params": [
+          {
+            "data": "0x4f558e7940920d1d24c83454d9d64e6666927f3abb97b3fd67c7e1bf43de5c2f4297f3b8",
+            "to": "0x8f4870e8ad6f0307cd3aae3ed1d66fffcb873f3a"
+          },
+          "latest"
+        ]
+      },
+      "RESPONSE": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": "0x0000000000000000000000000000000000000000000000000000000000000001"
+      }
+    }
+  ],
   "uns_domain_exists_test": [
     {
       "METHOD": "POST",
@@ -80,6 +122,26 @@
         "params": [
           {
             "data": "0x4f558e790f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f",
+            "to": "0x299974aed8911bcbd2c61262605b89f591a53e83"
+          },
+          "latest"
+        ]
+      },
+      "RESPONSE": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": "0x0000000000000000000000000000000000000000000000000000000000000001"
+      }
+    },
+    {
+      "METHOD": "POST",
+      "REQUEST": {
+        "jsonrpc": "2.0",
+        "id": "1",
+        "method": "eth_call",
+        "params": [
+          {
+            "data": "0x4f558e79644d751c0e0112006e6d5d5d9234c9d3fae5a4646ff88a754d7fa1ed09794e94",
             "to": "0x299974aed8911bcbd2c61262605b89f591a53e83"
           },
           "latest"

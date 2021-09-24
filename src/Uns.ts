@@ -1,15 +1,9 @@
-import {
-  UnsSupportedNetwork,
-  ProxyReaderMap,
-  hasProvider,
-  NullAddress,
-} from './types';
+import {UnsSupportedNetwork, ProxyReaderMap, hasProvider} from './types';
 import ResolutionError, {ResolutionErrorCode} from './errors/resolutionError';
 import {
   constructRecords,
   isNullAddress,
   EthereumNetworksInverted,
-  EthereumNetworks,
 } from './utils';
 import {
   UnsSource,
@@ -19,7 +13,6 @@ import {
   Provider,
   UnsLocation,
   DomainLocation,
-  BlockchainType,
 } from './types/publicTypes';
 import {isValidTwitterSignature} from './utils/TwitterSignatureValidator';
 import UnsConfig from './config/uns-config.json';
@@ -156,26 +149,11 @@ export default class Uns extends NamingService {
     if (!tld) {
       return false;
     }
-    const [resultOrErrorL1, resultOrErrorL2] = await Promise.all([
-      this.unsl1.readerContract
-        .call('exists', [this.namehash(tld)])
-        .catch((err) => err),
-      this.unsl2.readerContract
-        .call('exists', [this.namehash(tld)])
-        .catch((err) => err),
+    const [existsL1, existsL2] = await Promise.all([
+      this.unsl1.exists(tld),
+      this.unsl2.exists(tld),
     ]);
-    if (resultOrErrorL2 instanceof Error) {
-      throw resultOrErrorL2;
-    }
-    const [existsL2] = resultOrErrorL2;
-    if (existsL2) {
-      return existsL2;
-    }
-    if (resultOrErrorL1 instanceof Error) {
-      throw resultOrErrorL1;
-    }
-    const [existsL1] = await resultOrErrorL1;
-    return existsL1;
+    return existsL1 || existsL2;
   }
 
   async owner(domain: string): Promise<string> {
@@ -209,21 +187,22 @@ export default class Uns extends NamingService {
       this.unsl1.allRecords(domain).catch((err) => err),
       this.unsl2.allRecords(domain).catch((err) => err),
     ]);
-    if (resultOrErrorL2 instanceof ResolutionError) {
-      if (
-        resultOrErrorL2.code !== ResolutionErrorCode.UnspecifiedResolver &&
-        resultOrErrorL2.code !== ResolutionErrorCode.UnregisteredDomain
-      ) {
-        throw resultOrErrorL2;
-      }
+    if (resultOrErrorL2 instanceof Error) {
+      validResolutionErrorOrThrow(
+        resultOrErrorL2,
+        ResolutionErrorCode.UnregisteredDomain,
+      );
       return resultOrErrorL1;
     }
     if (
       resultOrErrorL2 &&
       resultOrErrorL2.owner &&
-      resultOrErrorL2.owner !== NullAddress
+      !isNullAddress(resultOrErrorL2.owner)
     ) {
       return resultOrErrorL2;
+    }
+    if (resultOrErrorL1 instanceof Error) {
+      throw resultOrErrorL1;
     }
     return resultOrErrorL1;
   }
@@ -235,7 +214,15 @@ export default class Uns extends NamingService {
       'social.twitter.username',
     ];
     const data = await this.getVerifiedData(domain, keys);
-    const {records} = data;
+    const {records, location} = data;
+    if (location === UnsLocation.Layer2) {
+      throw new ResolutionError(
+        ResolutionErrorCode.UnsupportedTwitterVerification,
+        {
+          domain,
+        },
+      );
+    }
     const validationSignature = records['validation.social.twitter.username'];
     const twitterHandle = records['social.twitter.username'];
     if (isNullAddress(validationSignature)) {
@@ -289,37 +276,38 @@ export default class Uns extends NamingService {
   }
 
   async getTokenUri(tokenId: string): Promise<string> {
-    const [tokenURIL2] = await this.unsl2.readerContract
-      .call('tokenURI', [tokenId])
-      .catch((error) => {
-        if (
-          error instanceof ResolutionError &&
-          error.code === ResolutionErrorCode.ServiceProviderError &&
-          error.message === '< execution reverted >'
-        ) {
-          return [null];
-        }
-        throw error;
-      });
-
-    if (tokenURIL2) {
-      return tokenURIL2;
-    }
-    const promiseL1 = this.unsl1.readerContract.call('tokenURI', [tokenId]);
-    const [tokenURIL1] = await promiseL1.catch((error) => {
+    const [resultOrErrorL1, resultOrErrorL2] = await Promise.all([
+      this.unsl1.getTokenUri(tokenId).catch((err) => err),
+      this.unsl2.getTokenUri(tokenId).catch((err) => err),
+    ]);
+    if (resultOrErrorL2 instanceof Error) {
+      if (!(resultOrErrorL2 instanceof ResolutionError)) {
+        throw resultOrErrorL2;
+      }
       if (
-        error instanceof ResolutionError &&
-        error.code === ResolutionErrorCode.ServiceProviderError &&
-        error.message === '< execution reverted >'
+        resultOrErrorL2.code !== ResolutionErrorCode.ServiceProviderError ||
+        resultOrErrorL2.message !== '< execution reverted >'
+      ) {
+        throw resultOrErrorL2;
+      }
+    } else if (resultOrErrorL2) {
+      return resultOrErrorL2;
+    }
+    if (resultOrErrorL1 instanceof Error) {
+      if (!(resultOrErrorL1 instanceof ResolutionError)) {
+        throw resultOrErrorL1;
+      }
+      if (
+        resultOrErrorL1.code === ResolutionErrorCode.ServiceProviderError &&
+        resultOrErrorL1.message === '< execution reverted >'
       ) {
         throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
           method: NamingServiceName.UNS,
           methodName: 'getTokenUri',
         });
       }
-      throw error;
-    });
-    return tokenURIL1;
+    }
+    return resultOrErrorL1;
   }
 
   async isAvailable(domain: string): Promise<boolean> {
@@ -327,31 +315,23 @@ export default class Uns extends NamingService {
   }
 
   async registryAddress(domainOrNamehash: string): Promise<string> {
-    if (
-      !this.checkDomain(domainOrNamehash, domainOrNamehash.startsWith('0x'))
-    ) {
-      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
-        domain: domainOrNamehash,
-      });
-    }
-    const namehash = domainOrNamehash.startsWith('0x')
-      ? domainOrNamehash
-      : this.namehash(domainOrNamehash);
-    const promiseL1 = this.unsl1.readerContract.call('registryOf', [namehash]);
-    const [addressL2] = await this.unsl2.readerContract.call('registryOf', [
-      namehash,
+    const [resultOrErrorL1, resultOrErrorL2] = await Promise.all([
+      this.unsl1.registryAddress(domainOrNamehash).catch((err) => err),
+      this.unsl2.registryAddress(domainOrNamehash).catch((err) => err),
     ]);
 
-    if (addressL2 !== NullAddress) {
-      return addressL2;
+    if (resultOrErrorL2 instanceof Error) {
+      validResolutionErrorOrThrow(
+        resultOrErrorL2,
+        ResolutionErrorCode.UnregisteredDomain,
+      );
+    } else if (!isNullAddress(resultOrErrorL2)) {
+      return resultOrErrorL2;
     }
-    const [addressL1] = await promiseL1;
-    if (addressL1 !== NullAddress) {
-      return addressL1;
+    if (resultOrErrorL1 instanceof Error) {
+      throw resultOrErrorL1;
     }
-    throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-      domain: domainOrNamehash,
-    });
+    return resultOrErrorL1;
   }
 
   async getDomainFromTokenId(tokenId: string): Promise<string> {
@@ -360,11 +340,12 @@ export default class Uns extends NamingService {
       this.unsl2.getDomainFromTokenId(tokenId).catch((err) => err),
     ]);
 
-    if (resultOrErrorL2 instanceof ResolutionError) {
-      if (resultOrErrorL2.code !== ResolutionErrorCode.UnregisteredDomain) {
-        throw resultOrErrorL2;
-      }
-      if (resultOrErrorL1 instanceof ResolutionError) {
+    if (resultOrErrorL2 instanceof Error) {
+      validResolutionErrorOrThrow(
+        resultOrErrorL2,
+        ResolutionErrorCode.UnregisteredDomain,
+      );
+      if (resultOrErrorL1 instanceof Error) {
         throw resultOrErrorL1;
       }
       return resultOrErrorL1;
@@ -373,26 +354,22 @@ export default class Uns extends NamingService {
   }
 
   async location(domain: string): Promise<DomainLocation> {
-    const tokenId = this.namehash(domain);
-    const [registry, {resolver, owner, location}] = await Promise.all([
-      this.registryAddress(domain),
-      this.get(tokenId),
+    const [resultOrErrorL1, resultOrErrorL2] = await Promise.all([
+      this.unsl1.location(domain).catch((err) => err),
+      this.unsl2.location(domain).catch((err) => err),
     ]);
 
-    let networkId = EthereumNetworks[this.unsl1.network];
-    let providerUrl = this.unsl1.url;
-    if (location === UnsLocation.Layer2) {
-      networkId = EthereumNetworks[this.unsl2.network];
-      providerUrl = this.unsl2.url;
+    if (resultOrErrorL2 instanceof Error) {
+      validResolutionErrorOrThrow(
+        resultOrErrorL2,
+        ResolutionErrorCode.UnregisteredDomain,
+      );
+      if (resultOrErrorL1 instanceof Error) {
+        throw resultOrErrorL1;
+      }
+      return resultOrErrorL1;
     }
-    return {
-      registry,
-      resolver,
-      networkId,
-      blockchain: BlockchainType.ETH,
-      owner,
-      providerUrl,
-    };
+    return resultOrErrorL2;
   }
 
   private async getVerifiedData(
@@ -417,18 +394,18 @@ export default class Uns extends NamingService {
 
   private async get(tokenId: string, keys: string[] = []): Promise<DomainData> {
     const [resultOrErrorL1, resultOrErrorL2] = await Promise.all([
-      this.unsl1.readerContract
-        .call('getData', [keys, tokenId])
-        .catch((err) => err),
-      this.unsl2.readerContract
-        .call('getData', [keys, tokenId])
-        .catch((err) => err),
+      this.unsl1.get(tokenId, keys).catch((err) => err),
+      this.unsl2.get(tokenId, keys).catch((err) => err),
     ]);
     if (resultOrErrorL2 instanceof Error) {
       throw resultOrErrorL2;
     }
-    const [resolverL2, ownerL2, recordsL2] = resultOrErrorL2;
-    if (ownerL2 !== NullAddress) {
+    const {
+      resolver: resolverL2,
+      owner: ownerL2,
+      records: recordsL2,
+    } = resultOrErrorL2;
+    if (!isNullAddress(ownerL2)) {
       return {
         resolver: resolverL2,
         owner: ownerL2,
@@ -439,7 +416,11 @@ export default class Uns extends NamingService {
     if (resultOrErrorL1 instanceof Error) {
       throw resultOrErrorL1;
     }
-    const [resolverL1, ownerL1, recordsL1] = resultOrErrorL1;
+    const {
+      resolver: resolverL1,
+      owner: ownerL1,
+      records: recordsL1,
+    } = resultOrErrorL1;
     return {
       resolver: resolverL1,
       owner: ownerL1,
@@ -463,6 +444,19 @@ export default class Uns extends NamingService {
       tokens.every((v) => !!v.length)
     );
   }
+}
+
+function validResolutionErrorOrThrow(
+  error: Error,
+  validCode: ResolutionErrorCode,
+) {
+  if (!(error instanceof ResolutionError)) {
+    throw error;
+  }
+  if (error.code === validCode) {
+    return true;
+  }
+  throw error;
 }
 
 function getProxyReaderMap(): ProxyReaderMap {
