@@ -194,11 +194,7 @@ export default class Uns extends NamingService {
       );
       return resultOrErrorL1;
     }
-    if (
-      resultOrErrorL2 &&
-      resultOrErrorL2.owner &&
-      !isNullAddress(resultOrErrorL2.owner)
-    ) {
+    if (resultOrErrorL2) {
       return resultOrErrorL2;
     }
     if (resultOrErrorL1 instanceof Error) {
@@ -214,15 +210,7 @@ export default class Uns extends NamingService {
       'social.twitter.username',
     ];
     const data = await this.getVerifiedData(domain, keys);
-    const {records, location} = data;
-    if (location === UnsLocation.Layer2) {
-      throw new ResolutionError(
-        ResolutionErrorCode.UnsupportedTwitterVerification,
-        {
-          domain,
-        },
-      );
-    }
+    const {records} = data;
     const validationSignature = records['validation.social.twitter.username'];
     const twitterHandle = records['social.twitter.username'];
     if (isNullAddress(validationSignature)) {
@@ -281,26 +269,22 @@ export default class Uns extends NamingService {
       this.unsl2.getTokenUri(tokenId).catch((err) => err),
     ]);
     if (resultOrErrorL2 instanceof Error) {
-      if (!(resultOrErrorL2 instanceof ResolutionError)) {
+      validResolutionErrorOrThrow(
+        resultOrErrorL2,
+        ResolutionErrorCode.ServiceProviderError,
+      );
+      if (resultOrErrorL2.message !== '< execution reverted >') {
         throw resultOrErrorL2;
       }
-      if (
-        resultOrErrorL2.code !== ResolutionErrorCode.ServiceProviderError ||
-        resultOrErrorL2.message !== '< execution reverted >'
-      ) {
-        throw resultOrErrorL2;
-      }
-    } else if (resultOrErrorL2) {
+    } else {
       return resultOrErrorL2;
     }
     if (resultOrErrorL1 instanceof Error) {
-      if (!(resultOrErrorL1 instanceof ResolutionError)) {
-        throw resultOrErrorL1;
-      }
-      if (
-        resultOrErrorL1.code === ResolutionErrorCode.ServiceProviderError &&
-        resultOrErrorL1.message === '< execution reverted >'
-      ) {
+      validResolutionErrorOrThrow(
+        resultOrErrorL1,
+        ResolutionErrorCode.ServiceProviderError,
+      );
+      if (resultOrErrorL1.message === '< execution reverted >') {
         throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
           method: NamingServiceName.UNS,
           methodName: 'getTokenUri',
@@ -338,25 +322,6 @@ export default class Uns extends NamingService {
     const [resultOrErrorL1, resultOrErrorL2] = await Promise.all([
       this.unsl1.getDomainFromTokenId(tokenId).catch((err) => err),
       this.unsl2.getDomainFromTokenId(tokenId).catch((err) => err),
-    ]);
-
-    if (resultOrErrorL2 instanceof Error) {
-      validResolutionErrorOrThrow(
-        resultOrErrorL2,
-        ResolutionErrorCode.UnregisteredDomain,
-      );
-      if (resultOrErrorL1 instanceof Error) {
-        throw resultOrErrorL1;
-      }
-      return resultOrErrorL1;
-    }
-    return resultOrErrorL2;
-  }
-
-  async location(domain: string): Promise<DomainLocation> {
-    const [resultOrErrorL1, resultOrErrorL2] = await Promise.all([
-      this.unsl1.location(domain).catch((err) => err),
-      this.unsl2.location(domain).catch((err) => err),
     ]);
 
     if (resultOrErrorL2 instanceof Error) {

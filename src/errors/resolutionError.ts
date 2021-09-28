@@ -28,7 +28,6 @@ export enum ResolutionErrorCode {
   RecordNotFound = 'RecordNotFound',
   ServiceProviderError = 'ServiceProviderError',
   InvalidTwitterVerification = 'InvalidTwitterVerification',
-  UnsupportedTwitterVerification = 'UnsupportedTwitterVerification',
 }
 
 /**
@@ -59,10 +58,6 @@ const HandlersByCode = {
     `${params.location ? `${params.location}: ` : ''}Domain ${
       params.domain
     } has invalid Twitter signature verification`,
-  [ResolutionErrorCode.UnsupportedTwitterVerification]: (params: {
-    domain?: string;
-  }) =>
-    `Twitter verification not yet supported for domain ${params.domain} stored on Layer2`,
   [ResolutionErrorCode.UnsupportedCurrency]: (params: {
     currencyTicker: string;
   }) => `${params.currencyTicker} is not supported`,

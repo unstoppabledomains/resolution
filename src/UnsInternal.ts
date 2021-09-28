@@ -6,13 +6,7 @@ import {
 } from './types';
 import {UnsLayerSource} from '.';
 import {ConfigurationError, ConfigurationErrorCode} from '.';
-import {
-  CryptoRecords,
-  DomainData,
-  UnsLocation,
-  DomainLocation,
-  BlockchainType,
-} from './types/publicTypes';
+import {CryptoRecords, DomainData, UnsLocation} from './types/publicTypes';
 import {constructRecords, EthereumNetworks, isNullAddress} from './utils';
 import FetchProvider from './FetchProvider';
 import EthereumContract from './contracts/EthereumContract';
@@ -87,28 +81,6 @@ export default class UnsInternal {
       });
     }
     return address;
-  }
-
-  async location(domain: string): Promise<DomainLocation> {
-    const tokenId = this.namehash(domain);
-    const [registry, {resolver, owner}] = await Promise.all([
-      this.registryAddress(domain),
-      this.get(tokenId),
-    ]);
-
-    const networkId = EthereumNetworks[this.network];
-    const providerUrl = this.url;
-    return {
-      registry,
-      resolver,
-      networkId,
-      blockchain:
-        this.unsLocation === UnsLocation.Layer1
-          ? BlockchainType.ETH
-          : BlockchainType.MATIC,
-      owner,
-      providerUrl,
-    };
   }
 
   async resolver(domain: string): Promise<string> {
