@@ -1032,14 +1032,17 @@ describe('UNS', () => {
           'https://metadata.staging.unstoppabledomains.com/metadata/brad.crypto',
         ],
       });
-      const polygonSpies = mockAsyncMethods(uns.unsl2.readerContract, {
-        call: [],
-      });
+      mockAsyncMethod(uns.unsl2.readerContract, 'call', (params) =>
+        Promise.reject(
+          new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
+            providerMessage: 'execution reverted',
+          }),
+        ),
+      );
 
       const uri = await resolution.tokenURI('brad.crypto');
 
       expectSpyToBeCalled(spies);
-      expectSpyToBeCalled(polygonSpies);
       expect(uri).toEqual(
         'https://metadata.staging.unstoppabledomains.com/metadata/brad.crypto',
       );
@@ -1084,172 +1087,186 @@ describe('UNS', () => {
       expectSpyToBeCalled(polygonSpies);
     });
 
-    skipItInLive('should throw the same internal error', async () => {
-      const spies = mockAsyncMethods(uns.unsl1.readerContract, {
-        call: new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
-          providerMessage: 'execution reverted',
-        }),
-      });
-      const polygonSpies = mockAsyncMethods(uns.unsl2.readerContract, {
-        call: [],
-      });
+    describe('.tokenURIMetadata', () => {
+      it('should return token metadata', async () => {
+        const testMeta: TokenUriMetadata = liveData.bradCryptoMetadata;
 
-      await expectResolutionErrorCode(
-        () => resolution.tokenURI('fakedomainthatdoesnotexist.crypto'),
-        ResolutionErrorCode.UnregisteredDomain,
-      );
-      expectSpyToBeCalled(spies);
-      expectSpyToBeCalled(polygonSpies);
-    });
-  });
-
-  describe('.tokenURIMetadata', () => {
-    it('should return token metadata', async () => {
-      const testMeta: TokenUriMetadata = liveData.bradCryptoMetadata;
-
-      const unsSpies = mockAsyncMethods(uns.unsl1.readerContract, {
-        call: ['https://metadata.unstoppabledomains.com/metadata/brad.crypto'],
-      });
-      mockAsyncMethods(uns.unsl2.readerContract, {
-        call: [],
-      });
-      const fetchSpies = mockAsyncMethods(Networking, {
-        fetch: {
-          ok: true,
-          json: () => testMeta,
-        },
-      });
-
-      const metadata = await resolution.tokenURIMetadata('brad.crypto');
-
-      expectSpyToBeCalled(unsSpies);
-      expectSpyToBeCalled(fetchSpies);
-      expect(metadata).toEqual(testMeta);
-    });
-  });
-
-  describe('.unhash', () => {
-    it('should unhash token', async () => {
-      const testMeta: TokenUriMetadata = liveData.bradCryptoMetadata;
-      mockAPICalls('unhash', protocolLink());
-      mockAsyncMethod(uns.unsl2, 'getDomainFromTokenId', (params) =>
-        Promise.reject(
-          new ResolutionError(ResolutionErrorCode.UnregisteredDomain),
-        ),
-      );
-      const domain = await resolution.unhash(
-        '0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9',
-        NamingServiceName.UNS,
-      );
-      expect(domain).toEqual(testMeta.name);
-    });
-
-    skipItInLive('should throw error if hash is wrong', async () => {
-      const provider = new FetchProvider(NamingServiceName.UNS, protocolLink());
-      const polygonProvider = new FetchProvider(
-        NamingServiceName.UNS,
-        protocolLink(ProviderProtocol.http, 'UNSL2'),
-      );
-      resolution = new Resolution({
-        sourceConfig: {
-          uns: {
-            locations: {
-              Layer1: {
-                provider,
-                network: 'mainnet',
-              },
-              Layer2: {
-                provider: polygonProvider,
-                network: 'polygon-mainnet',
-              },
-            },
+        const unsSpies = mockAsyncMethods(uns.unsl1.readerContract, {
+          call: [
+            'https://metadata.unstoppabledomains.com/metadata/brad.crypto',
+          ],
+        });
+        mockAsyncMethods(uns.unsl2.readerContract, {
+          call: [],
+        });
+        const fetchSpies = mockAsyncMethods(Networking, {
+          fetch: {
+            ok: true,
+            json: () => testMeta,
           },
-        },
+        });
+
+        const metadata = await resolution.tokenURIMetadata('brad.crypto');
+
+        expectSpyToBeCalled(unsSpies);
+        expectSpyToBeCalled(fetchSpies);
+        expect(metadata).toEqual(testMeta);
       });
-      const providerSpy = mockAsyncMethods(provider, {
-        fetchJson: {
-          jsonrpc: '2.0',
-          id: '1',
-          error: {
-            code: -32600,
-            message: 'data type size mismatch, expected 32 got 6',
-          },
-        },
-      });
-      const polygonProviderSpy = mockAsyncMethods(polygonProvider, {
-        fetchJson: {},
-      });
-      await expect(
-        resolution.unhash('0xdeaddeaddead', NamingServiceName.UNS),
-      ).rejects.toThrow(
-        new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
-          providerMessage: 'data type size mismatch, expected 32 got 6',
-        }),
-      );
-      expectSpyToBeCalled(providerSpy);
-      expectSpyToBeCalled(polygonProviderSpy);
     });
 
-    it('should throw error if domain is not found', async () => {
-      const unregisteredhash = resolution.namehash(
-        'test34230131207328144694.crypto',
-      );
-      mockAPICalls('unhash', protocolLink());
-      mockAsyncMethod(uns.unsl2, 'getDomainFromTokenId', (params) =>
-        Promise.reject(
-          new ResolutionError(ResolutionErrorCode.UnregisteredDomain),
-        ),
-      );
-      await expect(
-        resolution.unhash(unregisteredhash, NamingServiceName.UNS),
-      ).rejects.toThrow(
-        new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-          domain: unregisteredhash,
-        }),
-      );
-    });
-
-    skipItInLive(
-      'should throw an error if hash returned from the network is not equal to the hash provided',
-      async () => {
-        const someHash = resolution.namehash('test34230131207328144693.crypto');
+    describe('.unhash', () => {
+      it('should unhash token', async () => {
+        const testMeta: TokenUriMetadata = liveData.bradCryptoMetadata;
         mockAPICalls('unhash', protocolLink());
         mockAsyncMethod(uns.unsl2, 'getDomainFromTokenId', (params) =>
           Promise.reject(
             new ResolutionError(ResolutionErrorCode.UnregisteredDomain),
           ),
         );
-        await expectResolutionErrorCode(
-          () => resolution.unhash(someHash, NamingServiceName.UNS),
-          ResolutionErrorCode.ServiceProviderError,
+        const domain = await resolution.unhash(
+          '0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9',
+          NamingServiceName.UNS,
         );
-      },
-    );
+        expect(domain).toEqual(testMeta.name);
+      });
 
-    skipItInLive(
-      'getStartingBlockFromRegistry should return earliest for custom network',
-      async () => {
+      skipItInLive('should throw error if hash is wrong', async () => {
+        const provider = new FetchProvider(
+          NamingServiceName.UNS,
+          protocolLink(),
+        );
+        const polygonProvider = new FetchProvider(
+          NamingServiceName.UNS,
+          protocolLink(ProviderProtocol.http, 'UNSL2'),
+        );
         resolution = new Resolution({
           sourceConfig: {
             uns: {
               locations: {
                 Layer1: {
-                  network: 'custom',
-                  url: protocolLink(),
-                  proxyReaderAddress:
-                    UnsConfig.networks[4].contracts.ProxyReader.address.toLowerCase(),
+                  provider,
+                  network: 'mainnet',
                 },
                 Layer2: {
-                  network: 'polygon-mumbai',
+                  provider: polygonProvider,
+                  network: 'polygon-mainnet',
                 },
               },
             },
           },
         });
-        const someHash = resolution.namehash('test.coin');
-        // We need to make sure there is no mocks in the queque before we create new ones
-        nock.cleanAll();
-        mockAPICalls('unhashGetStartingBlockTest', protocolLink());
+        const providerSpy = mockAsyncMethods(provider, {
+          fetchJson: {
+            jsonrpc: '2.0',
+            id: '1',
+            error: {
+              code: -32600,
+              message: 'data type size mismatch, expected 32 got 6',
+            },
+          },
+        });
+        const polygonProviderSpy = mockAsyncMethods(polygonProvider, {
+          fetchJson: {},
+        });
+        await expect(
+          resolution.unhash('0xdeaddeaddead', NamingServiceName.UNS),
+        ).rejects.toThrow(
+          new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
+            providerMessage: 'data type size mismatch, expected 32 got 6',
+          }),
+        );
+        expectSpyToBeCalled(providerSpy);
+        expectSpyToBeCalled(polygonProviderSpy);
+      });
+
+      it('should throw error if domain is not found', async () => {
+        const unregisteredhash = resolution.namehash(
+          'test34230131207328144694.crypto',
+        );
+        mockAPICalls('unhash', protocolLink());
+        mockAsyncMethod(uns.unsl2, 'getDomainFromTokenId', (params) =>
+          Promise.reject(
+            new ResolutionError(ResolutionErrorCode.UnregisteredDomain),
+          ),
+        );
+        await expect(
+          resolution.unhash(unregisteredhash, NamingServiceName.UNS),
+        ).rejects.toThrow(
+          new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+            domain: unregisteredhash,
+          }),
+        );
+      });
+
+      skipItInLive(
+        'should throw an error if hash returned from the network is not equal to the hash provided',
+        async () => {
+          const someHash = resolution.namehash(
+            'test34230131207328144693.crypto',
+          );
+          mockAPICalls('unhash', protocolLink());
+          mockAsyncMethod(uns.unsl2, 'getDomainFromTokenId', (params) =>
+            Promise.reject(
+              new ResolutionError(ResolutionErrorCode.UnregisteredDomain),
+            ),
+          );
+          await expectResolutionErrorCode(
+            () => resolution.unhash(someHash, NamingServiceName.UNS),
+            ResolutionErrorCode.ServiceProviderError,
+          );
+        },
+      );
+
+      skipItInLive(
+        'getStartingBlockFromRegistry should return earliest for custom network',
+        async () => {
+          resolution = new Resolution({
+            sourceConfig: {
+              uns: {
+                locations: {
+                  Layer1: {
+                    network: 'custom',
+                    url: protocolLink(),
+                    proxyReaderAddress:
+                      UnsConfig.networks[4].contracts.ProxyReader.address.toLowerCase(),
+                  },
+                  Layer2: {
+                    network: 'polygon-mumbai',
+                  },
+                },
+              },
+            },
+          });
+          const someHash = resolution.namehash('test.coin');
+          // We need to make sure there is no mocks in the queque before we create new ones
+          nock.cleanAll();
+          mockAPICalls('unhashGetStartingBlockTest', protocolLink());
+          const uns = resolution.serviceMap['UNS'] as unknown as Uns;
+          const unsl2 = uns.unsl2;
+          mockAsyncMethod(unsl2, 'getDomainFromTokenId', (params) =>
+            Promise.reject(
+              new ResolutionError(ResolutionErrorCode.UnregisteredDomain),
+            ),
+          );
+          await expectResolutionErrorCode(
+            () => resolution.unhash(someHash, NamingServiceName.UNS),
+            ResolutionErrorCode.UnregisteredDomain,
+          );
+          // If the getStartingBlockFromRegistry function won't return "earliest" then one of the mocks will not be fired
+          // Giving us an indicator that something has changed in the function output
+          if (!nock.isDone()) {
+            throw new Error(
+              'Not all mocks have been called, getStartingBlockFromRegistry is misbehaving?',
+            );
+          }
+        },
+      );
+
+      it('should return a .wallet domain', async () => {
+        const walletDomain = 'udtestdev-johnnywallet.wallet';
+        const hash = resolution.namehash(walletDomain);
+        mockAPICalls('unhash', protocolLink());
+        mockAPICalls('unhash', protocolLink(ProviderProtocol.http, 'UNSL2'));
         const uns = resolution.serviceMap['UNS'] as unknown as Uns;
         const unsl2 = uns.unsl2;
         mockAsyncMethod(unsl2, 'getDomainFromTokenId', (params) =>
@@ -1257,49 +1274,24 @@ describe('UNS', () => {
             new ResolutionError(ResolutionErrorCode.UnregisteredDomain),
           ),
         );
-        await expectResolutionErrorCode(
-          () => resolution.unhash(someHash, NamingServiceName.UNS),
-          ResolutionErrorCode.UnregisteredDomain,
+        const result = await resolution.unhash(hash, NamingServiceName.UNS);
+        expect(result).toBe(walletDomain);
+      });
+
+      it('should return a .coin domain', async () => {
+        const walletDomain = 'udtestdev-johnnycoin.coin';
+        const hash = resolution.namehash(walletDomain);
+        mockAPICalls('unhash', protocolLink());
+        const uns = resolution.serviceMap['UNS'] as unknown as Uns;
+        const unsl2 = uns.unsl2;
+        mockAsyncMethod(unsl2, 'getDomainFromTokenId', (params) =>
+          Promise.reject(
+            new ResolutionError(ResolutionErrorCode.UnregisteredDomain),
+          ),
         );
-        // If the getStartingBlockFromRegistry function won't return "earliest" then one of the mocks will not be fired
-        // Giving us an indicator that something has changed in the function output
-        if (!nock.isDone()) {
-          throw new Error(
-            'Not all mocks have been called, getStartingBlockFromRegistry is misbehaving?',
-          );
-        }
-      },
-    );
-
-    it('should return a .wallet domain', async () => {
-      const walletDomain = 'udtestdev-johnnywallet.wallet';
-      const hash = resolution.namehash(walletDomain);
-      mockAPICalls('unhash', protocolLink());
-      mockAPICalls('unhash', protocolLink(ProviderProtocol.http, 'UNSL2'));
-      const uns = resolution.serviceMap['UNS'] as unknown as Uns;
-      const unsl2 = uns.unsl2;
-      mockAsyncMethod(unsl2, 'getDomainFromTokenId', (params) =>
-        Promise.reject(
-          new ResolutionError(ResolutionErrorCode.UnregisteredDomain),
-        ),
-      );
-      const result = await resolution.unhash(hash, NamingServiceName.UNS);
-      expect(result).toBe(walletDomain);
-    });
-
-    it('should return a .coin domain', async () => {
-      const walletDomain = 'udtestdev-johnnycoin.coin';
-      const hash = resolution.namehash(walletDomain);
-      mockAPICalls('unhash', protocolLink());
-      const uns = resolution.serviceMap['UNS'] as unknown as Uns;
-      const unsl2 = uns.unsl2;
-      mockAsyncMethod(unsl2, 'getDomainFromTokenId', (params) =>
-        Promise.reject(
-          new ResolutionError(ResolutionErrorCode.UnregisteredDomain),
-        ),
-      );
-      const result = await resolution.unhash(hash, NamingServiceName.UNS);
-      expect(result).toBe(walletDomain);
+        const result = await resolution.unhash(hash, NamingServiceName.UNS);
+        expect(result).toBe(walletDomain);
+      });
     });
   });
 });

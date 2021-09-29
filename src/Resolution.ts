@@ -19,7 +19,6 @@ import {
   Web3Version0Provider,
   Web3Version1Provider,
   TokenUriMetadata,
-  DomainLocation,
 } from './types/publicTypes';
 import ResolutionError, {ResolutionErrorCode} from './errors/resolutionError';
 import DnsUtils from './utils/DnsUtils';
@@ -772,16 +771,6 @@ export default class Resolution {
       });
     }
     return name;
-  }
-
-  /**
-   * Retrieves address of registry contract used for domain
-   * @param domain - domain name
-   * @returns Registry contract address
-   */
-  async location(domain: string): Promise<DomainLocation> {
-    const method = this.getNamingMethodOrThrow(domain);
-    return method.location(domain);
   }
 
   private async getMetadataFromTokenURI(

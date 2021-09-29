@@ -6,7 +6,6 @@ import Resolution, {
   UnsLocation,
 } from '../index';
 import {
-  BlockchainType,
   DnsRecordType,
   JsonRpcPayload,
   NamingServiceName,
@@ -29,7 +28,6 @@ import {
   CryptoDomainWithUsdtMultiChainRecords,
   expectConfigurationErrorCode,
   CryptoDomainWithAllRecords,
-  WalletDomainLayerTwoWithAllRecords,
 } from './helpers';
 import {RpcProviderTestCases} from './providerMockData';
 import fetch, {FetchError} from 'node-fetch';
@@ -1147,10 +1145,12 @@ describe('Resolution', () => {
                 '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
             },
           });
-          mockAsyncMethods(unsl2, {
-            resolver: '',
-            getAllRecords: {},
-          });
+          mockAsyncMethod(unsl2, 'getVerifiedData', (params) =>
+            Promise.reject(
+              new ResolutionError(ResolutionErrorCode.UnregisteredDomain),
+            ),
+          );
+
           const unsL1GetNewKeyMock = mockAsyncMethod(
             unsl1,
             'getNewKeyEvents',
@@ -1504,168 +1504,6 @@ describe('Resolution', () => {
           'COM' as NamingServiceName,
         ),
       ).toThrowError('Naming service COM is not supported');
-    });
-  });
-
-  describe('.location', () => {
-    it('should get location for .crypto domains', async () => {
-      const domain = 'brad.crypto';
-
-      const mockValuesL1 = {
-        location: {
-          registry: '0xAad76bea7CFEc82927239415BB18D2e93518ecBB',
-          resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
-          networkId: 4,
-          owner: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
-          blockchain: BlockchainType.ETH,
-          providerUrl:
-            'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
-        },
-      };
-
-      mockAsyncMethods(uns.unsl1, mockValuesL1);
-      mockAsyncMethod(
-        uns.unsl2,
-        'registryAddress',
-        new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-          domain,
-        }),
-      );
-
-      const location = await resolution.location(domain);
-      expect(location).toEqual({
-        registry: mockValuesL1.location.registry,
-        resolver: mockValuesL1.location.resolver,
-        networkId: 4,
-        blockchain: BlockchainType.ETH,
-        owner: mockValuesL1.location.owner,
-        providerUrl: mockValuesL1.location.providerUrl,
-      });
-    });
-
-    it('should get location for uns domains', async () => {
-      const domain = 'udtestdev-check.wallet';
-      const mockValuesL1 = {
-        location: {
-          registry: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
-          resolver: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
-          networkId: 4,
-          owner: '0x0e43F36e4B986dfbE1a75cacfA60cA2bD44Ae962',
-          blockchain: BlockchainType.ETH,
-          providerUrl:
-            'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
-        },
-      };
-
-      mockAsyncMethods(uns.unsl1, mockValuesL1);
-      mockAsyncMethod(
-        uns.unsl2,
-        'registryAddress',
-        new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-          domain,
-        }),
-      );
-      const location = await resolution.location(domain);
-      expect(location).toEqual({
-        registry: mockValuesL1.location.registry,
-        resolver: mockValuesL1.location.resolver,
-        networkId: 4,
-        blockchain: BlockchainType.ETH,
-        owner: mockValuesL1.location.owner,
-        providerUrl: mockValuesL1.location.providerUrl,
-      });
-    });
-
-    it('should get location for uns L2 domain', async () => {
-      const mockValuesL1 = {
-        location: {
-          registry: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
-          resolver: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
-          networkId: 4,
-          owner: '0x0e43F36e4B986dfbE1a75cacfA60cA2bD44Ae962',
-          blockchain: BlockchainType.ETH,
-          providerUrl:
-            'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
-        },
-      };
-      const mockValuesL2 = {
-        location: {
-          registry: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
-          resolver: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
-          networkId: 80001,
-          owner: '0x0e43F36e4B986dfbE1a75cacfA60cA2bD44Ae962',
-          blockchain: BlockchainType.MATIC,
-          providerUrl:
-            'https://polygon-mumbai.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
-        },
-      };
-
-      mockAsyncMethods(uns.unsl1, mockValuesL1);
-      mockAsyncMethods(uns.unsl2, mockValuesL2);
-      const location = await resolution.location(
-        WalletDomainLayerTwoWithAllRecords,
-      );
-      expect(location).toEqual({
-        registry: mockValuesL2.location.registry,
-        resolver: mockValuesL2.location.resolver,
-        networkId: 80001,
-        blockchain: BlockchainType.MATIC,
-        owner: mockValuesL2.location.owner,
-        providerUrl: mockValuesL2.location.providerUrl,
-      });
-    });
-
-    it('should get location for uns L2 domain when L1 throws', async () => {
-      const mockValuesL2 = {
-        location: {
-          registry: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
-          resolver: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
-          networkId: 80001,
-          owner: '0x0e43F36e4B986dfbE1a75cacfA60cA2bD44Ae962',
-          blockchain: BlockchainType.MATIC,
-          providerUrl:
-            'https://polygon-mumbai.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
-        },
-      };
-
-      mockAsyncMethod(
-        uns.unsl1,
-        'registryAddress',
-        new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-          domain: WalletDomainLayerTwoWithAllRecords,
-        }),
-      );
-      mockAsyncMethods(uns.unsl2, mockValuesL2);
-      const location = await resolution.location(
-        WalletDomainLayerTwoWithAllRecords,
-      );
-      expect(location).toEqual({
-        registry: mockValuesL2.location.registry,
-        resolver: mockValuesL2.location.resolver,
-        networkId: 80001,
-        blockchain: BlockchainType.MATIC,
-        owner: mockValuesL2.location.owner,
-        providerUrl: mockValuesL2.location.providerUrl,
-      });
-    });
-
-    it('should get location for zns domains', async () => {
-      const mockValues = {
-        registryAddress: 'zil1hyj6m5w4atcn7s806s69r0uh5g4t84e8gp6nps',
-        resolver: '0x02621c64a57e1424adfe122569f2356145f05d4f',
-        owner: 'zil1qqlrehlvat5kalsq07qedgd3k804glhwhv8ppa',
-      };
-
-      mockAsyncMethods(zns, mockValues);
-      const location = await resolution.location('testing.zil');
-      expect(location).toEqual({
-        registry: mockValues.registryAddress,
-        resolver: mockValues.resolver,
-        networkId: 333,
-        blockchain: BlockchainType.ZIL,
-        owner: mockValues.owner,
-        providerUrl: 'https://dev-api.zilliqa.com',
-      });
     });
   });
 });

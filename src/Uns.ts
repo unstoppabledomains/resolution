@@ -12,7 +12,6 @@ import {
   NamingServiceName,
   Provider,
   UnsLocation,
-  DomainLocation,
 } from './types/publicTypes';
 import {isValidTwitterSignature} from './utils/TwitterSignatureValidator';
 import UnsConfig from './config/uns-config.json';
@@ -192,15 +191,9 @@ export default class Uns extends NamingService {
         resultOrErrorL2,
         ResolutionErrorCode.UnregisteredDomain,
       );
-      return resultOrErrorL1;
+      return validResultOrThrow(resultOrErrorL1);
     }
-    if (resultOrErrorL2) {
-      return resultOrErrorL2;
-    }
-    if (resultOrErrorL1 instanceof Error) {
-      throw resultOrErrorL1;
-    }
-    return resultOrErrorL1;
+    return resultOrErrorL2;
   }
 
   async twitter(domain: string): Promise<string> {
@@ -312,10 +305,7 @@ export default class Uns extends NamingService {
     } else if (!isNullAddress(resultOrErrorL2)) {
       return resultOrErrorL2;
     }
-    if (resultOrErrorL1 instanceof Error) {
-      throw resultOrErrorL1;
-    }
-    return resultOrErrorL1;
+    return validResultOrThrow(resultOrErrorL1);
   }
 
   async getDomainFromTokenId(tokenId: string): Promise<string> {
@@ -329,10 +319,7 @@ export default class Uns extends NamingService {
         resultOrErrorL2,
         ResolutionErrorCode.UnregisteredDomain,
       );
-      if (resultOrErrorL1 instanceof Error) {
-        throw resultOrErrorL1;
-      }
-      return resultOrErrorL1;
+      return validResultOrThrow(resultOrErrorL1);
     }
     return resultOrErrorL2;
   }
@@ -362,9 +349,7 @@ export default class Uns extends NamingService {
       this.unsl1.get(tokenId, keys).catch((err) => err),
       this.unsl2.get(tokenId, keys).catch((err) => err),
     ]);
-    if (resultOrErrorL2 instanceof Error) {
-      throw resultOrErrorL2;
-    }
+    validResultOrThrow(resultOrErrorL2);
     const {
       resolver: resolverL2,
       owner: ownerL2,
@@ -378,9 +363,7 @@ export default class Uns extends NamingService {
         location: UnsLocation.Layer2,
       };
     }
-    if (resultOrErrorL1 instanceof Error) {
-      throw resultOrErrorL1;
-    }
+    validResultOrThrow(resultOrErrorL1);
     const {
       resolver: resolverL1,
       owner: ownerL1,
@@ -409,6 +392,13 @@ export default class Uns extends NamingService {
       tokens.every((v) => !!v.length)
     );
   }
+}
+
+function validResultOrThrow(resultOrError) {
+  if (resultOrError instanceof Error) {
+    throw resultOrError;
+  }
+  return resultOrError;
 }
 
 function validResolutionErrorOrThrow(

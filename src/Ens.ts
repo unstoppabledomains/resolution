@@ -9,13 +9,7 @@ import {
 import {ResolutionError, ResolutionErrorCode} from './errors/resolutionError';
 import EthereumContract from './contracts/EthereumContract';
 import EnsNetworkMap from 'ethereum-ens-network-map';
-import {
-  BlockchainType,
-  DomainLocation,
-  EnsSource,
-  NamingServiceName,
-  Provider,
-} from './types/publicTypes';
+import {EnsSource, NamingServiceName, Provider} from './types/publicTypes';
 import {
   constructRecords,
   EthereumNetworksInverted,
@@ -226,23 +220,6 @@ export default class Ens extends NamingService {
       method: NamingServiceName.ENS,
       methodName: 'getDomainFromTokenId',
     });
-  }
-
-  async location(domain: string): Promise<DomainLocation> {
-    const [registry, resolver, owner] = await Promise.all([
-      this.registryAddress(domain),
-      this.resolver(domain),
-      this.owner(domain),
-    ]);
-
-    return {
-      registry,
-      resolver,
-      networkId: this.network,
-      blockchain: BlockchainType.ETH,
-      owner,
-      providerUrl: this.url,
-    };
   }
 
   /**
