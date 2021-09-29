@@ -38,6 +38,14 @@ export function constructRecords(
 
 export const domainExtensionToNamingServiceName = {
   crypto: NamingServiceName.UNS,
+  coin: NamingServiceName.UNS,
+  wallet: NamingServiceName.UNS,
+  bitcoin: NamingServiceName.UNS,
+  x: NamingServiceName.UNS,
+  '888': NamingServiceName.UNS,
+  nft: NamingServiceName.UNS,
+  dao: NamingServiceName.UNS,
+  blockchain: NamingServiceName.UNS,
   zil: NamingServiceName.ZNS,
   eth: NamingServiceName.ENS,
   luxe: NamingServiceName.ENS,

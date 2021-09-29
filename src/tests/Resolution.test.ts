@@ -510,6 +510,26 @@ describe('Resolution', () => {
           const serviceName = resolution.serviceName('domain.crypto');
           expect(serviceName).toBe('UNS');
         });
+        it('checks uns service name', () => {
+          const resolution = new Resolution();
+          const serviceName = resolution.serviceName('domain.wallet');
+          expect(serviceName).toBe('UNS');
+        });
+        it('checks uns service name', () => {
+          const resolution = new Resolution();
+          const serviceName = resolution.serviceName('domain.coin');
+          expect(serviceName).toBe('UNS');
+        });
+        it('checks uns service name', () => {
+          const resolution = new Resolution();
+          const serviceName = resolution.serviceName('domain.bitcoin');
+          expect(serviceName).toBe('UNS');
+        });
+        it('checks uns service name', () => {
+          const resolution = new Resolution();
+          const serviceName = resolution.serviceName('domain.x');
+          expect(serviceName).toBe('UNS');
+        });
       });
     });
 
@@ -522,6 +542,18 @@ describe('Resolution', () => {
         });
         await expectResolutionErrorCode(
           resolution.addr('sdncdoncvdinvcsdncs.zil', 'ZIL'),
+          ResolutionErrorCode.UnregisteredDomain,
+        );
+        expectSpyToBeCalled(spy);
+      });
+      it('checks Resolution#addr error #2', async () => {
+        const resolution = new Resolution();
+        uns = resolution.serviceMap[NamingServiceName.UNS] as unknown as Uns;
+        const spy = mockAsyncMethods(uns, {
+          get: {},
+        });
+        await expectResolutionErrorCode(
+          resolution.addr('sdncdoncvdinvcsdncs.crypto', 'ETH'),
           ResolutionErrorCode.UnregisteredDomain,
         );
         expectSpyToBeCalled(spy);
