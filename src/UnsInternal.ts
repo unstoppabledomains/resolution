@@ -37,8 +37,8 @@ export default class UnsInternal {
   readonly unsLocation: UnsLocation;
 
   constructor(unsLocation: UnsLocation, source: UnsLayerSource) {
-    this.checkNetworkConfig(unsLocation, source);
     this.unsLocation = unsLocation;
+    this.checkNetworkConfig(unsLocation, source);
     this.network = source.network;
     this.url = source['url'] || UnsInternal.UrlMap[this.network];
     this.provider =
@@ -153,6 +153,22 @@ export default class UnsInternal {
     return eip137Namehash(domain);
   }
 
+  private checkDomain(domain: string, passIfTokenID = false): boolean {
+    if (passIfTokenID) {
+      return true;
+    }
+    const tokens = domain.split('.');
+    return (
+      !!tokens.length &&
+      tokens[tokens.length - 1] !== 'zil' &&
+      !(
+        domain === 'eth' ||
+        /^[^-]*[^-]*\.(eth|luxe|xyz|kred|addr\.reverse)$/.test(domain)
+      ) &&
+      tokens.every((v) => !!v.length)
+    );
+  }
+
   private isLegacyResolver(resolverAddress: string): boolean {
     return this.isWellKnownLegacyResolver(resolverAddress);
   }
@@ -214,22 +230,6 @@ export default class UnsInternal {
       return 'earliest';
     }
     return contractDetail.deploymentBlock;
-  }
-
-  private checkDomain(domain: string, passIfTokenID = false): boolean {
-    if (passIfTokenID) {
-      return true;
-    }
-    const tokens = domain.split('.');
-    return (
-      !!tokens.length &&
-      tokens[tokens.length - 1] !== 'zil' &&
-      !(
-        domain === 'eth' ||
-        /^[^-]*[^-]*\.(eth|luxe|xyz|kred|addr\.reverse)$/.test(domain)
-      ) &&
-      tokens.every((v) => !!v.length)
-    );
   }
 
   private checkNetworkConfig(

@@ -8,8 +8,16 @@ import {
   WalletDomainLayerTwoWithAllRecords,
   mockAPICalls,
   ProviderProtocol,
+  mockAsyncMethod,
 } from './helpers';
 import {UnsLocation} from '../types/publicTypes';
+import {
+  ConfigurationError,
+  ConfigurationErrorCode,
+  ResolutionError,
+  ResolutionErrorCode,
+} from '..';
+import {eip137Namehash} from '../utils/namehash';
 
 let unsInternalL1: UnsInternal;
 let unsInternalL2: UnsInternal;
@@ -27,32 +35,238 @@ beforeEach(async () => {
 });
 
 describe('UnsInternal', () => {
-  it('should return valid resolver', async () => {
-    const spies = mockAsyncMethods(unsInternalL1.readerContract, {
-      call: ['0x95AE1515367aa64C462c71e87157771165B1287A', NullAddress, []],
+  describe('constructor()', () => {
+    it('should throw error on invalid network', async () => {
+      expect(
+        () =>
+          new UnsInternal(UnsLocation.Layer1, {
+            url: protocolLink(ProviderProtocol.http, 'UNSL1'),
+          } as any),
+      ).toThrow(
+        new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {
+          method: UnsLocation.Layer1,
+        }),
+      );
     });
-    const resolverAddress = await unsInternalL1.resolver(
-      CryptoDomainWithAllRecords,
-    );
-    expectSpyToBeCalled(spies);
-    expect(resolverAddress).toBe('0x95AE1515367aa64C462c71e87157771165B1287A');
-  });
-  it('should return valid resolver on L2', async () => {
-    const spies = mockAsyncMethods(unsInternalL2.readerContract, {
-      call: ['0x2a93C52E7B6E7054870758e15A1446E769EdfB93', NullAddress, []],
+    it('should throw error on no proxyReaderAddress for custom network', async () => {
+      expect(
+        () =>
+          new UnsInternal(UnsLocation.Layer1, {
+            url: protocolLink(ProviderProtocol.http, 'UNSL1'),
+            network: 'custom',
+          }),
+      ).toThrow(
+        new ConfigurationError(
+          ConfigurationErrorCode.CustomNetworkConfigMissing,
+          {
+            method: UnsLocation.Layer1,
+            config: 'proxyReaderAddress',
+          },
+        ),
+      );
     });
-    const resolverAddress = await unsInternalL2.resolver(
-      WalletDomainLayerTwoWithAllRecords,
-    );
-    expectSpyToBeCalled(spies);
-    expect(resolverAddress).toBe('0x2a93C52E7B6E7054870758e15A1446E769EdfB93');
+    it('should throw error on invalid proxyReaderAddress for custom network', async () => {
+      expect(
+        () =>
+          new UnsInternal(UnsLocation.Layer1, {
+            url: protocolLink(ProviderProtocol.http, 'UNSL1'),
+            network: 'custom',
+            proxyReaderAddress: '0xinvalid',
+          }),
+      ).toThrow(
+        new ConfigurationError(
+          ConfigurationErrorCode.InvalidConfigurationField,
+          {
+            method: UnsLocation.Layer1,
+            field: 'proxyReaderAddress',
+          },
+        ),
+      );
+    });
+    it('should throw error on missing url or provider for custom network', async () => {
+      expect(
+        () =>
+          new UnsInternal(UnsLocation.Layer1, {
+            network: 'custom',
+            proxyReaderAddress: '0x7E9CC9e9120ccDE9038fD664fE82b1fC7d88e949',
+          }),
+      ).toThrow(
+        new ConfigurationError(
+          ConfigurationErrorCode.CustomNetworkConfigMissing,
+          {
+            method: UnsLocation.Layer1,
+            config: 'url or provider',
+          },
+        ),
+      );
+    });
   });
+  it('should return tokenURI for domain', async () => {
+    const tokenURI = `https://metadata.staging.unstoppabledomains.com/metadata/${WalletDomainLayerTwoWithAllRecords}`;
+    const namehash = eip137Namehash(WalletDomainLayerTwoWithAllRecords);
+    mockAsyncMethods(unsInternalL2.readerContract, {
+      call: [tokenURI],
+    });
+    const result = await unsInternalL2.getTokenUri(namehash);
+    expect(result).toEqual(tokenURI);
+  });
+  describe('.registryAddress()', () => {
+    it('should throw error for invalid domain', async () => {
+      const domain = 'invaliddomain.zil';
+      expect(() => unsInternalL1.registryAddress(domain)).rejects.toThrow(
+        new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
+          domain,
+        }),
+      );
+    });
+    it('should throw error for unregistered domain', async () => {
+      const domain = 'unregistered-domain.crypto';
+      mockAsyncMethods(unsInternalL2.readerContract, {
+        call: [NullAddress],
+      });
+      expect(() => unsInternalL2.registryAddress(domain)).rejects.toThrow(
+        new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+          domain,
+        }),
+      );
+    });
+    it('should return registry address', async () => {
+      const registryAddress = '0x95AE1515367aa64C462c71e87157771165B1287A';
+      mockAsyncMethods(unsInternalL2.readerContract, {
+        call: [registryAddress],
+      });
+      expect(
+        await unsInternalL2.registryAddress(WalletDomainLayerTwoWithAllRecords),
+      ).toEqual(registryAddress);
+    });
+  });
+  describe('.get()', () => {
+    it('should get records for L1', async () => {
+      const resolverAddress = '0x2a93C52E7B6E7054870758e15A1446E769EdfB93';
+      const recordName = 'crypto.ETH.address';
+      const records = {
+        [recordName]: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
+      };
+      const owner = '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2';
+      const tokenId = eip137Namehash(CryptoDomainWithAllRecords);
+      mockAsyncMethods(unsInternalL1.readerContract, {
+        call: [resolverAddress, owner, [records[recordName]]],
+      });
+      const data = await unsInternalL1.get(tokenId, [recordName]);
+      expect(data.resolver).toEqual(resolverAddress);
+      expect(data.location).toEqual(UnsLocation.Layer1);
+      expect(data.records).toEqual(records);
+      expect(data.owner).toEqual(owner);
+    });
+    it('should get records for L2', async () => {
+      const resolverAddress = '0x2a93C52E7B6E7054870758e15A1446E769EdfB93';
+      const recordName = 'crypto.ETH.address';
+      const records = {
+        [recordName]: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
+      };
+      const owner = '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2';
+      const tokenId = eip137Namehash(WalletDomainLayerTwoWithAllRecords);
+      mockAsyncMethods(unsInternalL2.readerContract, {
+        call: [resolverAddress, owner, [records[recordName]]],
+      });
+      const data = await unsInternalL2.get(tokenId, [recordName]);
+      expect(data.resolver).toEqual(resolverAddress);
+      expect(data.location).toEqual(UnsLocation.Layer2);
+      expect(data.records).toEqual(records);
+      expect(data.owner).toEqual(owner);
+    });
+  });
+  describe('.resolver()', () => {
+    it('should throw on unspecified resolver on L2', async () => {
+      const resolverAddress = NullAddress;
+      const owner = '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2';
+      mockAsyncMethods(unsInternalL2.readerContract, {
+        call: [resolverAddress, owner, []],
+      });
+      expect(() =>
+        unsInternalL2.resolver(WalletDomainLayerTwoWithAllRecords),
+      ).rejects.toThrow(
+        new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
+          location: UnsLocation.Layer2,
+          domain: WalletDomainLayerTwoWithAllRecords,
+        }),
+      );
+    });
+    it('should throw on unregistered domain on L2', async () => {
+      const resolverAddress = NullAddress;
+      const owner = NullAddress;
+      mockAsyncMethods(unsInternalL2.readerContract, {
+        call: [resolverAddress, owner, []],
+      });
+      expect(() =>
+        unsInternalL2.resolver(WalletDomainLayerTwoWithAllRecords),
+      ).rejects.toThrow(
+        new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+          domain: WalletDomainLayerTwoWithAllRecords,
+        }),
+      );
+    });
+    it('should throw on unspecified resolver on L1', async () => {
+      const resolverAddress = NullAddress;
+      const owner = '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2';
+      mockAsyncMethods(unsInternalL1.readerContract, {
+        call: [resolverAddress, owner, []],
+      });
+      expect(() =>
+        unsInternalL1.resolver(CryptoDomainWithAllRecords),
+      ).rejects.toThrow(
+        new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
+          location: UnsLocation.Layer1,
+          domain: CryptoDomainWithAllRecords,
+        }),
+      );
+    });
+    it('should throw on unregistered domain on L1', async () => {
+      const resolverAddress = NullAddress;
+      const owner = NullAddress;
+      mockAsyncMethods(unsInternalL1.readerContract, {
+        call: [resolverAddress, owner, []],
+      });
+      expect(() =>
+        unsInternalL1.resolver(CryptoDomainWithAllRecords),
+      ).rejects.toThrow(
+        new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+          domain: CryptoDomainWithAllRecords,
+        }),
+      );
+    });
+    it('should return valid resolver on L1', async () => {
+      const spies = mockAsyncMethods(unsInternalL1.readerContract, {
+        call: ['0x95AE1515367aa64C462c71e87157771165B1287A', NullAddress, []],
+      });
+      const resolverAddress = await unsInternalL1.resolver(
+        CryptoDomainWithAllRecords,
+      );
+      expectSpyToBeCalled(spies);
+      expect(resolverAddress).toBe(
+        '0x95AE1515367aa64C462c71e87157771165B1287A',
+      );
+    });
+    it('should return valid resolver on L2', async () => {
+      const spies = mockAsyncMethods(unsInternalL2.readerContract, {
+        call: ['0x2a93C52E7B6E7054870758e15A1446E769EdfB93', NullAddress, []],
+      });
+      const resolverAddress = await unsInternalL2.resolver(
+        WalletDomainLayerTwoWithAllRecords,
+      );
+      expectSpyToBeCalled(spies);
+      expect(resolverAddress).toBe(
+        '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
+      );
+    });
+  });
+
   it('should get domain from tokenId', async () => {
     const spies = mockAsyncMethods(unsInternalL1, {
       registryAddress: '0x95AE1515367aa64C462c71e87157771165B1287A',
     });
     mockAPICalls('unhash', protocolLink());
-    const hash = unsInternalL1.namehash(CryptoDomainWithAllRecords);
+    const hash = eip137Namehash(CryptoDomainWithAllRecords);
     const domainName = await unsInternalL1.getDomainFromTokenId(hash);
     expectSpyToBeCalled(spies);
     expect(domainName).toBe(CryptoDomainWithAllRecords);
