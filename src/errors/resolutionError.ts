@@ -29,6 +29,7 @@ export enum ResolutionErrorCode {
   RecordNotFound = 'RecordNotFound',
   ServiceProviderError = 'ServiceProviderError',
   InvalidTwitterVerification = 'InvalidTwitterVerification',
+  InconsistentDomainArray = 'InconsistentDomainArray',
 }
 
 /**

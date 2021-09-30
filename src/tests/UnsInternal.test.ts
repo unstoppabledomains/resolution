@@ -11,7 +11,7 @@ import {
   WalletDomainOnBothLayers,
   skipItInLive,
 } from './helpers';
-import {UnsLocation} from '../types/publicTypes';
+import {BlockchainType, UnsLocation} from '../types/publicTypes';
 import {
   ConfigurationError,
   ConfigurationErrorCode,
@@ -25,14 +25,22 @@ let unsInternalL2: UnsInternal;
 
 beforeEach(async () => {
   jest.restoreAllMocks();
-  unsInternalL1 = new UnsInternal(UnsLocation.Layer1, {
-    url: protocolLink(ProviderProtocol.http, 'UNSL1'),
-    network: 'rinkeby',
-  });
-  unsInternalL2 = new UnsInternal(UnsLocation.Layer2, {
-    url: protocolLink(ProviderProtocol.http, 'UNSL2'),
-    network: 'polygon-mumbai',
-  });
+  unsInternalL1 = new UnsInternal(
+    UnsLocation.Layer1,
+    {
+      url: protocolLink(ProviderProtocol.http, 'UNSL1'),
+      network: 'rinkeby',
+    },
+    BlockchainType.ETH,
+  );
+  unsInternalL2 = new UnsInternal(
+    UnsLocation.Layer2,
+    {
+      url: protocolLink(ProviderProtocol.http, 'UNSL2'),
+      network: 'polygon-mumbai',
+    },
+    BlockchainType.MATIC,
+  );
 });
 
 describe('UnsInternal', () => {
@@ -40,9 +48,13 @@ describe('UnsInternal', () => {
     it('should throw error on invalid network', async () => {
       expect(
         () =>
-          new UnsInternal(UnsLocation.Layer1, {
-            url: protocolLink(ProviderProtocol.http, 'UNSL1'),
-          } as any),
+          new UnsInternal(
+            UnsLocation.Layer1,
+            {
+              url: protocolLink(ProviderProtocol.http, 'UNSL1'),
+            } as any,
+            BlockchainType.ETH,
+          ),
       ).toThrow(
         new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {
           method: UnsLocation.Layer1,
@@ -52,10 +64,14 @@ describe('UnsInternal', () => {
     it('should throw error on no proxyReaderAddress for custom network', async () => {
       expect(
         () =>
-          new UnsInternal(UnsLocation.Layer1, {
-            url: protocolLink(ProviderProtocol.http, 'UNSL1'),
-            network: 'custom',
-          }),
+          new UnsInternal(
+            UnsLocation.Layer1,
+            {
+              url: protocolLink(ProviderProtocol.http, 'UNSL1'),
+              network: 'custom',
+            },
+            BlockchainType.ETH,
+          ),
       ).toThrow(
         new ConfigurationError(
           ConfigurationErrorCode.CustomNetworkConfigMissing,
@@ -69,11 +85,15 @@ describe('UnsInternal', () => {
     it('should throw error on invalid proxyReaderAddress for custom network', async () => {
       expect(
         () =>
-          new UnsInternal(UnsLocation.Layer1, {
-            url: protocolLink(ProviderProtocol.http, 'UNSL1'),
-            network: 'custom',
-            proxyReaderAddress: '0xinvalid',
-          }),
+          new UnsInternal(
+            UnsLocation.Layer1,
+            {
+              url: protocolLink(ProviderProtocol.http, 'UNSL1'),
+              network: 'custom',
+              proxyReaderAddress: '0xinvalid',
+            },
+            BlockchainType.ETH,
+          ),
       ).toThrow(
         new ConfigurationError(
           ConfigurationErrorCode.InvalidConfigurationField,
@@ -87,10 +107,14 @@ describe('UnsInternal', () => {
     it('should throw error on missing url or provider for custom network', async () => {
       expect(
         () =>
-          new UnsInternal(UnsLocation.Layer1, {
-            network: 'custom',
-            proxyReaderAddress: '0x7E9CC9e9120ccDE9038fD664fE82b1fC7d88e949',
-          }),
+          new UnsInternal(
+            UnsLocation.Layer1,
+            {
+              network: 'custom',
+              proxyReaderAddress: '0x7E9CC9e9120ccDE9038fD664fE82b1fC7d88e949',
+            },
+            BlockchainType.ETH,
+          ),
       ).toThrow(
         new ConfigurationError(
           ConfigurationErrorCode.CustomNetworkConfigMissing,
@@ -389,4 +413,57 @@ describe('UnsInternal', () => {
     );
     expect(exists).toBe(true);
   });
+
+  it('should return location for L1 domains', async () => {
+    mockAPICalls(
+      'uns_l1_location_test',
+      protocolLink(ProviderProtocol.http, 'UNSL1'),
+    );
+    const location = await unsInternalL1.locations([
+      'udtestdev-check.wallet',
+      'brad.crypto',
+      'testing-domain-doesnt-exist-12345abc.blockchain',
+    ]);
+    expect(location['udtestdev-check.wallet']).toEqual({
+      registryAddress: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
+      resolverAddress: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
+      networkId: 4,
+      blockchain: BlockchainType.ETH,
+      ownerAddress: '0x0e43F36e4B986dfbE1a75cacfA60cA2bD44Ae962',
+      blockchainProviderUrl: protocolLink(ProviderProtocol.http, 'UNSL1'),
+    });
+    expect(location['brad.crypto']).toEqual({
+      registryAddress: '0xAad76bea7CFEc82927239415BB18D2e93518ecBB',
+      resolverAddress: '0x95AE1515367aa64C462c71e87157771165B1287A',
+      networkId: 4,
+      blockchain: BlockchainType.ETH,
+      ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
+      blockchainProviderUrl: protocolLink(ProviderProtocol.http, 'UNSL1'),
+    });
+    expect(
+      location['testing-domain-doesnt-exist-12345abc.blockchain'],
+    ).toBeNull();
+  });
+});
+
+it('should return location for L2 domains', async () => {
+  mockAPICalls(
+    'uns_l2_location_test',
+    protocolLink(ProviderProtocol.http, 'UNSL2'),
+  );
+  const location = await unsInternalL2.locations([
+    'udtestdev-test-l2-domain-784391.wallet',
+    'testing-domain-doesnt-exist-12345abc.blockchain',
+  ]);
+  expect(location['udtestdev-test-l2-domain-784391.wallet']).toEqual({
+    registryAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
+    resolverAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
+    networkId: 80001,
+    blockchain: BlockchainType.MATIC,
+    ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
+    blockchainProviderUrl: protocolLink(ProviderProtocol.http, 'UNSL2'),
+  });
+  expect(
+    location['testing-domain-doesnt-exist-12345abc.blockchain'],
+  ).toBeNull();
 });

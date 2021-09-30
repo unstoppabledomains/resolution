@@ -2,13 +2,13 @@ export default [
   {
     inputs: [
       {
-        internalType: 'contract IRegistry',
+        internalType: 'contract IUNSRegistry',
         name: 'unsRegistry',
         type: 'address',
       },
       {
-        internalType: 'contract ICryptoRegistry',
-        name: 'unsRegistry',
+        internalType: 'contract ICNSRegistry',
+        name: 'cnsRegistry',
         type: 'address',
       },
     ],
@@ -420,6 +420,25 @@ export default [
       },
     ],
     stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'bytes[]',
+        name: 'data',
+        type: 'bytes[]',
+      },
+    ],
+    name: 'multicall',
+    outputs: [
+      {
+        internalType: 'bytes[]',
+        name: 'results',
+        type: 'bytes[]',
+      },
+    ],
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {

@@ -251,17 +251,18 @@ export interface TokenUriMetadata extends Erc721Metadata {
 }
 
 export enum BlockchainType {
-  ANYCHAIN = 'ANYCHAIN',
   ETH = 'ETH',
   MATIC = 'MATIC',
   ZIL = 'ZIL',
 }
 
 export type DomainLocation = {
-  registry: string;
-  resolver: string;
+  registryAddress: string;
+  resolverAddress: string;
   networkId: number;
   blockchain: BlockchainType;
-  owner: string;
-  providerUrl?: string;
+  ownerAddress: string;
+  blockchainProviderUrl: string;
 };
+
+export type Locations = Record<string, DomainLocation | null>;

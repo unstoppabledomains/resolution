@@ -12,6 +12,8 @@ import {
   NamingServiceName,
   Provider,
   UnsLocation,
+  Locations,
+  BlockchainType,
 } from './types/publicTypes';
 import {isValidTwitterSignature} from './utils/TwitterSignatureValidator';
 import UnsConfig from './config/uns-config.json';
@@ -60,8 +62,16 @@ export default class Uns extends NamingService {
         },
       };
     }
-    this.unsl1 = new UnsInternal(UnsLocation.Layer1, source.locations.Layer1);
-    this.unsl2 = new UnsInternal(UnsLocation.Layer2, source.locations.Layer2);
+    this.unsl1 = new UnsInternal(
+      UnsLocation.Layer1,
+      source.locations.Layer1,
+      BlockchainType.ETH,
+    );
+    this.unsl2 = new UnsInternal(
+      UnsLocation.Layer2,
+      source.locations.Layer2,
+      BlockchainType.MATIC,
+    );
   }
 
   static async autoNetwork(config: {
@@ -308,6 +318,21 @@ export default class Uns extends NamingService {
       return resultOrErrorL2;
     }
     return validResultOrThrow(resultOrErrorL1);
+  }
+
+  async locations(domains: string[]): Promise<Locations> {
+    const [resultL1, resultL2] = await Promise.all([
+      this.unsl1.locations(domains),
+      this.unsl2.locations(domains),
+    ]);
+
+    const nonEmptyRecordsFromL2 = Object.keys(resultL2)
+      .filter((k) => resultL2[k] != null)
+      .reduce((a, k) => ({...a, [k]: resultL2[k]}), {});
+    return {
+      ...resultL1,
+      ...nonEmptyRecordsFromL2,
+    };
   }
 
   async getDomainFromTokenId(tokenId: string): Promise<string> {

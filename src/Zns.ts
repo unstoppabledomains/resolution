@@ -11,6 +11,8 @@ import {
   Provider,
   ZnsSource,
   NamingServiceName,
+  BlockchainType,
+  Locations,
 } from './types/publicTypes';
 import FetchProvider from './FetchProvider';
 import {znsChildhash, znsNamehash} from './utils/namehash';
@@ -18,6 +20,7 @@ import {NamingService} from './NamingService';
 import ConfigurationError, {
   ConfigurationErrorCode,
 } from './errors/configurationError';
+import {GetLocations} from './utils/LocationUtils';
 
 /**
  * @internal
@@ -42,9 +45,10 @@ export default class Zns extends NamingService {
 
   readonly network: number;
   readonly name: NamingServiceName = NamingServiceName.ZNS;
-  readonly url: string | undefined;
+  readonly url: string;
   readonly registryAddr: string;
   readonly provider: Provider;
+  readonly blockchain: BlockchainType = BlockchainType.ZIL;
 
   constructor(
     source: ZnsSource = {
@@ -182,6 +186,10 @@ export default class Zns extends NamingService {
 
   async registryAddress(domain: string): Promise<string> {
     return this.registryAddr;
+  }
+
+  locations(domains: string[]): Promise<Locations> {
+    return GetLocations(domains, this);
   }
 
   private async getRecordsAddresses(

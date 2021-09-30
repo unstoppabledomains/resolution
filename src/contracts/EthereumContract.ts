@@ -1,4 +1,4 @@
-import {Interface, JsonFragment} from '@ethersproject/abi';
+import {Interface, JsonFragment, Result} from '@ethersproject/abi';
 import {RequestArguments, EventData} from '../types';
 import {Provider} from '../types/publicTypes';
 
@@ -26,6 +26,38 @@ export default class EthereumContract {
     }
 
     return this.coder.decodeFunctionResult(method, response);
+  }
+
+  async multicall(
+    callArgs: {
+      method: string;
+      args: (string | string[])[];
+    }[],
+  ): Promise<ReadonlyArray<any>> {
+    const methods: string[] = [];
+    for (const call of callArgs) {
+      methods.push(this.coder.encodeFunctionData(call.method, call.args));
+    }
+    const inputParam = this.coder.encodeFunctionData('multicall', [methods]);
+    const response = (await this.callEth(inputParam)) as string;
+    if (!response || response === '0x') {
+      return [];
+    }
+
+    const multicallResult = this.coder.decodeFunctionResult(
+      'multicall',
+      response,
+    );
+    const results: Result[] = [];
+    for (let i = 0; i < multicallResult.results.length; i++) {
+      results.push(
+        this.coder.decodeFunctionResult(
+          callArgs[i].method,
+          multicallResult.results[i],
+        ),
+      );
+    }
+    return results;
   }
 
   async fetchLogs(
