@@ -124,7 +124,7 @@ describe('Resolution', () => {
       ).toBe(5);
     });
 
-    it('should not work with invalid proxyReader configuration', async () => {
+    it('should not work with invalid proxyReader configuration #1', async () => {
       const mainnetUrl = protocolLink();
       const customNetwork = 'goerli';
       const polygonUrl = protocolLink(ProviderProtocol.http, 'UNSL2');
@@ -141,6 +141,52 @@ describe('Resolution', () => {
               network: 'polygon-mumbai',
               url: polygonUrl,
               proxyReaderAddress: '0x012312931293',
+            },
+          },
+        });
+      }, ConfigurationErrorCode.InvalidConfigurationField);
+    });
+    it('should not work with invalid proxyReader configuration #2', async () => {
+      const mainnetUrl = protocolLink();
+      const customNetwork = 'goerli';
+      const polygonUrl = protocolLink(ProviderProtocol.http, 'UNSL2');
+      const goerliUrl = mainnetUrl.replace('mainnet', customNetwork);
+      expectConfigurationErrorCode(() => {
+        new Uns({
+          locations: {
+            Layer1: {
+              network: customNetwork,
+              url: goerliUrl,
+              proxyReaderAddress: '0xe7474D07fD2FA286e7e0aa23cd107F8379025037',
+            },
+            Layer2: {
+              network: 'polygon-mumbai',
+              url: polygonUrl,
+              proxyReaderAddress: '0x012312931293',
+            },
+          },
+        });
+      }, ConfigurationErrorCode.InvalidConfigurationField);
+    });
+
+    it('should not work with invalid proxyReader configuration #3', async () => {
+      const mainnetUrl = protocolLink();
+      const provider = new FetchProvider(NamingServiceName.UNS, mainnetUrl);
+      const polygonUrl = protocolLink(ProviderProtocol.http, 'UNSL2');
+      const polygonProvider = new FetchProvider(UnsLocation.Layer2, polygonUrl);
+      const customNetwork = 'goerli';
+      expectConfigurationErrorCode(() => {
+        new Uns({
+          locations: {
+            Layer1: {
+              network: customNetwork,
+              provider,
+              proxyReaderAddress: '0xe7474D07fD2FA286e7e0aa23cd107F8379025037',
+            },
+            Layer2: {
+              network: 'polygon-mumbai',
+              provider: polygonProvider,
+              proxyReaderAddress: '0x332a8191905fa8e6eea7350b5799f225b8ed',
             },
           },
         });
@@ -167,30 +213,6 @@ describe('Resolution', () => {
         },
       });
       expect(uns).toBeDefined();
-    });
-
-    it('should not work with invalid proxyReader configuration 2', async () => {
-      const mainnetUrl = protocolLink();
-      const provider = new FetchProvider(NamingServiceName.UNS, mainnetUrl);
-      const polygonUrl = protocolLink(ProviderProtocol.http, 'UNSL2');
-      const polygonProvider = new FetchProvider(UnsLocation.Layer2, polygonUrl);
-      const customNetwork = 'goerli';
-      expectConfigurationErrorCode(() => {
-        new Uns({
-          locations: {
-            Layer1: {
-              network: customNetwork,
-              provider,
-              proxyReaderAddress: '0x012312931293',
-            },
-            Layer2: {
-              network: 'polygon-mumbai',
-              provider: polygonProvider,
-              proxyReaderAddress: '0x332a8191905fa8e6eea7350b5799f225b8ed30a9',
-            },
-          },
-        });
-      }, ConfigurationErrorCode.InvalidConfigurationField);
     });
 
     it('should work with custom network configuration with provider', async () => {
