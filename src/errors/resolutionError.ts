@@ -7,6 +7,7 @@ type ResolutionErrorHandler = (error: ResolutionErrorOptions) => string;
 /** Explains Resolution Error options */
 type ResolutionErrorOptions = {
   providerMessage?: string;
+  errorMessage?: string;
   method?: ResolutionMethod;
   methodName?: string;
   domain?: string;
@@ -26,6 +27,7 @@ export enum ResolutionErrorCode {
   UnsupportedCurrency = 'UnsupportedCurrency',
   IncorrectResolverInterface = 'IncorrectResolverInterface',
   RecordNotFound = 'RecordNotFound',
+  MetadataEndpointError = 'MetadataEndpointError',
   ServiceProviderError = 'ServiceProviderError',
   InvalidTwitterVerification = 'InvalidTwitterVerification',
 }
@@ -72,6 +74,9 @@ const HandlersByCode = {
     `${params.location ? `${params.location}: ` : ''}No ${
       params.recordName
     } record found for ${params.domain}`,
+  [ResolutionErrorCode.MetadataEndpointError]: (params: {
+    errorMessage?: string;
+  }) => `Failed to query metadata endpoint`,
   [ResolutionErrorCode.ServiceProviderError]: (params: {
     providerMessage?: string;
   }) => `< ${params.providerMessage} >`,

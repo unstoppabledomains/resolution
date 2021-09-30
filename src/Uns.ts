@@ -22,6 +22,7 @@ import ConfigurationError, {
   ConfigurationErrorCode,
 } from './errors/configurationError';
 import UnsInternal from './UnsInternal';
+import Networking from './utils/Networking';
 
 /**
  * @internal
@@ -29,6 +30,8 @@ import UnsInternal from './UnsInternal';
 export default class Uns extends NamingService {
   static readonly ProxyReaderMap: ProxyReaderMap = getProxyReaderMap();
 
+  readonly MetadataEndpoint =
+    'https://resolve.unstoppabledomains.com/metadata/';
   public unsl1: UnsInternal;
   public unsl2: UnsInternal;
   readonly name: NamingServiceName = NamingServiceName.UNS;
@@ -309,19 +312,20 @@ export default class Uns extends NamingService {
   }
 
   async getDomainFromTokenId(tokenId: string): Promise<string> {
-    const [resultOrErrorL1, resultOrErrorL2] = await Promise.all([
-      this.unsl1.getDomainFromTokenId(tokenId).catch((err) => err),
-      this.unsl2.getDomainFromTokenId(tokenId).catch((err) => err),
-    ]);
+    const resp = await Networking.fetch(
+      this.MetadataEndpoint + tokenId,
+      {},
+    ).then((resp) => resp.json());
 
-    if (resultOrErrorL2 instanceof Error) {
-      validResolutionErrorOrThrow(
-        resultOrErrorL2,
-        ResolutionErrorCode.UnregisteredDomain,
-      );
-      return validResultOrThrow(resultOrErrorL1);
+    if (!resp.ok) {
+      throw new ResolutionError(ResolutionErrorCode.MetadataEndpointError);
     }
-    return resultOrErrorL2;
+    if (!resp.name) {
+      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+        domain: `with tokenId ${tokenId}`,
+      });
+    }
+    return resp.name;
   }
 
   private async getVerifiedData(
