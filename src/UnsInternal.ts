@@ -180,31 +180,6 @@ export default class UnsInternal {
     return data;
   }
 
-  private getStartingBlockFromRegistry(registryAddress: string): string {
-    const contractDetails = Object.values(UnsConfig?.networks).reduce(
-      (acc, network) => {
-        const contracts = network.contracts;
-
-        return [
-          ...acc,
-          ...Object.values(contracts).map((c) => ({
-            address: c.address,
-            deploymentBlock: c.deploymentBlock,
-          })),
-        ];
-      },
-      [],
-    );
-
-    const contractDetail = contractDetails.find(
-      (detail) => detail.address === registryAddress,
-    );
-    if (!contractDetail || contractDetail?.deploymentBlock === '0x0') {
-      return 'earliest';
-    }
-    return contractDetail.deploymentBlock;
-  }
-
   private checkNetworkConfig(
     location: UnsLocation,
     source: UnsLayerSource,

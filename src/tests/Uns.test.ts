@@ -18,14 +18,13 @@ import {
   mockAsyncMethod,
 } from './helpers';
 import FetchProvider from '../FetchProvider';
-import {NamingServiceName} from '../types/publicTypes';
+import {NamingServiceName, UnsLocation} from '../types/publicTypes';
 import Uns from '../Uns';
 import Networking from '../utils/Networking';
 import {ConfigurationErrorCode} from '../errors/configurationError';
 import {TokenUriMetadata} from '../types/publicTypes';
 import liveData from './testData/liveData.json';
 import UnsConfig from '../config/uns-config.json';
-import nock from 'nock';
 import UnsInternal from '../UnsInternal';
 
 let resolution: Resolution;
@@ -148,6 +147,70 @@ describe('UNS', () => {
     ].twitter(CryptoDomainWithTwitterVerification);
     expectSpyToBeCalled(spies);
     expect(twitterHandle).toBe('Marlene12Bob');
+  });
+
+  it('should throw error if record not found for twitter handle', async () => {
+    mockAsyncMethods(uns, {
+      get: {
+        resolver: '0xb66dce2da6afaaa98f2013446dbcb0f4b0ab2842',
+        owner: '0x499dd6d875787869670900a2130223d85d4f6aa7',
+        records: {},
+        location: UnsLocation.Layer2,
+      },
+    });
+    expect(() =>
+      resolution.serviceMap[NamingServiceName.UNS].twitter(
+        WalletDomainLayerTwoWithAllRecords,
+      ),
+    ).rejects.toThrow(
+      new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+        domain: WalletDomainLayerTwoWithAllRecords,
+        location: UnsLocation.Layer2,
+        recordName: 'validation.social.twitter.username',
+      }),
+    );
+  });
+  it('should throw error if twitter validation signature is null', async () => {
+    mockAsyncMethods(uns, {
+      get: {
+        resolver: '0xb66dce2da6afaaa98f2013446dbcb0f4b0ab2842',
+        owner: '0x499dd6d875787869670900a2130223d85d4f6aa7',
+        records: {'validation.social.twitter.username': NullAddress},
+        location: UnsLocation.Layer2,
+      },
+    });
+    expect(() =>
+      resolution.serviceMap[NamingServiceName.UNS].twitter(
+        WalletDomainLayerTwoWithAllRecords,
+      ),
+    ).rejects.toThrow(
+      new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+        domain: WalletDomainLayerTwoWithAllRecords,
+        location: UnsLocation.Layer2,
+        recordName: 'validation.social.twitter.username',
+      }),
+    );
+  });
+  it('should throw error if twitter handle is undefined', async () => {
+    mockAsyncMethods(uns, {
+      get: {
+        resolver: '0xb66dce2da6afaaa98f2013446dbcb0f4b0ab2842',
+        owner: '0x499dd6d875787869670900a2130223d85d4f6aa7',
+        records: {'validation.social.twitter.username': 'random-signuture'},
+        location: UnsLocation.Layer2,
+      },
+    });
+    expect(() =>
+      resolution.serviceMap[NamingServiceName.UNS].twitter(
+        WalletDomainLayerTwoWithAllRecords,
+      ),
+    ).rejects.toThrow(
+      new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+        domain: WalletDomainLayerTwoWithAllRecords,
+        location: UnsLocation.Layer2,
+        recordName: 'social.twitter.username',
+      }),
+    );
   });
 
   it('should return NoRecord Resolution error', async () => {

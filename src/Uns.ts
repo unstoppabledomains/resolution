@@ -206,12 +206,13 @@ export default class Uns extends NamingService {
       'social.twitter.username',
     ];
     const data = await this.getVerifiedData(domain, keys);
-    const {records} = data;
+    const {records, location} = data;
     const validationSignature = records['validation.social.twitter.username'];
     const twitterHandle = records['social.twitter.username'];
     if (isNullAddress(validationSignature)) {
       throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
         domain,
+        location,
         recordName: 'validation.social.twitter.username',
       });
     }
@@ -219,6 +220,7 @@ export default class Uns extends NamingService {
     if (!twitterHandle) {
       throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
         domain,
+        location,
         recordName: 'social.twitter.username',
       });
     }
