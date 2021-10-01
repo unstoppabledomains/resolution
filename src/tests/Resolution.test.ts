@@ -1360,9 +1360,59 @@ describe('Resolution', () => {
         UnsConfig.networks[4].contracts.UNSRegistry.address,
       );
     });
+    it('should return uns l2 mainnet registry address if domain exists on both', async () => {
+      const spies = mockAsyncMethods(uns.unsl1, {
+        registryAddress: UnsConfig.networks[4].contracts.UNSRegistry.address,
+      });
+      const spies2 = mockAsyncMethods(uns.unsl2, {
+        registryAddress: UnsConfig.networks[1337].contracts.UNSRegistry.address,
+      });
+      const registryAddress = await resolution.registryAddress(
+        'udtestdev-check.wallet',
+      );
+      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
+      expect(registryAddress).toBe(
+        UnsConfig.networks[1337].contracts.UNSRegistry.address,
+      );
+    });
   });
 
   describe('.records', () => {
+    it('returns l2 records if domain exists on both', async () => {
+      const eyes = mockAsyncMethods(uns.unsl1, {
+        get: {
+          owner: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+          resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+          records: {
+            'crypto.ADA.address': 'blahblah-dont-care-about-these-records',
+            'crypto.ETH.address': 'blahblah-dont-care-about-these-records',
+          },
+        },
+      });
+      const eyes2 = mockAsyncMethods(uns.unsl2, {
+        get: {
+          owner: '0x6EC0DEeD30605Bcd19342f3c30201DB263291589',
+          resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+          records: {
+            'crypto.ADA.address':
+              'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
+            'crypto.ETH.address': '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+          },
+        },
+      });
+      expect(
+        await resolution.records(CryptoDomainWithAllRecords, [
+          'crypto.ADA.address',
+          'crypto.ETH.address',
+        ]),
+      ).toEqual({
+        'crypto.ADA.address':
+          'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
+        'crypto.ETH.address': '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+      });
+      expectSpyToBeCalled([...eyes, ...eyes2]);
+    });
     it('works', async () => {
       const eyes = mockAsyncMethods(uns, {
         get: {
@@ -1440,6 +1490,58 @@ describe('Resolution', () => {
       expectSpyToBeCalled(spies);
       expect(isRegistered).toBe(false);
     });
+    skipItInLive(
+      'should return true if registered on l2 but not l1',
+      async () => {
+        const spies = mockAsyncMethods(uns.unsl1, {
+          get: {
+            owner: '',
+            resolver: '',
+            records: {},
+            location: UnsLocation.Layer1,
+          },
+        });
+        const spies2 = mockAsyncMethods(uns.unsl2, {
+          get: {
+            owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
+            resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
+            records: {},
+            location: UnsLocation.Layer2,
+          },
+        });
+        const isRegistered = await resolution.isRegistered(
+          'qwdqwdjkqhdkqdqwjd.crypto',
+        );
+        expectSpyToBeCalled(spies);
+        expectSpyToBeCalled(spies2);
+        expect(isRegistered).toBe(true);
+      },
+    );
+    skipItInLive(
+      'should return true if registered on l1 but not l2',
+      async () => {
+        const spies = mockAsyncMethods(uns.unsl1, {
+          get: {
+            owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
+            resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
+            records: {},
+          },
+        });
+        const spies2 = mockAsyncMethods(uns.unsl2, {
+          get: {
+            owner: '',
+            resolver: '',
+            records: {},
+          },
+        });
+        const isRegistered = await resolution.isRegistered(
+          'qwdqwdjkqhdkqdqwjd.crypto',
+        );
+        expectSpyToBeCalled(spies);
+        expectSpyToBeCalled(spies2);
+        expect(isRegistered).toBe(true);
+      },
+    );
   });
 
   describe('.isAvailable', () => {
@@ -1473,6 +1575,31 @@ describe('Resolution', () => {
       expectSpyToBeCalled(spies);
       expect(isAvailable).toBe(true);
     });
+    skipItInLive(
+      'should return false is available on l1 but not l2',
+      async () => {
+        const spies = mockAsyncMethods(uns.unsl1, {
+          get: {
+            owner: '',
+            resolver: '',
+            records: {},
+          },
+        });
+        const spies2 = mockAsyncMethods(uns.unsl2, {
+          get: {
+            owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
+            resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
+            records: {},
+          },
+        });
+        const isAvailable = await resolution.isAvailable(
+          'qwdqwdjkqhdkqdqwjd.crypto',
+        );
+        expectSpyToBeCalled(spies);
+        expectSpyToBeCalled(spies2);
+        expect(isAvailable).toBe(false);
+      },
+    );
 
     it('should return false', async () => {
       const spies = mockAsyncMethods(zns, {

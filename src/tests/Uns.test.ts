@@ -313,6 +313,23 @@ describe('UNS', () => {
     );
     expectSpyToBeCalled(spies);
   });
+  it('should throw ResolutionError.UnspecifiedResolver if domain is on l2', async () => {
+    const spies = mockAsyncMethods(uns.unsl1, {
+      get: {
+        owner: 'someowneraddress',
+        resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
+      },
+    });
+    const spies2 = mockAsyncMethods(uns.unsl2, {
+      get: {owner: 'someowneraddress', resolver: NullAddress},
+    });
+    await expectResolutionErrorCode(
+      resolution.resolver(CryptoDomainWithoutResolver),
+      ResolutionErrorCode.UnspecifiedResolver,
+    );
+    expectSpyToBeCalled(spies);
+    expectSpyToBeCalled(spies2);
+  });
 
   describe('.Crypto', () => {
     it(`checks the BCH address on ${CryptoDomainWithAllRecords}`, async () => {
@@ -361,6 +378,29 @@ describe('UNS', () => {
         WalletDomainLayerTwoWithAllRecords,
         'LINK',
       );
+      expectSpyToBeCalled(eyesL2);
+      expect(addr).toBe('0x6A1fd9a073256f14659fe59613bbf169Ed27CdcC');
+    });
+    it(`checks the LINK address on ${WalletDomainLayerTwoWithAllRecords} L2 even if L1 exists`, async () => {
+      const eyesL1 = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [
+          'ignore-field',
+          'ignore-this',
+          ['0xd1D5eb96f36A7605b0cED801fF497E81F6245106'],
+        ],
+      });
+      const eyesL2 = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [
+          '0x95AE1515367aa64C462c71e87157771165B1287A',
+          '0xd1D5eb96f36A7605b0cED801fF497E81F6245106',
+          ['0x6A1fd9a073256f14659fe59613bbf169Ed27CdcC'],
+        ],
+      });
+      const addr = await resolution.addr(
+        WalletDomainLayerTwoWithAllRecords,
+        'LINK',
+      );
+      expectSpyToBeCalled(eyesL1);
       expectSpyToBeCalled(eyesL2);
       expect(addr).toBe('0x6A1fd9a073256f14659fe59613bbf169Ed27CdcC');
     });
