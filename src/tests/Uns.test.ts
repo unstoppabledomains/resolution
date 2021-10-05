@@ -1290,6 +1290,20 @@ describe('UNS', () => {
             ok: true,
           }),
         });
+        mockAsyncMethod(uns.unsl1, 'getDomainFromTokenId', (params) =>
+          Promise.reject(
+            new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+              domain: `with tokenId ${tokenId}`,
+            }),
+          ),
+        );
+        mockAsyncMethod(uns.unsl2, 'getDomainFromTokenId', (params) =>
+          Promise.reject(
+            new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+              domain: `with tokenId ${tokenId}`,
+            }),
+          ),
+        );
         expect(() =>
           resolution.unhash(tokenId, NamingServiceName.UNS),
         ).rejects.toThrow(
@@ -1374,18 +1388,6 @@ describe('UNS', () => {
               new ResolutionError(ResolutionErrorCode.UnregisteredDomain),
             ),
           );
-          await expectResolutionErrorCode(
-            () => resolution.unhash(someHash, NamingServiceName.UNS),
-            ResolutionErrorCode.UnregisteredDomain,
-          );
-          // If the getStartingBlockFromRegistry function won't return "earliest" then one of the mocks will not be fired
-          // Giving us an indicator that something has changed in the function output
-          if (!nock.isDone()) {
-            throw new Error(
-              'Not all mocks have been called, getStartingBlockFromRegistry is misbehaving?',
-            );
-          }
-
           await expectResolutionErrorCode(
             () => resolution.unhash(someHash, NamingServiceName.UNS),
             ResolutionErrorCode.UnregisteredDomain,
