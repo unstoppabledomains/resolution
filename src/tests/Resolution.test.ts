@@ -28,6 +28,7 @@ import {
   CryptoDomainWithUsdtMultiChainRecords,
   expectConfigurationErrorCode,
   CryptoDomainWithAllRecords,
+  WalletDomainLayerTwoWithAllRecords,
 } from './helpers';
 import {RpcProviderTestCases} from './providerMockData';
 import fetch, {FetchError} from 'node-fetch';
@@ -1490,58 +1491,52 @@ describe('Resolution', () => {
       expectSpyToBeCalled(spies);
       expect(isRegistered).toBe(false);
     });
-    skipItInLive(
-      'should return true if registered on l2 but not l1',
-      async () => {
-        const spies = mockAsyncMethods(uns.unsl1, {
-          get: {
-            owner: '',
-            resolver: '',
-            records: {},
-            location: UnsLocation.Layer1,
-          },
-        });
-        const spies2 = mockAsyncMethods(uns.unsl2, {
-          get: {
-            owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
-            resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
-            records: {},
-            location: UnsLocation.Layer2,
-          },
-        });
-        const isRegistered = await resolution.isRegistered(
-          'qwdqwdjkqhdkqdqwjd.crypto',
-        );
-        expectSpyToBeCalled(spies);
-        expectSpyToBeCalled(spies2);
-        expect(isRegistered).toBe(true);
-      },
-    );
-    skipItInLive(
-      'should return true if registered on l1 but not l2',
-      async () => {
-        const spies = mockAsyncMethods(uns.unsl1, {
-          get: {
-            owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
-            resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
-            records: {},
-          },
-        });
-        const spies2 = mockAsyncMethods(uns.unsl2, {
-          get: {
-            owner: '',
-            resolver: '',
-            records: {},
-          },
-        });
-        const isRegistered = await resolution.isRegistered(
-          'qwdqwdjkqhdkqdqwjd.crypto',
-        );
-        expectSpyToBeCalled(spies);
-        expectSpyToBeCalled(spies2);
-        expect(isRegistered).toBe(true);
-      },
-    );
+    it('should return true if registered on l2 but not l1', async () => {
+      const spies = mockAsyncMethods(uns.unsl1, {
+        get: {
+          owner: '',
+          resolver: '',
+          records: {},
+          location: UnsLocation.Layer1,
+        },
+      });
+      const spies2 = mockAsyncMethods(uns.unsl2, {
+        get: {
+          owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
+          resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
+          records: {},
+          location: UnsLocation.Layer2,
+        },
+      });
+      const isRegistered = await resolution.isRegistered(
+        WalletDomainLayerTwoWithAllRecords,
+      );
+      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
+      expect(isRegistered).toBe(true);
+    });
+    it('should return true if registered on l1 but not l2', async () => {
+      const spies = mockAsyncMethods(uns.unsl1, {
+        get: {
+          owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
+          resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
+          records: {},
+        },
+      });
+      const spies2 = mockAsyncMethods(uns.unsl2, {
+        get: {
+          owner: '',
+          resolver: '',
+          records: {},
+        },
+      });
+      const isRegistered = await resolution.isRegistered(
+        CryptoDomainWithAllRecords,
+      );
+      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
+      expect(isRegistered).toBe(true);
+    });
   });
 
   describe('.isAvailable', () => {
@@ -1575,31 +1570,28 @@ describe('Resolution', () => {
       expectSpyToBeCalled(spies);
       expect(isAvailable).toBe(true);
     });
-    skipItInLive(
-      'should return false is available on l1 but not l2',
-      async () => {
-        const spies = mockAsyncMethods(uns.unsl1, {
-          get: {
-            owner: '',
-            resolver: '',
-            records: {},
-          },
-        });
-        const spies2 = mockAsyncMethods(uns.unsl2, {
-          get: {
-            owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
-            resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
-            records: {},
-          },
-        });
-        const isAvailable = await resolution.isAvailable(
-          'qwdqwdjkqhdkqdqwjd.crypto',
-        );
-        expectSpyToBeCalled(spies);
-        expectSpyToBeCalled(spies2);
-        expect(isAvailable).toBe(false);
-      },
-    );
+    it('should return false is available on l1 but not l2', async () => {
+      const spies = mockAsyncMethods(uns.unsl1, {
+        get: {
+          owner: '',
+          resolver: '',
+          records: {},
+        },
+      });
+      const spies2 = mockAsyncMethods(uns.unsl2, {
+        get: {
+          owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
+          resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
+          records: {},
+        },
+      });
+      const isAvailable = await resolution.isAvailable(
+        CryptoDomainWithAllRecords,
+      );
+      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
+      expect(isAvailable).toBe(false);
+    });
 
     it('should return false', async () => {
       const spies = mockAsyncMethods(zns, {

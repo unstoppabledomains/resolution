@@ -932,7 +932,7 @@ describe('UNS', () => {
       );
     });
 
-    skipItInLive('should return uns l2 registry address', async () => {
+    it('should return uns l2 registry address', async () => {
       mockAsyncMethod(uns.unsl1.readerContract, 'call', (params) =>
         Promise.resolve(),
       );

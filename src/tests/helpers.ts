@@ -23,6 +23,10 @@ export const ZilDomainWithUsdtMultiChainRecords =
 export const CryptoDomainWithAllRecords = 'test-usdt-and-dns-records.crypto';
 export const WalletDomainLayerTwoWithAllRecords =
   'udtestdev-test-l2-domain-784391.wallet';
+export const WalletDomainLayerTwoWithNoRecords =
+  'udtestdev-test-l2-domain-empty.wallet';
+export const WalletDomainOnBothLayers =
+  'udtestdev-test-l1-and-l2-ownership.wallet';
 export const CryptoDomainWithoutGunDbRecords =
   'test-usdt-and-dns-records.crypto';
 
