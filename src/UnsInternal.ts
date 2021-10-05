@@ -15,6 +15,8 @@ import ResolutionError, {ResolutionErrorCode} from './errors/resolutionError';
 import {eip137Namehash} from './utils/namehash';
 import {default as resolverInterface} from './contracts/uns/resolver';
 import SupportedKeys from './config/resolver-keys.json';
+import registry from './contracts/uns/registry';
+import {Interface} from '@ethersproject/abi';
 
 export default class UnsInternal {
   static readonly ProxyReaderMap: ProxyReaderMap = getProxyReaderMap();
@@ -103,6 +105,30 @@ export default class UnsInternal {
     return this.getAllRecords(resolverContract, tokenId);
   }
 
+  async getDomainFromTokenId(tokenId: string): Promise<string> {
+    const registryAddress = await this.registryAddress(tokenId);
+    const registryContract = new EthereumContract(
+      registry,
+      registryAddress,
+      this.provider,
+    );
+    const startingBlock = this.getStartingBlockFromRegistry(registryAddress);
+    const newURIEvents = await registryContract.fetchLogs(
+      'NewURI',
+      tokenId,
+      startingBlock,
+    );
+
+    if (!newURIEvents || newURIEvents.length === 0) {
+      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+        domain: `with tokenId ${tokenId}`,
+      });
+    }
+    const rawData = newURIEvents[newURIEvents.length - 1].data;
+    const decoded = Interface.getAbiCoder().decode(['string'], rawData);
+    return decoded[decoded.length - 1];
+  }
+
   async get(tokenId: string, keys: string[] = []): Promise<DomainData> {
     const [resolver, owner, values] = await this.readerContract.call(
       'getData',
@@ -158,6 +184,30 @@ export default class UnsInternal {
         return address.toLowerCase() === resolverAddress.toLowerCase();
       }) > -1
     );
+  }
+
+  private getStartingBlockFromRegistry(registryAddress: string): string {
+    const contractDetails = Object.values(UnsConfig?.networks).reduce(
+      (acc, network) => {
+        const contracts = network.contracts;
+
+        return [
+          ...acc,
+          ...Object.values(contracts).map((c) => ({
+            address: c.address,
+            deploymentBlock: c.deploymentBlock,
+          })),
+        ];
+      },
+      [],
+    );
+    const contractDetail = contractDetails.find(
+      (detail) => detail.address === registryAddress,
+    );
+    if (!contractDetail || contractDetail?.deploymentBlock === '0x0') {
+      return 'earliest';
+    }
+    return contractDetail.deploymentBlock;
   }
 
   private async getVerifiedData(

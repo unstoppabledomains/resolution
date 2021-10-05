@@ -342,6 +342,17 @@ describe('UnsInternal', () => {
     });
   });
 
+  it('should get domain from tokenId', async () => {
+    const spies = mockAsyncMethods(unsInternalL1, {
+      registryAddress: '0x95AE1515367aa64C462c71e87157771165B1287A',
+    });
+    mockAPICalls('unhash', protocolLink());
+    const hash = eip137Namehash(CryptoDomainWithAllRecords);
+    const domainName = await unsInternalL1.getDomainFromTokenId(hash);
+    expectSpyToBeCalled(spies);
+    expect(domainName).toBe(CryptoDomainWithAllRecords);
+  });
+
   it('should return true for tld exists', async () => {
     mockAPICalls('uns_domain_exists_test', protocolLink());
     const exists = await unsInternalL1.exists(
