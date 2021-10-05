@@ -1226,6 +1226,9 @@ describe('UNS', () => {
             ok: true,
           }),
         });
+        const endpoint = 'https://resolve.unstoppabledomains.com/metadata/';
+
+        mockAsyncMethod(uns, 'getTokenUri', endpoint);
         const domain = await resolution.unhash(
           '0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9',
           NamingServiceName.UNS,
@@ -1252,6 +1255,9 @@ describe('UNS', () => {
       it('should throw if unable to query metadata endpoint token', async () => {
         const tokenId =
           '0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc8';
+        const endpoint = 'https://resolve.unstoppabledomains.com/metadata/';
+
+        mockAsyncMethod(uns, 'getTokenUri', endpoint);
         mockAsyncMethod(Networking, 'fetch', {
           json: () => ({
             ok: false,
@@ -1264,25 +1270,24 @@ describe('UNS', () => {
         );
       });
 
-      skipItInLive(
-        'should throw error if returned domain is wrong',
-        async () => {
-          mockAsyncMethod(Networking, 'fetch', {
-            json: () => ({
-              name: 'invalid-domain.crypto',
-              ok: true,
-            }),
-          });
-          await expect(
-            resolution.unhash('0xdeaddeaddead', NamingServiceName.UNS),
-          ).rejects.toThrow(
-            new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
-              providerMessage:
-                'Service provider returned an invalid domain name',
-            }),
-          );
-        },
-      );
+      it('should throw error if returned domain is wrong', async () => {
+        mockAsyncMethod(Networking, 'fetch', {
+          json: () => ({
+            name: 'invalid-domain.crypto',
+            ok: true,
+          }),
+        });
+        const endpoint = 'https://resolve.unstoppabledomains.com/metadata/';
+
+        mockAsyncMethod(uns, 'getTokenUri', endpoint);
+        await expect(
+          resolution.unhash('0xdeaddeaddead', NamingServiceName.UNS),
+        ).rejects.toThrow(
+          new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
+            providerMessage: 'Service provider returned an invalid domain name',
+          }),
+        );
+      });
     });
   });
 });

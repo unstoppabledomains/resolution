@@ -30,8 +30,6 @@ import Networking from './utils/Networking';
 export default class Uns extends NamingService {
   static readonly ProxyReaderMap: ProxyReaderMap = getProxyReaderMap();
 
-  readonly MetadataEndpoint =
-    'https://resolve.unstoppabledomains.com/metadata/';
   public unsl1: UnsInternal;
   public unsl2: UnsInternal;
   readonly name: NamingServiceName = NamingServiceName.UNS;
@@ -314,10 +312,10 @@ export default class Uns extends NamingService {
   }
 
   async getDomainFromTokenId(tokenId: string): Promise<string> {
-    const resp = await Networking.fetch(
-      this.MetadataEndpoint + tokenId,
-      {},
-    ).then((resp) => resp.json());
+    const metadataEndpoint = await this.getTokenUri(tokenId);
+    const resp = await Networking.fetch(metadataEndpoint + tokenId, {}).then(
+      (resp) => resp.json(),
+    );
 
     if (!resp.ok) {
       throw new ResolutionError(ResolutionErrorCode.MetadataEndpointError);
@@ -327,6 +325,14 @@ export default class Uns extends NamingService {
         domain: `with tokenId ${tokenId}`,
       });
     }
+    if (this.namehash(resp.name) !== tokenId) {
+      throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
+        methodName: 'unhash',
+        domain: resp.name,
+        providerMessage: 'Service provider returned an invalid domain name',
+      });
+    }
+
     return resp.name;
   }
 
