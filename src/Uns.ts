@@ -1,4 +1,4 @@
-import {UnsSupportedNetwork, ProxyReaderMap, hasProvider} from './types';
+import {UnsSupportedNetwork, hasProvider} from './types';
 import ResolutionError, {ResolutionErrorCode} from './errors/resolutionError';
 import {
   constructRecords,
@@ -14,7 +14,6 @@ import {
   UnsLocation,
 } from './types/publicTypes';
 import {isValidTwitterSignature} from './utils/TwitterSignatureValidator';
-import UnsConfig from './config/uns-config.json';
 import FetchProvider from './FetchProvider';
 import {eip137Childhash, eip137Namehash} from './utils/namehash';
 import {NamingService} from './NamingService';
@@ -28,8 +27,6 @@ import Networking from './utils/Networking';
  * @internal
  */
 export default class Uns extends NamingService {
-  static readonly ProxyReaderMap: ProxyReaderMap = getProxyReaderMap();
-
   public unsl1: UnsInternal;
   public unsl2: UnsInternal;
   readonly name: NamingServiceName = NamingServiceName.UNS;
@@ -269,7 +266,10 @@ export default class Uns extends NamingService {
         resultOrErrorL2,
         ResolutionErrorCode.ServiceProviderError,
       );
-      if (resultOrErrorL2.message !== '< execution reverted >') {
+      if (
+        resultOrErrorL2.message !==
+        '< execution reverted: ERC721Metadata: URI query for nonexistent token >'
+      ) {
         throw resultOrErrorL2;
       }
     } else {
@@ -282,8 +282,7 @@ export default class Uns extends NamingService {
       );
       if (resultOrErrorL1.message === '< execution reverted >') {
         throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-          method: NamingServiceName.UNS,
-          methodName: 'getTokenUri',
+          domain: `with tokenId ${tokenId}`,
         });
       }
     }
@@ -312,14 +311,16 @@ export default class Uns extends NamingService {
   }
 
   async getDomainFromTokenId(tokenId: string): Promise<string> {
-    const metadataEndpoint = await this.getTokenUri(tokenId);
-    const resp = await Networking.fetch(metadataEndpoint + tokenId, {}).then(
-      (resp) => resp.json(),
-    );
+    const tokenUri = await this.getTokenUri(tokenId);
+    const resp = await Networking.fetch(tokenUri, {})
+      .then((resp) => resp.json())
+      .catch((err) => {
+        throw new ResolutionError(ResolutionErrorCode.MetadataEndpointError, {
+          tokenUri: tokenUri || 'undefined',
+          errorMessage: err.message,
+        });
+      });
 
-    if (!resp.ok) {
-      throw new ResolutionError(ResolutionErrorCode.MetadataEndpointError);
-    }
     if (!resp.name) {
       throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
         domain: `with tokenId ${tokenId}`,
@@ -424,13 +425,4 @@ function validResolutionErrorOrThrow(
     return true;
   }
   throw error;
-}
-
-function getProxyReaderMap(): ProxyReaderMap {
-  const map: ProxyReaderMap = {};
-  for (const id of Object.keys(UnsConfig.networks)) {
-    map[id] =
-      UnsConfig.networks[id].contracts.ProxyReader.address.toLowerCase();
-  }
-  return map;
 }

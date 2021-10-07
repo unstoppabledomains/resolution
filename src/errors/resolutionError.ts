@@ -15,6 +15,7 @@ type ResolutionErrorOptions = {
   recordName?: string;
   namingService?: string;
   location?: UnsLocation;
+  tokenUri?: string;
 };
 
 export enum ResolutionErrorCode {
@@ -74,12 +75,14 @@ const HandlersByCode = {
     `${params.location ? `${params.location}: ` : ''}No ${
       params.recordName
     } record found for ${params.domain}`,
-  [ResolutionErrorCode.MetadataEndpointError]: (params: {
-    errorMessage?: string;
-  }) => `Failed to query metadata endpoint`,
   [ResolutionErrorCode.ServiceProviderError]: (params: {
     providerMessage?: string;
   }) => `< ${params.providerMessage} >`,
+  [ResolutionErrorCode.MetadataEndpointError]: (params: {
+    tokenUri: string;
+    errorMessage: string;
+  }) =>
+    `Failed to query tokenUri ${params.tokenUri}. Error: ${params.errorMessage}`,
   [ResolutionErrorCode.UnsupportedService]: (params: {namingService: string}) =>
     `Naming service ${params.namingService} is not supported`,
 };

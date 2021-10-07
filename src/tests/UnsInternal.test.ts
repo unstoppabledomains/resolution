@@ -8,6 +8,8 @@ import {
   WalletDomainLayerTwoWithAllRecords,
   mockAPICalls,
   ProviderProtocol,
+  WalletDomainOnBothLayers,
+  skipItInLive,
 } from './helpers';
 import {UnsLocation} from '../types/publicTypes';
 import {
@@ -16,7 +18,7 @@ import {
   ResolutionError,
   ResolutionErrorCode,
 } from '..';
-import {eip137Namehash} from '../utils/namehash';
+import {eip137Namehash, fromHexStringToDecimals} from '../utils/namehash';
 
 let unsInternalL1: UnsInternal;
 let unsInternalL2: UnsInternal;
@@ -101,12 +103,14 @@ describe('UnsInternal', () => {
     });
   });
   it('should return tokenURI for domain on L2', async () => {
-    const tokenURI = `https://metadata.staging.unstoppabledomains.com/metadata/${WalletDomainLayerTwoWithAllRecords}`;
     const namehash = eip137Namehash(WalletDomainLayerTwoWithAllRecords);
+    const tokenId = fromHexStringToDecimals(namehash);
+
+    const tokenURI = `https://metadata.staging.unstoppabledomains.com/metadata/${tokenId}`;
     mockAsyncMethods(unsInternalL2.readerContract, {
       call: [tokenURI],
     });
-    const result = await unsInternalL2.getTokenUri(namehash);
+    const result = await unsInternalL2.getTokenUri(tokenId);
     expect(result).toEqual(tokenURI);
   });
   it('should return tokenURI for domain on L1', async () => {
@@ -170,10 +174,10 @@ describe('UnsInternal', () => {
       const resolverAddress = '0x2a93C52E7B6E7054870758e15A1446E769EdfB93';
       const recordName = 'crypto.ETH.address';
       const records = {
-        [recordName]: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
+        [recordName]: '0x499dd6d875787869670900a2130223d85d4f6aa7',
       };
-      const owner = '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2';
-      const tokenId = eip137Namehash(WalletDomainLayerTwoWithAllRecords);
+      const owner = '0x499dD6D875787869670900a2130223D85d4F6Aa7';
+      const tokenId = eip137Namehash(WalletDomainOnBothLayers);
       mockAsyncMethods(unsInternalL2.readerContract, {
         call: [resolverAddress, owner, [records[recordName]]],
       });
@@ -185,7 +189,7 @@ describe('UnsInternal', () => {
     });
   });
   describe('.resolver()', () => {
-    it('should throw on unspecified resolver on L2', async () => {
+    skipItInLive('should throw on unspecified resolver on L2', async () => {
       const resolverAddress = NullAddress;
       const owner = '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2';
       mockAsyncMethods(unsInternalL2.readerContract, {
@@ -215,17 +219,16 @@ describe('UnsInternal', () => {
       );
     });
     it('should throw on unspecified resolver on L1', async () => {
-      const resolverAddress = NullAddress;
       const owner = '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2';
       mockAsyncMethods(unsInternalL1.readerContract, {
-        call: [resolverAddress, owner, []],
+        call: [NullAddress, owner, []],
       });
       expect(() =>
-        unsInternalL1.resolver(CryptoDomainWithAllRecords),
+        unsInternalL1.resolver('udtestdev-d0137c.crypto'),
       ).rejects.toThrow(
         new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
           location: UnsLocation.Layer1,
-          domain: CryptoDomainWithAllRecords,
+          domain: 'udtestdev-d0137c.crypto',
         }),
       );
     });
@@ -304,7 +307,8 @@ describe('UnsInternal', () => {
       expectSpyToBeCalled(spies);
       expect(result).toEqual(records);
     });
-    it('should return all records on L2', async () => {
+    it.skip('should return all records on L2', async () => {
+      // todo Get it back when all records method will migrate to ERC721 metadata endpoint
       const records = {
         'crypto.ADA.address':
           'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',

@@ -28,6 +28,8 @@ import {
   CryptoDomainWithUsdtMultiChainRecords,
   expectConfigurationErrorCode,
   CryptoDomainWithAllRecords,
+  WalletDomainLayerTwoWithAllRecords,
+  WalletDomainOnBothLayers,
 } from './helpers';
 import {RpcProviderTestCases} from './providerMockData';
 import fetch, {FetchError} from 'node-fetch';
@@ -35,7 +37,10 @@ import Uns from '../Uns';
 import Zns from '../Zns';
 import Ens from '../Ens';
 import FetchProvider from '../FetchProvider';
-import {ConfigurationErrorCode} from '../errors/configurationError';
+import {
+  ConfigurationErrorCode,
+  ConfigurationError,
+} from '../errors/configurationError';
 import {HTTPProvider} from '@zilliqa-js/core';
 import {Eip1993Factories as Eip1193Factories} from '../utils/Eip1993Factories';
 import UnsConfig from '../config/uns-config.json';
@@ -129,7 +134,7 @@ describe('Resolution', () => {
       const customNetwork = 'goerli';
       const polygonUrl = protocolLink(ProviderProtocol.http, 'UNSL2');
       const goerliUrl = mainnetUrl.replace('mainnet', customNetwork);
-      expectConfigurationErrorCode(() => {
+      await expectConfigurationErrorCode(() => {
         new Uns({
           locations: {
             Layer1: {
@@ -151,7 +156,7 @@ describe('Resolution', () => {
       const customNetwork = 'goerli';
       const polygonUrl = protocolLink(ProviderProtocol.http, 'UNSL2');
       const goerliUrl = mainnetUrl.replace('mainnet', customNetwork);
-      expectConfigurationErrorCode(() => {
+      await expect(() => {
         new Uns({
           locations: {
             Layer1: {
@@ -166,7 +171,15 @@ describe('Resolution', () => {
             },
           },
         });
-      }, ConfigurationErrorCode.InvalidConfigurationField);
+      }).toThrow(
+        new ConfigurationError(
+          ConfigurationErrorCode.InvalidConfigurationField,
+          {
+            method: UnsLocation.Layer2,
+            field: 'proxyReaderAddress',
+          },
+        ),
+      );
     });
 
     it('should not work with invalid proxyReader configuration #3', async () => {
@@ -175,7 +188,7 @@ describe('Resolution', () => {
       const polygonUrl = protocolLink(ProviderProtocol.http, 'UNSL2');
       const polygonProvider = new FetchProvider(UnsLocation.Layer2, polygonUrl);
       const customNetwork = 'goerli';
-      expectConfigurationErrorCode(() => {
+      await expectConfigurationErrorCode(() => {
         new Uns({
           locations: {
             Layer1: {
@@ -362,7 +375,7 @@ describe('Resolution', () => {
         expect(err).toBeInstanceOf(FetchError);
         return;
       }
-      fail('nock is not configured correctly!');
+      throw new Error('nock is not configured correctly!');
     });
 
     it('should get a valid resolution instance', async () => {
@@ -569,7 +582,22 @@ describe('Resolution', () => {
         expectSpyToBeCalled(spy);
       });
       it('checks Resolution#addr error #2', async () => {
-        const resolution = new Resolution();
+        const resolution = new Resolution({
+          sourceConfig: {
+            uns: {
+              locations: {
+                Layer1: {
+                  url: protocolLink(ProviderProtocol.http, 'UNSL1'),
+                  network: 'rinkeby',
+                },
+                Layer2: {
+                  url: protocolLink(ProviderProtocol.http, 'UNSL2'),
+                  network: 'polygon-mumbai',
+                },
+              },
+            },
+          },
+        });
         uns = resolution.serviceMap[NamingServiceName.UNS] as unknown as Uns;
         const spy = mockAsyncMethods(uns, {
           get: {},
@@ -870,7 +898,7 @@ describe('Resolution', () => {
             'rinkeby',
           );
           const polygonProvider = new JsonRpcProvider(
-            protocolLink(ProviderProtocol.http),
+            protocolLink(ProviderProtocol.http, 'UNSL2'),
             'maticmum',
           );
           const resolution = Resolution.fromEthersProvider({
@@ -1028,7 +1056,7 @@ describe('Resolution', () => {
               'rinkeby',
             );
             const polygonProvider = new JsonRpcProvider(
-              protocolLink(ProviderProtocol.http),
+              protocolLink(ProviderProtocol.http, 'UNSL2'),
               'maticmum',
             );
             const resolution = Resolution.fromEthersProvider({
@@ -1078,7 +1106,7 @@ describe('Resolution', () => {
               'rinkeby',
             );
             const polygonProvider = new JsonRpcProvider(
-              protocolLink(ProviderProtocol.http),
+              protocolLink(ProviderProtocol.http, 'UNSL2'),
               'maticmum',
             );
             const resolution = Resolution.fromEthersProvider({
@@ -1365,15 +1393,16 @@ describe('Resolution', () => {
         registryAddress: UnsConfig.networks[4].contracts.UNSRegistry.address,
       });
       const spies2 = mockAsyncMethods(uns.unsl2, {
-        registryAddress: UnsConfig.networks[1337].contracts.UNSRegistry.address,
+        registryAddress:
+          UnsConfig.networks[80001].contracts.UNSRegistry.address,
       });
       const registryAddress = await resolution.registryAddress(
-        'udtestdev-check.wallet',
+        WalletDomainOnBothLayers,
       );
       expectSpyToBeCalled(spies);
       expectSpyToBeCalled(spies2);
       expect(registryAddress).toBe(
-        UnsConfig.networks[1337].contracts.UNSRegistry.address,
+        UnsConfig.networks[80001].contracts.UNSRegistry.address,
       );
     });
   });
@@ -1490,58 +1519,52 @@ describe('Resolution', () => {
       expectSpyToBeCalled(spies);
       expect(isRegistered).toBe(false);
     });
-    skipItInLive(
-      'should return true if registered on l2 but not l1',
-      async () => {
-        const spies = mockAsyncMethods(uns.unsl1, {
-          get: {
-            owner: '',
-            resolver: '',
-            records: {},
-            location: UnsLocation.Layer1,
-          },
-        });
-        const spies2 = mockAsyncMethods(uns.unsl2, {
-          get: {
-            owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
-            resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
-            records: {},
-            location: UnsLocation.Layer2,
-          },
-        });
-        const isRegistered = await resolution.isRegistered(
-          'qwdqwdjkqhdkqdqwjd.crypto',
-        );
-        expectSpyToBeCalled(spies);
-        expectSpyToBeCalled(spies2);
-        expect(isRegistered).toBe(true);
-      },
-    );
-    skipItInLive(
-      'should return true if registered on l1 but not l2',
-      async () => {
-        const spies = mockAsyncMethods(uns.unsl1, {
-          get: {
-            owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
-            resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
-            records: {},
-          },
-        });
-        const spies2 = mockAsyncMethods(uns.unsl2, {
-          get: {
-            owner: '',
-            resolver: '',
-            records: {},
-          },
-        });
-        const isRegistered = await resolution.isRegistered(
-          'qwdqwdjkqhdkqdqwjd.crypto',
-        );
-        expectSpyToBeCalled(spies);
-        expectSpyToBeCalled(spies2);
-        expect(isRegistered).toBe(true);
-      },
-    );
+    it('should return true if registered on l2 but not l1', async () => {
+      const spies = mockAsyncMethods(uns.unsl1, {
+        get: {
+          owner: '',
+          resolver: '',
+          records: {},
+          location: UnsLocation.Layer1,
+        },
+      });
+      const spies2 = mockAsyncMethods(uns.unsl2, {
+        get: {
+          owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
+          resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
+          records: {},
+          location: UnsLocation.Layer2,
+        },
+      });
+      const isRegistered = await resolution.isRegistered(
+        WalletDomainLayerTwoWithAllRecords,
+      );
+      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
+      expect(isRegistered).toBe(true);
+    });
+    it('should return true if registered on l1 but not l2', async () => {
+      const spies = mockAsyncMethods(uns.unsl1, {
+        get: {
+          owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
+          resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
+          records: {},
+        },
+      });
+      const spies2 = mockAsyncMethods(uns.unsl2, {
+        get: {
+          owner: '',
+          resolver: '',
+          records: {},
+        },
+      });
+      const isRegistered = await resolution.isRegistered(
+        CryptoDomainWithAllRecords,
+      );
+      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
+      expect(isRegistered).toBe(true);
+    });
   });
 
   describe('.isAvailable', () => {
@@ -1575,31 +1598,28 @@ describe('Resolution', () => {
       expectSpyToBeCalled(spies);
       expect(isAvailable).toBe(true);
     });
-    skipItInLive(
-      'should return false is available on l1 but not l2',
-      async () => {
-        const spies = mockAsyncMethods(uns.unsl1, {
-          get: {
-            owner: '',
-            resolver: '',
-            records: {},
-          },
-        });
-        const spies2 = mockAsyncMethods(uns.unsl2, {
-          get: {
-            owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
-            resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
-            records: {},
-          },
-        });
-        const isAvailable = await resolution.isAvailable(
-          'qwdqwdjkqhdkqdqwjd.crypto',
-        );
-        expectSpyToBeCalled(spies);
-        expectSpyToBeCalled(spies2);
-        expect(isAvailable).toBe(false);
-      },
-    );
+    it('should return false is available on l1 but not l2', async () => {
+      const spies = mockAsyncMethods(uns.unsl1, {
+        get: {
+          owner: '',
+          resolver: '',
+          records: {},
+        },
+      });
+      const spies2 = mockAsyncMethods(uns.unsl2, {
+        get: {
+          owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
+          resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
+          records: {},
+        },
+      });
+      const isAvailable = await resolution.isAvailable(
+        CryptoDomainWithAllRecords,
+      );
+      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
+      expect(isAvailable).toBe(false);
+    });
 
     it('should return false', async () => {
       const spies = mockAsyncMethods(zns, {
