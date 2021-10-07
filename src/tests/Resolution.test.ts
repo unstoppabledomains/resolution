@@ -898,7 +898,7 @@ describe('Resolution', () => {
             'rinkeby',
           );
           const polygonProvider = new JsonRpcProvider(
-            protocolLink(ProviderProtocol.http),
+            protocolLink(ProviderProtocol.http, 'UNSL2'),
             'maticmum',
           );
           const resolution = Resolution.fromEthersProvider({
@@ -1056,7 +1056,7 @@ describe('Resolution', () => {
               'rinkeby',
             );
             const polygonProvider = new JsonRpcProvider(
-              protocolLink(ProviderProtocol.http),
+              protocolLink(ProviderProtocol.http, 'UNSL2'),
               'maticmum',
             );
             const resolution = Resolution.fromEthersProvider({
@@ -1106,7 +1106,7 @@ describe('Resolution', () => {
               'rinkeby',
             );
             const polygonProvider = new JsonRpcProvider(
-              protocolLink(ProviderProtocol.http),
+              protocolLink(ProviderProtocol.http, 'UNSL2'),
               'maticmum',
             );
             const resolution = Resolution.fromEthersProvider({
