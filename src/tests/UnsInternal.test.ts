@@ -305,7 +305,8 @@ describe('UnsInternal', () => {
       expectSpyToBeCalled(spies);
       expect(result).toEqual(records);
     });
-    it('should return all records on L2', async () => {
+    it.skip('should return all records on L2', async () => {
+      // todo Get it back when all records method will migrate to ERC721 metadata endpoint
       const records = {
         'crypto.ADA.address':
           'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
