@@ -27,7 +27,7 @@ import liveData from './testData/liveData.json';
 import UnsConfig from '../config/uns-config.json';
 import UnsInternal from '../UnsInternal';
 import nock from 'nock';
-import {eip137Namehash} from '../utils/namehash';
+import {eip137Namehash, fromHexStringToDecimals} from '../utils/namehash';
 
 let resolution: Resolution;
 let uns: Uns;
@@ -1161,9 +1161,11 @@ describe('UNS', () => {
     });
 
     it('should return token URI from L2', async () => {
+      const namehash = eip137Namehash(WalletDomainLayerTwoWithAllRecords);
+      const tokenId = fromHexStringToDecimals(namehash);
       const spies = mockAsyncMethods(uns.unsl2.readerContract, {
         call: [
-          `https://metadata.staging.unstoppabledomains.com/metadata/${WalletDomainLayerTwoWithAllRecords}`,
+          `https://metadata.staging.unstoppabledomains.com/metadata/${tokenId}`,
         ],
       });
       mockAsyncMethods(uns.unsl1.readerContract, {
@@ -1174,7 +1176,7 @@ describe('UNS', () => {
 
       expectSpyToBeCalled(spies);
       expect(uri).toEqual(
-        `https://metadata.staging.unstoppabledomains.com/metadata/${WalletDomainLayerTwoWithAllRecords}`,
+        `https://metadata.staging.unstoppabledomains.com/metadata/${tokenId}`,
       );
     });
 

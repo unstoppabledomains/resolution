@@ -18,7 +18,7 @@ import {
   ResolutionError,
   ResolutionErrorCode,
 } from '..';
-import {eip137Namehash} from '../utils/namehash';
+import {eip137Namehash, fromHexStringToDecimals} from '../utils/namehash';
 
 let unsInternalL1: UnsInternal;
 let unsInternalL2: UnsInternal;
@@ -103,12 +103,14 @@ describe('UnsInternal', () => {
     });
   });
   it('should return tokenURI for domain on L2', async () => {
-    const tokenURI = `https://metadata.staging.unstoppabledomains.com/metadata/${WalletDomainLayerTwoWithAllRecords}`;
     const namehash = eip137Namehash(WalletDomainLayerTwoWithAllRecords);
+    const tokenId = fromHexStringToDecimals(namehash);
+
+    const tokenURI = `https://metadata.staging.unstoppabledomains.com/metadata/${tokenId}`;
     mockAsyncMethods(unsInternalL2.readerContract, {
       call: [tokenURI],
     });
-    const result = await unsInternalL2.getTokenUri(namehash);
+    const result = await unsInternalL2.getTokenUri(tokenId);
     expect(result).toEqual(tokenURI);
   });
   it('should return tokenURI for domain on L1', async () => {
