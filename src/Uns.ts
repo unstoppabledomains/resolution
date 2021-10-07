@@ -268,7 +268,10 @@ export default class Uns extends NamingService {
         resultOrErrorL2,
         ResolutionErrorCode.ServiceProviderError,
       );
-      if (resultOrErrorL2.message !== '< execution reverted >') {
+      if (
+        resultOrErrorL2.message !==
+        '< execution reverted: ERC721Metadata: URI query for nonexistent token >'
+      ) {
         throw resultOrErrorL2;
       }
     } else {
@@ -281,8 +284,7 @@ export default class Uns extends NamingService {
       );
       if (resultOrErrorL1.message === '< execution reverted >') {
         throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-          method: NamingServiceName.UNS,
-          methodName: 'getTokenUri',
+          domain: `with tokenId ${tokenId}`,
         });
       }
     }

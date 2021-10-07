@@ -16,6 +16,7 @@ import {
   mockAPICalls,
   ProviderProtocol,
   mockAsyncMethod,
+  WalletDomainOnBothLayers,
 } from './helpers';
 import FetchProvider from '../FetchProvider';
 import {NamingServiceName, UnsLocation} from '../types/publicTypes';
@@ -27,6 +28,7 @@ import liveData from './testData/liveData.json';
 import UnsConfig from '../config/uns-config.json';
 import UnsInternal from '../UnsInternal';
 import nock from 'nock';
+import {eip137Namehash} from '../utils/namehash';
 
 let resolution: Resolution;
 let uns: Uns;
@@ -150,27 +152,30 @@ describe('UNS', () => {
     expect(twitterHandle).toBe('Marlene12Bob');
   });
 
-  it('should throw error if record not found for twitter handle', async () => {
-    mockAsyncMethods(uns, {
-      get: {
-        resolver: '0xb66dce2da6afaaa98f2013446dbcb0f4b0ab2842',
-        owner: '0x499dd6d875787869670900a2130223d85d4f6aa7',
-        records: {},
-        location: UnsLocation.Layer2,
-      },
-    });
-    expect(() =>
-      resolution.serviceMap[NamingServiceName.UNS].twitter(
-        WalletDomainLayerTwoWithAllRecords,
-      ),
-    ).rejects.toThrow(
-      new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-        domain: WalletDomainLayerTwoWithAllRecords,
-        location: UnsLocation.Layer2,
-        recordName: 'validation.social.twitter.username',
-      }),
-    );
-  });
+  skipItInLive(
+    'should throw error if record not found for twitter handle',
+    async () => {
+      mockAsyncMethods(uns, {
+        get: {
+          resolver: '0xb66dce2da6afaaa98f2013446dbcb0f4b0ab2842',
+          owner: '0x499dd6d875787869670900a2130223d85d4f6aa7',
+          records: {},
+          location: UnsLocation.Layer2,
+        },
+      });
+      expect(() =>
+        resolution.serviceMap[NamingServiceName.UNS].twitter(
+          WalletDomainLayerTwoWithAllRecords,
+        ),
+      ).rejects.toThrow(
+        new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+          domain: WalletDomainLayerTwoWithAllRecords,
+          location: UnsLocation.Layer2,
+          recordName: 'validation.social.twitter.username',
+        }),
+      );
+    },
+  );
   it('should throw error if twitter validation signature is null', async () => {
     mockAsyncMethods(uns, {
       get: {
@@ -192,27 +197,30 @@ describe('UNS', () => {
       }),
     );
   });
-  it('should throw error if twitter handle is undefined', async () => {
-    mockAsyncMethods(uns, {
-      get: {
-        resolver: '0xb66dce2da6afaaa98f2013446dbcb0f4b0ab2842',
-        owner: '0x499dd6d875787869670900a2130223d85d4f6aa7',
-        records: {'validation.social.twitter.username': 'random-signuture'},
-        location: UnsLocation.Layer2,
-      },
-    });
-    expect(() =>
-      resolution.serviceMap[NamingServiceName.UNS].twitter(
-        WalletDomainLayerTwoWithAllRecords,
-      ),
-    ).rejects.toThrow(
-      new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-        domain: WalletDomainLayerTwoWithAllRecords,
-        location: UnsLocation.Layer2,
-        recordName: 'social.twitter.username',
-      }),
-    );
-  });
+  skipItInLive(
+    'should throw error if twitter handle is undefined',
+    async () => {
+      mockAsyncMethods(uns, {
+        get: {
+          resolver: '0xb66dce2da6afaaa98f2013446dbcb0f4b0ab2842',
+          owner: '0x499dd6d875787869670900a2130223d85d4f6aa7',
+          records: {'validation.social.twitter.username': 'random-signuture'},
+          location: UnsLocation.Layer2,
+        },
+      });
+      expect(() =>
+        resolution.serviceMap[NamingServiceName.UNS].twitter(
+          WalletDomainLayerTwoWithAllRecords,
+        ),
+      ).rejects.toThrow(
+        new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+          domain: WalletDomainLayerTwoWithAllRecords,
+          location: UnsLocation.Layer2,
+          recordName: 'social.twitter.username',
+        }),
+      );
+    },
+  );
 
   it('should return NoRecord Resolution error', async () => {
     const uns = resolution.serviceMap[NamingServiceName.UNS] as Uns;
@@ -1139,7 +1147,8 @@ describe('UNS', () => {
       mockAsyncMethod(uns.unsl2.readerContract, 'call', (params) =>
         Promise.reject(
           new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
-            providerMessage: 'execution reverted',
+            providerMessage:
+              'execution reverted: ERC721Metadata: URI query for nonexistent token',
           }),
         ),
       );
@@ -1155,22 +1164,23 @@ describe('UNS', () => {
     it('should return token URI from L2', async () => {
       const spies = mockAsyncMethods(uns.unsl2.readerContract, {
         call: [
-          'https://metadata.staging.unstoppabledomains.com/metadata/brad.crypto',
+          `https://metadata.staging.unstoppabledomains.com/metadata/${WalletDomainLayerTwoWithAllRecords}`,
         ],
       });
       mockAsyncMethods(uns.unsl1.readerContract, {
         call: [],
       });
 
-      const uri = await resolution.tokenURI('brad.crypto');
+      const uri = await resolution.tokenURI(WalletDomainLayerTwoWithAllRecords);
 
       expectSpyToBeCalled(spies);
       expect(uri).toEqual(
-        'https://metadata.staging.unstoppabledomains.com/metadata/brad.crypto',
+        `https://metadata.staging.unstoppabledomains.com/metadata/${WalletDomainLayerTwoWithAllRecords}`,
       );
     });
 
     it('should throw error', async () => {
+      const domain = 'fakedomainthatdoesnotexist.crypto';
       const spies = mockAsyncMethods(uns.unsl1.readerContract, {
         call: new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
           providerMessage: 'execution reverted',
@@ -1178,14 +1188,15 @@ describe('UNS', () => {
       });
       const polygonSpies = mockAsyncMethods(uns.unsl2.readerContract, {
         call: new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
-          providerMessage: 'execution reverted',
+          providerMessage:
+            'execution reverted: ERC721Metadata: URI query for nonexistent token',
         }),
       });
 
-      await expect(
-        resolution.tokenURI('fakedomainthatdoesnotexist.crypto'),
-      ).rejects.toThrow(
-        new ResolutionError(ResolutionErrorCode.UnregisteredDomain),
+      await expect(resolution.tokenURI(domain)).rejects.toThrow(
+        new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+          domain: `with tokenId ${eip137Namehash(domain)}`,
+        }),
       );
       expectSpyToBeCalled(spies);
       expectSpyToBeCalled(polygonSpies);
@@ -1193,11 +1204,11 @@ describe('UNS', () => {
 
     describe('.tokenURIMetadata', () => {
       it('should return token metadata', async () => {
-        const testMeta: TokenUriMetadata = liveData.bradCryptoMetadata;
+        const testMeta: TokenUriMetadata = liveData.cryptoDomainMetadata;
 
         const unsSpies = mockAsyncMethods(uns.unsl1.readerContract, {
           call: [
-            'https://metadata.unstoppabledomains.com/metadata/brad.crypto',
+            `https://metadata.unstoppabledomains.com/metadata/${CryptoDomainWithAllRecords}`,
           ],
         });
         mockAsyncMethods(uns.unsl2.readerContract, {
@@ -1210,7 +1221,9 @@ describe('UNS', () => {
           },
         });
 
-        const metadata = await resolution.tokenURIMetadata('brad.crypto');
+        const metadata = await resolution.tokenURIMetadata(
+          CryptoDomainWithAllRecords,
+        );
 
         expectSpyToBeCalled(unsSpies);
         expectSpyToBeCalled(fetchSpies);
@@ -1220,15 +1233,17 @@ describe('UNS', () => {
 
     describe('.unhash', () => {
       it('should unhash token', async () => {
-        const testMeta: TokenUriMetadata = liveData.bradCryptoMetadata;
-        mockAPICalls('unhash', protocolLink());
+        const testMeta: TokenUriMetadata = liveData.cryptoDomainMetadata;
+        mockAsyncMethod(uns.unsl1, 'getDomainFromTokenId', (params) =>
+          Promise.resolve(CryptoDomainWithoutGunDbRecords),
+        );
         mockAsyncMethod(uns.unsl2, 'getDomainFromTokenId', (params) =>
           Promise.reject(
             new ResolutionError(ResolutionErrorCode.UnregisteredDomain),
           ),
         );
         const domain = await resolution.unhash(
-          '0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9',
+          '0x644d751c0e0112006e6d5d5d9234c9d3fae5a4646ff88a754d7fa1ed09794e94',
           NamingServiceName.UNS,
         );
         expect(domain).toEqual(testMeta.name);
@@ -1293,14 +1308,14 @@ describe('UNS', () => {
         mockAsyncMethod(uns.unsl1, 'getDomainFromTokenId', (params) =>
           Promise.reject(
             new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-              domain: `with tokenId ${tokenId}`,
+              domain: tokenId,
             }),
           ),
         );
         mockAsyncMethod(uns.unsl2, 'getDomainFromTokenId', (params) =>
           Promise.reject(
             new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-              domain: `with tokenId ${tokenId}`,
+              domain: tokenId,
             }),
           ),
         );
@@ -1308,7 +1323,7 @@ describe('UNS', () => {
           resolution.unhash(tokenId, NamingServiceName.UNS),
         ).rejects.toThrow(
           new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-            domain: `with tokenId ${tokenId}`,
+            domain: tokenId,
           }),
         );
       });
@@ -1320,14 +1335,14 @@ describe('UNS', () => {
         mockAsyncMethod(uns.unsl2, 'getDomainFromTokenId', (params) =>
           Promise.reject(
             new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-              domain: `with tokenId ${unregisteredhash}`,
+              domain: unregisteredhash,
             }),
           ),
         );
         mockAsyncMethod(uns.unsl1, 'getDomainFromTokenId', (params) =>
           Promise.reject(
             new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-              domain: `with tokenId ${unregisteredhash}`,
+              domain: unregisteredhash,
             }),
           ),
         );
@@ -1335,7 +1350,7 @@ describe('UNS', () => {
           resolution.unhash(unregisteredhash, NamingServiceName.UNS),
         ).rejects.toThrow(
           new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-            domain: `with tokenId ${unregisteredhash}`,
+            domain: unregisteredhash,
           }),
         );
       });

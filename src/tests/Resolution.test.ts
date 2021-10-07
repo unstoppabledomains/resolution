@@ -29,6 +29,7 @@ import {
   expectConfigurationErrorCode,
   CryptoDomainWithAllRecords,
   WalletDomainLayerTwoWithAllRecords,
+  WalletDomainOnBothLayers,
 } from './helpers';
 import {RpcProviderTestCases} from './providerMockData';
 import fetch, {FetchError} from 'node-fetch';
@@ -570,7 +571,22 @@ describe('Resolution', () => {
         expectSpyToBeCalled(spy);
       });
       it('checks Resolution#addr error #2', async () => {
-        const resolution = new Resolution();
+        const resolution = new Resolution({
+          sourceConfig: {
+            uns: {
+              locations: {
+                Layer1: {
+                  url: protocolLink(ProviderProtocol.http, 'UNSL1'),
+                  network: 'rinkeby',
+                },
+                Layer2: {
+                  url: protocolLink(ProviderProtocol.http, 'UNSL2'),
+                  network: 'polygon-mumbai',
+                },
+              },
+            },
+          },
+        });
         uns = resolution.serviceMap[NamingServiceName.UNS] as unknown as Uns;
         const spy = mockAsyncMethods(uns, {
           get: {},
@@ -1366,15 +1382,16 @@ describe('Resolution', () => {
         registryAddress: UnsConfig.networks[4].contracts.UNSRegistry.address,
       });
       const spies2 = mockAsyncMethods(uns.unsl2, {
-        registryAddress: UnsConfig.networks[1337].contracts.UNSRegistry.address,
+        registryAddress:
+          UnsConfig.networks[80001].contracts.UNSRegistry.address,
       });
       const registryAddress = await resolution.registryAddress(
-        'udtestdev-check.wallet',
+        WalletDomainOnBothLayers,
       );
       expectSpyToBeCalled(spies);
       expectSpyToBeCalled(spies2);
       expect(registryAddress).toBe(
-        UnsConfig.networks[1337].contracts.UNSRegistry.address,
+        UnsConfig.networks[80001].contracts.UNSRegistry.address,
       );
     });
   });
