@@ -37,7 +37,10 @@ import Uns from '../Uns';
 import Zns from '../Zns';
 import Ens from '../Ens';
 import FetchProvider from '../FetchProvider';
-import {ConfigurationErrorCode} from '../errors/configurationError';
+import {
+  ConfigurationErrorCode,
+  ConfigurationError,
+} from '../errors/configurationError';
 import {HTTPProvider} from '@zilliqa-js/core';
 import {Eip1993Factories as Eip1193Factories} from '../utils/Eip1993Factories';
 import UnsConfig from '../config/uns-config.json';
@@ -153,7 +156,7 @@ describe('Resolution', () => {
       const customNetwork = 'goerli';
       const polygonUrl = protocolLink(ProviderProtocol.http, 'UNSL2');
       const goerliUrl = mainnetUrl.replace('mainnet', customNetwork);
-      await expectConfigurationErrorCode(() => {
+      await expect(() => {
         new Uns({
           locations: {
             Layer1: {
@@ -168,7 +171,15 @@ describe('Resolution', () => {
             },
           },
         });
-      }, ConfigurationErrorCode.InvalidConfigurationField);
+      }).toThrow(
+        new ConfigurationError(
+          ConfigurationErrorCode.InvalidConfigurationField,
+          {
+            method: UnsLocation.Layer2,
+            field: 'proxyReaderAddress',
+          },
+        ),
+      );
     });
 
     it('should not work with invalid proxyReader configuration #3', async () => {

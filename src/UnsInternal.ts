@@ -239,6 +239,18 @@ export default class UnsInternal {
         method: location,
       });
     }
+    if (
+      source.proxyReaderAddress &&
+      !this.isValidProxyReader(source.proxyReaderAddress)
+    ) {
+      throw new ConfigurationError(
+        ConfigurationErrorCode.InvalidConfigurationField,
+        {
+          method: this.unsLocation,
+          field: 'proxyReaderAddress',
+        },
+      );
+    }
     if (!UnsSupportedNetwork.guard(source.network)) {
       this.checkCustomNetworkConfig(source);
     }
