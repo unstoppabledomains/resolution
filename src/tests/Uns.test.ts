@@ -16,7 +16,6 @@ import {
   mockAPICalls,
   ProviderProtocol,
   mockAsyncMethod,
-  WalletDomainOnBothLayers,
 } from './helpers';
 import FetchProvider from '../FetchProvider';
 import {NamingServiceName, UnsLocation} from '../types/publicTypes';

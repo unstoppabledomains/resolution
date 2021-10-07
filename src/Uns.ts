@@ -27,8 +27,6 @@ import UnsInternal from './UnsInternal';
  * @internal
  */
 export default class Uns extends NamingService {
-  static readonly ProxyReaderMap: ProxyReaderMap = getProxyReaderMap();
-
   public unsl1: UnsInternal;
   public unsl2: UnsInternal;
   readonly name: NamingServiceName = NamingServiceName.UNS;

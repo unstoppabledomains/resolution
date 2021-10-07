@@ -128,7 +128,9 @@ async function expectError(
 
   return callback.then(
     // eslint-disable-next-line no-undef
-    () => fail(`Expected ${klass.name} to be thrown but wasn't`),
+    () => {
+      throw new Error(`Expected ${klass.name} to be thrown but wasn't`);
+    },
     (error) => {
       // Redundant code quality check is required
       // to display stack traces when code is incorrect

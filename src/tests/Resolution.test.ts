@@ -131,7 +131,7 @@ describe('Resolution', () => {
       const customNetwork = 'goerli';
       const polygonUrl = protocolLink(ProviderProtocol.http, 'UNSL2');
       const goerliUrl = mainnetUrl.replace('mainnet', customNetwork);
-      expectConfigurationErrorCode(() => {
+      await expectConfigurationErrorCode(() => {
         new Uns({
           locations: {
             Layer1: {
@@ -153,7 +153,7 @@ describe('Resolution', () => {
       const customNetwork = 'goerli';
       const polygonUrl = protocolLink(ProviderProtocol.http, 'UNSL2');
       const goerliUrl = mainnetUrl.replace('mainnet', customNetwork);
-      expectConfigurationErrorCode(() => {
+      await expectConfigurationErrorCode(() => {
         new Uns({
           locations: {
             Layer1: {
@@ -177,7 +177,7 @@ describe('Resolution', () => {
       const polygonUrl = protocolLink(ProviderProtocol.http, 'UNSL2');
       const polygonProvider = new FetchProvider(UnsLocation.Layer2, polygonUrl);
       const customNetwork = 'goerli';
-      expectConfigurationErrorCode(() => {
+      await expectConfigurationErrorCode(() => {
         new Uns({
           locations: {
             Layer1: {
@@ -364,7 +364,7 @@ describe('Resolution', () => {
         expect(err).toBeInstanceOf(FetchError);
         return;
       }
-      fail('nock is not configured correctly!');
+      throw new Error('nock is not configured correctly!');
     });
 
     it('should get a valid resolution instance', async () => {
