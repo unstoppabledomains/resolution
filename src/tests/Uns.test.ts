@@ -2,7 +2,7 @@ import Resolution from '../index';
 import ResolutionError, {ResolutionErrorCode} from '../errors/resolutionError';
 import {NullAddress} from '../types';
 import {
-  CryptoDomainWithoutResolver,
+  CryptoDomainLayerOneWithNoResolver,
   CryptoDomainWithTwitterVerification,
   mockAsyncMethods,
   expectSpyToBeCalled,
@@ -316,27 +316,10 @@ describe('UNS', () => {
       get: {owner: 'someowneraddress', resolver: NullAddress},
     });
     await expectResolutionErrorCode(
-      resolution.resolver(CryptoDomainWithoutResolver),
+      resolution.resolver(CryptoDomainLayerOneWithNoResolver),
       ResolutionErrorCode.UnspecifiedResolver,
     );
     expectSpyToBeCalled(spies);
-  });
-  it('should throw ResolutionError.UnspecifiedResolver if domain is on l2', async () => {
-    const spies = mockAsyncMethods(uns.unsl1, {
-      get: {
-        owner: 'someowneraddress',
-        resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
-      },
-    });
-    const spies2 = mockAsyncMethods(uns.unsl2, {
-      get: {owner: 'someowneraddress', resolver: NullAddress},
-    });
-    await expectResolutionErrorCode(
-      resolution.resolver(CryptoDomainWithoutResolver),
-      ResolutionErrorCode.UnspecifiedResolver,
-    );
-    expectSpyToBeCalled(spies);
-    expectSpyToBeCalled(spies2);
   });
 
   describe('.Crypto', () => {
@@ -481,7 +464,7 @@ describe('UNS', () => {
           },
         });
         await expectResolutionErrorCode(
-          resolution.chatId(CryptoDomainWithoutResolver),
+          resolution.chatId(CryptoDomainLayerOneWithNoResolver),
           ResolutionErrorCode.UnspecifiedResolver,
         );
       });
@@ -680,7 +663,7 @@ describe('UNS', () => {
         call: [NullAddress, '0x000000000000000000000000000000000000dead', []],
       });
       await expectResolutionErrorCode(
-        resolution.resolver(CryptoDomainWithoutResolver),
+        resolution.resolver(CryptoDomainLayerOneWithNoResolver),
         ResolutionErrorCode.UnspecifiedResolver,
       );
       expectSpyToBeCalled(spies);
@@ -819,7 +802,7 @@ describe('UNS', () => {
           },
         });
         await expectResolutionErrorCode(
-          resolution.chatId(CryptoDomainWithoutResolver),
+          resolution.chatId(CryptoDomainLayerOneWithNoResolver),
           ResolutionErrorCode.UnspecifiedResolver,
         );
       });
