@@ -13,13 +13,14 @@ export const MainnetUrl = 'https://rinkeby.infura.io';
 export const ZilliqaUrl = 'https://api.zilliqa.com';
 export const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
 
-export const CryptoDomainWithoutResolver = 'twistedmusic.crypto';
 export const CryptoDomainWithTwitterVerification =
   'reseller-test-udtesting-052523593694.crypto';
 export const CryptoDomainWithUsdtMultiChainRecords =
   'test-usdt-and-dns-records.crypto';
 export const ZilDomainWithUsdtMultiChainRecords =
   'reseller-test-udtesting-422508414817.zil';
+export const CryptoDomainLayerOneWithNoResolver =
+  'udtestdev-test-l1-domain-no-resolver.crypto';
 export const CryptoDomainWithAllRecords = 'test-usdt-and-dns-records.crypto';
 export const WalletDomainLayerTwoWithAllRecords =
   'udtestdev-test-l2-domain-784391.wallet';
