@@ -11,8 +11,6 @@ import {
   Provider,
   ZnsSource,
   NamingServiceName,
-  BlockchainType,
-  DomainLocation,
 } from './types/publicTypes';
 import FetchProvider from './FetchProvider';
 import {znsChildhash, znsNamehash} from './utils/namehash';
@@ -142,7 +140,7 @@ export default class Zns extends NamingService {
 
   async allRecords(domain: string): Promise<CryptoRecords> {
     const resolverAddress = await this.resolver(domain);
-    return await this.getResolverRecords(resolverAddress);
+    return this.getResolverRecords(resolverAddress);
   }
 
   async twitter(domain: string): Promise<string> {
@@ -184,22 +182,6 @@ export default class Zns extends NamingService {
 
   async registryAddress(domain: string): Promise<string> {
     return this.registryAddr;
-  }
-
-  async location(domain: string): Promise<DomainLocation> {
-    const [registry, resolver, owner] = await Promise.all([
-      this.registryAddress(domain),
-      this.resolver(domain),
-      this.owner(domain),
-    ]);
-
-    return {
-      registry,
-      resolver,
-      networkId: this.network,
-      blockchain: BlockchainType.ZIL,
-      owner,
-    };
   }
 
   private async getRecordsAddresses(
@@ -249,7 +231,7 @@ export default class Zns extends NamingService {
   ): Promise<any> {
     const params = [contractAddress.replace('0x', ''), field, keys];
     const method = 'GetSmartContractSubState';
-    return await this.provider.request({method, params});
+    return this.provider.request({method, params});
   }
 
   private async getContractField(
