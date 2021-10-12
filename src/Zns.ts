@@ -11,7 +11,6 @@ import {
   Provider,
   ZnsSource,
   NamingServiceName,
-  BlockchainType,
   Locations,
 } from './types/publicTypes';
 import FetchProvider from './FetchProvider';
@@ -20,7 +19,6 @@ import {NamingService} from './NamingService';
 import ConfigurationError, {
   ConfigurationErrorCode,
 } from './errors/configurationError';
-import {GetLocations} from './utils/LocationUtils';
 
 /**
  * @internal
@@ -48,7 +46,6 @@ export default class Zns extends NamingService {
   readonly url: string;
   readonly registryAddr: string;
   readonly provider: Provider;
-  readonly blockchain: BlockchainType = BlockchainType.ZIL;
 
   constructor(
     source: ZnsSource = {
@@ -189,7 +186,10 @@ export default class Zns extends NamingService {
   }
 
   locations(domains: string[]): Promise<Locations> {
-    return GetLocations(domains, this);
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+      method: NamingServiceName.ZNS,
+      methodName: 'locations',
+    });
   }
 
   private async getRecordsAddresses(
