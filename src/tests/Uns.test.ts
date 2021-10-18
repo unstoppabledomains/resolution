@@ -894,6 +894,124 @@ describe('UNS', () => {
     });
   });
 
+  describe('.allRecords()', () => {
+    it('should return all records on L1', async () => {
+      const records = {
+        'crypto.ADA.address':
+          'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
+        'crypto.BCH.address': 'qzx048ez005q4yhphqu2pylpfc3hy88zzu4lu6q9j8',
+        'crypto.BTC.address': '1MUFCFhhuApRqfbqNby6Jvvp6gbYx6yWhR',
+        'crypto.ETH.address': '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+        'crypto.LTC.address': 'ltc1qj03wgu07dqytxz4r9arc4taz2u7mzuz38xpuu4',
+        'crypto.USDC.address': '0x666574cAdedEB4a0f282fF0C2B3588617E29e6A0',
+        'crypto.USDT.version.EOS.address': 'letsminesome',
+        'crypto.USDT.version.ERC20.address':
+          '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+        'crypto.USDT.version.OMNI.address':
+          '19o6LvAdCPkjLi83VsjrCsmvQZUirT4KXJ',
+        'crypto.USDT.version.TRON.address':
+          'TNemhXhpX7MwzZJa3oXvfCjo5pEeXrfN2h',
+        'crypto.XRP.address': 'rMXToC1316oNyqwgQpWgSrzMUU9R6UDizW',
+        'crypto.ZIL.address': 'zil1xftz4cd425mer6jxmtl29l28xr0zu8s5hnp9he',
+        'dns.A': '["10.0.0.1","10.0.0.3"]',
+        'dns.A.ttl': '98',
+        'dns.AAAA': '[]',
+        'dns.ttl': '128',
+        'ipfs.html.value': 'QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu',
+        'ipfs.redirect_domain.value': 'google.com',
+        'whois.email.value': 'johnny@unstoppabledomains.com',
+      };
+      const unsl1 = uns.unsl1;
+      const unsl2 = uns.unsl2;
+      mockAsyncMethods(unsl1, {
+        get: {
+          owner: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+          resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+          records: records,
+          location: UnsLocation.Layer1,
+        },
+      });
+      mockAsyncMethods(unsl2, {
+        get: {
+          owner: NullAddress,
+          resolver: NullAddress,
+          records: {},
+          location: UnsLocation.Layer2,
+        },
+      });
+      mockAsyncMethod(Networking, 'fetch', {
+        ok: true,
+        json: () => ({
+          name: CryptoDomainWithAllRecords,
+          records,
+        }),
+      });
+      const endpoint = 'https://resolve.unstoppabledomains.com/metadata/';
+
+      mockAsyncMethod(uns, 'getTokenUri', endpoint);
+      const result = await uns.allRecords(CryptoDomainWithAllRecords);
+      expect(result).toMatchObject(records);
+    });
+    it('should return all records on L1 with non standard records', async () => {
+      const records = {
+        'crypto.AwDA.address':
+          'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
+        'crypto.BCwH.address': 'qzx048ez005q4yhphqu2pylpfc3hy88zzu4lu6q9j8',
+        'crypto.BfTC.address': '1MUFCFhhuApRqfbqNby6Jvvp6gbYx6yWhR',
+        'crypto.EgTH.address': '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+        'crypto.LTgC.address': 'ltc1qj03wgu07dqytxz4r9arc4taz2u7mzuz38xpuu4',
+        'crypto.US3DC.address': '0x666574cAdedEB4a0f282fF0C2B3588617E29e6A0',
+        'crypto.USrDT.version.EOS.address': 'letsminesome',
+        'crypto.U3SDT.version.ERC20.address':
+          '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+        'crypto.USDgT.version.OMNI.address':
+          '19o6LvAdCPkjLi83VsjrCsmvQZUirT4KXJ',
+        'crypto.UnSDT.version.TRON.address':
+          'TNemhXhpX7MwzZJa3oXvfCjo5pEeXrfN2h',
+        'crypto.XRP.address': 'rMXToC1316oNyqwgQpWgSrzMUU9R6UDizW',
+        'crypto.ZIL.address': 'zil1xftz4cd425mer6jxmtl29l28xr0zu8s5hnp9he',
+        'dns.A': '["10.0.0.1","10.0.0.3"]',
+        'dns.A.ttl': '98',
+        'dns.AAAA': '[]',
+        'dns.ttl': '128',
+        'ipfs.html.value': 'QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu',
+        'ipfs.redirect_domain.value': 'google.com',
+        'whois.email.value': 'johnny@unstoppabledomains.com',
+        'custom.record.value': 'blah',
+      };
+      const unsl1 = uns.unsl1;
+      const unsl2 = uns.unsl2;
+      mockAsyncMethods(unsl1, {
+        get: {
+          owner: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+          resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+          records: records,
+          location: UnsLocation.Layer1,
+        },
+      });
+      mockAsyncMethods(unsl2, {
+        get: {
+          owner: NullAddress,
+          resolver: NullAddress,
+          records: {},
+          location: UnsLocation.Layer2,
+        },
+      });
+      mockAsyncMethod(Networking, 'fetch', {
+        ok: true,
+        json: () => ({
+          name: CryptoDomainWithAllRecords,
+          records,
+        }),
+      });
+      const endpoint = 'https://resolve.unstoppabledomains.com/metadata/';
+
+      mockAsyncMethod(uns, 'getTokenUri', endpoint);
+      const result = await uns.allRecords(CryptoDomainWithAllRecords);
+      expect(result).toMatchObject(records);
+    });
+  });
+
   describe('.registryAddress', () => {
     it('should return cns registry address', async () => {
       const unsl2 = uns.unsl2;
@@ -1219,9 +1337,9 @@ describe('UNS', () => {
       it('should unhash token', async () => {
         const testMeta: TokenUriMetadata = liveData.cryptoDomainMetadata;
         mockAsyncMethod(Networking, 'fetch', {
+          ok: true,
           json: () => ({
             name: testMeta.name,
-            ok: true,
           }),
         });
         const endpoint = 'https://resolve.unstoppabledomains.com/metadata/';
@@ -1315,9 +1433,9 @@ describe('UNS', () => {
         'should throw error if returned domain is wrong',
         async () => {
           mockAsyncMethod(Networking, 'fetch', {
+            ok: true,
             json: () => ({
               name: 'invalid-domain.crypto',
-              ok: true,
             }),
           });
           const endpoint = 'https://resolve.unstoppabledomains.com/metadata/';

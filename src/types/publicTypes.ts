@@ -208,6 +208,7 @@ export interface DnsRecord {
   data: string;
 }
 export type CryptoRecords = Record<string, string>;
+
 export type DomainData = {
   owner: string;
   resolver: string;
@@ -248,6 +249,10 @@ export interface TokenUriMetadata extends Erc721Metadata {
   background_color?: string;
   animation_url?: string;
   youtube_url?: string;
+}
+
+export interface DomainMetadata extends Erc721Metadata {
+  records: CryptoRecords;
 }
 
 export enum BlockchainType {

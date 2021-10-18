@@ -2,10 +2,9 @@ import {
   BlockhainNetworkUrlMap,
   UnsSupportedNetwork,
   ProxyReaderMap,
-  EventData,
 } from './types';
 import {UnsLayerSource, ConfigurationError, ConfigurationErrorCode} from '.';
-import {CryptoRecords, DomainData, UnsLocation} from './types/publicTypes';
+import {DomainData, UnsLocation} from './types/publicTypes';
 import {constructRecords, EthereumNetworks, isNullAddress} from './utils';
 import FetchProvider from './FetchProvider';
 import EthereumContract from './contracts/EthereumContract';
@@ -13,10 +12,6 @@ import proxyReader from './contracts/uns/proxyReader';
 import UnsConfig from './config/uns-config.json';
 import ResolutionError, {ResolutionErrorCode} from './errors/resolutionError';
 import {eip137Namehash} from './utils/namehash';
-import {default as resolverInterface} from './contracts/uns/resolver';
-import SupportedKeys from './config/resolver-keys.json';
-import registry from './contracts/uns/registry';
-import {Interface} from '@ethersproject/abi';
 
 export default class UnsInternal {
   static readonly ProxyReaderMap: ProxyReaderMap = getProxyReaderMap();
@@ -86,25 +81,6 @@ export default class UnsInternal {
     return (await this.getVerifiedData(domain)).resolver;
   }
 
-  async allRecords(domain: string): Promise<CryptoRecords> {
-    const tokenId = this.namehash(domain);
-    const resolver = await this.resolver(domain);
-
-    if (!resolver) {
-      return {};
-    }
-    const resolverContract = new EthereumContract(
-      resolverInterface,
-      resolver,
-      this.provider,
-    );
-    if (this.isLegacyResolver(resolver)) {
-      return this.getStandardRecords(tokenId);
-    }
-
-    return this.getAllRecords(resolverContract, tokenId);
-  }
-
   async get(tokenId: string, keys: string[] = []): Promise<DomainData> {
     const [resolver, owner, values] = await this.readerContract.call(
       'getData',
@@ -142,48 +118,6 @@ export default class UnsInternal {
       ) &&
       tokens.every((v) => !!v.length)
     );
-  }
-
-  private isLegacyResolver(resolverAddress: string): boolean {
-    return this.isWellKnownLegacyResolver(resolverAddress);
-  }
-
-  private isWellKnownLegacyResolver(resolverAddress: string): boolean {
-    const legacyAddresses =
-      UnsConfig?.networks[EthereumNetworks[this.network]]?.contracts?.Resolver
-        ?.legacyAddresses;
-    if (!legacyAddresses || legacyAddresses.length === 0) {
-      return false;
-    }
-    return (
-      legacyAddresses.findIndex((address) => {
-        return address.toLowerCase() === resolverAddress.toLowerCase();
-      }) > -1
-    );
-  }
-
-  private getStartingBlockFromRegistry(registryAddress: string): string {
-    const contractDetails = Object.values(UnsConfig?.networks).reduce(
-      (acc, network) => {
-        const contracts = network.contracts;
-
-        return [
-          ...acc,
-          ...Object.values(contracts).map((c) => ({
-            address: c.address,
-            deploymentBlock: c.deploymentBlock,
-          })),
-        ];
-      },
-      [],
-    );
-    const contractDetail = contractDetails.find(
-      (detail) => detail.address === registryAddress,
-    );
-    if (!contractDetail || contractDetail?.deploymentBlock === '0x0') {
-      return 'earliest';
-    }
-    return contractDetail.deploymentBlock;
   }
 
   private async getVerifiedData(
@@ -265,70 +199,6 @@ export default class UnsInternal {
     }
     const ethLikePattern = new RegExp('^0x[a-fA-F0-9]{40}$');
     return ethLikePattern.test(address);
-  }
-
-  private async getStandardRecords(tokenId: string): Promise<CryptoRecords> {
-    const keys = Object.keys(SupportedKeys.keys);
-    return this.getMany(tokenId, keys);
-  }
-
-  private async getMany(
-    tokenId: string,
-    keys: string[],
-  ): Promise<CryptoRecords> {
-    return (await this.get(tokenId, keys)).records;
-  }
-
-  private async getStartingBlock(
-    contract: EthereumContract,
-    tokenId: string,
-  ): Promise<string | undefined> {
-    const defaultStartingBlock =
-      UnsConfig?.networks[EthereumNetworks[this.network]]?.contracts?.Resolver
-        ?.deploymentBlock;
-    const logs = await contract.fetchLogs('ResetRecords', tokenId);
-    const lastResetEvent = logs[logs.length - 1];
-    return lastResetEvent?.blockNumber || defaultStartingBlock;
-  }
-
-  private async getAllRecords(
-    resolverContract: EthereumContract,
-    tokenId: string,
-  ): Promise<CryptoRecords> {
-    const startingBlock = await this.getStartingBlock(
-      resolverContract,
-      tokenId,
-    );
-    const logs = await this.getNewKeyEvents(
-      resolverContract,
-      tokenId,
-      startingBlock || 'earliest',
-    );
-    const keyTopics = logs.map((event) => event.topics[2]);
-    // If there are no NewKey events we want to check the standardRecords
-    if (keyTopics.length === 0) {
-      return this.getStandardRecords(tokenId);
-    }
-    return this.getManyByHash(tokenId, keyTopics);
-  }
-
-  private async getManyByHash(
-    tokenId: string,
-    hashes: string[],
-  ): Promise<CryptoRecords> {
-    const [keys, values] = (await this.readerContract.call('getManyByHash', [
-      hashes,
-      tokenId,
-    ])) as [string[], string[]];
-    return constructRecords(keys, values);
-  }
-
-  private async getNewKeyEvents(
-    resolverContract: EthereumContract,
-    tokenId: string,
-    startingBlock: string,
-  ): Promise<EventData[]> {
-    return resolverContract.fetchLogs('NewKey', tokenId, startingBlock);
   }
 }
 

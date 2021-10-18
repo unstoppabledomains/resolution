@@ -44,8 +44,8 @@ import {
 import {HTTPProvider} from '@zilliqa-js/core';
 import {Eip1993Factories as Eip1193Factories} from '../utils/Eip1993Factories';
 import UnsConfig from '../config/uns-config.json';
-import EthereumContract from '../contracts/EthereumContract';
 import {NullAddress} from '../types';
+import Networking from '../utils/Networking';
 
 let resolution: Resolution;
 let uns: Uns;
@@ -999,145 +999,70 @@ describe('Resolution', () => {
         });
 
         describe('.All-get', () => {
-          it('should be able to get logs with ethers default provider', async () => {
-            const provider = new InfuraProvider(
-              'rinkeby',
-              '213fff28936343858ca9c5115eff1419',
-            );
-            const polygonProvider = new InfuraProvider(
-              'maticmum',
-              'c4bb906ed6904c42b19c95825fe55f39',
-            );
-
-            const eye = mockAsyncMethod(provider, 'call', (params) =>
-              Promise.resolve(caseMock(params, RpcProviderTestCases)),
-            );
-            const eye2 = mockAsyncMethod(provider, 'getLogs', (params) =>
-              Promise.resolve(caseMock(params, RpcProviderTestCases)),
-            );
-
-            const resolution = Resolution.fromEthersProvider({
-              uns: {
-                locations: {
-                  Layer1: {network: 'rinkeby', provider},
-                  Layer2: {
-                    network: 'polygon-mumbai',
-                    provider: polygonProvider,
-                  },
-                },
-              },
-            });
-            const uns = resolution.serviceMap['UNS'] as unknown as Uns;
-            mockAsyncMethod(uns.unsl2, 'get', (params) =>
-              Promise.resolve([NullAddress, NullAddress, {}]),
-            );
-            const resp = await resolution.allRecords('brad.crypto');
-            expectSpyToBeCalled([eye], 2);
-            expectSpyToBeCalled([eye2], 2);
-            expect(resp).toMatchObject({
-              'gundb.username.value':
-                '0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c',
-              'ipfs.html.value':
-                'QmdyBw5oTgCtTLQ18PbDvPL8iaLoEPhSyzD91q9XmgmAjb',
-              'ipfs.redirect_domain.value':
-                'https://abbfe6z95qov3d40hf6j30g7auo7afhp.mypinata.cloud/ipfs/Qme54oEzRkgooJbCDr78vzKAWcv6DDEZqRhhDyDtzgrZP6',
-              'crypto.ETH.address':
-                '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
-              'gundb.public_key.value':
-                'pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI',
-              'crypto.BTC.address':
-                'bc1q359khn0phg58xgezyqsuuaha28zkwx047c0c3y',
-            });
-          });
-
-          it('should be able to get logs with jsonProvider', async () => {
-            const provider = new JsonRpcProvider(
-              protocolLink(ProviderProtocol.http),
-              'rinkeby',
-            );
-            const polygonProvider = new JsonRpcProvider(
-              protocolLink(ProviderProtocol.http, 'UNSL2'),
-              'maticmum',
-            );
-            const resolution = Resolution.fromEthersProvider({
-              uns: {
-                locations: {
-                  Layer1: {network: 'rinkeby', provider},
-                  Layer2: {
-                    network: 'polygon-mumbai',
-                    provider: polygonProvider,
-                  },
-                },
-              },
-            });
-            const eye = mockAsyncMethod(provider, 'call', (params) =>
-              Promise.resolve(caseMock(params, RpcProviderTestCases)),
-            );
-            const eye2 = mockAsyncMethod(provider, 'getLogs', (params) => {
-              // console.log({params, response: caseMock(params, RpcProviderTestCases)});
-              return Promise.resolve(caseMock(params, RpcProviderTestCases));
-            });
-            const uns = resolution.serviceMap['UNS'] as unknown as Uns;
-            mockAsyncMethod(uns.unsl2, 'get', (params) =>
-              Promise.resolve([NullAddress, NullAddress, {}]),
-            );
-            const resp = await resolution.allRecords('brad.crypto');
-            expectSpyToBeCalled([eye], 2);
-            expectSpyToBeCalled([eye2], 2);
-            expect(resp).toMatchObject({
-              'gundb.username.value':
-                '0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c',
-              'ipfs.html.value':
-                'QmdyBw5oTgCtTLQ18PbDvPL8iaLoEPhSyzD91q9XmgmAjb',
-              'ipfs.redirect_domain.value':
-                'https://abbfe6z95qov3d40hf6j30g7auo7afhp.mypinata.cloud/ipfs/Qme54oEzRkgooJbCDr78vzKAWcv6DDEZqRhhDyDtzgrZP6',
-              'crypto.ETH.address':
-                '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
-              'gundb.public_key.value':
-                'pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI',
-              'crypto.BTC.address':
-                'bc1q359khn0phg58xgezyqsuuaha28zkwx047c0c3y',
-            });
-          });
-
           it('should return allNonEmptyRecords', async () => {
-            const provider = new JsonRpcProvider(
-              protocolLink(ProviderProtocol.http),
-              'rinkeby',
-            );
-            const polygonProvider = new JsonRpcProvider(
-              protocolLink(ProviderProtocol.http, 'UNSL2'),
-              'maticmum',
-            );
-            const resolution = Resolution.fromEthersProvider({
-              uns: {
-                locations: {
-                  Layer1: {network: 'rinkeby', provider},
-                  Layer2: {
-                    network: 'polygon-mumbai',
-                    provider: polygonProvider,
-                  },
-                },
+            const records = {
+              'crypto.ADA.address':
+                'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
+              'crypto.BCH.address':
+                'qzx048ez005q4yhphqu2pylpfc3hy88zzu4lu6q9j8',
+              'crypto.BTC.address': '1MUFCFhhuApRqfbqNby6Jvvp6gbYx6yWhR',
+              'crypto.ETH.address':
+                '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+              'crypto.LTC.address':
+                'ltc1qj03wgu07dqytxz4r9arc4taz2u7mzuz38xpuu4',
+              'crypto.USDC.address':
+                '0x666574cAdedEB4a0f282fF0C2B3588617E29e6A0',
+              'crypto.USDT.version.EOS.address': 'letsminesome',
+              'crypto.USDT.version.ERC20.address':
+                '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+              'crypto.USDT.version.OMNI.address':
+                '19o6LvAdCPkjLi83VsjrCsmvQZUirT4KXJ',
+              'crypto.USDT.version.TRON.address':
+                'TNemhXhpX7MwzZJa3oXvfCjo5pEeXrfN2h',
+              'crypto.XRP.address': 'rMXToC1316oNyqwgQpWgSrzMUU9R6UDizW',
+              'crypto.ZIL.address':
+                'zil1xftz4cd425mer6jxmtl29l28xr0zu8s5hnp9he',
+              'dns.A': '["10.0.0.1","10.0.0.3"]',
+              'dns.A.ttl': '98',
+              'dns.AAAA': '[]',
+              'dns.ttl': '128',
+              'ipfs.html.value':
+                'QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu',
+              'ipfs.redirect_domain.value': 'google.com',
+              'whois.email.value': 'johnny@unstoppabledomains.com',
+            };
+            const unsl1 = uns.unsl1;
+            const unsl2 = uns.unsl2;
+            mockAsyncMethods(unsl1, {
+              get: {
+                owner: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+                resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+                records: records,
+                location: UnsLocation.Layer1,
               },
             });
-            const eye = mockAsyncMethod(provider, 'call', (params) =>
-              Promise.resolve(caseMock(params, RpcProviderTestCases)),
-            );
-            const eye2 = mockAsyncMethod(provider, 'getLogs', (params) => {
-              return Promise.resolve(caseMock(params, RpcProviderTestCases));
+            mockAsyncMethods(unsl2, {
+              get: {
+                owner: NullAddress,
+                resolver: NullAddress,
+                records: {},
+                location: UnsLocation.Layer2,
+              },
             });
-            const uns = resolution.serviceMap['UNS'] as unknown as Uns;
-            mockAsyncMethod(uns.unsl2, 'get', (params) =>
-              Promise.resolve([NullAddress, NullAddress, {}]),
-            );
+            mockAsyncMethod(Networking, 'fetch', {
+              ok: true,
+              json: () => ({
+                name: CryptoDomainWithAllRecords,
+                records,
+              }),
+            });
+            const endpoint = 'https://resolve.unstoppabledomains.com/metadata/';
 
-            // udtestdev-emptyrecords.crypto have 1 empty record and 1 record with value
-            const response = await resolution.allNonEmptyRecords(
-              'udtestdev-emptyrecords.crypto',
+            mockAsyncMethod(uns, 'getTokenUri', endpoint);
+            const result = await resolution.allNonEmptyRecords(
+              CryptoDomainWithAllRecords,
             );
-            expectSpyToBeCalled([eye], 2);
-            expectSpyToBeCalled([eye2], 2);
-            expect(Object.keys(response).length).toBe(1);
+            expect(result).toEqual(records);
           });
 
           it('should get standard keys from legacy resolver', async () => {
@@ -1170,10 +1095,19 @@ describe('Resolution', () => {
             mockAsyncMethod(uns.unsl2, 'get', (params) =>
               Promise.resolve([NullAddress, NullAddress, {}]),
             );
+            mockAsyncMethod(Networking, 'fetch', {
+              ok: true,
+              json: () => ({
+                name: 'monmouthcounty.crypto',
+                records: {},
+              }),
+            });
+            const endpoint = 'https://resolve.unstoppabledomains.com/metadata/';
 
+            mockAsyncMethod(uns, 'getTokenUri', endpoint);
             const resp = await resolution.allRecords('monmouthcounty.crypto');
 
-            expectSpyToBeCalled([eye], 2);
+            expectSpyToBeCalled([eye], 1);
             expect(resp).toMatchObject({
               'crypto.BTC.address': '3NwuV8nVT2VKbtCs8evChdiW6kHTHcVpdn',
               'crypto.ETH.address':
@@ -1219,25 +1153,36 @@ describe('Resolution', () => {
           const zns = resolution.serviceMap['ZNS'] as unknown as Zns;
           const unsl1 = uns.unsl1;
           const unsl2 = uns.unsl2;
-          const unsL1AllRecordsMock = mockAsyncMethods(unsl1, {
-            getStartingBlock: undefined,
-            resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
-            getStandardRecords: {
-              'crypto.ETH.address':
-                '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
+          const unsL1GetMock = mockAsyncMethods(unsl1, {
+            get: {
+              owner: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+              resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+              records: {
+                'crypto.ETH.address':
+                  '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
+              },
+              location: UnsLocation.Layer1,
             },
           });
-          mockAsyncMethod(unsl2, 'getVerifiedData', (params) =>
-            Promise.reject(
-              new ResolutionError(ResolutionErrorCode.UnregisteredDomain),
-            ),
-          );
+          const unsL2GetMock = mockAsyncMethods(unsl2, {
+            get: {
+              owner: NullAddress,
+              resolver: NullAddress,
+              records: {},
+              location: UnsLocation.Layer2,
+            },
+          });
+          mockAsyncMethod(Networking, 'fetch', {
+            ok: true,
+            json: () => ({
+              name: 'brad.crypto',
+              records: {},
+            }),
+          });
+          const endpoint = 'https://resolve.unstoppabledomains.com/metadata/';
 
-          const unsL1GetNewKeyMock = mockAsyncMethod(
-            unsl1,
-            'getNewKeyEvents',
-            [],
-          );
+          mockAsyncMethod(uns, 'getTokenUri', endpoint);
+
           const znsAllRecordsMock = mockAsyncMethods(zns, {
             resolver: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
             getResolverRecords: {
@@ -1248,26 +1193,14 @@ describe('Resolution', () => {
           const znsRecords = await resolution.allRecords('brad.zil');
           const unsRecords = await resolution.allRecords('brad.crypto');
           expectSpyToBeCalled(znsAllRecordsMock);
-          expectSpyToBeCalled(unsL1AllRecordsMock);
+          expectSpyToBeCalled(unsL1GetMock);
+          expectSpyToBeCalled(unsL2GetMock);
           expect(unsRecords['crypto.ETH.address']).toEqual(
             '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
           );
           expect(znsRecords['crypto.ZIL.address']).toEqual(
             'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
           );
-          if (isLive()) {
-            expect(unsL1GetNewKeyMock).toBeCalledWith(
-              expect.any(EthereumContract),
-              resolution.namehash('brad.crypto'),
-              '0x99a587',
-            );
-          } else {
-            expect(unsL1GetNewKeyMock).toBeCalledWith(
-              expect.any(EthereumContract),
-              resolution.namehash('brad.crypto'),
-              'earliest',
-            );
-          }
         });
       });
 
