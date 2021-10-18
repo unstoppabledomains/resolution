@@ -105,30 +105,6 @@ export default class UnsInternal {
     return this.getAllRecords(resolverContract, tokenId);
   }
 
-  async getDomainFromTokenId(tokenId: string): Promise<string> {
-    const registryAddress = await this.registryAddress(tokenId);
-    const registryContract = new EthereumContract(
-      registry,
-      registryAddress,
-      this.provider,
-    );
-    const startingBlock = this.getStartingBlockFromRegistry(registryAddress);
-    const newURIEvents = await registryContract.fetchLogs(
-      'NewURI',
-      tokenId,
-      startingBlock,
-    );
-
-    if (!newURIEvents || newURIEvents.length === 0) {
-      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-        domain: `with tokenId ${tokenId}`,
-      });
-    }
-    const rawData = newURIEvents[newURIEvents.length - 1].data;
-    const decoded = Interface.getAbiCoder().decode(['string'], rawData);
-    return decoded[decoded.length - 1];
-  }
-
   async get(tokenId: string, keys: string[] = []): Promise<DomainData> {
     const [resolver, owner, values] = await this.readerContract.call(
       'getData',
