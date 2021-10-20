@@ -1,4 +1,4 @@
-import {UnsSupportedNetwork, ProxyReaderMap, hasProvider} from './types';
+import {UnsSupportedNetwork, hasProvider} from './types';
 import ResolutionError, {ResolutionErrorCode} from './errors/resolutionError';
 import {
   constructRecords,
@@ -14,7 +14,6 @@ import {
   UnsLocation,
 } from './types/publicTypes';
 import {isValidTwitterSignature} from './utils/TwitterSignatureValidator';
-import UnsConfig from './config/uns-config.json';
 import FetchProvider from './FetchProvider';
 import {eip137Childhash, eip137Namehash} from './utils/namehash';
 import {NamingService} from './NamingService';
@@ -22,6 +21,7 @@ import ConfigurationError, {
   ConfigurationErrorCode,
 } from './errors/configurationError';
 import UnsInternal from './UnsInternal';
+import Networking from './utils/Networking';
 
 /**
  * @internal
@@ -311,18 +311,33 @@ export default class Uns extends NamingService {
   }
 
   async getDomainFromTokenId(tokenId: string): Promise<string> {
-    const [resultOrErrorL1, resultOrErrorL2] = await Promise.all([
-      this.unsl1.getDomainFromTokenId(tokenId).catch((err) => err),
-      this.unsl2.getDomainFromTokenId(tokenId).catch((err) => err),
-    ]);
-    if (resultOrErrorL2 instanceof Error) {
-      validResolutionErrorOrThrow(
-        resultOrErrorL2,
-        ResolutionErrorCode.UnregisteredDomain,
-      );
-      return validResultOrThrow(resultOrErrorL1);
+    const tokenUri = await this.getTokenUri(tokenId);
+    const resp = await Networking.fetch(tokenUri, {}).catch((err) => {
+      throw new ResolutionError(ResolutionErrorCode.MetadataEndpointError, {
+        tokenUri: tokenUri || 'undefined',
+        errorMessage: err.message,
+      });
+    });
+    if (!resp.ok) {
+      throw new ResolutionError(ResolutionErrorCode.MetadataEndpointError, {
+        tokenUri: tokenUri || 'undefined',
+      });
     }
-    return resultOrErrorL2;
+    const metadata = await resp.json();
+    if (!metadata.name) {
+      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+        domain: `with tokenId ${tokenId}`,
+      });
+    }
+    if (this.namehash(metadata.name) !== tokenId) {
+      throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
+        methodName: 'unhash',
+        domain: metadata.name,
+        providerMessage: 'Service provider returned an invalid domain name',
+      });
+    }
+
+    return metadata.name;
   }
 
   private async getVerifiedData(
@@ -413,13 +428,4 @@ function validResolutionErrorOrThrow(
     return true;
   }
   throw error;
-}
-
-function getProxyReaderMap(): ProxyReaderMap {
-  const map: ProxyReaderMap = {};
-  for (const id of Object.keys(UnsConfig.networks)) {
-    map[id] =
-      UnsConfig.networks[id].contracts.ProxyReader.address.toLowerCase();
-  }
-  return map;
 }
