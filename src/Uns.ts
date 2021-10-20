@@ -186,7 +186,7 @@ export default class Uns extends NamingService {
     const metadata = await this.getMetadata(tokenId);
     return this.records(domain, [
       ...Object.keys(SupportedKeys.keys),
-      ...Object.keys(metadata.records),
+      ...Object.keys(metadata.properties.records),
     ]);
   }
 

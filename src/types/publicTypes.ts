@@ -252,7 +252,9 @@ export interface TokenUriMetadata extends Erc721Metadata {
 }
 
 export interface DomainMetadata extends Erc721Metadata {
-  records: CryptoRecords;
+  properties: {
+    records: CryptoRecords;
+  };
 }
 
 export enum BlockchainType {

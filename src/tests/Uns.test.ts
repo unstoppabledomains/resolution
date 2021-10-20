@@ -943,7 +943,7 @@ describe('UNS', () => {
         ok: true,
         json: () => ({
           name: CryptoDomainWithAllRecords,
-          records,
+          properties: {records},
         }),
       });
       const endpoint = 'https://resolve.unstoppabledomains.com/metadata/';
@@ -1001,7 +1001,7 @@ describe('UNS', () => {
         ok: true,
         json: () => ({
           name: CryptoDomainWithAllRecords,
-          records,
+          properties: {records},
         }),
       });
       const endpoint = 'https://resolve.unstoppabledomains.com/metadata/';
@@ -1382,24 +1382,27 @@ describe('UNS', () => {
           }),
         );
       });
-      it('should throw if unable to query metadata endpoint token', async () => {
-        const tokenId =
-          '0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc8';
-        const tokenUri = 'https://resolve.unstoppabledomains.com/metadata/';
+      skipItInLive(
+        'should throw if unable to query metadata endpoint token',
+        async () => {
+          const tokenId =
+            '0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc8';
+          const tokenUri = 'https://resolve.unstoppabledomains.com/metadata/';
 
-        mockAsyncMethod(uns, 'getTokenUri', tokenUri);
-        mockAsyncMethod(Networking, 'fetch', {
-          ok: false,
-          json: () => null,
-        });
-        expect(() =>
-          resolution.unhash(tokenId, NamingServiceName.UNS),
-        ).rejects.toThrow(
-          new ResolutionError(ResolutionErrorCode.MetadataEndpointError, {
-            tokenUri,
-          }),
-        );
-      });
+          mockAsyncMethod(uns, 'getTokenUri', tokenUri);
+          mockAsyncMethod(Networking, 'fetch', {
+            ok: false,
+            json: () => null,
+          });
+          expect(() =>
+            resolution.unhash(tokenId, NamingServiceName.UNS),
+          ).rejects.toThrow(
+            new ResolutionError(ResolutionErrorCode.MetadataEndpointError, {
+              tokenUri,
+            }),
+          );
+        },
+      );
       it('should throw error if domain is not found', async () => {
         const unregisteredhash = resolution.namehash(
           'test34230131207328144694.crypto',

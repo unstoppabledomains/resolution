@@ -1053,7 +1053,7 @@ describe('Resolution', () => {
               ok: true,
               json: () => ({
                 name: CryptoDomainWithAllRecords,
-                records,
+                properties: {records},
               }),
             });
             const endpoint = 'https://resolve.unstoppabledomains.com/metadata/';
@@ -1098,14 +1098,16 @@ describe('Resolution', () => {
             mockAsyncMethod(Networking, 'fetch', {
               ok: true,
               json: () => ({
-                name: 'monmouthcounty.crypto',
-                records: {},
+                name: CryptoDomainWithAllRecords,
+                properties: {records: {}},
               }),
             });
             const endpoint = 'https://resolve.unstoppabledomains.com/metadata/';
 
             mockAsyncMethod(uns, 'getTokenUri', endpoint);
-            const resp = await resolution.allRecords('monmouthcounty.crypto');
+            const resp = await resolution.allRecords(
+              CryptoDomainWithAllRecords,
+            );
 
             expectSpyToBeCalled([eye], 1);
             expect(resp).toMatchObject({
@@ -1176,7 +1178,7 @@ describe('Resolution', () => {
             ok: true,
             json: () => ({
               name: 'brad.crypto',
-              records: {},
+              properties: {records: {}},
             }),
           });
           const endpoint = 'https://resolve.unstoppabledomains.com/metadata/';
