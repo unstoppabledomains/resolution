@@ -1378,7 +1378,7 @@ describe('UNS', () => {
           resolution.unhash(tokenId, NamingServiceName.UNS),
         ).rejects.toThrow(
           new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-            domain: tokenId,
+            domain: `with tokenId ${tokenId}`,
           }),
         );
       });
@@ -1389,9 +1389,8 @@ describe('UNS', () => {
 
         mockAsyncMethod(uns, 'getTokenUri', tokenUri);
         mockAsyncMethod(Networking, 'fetch', {
-          json: () => ({
-            ok: false,
-          }),
+          ok: false,
+          json: () => null,
         });
         expect(() =>
           resolution.unhash(tokenId, NamingServiceName.UNS),
