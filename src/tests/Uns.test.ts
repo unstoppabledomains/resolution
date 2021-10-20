@@ -1219,9 +1219,9 @@ describe('UNS', () => {
       it('should unhash token', async () => {
         const testMeta: TokenUriMetadata = liveData.cryptoDomainMetadata;
         mockAsyncMethod(Networking, 'fetch', {
+          ok: true,
           json: () => ({
             name: testMeta.name,
-            ok: true,
           }),
         });
         const endpoint = 'https://resolve.unstoppabledomains.com/metadata/';
@@ -1260,7 +1260,7 @@ describe('UNS', () => {
           resolution.unhash(tokenId, NamingServiceName.UNS),
         ).rejects.toThrow(
           new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-            domain: tokenId,
+            domain: `with tokenId ${tokenId}`,
           }),
         );
       });
@@ -1271,9 +1271,8 @@ describe('UNS', () => {
 
         mockAsyncMethod(uns, 'getTokenUri', tokenUri);
         mockAsyncMethod(Networking, 'fetch', {
-          json: () => ({
-            ok: false,
-          }),
+          ok: false,
+          json: () => null,
         });
         expect(() =>
           resolution.unhash(tokenId, NamingServiceName.UNS),
@@ -1315,9 +1314,9 @@ describe('UNS', () => {
         'should throw error if returned domain is wrong',
         async () => {
           mockAsyncMethod(Networking, 'fetch', {
+            ok: true,
             json: () => ({
               name: 'invalid-domain.crypto',
-              ok: true,
             }),
           });
           const endpoint = 'https://resolve.unstoppabledomains.com/metadata/';

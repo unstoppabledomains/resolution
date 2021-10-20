@@ -312,29 +312,32 @@ export default class Uns extends NamingService {
 
   async getDomainFromTokenId(tokenId: string): Promise<string> {
     const tokenUri = await this.getTokenUri(tokenId);
-    const resp = await Networking.fetch(tokenUri, {})
-      .then((resp) => resp.json())
-      .catch((err) => {
-        throw new ResolutionError(ResolutionErrorCode.MetadataEndpointError, {
-          tokenUri: tokenUri || 'undefined',
-          errorMessage: err.message,
-        });
+    const resp = await Networking.fetch(tokenUri, {}).catch((err) => {
+      throw new ResolutionError(ResolutionErrorCode.MetadataEndpointError, {
+        tokenUri: tokenUri || 'undefined',
+        errorMessage: err.message,
       });
-
-    if (!resp.name) {
+    });
+    if (!resp.ok) {
+      throw new ResolutionError(ResolutionErrorCode.MetadataEndpointError, {
+        tokenUri: tokenUri || 'undefined',
+      });
+    }
+    const metadata = await resp.json();
+    if (!metadata.name) {
       throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
         domain: `with tokenId ${tokenId}`,
       });
     }
-    if (this.namehash(resp.name) !== tokenId) {
+    if (this.namehash(metadata.name) !== tokenId) {
       throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
         methodName: 'unhash',
-        domain: resp.name,
+        domain: metadata.name,
         providerMessage: 'Service provider returned an invalid domain name',
       });
     }
 
-    return resp.name;
+    return metadata.name;
   }
 
   private async getVerifiedData(
