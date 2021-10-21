@@ -954,20 +954,6 @@ describe('UNS', () => {
     });
     it('should return all records on L1 with non standard records', async () => {
       const records = {
-        'crypto.AwDA.address':
-          'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
-        'crypto.BCwH.address': 'qzx048ez005q4yhphqu2pylpfc3hy88zzu4lu6q9j8',
-        'crypto.BfTC.address': '1MUFCFhhuApRqfbqNby6Jvvp6gbYx6yWhR',
-        'crypto.EgTH.address': '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
-        'crypto.LTgC.address': 'ltc1qj03wgu07dqytxz4r9arc4taz2u7mzuz38xpuu4',
-        'crypto.US3DC.address': '0x666574cAdedEB4a0f282fF0C2B3588617E29e6A0',
-        'crypto.USrDT.version.EOS.address': 'letsminesome',
-        'crypto.U3SDT.version.ERC20.address':
-          '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
-        'crypto.USDgT.version.OMNI.address':
-          '19o6LvAdCPkjLi83VsjrCsmvQZUirT4KXJ',
-        'crypto.UnSDT.version.TRON.address':
-          'TNemhXhpX7MwzZJa3oXvfCjo5pEeXrfN2h',
         'crypto.XRP.address': 'rMXToC1316oNyqwgQpWgSrzMUU9R6UDizW',
         'crypto.ZIL.address': 'zil1xftz4cd425mer6jxmtl29l28xr0zu8s5hnp9he',
         'dns.A': '["10.0.0.1","10.0.0.3"]',
@@ -977,7 +963,6 @@ describe('UNS', () => {
         'ipfs.html.value': 'QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu',
         'ipfs.redirect_domain.value': 'google.com',
         'whois.email.value': 'johnny@unstoppabledomains.com',
-        'custom.record.value': 'blah',
       };
       const unsl1 = uns.unsl1;
       const unsl2 = uns.unsl2;

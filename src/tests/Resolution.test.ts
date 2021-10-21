@@ -1078,7 +1078,6 @@ describe('Resolution', () => {
               'maticmum',
               'c4bb906ed6904c42b19c95825fe55f39',
             );
-
             const resolution = Resolution.fromEthersProvider({
               uns: {
                 locations: {
@@ -1098,16 +1097,14 @@ describe('Resolution', () => {
             mockAsyncMethod(Networking, 'fetch', {
               ok: true,
               json: () => ({
-                name: CryptoDomainWithAllRecords,
+                name: 'monmouthcounty.crypto',
                 properties: {records: {}},
               }),
             });
             const endpoint = 'https://resolve.unstoppabledomains.com/metadata/';
 
             mockAsyncMethod(uns, 'getTokenUri', endpoint);
-            const resp = await resolution.allRecords(
-              CryptoDomainWithAllRecords,
-            );
+            const resp = await resolution.allRecords('monmouthcounty.crypto');
 
             expectSpyToBeCalled([eye], 1);
             expect(resp).toMatchObject({

@@ -258,13 +258,10 @@ export default class Uns extends NamingService {
       this.unsl2.getTokenUri(tokenId).catch((err) => err),
     ]);
     if (resultOrErrorL2 instanceof Error) {
-      validResolutionErrorOrThrow(
-        resultOrErrorL2,
-        ResolutionErrorCode.ServiceProviderError,
-      );
       if (
-        resultOrErrorL2.message !==
-        '< execution reverted: ERC721Metadata: URI query for nonexistent token >'
+        !resultOrErrorL2.message.includes(
+          'ERC721Metadata: URI query for nonexistent token',
+        )
       ) {
         throw resultOrErrorL2;
       }
