@@ -1353,13 +1353,16 @@ describe('UNS', () => {
       it('should throw if unable to unhash token', async () => {
         const tokenId =
           '0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc8';
+        const tokenUri =
+          'https://metadata.staging.unstoppabledomains.com/metadata/';
+        mockAsyncMethod(uns, 'getTokenUri', tokenUri);
         mockAsyncMethod(Networking, 'fetch', {
+          ok: true,
           json: () => ({
             name: null,
-            ok: true,
           }),
         });
-        expect(() =>
+        expect(
           resolution.unhash(tokenId, NamingServiceName.UNS),
         ).rejects.toThrow(
           new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
@@ -1367,27 +1370,28 @@ describe('UNS', () => {
           }),
         );
       });
-      skipItInLive(
-        'should throw if unable to query metadata endpoint token',
-        async () => {
-          const tokenId =
-            '0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc8';
-          const tokenUri = 'https://resolve.unstoppabledomains.com/metadata/';
+      it('should throw if unable to query metadata endpoint token', async () => {
+        const tokenId =
+          '0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc8';
+        const tokenUri =
+          'https://metadata.staging.unstoppabledomains.com/metadata/';
 
-          mockAsyncMethod(uns, 'getTokenUri', tokenUri);
-          mockAsyncMethod(Networking, 'fetch', {
-            ok: false,
-            json: () => null,
-          });
-          expect(() =>
-            resolution.unhash(tokenId, NamingServiceName.UNS),
-          ).rejects.toThrow(
-            new ResolutionError(ResolutionErrorCode.MetadataEndpointError, {
-              tokenUri,
-            }),
-          );
-        },
-      );
+        const spy = jest.spyOn(uns, 'getTokenUri');
+        spy.mockImplementation(() => Promise.resolve(tokenUri));
+
+        mockAsyncMethod(Networking, 'fetch', {
+          ok: false,
+          json: () => null,
+        });
+        expect(
+          resolution.unhash(tokenId, NamingServiceName.UNS),
+        ).rejects.toThrow(
+          new ResolutionError(ResolutionErrorCode.MetadataEndpointError, {
+            tokenUri,
+          }),
+        );
+        expectSpyToBeCalled([spy]);
+      });
       it('should throw error if domain is not found', async () => {
         const unregisteredhash = resolution.namehash(
           'test34230131207328144694.crypto',

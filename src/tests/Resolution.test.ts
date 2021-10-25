@@ -292,7 +292,7 @@ describe('Resolution', () => {
         'request',
         new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
           providerMessage:
-            'Request to https://google.com failed with responce status 405',
+            'Request to https://google.com failed with response status 405',
         }),
       );
       const factorySpy = mockAsyncMethod(
@@ -312,7 +312,7 @@ describe('Resolution', () => {
       } catch (error) {
         expect(error).toBeInstanceOf(ResolutionError);
         expect(error.message).toBe(
-          '< Request to https://google.com failed with responce status 405 >',
+          '< Request to https://google.com failed with response status 405 >',
         );
       }
       expectSpyToBeCalled([factorySpy, providerSpy]);
@@ -1056,7 +1056,8 @@ describe('Resolution', () => {
                 properties: {records},
               }),
             });
-            const endpoint = 'https://resolve.unstoppabledomains.com/metadata/';
+            const endpoint =
+              'https://metadata.staging.unstoppabledomains.com/metadata/';
 
             mockAsyncMethod(uns, 'getTokenUri', endpoint);
             const result = await resolution.allNonEmptyRecords(
@@ -1101,7 +1102,8 @@ describe('Resolution', () => {
                 properties: {records: {}},
               }),
             });
-            const endpoint = 'https://resolve.unstoppabledomains.com/metadata/';
+            const endpoint =
+              'https://metadata.staging.unstoppabledomains.com/metadata/';
 
             mockAsyncMethod(uns, 'getTokenUri', endpoint);
             const resp = await resolution.allRecords('monmouthcounty.crypto');
@@ -1178,7 +1180,8 @@ describe('Resolution', () => {
               properties: {records: {}},
             }),
           });
-          const endpoint = 'https://resolve.unstoppabledomains.com/metadata/';
+          const endpoint =
+            'https://metadata.staging.unstoppabledomains.com/metadata/';
 
           mockAsyncMethod(uns, 'getTokenUri', endpoint);
 
