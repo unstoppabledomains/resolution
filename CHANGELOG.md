@@ -1,3 +1,6 @@
+## 5.0.2
+- Replaces `node-fetch` with `cross-fetch` package
+
 ## 5.0.1
 - Add `elliptic` package dependency in order to enable twitter verification support by default
 
