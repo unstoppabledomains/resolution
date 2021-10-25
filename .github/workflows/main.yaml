@@ -31,7 +31,7 @@ jobs:
         run: yarn test --coverage
 
       - name: Dependencies Security Audit
-        run: yarn audit-ci --moderate
+        run: npx audit-ci --skip-dev --critical --package-manager yarn
 
   size:
     runs-on: ubuntu-latest
