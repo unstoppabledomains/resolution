@@ -30,11 +30,8 @@ jobs:
         if: ${{ matrix.os == 'ubuntu-latest' && matrix.node == 12 }}
         run: yarn test --coverage
 
-      - name: Remove Dev Dependencies
-        run: yarn install --production=true
-
       - name: Dependencies Security Audit
-        run: npx audit-ci --moderate --package-manager yarn
+        run: npx audit-ci --skip-dev --critical --package-manager yarn
 
   size:
     runs-on: ubuntu-latest
