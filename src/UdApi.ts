@@ -34,9 +34,8 @@ export default class Udapi extends NamingService {
     super();
     this.name = 'UDAPI';
     this.url = api?.url || 'https://unstoppabledomains.com/api/v1';
-    const DefaultUserAgent = Networking.isNode()
-      ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'
-      : navigator.userAgent;
+    const DefaultUserAgent =
+      'cross-fetch/3.1.4 (+https://github.com/lquixada/cross-fetch)';
     const version = pckg.version;
     const CustomUserAgent = `${DefaultUserAgent} Resolution/${version}`;
     this.headers = {'X-user-agent': CustomUserAgent};
