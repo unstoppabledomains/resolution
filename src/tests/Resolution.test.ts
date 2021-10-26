@@ -1773,32 +1773,10 @@ describe('Resolution', () => {
     });
 
     it('should get location for zns domains', async () => {
-      const mockValues = {
-        registryAddress: 'zil1hyj6m5w4atcn7s806s69r0uh5g4t84e8gp6nps',
-        resolver: '0x02621c64a57e1424adfe122569f2356145f05d4f',
-        owner: (domain) => {
-          if (domain === 'testing.zil') {
-            return 'zil1qqlrehlvat5kalsq07qedgd3k804glhwhv8ppa';
-          } else {
-            throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
-          }
-        },
-      };
-
-      mockAsyncMethods(zns, mockValues);
-      const location = await resolution.locations([
-        'testing.zil',
-        'testing-domain-doesnt-exist-12345abc.zil',
-      ]);
-      expect(location['testing.zil']).toEqual({
-        registryAddress: mockValues.registryAddress,
-        resolverAddress: mockValues.resolver,
-        networkId: 333,
-        blockchain: BlockchainType.ZIL,
-        ownerAddress: mockValues.owner('testing.zil'),
-        blockchainProviderUrl: 'https://dev-api.zilliqa.com',
-      });
-      expect(location['testing-domain-doesnt-exist-12345abc.zil']).toBeNull();
+      await expectResolutionErrorCode(
+        () => resolution.locations(['testing.zil']),
+        ResolutionErrorCode.UnsupportedMethod,
+      );
     });
   });
 });

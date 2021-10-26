@@ -196,47 +196,9 @@ export default class Udapi extends NamingService {
     });
   }
 
-  async location(domain: string): Promise<DomainLocation | null> {
-    try {
-      const [registryAddress, resolverAddress, ownerAddress] =
-        await Promise.all([
-          this.registryAddress(domain),
-          this.resolver(domain),
-          this.owner(domain),
-        ]);
-
-      return {
-        registryAddress,
-        resolverAddress,
-        networkId: this.network,
-        blockchain: domain.endsWith('zil')
-          ? BlockchainType.ZIL
-          : BlockchainType.ETH, //TODO: get blockchain location from API
-        ownerAddress,
-        blockchainProviderUrl: this.url,
-      };
-    } catch (error) {
-      if (
-        error instanceof ResolutionError &&
-        (error as ResolutionError).code ===
-          ResolutionErrorCode.UnregisteredDomain
-      ) {
-        return null;
-      }
-      throw error;
-    }
-  }
-
   async locations(domains: string[]): Promise<Locations> {
-    const promises: Promise<DomainLocation | null>[] = [];
-    for (const domain of domains) {
-      promises.push(this.location(domain));
-    }
-    const results = await Promise.all(promises);
-    const locations: Locations = domains.reduce((locations, domain, i) => {
-      locations[domain] = results[i];
-      return locations;
-    }, {} as Locations);
-    return locations;
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+      methodName: 'locations',
+    });
   }
 }
