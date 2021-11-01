@@ -1,4 +1,4 @@
-import {UnsSupportedNetwork, ProxyReaderMap, hasProvider} from './types';
+import {UnsSupportedNetwork, hasProvider} from './types';
 import ResolutionError, {ResolutionErrorCode} from './errors/resolutionError';
 import {
   constructRecords,
@@ -14,9 +14,9 @@ import {
   UnsLocation,
   Locations,
   BlockchainType,
+  DomainMetadata,
 } from './types/publicTypes';
 import {isValidTwitterSignature} from './utils/TwitterSignatureValidator';
-import UnsConfig from './config/uns-config.json';
 import FetchProvider from './FetchProvider';
 import {eip137Childhash, eip137Namehash} from './utils/namehash';
 import {NamingService} from './NamingService';
@@ -24,6 +24,8 @@ import ConfigurationError, {
   ConfigurationErrorCode,
 } from './errors/configurationError';
 import UnsInternal from './UnsInternal';
+import Networking from './utils/Networking';
+import SupportedKeys from './config/resolver-keys.json';
 
 /**
  * @internal
@@ -190,18 +192,12 @@ export default class Uns extends NamingService {
   }
 
   async allRecords(domain: string): Promise<CryptoRecords> {
-    const [resultOrErrorL1, resultOrErrorL2] = await Promise.all([
-      this.unsl1.allRecords(domain).catch((err) => err),
-      this.unsl2.allRecords(domain).catch((err) => err),
+    const tokenId = this.namehash(domain);
+    const metadata = await this.getMetadata(tokenId);
+    return this.records(domain, [
+      ...Object.keys(SupportedKeys.keys),
+      ...Object.keys(metadata.properties.records),
     ]);
-    if (resultOrErrorL2 instanceof Error) {
-      validResolutionErrorOrThrow(
-        resultOrErrorL2,
-        ResolutionErrorCode.UnregisteredDomain,
-      );
-      return validResultOrThrow(resultOrErrorL1);
-    }
-    return resultOrErrorL2;
   }
 
   async twitter(domain: string): Promise<string> {
@@ -272,13 +268,10 @@ export default class Uns extends NamingService {
       this.unsl2.getTokenUri(tokenId).catch((err) => err),
     ]);
     if (resultOrErrorL2 instanceof Error) {
-      validResolutionErrorOrThrow(
-        resultOrErrorL2,
-        ResolutionErrorCode.ServiceProviderError,
-      );
       if (
-        resultOrErrorL2.message !==
-        '< execution reverted: ERC721Metadata: URI query for nonexistent token >'
+        !resultOrErrorL2.message.includes(
+          'ERC721Metadata: URI query for nonexistent token',
+        )
       ) {
         throw resultOrErrorL2;
       }
@@ -336,18 +329,38 @@ export default class Uns extends NamingService {
   }
 
   async getDomainFromTokenId(tokenId: string): Promise<string> {
-    const [resultOrErrorL1, resultOrErrorL2] = await Promise.all([
-      this.unsl1.getDomainFromTokenId(tokenId).catch((err) => err),
-      this.unsl2.getDomainFromTokenId(tokenId).catch((err) => err),
-    ]);
-    if (resultOrErrorL2 instanceof Error) {
-      validResolutionErrorOrThrow(
-        resultOrErrorL2,
-        ResolutionErrorCode.UnregisteredDomain,
-      );
-      return validResultOrThrow(resultOrErrorL1);
+    const metadata = await this.getMetadata(tokenId);
+
+    return metadata.name;
+  }
+
+  private async getMetadata(tokenId: string): Promise<DomainMetadata> {
+    const tokenUri = await this.getTokenUri(tokenId);
+    const resp = await Networking.fetch(tokenUri, {}).catch((err) => {
+      throw new ResolutionError(ResolutionErrorCode.MetadataEndpointError, {
+        tokenUri: tokenUri || 'undefined',
+        errorMessage: err.message,
+      });
+    });
+    if (!resp.ok) {
+      throw new ResolutionError(ResolutionErrorCode.MetadataEndpointError, {
+        tokenUri: tokenUri || 'undefined',
+      });
     }
-    return resultOrErrorL2;
+    const metadata: DomainMetadata = await resp.json();
+    if (!metadata.name) {
+      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+        domain: `with tokenId ${tokenId}`,
+      });
+    }
+    if (this.namehash(metadata.name) !== tokenId) {
+      throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
+        methodName: 'unhash',
+        domain: metadata.name,
+        providerMessage: 'Service provider returned an invalid domain name',
+      });
+    }
+    return metadata;
   }
 
   private async getVerifiedData(
@@ -438,13 +451,4 @@ function validResolutionErrorOrThrow(
     return true;
   }
   throw error;
-}
-
-function getProxyReaderMap(): ProxyReaderMap {
-  const map: ProxyReaderMap = {};
-  for (const id of Object.keys(UnsConfig.networks)) {
-    map[id] =
-      UnsConfig.networks[id].contracts.ProxyReader.address.toLowerCase();
-  }
-  return map;
 }

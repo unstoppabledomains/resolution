@@ -4,6 +4,29 @@
     "description": "A CNS or UNS blockchain domain. Use it to resolve your cryptocurrency addresses and decentralized websites.\nhttps://gateway.pinata.cloud/ipfs/QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu",
     "external_url": "https://unstoppabledomains.com/search?searchTerm=test-usdt-and-dns-records.crypto",
     "image": "https://storage.googleapis.com/dot-crypto-metadata-api/images/unstoppabledomains.svg",
+    "properties": {
+      "records": {
+        "crypto.ADA.address": "DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj",
+        "crypto.BCH.address": "qzx048ez005q4yhphqu2pylpfc3hy88zzu4lu6q9j8",
+        "crypto.BTC.address": "1MUFCFhhuApRqfbqNby6Jvvp6gbYx6yWhR",
+        "crypto.ETH.address": "0xe7474D07fD2FA286e7e0aa23cd107F8379085037",
+        "crypto.LTC.address": "ltc1qj03wgu07dqytxz4r9arc4taz2u7mzuz38xpuu4",
+        "crypto.USDC.address": "0x666574cAdedEB4a0f282fF0C2B3588617E29e6A0",
+        "crypto.USDT.version.EOS.address": "letsminesome",
+        "crypto.USDT.version.ERC20.address": "0xe7474D07fD2FA286e7e0aa23cd107F8379085037",
+        "crypto.USDT.version.OMNI.address": "19o6LvAdCPkjLi83VsjrCsmvQZUirT4KXJ",
+        "crypto.USDT.version.TRON.address": "TNemhXhpX7MwzZJa3oXvfCjo5pEeXrfN2h",
+        "crypto.XRP.address": "rMXToC1316oNyqwgQpWgSrzMUU9R6UDizW",
+        "crypto.ZIL.address": "zil1xftz4cd425mer6jxmtl29l28xr0zu8s5hnp9he",
+        "dns.A": "[\"10.0.0.1\",\"10.0.0.3\"]",
+        "dns.A.ttl": "98",
+        "dns.AAAA": "[]",
+        "dns.ttl": "128",
+        "ipfs.html.value": "QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu",
+        "ipfs.redirect_domain.value": "google.com",
+        "whois.email.value": "johnny@unstoppabledomains.com"
+      }
+    },
     "attributes": [
       {
         "trait_type": "domain",
@@ -16,54 +39,6 @@
       {
         "trait_type": "length",
         "value": 25
-      },
-      {
-        "trait_type": "ADA",
-        "value": "DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj"
-      },
-      {
-        "trait_type": "BCH",
-        "value": "qzx048ez005q4yhphqu2pylpfc3hy88zzu4lu6q9j8"
-      },
-      {
-        "trait_type": "BTC",
-        "value": "1MUFCFhhuApRqfbqNby6Jvvp6gbYx6yWhR"
-      },
-      {
-        "trait_type": "ETH",
-        "value": "0xe7474D07fD2FA286e7e0aa23cd107F8379085037"
-      },
-      {
-        "trait_type": "LTC",
-        "value": "ltc1qj03wgu07dqytxz4r9arc4taz2u7mzuz38xpuu4"
-      },
-      {
-        "trait_type": "XRP",
-        "value": "rMXToC1316oNyqwgQpWgSrzMUU9R6UDizW"
-      },
-      {
-        "trait_type": "ZIL",
-        "value": "zil1xftz4cd425mer6jxmtl29l28xr0zu8s5hnp9he"
-      },
-      {
-        "trait_type": "USDC",
-        "value": "0x666574cAdedEB4a0f282fF0C2B3588617E29e6A0"
-      },
-      {
-        "trait_type": "USDT.version.EOS",
-        "value": "letsminesome"
-      },
-      {
-        "trait_type": "USDT.version.OMNI",
-        "value": "19o6LvAdCPkjLi83VsjrCsmvQZUirT4KXJ"
-      },
-      {
-        "trait_type": "USDT.version.TRON",
-        "value": "TNemhXhpX7MwzZJa3oXvfCjo5pEeXrfN2h"
-      },
-      {
-        "trait_type": "USDT.version.ERC20",
-        "value": "0xe7474D07fD2FA286e7e0aa23cd107F8379085037"
       },
       {
         "trait_type": "IPFS Content",
