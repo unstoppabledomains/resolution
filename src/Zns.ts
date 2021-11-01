@@ -11,6 +11,7 @@ import {
   Provider,
   ZnsSource,
   NamingServiceName,
+  Locations,
 } from './types/publicTypes';
 import FetchProvider from './FetchProvider';
 import {znsChildhash, znsNamehash} from './utils/namehash';
@@ -42,7 +43,7 @@ export default class Zns extends NamingService {
 
   readonly network: number;
   readonly name: NamingServiceName = NamingServiceName.ZNS;
-  readonly url: string | undefined;
+  readonly url: string;
   readonly registryAddr: string;
   readonly provider: Provider;
 
@@ -182,6 +183,13 @@ export default class Zns extends NamingService {
 
   async registryAddress(domain: string): Promise<string> {
     return this.registryAddr;
+  }
+
+  locations(domains: string[]): Promise<Locations> {
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+      method: NamingServiceName.ZNS,
+      methodName: 'locations',
+    });
   }
 
   private async getRecordsAddresses(

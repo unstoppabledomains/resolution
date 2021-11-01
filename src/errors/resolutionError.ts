@@ -31,6 +31,7 @@ export enum ResolutionErrorCode {
   MetadataEndpointError = 'MetadataEndpointError',
   ServiceProviderError = 'ServiceProviderError',
   InvalidTwitterVerification = 'InvalidTwitterVerification',
+  InconsistentDomainArray = 'InconsistentDomainArray',
 }
 
 /**

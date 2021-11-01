@@ -9,7 +9,12 @@ import {
 import {ResolutionError, ResolutionErrorCode} from './errors/resolutionError';
 import EthereumContract from './contracts/EthereumContract';
 import EnsNetworkMap from 'ethereum-ens-network-map';
-import {EnsSource, NamingServiceName, Provider} from './types/publicTypes';
+import {
+  EnsSource,
+  Locations,
+  NamingServiceName,
+  Provider,
+} from './types/publicTypes';
 import {
   constructRecords,
   EthereumNetworksInverted,
@@ -219,6 +224,13 @@ export default class Ens extends NamingService {
     throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
       method: NamingServiceName.ENS,
       methodName: 'getDomainFromTokenId',
+    });
+  }
+
+  locations(domains: string[]): Promise<Locations> {
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+      method: NamingServiceName.ENS,
+      methodName: 'locations',
     });
   }
 

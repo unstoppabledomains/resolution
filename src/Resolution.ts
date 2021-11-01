@@ -19,6 +19,7 @@ import {
   Web3Version0Provider,
   Web3Version1Provider,
   TokenUriMetadata,
+  Locations,
 } from './types/publicTypes';
 import ResolutionError, {ResolutionErrorCode} from './errors/resolutionError';
 import DnsUtils from './utils/DnsUtils';
@@ -771,6 +772,21 @@ export default class Resolution {
       });
     }
     return name;
+  }
+
+  /**
+   * Retrieves address of registry contract used for domain
+   * @param domain - domain name
+   * @returns Registry contract address
+   */
+  async locations(domains: string[]): Promise<Locations> {
+    const method = this.getNamingMethodOrThrow(domains[0]);
+    for (const domain of domains) {
+      if (!(await method.isSupportedDomain(domain))) {
+        throw new ResolutionError(ResolutionErrorCode.InconsistentDomainArray);
+      }
+    }
+    return method.locations(domains);
   }
 
   private async getMetadataFromTokenURI(

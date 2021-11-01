@@ -2,9 +2,15 @@ import {
   BlockhainNetworkUrlMap,
   UnsSupportedNetwork,
   ProxyReaderMap,
+  NullAddress,
 } from './types';
 import {UnsLayerSource, ConfigurationError, ConfigurationErrorCode} from '.';
-import {DomainData, UnsLocation} from './types/publicTypes';
+import {
+  BlockchainType,
+  DomainData,
+  Locations,
+  UnsLocation,
+} from './types/publicTypes';
 import {constructRecords, EthereumNetworks, isNullAddress} from './utils';
 import FetchProvider from './FetchProvider';
 import EthereumContract from './contracts/EthereumContract';
@@ -29,11 +35,24 @@ export default class UnsInternal {
   readonly provider: FetchProvider;
   readonly readerContract: EthereumContract;
   readonly unsLocation: UnsLocation;
+  readonly blockchain: BlockchainType;
 
-  constructor(unsLocation: UnsLocation, source: UnsLayerSource) {
+  static readonly NetworkNameMap = {
+    mainnet: 1,
+    rinkeby: 4,
+    'polygon-mainnet': 137,
+    'polygon-mumbai': 80001,
+  };
+
+  constructor(
+    unsLocation: UnsLocation,
+    source: UnsLayerSource,
+    blockchain: BlockchainType,
+  ) {
     this.unsLocation = unsLocation;
     this.checkNetworkConfig(unsLocation, source);
     this.network = source.network;
+    this.blockchain = blockchain;
     this.url = source['url'] || UnsInternal.UrlMap[this.network];
     this.provider =
       source['provider'] || new FetchProvider(this.unsLocation, this.url);
@@ -93,6 +112,37 @@ export default class UnsInternal {
       records: constructRecords(keys, values),
       location: this.unsLocation,
     };
+  }
+
+  async locations(domains: string[]): Promise<Locations> {
+    const tokenIds = domains.map((d) => this.namehash(d));
+    const [[resolvers, owners], ...registries] =
+      await this.readerContract.multicall([
+        {
+          method: 'getDataForMany',
+          args: [[], tokenIds],
+        },
+        ...tokenIds.map((id) => ({
+          method: 'registryOf',
+          args: [id],
+        })),
+      ]);
+
+    const locations: Locations = domains.reduce((locations, domain, i) => {
+      locations[domain] = null;
+      if (owners && owners[i] !== NullAddress) {
+        locations[domain] = {
+          resolverAddress: resolvers[i],
+          registryAddress: registries[i][0],
+          ownerAddress: owners[i],
+          networkId: UnsInternal.NetworkNameMap[this.network],
+          blockchain: this.blockchain,
+          blockchainProviderUrl: this.url,
+        };
+      }
+      return locations;
+    }, {} as Locations);
+    return locations;
   }
 
   namehash(domain: string): string {
