@@ -7,9 +7,6 @@
     "doc": "docs"
   },
   "types": "./build/index.d.ts",
-  "bin": {
-    "resolution": "./build/cli/cli.js"
-  },
   "scripts": {
     "release": "RELEASE=patch yarn release:run",
     "release:minor": "RELEASE=minor yarn release:run",
@@ -24,9 +21,7 @@
     "test:live": "LIVE=1 yarn test",
     "test:live:win": "set LIVE=1&& yarn test",
     "start": "npm run build:live",
-    "dev": "yarn build && ./build/cli/cli.js -d brad.crypto",
-    "build": "rm -rf build && tsc -p . && chmod +x ./build/cli/cli.js",
-    "build:symlink": "yarn build && ln -sf $PWD/build/cli/cli.js  /usr/local/bin/resolution",
+    "build": "rm -rf build && tsc -p .",
     "build:live": "nodemon --watch 'src/**/*.ts' --exec yarn build",
     "docs": "yarn docs:clone && yarn docs:generate && yarn docs:readme",
     "docs:clone": "([ -d ./docs ] || git clone --branch gh-pages git@github.com:unstoppabledomains/resolution.git docs) && git -C ./docs pull",
@@ -108,7 +103,6 @@
   "dependencies": {
     "@ethersproject/abi": "^5.0.1",
     "bn.js": "^4.4.0",
-    "commander": "^4.1.1",
     "cross-fetch": "^3.1.4",
     "elliptic": "^6.5.4",
     "ethereum-ens-network-map": "^1.0.2",
