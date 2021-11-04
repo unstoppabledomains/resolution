@@ -9,7 +9,7 @@
     - `Resolution#fromResolutionProvider`
     - `Resolution#fromEthereumEip1193Provider`
     - `Resolution#fromWeb3Version0Provider`
-    - `Resolution#fromEthersProvider`
+    - `Resolution#fromWeb3Version1Provider`
     - `Resolution#fromEthersProvider`
 - `Resolution#location` method is replaced by `Resolution#locations`.
 
