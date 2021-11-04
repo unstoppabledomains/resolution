@@ -26,7 +26,6 @@ import {TokenUriMetadata} from '../types/publicTypes';
 import liveData from './testData/liveData.json';
 import UnsConfig from '../config/uns-config.json';
 import UnsInternal from '../UnsInternal';
-import nock from 'nock';
 import {eip137Namehash, fromHexStringToDecimals} from '../utils/namehash';
 
 let resolution: Resolution;
@@ -762,18 +761,18 @@ describe('UNS', () => {
         expect(email).toBe('johnny@unstoppabledomains.com');
       });
 
-      it.skip('should resolve with httpUrl stored on uns', async () => {
+      it('should resolve with httpUrl stored on uns', async () => {
         const spies = mockAsyncMethods(uns, {
           get: {
             resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
             records: {
-              ['ipfs.redirect_domain.value']: 'https://unstoppabledomains.com/',
+              ['ipfs.redirect_domain.value']: 'google.com',
             },
           },
         });
         const httpUrl = await resolution.httpUrl(CryptoDomainWithAllRecords);
         expectSpyToBeCalled(spies);
-        expect(httpUrl).toBe('https://unstoppabledomains.com/');
+        expect(httpUrl).toBe('google.com');
       });
 
       it('should resolve with the gundb chatId stored on uns', async () => {

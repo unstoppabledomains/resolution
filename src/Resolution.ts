@@ -776,8 +776,8 @@ export default class Resolution {
 
   /**
    * Retrieves address of registry contract used for domain
-   * @param domain - domain name
-   * @returns Registry contract address
+   * @param domains - domain name
+   * @returns Promise<Locations> - A map of domain name and Location (a set of attributes like blockchain,
    */
   async locations(domains: string[]): Promise<Locations> {
     const method = this.getNamingMethodOrThrow(domains[0]);

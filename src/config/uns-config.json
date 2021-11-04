@@ -14,7 +14,7 @@
           "address": "0xD1E5b0FF1287aA9f9A268759062E4Ab08b9Dacbe",
           "legacyAddresses": [],
           "deploymentBlock": "0x8a958b",
-          "forwarder": "0x802E1D2d48dA1d36ff2c8E2e376D39b8D1DCA549"
+          "forwarder": "0x97B0E89fC1B7eD4A8B237D9d8Fcce9b234f25A37"
         },
         "MintingManager": {
           "address": "0x2a7084870bB724175a3C96Da8FaA55128fa3E19D",
@@ -64,7 +64,7 @@
             "0x878bc2f3f717766ab69c0a5f9a6144931e61aed3"
           ],
           "deploymentBlock": "0x960844",
-          "forwarder": "0xa88541075B3E29C602C3334F8CA8C943F6BD35c1"
+          "forwarder": "0x92660E5F403679aB45e0C6DB7c35B5629d265fDd"
         },
         "ProxyReader": {
           "address": "0xc3C2BAB5e3e52DBF311b2aAcEf2e40344f19494E",
@@ -101,7 +101,7 @@
           "address": "0xAad76bea7CFEc82927239415BB18D2e93518ecBB",
           "legacyAddresses": [],
           "deploymentBlock": "0x7232bc",
-          "forwarder": "0x4c46Fb148F2165517E71d6EB5C99c2021e67f068"
+          "forwarder": "0xdf5CC97216785398D5C77348e68fc9461108f85d"
         },
         "MintingManager": {
           "address": "0xdAAf99A920D31F4f5720e4667b12b24e54A03070",
@@ -148,7 +148,7 @@
           "address": "0x95AE1515367aa64C462c71e87157771165B1287A",
           "legacyAddresses": [],
           "deploymentBlock": "0x7232cf",
-          "forwarder": "0xB55a783126B1068FeB64dF6f78B2a2063A288b4a"
+          "forwarder": "0xE172D8557d6F342b1b2976dE784F6Dff6ABC0a37"
         },
         "ProxyReader": {
           "address": "0xE6729D224D00b3dd4FC731C4Ee3274E35Da06578",

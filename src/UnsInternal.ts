@@ -25,7 +25,7 @@ export default class UnsInternal {
     mainnet: 'https://mainnet.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
     rinkeby: 'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
     'polygon-mainnet':
-      'https://polygon.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+      'https://polygon-mainnet.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
     'polygon-mumbai':
       'https://polygon-mumbai.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
   };
