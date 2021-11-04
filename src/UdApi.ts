@@ -8,8 +8,9 @@ import {
   ResolutionMethod,
   NamingServiceName,
   Api,
-  BlockchainType,
+  Locations,
   DomainLocation,
+  BlockchainType,
 } from './types/publicTypes';
 import Networking from './utils/Networking';
 import {constructRecords, findNamingServiceName, isNullAddress} from './utils';
@@ -194,21 +195,9 @@ export default class Udapi extends NamingService {
     });
   }
 
-  async location(domain: string): Promise<DomainLocation> {
-    const [registry, resolver, owner] = await Promise.all([
-      this.registryAddress(domain),
-      this.resolver(domain),
-      this.owner(domain),
-    ]);
-
-    return {
-      registry,
-      resolver,
-      networkId: this.network,
-      blockchain: domain.endsWith('.zil')
-        ? BlockchainType.ZIL
-        : BlockchainType.ETH,
-      owner,
-    };
+  async locations(domains: string[]): Promise<Locations> {
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+      methodName: 'locations',
+    });
   }
 }

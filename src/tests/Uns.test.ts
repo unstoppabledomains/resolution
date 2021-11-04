@@ -2,7 +2,7 @@ import Resolution from '../index';
 import ResolutionError, {ResolutionErrorCode} from '../errors/resolutionError';
 import {NullAddress} from '../types';
 import {
-  CryptoDomainWithoutResolver,
+  CryptoDomainLayerOneWithNoResolver,
   CryptoDomainWithTwitterVerification,
   mockAsyncMethods,
   expectSpyToBeCalled,
@@ -11,18 +11,22 @@ import {
   expectConfigurationErrorCode,
   CryptoDomainWithoutGunDbRecords,
   CryptoDomainWithAllRecords,
+  WalletDomainLayerTwoWithAllRecords,
   skipItInLive,
   mockAPICalls,
+  ProviderProtocol,
+  mockAsyncMethod,
 } from './helpers';
 import FetchProvider from '../FetchProvider';
-import {NamingServiceName} from '../types/publicTypes';
+import {NamingServiceName, UnsLocation} from '../types/publicTypes';
 import Uns from '../Uns';
 import Networking from '../utils/Networking';
 import {ConfigurationErrorCode} from '../errors/configurationError';
 import {TokenUriMetadata} from '../types/publicTypes';
 import liveData from './testData/liveData.json';
 import UnsConfig from '../config/uns-config.json';
-import nock from 'nock';
+import UnsInternal from '../UnsInternal';
+import {eip137Namehash, fromHexStringToDecimals} from '../utils/namehash';
 
 let resolution: Resolution;
 let uns: Uns;
@@ -30,7 +34,20 @@ let uns: Uns;
 beforeEach(async () => {
   jest.restoreAllMocks();
   resolution = new Resolution({
-    sourceConfig: {uns: {url: protocolLink(), network: 'rinkeby'}},
+    sourceConfig: {
+      uns: {
+        locations: {
+          Layer1: {
+            url: protocolLink(ProviderProtocol.http, 'UNSL1'),
+            network: 'rinkeby',
+          },
+          Layer2: {
+            url: protocolLink(ProviderProtocol.http, 'UNSL2'),
+            network: 'polygon-mumbai',
+          },
+        },
+      },
+    },
   });
   uns = resolution.serviceMap[NamingServiceName.UNS] as Uns;
 });
@@ -38,8 +55,10 @@ beforeEach(async () => {
 describe('UNS', () => {
   it('should define the default uns contract', () => {
     expect(uns).toBeDefined();
-    expect(uns.network).toBe(4);
-    expect(uns.url).toBe(protocolLink());
+    expect(uns.unsl1.network).toBe('rinkeby');
+    expect(uns.unsl1.url).toBe(protocolLink());
+    expect(uns.unsl2.network).toBe('polygon-mumbai');
+    expect(uns.unsl2.url).toBe(protocolLink(ProviderProtocol.http, 'UNSL2'));
   });
 
   it('should not allow missing config for custom network', async () => {
@@ -47,10 +66,51 @@ describe('UNS', () => {
       () =>
         new Resolution({
           sourceConfig: {
-            uns: {network: 'ropsten'},
+            uns: {
+              locations: {
+                Layer1: {network: 'ropsten'},
+                Layer2: {network: 'polygon-mumbai'},
+              },
+            },
           },
         }),
       ConfigurationErrorCode.CustomNetworkConfigMissing,
+    );
+  });
+  it('should not allow missing Layer1 config', async () => {
+    await expectConfigurationErrorCode(
+      () =>
+        new Resolution({
+          sourceConfig: {
+            uns: {
+              locations: {
+                Layer2: {
+                  url: UnsInternal.UrlMap['mainnet'],
+                  network: 'mainnet',
+                },
+              } as any,
+            },
+          },
+        }),
+      ConfigurationErrorCode.NetworkConfigMissing,
+    );
+  });
+  it('should not allow missing Layer2 config', async () => {
+    await expectConfigurationErrorCode(
+      () =>
+        new Resolution({
+          sourceConfig: {
+            uns: {
+              locations: {
+                Layer1: {
+                  url: UnsInternal.UrlMap['mainnet'],
+                  network: 'mainnet',
+                },
+              } as any,
+            },
+          },
+        }),
+      ConfigurationErrorCode.NetworkConfigMissing,
     );
   });
 
@@ -90,18 +150,114 @@ describe('UNS', () => {
     expect(twitterHandle).toBe('Marlene12Bob');
   });
 
-  it('should return NoRecord Resolution error', async () => {
-    const spies = mockAsyncMethods(uns, {
+  skipItInLive(
+    'should throw error if record not found for twitter handle',
+    async () => {
+      mockAsyncMethods(uns, {
+        get: {
+          resolver: '0xb66dce2da6afaaa98f2013446dbcb0f4b0ab2842',
+          owner: '0x499dd6d875787869670900a2130223d85d4f6aa7',
+          records: {},
+          location: UnsLocation.Layer2,
+        },
+      });
+      expect(() =>
+        resolution.serviceMap[NamingServiceName.UNS].twitter(
+          WalletDomainLayerTwoWithAllRecords,
+        ),
+      ).rejects.toThrow(
+        new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+          domain: WalletDomainLayerTwoWithAllRecords,
+          location: UnsLocation.Layer2,
+          recordName: 'validation.social.twitter.username',
+        }),
+      );
+    },
+  );
+  it('should throw error if twitter validation signature is null', async () => {
+    mockAsyncMethods(uns, {
       get: {
-        resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
-        records: {},
+        resolver: '0xb66dce2da6afaaa98f2013446dbcb0f4b0ab2842',
+        owner: '0x499dd6d875787869670900a2130223d85d4f6aa7',
+        records: {'validation.social.twitter.username': NullAddress},
+        location: UnsLocation.Layer2,
       },
+    });
+    expect(() =>
+      resolution.serviceMap[NamingServiceName.UNS].twitter(
+        WalletDomainLayerTwoWithAllRecords,
+      ),
+    ).rejects.toThrow(
+      new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+        domain: WalletDomainLayerTwoWithAllRecords,
+        location: UnsLocation.Layer2,
+        recordName: 'validation.social.twitter.username',
+      }),
+    );
+  });
+  skipItInLive(
+    'should throw error if twitter handle is undefined',
+    async () => {
+      mockAsyncMethods(uns, {
+        get: {
+          resolver: '0xb66dce2da6afaaa98f2013446dbcb0f4b0ab2842',
+          owner: '0x499dd6d875787869670900a2130223d85d4f6aa7',
+          records: {'validation.social.twitter.username': 'random-signuture'},
+          location: UnsLocation.Layer2,
+        },
+      });
+      expect(() =>
+        resolution.serviceMap[NamingServiceName.UNS].twitter(
+          WalletDomainLayerTwoWithAllRecords,
+        ),
+      ).rejects.toThrow(
+        new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+          domain: WalletDomainLayerTwoWithAllRecords,
+          location: UnsLocation.Layer2,
+          recordName: 'social.twitter.username',
+        }),
+      );
+    },
+  );
+
+  it('should return NoRecord Resolution error', async () => {
+    const uns = resolution.serviceMap[NamingServiceName.UNS] as Uns;
+    const spies = mockAsyncMethods(uns.unsl2.readerContract, {
+      call: [NullAddress, NullAddress, []],
+    });
+    const spies2 = mockAsyncMethods(uns.unsl1.readerContract, {
+      call: [
+        '0x95AE1515367aa64C462c71e87157771165B1287A',
+        '0x8aad44321a86b170879d7a244c1e8d360c99dda8',
+        [],
+      ],
     });
     await expectResolutionErrorCode(
       resolution.record(CryptoDomainWithAllRecords, 'No.such.record'),
       ResolutionErrorCode.RecordNotFound,
     );
     expectSpyToBeCalled(spies);
+    expectSpyToBeCalled(spies2);
+  }, 20000);
+
+  it('should return NoRecord Resolution error for L2', async () => {
+    const uns = resolution.serviceMap[NamingServiceName.UNS] as Uns;
+    const spies = mockAsyncMethods(uns.unsl2.readerContract, {
+      call: [NullAddress, NullAddress, []],
+    });
+    const spies2 = mockAsyncMethods(uns.unsl1.readerContract, {
+      call: [
+        '0x95AE1515367aa64C462c71e87157771165B1287A',
+        '0x8aad44321a86b170879d7a244c1e8d360c99dda8',
+        [],
+      ],
+    });
+    await expectResolutionErrorCode(
+      resolution.record(WalletDomainLayerTwoWithAllRecords, 'No.such.record'),
+      ResolutionErrorCode.RecordNotFound,
+    );
+    expectSpyToBeCalled(spies);
+    expectSpyToBeCalled(spies2);
   }, 20000);
 
   it('should return a valid resolver address', async () => {
@@ -117,13 +273,24 @@ describe('UNS', () => {
 
   it('should return true for supported domain', async () => {
     mockAPICalls('uns_domain_exists_test', protocolLink());
+    const uns = resolution.serviceMap[NamingServiceName.UNS] as Uns;
+    mockAsyncMethods(uns.unsl2.readerContract, {
+      call: [false],
+    });
     expect(await uns.isSupportedDomain('brad.crypto')).toBe(true);
     expect(await uns.isSupportedDomain('brad.blockchain')).toBe(true);
     expect(await uns.isSupportedDomain('brad.888')).toBe(true);
+    expect(
+      await uns.isSupportedDomain(WalletDomainLayerTwoWithAllRecords),
+    ).toBe(true);
   });
 
   it('should return false for unsupported domain', async () => {
     mockAPICalls('uns_domain_exists_test', protocolLink());
+    const uns = resolution.serviceMap[NamingServiceName.UNS] as Uns;
+    mockAsyncMethods(uns.unsl2.readerContract, {
+      call: [false],
+    });
     expect(await uns.isSupportedDomain('brad.zil')).toBe(false);
     expect(await uns.isSupportedDomain('brad.invalid')).toBe(false);
   });
@@ -131,7 +298,7 @@ describe('UNS', () => {
   it('should not find a resolver address', async () => {
     const spies = mockAsyncMethods(uns, {
       get: {
-        owner: '0x0000000000000000000000000000000000000000',
+        owner: NullAddress,
         resolver: undefined,
       },
     });
@@ -148,7 +315,7 @@ describe('UNS', () => {
       get: {owner: 'someowneraddress', resolver: NullAddress},
     });
     await expectResolutionErrorCode(
-      resolution.resolver(CryptoDomainWithoutResolver),
+      resolution.resolver(CryptoDomainLayerOneWithNoResolver),
       ResolutionErrorCode.UnspecifiedResolver,
     );
     expectSpyToBeCalled(spies);
@@ -169,7 +336,6 @@ describe('UNS', () => {
       expectSpyToBeCalled(eyes);
       expect(addr).toBe('qzx048ez005q4yhphqu2pylpfc3hy88zzu4lu6q9j8');
     });
-
     it(`checks the ADA address on ${CryptoDomainWithAllRecords}`, async () => {
       const eyes = mockAsyncMethods(uns, {
         get: {
@@ -185,6 +351,48 @@ describe('UNS', () => {
       expect(addr).toBe(
         'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
       );
+    });
+
+    it(`checks the LINK address on ${WalletDomainLayerTwoWithAllRecords} L2`, async () => {
+      mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [NullAddress, NullAddress, []],
+      });
+      const eyesL2 = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [
+          '0x95AE1515367aa64C462c71e87157771165B1287A',
+          '0xd1D5eb96f36A7605b0cED801fF497E81F6245106',
+          ['0x6A1fd9a073256f14659fe59613bbf169Ed27CdcC'],
+        ],
+      });
+      const addr = await resolution.addr(
+        WalletDomainLayerTwoWithAllRecords,
+        'LINK',
+      );
+      expectSpyToBeCalled(eyesL2);
+      expect(addr).toBe('0x6A1fd9a073256f14659fe59613bbf169Ed27CdcC');
+    });
+    it(`checks the LINK address on ${WalletDomainLayerTwoWithAllRecords} L2 even if L1 exists`, async () => {
+      const eyesL1 = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [
+          'ignore-field',
+          'ignore-this',
+          ['0xd1D5eb96f36A7605b0cED801fF497E81F6245106'],
+        ],
+      });
+      const eyesL2 = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [
+          '0x95AE1515367aa64C462c71e87157771165B1287A',
+          '0xd1D5eb96f36A7605b0cED801fF497E81F6245106',
+          ['0x6A1fd9a073256f14659fe59613bbf169Ed27CdcC'],
+        ],
+      });
+      const addr = await resolution.addr(
+        WalletDomainLayerTwoWithAllRecords,
+        'LINK',
+      );
+      expectSpyToBeCalled(eyesL1);
+      expectSpyToBeCalled(eyesL2);
+      expect(addr).toBe('0x6A1fd9a073256f14659fe59613bbf169Ed27CdcC');
     });
 
     describe('.Metadata', () => {
@@ -255,7 +463,7 @@ describe('UNS', () => {
           },
         });
         await expectResolutionErrorCode(
-          resolution.chatId(CryptoDomainWithoutResolver),
+          resolution.chatId(CryptoDomainLayerOneWithNoResolver),
           ResolutionErrorCode.UnspecifiedResolver,
         );
       });
@@ -327,73 +535,182 @@ describe('UNS', () => {
     });
 
     it('should return NoRecord Resolution error when value not found', async () => {
-      const spies = mockAsyncMethods(uns, {
-        get: {
-          resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
-          records: {},
-        },
+      const spies = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [NullAddress, NullAddress, []],
       });
+      const spies2 = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [
+          '0x95AE1515367aa64C462c71e87157771165B1287A',
+          '0x8aad44321a86b170879d7a244c1e8d360c99dda8',
+          [],
+        ],
+      });
+
       await expectResolutionErrorCode(
         resolution.record(CryptoDomainWithAllRecords, 'No.such.record'),
         ResolutionErrorCode.RecordNotFound,
       );
       expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
     });
 
     it('should return a valid resolver address', async () => {
-      const spies = mockAsyncMethods(uns, {
-        get: {
-          resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
-          records: {},
-        },
+      const spies = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [NullAddress, NullAddress, []],
       });
+      const spies2 = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [
+          '0x95AE1515367aa64C462c71e87157771165B1287A',
+          '0x8aad44321a86b170879d7a244c1e8d360c99dda8',
+          [],
+        ],
+      });
+
       const resolverAddress = await resolution.resolver(
         CryptoDomainWithAllRecords,
       );
       expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
       expect(resolverAddress).toBe(
         '0x95AE1515367aa64C462c71e87157771165B1287A',
       );
     });
 
+    it('should return a valid resolver address from L2', async () => {
+      const spies = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [NullAddress, NullAddress, []],
+      });
+      const spies2 = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [
+          '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
+          '0x8aad44321a86b170879d7a244c1e8d360c99dda8',
+          [],
+        ],
+      });
+
+      const resolverAddress = await resolution.resolver(
+        WalletDomainLayerTwoWithAllRecords,
+      );
+      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
+      expect(resolverAddress).toBe(
+        '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
+      );
+    });
+
+    it('should return a valid resolver address from L2 and ignore L1', async () => {
+      const spies = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [
+          '0x8aad44321a86b170879d7a244c1e8d360c99dda8',
+          '0x95AE1515367aa64C462c71e87157771165B1287A',
+          [],
+        ],
+      });
+      const spies2 = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [
+          '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
+          '0x8aad44321a86b170879d7a244c1e8d360c99dda8',
+          [],
+        ],
+      });
+
+      const resolverAddress = await resolution.resolver(
+        WalletDomainLayerTwoWithAllRecords,
+      );
+      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
+      expect(resolverAddress).toBe(
+        '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
+      );
+    });
+
     it('should return UnregisteredDomain error when owner address not found', async () => {
-      const spies = mockAsyncMethods(uns, {
-        get: {owner: NullAddress},
+      const spies = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [NullAddress, NullAddress, []],
+      });
+      const spies2 = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [NullAddress, NullAddress, []],
       });
       await expectResolutionErrorCode(
         resolution.resolver('unknown-unknown-938388383.crypto'),
         ResolutionErrorCode.UnregisteredDomain,
       );
       expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
+    });
+
+    it('should return UnregisteredDomain error when owner address not found on L2', async () => {
+      const spies = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [NullAddress, NullAddress, []],
+      });
+      const spies2 = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: ['0x95AE1515367aa64C462c71e87157771165B1287A', NullAddress, []],
+      });
+      await expectResolutionErrorCode(
+        resolution.resolver('unknown-unknown-938388383w.crypto'),
+        ResolutionErrorCode.UnregisteredDomain,
+      );
+      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
     });
 
     it('should return UnspecifiedResolver error when resolver address not found', async () => {
-      const spies = mockAsyncMethods(uns, {
-        get: {owner: '0x000000000000000000000000000000000000dead'},
+      const spies = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [NullAddress, '0x000000000000000000000000000000000000dead', []],
+      });
+      const spies2 = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [NullAddress, '0x000000000000000000000000000000000000dead', []],
       });
       await expectResolutionErrorCode(
-        resolution.resolver(CryptoDomainWithoutResolver),
+        resolution.resolver(CryptoDomainLayerOneWithNoResolver),
         ResolutionErrorCode.UnspecifiedResolver,
       );
       expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
     });
 
     skipItInLive('should work without any configs', async () => {
       resolution = new Resolution();
-      const eyes = mockAsyncMethods(
-        resolution.serviceMap[NamingServiceName.UNS],
-        {
-          get: {
-            resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
-            records: {
-              ['crypto.ETH.address']:
-                '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
-            },
-          },
-        },
-      );
+
+      const uns = resolution.serviceMap['UNS'] as unknown as Uns;
+
+      const spies = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [
+          '0x95AE1515367aa64C462c71e87157771165B1287A',
+          '0x000000000000000000000000000000000000dead',
+          ['0xe7474D07fD2FA286e7e0aa23cd107F8379085037'],
+        ],
+      });
+      const spies2 = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [NullAddress, NullAddress, []],
+      });
       const address = await resolution.addr(CryptoDomainWithAllRecords, 'eth');
-      expectSpyToBeCalled(eyes);
+      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
+      expect(address).toBe('0xe7474D07fD2FA286e7e0aa23cd107F8379085037');
+    });
+
+    skipItInLive('should work without any configs for L2', async () => {
+      resolution = new Resolution();
+
+      const uns = resolution.serviceMap['UNS'] as unknown as Uns;
+
+      const spies = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [
+          '0x95AE1515367aa64C462c71e87157771165B1287A',
+          '0x000000000000000000000000000000000000dead',
+          ['0xe7474D07fD2FA286e7e0aa23cd107F8379085037'],
+        ],
+      });
+      const spies2 = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [NullAddress, NullAddress, []],
+      });
+      const address = await resolution.addr(
+        WalletDomainLayerTwoWithAllRecords,
+        'eth',
+      );
+      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
       expect(address).toBe('0xe7474D07fD2FA286e7e0aa23cd107F8379085037');
     });
 
@@ -413,6 +730,25 @@ describe('UNS', () => {
         expect(ipfsHash).toBe('QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu');
       });
 
+      it('should resolve with ipfs stored on l2', async () => {
+        const spies = mockAsyncMethods(uns.unsl2.readerContract, {
+          call: [
+            '0x95AE1515367aa64C462c71e87157771165B1287A',
+            '0x000000000000000000000000000000000000dead',
+            ['QmfRXG3CcM1eWiCUA89uzimCvQUnw4HzTKLo6hRZ47PYsN'],
+          ],
+        });
+        const spies2 = mockAsyncMethods(uns.unsl1.readerContract, {
+          call: [NullAddress, NullAddress, []],
+        });
+        const ipfsHash = await resolution.ipfsHash(
+          WalletDomainLayerTwoWithAllRecords,
+        );
+        expectSpyToBeCalled(spies);
+        expectSpyToBeCalled(spies2);
+        expect(ipfsHash).toBe('QmfRXG3CcM1eWiCUA89uzimCvQUnw4HzTKLo6hRZ47PYsN');
+      });
+
       it('should resolve with email stored on uns', async () => {
         const spies = mockAsyncMethods(uns, {
           get: {
@@ -425,18 +761,18 @@ describe('UNS', () => {
         expect(email).toBe('johnny@unstoppabledomains.com');
       });
 
-      it.skip('should resolve with httpUrl stored on uns', async () => {
+      it('should resolve with httpUrl stored on uns', async () => {
         const spies = mockAsyncMethods(uns, {
           get: {
             resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
             records: {
-              ['ipfs.redirect_domain.value']: 'https://unstoppabledomains.com/',
+              ['ipfs.redirect_domain.value']: 'google.com',
             },
           },
         });
         const httpUrl = await resolution.httpUrl(CryptoDomainWithAllRecords);
         expectSpyToBeCalled(spies);
-        expect(httpUrl).toBe('https://unstoppabledomains.com/');
+        expect(httpUrl).toBe('google.com');
       });
 
       it('should resolve with the gundb chatId stored on uns', async () => {
@@ -465,7 +801,7 @@ describe('UNS', () => {
           },
         });
         await expectResolutionErrorCode(
-          resolution.chatId(CryptoDomainWithoutResolver),
+          resolution.chatId(CryptoDomainLayerOneWithNoResolver),
           ResolutionErrorCode.UnspecifiedResolver,
         );
       });
@@ -557,8 +893,115 @@ describe('UNS', () => {
     });
   });
 
+  describe('.allRecords()', () => {
+    it('should return all records on L1', async () => {
+      const records = {
+        'crypto.ADA.address':
+          'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
+        'crypto.BCH.address': 'qzx048ez005q4yhphqu2pylpfc3hy88zzu4lu6q9j8',
+        'crypto.BTC.address': '1MUFCFhhuApRqfbqNby6Jvvp6gbYx6yWhR',
+        'crypto.ETH.address': '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+        'crypto.LTC.address': 'ltc1qj03wgu07dqytxz4r9arc4taz2u7mzuz38xpuu4',
+        'crypto.USDC.address': '0x666574cAdedEB4a0f282fF0C2B3588617E29e6A0',
+        'crypto.USDT.version.EOS.address': 'letsminesome',
+        'crypto.USDT.version.ERC20.address':
+          '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+        'crypto.USDT.version.OMNI.address':
+          '19o6LvAdCPkjLi83VsjrCsmvQZUirT4KXJ',
+        'crypto.USDT.version.TRON.address':
+          'TNemhXhpX7MwzZJa3oXvfCjo5pEeXrfN2h',
+        'crypto.XRP.address': 'rMXToC1316oNyqwgQpWgSrzMUU9R6UDizW',
+        'crypto.ZIL.address': 'zil1xftz4cd425mer6jxmtl29l28xr0zu8s5hnp9he',
+        'dns.A': '["10.0.0.1","10.0.0.3"]',
+        'dns.A.ttl': '98',
+        'dns.AAAA': '[]',
+        'dns.ttl': '128',
+        'ipfs.html.value': 'QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu',
+        'ipfs.redirect_domain.value': 'google.com',
+        'whois.email.value': 'johnny@unstoppabledomains.com',
+      };
+      const unsl1 = uns.unsl1;
+      const unsl2 = uns.unsl2;
+      mockAsyncMethods(unsl1, {
+        get: {
+          owner: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+          resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+          records: records,
+          location: UnsLocation.Layer1,
+        },
+      });
+      mockAsyncMethods(unsl2, {
+        get: {
+          owner: NullAddress,
+          resolver: NullAddress,
+          records: {},
+          location: UnsLocation.Layer2,
+        },
+      });
+      mockAsyncMethod(Networking, 'fetch', {
+        ok: true,
+        json: () => ({
+          name: CryptoDomainWithAllRecords,
+          properties: {records},
+        }),
+      });
+      const endpoint = 'https://resolve.unstoppabledomains.com/metadata/';
+
+      mockAsyncMethod(uns, 'getTokenUri', endpoint);
+      const result = await uns.allRecords(CryptoDomainWithAllRecords);
+      expect(result).toMatchObject(records);
+    });
+    it('should return all records on L1 with non standard records', async () => {
+      const records = {
+        'crypto.XRP.address': 'rMXToC1316oNyqwgQpWgSrzMUU9R6UDizW',
+        'crypto.ZIL.address': 'zil1xftz4cd425mer6jxmtl29l28xr0zu8s5hnp9he',
+        'dns.A': '["10.0.0.1","10.0.0.3"]',
+        'dns.A.ttl': '98',
+        'dns.AAAA': '[]',
+        'dns.ttl': '128',
+        'ipfs.html.value': 'QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu',
+        'ipfs.redirect_domain.value': 'google.com',
+        'whois.email.value': 'johnny@unstoppabledomains.com',
+      };
+      const unsl1 = uns.unsl1;
+      const unsl2 = uns.unsl2;
+      mockAsyncMethods(unsl1, {
+        get: {
+          owner: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+          resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+          records: records,
+          location: UnsLocation.Layer1,
+        },
+      });
+      mockAsyncMethods(unsl2, {
+        get: {
+          owner: NullAddress,
+          resolver: NullAddress,
+          records: {},
+          location: UnsLocation.Layer2,
+        },
+      });
+      mockAsyncMethod(Networking, 'fetch', {
+        ok: true,
+        json: () => ({
+          name: CryptoDomainWithAllRecords,
+          properties: {records},
+        }),
+      });
+      const endpoint = 'https://resolve.unstoppabledomains.com/metadata/';
+
+      mockAsyncMethod(uns, 'getTokenUri', endpoint);
+      const result = await uns.allRecords(CryptoDomainWithAllRecords);
+      expect(result).toMatchObject(records);
+    });
+  });
+
   describe('.registryAddress', () => {
     it('should return cns registry address', async () => {
+      const unsl2 = uns.unsl2;
+      mockAsyncMethod(unsl2.readerContract, 'call', (params) =>
+        Promise.resolve([NullAddress]),
+      );
       mockAPICalls('uns_registry_address_tests', protocolLink());
       const registryAddress = await uns.registryAddress(
         'udtestdev-265f8f.crypto',
@@ -570,6 +1013,10 @@ describe('UNS', () => {
 
     //todo Replace the domain with existed test domain ending on .888
     skipItInLive('should return uns registry address', async () => {
+      const unsl2 = uns.unsl2;
+      mockAsyncMethod(unsl2.readerContract, 'call', (params) =>
+        Promise.resolve([NullAddress]),
+      );
       mockAPICalls('uns_registry_address_tests', protocolLink());
       const registryAddress = await uns.registryAddress('some-domain.888');
       expect(registryAddress).toBe(
@@ -577,8 +1024,29 @@ describe('UNS', () => {
       );
     });
 
+    it('should return uns l2 registry address', async () => {
+      mockAsyncMethod(uns.unsl1.readerContract, 'call', (params) =>
+        Promise.resolve(),
+      );
+      mockAsyncMethod(uns.unsl2.readerContract, 'call', (params) =>
+        Promise.resolve([
+          UnsConfig.networks[80001].contracts.UNSRegistry.address,
+        ]),
+      );
+      const registryAddress = await uns.registryAddress(
+        WalletDomainLayerTwoWithAllRecords,
+      );
+      expect(registryAddress).toBe(
+        UnsConfig.networks[80001].contracts.UNSRegistry.address,
+      );
+    });
+
     it('should throw error if tld is not supported', async () => {
       mockAPICalls('uns_registry_address_tests', protocolLink());
+      const unsl2 = uns.unsl2;
+      mockAsyncMethod(unsl2.readerContract, 'call', (params) =>
+        Promise.resolve([NullAddress]),
+      );
       await expectResolutionErrorCode(
         () => uns.registryAddress('some-domain.zil'),
         ResolutionErrorCode.UnsupportedDomain,
@@ -586,6 +1054,10 @@ describe('UNS', () => {
     });
 
     it('should throw error if tld does not exist', async () => {
+      const unsl2 = uns.unsl2;
+      mockAsyncMethod(unsl2.readerContract, 'call', (params) =>
+        Promise.resolve([NullAddress]),
+      );
       mockAPICalls('uns_registry_address_tests', protocolLink());
       await expectResolutionErrorCode(
         () => uns.registryAddress('some-domain.unknown'),
@@ -596,64 +1068,100 @@ describe('UNS', () => {
 
   describe('.isRegistered', () => {
     it('should return true', async () => {
-      const spies = mockAsyncMethods(uns, {
-        get: {
-          owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
-          resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
-          records: {
-            ['ipfs.html.value']:
-              'QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu',
-          },
-        },
+      const spies = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [
+          '0x95AE1515367aa64C462c71e87157771165B1287A',
+          '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
+          ['QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu'],
+        ],
+      });
+      const spies2 = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [NullAddress, NullAddress, []],
       });
       const isRegistered = await uns.isRegistered('brad.crypto');
       expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
+      expect(isRegistered).toBe(true);
+    });
+    it('should return true if registered on L2', async () => {
+      const spies = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [
+          '0x95AE1515367aa64C462c71e87157771165B1287A',
+          '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
+          ['QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu'],
+        ],
+      });
+      const spies2 = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [NullAddress, NullAddress, []],
+      });
+      const isRegistered = await uns.isRegistered(
+        WalletDomainLayerTwoWithAllRecords,
+      );
+      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
       expect(isRegistered).toBe(true);
     });
     it('should return false', async () => {
-      const spies = mockAsyncMethods(uns, {
-        get: {
-          owner: '',
-          resolver: '',
-          records: {},
-        },
+      const spies = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [NullAddress, NullAddress, []],
+      });
+      const spies2 = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [NullAddress, NullAddress, []],
       });
       const isRegistered = await uns.isRegistered(
         'thisdomainisdefinitelynotregistered123.crypto',
       );
       expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
       expect(isRegistered).toBe(false);
     });
   });
 
   describe('.isAvailable', () => {
     it('should return false', async () => {
-      const spies = mockAsyncMethods(uns, {
-        get: {
-          owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
-          resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
-          records: {
-            ['ipfs.html.value']:
-              'QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu',
-          },
-        },
+      const spies = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [
+          '0x95AE1515367aa64C462c71e87157771165B1287A',
+          '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
+          [],
+        ],
+      });
+      const spies2 = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [NullAddress, NullAddress, []],
       });
       const isAvailable = await uns.isAvailable('brad.crypto');
       expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
+      expect(isAvailable).toBe(false);
+    });
+    it('should return false if exists on L2', async () => {
+      const spies = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [
+          '0x95AE1515367aa64C462c71e87157771165B1287A',
+          '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
+          [],
+        ],
+      });
+      const spies2 = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [NullAddress, NullAddress, []],
+      });
+      const isAvailable = await uns.isAvailable('brad.crypto');
+      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
       expect(isAvailable).toBe(false);
     });
     it('should return true', async () => {
-      const spies = mockAsyncMethods(uns, {
-        get: {
-          owner: '',
-          resolver: '',
-          records: {},
-        },
+      const spies = mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [NullAddress, NullAddress, []],
+      });
+      const spies2 = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [NullAddress, NullAddress, []],
       });
       const isAvailable = await uns.isAvailable(
         'thisdomainisdefinitelynotregistered123.crypto',
       );
       expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
       expect(isAvailable).toBe(true);
     });
   });
@@ -679,27 +1187,55 @@ describe('UNS', () => {
   });
 
   describe('Providers', () => {
-    it('should throw error when FetchProvider throws Error', async () => {
-      const url = protocolLink();
-      const provider = new FetchProvider(NamingServiceName.UNS, url);
-      resolution = new Resolution({
-        sourceConfig: {uns: {url, provider, network: 'rinkeby'}},
-      });
-      jest.spyOn(Networking, 'fetch').mockRejectedValue(new Error('error_up'));
+    skipItInLive(
+      'should throw error when FetchProvider throws Error',
+      async () => {
+        const url = protocolLink();
+        const provider = new FetchProvider(NamingServiceName.UNS, url);
+        const polygonProvider = new FetchProvider(
+          NamingServiceName.UNS,
+          protocolLink(ProviderProtocol.http, 'UNSL2'),
+        );
+        resolution = new Resolution({
+          sourceConfig: {
+            uns: {
+              locations: {
+                Layer1: {url, provider, network: 'rinkeby'},
+                Layer2: {network: 'polygon-mumbai', provider: polygonProvider},
+              },
+            },
+          },
+        });
+        const uns = resolution.serviceMap['UNS'] as unknown as Uns;
+        mockAsyncMethods(uns.unsl1.readerContract, {
+          call: () => Promise.reject(new Error('error_up')),
+        });
+        mockAsyncMethods(uns.unsl2.readerContract, {
+          call: () => Promise.reject(new Error('error_up')),
+        });
 
-      await expect(
-        resolution.record(CryptoDomainWithAllRecords, 'No.such.record'),
-      ).rejects.toEqual(new Error('error_up'));
-    });
+        await expect(
+          resolution.record(CryptoDomainWithAllRecords, 'No.such.record'),
+        ).rejects.toThrow(new Error('error_up'));
+      },
+    );
   });
 
   describe('.tokenURI', () => {
     it('should return token URI', async () => {
-      const spies = mockAsyncMethods(uns.readerContract, {
+      const spies = mockAsyncMethods(uns.unsl1.readerContract, {
         call: [
           'https://metadata.staging.unstoppabledomains.com/metadata/brad.crypto',
         ],
       });
+      mockAsyncMethod(uns.unsl2.readerContract, 'call', (params) =>
+        Promise.reject(
+          new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
+            providerMessage:
+              'execution reverted: ERC721Metadata: URI query for nonexistent token',
+          }),
+        ),
+      );
 
       const uri = await resolution.tokenURI('brad.crypto');
 
@@ -709,162 +1245,220 @@ describe('UNS', () => {
       );
     });
 
+    it('should return token URI from L2', async () => {
+      const namehash = eip137Namehash(WalletDomainLayerTwoWithAllRecords);
+      const tokenId = fromHexStringToDecimals(namehash);
+      const spies = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: [
+          `https://metadata.staging.unstoppabledomains.com/metadata/${tokenId}`,
+        ],
+      });
+      mockAsyncMethods(uns.unsl1.readerContract, {
+        call: [],
+      });
+
+      const uri = await resolution.tokenURI(WalletDomainLayerTwoWithAllRecords);
+
+      expectSpyToBeCalled(spies);
+      expect(uri).toEqual(
+        `https://metadata.staging.unstoppabledomains.com/metadata/${tokenId}`,
+      );
+    });
+
     it('should throw error', async () => {
-      const spies = mockAsyncMethods(uns.readerContract, {
+      const domain = 'fakedomainthatdoesnotexist.crypto';
+      const spies = mockAsyncMethods(uns.unsl1.readerContract, {
         call: new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
           providerMessage: 'execution reverted',
         }),
       });
+      const polygonSpies = mockAsyncMethods(uns.unsl2.readerContract, {
+        call: new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
+          providerMessage:
+            'execution reverted: ERC721Metadata: URI query for nonexistent token',
+        }),
+      });
 
-      await expectResolutionErrorCode(
-        () => resolution.tokenURI('fakedomainthatdoesnotexist.crypto'),
-        ResolutionErrorCode.UnregisteredDomain,
+      await expect(resolution.tokenURI(domain)).rejects.toThrow(
+        new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+          domain: `with tokenId ${eip137Namehash(domain)}`,
+        }),
       );
       expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(polygonSpies);
     });
 
-    skipItInLive('should throw the same internal error', async () => {
-      const spies = mockAsyncMethods(uns.readerContract, {
-        call: new ResolutionError(ResolutionErrorCode.ServiceProviderError),
-      });
+    describe('.tokenURIMetadata', () => {
+      it('should return token metadata', async () => {
+        const testMeta: TokenUriMetadata = liveData.cryptoDomainMetadata;
 
-      await expectResolutionErrorCode(
-        () => resolution.tokenURI('fakedomainthatdoesnotexist.crypto'),
-        ResolutionErrorCode.ServiceProviderError,
-      );
-      expectSpyToBeCalled(spies);
-    });
-  });
-
-  describe('.tokenURIMetadata', () => {
-    it('should return token metadata', async () => {
-      const testMeta: TokenUriMetadata = liveData.bradCryptoMetadata;
-
-      const unsSpies = mockAsyncMethods(uns.readerContract, {
-        call: ['https://metadata.unstoppabledomains.com/metadata/brad.crypto'],
-      });
-      const fetchSpies = mockAsyncMethods(Networking, {
-        fetch: {
-          ok: true,
-          json: () => testMeta,
-        },
-      });
-
-      const metadata = await resolution.tokenURIMetadata('brad.crypto');
-
-      expectSpyToBeCalled(unsSpies);
-      expectSpyToBeCalled(fetchSpies);
-      expect(metadata).toEqual(testMeta);
-    });
-  });
-
-  describe('.unhash', () => {
-    it('should unhash token', async () => {
-      const testMeta: TokenUriMetadata = liveData.bradCryptoMetadata;
-      mockAPICalls('unhash', protocolLink());
-      const domain = await resolution.unhash(
-        '0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9',
-        NamingServiceName.UNS,
-      );
-      expect(domain).toEqual(testMeta.name);
-    });
-
-    skipItInLive('should throw error if hash is wrong', async () => {
-      const provider = new FetchProvider(NamingServiceName.UNS, protocolLink());
-      resolution = new Resolution({
-        sourceConfig: {
-          uns: {
-            provider,
-            network: 'mainnet',
-          },
-        },
-      });
-      const providerSpy = mockAsyncMethods(provider, {
-        fetchJson: {
-          jsonrpc: '2.0',
-          id: '1',
-          error: {
-            code: -32600,
-            message: 'data type size mismatch, expected 32 got 6',
-          },
-        },
-      });
-
-      await expectResolutionErrorCode(
-        () => resolution.unhash('0xdeaddeaddead', NamingServiceName.UNS),
-        ResolutionErrorCode.ServiceProviderError,
-      );
-      expectSpyToBeCalled(providerSpy);
-    });
-
-    it('should throw error if domain is not found', async () => {
-      const unregisteredhash = resolution.namehash(
-        'test34230131207328144694.crypto',
-      );
-      mockAPICalls('unhash', protocolLink());
-      await expectResolutionErrorCode(
-        () => resolution.unhash(unregisteredhash, NamingServiceName.UNS),
-        ResolutionErrorCode.UnregisteredDomain,
-      );
-    });
-
-    skipItInLive(
-      'should throw an error if hash returned from the network is not equal to the hash provided',
-      async () => {
-        const someHash = resolution.namehash('test34230131207328144693.crypto');
-        mockAPICalls('unhash', protocolLink());
-        await expectResolutionErrorCode(
-          () => resolution.unhash(someHash, NamingServiceName.UNS),
-          ResolutionErrorCode.ServiceProviderError,
-        );
-      },
-    );
-
-    skipItInLive(
-      'getStartingBlockFromRegistry shouild return earliest for custom network',
-      async () => {
-        resolution = new Resolution({
-          sourceConfig: {
-            uns: {
-              network: 'custom',
-              url: protocolLink(),
-              proxyReaderAddress:
-                UnsConfig.networks[4].contracts.ProxyReader.address,
-            },
+        const unsSpies = mockAsyncMethods(uns.unsl1.readerContract, {
+          call: [
+            `https://metadata.unstoppabledomains.com/metadata/${CryptoDomainWithAllRecords}`,
+          ],
+        });
+        mockAsyncMethods(uns.unsl2.readerContract, {
+          call: [],
+        });
+        const fetchSpies = mockAsyncMethods(Networking, {
+          fetch: {
+            ok: true,
+            json: () => testMeta,
           },
         });
-        const someHash = resolution.namehash('test.coin');
-        // We need to make sure there is no mocks in the queque before we create new ones
-        nock.cleanAll();
-        mockAPICalls('unhashGetStartingBlockTest', protocolLink());
-        await expectResolutionErrorCode(
-          () => resolution.unhash(someHash, NamingServiceName.UNS),
-          ResolutionErrorCode.UnregisteredDomain,
-        );
-        // If the getStartingBlockFromRegistry function won't return "earliest" then one of the mocks will not be fired
-        // Giving us an indicator that something has changed in the function output
-        if (!nock.isDone()) {
-          throw new Error(
-            'Not all mocks have been called, getStartingBlockFromRegistry is misbehaving?',
-          );
-        }
-      },
-    );
 
-    it('should return a .wallet domain', async () => {
-      const walletDomain = 'udtestdev-johnnywallet.wallet';
-      const hash = resolution.namehash(walletDomain);
-      mockAPICalls('unhash', protocolLink());
-      const result = await resolution.unhash(hash, NamingServiceName.UNS);
-      expect(result).toBe(walletDomain);
+        const metadata = await resolution.tokenURIMetadata(
+          CryptoDomainWithAllRecords,
+        );
+
+        expectSpyToBeCalled(unsSpies);
+        expectSpyToBeCalled(fetchSpies);
+        expect(metadata).toEqual(testMeta);
+      });
     });
 
-    it('should return a .coin domain', async () => {
-      const walletDomain = 'udtestdev-johnnycoin.coin';
-      const hash = resolution.namehash(walletDomain);
-      mockAPICalls('unhash', protocolLink());
-      const result = await resolution.unhash(hash, NamingServiceName.UNS);
-      expect(result).toBe(walletDomain);
+    describe('.unhash', () => {
+      it('should unhash token', async () => {
+        const testMeta: TokenUriMetadata = liveData.cryptoDomainMetadata;
+        mockAsyncMethod(Networking, 'fetch', {
+          ok: true,
+          json: () => ({
+            name: testMeta.name,
+          }),
+        });
+        const endpoint = 'https://resolve.unstoppabledomains.com/metadata/';
+
+        mockAsyncMethod(uns, 'getTokenUri', endpoint);
+        const domain = await resolution.unhash(
+          '0x644d751c0e0112006e6d5d5d9234c9d3fae5a4646ff88a754d7fa1ed09794e94',
+          NamingServiceName.UNS,
+        );
+        expect(domain).toEqual(testMeta.name);
+      });
+      skipItInLive(
+        'should throw error if metadata endpoint is undefined',
+        async () => {
+          mockAsyncMethod(uns, 'getTokenUri', '');
+          await expect(
+            resolution.unhash('0xdeaddeaddead', NamingServiceName.UNS),
+          ).rejects.toThrow(
+            new ResolutionError(ResolutionErrorCode.MetadataEndpointError, {
+              tokenUri: 'undefined',
+              errorMessage: 'Only absolute URLs are supported',
+            }),
+          );
+        },
+      );
+      it('should throw if unable to unhash token', async () => {
+        const tokenId =
+          '0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc8';
+        const tokenUri =
+          'https://metadata.staging.unstoppabledomains.com/metadata/';
+        mockAsyncMethod(uns, 'getTokenUri', tokenUri);
+        mockAsyncMethod(Networking, 'fetch', {
+          ok: true,
+          json: () => ({
+            name: null,
+          }),
+        });
+        expect(
+          resolution.unhash(tokenId, NamingServiceName.UNS),
+        ).rejects.toThrow(
+          new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+            domain: `with tokenId ${tokenId}`,
+          }),
+        );
+      });
+      it('should throw if unable to query metadata endpoint token', async () => {
+        const tokenId =
+          '0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc8';
+        const tokenUri =
+          'https://metadata.staging.unstoppabledomains.com/metadata/';
+
+        const spy = jest.spyOn(uns, 'getTokenUri');
+        spy.mockImplementation(() => Promise.resolve(tokenUri));
+
+        mockAsyncMethod(Networking, 'fetch', {
+          ok: false,
+          json: () => null,
+        });
+        expect(
+          resolution.unhash(tokenId, NamingServiceName.UNS),
+        ).rejects.toThrow(
+          new ResolutionError(ResolutionErrorCode.MetadataEndpointError, {
+            tokenUri,
+          }),
+        );
+        expectSpyToBeCalled([spy]);
+      });
+      it('should throw error if domain is not found', async () => {
+        const unregisteredhash = resolution.namehash(
+          'test34230131207328144694.crypto',
+        );
+        mockAsyncMethod(uns.unsl2, 'getTokenUri', (params) =>
+          Promise.reject(
+            new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
+              providerMessage:
+                'execution reverted: ERC721Metadata: URI query for nonexistent token',
+            }),
+          ),
+        );
+        mockAsyncMethod(uns.unsl1, 'getTokenUri', (params) =>
+          Promise.reject(
+            new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
+              providerMessage: 'execution reverted',
+            }),
+          ),
+        );
+        await expect(
+          resolution.unhash(unregisteredhash, NamingServiceName.UNS),
+        ).rejects.toThrow(
+          new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+            domain: `with tokenId ${unregisteredhash}`,
+          }),
+        );
+      });
+
+      skipItInLive(
+        'should throw error if returned domain is wrong',
+        async () => {
+          mockAsyncMethod(Networking, 'fetch', {
+            ok: true,
+            json: () => ({
+              name: 'invalid-domain.crypto',
+            }),
+          });
+          const endpoint = 'https://resolve.unstoppabledomains.com/metadata/';
+
+          mockAsyncMethod(uns, 'getTokenUri', endpoint);
+          await expect(
+            resolution.unhash('0xdeaddeaddead', NamingServiceName.UNS),
+          ).rejects.toThrow(
+            new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
+              providerMessage:
+                'Service provider returned an invalid domain name',
+            }),
+          );
+        },
+      );
+      skipItInLive(
+        'should throw an error if hash returned from the network is not equal to the hash provided',
+        async () => {
+          const someHash = resolution.namehash(
+            'test34230131207328144693.crypto',
+          );
+          mockAsyncMethod(Networking, 'fetch', {
+            json: () => ({
+              name: 'invalid-domain.crypto',
+              ok: true,
+            }),
+          });
+          await expectResolutionErrorCode(
+            () => resolution.unhash(someHash, NamingServiceName.UNS),
+            ResolutionErrorCode.ServiceProviderError,
+          );
+        },
+      );
     });
   });
 });

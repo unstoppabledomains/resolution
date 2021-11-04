@@ -1,21 +1,9 @@
-import {
-  BlockhanNetworkUrlMap,
-  UnsSupportedNetwork,
-  ProxyReaderMap,
-  hasProvider,
-  NullAddress,
-  EventData,
-} from './types';
-import {default as proxyReaderAbi} from './contracts/uns/proxyReader';
-import {default as registryAbi} from './contracts/uns/registry';
-import {default as resolverInterface} from './contracts/uns/resolver';
+import {UnsSupportedNetwork, hasProvider} from './types';
 import ResolutionError, {ResolutionErrorCode} from './errors/resolutionError';
-import EthereumContract from './contracts/EthereumContract';
 import {
   constructRecords,
   isNullAddress,
   EthereumNetworksInverted,
-  EthereumNetworks,
 } from './utils';
 import {
   UnsSource,
@@ -23,77 +11,126 @@ import {
   DomainData,
   NamingServiceName,
   Provider,
+  UnsLocation,
+  Locations,
   BlockchainType,
-  DomainLocation,
+  DomainMetadata,
 } from './types/publicTypes';
 import {isValidTwitterSignature} from './utils/TwitterSignatureValidator';
-import UnsConfig from './config/uns-config.json';
 import FetchProvider from './FetchProvider';
 import {eip137Childhash, eip137Namehash} from './utils/namehash';
 import {NamingService} from './NamingService';
 import ConfigurationError, {
   ConfigurationErrorCode,
 } from './errors/configurationError';
-import ResolverKeys from './config/resolver-keys.json';
-import {Interface} from '@ethersproject/abi';
+import UnsInternal from './UnsInternal';
+import Networking from './utils/Networking';
+import SupportedKeys from './config/resolver-keys.json';
 
 /**
  * @internal
  */
 export default class Uns extends NamingService {
-  static readonly ProxyReaderMap: ProxyReaderMap = getProxyReaderMap();
-
-  static readonly UrlMap: BlockhanNetworkUrlMap = {
-    1: 'https://mainnet.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
-    4: 'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
-  };
-
-  readonly network: number;
+  public unsl1: UnsInternal;
+  public unsl2: UnsInternal;
   readonly name: NamingServiceName = NamingServiceName.UNS;
-  readonly url: string | undefined;
-  readonly provider: Provider;
-  readonly readerContract: EthereumContract;
 
-  constructor(source: UnsSource = {url: Uns.UrlMap[1], network: 'mainnet'}) {
+  constructor(source?: UnsSource) {
     super();
-    this.checkNetworkConfig(source);
-    this.network = EthereumNetworks[source.network];
-    this.url = source['url'] || Uns.UrlMap[this.network];
-    this.provider =
-      source['provider'] || new FetchProvider(this.name, this.url!);
-    this.readerContract = new EthereumContract(
-      proxyReaderAbi,
-      source['proxyReaderAddress'] || Uns.ProxyReaderMap[this.network],
-      this.provider,
+    if (
+      source &&
+      source.locations &&
+      (!source.locations.Layer1 || !source.locations.Layer2)
+    ) {
+      throw new ConfigurationError(
+        ConfigurationErrorCode.NetworkConfigMissing,
+        {
+          method: NamingServiceName.UNS,
+          config: !source.locations.Layer1 ? 'Layer1' : 'Layer2',
+        },
+      );
+    }
+    if (!source) {
+      source = {
+        locations: {
+          Layer1: {
+            url: UnsInternal.UrlMap['mainnet'],
+            network: 'mainnet',
+          },
+          Layer2: {
+            url: UnsInternal.UrlMap['polygon-mainnet'],
+            network: 'polygon-mainnet',
+          },
+        },
+      };
+    }
+    this.unsl1 = new UnsInternal(
+      UnsLocation.Layer1,
+      source.locations.Layer1,
+      BlockchainType.ETH,
+    );
+    this.unsl2 = new UnsInternal(
+      UnsLocation.Layer2,
+      source.locations.Layer2,
+      BlockchainType.MATIC,
     );
   }
 
-  static async autoNetwork(
-    config: {url: string} | {provider: Provider},
-  ): Promise<Uns> {
-    let provider: Provider;
+  static async autoNetwork(config: {
+    locations: {
+      Layer1: {url: string} | {provider: Provider};
+      Layer2: {url: string} | {provider: Provider};
+    };
+  }): Promise<Uns> {
+    let providerLayer1: Provider;
+    let providerLayer2: Provider;
 
-    if (hasProvider(config)) {
-      provider = config.provider;
+    if (
+      hasProvider(config.locations.Layer1) &&
+      hasProvider(config.locations.Layer2)
+    ) {
+      providerLayer1 = config.locations.Layer1.provider;
+      providerLayer2 = config.locations.Layer2.provider;
     } else {
-      if (!config.url) {
+      if (!config.locations.Layer1['url'] || !config.locations.Layer2['url']) {
         throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedUrl, {
           method: NamingServiceName.UNS,
         });
       }
-      provider = FetchProvider.factory(NamingServiceName.UNS, config.url);
+      providerLayer1 = FetchProvider.factory(
+        NamingServiceName.UNS,
+        config.locations.Layer1['url'],
+      );
+      providerLayer2 = FetchProvider.factory(
+        NamingServiceName.UNS,
+        config.locations.Layer2['url'],
+      );
     }
 
-    const networkId = (await provider.request({
+    const networkIdLayer1 = (await providerLayer1.request({
       method: 'net_version',
     })) as number;
-    const networkName = EthereumNetworksInverted[networkId];
-    if (!networkName || !UnsSupportedNetwork.guard(networkName)) {
+    const networkIdLayer2 = (await providerLayer2.request({
+      method: 'net_version',
+    })) as number;
+    const networkNameLayer1 = EthereumNetworksInverted[networkIdLayer1];
+    const networkNameLayer2 = EthereumNetworksInverted[networkIdLayer2];
+    if (
+      !networkNameLayer1 ||
+      !UnsSupportedNetwork.guard(networkNameLayer1) ||
+      !networkNameLayer2 ||
+      !UnsSupportedNetwork.guard(networkNameLayer2)
+    ) {
       throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {
         method: NamingServiceName.UNS,
       });
     }
-    return new this({network: networkName, provider: provider});
+    return new this({
+      locations: {
+        Layer1: {network: networkNameLayer1, provider: providerLayer1},
+        Layer2: {network: networkNameLayer2, provider: providerLayer2},
+      },
+    });
   }
 
   namehash(domain: string): string {
@@ -117,15 +154,15 @@ export default class Uns extends NamingService {
     if (!this.checkDomain(domain)) {
       return false;
     }
-
     const tld = domain.split('.').pop();
     if (!tld) {
       return false;
     }
-    const [exists] = await this.readerContract.call('exists', [
-      this.namehash(tld),
+    const [existsL1, existsL2] = await Promise.all([
+      this.unsl1.exists(tld),
+      this.unsl2.exists(tld),
     ]);
-    return exists;
+    return existsL1 || existsL2;
   }
 
   async owner(domain: string): Promise<string> {
@@ -156,18 +193,11 @@ export default class Uns extends NamingService {
 
   async allRecords(domain: string): Promise<CryptoRecords> {
     const tokenId = this.namehash(domain);
-    const resolver = await this.resolver(domain);
-
-    const resolverContract = new EthereumContract(
-      resolverInterface,
-      resolver,
-      this.provider,
-    );
-    if (this.isLegacyResolver(resolver)) {
-      return await this.getStandardRecords(tokenId);
-    }
-
-    return await this.getAllRecords(resolverContract, tokenId);
+    const metadata = await this.getMetadata(tokenId);
+    return this.records(domain, [
+      ...Object.keys(SupportedKeys.keys),
+      ...Object.keys(metadata.properties.records),
+    ]);
   }
 
   async twitter(domain: string): Promise<string> {
@@ -177,12 +207,13 @@ export default class Uns extends NamingService {
       'social.twitter.username',
     ];
     const data = await this.getVerifiedData(domain, keys);
-    const {records} = data;
+    const {records, location} = data;
     const validationSignature = records['validation.social.twitter.username'];
     const twitterHandle = records['social.twitter.username'];
     if (isNullAddress(validationSignature)) {
       throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
         domain,
+        location,
         recordName: 'validation.social.twitter.username',
       });
     }
@@ -190,6 +221,7 @@ export default class Uns extends NamingService {
     if (!twitterHandle) {
       throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
         domain,
+        location,
         recordName: 'social.twitter.username',
       });
     }
@@ -231,22 +263,33 @@ export default class Uns extends NamingService {
   }
 
   async getTokenUri(tokenId: string): Promise<string> {
-    try {
-      const [tokenUri] = await this.readerContract.call('tokenURI', [tokenId]);
-      return tokenUri;
-    } catch (error) {
+    const [resultOrErrorL1, resultOrErrorL2] = await Promise.all([
+      this.unsl1.getTokenUri(tokenId).catch((err) => err),
+      this.unsl2.getTokenUri(tokenId).catch((err) => err),
+    ]);
+    if (resultOrErrorL2 instanceof Error) {
       if (
-        error instanceof ResolutionError &&
-        error.code === ResolutionErrorCode.ServiceProviderError &&
-        error.message === '< execution reverted >'
+        !resultOrErrorL2.message.includes(
+          'ERC721Metadata: URI query for nonexistent token',
+        )
       ) {
+        throw resultOrErrorL2;
+      }
+    } else {
+      return resultOrErrorL2;
+    }
+    if (resultOrErrorL1 instanceof Error) {
+      validResolutionErrorOrThrow(
+        resultOrErrorL1,
+        ResolutionErrorCode.ServiceProviderError,
+      );
+      if (resultOrErrorL1.message === '< execution reverted >') {
         throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-          method: NamingServiceName.UNS,
-          methodName: 'getTokenUri',
+          domain: `with tokenId ${tokenId}`,
         });
       }
-      throw error;
     }
+    return resultOrErrorL1;
   }
 
   async isAvailable(domain: string): Promise<boolean> {
@@ -254,87 +297,70 @@ export default class Uns extends NamingService {
   }
 
   async registryAddress(domainOrNamehash: string): Promise<string> {
-    if (
-      !this.checkDomain(domainOrNamehash, domainOrNamehash.startsWith('0x'))
-    ) {
-      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
-        domain: domainOrNamehash,
-      });
+    const [resultOrErrorL1, resultOrErrorL2] = await Promise.all([
+      this.unsl1.registryAddress(domainOrNamehash).catch((err) => err),
+      this.unsl2.registryAddress(domainOrNamehash).catch((err) => err),
+    ]);
+
+    if (resultOrErrorL2 instanceof Error) {
+      validResolutionErrorOrThrow(
+        resultOrErrorL2,
+        ResolutionErrorCode.UnregisteredDomain,
+      );
+    } else if (!isNullAddress(resultOrErrorL2)) {
+      return resultOrErrorL2;
     }
-    const namehash = domainOrNamehash.startsWith('0x')
-      ? domainOrNamehash
-      : this.namehash(domainOrNamehash);
-    const [address] = await this.readerContract.call('registryOf', [namehash]);
-    if (address === NullAddress) {
-      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-        domain: domainOrNamehash,
-      });
-    }
-    return address;
+    return validResultOrThrow(resultOrErrorL1);
+  }
+
+  async locations(domains: string[]): Promise<Locations> {
+    const [resultL1, resultL2] = await Promise.all([
+      this.unsl1.locations(domains),
+      this.unsl2.locations(domains),
+    ]);
+
+    const nonEmptyRecordsFromL2 = Object.keys(resultL2)
+      .filter((k) => resultL2[k] != null)
+      .reduce((a, k) => ({...a, [k]: resultL2[k]}), {});
+    return {
+      ...resultL1,
+      ...nonEmptyRecordsFromL2,
+    };
   }
 
   async getDomainFromTokenId(tokenId: string): Promise<string> {
-    const registryAddress = await this.registryAddress(tokenId);
-    const registryContract = new EthereumContract(
-      registryAbi,
-      registryAddress,
-      this.provider,
-    );
-    const startingBlock = this.getStartingBlockFromRegistry(registryAddress);
-    const newURIEvents = await registryContract.fetchLogs(
-      'NewURI',
-      tokenId,
-      startingBlock,
-    );
-    if (!newURIEvents || newURIEvents.length === 0) {
+    const metadata = await this.getMetadata(tokenId);
+
+    return metadata.name;
+  }
+
+  private async getMetadata(tokenId: string): Promise<DomainMetadata> {
+    const tokenUri = await this.getTokenUri(tokenId);
+    const resp = await Networking.fetch(tokenUri, {}).catch((err) => {
+      throw new ResolutionError(ResolutionErrorCode.MetadataEndpointError, {
+        tokenUri: tokenUri || 'undefined',
+        errorMessage: err.message,
+      });
+    });
+    if (!resp.ok) {
+      throw new ResolutionError(ResolutionErrorCode.MetadataEndpointError, {
+        tokenUri: tokenUri || 'undefined',
+      });
+    }
+    const metadata: DomainMetadata = await resp.json();
+    if (!metadata.name) {
       throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
         domain: `with tokenId ${tokenId}`,
       });
     }
-    const rawData = newURIEvents[newURIEvents.length - 1].data;
-    const decoded = Interface.getAbiCoder().decode(['string'], rawData);
-    return decoded[decoded.length - 1];
-  }
-
-  async location(domain: string): Promise<DomainLocation> {
-    const tokenId = this.namehash(domain);
-    const [registry, {resolver, owner}] = await Promise.all([
-      this.registryAddress(domain),
-      this.get(tokenId),
-    ]);
-
-    return {
-      registry,
-      resolver,
-      networkId: this.network,
-      blockchain: BlockchainType.ETH,
-      owner,
-    };
-  }
-
-  private getStartingBlockFromRegistry(registryAddress: string): string {
-    const contractDetails = Object.values(UnsConfig?.networks).reduce(
-      (acc, network) => {
-        const contracts = network.contracts;
-
-        return [
-          ...acc,
-          ...Object.values(contracts).map((c) => ({
-            address: c.address,
-            deploymentBlock: c.deploymentBlock,
-          })),
-        ];
-      },
-      [],
-    );
-
-    const contractDetail = contractDetails.find(
-      (detail) => detail.address === registryAddress,
-    );
-    if (!contractDetail || contractDetail?.deploymentBlock === '0x0') {
-      return 'earliest';
+    if (this.namehash(metadata.name) !== tokenId) {
+      throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
+        methodName: 'unhash',
+        domain: metadata.name,
+        providerMessage: 'Service provider returned an invalid domain name',
+      });
     }
-    return contractDetail.deploymentBlock;
+    return metadata;
   }
 
   private async getVerifiedData(
@@ -350,90 +376,44 @@ export default class Uns extends NamingService {
         });
       }
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
+        location: data.location,
         domain,
       });
     }
     return data;
   }
 
-  private async getStandardRecords(tokenId: string): Promise<CryptoRecords> {
-    const keys = Object.keys(ResolverKeys.keys);
-    return await this.getMany(tokenId, keys);
-  }
-
-  private async getAllRecords(
-    resolverContract: EthereumContract,
-    tokenId: string,
-  ): Promise<CryptoRecords> {
-    const startingBlock = await this.getStartingBlock(
-      resolverContract,
-      tokenId,
-    );
-    const logs = await this.getNewKeyEvents(
-      resolverContract,
-      tokenId,
-      startingBlock || 'earliest',
-    );
-    const keyTopics = logs.map((event) => event.topics[2]);
-    // If there are no NewKey events we want to check the standardRecords
-    if (keyTopics.length === 0) {
-      return await this.getStandardRecords(tokenId);
-    }
-    return await this.getManyByHash(tokenId, keyTopics);
-  }
-
-  private async getMany(
-    tokenId: string,
-    keys: string[],
-  ): Promise<CryptoRecords> {
-    return (await this.get(tokenId, keys)).records;
-  }
-
-  private async getManyByHash(
-    tokenId: string,
-    hashes: string[],
-  ): Promise<CryptoRecords> {
-    const [keys, values] = (await this.readerContract.call('getManyByHash', [
-      hashes,
-      tokenId,
-    ])) as [string[], string[]];
-    return constructRecords(keys, values);
-  }
-
   private async get(tokenId: string, keys: string[] = []): Promise<DomainData> {
-    const [resolver, owner, values] = await this.readerContract.call(
-      'getData',
-      [keys, tokenId],
-    );
-    return {owner, resolver, records: constructRecords(keys, values)};
-  }
-
-  private isLegacyResolver(resolverAddress: string): boolean {
-    return this.isWellKnownLegacyResolver(resolverAddress);
-  }
-
-  private isWellKnownLegacyResolver(resolverAddress: string): boolean {
-    const legacyAddresses =
-      UnsConfig?.networks[this.network]?.contracts?.Resolver?.legacyAddresses;
-    if (!legacyAddresses || legacyAddresses.length === 0) {
-      return false;
+    const [resultOrErrorL1, resultOrErrorL2] = await Promise.all([
+      this.unsl1.get(tokenId, keys).catch((err) => err),
+      this.unsl2.get(tokenId, keys).catch((err) => err),
+    ]);
+    validResultOrThrow(resultOrErrorL2);
+    const {
+      resolver: resolverL2,
+      owner: ownerL2,
+      records: recordsL2,
+    } = resultOrErrorL2;
+    if (!isNullAddress(ownerL2)) {
+      return {
+        resolver: resolverL2,
+        owner: ownerL2,
+        records: constructRecords(keys, recordsL2),
+        location: UnsLocation.Layer2,
+      };
     }
-    return (
-      legacyAddresses.findIndex((address) => {
-        return address.toLowerCase() === resolverAddress.toLowerCase();
-      }) > -1
-    );
-  }
-
-  private async getStartingBlock(
-    contract: EthereumContract,
-    tokenId: string,
-  ): Promise<string | undefined> {
-    const defaultStartingBlock =
-      UnsConfig?.networks[this.network]?.contracts?.Resolver?.deploymentBlock;
-    const logs = await contract.fetchLogs('ResetRecords', tokenId);
-    const lastResetEvent = logs[logs.length - 1];
-    return lastResetEvent?.blockNumber || defaultStartingBlock;
+    validResultOrThrow(resultOrErrorL1);
+    const {
+      resolver: resolverL1,
+      owner: ownerL1,
+      records: recordsL1,
+    } = resultOrErrorL1;
+    return {
+      resolver: resolverL1,
+      owner: ownerL1,
+      records: constructRecords(keys, recordsL1),
+      location: UnsLocation.Layer1,
+    };
   }
 
   private checkDomain(domain: string, passIfTokenID = false): boolean {
@@ -451,67 +431,24 @@ export default class Uns extends NamingService {
       tokens.every((v) => !!v.length)
     );
   }
-
-  private async getNewKeyEvents(
-    resolverContract: EthereumContract,
-    tokenId: string,
-    startingBlock: string,
-  ): Promise<EventData[]> {
-    return resolverContract.fetchLogs('NewKey', tokenId, startingBlock);
-  }
-
-  private checkNetworkConfig(source: UnsSource): void {
-    if (!source.network) {
-      throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {
-        method: this.name,
-      });
-    }
-    if (!UnsSupportedNetwork.guard(source.network)) {
-      this.checkCustomNetworkConfig(source);
-    }
-  }
-
-  private checkCustomNetworkConfig(source: UnsSource): void {
-    if (!this.isValidProxyReader(source.proxyReaderAddress)) {
-      throw new ConfigurationError(
-        ConfigurationErrorCode.InvalidConfigurationField,
-        {
-          method: this.name,
-          field: 'proxyReaderAddress',
-        },
-      );
-    }
-    if (!source['url'] && !source['provider']) {
-      throw new ConfigurationError(
-        ConfigurationErrorCode.CustomNetworkConfigMissing,
-        {
-          method: this.name,
-          config: 'url or provider',
-        },
-      );
-    }
-  }
-
-  private isValidProxyReader(address?: string): boolean {
-    if (!address) {
-      throw new ConfigurationError(
-        ConfigurationErrorCode.CustomNetworkConfigMissing,
-        {
-          method: this.name,
-          config: 'proxyReaderAddress',
-        },
-      );
-    }
-    const ethLikePattern = new RegExp('^0x[a-fA-F0-9]{40}$');
-    return ethLikePattern.test(address);
-  }
 }
 
-function getProxyReaderMap(): ProxyReaderMap {
-  const map: ProxyReaderMap = {};
-  for (const id of Object.keys(UnsConfig.networks)) {
-    map[id] =
-      UnsConfig.networks[id].contracts.ProxyReader.address.toLowerCase();
+function validResultOrThrow(resultOrError) {
+  if (resultOrError instanceof Error) {
+    throw resultOrError;
   }
-  return map;
+  return resultOrError;
+}
+
+function validResolutionErrorOrThrow(
+  error: Error,
+  validCode: ResolutionErrorCode,
+) {
+  if (!(error instanceof ResolutionError)) {
+    throw error;
+  }
+  if (error.code === validCode) {
+    return true;
+  }
+  throw error;
 }

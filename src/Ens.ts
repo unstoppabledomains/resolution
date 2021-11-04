@@ -1,7 +1,7 @@
 import {default as ensInterface} from './contracts/ens/ens';
 import {default as resolverInterface} from './contracts/ens/resolver';
 import {
-  BlockhanNetworkUrlMap,
+  BlockhainNetworkUrlMap,
   EnsSupportedNetwork,
   EthCoinIndex,
   hasProvider,
@@ -10,9 +10,8 @@ import {ResolutionError, ResolutionErrorCode} from './errors/resolutionError';
 import EthereumContract from './contracts/EthereumContract';
 import EnsNetworkMap from 'ethereum-ens-network-map';
 import {
-  BlockchainType,
-  DomainLocation,
   EnsSource,
+  Locations,
   NamingServiceName,
   Provider,
 } from './types/publicTypes';
@@ -34,7 +33,7 @@ import {requireOrFail} from './utils/requireOrFail';
  * @internal
  */
 export default class Ens extends NamingService {
-  static readonly UrlMap: BlockhanNetworkUrlMap = {
+  static readonly UrlMap: BlockhainNetworkUrlMap = {
     1: 'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
     3: 'https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
     4: 'https://rinkeby.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
@@ -228,20 +227,11 @@ export default class Ens extends NamingService {
     });
   }
 
-  async location(domain: string): Promise<DomainLocation> {
-    const [registry, resolver, owner] = await Promise.all([
-      this.registryAddress(domain),
-      this.resolver(domain),
-      this.owner(domain),
-    ]);
-
-    return {
-      registry,
-      resolver,
-      networkId: this.network,
-      blockchain: BlockchainType.ETH,
-      owner,
-    };
+  locations(domains: string[]): Promise<Locations> {
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+      method: NamingServiceName.ENS,
+      methodName: 'locations',
+    });
   }
 
   /**

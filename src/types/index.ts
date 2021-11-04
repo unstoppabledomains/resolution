@@ -4,7 +4,7 @@ export type Dictionary<T> = {[k: string]: T};
 export type EnsNetworkIdMap = {
   [key: number]: string;
 };
-export interface BlockhanNetworkUrlMap {
+export interface BlockhainNetworkUrlMap {
   [key: string]: string | undefined;
 }
 export interface ProxyReaderMap {
@@ -124,13 +124,20 @@ const StringUnion = <UnionType extends string>(...values: UnionType[]) => {
   );
 };
 
-export const UnsSupportedNetwork = StringUnion('mainnet', 'rinkeby');
+export const UnsSupportedNetwork = StringUnion(
+  'mainnet',
+  'rinkeby',
+  'polygon-mainnet',
+  'polygon-mumbai',
+);
+
 export const EnsSupportedNetwork = StringUnion(
   'mainnet',
   'rinkeby',
   'goerli',
   'ropsten',
 );
+
 export const ZnsSupportedNetwork = StringUnion('mainnet', 'testnet');
 
 export function hasProvider(obj: any): obj is {provider: Provider} {

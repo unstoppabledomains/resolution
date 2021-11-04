@@ -1,3 +1,30 @@
+## 6.0.0
+### Breaking changes
+- CLI tool was removed. Please use new binary CLI tool instead: [Github repo](https://github.com/unstoppabledomains/resolution-cli/releases).
+- Constructor has changed. If you used `uns` configuration you have to specify parameters for L1 and L2 locations (Ethereum and Polygon mainnets).
+- ENS support is deprecated and will be removed in future.
+- Factory methods has changed. All of them requires provide L1 and L2 locations configuration for UNS. For example: `uns: {locations: {L1: ..., L2...}}`.
+  - The list of affected methods:
+    - `Resolution#infura`
+    - `Resolution#fromResolutionProvider`
+    - `Resolution#fromEthereumEip1193Provider`
+    - `Resolution#fromWeb3Version0Provider`
+    - `Resolution#fromWeb3Version1Provider`
+    - `Resolution#fromEthersProvider`
+- `Resolution#location` method is replaced by `Resolution#locations`.
+
+### New methods and features
+- 🎉 🎉 🎉 Add Polygon Layer 2 support!
+- Add `Resolution#locations` method which will help to determine domains location (blockhain, networkId) and useful metadata like owner, resolver, registry addresses, provider url if possible.
+  - Method returns:
+    - Domain blockhain (ETH or MATIC)
+    - Blockchain network id (numeric)
+    - Owner address
+    - Resolver address
+    - Registry address
+    - Provider URL if possible
+      - Infura URL by default
+
 ## 5.0.2
 - Replaces `node-fetch` with `cross-fetch` package
 

@@ -13,14 +13,21 @@ export const MainnetUrl = 'https://rinkeby.infura.io';
 export const ZilliqaUrl = 'https://api.zilliqa.com';
 export const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
 
-export const CryptoDomainWithoutResolver = 'twistedmusic.crypto';
 export const CryptoDomainWithTwitterVerification =
   'reseller-test-udtesting-052523593694.crypto';
 export const CryptoDomainWithUsdtMultiChainRecords =
   'test-usdt-and-dns-records.crypto';
 export const ZilDomainWithUsdtMultiChainRecords =
   'reseller-test-udtesting-422508414817.zil';
+export const CryptoDomainLayerOneWithNoResolver =
+  'udtestdev-test-l1-domain-no-resolver.crypto';
 export const CryptoDomainWithAllRecords = 'test-usdt-and-dns-records.crypto';
+export const WalletDomainLayerTwoWithAllRecords =
+  'udtestdev-test-l2-domain-784391.wallet';
+export const WalletDomainLayerTwoWithNoRecords =
+  'udtestdev-test-l2-domain-empty.wallet';
+export const WalletDomainOnBothLayers =
+  'udtestdev-test-l1-and-l2-ownership.wallet';
 export const CryptoDomainWithoutGunDbRecords =
   'test-usdt-and-dns-records.crypto';
 
@@ -122,7 +129,9 @@ async function expectError(
 
   return callback.then(
     // eslint-disable-next-line no-undef
-    () => fail(`Expected ${klass.name} to be thrown but wasn't`),
+    () => {
+      throw new Error(`Expected ${klass.name} to be thrown but wasn't`);
+    },
     (error) => {
       // Redundant code quality check is required
       // to display stack traces when code is incorrect
@@ -167,15 +176,19 @@ export function mockAPICalls(testName: string, url = MainnetUrl): void {
  */
 export function protocolLink(
   providerProtocol: ProviderProtocol = ProviderProtocol.http,
-  namingService:
-    | NamingServiceName.ENS
-    | NamingServiceName.UNS = NamingServiceName.UNS,
+  namingService: NamingServiceName.ENS | 'UNSL1' | 'UNSL2' = 'UNSL1',
 ): string {
   const secret =
     process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID ?? undefined;
 
   if (!secret) {
     return ethereumDefaultProviders[namingService][providerProtocol];
+  }
+
+  if (namingService === 'UNSL2') {
+    return providerProtocol === ProviderProtocol.wss
+      ? `wss://polygon-mumbai.infura.io/ws/v3/${secret}`
+      : `https://polygon-mumbai.infura.io/v3/${secret}`;
   }
 
   return providerProtocol === ProviderProtocol.wss
@@ -202,11 +215,17 @@ export const caseMock = <T, U>(
 };
 
 const ethereumDefaultProviders = {
-  [NamingServiceName.UNS]: {
+  UNSL1: {
     [ProviderProtocol.http]:
       'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
     [ProviderProtocol.wss]:
       'wss://rinkeby.infura.io/ws/v3/c4bb906ed6904c42b19c95825fe55f39',
+  },
+  UNSL2: {
+    [ProviderProtocol.http]:
+      'https://polygon-mumbai.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+    [ProviderProtocol.wss]:
+      'wss://polygon-mumbai.infura.io/ws/v3/c4bb906ed6904c42b19c95825fe55f39',
   },
   [NamingServiceName.ENS]: {
     [ProviderProtocol.http]:

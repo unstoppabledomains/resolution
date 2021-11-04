@@ -3,6 +3,7 @@ import Resolution, {
   ResolutionError,
   ResolutionErrorCode,
   UnclaimedDomainResponse,
+  UnsLocation,
 } from '../index';
 import {
   BlockchainType,
@@ -28,6 +29,8 @@ import {
   CryptoDomainWithUsdtMultiChainRecords,
   expectConfigurationErrorCode,
   CryptoDomainWithAllRecords,
+  WalletDomainLayerTwoWithAllRecords,
+  WalletDomainOnBothLayers,
 } from './helpers';
 import {RpcProviderTestCases} from './providerMockData';
 import fetch, {FetchError} from 'node-fetch';
@@ -35,11 +38,15 @@ import Uns from '../Uns';
 import Zns from '../Zns';
 import Ens from '../Ens';
 import FetchProvider from '../FetchProvider';
-import {ConfigurationErrorCode} from '../errors/configurationError';
+import {
+  ConfigurationErrorCode,
+  ConfigurationError,
+} from '../errors/configurationError';
 import {HTTPProvider} from '@zilliqa-js/core';
 import {Eip1993Factories as Eip1193Factories} from '../utils/Eip1993Factories';
 import UnsConfig from '../config/uns-config.json';
-import EthereumContract from '../contracts/EthereumContract';
+import {NullAddress} from '../types';
+import Networking from '../utils/Networking';
 
 let resolution: Resolution;
 let uns: Uns;
@@ -51,7 +58,15 @@ beforeEach(() => {
   jest.restoreAllMocks();
   resolution = new Resolution({
     sourceConfig: {
-      uns: {url: protocolLink(), network: 'rinkeby'},
+      uns: {
+        locations: {
+          Layer1: {url: protocolLink(), network: 'rinkeby'},
+          Layer2: {
+            url: protocolLink(ProviderProtocol.http, 'UNSL2'),
+            network: 'polygon-mumbai',
+          },
+        },
+      },
       ens: {url: protocolLink(), network: 'rinkeby'},
       zns: {network: 'testnet'},
     },
@@ -64,6 +79,7 @@ beforeEach(() => {
 describe('Resolution', () => {
   describe('.Basic setup', () => {
     it('should work with autonetwork url configuration', async () => {
+      const polygonUrl = protocolLink(ProviderProtocol.http, 'UNSL2');
       const rinkebyUrl = protocolLink();
       const goerliUrl = rinkebyUrl.replace('rinkeby', 'goerli');
       // mocking getNetworkConfigs because no access to inner provider.request
@@ -72,8 +88,16 @@ describe('Resolution', () => {
       if (!isLive()) {
         Uns.autoNetwork = jest.fn().mockReturnValue(
           new Uns({
-            network: 'rinkeby',
-            provider: new FetchProvider(NamingServiceName.UNS, rinkebyUrl),
+            locations: {
+              Layer1: {
+                network: 'rinkeby',
+                provider: new FetchProvider(UnsLocation.Layer1, rinkebyUrl),
+              },
+              Layer2: {
+                network: 'polygon-mumbai',
+                provider: new FetchProvider(UnsLocation.Layer2, polygonUrl),
+              },
+            },
           }),
         );
         Ens.autoNetwork = jest.fn().mockReturnValue(
@@ -84,68 +108,146 @@ describe('Resolution', () => {
         );
       }
       const resolution = await Resolution.autoNetwork({
-        uns: {url: rinkebyUrl},
+        uns: {
+          locations: {Layer1: {url: rinkebyUrl}, Layer2: {url: polygonUrl}},
+        },
         ens: {url: goerliUrl},
       });
       // We need to manually restore the function as jest.restoreAllMocks and simillar works only with spyOn
       Uns.autoNetwork = UnsGetNetworkOriginal;
       Ens.autoNetwork = EnsGetNetworkOriginal;
       expect(
-        (resolution.serviceMap[NamingServiceName.UNS] as unknown as Uns)
+        (resolution.serviceMap[NamingServiceName.UNS] as unknown as Uns).unsl1
           .network,
-      ).toBe(4);
+      ).toBe('rinkeby');
+      expect(
+        (resolution.serviceMap[NamingServiceName.UNS] as unknown as Uns).unsl2
+          .network,
+      ).toBe('polygon-mumbai');
       expect(
         (resolution.serviceMap[NamingServiceName.ENS] as unknown as Ens)
           .network,
       ).toBe(5);
     });
 
-    it('should not work with invalid proxyReader configuration', async () => {
+    it('should not work with invalid proxyReader configuration #1', async () => {
       const mainnetUrl = protocolLink();
       const customNetwork = 'goerli';
+      const polygonUrl = protocolLink(ProviderProtocol.http, 'UNSL2');
       const goerliUrl = mainnetUrl.replace('mainnet', customNetwork);
-      expectConfigurationErrorCode(() => {
+      await expectConfigurationErrorCode(() => {
         new Uns({
-          network: customNetwork,
-          url: goerliUrl,
-          proxyReaderAddress: '0x012312931293',
+          locations: {
+            Layer1: {
+              network: customNetwork,
+              url: goerliUrl,
+              proxyReaderAddress: '0x012312931293',
+            },
+            Layer2: {
+              network: 'polygon-mumbai',
+              url: polygonUrl,
+              proxyReaderAddress: '0x012312931293',
+            },
+          },
+        });
+      }, ConfigurationErrorCode.InvalidConfigurationField);
+    });
+    it('should not work with invalid proxyReader configuration #2', async () => {
+      const mainnetUrl = protocolLink();
+      const customNetwork = 'goerli';
+      const polygonUrl = protocolLink(ProviderProtocol.http, 'UNSL2');
+      const goerliUrl = mainnetUrl.replace('mainnet', customNetwork);
+      await expect(() => {
+        new Uns({
+          locations: {
+            Layer1: {
+              network: customNetwork,
+              url: goerliUrl,
+              proxyReaderAddress: '0xe7474D07fD2FA286e7e0aa23cd107F8379025037',
+            },
+            Layer2: {
+              network: 'polygon-mumbai',
+              url: polygonUrl,
+              proxyReaderAddress: '0x012312931293',
+            },
+          },
+        });
+      }).toThrow(
+        new ConfigurationError(
+          ConfigurationErrorCode.InvalidConfigurationField,
+          {
+            method: UnsLocation.Layer2,
+            field: 'proxyReaderAddress',
+          },
+        ),
+      );
+    });
+
+    it('should not work with invalid proxyReader configuration #3', async () => {
+      const mainnetUrl = protocolLink();
+      const provider = new FetchProvider(NamingServiceName.UNS, mainnetUrl);
+      const polygonUrl = protocolLink(ProviderProtocol.http, 'UNSL2');
+      const polygonProvider = new FetchProvider(UnsLocation.Layer2, polygonUrl);
+      const customNetwork = 'goerli';
+      await expectConfigurationErrorCode(() => {
+        new Uns({
+          locations: {
+            Layer1: {
+              network: customNetwork,
+              provider,
+              proxyReaderAddress: '0xe7474D07fD2FA286e7e0aa23cd107F8379025037',
+            },
+            Layer2: {
+              network: 'polygon-mumbai',
+              provider: polygonProvider,
+              proxyReaderAddress: '0x332a8191905fa8e6eea7350b5799f225b8ed',
+            },
+          },
         });
       }, ConfigurationErrorCode.InvalidConfigurationField);
     });
 
     it('should work with proxyReader configuration', async () => {
       const mainnetUrl = protocolLink();
+      const polygonUrl = protocolLink(ProviderProtocol.http, 'UNSL2');
       const customNetwork = 'goerli';
       const goerliUrl = mainnetUrl.replace('mainnet', customNetwork);
       const uns = new Uns({
-        network: customNetwork,
-        url: goerliUrl,
-        proxyReaderAddress: '0xe7474D07fD2FA286e7e0aa23cd107F8379025037',
+        locations: {
+          Layer1: {
+            network: customNetwork,
+            url: goerliUrl,
+            proxyReaderAddress: '0xe7474D07fD2FA286e7e0aa23cd107F8379025037',
+          },
+          Layer2: {
+            network: 'polygon-mumbai',
+            url: polygonUrl,
+            proxyReaderAddress: '0x332a8191905fa8e6eea7350b5799f225b8ed30a9',
+          },
+        },
       });
       expect(uns).toBeDefined();
     });
 
-    it('should not work with invalid proxyReader configuration 2', async () => {
-      const mainnetUrl = protocolLink();
-      const customNetwork = 'goerli';
-      const provider = new FetchProvider(NamingServiceName.UNS, mainnetUrl);
-      expectConfigurationErrorCode(() => {
-        new Uns({
-          network: customNetwork,
-          provider,
-          proxyReaderAddress: '0x012312931293',
-        });
-      }, ConfigurationErrorCode.InvalidConfigurationField);
-    });
-
     it('should work with custom network configuration with provider', async () => {
       const mainnetUrl = protocolLink();
-      const customNetwork = 'goerli';
       const provider = new FetchProvider(NamingServiceName.UNS, mainnetUrl);
+      const polygonUrl = protocolLink(ProviderProtocol.http, 'UNSL2');
+      const polygonProvider = new FetchProvider(UnsLocation.Layer2, polygonUrl);
+      const customNetwork = 'goerli';
       const uns = new Uns({
-        network: customNetwork,
-        provider,
-        proxyReaderAddress: '0xe7447Fdd52FA286e7e0aa23cd107F83790250897',
+        locations: {
+          Layer1: {
+            network: customNetwork,
+            provider,
+            proxyReaderAddress: '0xe7447Fdd52FA286e7e0aa23cd107F83790250897',
+          },
+          Layer2: {
+            network: 'polygon-mumbai',
+            provider: polygonProvider,
+            proxyReaderAddress: '0x332a8191905fa8e6eea7350b5799f225b8ed30a9',
+          },
+        },
       });
       expect(uns).toBeDefined();
     });
@@ -155,16 +257,26 @@ describe('Resolution', () => {
         'UDAPI',
         protocolLink().replace('rinkeby', 'mainnet'),
       );
+      const polygonUrl = protocolLink(ProviderProtocol.http, 'UNSL2');
+      const polygonProvider = new FetchProvider(UnsLocation.Layer2, polygonUrl);
       const spy = mockAsyncMethod(provider, 'request', '1');
+      const spyTwo = mockAsyncMethod(polygonProvider, 'request', '80001');
       const resolution = await Resolution.autoNetwork({
-        uns: {provider},
+        uns: {
+          locations: {Layer1: {provider}, Layer2: {provider: polygonProvider}},
+        },
         ens: {provider},
       });
       expect(spy).toBeCalledTimes(2);
+      expect(spyTwo).toBeCalledTimes(1);
       expect(
-        (resolution.serviceMap[NamingServiceName.UNS] as unknown as Uns)
+        (resolution.serviceMap[NamingServiceName.UNS] as unknown as Uns).unsl1
           .network,
-      ).toBe(1);
+      ).toBe('mainnet');
+      expect(
+        (resolution.serviceMap[NamingServiceName.UNS] as unknown as Uns).unsl2
+          .network,
+      ).toBe('polygon-mumbai');
       expect(
         (resolution.serviceMap[NamingServiceName.ENS] as unknown as Ens)
           .network,
@@ -181,7 +293,7 @@ describe('Resolution', () => {
         'request',
         new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
           providerMessage:
-            'Request to https://google.com failed with responce status 405',
+            'Request to https://google.com failed with response status 405',
         }),
       );
       const factorySpy = mockAsyncMethod(
@@ -191,12 +303,17 @@ describe('Resolution', () => {
       );
       try {
         await Resolution.autoNetwork({
-          uns: {url: 'https://google.com'},
+          uns: {
+            locations: {
+              Layer1: {url: 'https://google.com'},
+              Layer2: {url: 'https://google.com'},
+            },
+          },
         });
       } catch (error) {
         expect(error).toBeInstanceOf(ResolutionError);
         expect(error.message).toBe(
-          '< Request to https://google.com failed with responce status 405 >',
+          '< Request to https://google.com failed with response status 405 >',
         );
       }
       expectSpyToBeCalled([factorySpy, providerSpy]);
@@ -230,6 +347,7 @@ describe('Resolution', () => {
 
     it('should fail because of unsupported test network for uns', async () => {
       const blockchainUrl = protocolLink().replace('rinkeby', 'ropsten');
+      const polygonUrl = protocolLink(ProviderProtocol.http, 'UNSL2');
       const mockedProvider = new FetchProvider(
         NamingServiceName.UNS,
         blockchainUrl,
@@ -239,7 +357,12 @@ describe('Resolution', () => {
 
       await expectConfigurationErrorCode(
         Resolution.autoNetwork({
-          uns: {url: blockchainUrl},
+          uns: {
+            locations: {
+              Layer1: {url: blockchainUrl},
+              Layer2: {url: polygonUrl},
+            },
+          },
         }),
         ConfigurationErrorCode.UnsupportedNetwork,
       );
@@ -253,26 +376,30 @@ describe('Resolution', () => {
         expect(err).toBeInstanceOf(FetchError);
         return;
       }
-      fail('nock is not configured correctly!');
+      throw new Error('nock is not configured correctly!');
     });
 
     it('should get a valid resolution instance', async () => {
       const resolution = Resolution.infura('api-key', {
-        uns: {network: 'rinkeby'},
+        uns: {
+          locations: {
+            Layer1: {network: 'rinkeby'},
+            Layer2: {network: 'polygon-mumbai'},
+          },
+        },
         ens: {network: 'rinkeby'},
       });
       uns = resolution.serviceMap[NamingServiceName.UNS] as unknown as Uns;
       ens = resolution.serviceMap[NamingServiceName.ENS] as unknown as Ens;
-      expect(uns.url).toBe(`https://rinkeby.infura.io/v3/api-key`);
+      expect(uns.unsl1.url).toBe(`https://rinkeby.infura.io/v3/api-key`);
+      expect(uns.unsl2.url).toBe(`https://polygon-mumbai.infura.io/v3/api-key`);
       expect(ens.url).toBe(`https://rinkeby.infura.io/v3/api-key`);
     });
 
     it('should throw on unspecified network', async () => {
-      const zilliqaProvider = new HTTPProvider('https://api.zilliqa.com');
-      const provider = Eip1193Factories.fromZilliqaProvider(zilliqaProvider);
-      expect(() =>
-        Resolution.fromResolutionProvider(provider, {}),
-      ).toThrowError('< Must specify network for ens, uns, or zns >');
+      expect(() => Resolution.fromResolutionProvider({})).toThrowError(
+        '< Must specify network for uns, ens, or zns >',
+      );
     });
 
     it('should create resolution instance from Zilliqa provider', async () => {
@@ -419,6 +546,26 @@ describe('Resolution', () => {
           const serviceName = resolution.serviceName('domain.crypto');
           expect(serviceName).toBe('UNS');
         });
+        it('checks uns service name', () => {
+          const resolution = new Resolution();
+          const serviceName = resolution.serviceName('domain.wallet');
+          expect(serviceName).toBe('UNS');
+        });
+        it('checks uns service name', () => {
+          const resolution = new Resolution();
+          const serviceName = resolution.serviceName('domain.coin');
+          expect(serviceName).toBe('UNS');
+        });
+        it('checks uns service name', () => {
+          const resolution = new Resolution();
+          const serviceName = resolution.serviceName('domain.bitcoin');
+          expect(serviceName).toBe('UNS');
+        });
+        it('checks uns service name', () => {
+          const resolution = new Resolution();
+          const serviceName = resolution.serviceName('domain.x');
+          expect(serviceName).toBe('UNS');
+        });
       });
     });
 
@@ -435,8 +582,35 @@ describe('Resolution', () => {
         );
         expectSpyToBeCalled(spy);
       });
+      it('checks Resolution#addr error #2', async () => {
+        const resolution = new Resolution({
+          sourceConfig: {
+            uns: {
+              locations: {
+                Layer1: {
+                  url: protocolLink(ProviderProtocol.http, 'UNSL1'),
+                  network: 'rinkeby',
+                },
+                Layer2: {
+                  url: protocolLink(ProviderProtocol.http, 'UNSL2'),
+                  network: 'polygon-mumbai',
+                },
+              },
+            },
+          },
+        });
+        uns = resolution.serviceMap[NamingServiceName.UNS] as unknown as Uns;
+        const spy = mockAsyncMethods(uns, {
+          get: {},
+        });
+        await expectResolutionErrorCode(
+          resolution.addr('sdncdoncvdinvcsdncs.crypto', 'ETH'),
+          ResolutionErrorCode.UnregisteredDomain,
+        );
+        expectSpyToBeCalled(spy);
+      });
 
-      it('checks error for email on brad.zil', async () => {
+      it('checks error for email on ryan-testing.zil', async () => {
         const spies = mockAsyncMethods(zns, {
           allRecords: {
             'crypto.ETH.address': '0xc101679df8e2d6092da6d7ca9bced5bfeeb5abd8',
@@ -444,7 +618,7 @@ describe('Resolution', () => {
           },
         });
         await expectResolutionErrorCode(
-          resolution.email('merenkov.zil'),
+          resolution.email('ryan-testing.zil'),
           ResolutionErrorCode.RecordNotFound,
         );
         expectSpyToBeCalled(spies);
@@ -644,6 +818,9 @@ describe('Resolution', () => {
           const provider = new (Web3HttpProvider as any)(
             protocolLink(),
           ) as Web3HttpProvider.HttpProvider;
+          const polygonProvider = new (Web3HttpProvider as any)(
+            protocolLink(ProviderProtocol.http, 'UNSL2'),
+          ) as Web3HttpProvider.HttpProvider;
           // mock the send function with different implementations (each should call callback right away with different answers)
           const eye = mockAsyncMethod(
             provider,
@@ -661,9 +838,18 @@ describe('Resolution', () => {
                 });
             },
           );
-          const resolution = Resolution.fromWeb3Version1Provider(provider, {
-            uns: {network: 'rinkeby'},
+          const resolution = Resolution.fromWeb3Version1Provider({
+            uns: {
+              locations: {
+                Layer1: {network: 'rinkeby', provider},
+                Layer2: {network: 'polygon-mumbai', provider: polygonProvider},
+              },
+            },
           });
+          const uns = resolution.serviceMap['UNS'] as unknown as Uns;
+          mockAsyncMethod(uns.unsl2.readerContract, 'call', (params) =>
+            Promise.resolve([NullAddress, NullAddress, {}]),
+          );
           const ethAddress = await resolution.addr('brad.crypto', 'ETH');
 
           // expect each mock to be called at least once.
@@ -677,6 +863,9 @@ describe('Resolution', () => {
           const provider = new (Web3WsProvider as any)(
             protocolLink(ProviderProtocol.wss),
           ) as Web3WsProvider.WebsocketProvider;
+          const polygonProvider = new (Web3WsProvider as any)(
+            protocolLink(ProviderProtocol.wss, 'UNSL2'),
+          ) as Web3WsProvider.WebsocketProvider;
           const eye = mockAsyncMethod(provider, 'send', (payload, callback) => {
             const result = caseMock(payload.params?.[0], RpcProviderTestCases);
             callback(null, {
@@ -686,9 +875,18 @@ describe('Resolution', () => {
             });
           });
 
-          const resolution = Resolution.fromWeb3Version1Provider(provider, {
-            uns: {network: 'rinkeby'},
+          const resolution = Resolution.fromWeb3Version1Provider({
+            uns: {
+              locations: {
+                Layer1: {network: 'rinkeby', provider},
+                Layer2: {network: 'polygon-mumbai', provider: polygonProvider},
+              },
+            },
           });
+          const uns = resolution.serviceMap['UNS'] as unknown as Uns;
+          mockAsyncMethod(uns.unsl2.readerContract, 'call', (params) =>
+            Promise.resolve([NullAddress, NullAddress, {}]),
+          );
           const ethAddress = await resolution.addr('brad.crypto', 'ETH');
           provider.disconnect(1000, 'end of test');
           expectSpyToBeCalled([eye]);
@@ -700,9 +898,22 @@ describe('Resolution', () => {
             protocolLink(ProviderProtocol.http),
             'rinkeby',
           );
-          const resolution = Resolution.fromEthersProvider(provider, {
-            uns: {network: 'rinkeby'},
+          const polygonProvider = new JsonRpcProvider(
+            protocolLink(ProviderProtocol.http, 'UNSL2'),
+            'maticmum',
+          );
+          const resolution = Resolution.fromEthersProvider({
+            uns: {
+              locations: {
+                Layer1: {network: 'rinkeby', provider},
+                Layer2: {network: 'polygon-mumbai', provider: polygonProvider},
+              },
+            },
           });
+          const uns = resolution.serviceMap['UNS'] as unknown as Uns;
+          mockAsyncMethod(uns.unsl2.readerContract, 'call', (params) =>
+            Promise.resolve([NullAddress, NullAddress, {}]),
+          );
           const eye = mockAsyncMethod(provider, 'call', (params) =>
             Promise.resolve(caseMock(params, RpcProviderTestCases)),
           );
@@ -716,13 +927,26 @@ describe('Resolution', () => {
             'rinkeby',
             '213fff28936343858ca9c5115eff1419',
           );
+          const polygonProvider = new InfuraProvider(
+            'maticmum',
+            'c4bb906ed6904c42b19c95825fe55f39',
+          );
 
           const eye = mockAsyncMethod(provider, 'call', (params) =>
             Promise.resolve(caseMock(params, RpcProviderTestCases)),
           );
-          const resolution = Resolution.fromEthersProvider(provider, {
-            uns: {network: 'rinkeby'},
+          const resolution = Resolution.fromEthersProvider({
+            uns: {
+              locations: {
+                Layer1: {network: 'rinkeby', provider},
+                Layer2: {network: 'polygon-mumbai', provider: polygonProvider},
+              },
+            },
           });
+          const uns = resolution.serviceMap['UNS'] as unknown as Uns;
+          mockAsyncMethod(uns.unsl2.readerContract, 'call', (params) =>
+            Promise.resolve([NullAddress, NullAddress, {}]),
+          );
           const ethAddress = await resolution.addr('brad.crypto', 'eth');
           expectSpyToBeCalled([eye]);
           expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
@@ -731,6 +955,13 @@ describe('Resolution', () => {
         it('should work with web3@0.20.7 provider', async () => {
           const provider = new Web3V027Provider(
             protocolLink(ProviderProtocol.http),
+            5000,
+            null,
+            null,
+            null,
+          );
+          const polygonProvider = new Web3V027Provider(
+            protocolLink(ProviderProtocol.http, 'UNSL2'),
             5000,
             null,
             null,
@@ -751,124 +982,134 @@ describe('Resolution', () => {
               });
             },
           );
-          const resolution = Resolution.fromWeb3Version0Provider(provider, {
-            uns: {network: 'rinkeby'},
+          const resolution = Resolution.fromWeb3Version0Provider({
+            uns: {
+              locations: {
+                Layer1: {network: 'rinkeby', provider},
+                Layer2: {network: 'polygon-mumbai', provider: polygonProvider},
+              },
+            },
           });
+          const uns = resolution.serviceMap['UNS'] as unknown as Uns;
+          mockAsyncMethod(uns.unsl2.readerContract, 'call', (params) =>
+            Promise.resolve([NullAddress, NullAddress, {}]),
+          );
           const ethAddress = await resolution.addr('brad.crypto', 'eth');
           expectSpyToBeCalled([eye]);
           expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
         });
 
         describe('.All-get', () => {
-          it('should be able to get logs with ethers default provider', async () => {
-            const provider = new InfuraProvider(
-              'rinkeby',
-              '213fff28936343858ca9c5115eff1419',
-            );
-
-            const eye = mockAsyncMethod(provider, 'call', (params) =>
-              Promise.resolve(caseMock(params, RpcProviderTestCases)),
-            );
-            const eye2 = mockAsyncMethod(provider, 'getLogs', (params) =>
-              Promise.resolve(caseMock(params, RpcProviderTestCases)),
-            );
-
-            const resolution = Resolution.fromEthersProvider(provider, {
-              uns: {network: 'rinkeby'},
-            });
-            const resp = await resolution.allRecords('brad.crypto');
-            expectSpyToBeCalled([eye], 2);
-            expectSpyToBeCalled([eye2], 2);
-            expect(resp).toMatchObject({
-              'gundb.username.value':
-                '0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c',
-              'ipfs.html.value':
-                'QmdyBw5oTgCtTLQ18PbDvPL8iaLoEPhSyzD91q9XmgmAjb',
-              'ipfs.redirect_domain.value':
-                'https://abbfe6z95qov3d40hf6j30g7auo7afhp.mypinata.cloud/ipfs/Qme54oEzRkgooJbCDr78vzKAWcv6DDEZqRhhDyDtzgrZP6',
-              'crypto.ETH.address':
-                '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
-              'gundb.public_key.value':
-                'pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI',
-              'crypto.BTC.address':
-                'bc1q359khn0phg58xgezyqsuuaha28zkwx047c0c3y',
-            });
-          });
-
-          it('should be able to get logs with jsonProvider', async () => {
-            const provider = new JsonRpcProvider(
-              protocolLink(ProviderProtocol.http),
-              'rinkeby',
-            );
-            const resolution = Resolution.fromEthersProvider(provider, {
-              uns: {network: 'rinkeby'},
-            });
-            const eye = mockAsyncMethod(provider, 'call', (params) =>
-              Promise.resolve(caseMock(params, RpcProviderTestCases)),
-            );
-            const eye2 = mockAsyncMethod(provider, 'getLogs', (params) => {
-              // console.log({params, response: caseMock(params, RpcProviderTestCases)});
-              return Promise.resolve(caseMock(params, RpcProviderTestCases));
-            });
-
-            const resp = await resolution.allRecords('brad.crypto');
-            expectSpyToBeCalled([eye], 2);
-            expectSpyToBeCalled([eye2], 2);
-            expect(resp).toMatchObject({
-              'gundb.username.value':
-                '0x8912623832e174f2eb1f59cc3b587444d619376ad5bf10070e937e0dc22b9ffb2e3ae059e6ebf729f87746b2f71e5d88ec99c1fb3c7c49b8617e2520d474c48e1c',
-              'ipfs.html.value':
-                'QmdyBw5oTgCtTLQ18PbDvPL8iaLoEPhSyzD91q9XmgmAjb',
-              'ipfs.redirect_domain.value':
-                'https://abbfe6z95qov3d40hf6j30g7auo7afhp.mypinata.cloud/ipfs/Qme54oEzRkgooJbCDr78vzKAWcv6DDEZqRhhDyDtzgrZP6',
-              'crypto.ETH.address':
-                '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
-              'gundb.public_key.value':
-                'pqeBHabDQdCHhbdivgNEc74QO-x8CPGXq4PKWgfIzhY.7WJR5cZFuSyh1bFwx0GWzjmrim0T5Y6Bp0SSK0im3nI',
-              'crypto.BTC.address':
-                'bc1q359khn0phg58xgezyqsuuaha28zkwx047c0c3y',
-            });
-          });
-
           it('should return allNonEmptyRecords', async () => {
-            const provider = new JsonRpcProvider(
-              protocolLink(ProviderProtocol.http),
-              'rinkeby',
-            );
-            const resolution = Resolution.fromEthersProvider(provider, {
-              uns: {network: 'rinkeby'},
+            const records = {
+              'crypto.ADA.address':
+                'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
+              'crypto.BCH.address':
+                'qzx048ez005q4yhphqu2pylpfc3hy88zzu4lu6q9j8',
+              'crypto.BTC.address': '1MUFCFhhuApRqfbqNby6Jvvp6gbYx6yWhR',
+              'crypto.ETH.address':
+                '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+              'crypto.LTC.address':
+                'ltc1qj03wgu07dqytxz4r9arc4taz2u7mzuz38xpuu4',
+              'crypto.USDC.address':
+                '0x666574cAdedEB4a0f282fF0C2B3588617E29e6A0',
+              'crypto.USDT.version.EOS.address': 'letsminesome',
+              'crypto.USDT.version.ERC20.address':
+                '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+              'crypto.USDT.version.OMNI.address':
+                '19o6LvAdCPkjLi83VsjrCsmvQZUirT4KXJ',
+              'crypto.USDT.version.TRON.address':
+                'TNemhXhpX7MwzZJa3oXvfCjo5pEeXrfN2h',
+              'crypto.XRP.address': 'rMXToC1316oNyqwgQpWgSrzMUU9R6UDizW',
+              'crypto.ZIL.address':
+                'zil1xftz4cd425mer6jxmtl29l28xr0zu8s5hnp9he',
+              'dns.A': '["10.0.0.1","10.0.0.3"]',
+              'dns.A.ttl': '98',
+              'dns.AAAA': '[]',
+              'dns.ttl': '128',
+              'ipfs.html.value':
+                'QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu',
+              'ipfs.redirect_domain.value': 'google.com',
+              'whois.email.value': 'johnny@unstoppabledomains.com',
+            };
+            const unsl1 = uns.unsl1;
+            const unsl2 = uns.unsl2;
+            mockAsyncMethods(unsl1, {
+              get: {
+                owner: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+                resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+                records: records,
+                location: UnsLocation.Layer1,
+              },
             });
-            const eye = mockAsyncMethod(provider, 'call', (params) =>
-              Promise.resolve(caseMock(params, RpcProviderTestCases)),
-            );
-            const eye2 = mockAsyncMethod(provider, 'getLogs', (params) => {
-              return Promise.resolve(caseMock(params, RpcProviderTestCases));
+            mockAsyncMethods(unsl2, {
+              get: {
+                owner: NullAddress,
+                resolver: NullAddress,
+                records: {},
+                location: UnsLocation.Layer2,
+              },
             });
-            // udtestdev-emptyrecords.crypto have 1 empty record and 1 record with value
-            const response = await resolution.allNonEmptyRecords(
-              'udtestdev-emptyrecords.crypto',
+            mockAsyncMethod(Networking, 'fetch', {
+              ok: true,
+              json: () => ({
+                name: CryptoDomainWithAllRecords,
+                properties: {records},
+              }),
+            });
+            const endpoint =
+              'https://metadata.staging.unstoppabledomains.com/metadata/';
+
+            mockAsyncMethod(uns, 'getTokenUri', endpoint);
+            const result = await resolution.allNonEmptyRecords(
+              CryptoDomainWithAllRecords,
             );
-            expectSpyToBeCalled([eye], 2);
-            expectSpyToBeCalled([eye2], 2);
-            expect(Object.keys(response).length).toBe(1);
+            expect(result).toEqual(records);
           });
 
           it('should get standard keys from legacy resolver', async () => {
             // There are no legacy providers on testnet
             const provider = new InfuraProvider(
               'mainnet',
-              '213fff28936343858ca9c5115eff1419',
+              'c4bb906ed6904c42b19c95825fe55f39',
             );
             const eye = mockAsyncMethod(provider, 'call', (params) =>
               Promise.resolve(caseMock(params, RpcProviderTestCases)),
             );
-
-            const resolution = Resolution.fromEthersProvider(provider, {
-              uns: {network: 'mainnet'},
+            const polygonProvider = new InfuraProvider(
+              'maticmum',
+              'c4bb906ed6904c42b19c95825fe55f39',
+            );
+            const resolution = Resolution.fromEthersProvider({
+              uns: {
+                locations: {
+                  Layer1: {network: 'mainnet', provider},
+                  Layer2: {
+                    network: 'polygon-mumbai',
+                    provider: polygonProvider,
+                  },
+                },
+              },
             });
+            const uns = resolution.serviceMap['UNS'] as unknown as Uns;
+
+            mockAsyncMethod(uns.unsl2, 'get', (params) =>
+              Promise.resolve([NullAddress, NullAddress, {}]),
+            );
+            mockAsyncMethod(Networking, 'fetch', {
+              ok: true,
+              json: () => ({
+                name: 'monmouthcounty.crypto',
+                properties: {records: {}},
+              }),
+            });
+            const endpoint =
+              'https://metadata.staging.unstoppabledomains.com/metadata/';
+
+            mockAsyncMethod(uns, 'getTokenUri', endpoint);
             const resp = await resolution.allRecords('monmouthcounty.crypto');
 
-            expectSpyToBeCalled([eye], 2);
+            expectSpyToBeCalled([eye], 1);
             expect(resp).toMatchObject({
               'crypto.BTC.address': '3NwuV8nVT2VKbtCs8evChdiW6kHTHcVpdn',
               'crypto.ETH.address':
@@ -888,10 +1129,20 @@ describe('Resolution', () => {
           const resolution = new Resolution({
             sourceConfig: {
               uns: {
-                network: 'custom',
-                proxyReaderAddress:
-                  '0xa6E7cEf2EDDEA66352Fd68E5915b60BDbb7309f5',
-                url: 'https://mainnet.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+                locations: {
+                  Layer1: {
+                    network: 'custom',
+                    proxyReaderAddress:
+                      '0xfee4d4f0adff8d84c12170306507554bc7045878',
+                    url: 'https://mainnet.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+                  },
+                  Layer2: {
+                    network: 'custom',
+                    proxyReaderAddress:
+                      '0x332a8191905fa8e6eea7350b5799f225b8ed30a9',
+                    url: 'https://polygon-mumbai.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+                  },
+                },
               },
               zns: {
                 network: 'custom',
@@ -902,15 +1153,39 @@ describe('Resolution', () => {
           });
           const uns = resolution.serviceMap['UNS'] as unknown as Uns;
           const zns = resolution.serviceMap['ZNS'] as unknown as Zns;
-          const unsAllRecordsMock = mockAsyncMethods(uns, {
-            getStartingBlock: undefined,
-            resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
-            getStandardRecords: {
-              'crypto.ETH.address':
-                '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
+          const unsl1 = uns.unsl1;
+          const unsl2 = uns.unsl2;
+          const unsL1GetMock = mockAsyncMethods(unsl1, {
+            get: {
+              owner: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+              resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+              records: {
+                'crypto.ETH.address':
+                  '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
+              },
+              location: UnsLocation.Layer1,
             },
           });
-          const unsGetNewKeyMock = mockAsyncMethod(uns, 'getNewKeyEvents', []);
+          const unsL2GetMock = mockAsyncMethods(unsl2, {
+            get: {
+              owner: NullAddress,
+              resolver: NullAddress,
+              records: {},
+              location: UnsLocation.Layer2,
+            },
+          });
+          mockAsyncMethod(Networking, 'fetch', {
+            ok: true,
+            json: () => ({
+              name: 'brad.crypto',
+              properties: {records: {}},
+            }),
+          });
+          const endpoint =
+            'https://metadata.staging.unstoppabledomains.com/metadata/';
+
+          mockAsyncMethod(uns, 'getTokenUri', endpoint);
+
           const znsAllRecordsMock = mockAsyncMethods(zns, {
             resolver: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
             getResolverRecords: {
@@ -920,28 +1195,15 @@ describe('Resolution', () => {
           });
           const znsRecords = await resolution.allRecords('brad.zil');
           const unsRecords = await resolution.allRecords('brad.crypto');
-
           expectSpyToBeCalled(znsAllRecordsMock);
-          expectSpyToBeCalled(unsAllRecordsMock);
+          expectSpyToBeCalled(unsL1GetMock);
+          expectSpyToBeCalled(unsL2GetMock);
           expect(unsRecords['crypto.ETH.address']).toEqual(
             '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
           );
           expect(znsRecords['crypto.ZIL.address']).toEqual(
             'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
           );
-          if (isLive()) {
-            expect(unsGetNewKeyMock).toBeCalledWith(
-              expect.any(EthereumContract),
-              resolution.namehash('brad.crypto'),
-              '0x99a587',
-            );
-          } else {
-            expect(unsGetNewKeyMock).toBeCalledWith(
-              expect.any(EthereumContract),
-              resolution.namehash('brad.crypto'),
-              'earliest',
-            );
-          }
         });
       });
 
@@ -1062,9 +1324,60 @@ describe('Resolution', () => {
         UnsConfig.networks[4].contracts.UNSRegistry.address,
       );
     });
+    it('should return uns l2 mainnet registry address if domain exists on both', async () => {
+      const spies = mockAsyncMethods(uns.unsl1, {
+        registryAddress: UnsConfig.networks[4].contracts.UNSRegistry.address,
+      });
+      const spies2 = mockAsyncMethods(uns.unsl2, {
+        registryAddress:
+          UnsConfig.networks[80001].contracts.UNSRegistry.address,
+      });
+      const registryAddress = await resolution.registryAddress(
+        WalletDomainOnBothLayers,
+      );
+      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
+      expect(registryAddress).toBe(
+        UnsConfig.networks[80001].contracts.UNSRegistry.address,
+      );
+    });
   });
 
   describe('.records', () => {
+    it('returns l2 records if domain exists on both', async () => {
+      const eyes = mockAsyncMethods(uns.unsl1, {
+        get: {
+          owner: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+          resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+          records: {
+            'crypto.ADA.address': 'blahblah-dont-care-about-these-records',
+            'crypto.ETH.address': 'blahblah-dont-care-about-these-records',
+          },
+        },
+      });
+      const eyes2 = mockAsyncMethods(uns.unsl2, {
+        get: {
+          owner: '0x6EC0DEeD30605Bcd19342f3c30201DB263291589',
+          resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+          records: {
+            'crypto.ADA.address':
+              'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
+            'crypto.ETH.address': '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+          },
+        },
+      });
+      expect(
+        await resolution.records(CryptoDomainWithAllRecords, [
+          'crypto.ADA.address',
+          'crypto.ETH.address',
+        ]),
+      ).toEqual({
+        'crypto.ADA.address':
+          'DdzFFzCqrhssjmxkChyAHE9MdHJkEc4zsZe7jgum6RtGzKLkUanN1kPZ1ipVPBLwVq2TWrhmPsAvArcr47Pp1VNKmZTh6jv8ctAFVCkj',
+        'crypto.ETH.address': '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+      });
+      expectSpyToBeCalled([...eyes, ...eyes2]);
+    });
     it('works', async () => {
       const eyes = mockAsyncMethods(uns, {
         get: {
@@ -1142,6 +1455,52 @@ describe('Resolution', () => {
       expectSpyToBeCalled(spies);
       expect(isRegistered).toBe(false);
     });
+    it('should return true if registered on l2 but not l1', async () => {
+      const spies = mockAsyncMethods(uns.unsl1, {
+        get: {
+          owner: '',
+          resolver: '',
+          records: {},
+          location: UnsLocation.Layer1,
+        },
+      });
+      const spies2 = mockAsyncMethods(uns.unsl2, {
+        get: {
+          owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
+          resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
+          records: {},
+          location: UnsLocation.Layer2,
+        },
+      });
+      const isRegistered = await resolution.isRegistered(
+        WalletDomainLayerTwoWithAllRecords,
+      );
+      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
+      expect(isRegistered).toBe(true);
+    });
+    it('should return true if registered on l1 but not l2', async () => {
+      const spies = mockAsyncMethods(uns.unsl1, {
+        get: {
+          owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
+          resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
+          records: {},
+        },
+      });
+      const spies2 = mockAsyncMethods(uns.unsl2, {
+        get: {
+          owner: '',
+          resolver: '',
+          records: {},
+        },
+      });
+      const isRegistered = await resolution.isRegistered(
+        CryptoDomainWithAllRecords,
+      );
+      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
+      expect(isRegistered).toBe(true);
+    });
   });
 
   describe('.isAvailable', () => {
@@ -1174,6 +1533,28 @@ describe('Resolution', () => {
       );
       expectSpyToBeCalled(spies);
       expect(isAvailable).toBe(true);
+    });
+    it('should return false is available on l1 but not l2', async () => {
+      const spies = mockAsyncMethods(uns.unsl1, {
+        get: {
+          owner: '',
+          resolver: '',
+          records: {},
+        },
+      });
+      const spies2 = mockAsyncMethods(uns.unsl2, {
+        get: {
+          owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
+          resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
+          records: {},
+        },
+      });
+      const isAvailable = await resolution.isAvailable(
+        CryptoDomainWithAllRecords,
+      );
+      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled(spies2);
+      expect(isAvailable).toBe(false);
     });
 
     it('should return false', async () => {
@@ -1264,62 +1645,73 @@ describe('Resolution', () => {
   });
 
   describe('.location', () => {
-    it('should get location for .crypto domains', async () => {
-      const mockValues = {
-        registryAddress: '0xAad76bea7CFEc82927239415BB18D2e93518ecBB',
-        get: {
-          resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
-          owner: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
-        },
+    it('should get location for uns l1 and l2 domains', async () => {
+      const mockValuesL1 = {
+        callEth:
+          '0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000420000000000000000000000000000000000000000000000000000000000000046000000000000000000000000000000000000000000000000000000000000004a000000000000000000000000000000000000000000000000000000000000004e0000000000000000000000000000000000000000000000000000000000000052000000000000000000000000000000000000000000000000000000000000003400000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000012000000000000000000000000000000000000000000000000000000000000001e000000000000000000000000000000000000000000000000000000000000000050000000000000000000000007fb83000b8ed59d3ead22f0d584df3a85fbc008600000000000000000000000095ae1515367aa64c462c71e87157771165b1287a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000050000000000000000000000000e43f36e4b986dfbe1a75cacfa60ca2bd44ae962000000000000000000000000499dd6d875787869670900a2130223d85d4f6aa7000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000500000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000c000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000000007fb83000b8ed59d3ead22f0d584df3a85fbc00860000000000000000000000000000000000000000000000000000000000000020000000000000000000000000aad76bea7cfec82927239415bb18d2e93518ecbb000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000',
+      };
+      const mockValuesL2 = {
+        callEth:
+          '0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000420000000000000000000000000000000000000000000000000000000000000046000000000000000000000000000000000000000000000000000000000000004a000000000000000000000000000000000000000000000000000000000000004e0000000000000000000000000000000000000000000000000000000000000052000000000000000000000000000000000000000000000000000000000000003400000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000012000000000000000000000000000000000000000000000000000000000000001e00000000000000000000000000000000000000000000000000000000000000005000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002a93c52e7b6e7054870758e15a1446e769edfb930000000000000000000000002a93c52e7b6e7054870758e15a1446e769edfb930000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000499dd6d875787869670900a2130223d85d4f6aa7000000000000000000000000499dd6d875787869670900a2130223d85d4f6aa70000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000500000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000c000000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000012000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000000002a93c52e7b6e7054870758e15a1446e769edfb9300000000000000000000000000000000000000000000000000000000000000200000000000000000000000002a93c52e7b6e7054870758e15a1446e769edfb9300000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000',
       };
 
-      mockAsyncMethods(uns, mockValues);
-      const location = await resolution.location('brad.crypto');
-      expect(location).toEqual({
-        registry: mockValues.registryAddress,
-        resolver: mockValues.get.resolver,
-        networkId: 4,
-        blockchain: BlockchainType.ETH,
-        owner: mockValues.get.owner,
-      });
-    });
+      mockAsyncMethods(uns.unsl1.readerContract, mockValuesL1);
+      mockAsyncMethods(uns.unsl2.readerContract, mockValuesL2);
+      mockAsyncMethods(uns, {isSupportedDomain: true});
 
-    it('should get location for uns domains', async () => {
-      const mockValues = {
+      const location = await resolution.locations([
+        'udtestdev-check.wallet',
+        'brad.crypto',
+        'udtestdev-test-l2-domain-784391.wallet',
+        'udtestdev-test-l1-and-l2-ownership.wallet',
+        'testing-domain-doesnt-exist-12345abc.blockchain',
+      ]);
+      expect(location['udtestdev-check.wallet']).toEqual({
         registryAddress: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
-        get: {
-          resolver: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
-          owner: '0x0e43F36e4B986dfbE1a75cacfA60cA2bD44Ae962',
-        },
-      };
-
-      mockAsyncMethods(uns, mockValues);
-      const location = await resolution.location('udtestdev-check.wallet');
-      expect(location).toEqual({
-        registry: mockValues.registryAddress,
-        resolver: mockValues.get.resolver,
+        resolverAddress: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
         networkId: 4,
         blockchain: BlockchainType.ETH,
-        owner: mockValues.get.owner,
+        ownerAddress: '0x0e43F36e4B986dfbE1a75cacfA60cA2bD44Ae962',
+        blockchainProviderUrl:
+          'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
       });
+      expect(location['brad.crypto']).toEqual({
+        registryAddress: '0xAad76bea7CFEc82927239415BB18D2e93518ecBB',
+        resolverAddress: '0x95AE1515367aa64C462c71e87157771165B1287A',
+        networkId: 4,
+        blockchain: BlockchainType.ETH,
+        ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
+        blockchainProviderUrl:
+          'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+      });
+      expect(location['udtestdev-test-l2-domain-784391.wallet']).toEqual({
+        registryAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
+        resolverAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
+        networkId: 80001,
+        blockchain: BlockchainType.MATIC,
+        ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
+        blockchainProviderUrl:
+          'https://polygon-mumbai.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+      });
+      expect(location['udtestdev-test-l1-and-l2-ownership.wallet']).toEqual({
+        registryAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
+        resolverAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
+        networkId: 80001,
+        blockchain: BlockchainType.MATIC,
+        ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
+        blockchainProviderUrl:
+          'https://polygon-mumbai.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+      });
+      expect(
+        location['testing-domain-doesnt-exist-12345abc.blockchain'],
+      ).toBeNull();
     });
 
     it('should get location for zns domains', async () => {
-      const mockValues = {
-        registryAddress: 'zil1hyj6m5w4atcn7s806s69r0uh5g4t84e8gp6nps',
-        resolver: '0x02621c64a57e1424adfe122569f2356145f05d4f',
-        owner: 'zil1qqlrehlvat5kalsq07qedgd3k804glhwhv8ppa',
-      };
-
-      mockAsyncMethods(zns, mockValues);
-      const location = await resolution.location('testing.zil');
-      expect(location).toEqual({
-        registry: mockValues.registryAddress,
-        resolver: mockValues.resolver,
-        networkId: 333,
-        blockchain: BlockchainType.ZIL,
-        owner: mockValues.owner,
-      });
+      await expectResolutionErrorCode(
+        () => resolution.locations(['testing.zil']),
+        ResolutionErrorCode.UnsupportedMethod,
+      );
     });
   });
 });

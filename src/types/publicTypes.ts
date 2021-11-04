@@ -9,9 +9,13 @@ export type Api = {api: true; url?: string; network?: number};
 
 type NamingServiceSource = {url?: string} | {provider?: Provider};
 
-export type UnsSource = NamingServiceSource & {
+export type UnsLayerSource = NamingServiceSource & {
   network: string;
   proxyReaderAddress?: string;
+};
+
+export type UnsSource = {
+  locations: {Layer1: UnsLayerSource; Layer2: UnsLayerSource};
 };
 
 export type EnsSource = NamingServiceSource & {
@@ -30,16 +34,26 @@ export type SourceConfig = {
   ens?: EnsSource | Api;
 };
 
+export enum UnsLocation {
+  Layer1 = 'UNSLayer1',
+  Layer2 = 'UNSLayer2',
+}
+
 export enum NamingServiceName {
   UNS = 'UNS',
   ENS = 'ENS',
   ZNS = 'ZNS',
 }
 
-export type ResolutionMethod = NamingServiceName | 'UDAPI';
+export type ResolutionMethod = NamingServiceName | UnsLocation | 'UDAPI';
 
 export type AutoNetworkConfigs = {
-  uns?: {url: string} | {provider: Provider};
+  uns?: {
+    locations: {
+      Layer1: {url: string} | {provider: Provider};
+      Layer2: {url: string} | {provider: Provider};
+    };
+  };
   ens?: {url: string} | {provider: Provider};
   zns?: {url: string} | {provider: Provider};
 };
@@ -194,10 +208,12 @@ export interface DnsRecord {
   data: string;
 }
 export type CryptoRecords = Record<string, string>;
+
 export type DomainData = {
   owner: string;
   resolver: string;
   records: CryptoRecords;
+  location: UnsLocation;
 };
 
 export interface Erc721Metadata {
@@ -235,16 +251,25 @@ export interface TokenUriMetadata extends Erc721Metadata {
   youtube_url?: string;
 }
 
+export interface DomainMetadata extends Erc721Metadata {
+  properties: {
+    records: CryptoRecords;
+  };
+}
+
 export enum BlockchainType {
-  ANYCHAIN = 'ANYCHAIN',
   ETH = 'ETH',
+  MATIC = 'MATIC',
   ZIL = 'ZIL',
 }
 
 export type DomainLocation = {
-  registry: string;
-  resolver: string;
+  registryAddress: string;
+  resolverAddress: string;
   networkId: number;
   blockchain: BlockchainType;
-  owner: string;
+  ownerAddress: string;
+  blockchainProviderUrl: string;
 };
+
+export type Locations = Record<string, DomainLocation | null>;

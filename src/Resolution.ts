@@ -19,7 +19,7 @@ import {
   Web3Version0Provider,
   Web3Version1Provider,
   TokenUriMetadata,
-  DomainLocation,
+  Locations,
 } from './types/publicTypes';
 import ResolutionError, {ResolutionErrorCode} from './errors/resolutionError';
 import DnsUtils from './utils/DnsUtils';
@@ -112,7 +112,14 @@ export default class Resolution {
         network: string;
       };
       uns?: {
-        network: string;
+        locations: {
+          Layer1: {
+            network: string;
+          };
+          Layer2: {
+            network: string;
+          };
+        };
       };
     },
   ): Resolution {
@@ -123,8 +130,23 @@ export default class Resolution {
           network: networks?.ens?.network || 'mainnet',
         },
         uns: {
-          url: signedInfuraLink(infura, networks?.uns?.network),
-          network: networks?.uns?.network || 'mainnet',
+          locations: {
+            Layer1: {
+              url: signedInfuraLink(
+                infura,
+                networks?.uns?.locations.Layer1.network,
+              ),
+              network: networks?.uns?.locations.Layer1.network || 'mainnet',
+            },
+            Layer2: {
+              url: signedInfuraLink(
+                infura,
+                networks?.uns?.locations.Layer2.network,
+              ),
+              network:
+                networks?.uns?.locations.Layer2.network || 'polygon-mainnet',
+            },
+          },
         },
       },
     });
@@ -132,57 +154,85 @@ export default class Resolution {
 
   /**
    * Creates a resolution instance with configured provider
-   * @param provider - any provider compatible with EIP-1193
-   * @param networks - an object that describes what network to use when connecting ENS, UNS, or ZNS default is mainnet
+   * @param networks - an object that describes what network to use when connecting UNS, ENS, or ZNS default is mainnet
    * @see https://eips.ethereum.org/EIPS/eip-1193
    */
-  static fromResolutionProvider(
-    provider: Provider,
-    networks: {
-      ens?: {
-        network: string;
+  static fromResolutionProvider(networks: {
+    ens?: {
+      provider: Provider;
+      network: string;
+    };
+    uns?: {
+      locations: {
+        Layer1: {provider: Provider; network: string};
+        Layer2: {provider: Provider; network: string};
       };
-      uns?: {
-        network: string;
-      };
-      zns?: {
-        network: string;
-      };
-    },
-  ): Resolution {
+    };
+    zns?: {
+      provider: Provider;
+      network: string;
+    };
+  }): Resolution {
     if (networks.ens || networks.uns) {
-      return this.fromEthereumEip1193Provider(provider, networks);
+      return this.fromEthereumEip1193Provider({
+        ens: networks.ens,
+        uns: networks.uns,
+      });
     }
     if (networks.zns) {
-      return this.fromZilliqaProvider(provider, networks);
+      return this.fromZilliqaProvider(networks.zns.provider, networks);
     }
     throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
-      providerMessage: 'Must specify network for ens, uns, or zns',
+      providerMessage: 'Must specify network for uns, ens, or zns',
     });
   }
 
   /**
    * Creates a resolution instance with configured provider
-   * @param provider - any provider compatible with EIP-1193
-   * @param networks - an optional object that describes what network to use when connecting ENS or UNS default is mainnet
+   * @param networks - an object that describes what network to use when connecting UNS and ENS default is mainnet
    * @see https://eips.ethereum.org/EIPS/eip-1193
    */
-  static fromEthereumEip1193Provider(
-    provider: Provider,
-    networks?: {
-      ens?: {
-        network: string;
+  static fromEthereumEip1193Provider(networks: {
+    ens?: {
+      network?: string;
+      provider: Provider;
+    };
+    uns?: {
+      locations: {
+        Layer1: {
+          provider: Provider;
+          network?: string;
+        };
+        Layer2: {
+          provider: Provider;
+          network?: string;
+        };
       };
-      uns?: {
-        network: string;
+    };
+  }): Resolution {
+    const sourceConfig: SourceConfig = {};
+    if (networks.ens) {
+      sourceConfig.ens = {
+        provider: networks.ens.provider,
+        network: networks?.ens?.network || 'mainnet',
       };
-    },
-  ): Resolution {
+    }
+    if (networks.uns) {
+      sourceConfig.uns = {
+        locations: {
+          Layer1: {
+            provider: networks.uns.locations.Layer1.provider,
+            network: networks.uns.locations.Layer1.network || 'mainnet',
+          },
+          Layer2: {
+            provider: networks.uns.locations.Layer2.provider,
+            network: networks.uns.locations.Layer2.network || 'polygon-mainnet',
+          },
+        },
+      };
+    }
     return new this({
-      sourceConfig: {
-        ens: {provider, network: networks?.ens?.network || 'mainnet'},
-        uns: {provider, network: networks?.uns?.network || 'mainnet'},
-      },
+      sourceConfig,
     });
   }
 
@@ -209,76 +259,166 @@ export default class Resolution {
 
   /**
    * Create a resolution instance from web3 0.x version provider
-   * @param provider - an 0.x version provider from web3 ( must implement sendAsync(payload, callback) )
-   * @param networks - Ethereum network configuration
+   * @param networks - Ethereum network configuration with 0.x version provider from web3 ( must implement sendAsync(payload, callback) )
    * @see https://github.com/ethereum/web3.js/blob/0.20.7/lib/web3/httpprovider.js#L116
    */
-  static fromWeb3Version0Provider(
-    provider: Web3Version0Provider,
-    networks?: {
-      ens?: {
-        network: string;
+  static fromWeb3Version0Provider(networks: {
+    ens?: {
+      provider: Web3Version0Provider;
+      network: string;
+    };
+    uns?: {
+      locations: {
+        Layer1: {
+          provider: Web3Version0Provider;
+          network: string;
+        };
+        Layer2: {
+          provider: Web3Version0Provider;
+          network: string;
+        };
       };
-      uns?: {
-        network: string;
-      };
-    },
-  ): Resolution {
-    return this.fromEthereumEip1193Provider(
-      Eip1193Factories.fromWeb3Version0Provider(provider),
-      networks,
-    );
+    };
+  }): Resolution {
+    return this.fromEthereumEip1193Provider({
+      ens: networks.ens
+        ? {
+          network: networks.ens.network,
+          provider: Eip1193Factories.fromWeb3Version0Provider(
+            networks.ens.provider,
+          ),
+        }
+        : undefined,
+      uns: networks.uns
+        ? {
+          locations: {
+            Layer1: {
+              network: networks.uns.locations.Layer1.network,
+              provider: Eip1193Factories.fromWeb3Version0Provider(
+                networks.uns.locations.Layer1.provider,
+              ),
+            },
+            Layer2: {
+              network: networks.uns.locations.Layer2.network,
+              provider: Eip1193Factories.fromWeb3Version0Provider(
+                networks.uns.locations.Layer2.provider,
+              ),
+            },
+          },
+        }
+        : undefined,
+    });
   }
 
   /**
    * Create a resolution instance from web3 1.x version provider
-   * @param provider - an 1.x version provider from web3 ( must implement send(payload, callback) )
-   * @param networks - an optional object that describes what network to use when connecting ENS or UNS default is mainnet
+   * @param networks - an optional object with 1.x version provider from web3 ( must implement send(payload, callback) ) that describes what network to use when connecting ENS or UNS default is mainnet
    * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-core-helpers/types/index.d.ts#L165
    * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-providers-http/src/index.js#L95
    */
-  static fromWeb3Version1Provider(
-    provider: Web3Version1Provider,
-    networks?: {
-      ens?: {
-        network: string;
+  static fromWeb3Version1Provider(networks: {
+    ens?: {
+      provider: Web3Version1Provider;
+      network: string;
+    };
+    uns?: {
+      locations: {
+        Layer1: {
+          provider: Web3Version1Provider;
+          network: string;
+        };
+        Layer2: {
+          provider: Web3Version1Provider;
+          network: string;
+        };
       };
-      uns?: {
-        network: string;
-      };
-    },
-  ): Resolution {
-    return this.fromEthereumEip1193Provider(
-      Eip1193Factories.fromWeb3Version1Provider(provider),
-      networks,
-    );
+    };
+  }): Resolution {
+    return this.fromEthereumEip1193Provider({
+      ens: networks.ens
+        ? {
+          network: networks.ens.network,
+          provider: Eip1193Factories.fromWeb3Version1Provider(
+            networks.ens.provider,
+          ),
+        }
+        : undefined,
+      uns: networks.uns
+        ? {
+          locations: {
+            Layer1: {
+              network: networks.uns.locations.Layer1.network,
+              provider: Eip1193Factories.fromWeb3Version1Provider(
+                networks.uns.locations.Layer1.provider,
+              ),
+            },
+            Layer2: {
+              network: networks.uns.locations.Layer2.network,
+              provider: Eip1193Factories.fromWeb3Version1Provider(
+                networks.uns.locations.Layer2.provider,
+              ),
+            },
+          },
+        }
+        : undefined,
+    });
   }
 
   /**
    * Creates instance of resolution from provider that implements Ethers Provider#call interface.
    * This wrapper support only `eth_call` method for now, which is enough for all the current Resolution functionality
-   * @param provider - provider object
-   * @param networks - an optional object that describes what network to use when connecting ENS or UNS default is mainnet
+   * @param networks - an object that describes what network to use when connecting ENS or UNS default is mainnet
    * @see https://github.com/ethers-io/ethers.js/blob/v4-legacy/providers/abstract-provider.d.ts#L91
    * @see https://github.com/ethers-io/ethers.js/blob/v5.0.4/packages/abstract-provider/src.ts/index.ts#L224
    * @see https://docs.ethers.io/ethers.js/v5-beta/api-providers.html#jsonrpcprovider-inherits-from-provider
    * @see https://github.com/ethers-io/ethers.js/blob/master/packages/providers/src.ts/json-rpc-provider.ts
    */
-  static fromEthersProvider(
-    provider: EthersProvider,
-    networks?: {
-      ens?: {
-        network: string;
+  static fromEthersProvider(networks: {
+    ens?: {
+      network: string;
+      provider: EthersProvider;
+    };
+    uns?: {
+      locations: {
+        Layer1: {
+          network: string;
+          provider: EthersProvider;
+        };
+        Layer2: {
+          network: string;
+          provider: EthersProvider;
+        };
       };
-      uns?: {
-        network: string;
-      };
-    },
-  ): Resolution {
-    return this.fromEthereumEip1193Provider(
-      Eip1193Factories.fromEthersProvider(provider),
-      networks,
-    );
+    };
+  }): Resolution {
+    return this.fromEthereumEip1193Provider({
+      ens: networks.ens
+        ? {
+          network: networks.ens.network,
+          provider: Eip1193Factories.fromEthersProvider(
+            networks.ens.provider,
+          ),
+        }
+        : undefined,
+      uns: networks.uns
+        ? {
+          locations: {
+            Layer1: {
+              network: networks.uns.locations.Layer1.network,
+              provider: Eip1193Factories.fromEthersProvider(
+                networks.uns.locations.Layer1.provider,
+              ),
+            },
+            Layer2: {
+              network: networks.uns.locations.Layer2.network,
+              provider: Eip1193Factories.fromEthersProvider(
+                networks.uns.locations.Layer2.provider,
+              ),
+            },
+          },
+        }
+        : undefined,
+    });
   }
 
   /**
@@ -290,7 +430,7 @@ export default class Resolution {
    * @returns A promise that resolves in an address
    */
   async addr(domain: string, ticker: string): Promise<string> {
-    return await this.record(domain, `crypto.${ticker.toUpperCase()}.address`);
+    return this.record(domain, `crypto.${ticker.toUpperCase()}.address`);
   }
 
   /**
@@ -317,7 +457,7 @@ export default class Resolution {
     }
 
     const recordKey = `crypto.${ticker.toUpperCase()}.version.${chain.toUpperCase()}.address`;
-    return await method.record(domain, recordKey);
+    return method.record(domain, recordKey);
   }
 
   /**
@@ -340,7 +480,7 @@ export default class Resolution {
    * @returns A promise that resolves in chatId
    */
   async chatId(domain: string): Promise<string> {
-    return await this.record(domain, 'gundb.username.value');
+    return this.record(domain, 'gundb.username.value');
   }
 
   /**
@@ -350,7 +490,7 @@ export default class Resolution {
    * @returns a promise that resolves in gundb public key
    */
   async chatPk(domain: string): Promise<string> {
-    return await this.record(domain, 'gundb.public_key.value');
+    return this.record(domain, 'gundb.public_key.value');
   }
 
   /**
@@ -360,7 +500,7 @@ export default class Resolution {
    */
   async ipfsHash(domain: string): Promise<string> {
     domain = this.prepareDomain(domain);
-    return await this.getPreferableNewRecord(
+    return this.getPreferableNewRecord(
       domain,
       'dweb.ipfs.hash',
       'ipfs.html.value',
@@ -373,7 +513,7 @@ export default class Resolution {
    */
   async httpUrl(domain: string): Promise<string> {
     domain = this.prepareDomain(domain);
-    return await this.getPreferableNewRecord(
+    return this.getPreferableNewRecord(
       domain,
       'browser.redirect_url',
       'ipfs.redirect_domain.value',
@@ -387,7 +527,7 @@ export default class Resolution {
    * @returns A Promise that resolves in an email address configured for this domain whois
    */
   async email(domain: string): Promise<string> {
-    return await this.record(domain, 'whois.email.value');
+    return this.record(domain, 'whois.email.value');
   }
 
   /**
@@ -423,7 +563,7 @@ export default class Resolution {
   async record(domain: string, recordKey: string): Promise<string> {
     domain = this.prepareDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
-    return await method.record(domain, recordKey);
+    return method.record(domain, recordKey);
   }
 
   /**
@@ -434,7 +574,7 @@ export default class Resolution {
   async records(domain: string, keys: string[]): Promise<CryptoRecords> {
     domain = this.prepareDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
-    return await method.records(domain, keys);
+    return method.records(domain, keys);
   }
 
   /**
@@ -444,7 +584,7 @@ export default class Resolution {
   async isRegistered(domain: string): Promise<Boolean> {
     domain = this.prepareDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
-    return await method.isRegistered(domain);
+    return method.isRegistered(domain);
   }
 
   /**
@@ -454,7 +594,7 @@ export default class Resolution {
   async isAvailable(domain: string): Promise<Boolean> {
     domain = this.prepareDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
-    return await method.isAvailable(domain);
+    return method.isAvailable(domain);
   }
 
   /**
@@ -562,7 +702,7 @@ export default class Resolution {
    */
   async allRecords(domain: string): Promise<CryptoRecords> {
     domain = this.prepareDomain(domain);
-    return await this.getNamingMethodOrThrow(domain).allRecords(domain);
+    return this.getNamingMethodOrThrow(domain).allRecords(domain);
   }
 
   async allNonEmptyRecords(domain: string): Promise<CryptoRecords> {
@@ -636,12 +776,17 @@ export default class Resolution {
 
   /**
    * Retrieves address of registry contract used for domain
-   * @param domain - domain name
-   * @returns Registry contract address
+   * @param domains - domain name
+   * @returns Promise<Locations> - A map of domain name and Location (a set of attributes like blockchain,
    */
-  async location(domain: string): Promise<DomainLocation> {
-    const method = this.getNamingMethodOrThrow(domain);
-    return method.location(domain);
+  async locations(domains: string[]): Promise<Locations> {
+    const method = this.getNamingMethodOrThrow(domains[0]);
+    for (const domain of domains) {
+      if (!(await method.isSupportedDomain(domain))) {
+        throw new ResolutionError(ResolutionErrorCode.InconsistentDomainArray);
+      }
+    }
+    return method.locations(domains);
   }
 
   private async getMetadataFromTokenURI(
@@ -649,7 +794,7 @@ export default class Resolution {
   ): Promise<TokenUriMetadata> {
     const resp = await Networking.fetch(tokenUri, {});
     if (resp.ok) {
-      return await resp.json();
+      return resp.json();
     }
 
     throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {

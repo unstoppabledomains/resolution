@@ -1,15 +1,12 @@
 {
   "name": "@unstoppabledomains/resolution",
-  "version": "5.0.2",
+  "version": "6.0.0",
   "description": "Domain Resolution for blockchain domains",
   "main": "./build/index.js",
   "directories": {
     "doc": "docs"
   },
   "types": "./build/index.d.ts",
-  "bin": {
-    "resolution": "./build/cli/cli.js"
-  },
   "scripts": {
     "release": "RELEASE=patch yarn release:run",
     "release:minor": "RELEASE=minor yarn release:run",
@@ -24,9 +21,7 @@
     "test:live": "LIVE=1 yarn test",
     "test:live:win": "set LIVE=1&& yarn test",
     "start": "npm run build:live",
-    "dev": "yarn build && ./build/cli/cli.js -d brad.crypto",
-    "build": "rm -rf build && tsc -p . && chmod +x ./build/cli/cli.js",
-    "build:symlink": "yarn build && ln -sf $PWD/build/cli/cli.js  /usr/local/bin/resolution",
+    "build": "rm -rf build && tsc -p .",
     "build:live": "nodemon --watch 'src/**/*.ts' --exec yarn build",
     "docs": "yarn docs:clone && yarn docs:generate && yarn docs:readme",
     "docs:clone": "([ -d ./docs ] || git clone --branch gh-pages git@github.com:unstoppabledomains/resolution.git docs) && git -C ./docs pull",
@@ -68,10 +63,10 @@
   "homepage": "https://github.com/unstoppabledomains/resolution.git#readme",
   "devDependencies": {
     "@ensdomains/address-encoder": "0.2.6",
-    "@ethersproject/providers": "^5.0.2",
+    "@ethersproject/providers": "^5.4.5",
     "@types/bn.js": "^4.11.6",
     "@types/elliptic": "^6.4.13",
-    "@types/jest": "24.0.23",
+    "@types/jest": "27.0.2",
     "@types/lodash": "^4.14.158",
     "@types/node": "11.15.3",
     "@typescript-eslint/eslint-plugin": "^3.9.0",
@@ -87,7 +82,7 @@
     "eslint-plugin-jest": "^24.1.0",
     "husky": "^6.0.0",
     "jest": "^27.0.4",
-    "lint-staged": "^11.0.0",
+    "lint-staged": "11.0.0",
     "lodash": "^4.17.19",
     "nock": "10.0.6",
     "nodemon": "^2.0.7",
@@ -96,7 +91,7 @@
     "ts-jest": "^27.0.3",
     "ts-loader": "6.2.1",
     "ts-node": "^8.6.2",
-    "typedoc": "0.17.8",
+    "typedoc": "0.18.0",
     "typescript": "3.8.3",
     "web3-0.20.7": "npm:web3@0.20.7",
     "web3-providers-http": "^1.3.6",
@@ -108,7 +103,6 @@
   "dependencies": {
     "@ethersproject/abi": "^5.0.1",
     "bn.js": "^4.4.0",
-    "commander": "^4.1.1",
     "cross-fetch": "^3.1.4",
     "elliptic": "^6.5.4",
     "ethereum-ens-network-map": "^1.0.2",

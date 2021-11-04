@@ -1,6 +1,7 @@
 import {Hash, keccak_256 as sha3} from 'js-sha3';
 import {sha256} from 'js-sha256';
 import {Buffer} from 'buffer';
+import BN from 'bn.js';
 
 export function eip137Namehash(domain: string): string {
   const arr = hashArray(domain, sha3);
@@ -45,4 +46,14 @@ function arrayToHex(arr: number[]) {
   return `0x${Array.prototype.map
     .call(arr, (x) => ('00' + x.toString(16)).slice(-2))
     .join('')}`;
+}
+
+export function fromHexStringToDecimals(value: string): string {
+  if (value.startsWith('0x')) {
+    const valueWithoutPrefix = value.slice(2, value.length);
+    const bn = new BN(valueWithoutPrefix, 16);
+    return bn.toString(10);
+  }
+
+  return value;
 }

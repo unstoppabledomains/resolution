@@ -65,6 +65,8 @@ export const EthereumNetworks = {
   ropsten: 3,
   rinkeby: 4,
   goerli: 5,
+  polygon: 137,
+  'polygon-mumbai': 80001,
 } as const;
 
 export const EthereumNetworksInverted = {
@@ -72,4 +74,6 @@ export const EthereumNetworksInverted = {
   3: 'ropsten',
   4: 'rinkeby',
   5: 'goerli',
+  137: 'polygon-mainnet',
+  80001: 'polygon-mumbai',
 } as const;
