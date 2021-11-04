@@ -1071,7 +1071,7 @@ describe('Resolution', () => {
             // There are no legacy providers on testnet
             const provider = new InfuraProvider(
               'mainnet',
-              '213fff28936343858ca9c5115eff1419',
+              'c4bb906ed6904c42b19c95825fe55f39',
             );
             const eye = mockAsyncMethod(provider, 'call', (params) =>
               Promise.resolve(caseMock(params, RpcProviderTestCases)),
