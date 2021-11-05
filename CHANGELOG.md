@@ -1,3 +1,6 @@
+## 6.0.1
+- Set correct polygon-mainnet provider if use default settings
+
 ## 6.0.0
 ### Breaking changes
 - CLI tool was removed. Please use new binary CLI tool instead: [Github repo](https://github.com/unstoppabledomains/resolution-cli/releases).
