@@ -1126,7 +1126,7 @@ describe('UNS', () => {
           records: {},
         },
       });
-      const owner = await uns.owner('ryan.crypto');
+      const owner = await uns.owner(CryptoDomainLayerOneWithNoResolver);
       expectSpyToBeCalled(spies);
       expect(owner).toBe('0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2');
     });
