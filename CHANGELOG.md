@@ -1,3 +1,6 @@
+## 6.0.2
+- `Resolution#owner` method doesn't throw an error in case of empty resolver
+
 ## 6.0.1
 - Set correct polygon-mainnet provider if use default settings
 
