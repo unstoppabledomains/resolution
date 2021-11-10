@@ -8,6 +8,9 @@ import {
   ResolutionMethod,
   NamingServiceName,
   Api,
+  Locations,
+  DomainLocation,
+  BlockchainType,
 } from './types/publicTypes';
 import Networking from './utils/Networking';
 import {constructRecords, findNamingServiceName, isNullAddress} from './utils';
@@ -18,6 +21,7 @@ import {NamingService} from './NamingService';
  * @internal
  */
 export default class Udapi extends NamingService {
+  private readonly network: number;
   private readonly name: ResolutionMethod;
   private readonly url: string;
   private readonly headers: {
@@ -26,15 +30,13 @@ export default class Udapi extends NamingService {
   static readonly ZnsRegistryMap = {
     1: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
   };
-  readonly network: number;
 
   constructor(api?: Api) {
     super();
     this.name = 'UDAPI';
     this.url = api?.url || 'https://unstoppabledomains.com/api/v1';
-    const DefaultUserAgent = Networking.isNode()
-      ? 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)'
-      : navigator.userAgent;
+    const DefaultUserAgent =
+      'cross-fetch/3.1.4 (+https://github.com/lquixada/cross-fetch)';
     const version = pckg.version;
     const CustomUserAgent = `${DefaultUserAgent} Resolution/${version}`;
     this.headers = {'X-user-agent': CustomUserAgent};
@@ -190,6 +192,12 @@ export default class Udapi extends NamingService {
     throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
       domain,
       methodName: 'registryAddress',
+    });
+  }
+
+  async locations(domains: string[]): Promise<Locations> {
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+      methodName: 'locations',
     });
   }
 }

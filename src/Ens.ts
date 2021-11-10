@@ -1,7 +1,7 @@
 import {default as ensInterface} from './contracts/ens/ens';
 import {default as resolverInterface} from './contracts/ens/resolver';
 import {
-  BlockhanNetworkUrlMap,
+  BlockhainNetworkUrlMap,
   EnsSupportedNetwork,
   EthCoinIndex,
   hasProvider,
@@ -9,7 +9,12 @@ import {
 import {ResolutionError, ResolutionErrorCode} from './errors/resolutionError';
 import EthereumContract from './contracts/EthereumContract';
 import EnsNetworkMap from 'ethereum-ens-network-map';
-import {EnsSource, NamingServiceName, Provider} from './types/publicTypes';
+import {
+  EnsSource,
+  Locations,
+  NamingServiceName,
+  Provider,
+} from './types/publicTypes';
 import {
   constructRecords,
   EthereumNetworksInverted,
@@ -28,7 +33,7 @@ import {requireOrFail} from './utils/requireOrFail';
  * @internal
  */
 export default class Ens extends NamingService {
-  static readonly UrlMap: BlockhanNetworkUrlMap = {
+  static readonly UrlMap: BlockhainNetworkUrlMap = {
     1: 'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
     3: 'https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
     4: 'https://rinkeby.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
@@ -40,14 +45,13 @@ export default class Ens extends NamingService {
   readonly provider: Provider;
   readonly readerContract: EthereumContract;
 
-  constructor(source?: EnsSource) {
+  constructor(
+    source: EnsSource = {
+      url: Ens.UrlMap[1],
+      network: 'mainnet',
+    },
+  ) {
     super();
-    if (!source) {
-      source = {
-        url: Ens.UrlMap[1],
-        network: 'mainnet',
-      };
-    }
     this.checkNetworkConfig(source);
     this.network = EthereumNetworks[source.network];
     this.url = source['url'] || Ens.UrlMap[this.network];
@@ -220,6 +224,13 @@ export default class Ens extends NamingService {
     throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
       method: NamingServiceName.ENS,
       methodName: 'getDomainFromTokenId',
+    });
+  }
+
+  locations(domains: string[]): Promise<Locations> {
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+      method: NamingServiceName.ENS,
+      methodName: 'locations',
     });
   }
 

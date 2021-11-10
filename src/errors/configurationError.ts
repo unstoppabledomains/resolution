@@ -17,6 +17,7 @@ export enum ConfigurationErrorCode {
   UnsupportedNetwork = 'UnsupportedNetwork',
   UnspecifiedUrl = 'UnspecifiedUrl',
   DependencyMissing = 'DependencyMissing',
+  NetworkConfigMissing = 'NetworkConfigMissing',
   CustomNetworkConfigMissing = 'CustomNetworkConfigMissing',
   InvalidConfigurationField = 'InvalidProxyReader',
 }
@@ -40,6 +41,11 @@ const HandlersByCode = {
     version: string;
   }) =>
     `Missing dependency for this functionality. Please install ${params.dependency} @ ${params.version} via npm or yarn`,
+  [ConfigurationErrorCode.NetworkConfigMissing]: (params: {
+    method: ResolutionMethod;
+    config: string;
+  }) =>
+    `Missing configuration in Resolution ${params.method}. Please specify ${params.config}`,
   [ConfigurationErrorCode.CustomNetworkConfigMissing]: (params: {
     method: ResolutionMethod;
     config: string;

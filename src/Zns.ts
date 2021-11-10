@@ -11,6 +11,7 @@ import {
   Provider,
   ZnsSource,
   NamingServiceName,
+  Locations,
 } from './types/publicTypes';
 import FetchProvider from './FetchProvider';
 import {znsChildhash, znsNamehash} from './utils/namehash';
@@ -40,20 +41,19 @@ export default class Zns extends NamingService {
     333: 'zil1hyj6m5w4atcn7s806s69r0uh5g4t84e8gp6nps',
   };
 
-  readonly name: NamingServiceName = NamingServiceName.ZNS;
   readonly network: number;
-  readonly url: string | undefined;
+  readonly name: NamingServiceName = NamingServiceName.ZNS;
+  readonly url: string;
   readonly registryAddr: string;
   readonly provider: Provider;
 
-  constructor(source?: ZnsSource) {
+  constructor(
+    source: ZnsSource = {
+      url: Zns.UrlMap[1],
+      network: 'mainnet',
+    },
+  ) {
     super();
-    if (!source) {
-      source = {
-        url: Zns.UrlMap[1],
-        network: 'mainnet',
-      };
-    }
     this.checkNetworkConfig(source);
     this.network = Zns.NetworkNameMap[source.network];
     this.url = source['url'] || Zns.UrlMap[this.network];
@@ -141,7 +141,7 @@ export default class Zns extends NamingService {
 
   async allRecords(domain: string): Promise<CryptoRecords> {
     const resolverAddress = await this.resolver(domain);
-    return await this.getResolverRecords(resolverAddress);
+    return this.getResolverRecords(resolverAddress);
   }
 
   async twitter(domain: string): Promise<string> {
@@ -183,6 +183,13 @@ export default class Zns extends NamingService {
 
   async registryAddress(domain: string): Promise<string> {
     return this.registryAddr;
+  }
+
+  locations(domains: string[]): Promise<Locations> {
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+      method: NamingServiceName.ZNS,
+      methodName: 'locations',
+    });
   }
 
   private async getRecordsAddresses(
@@ -232,7 +239,7 @@ export default class Zns extends NamingService {
   ): Promise<any> {
     const params = [contractAddress.replace('0x', ''), field, keys];
     const method = 'GetSmartContractSubState';
-    return await this.provider.request({method, params});
+    return this.provider.request({method, params});
   }
 
   private async getContractField(

@@ -53,16 +53,16 @@ describe('ENS', () => {
 
     const eyes = mockAsyncMethods(ens, {
       resolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
-      fetchAddress: '0x714ef33943d925731FBB89C99aF5780D888bD106',
+      fetchAddress: '0xa59C818Ddb801f1253edEbf0Cf08c9E481EA2fE5',
     });
     const spy = mockAsyncMethods(ens, {
-      owner: '0x714ef33943d925731FBB89C99aF5780D888bD106',
+      owner: '0xa59C818Ddb801f1253edEbf0Cf08c9E481EA2fE5',
     });
     expect(await resolution.addr('matthewgould.eth', 'ETH')).toEqual(
-      '0x714ef33943d925731FBB89C99aF5780D888bD106',
+      '0xa59C818Ddb801f1253edEbf0Cf08c9E481EA2fE5',
     );
     expect(await resolution.owner('matthewgould.eth')).toEqual(
-      '0x714ef33943d925731FBB89C99aF5780D888bD106',
+      '0xa59C818Ddb801f1253edEbf0Cf08c9E481EA2fE5',
     );
     expectSpyToBeCalled(eyes);
     expectSpyToBeCalled(spy, 1);
