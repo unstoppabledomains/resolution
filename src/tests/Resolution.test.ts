@@ -36,7 +36,6 @@ import {RpcProviderTestCases} from './providerMockData';
 import fetch, {FetchError} from 'node-fetch';
 import Uns from '../Uns';
 import Zns from '../Zns';
-import Ens from '../Ens';
 import FetchProvider from '../FetchProvider';
 import {
   ConfigurationErrorCode,
@@ -51,7 +50,6 @@ import Networking from '../utils/Networking';
 let resolution: Resolution;
 let uns: Uns;
 let zns: Zns;
-let ens: Ens;
 
 beforeEach(() => {
   nock.cleanAll();
@@ -67,12 +65,10 @@ beforeEach(() => {
           },
         },
       },
-      ens: {url: protocolLink(), network: 'rinkeby'},
       zns: {network: 'testnet'},
     },
   });
   uns = resolution.serviceMap[NamingServiceName.UNS] as unknown as Uns;
-  ens = resolution.serviceMap[NamingServiceName.ENS] as unknown as Ens;
   zns = resolution.serviceMap[NamingServiceName.ZNS] as unknown as Zns;
 });
 
@@ -84,7 +80,6 @@ describe('Resolution', () => {
       const goerliUrl = rinkebyUrl.replace('rinkeby', 'goerli');
       // mocking getNetworkConfigs because no access to inner provider.request
       const UnsGetNetworkOriginal = Uns.autoNetwork;
-      const EnsGetNetworkOriginal = Ens.autoNetwork;
       if (!isLive()) {
         Uns.autoNetwork = jest.fn().mockReturnValue(
           new Uns({
@@ -100,22 +95,14 @@ describe('Resolution', () => {
             },
           }),
         );
-        Ens.autoNetwork = jest.fn().mockReturnValue(
-          new Ens({
-            network: 'goerli',
-            provider: new FetchProvider(NamingServiceName.ENS, goerliUrl),
-          }),
-        );
       }
       const resolution = await Resolution.autoNetwork({
         uns: {
           locations: {Layer1: {url: rinkebyUrl}, Layer2: {url: polygonUrl}},
         },
-        ens: {url: goerliUrl},
       });
       // We need to manually restore the function as jest.restoreAllMocks and simillar works only with spyOn
       Uns.autoNetwork = UnsGetNetworkOriginal;
-      Ens.autoNetwork = EnsGetNetworkOriginal;
       expect(
         (resolution.serviceMap[NamingServiceName.UNS] as unknown as Uns).unsl1
           .network,
@@ -124,10 +111,6 @@ describe('Resolution', () => {
         (resolution.serviceMap[NamingServiceName.UNS] as unknown as Uns).unsl2
           .network,
       ).toBe('polygon-mumbai');
-      expect(
-        (resolution.serviceMap[NamingServiceName.ENS] as unknown as Ens)
-          .network,
-      ).toBe(5);
     });
 
     it('should not work with invalid proxyReader configuration #1', async () => {
@@ -265,9 +248,8 @@ describe('Resolution', () => {
         uns: {
           locations: {Layer1: {provider}, Layer2: {provider: polygonProvider}},
         },
-        ens: {provider},
       });
-      expect(spy).toBeCalledTimes(2);
+      expect(spy).toBeCalledTimes(1);
       expect(spyTwo).toBeCalledTimes(1);
       expect(
         (resolution.serviceMap[NamingServiceName.UNS] as unknown as Uns).unsl1
@@ -277,10 +259,6 @@ describe('Resolution', () => {
         (resolution.serviceMap[NamingServiceName.UNS] as unknown as Uns).unsl2
           .network,
       ).toBe('polygon-mumbai');
-      expect(
-        (resolution.serviceMap[NamingServiceName.ENS] as unknown as Ens)
-          .network,
-      ).toBe(1);
     });
 
     it('should fail because provided url failled net_version call', async () => {
@@ -317,32 +295,6 @@ describe('Resolution', () => {
         );
       }
       expectSpyToBeCalled([factorySpy, providerSpy]);
-    });
-
-    it('should fail because provided provider failed to make a net_version call', async () => {
-      const mockedProvider = new FetchProvider(
-        NamingServiceName.ENS,
-        'http://unstoppabledomains.com',
-      );
-      const providerSpy = mockAsyncMethod(
-        mockedProvider,
-        'request',
-        new FetchError(
-          'invalid json response body at https://unstoppabledomains.com/ reason: Unexpected token < in JSON at position 0',
-          'invalid_json',
-        ),
-      );
-      try {
-        await Resolution.autoNetwork({
-          ens: {provider: mockedProvider},
-        });
-      } catch (error) {
-        expect(error).toBeInstanceOf(FetchError);
-        expect(error.message).toBe(
-          'invalid json response body at https://unstoppabledomains.com/ reason: Unexpected token < in JSON at position 0',
-        );
-      }
-      expect(providerSpy).toBeCalled();
     });
 
     it('should fail because of unsupported test network for uns', async () => {
@@ -387,18 +339,15 @@ describe('Resolution', () => {
             Layer2: {network: 'polygon-mumbai'},
           },
         },
-        ens: {network: 'rinkeby'},
       });
       uns = resolution.serviceMap[NamingServiceName.UNS] as unknown as Uns;
-      ens = resolution.serviceMap[NamingServiceName.ENS] as unknown as Ens;
       expect(uns.unsl1.url).toBe(`https://rinkeby.infura.io/v3/api-key`);
       expect(uns.unsl2.url).toBe(`https://polygon-mumbai.infura.io/v3/api-key`);
-      expect(ens.url).toBe(`https://rinkeby.infura.io/v3/api-key`);
     });
 
     it('should throw on unspecified network', async () => {
       expect(() => Resolution.fromResolutionProvider({})).toThrowError(
-        '< Must specify network for uns, ens, or zns >',
+        '< Must specify network for uns or zns >',
       );
     });
 
@@ -465,12 +414,6 @@ describe('Resolution', () => {
     });
 
     describe('.ServiceName', () => {
-      it('checks ens service name', () => {
-        const resolution = new Resolution();
-        const serviceName = resolution.serviceName('domain.eth');
-        expect(serviceName).toBe('ENS');
-      });
-
       it('should resolve gundb chat id', async () => {
         const eyes = mockAsyncMethods(uns, {
           get: {
@@ -529,12 +472,6 @@ describe('Resolution', () => {
       });
 
       describe('serviceName', () => {
-        it('checks ens service name', () => {
-          const resolution = new Resolution();
-          const serviceName = resolution.serviceName('domain.eth');
-          expect(serviceName).toBe('ENS');
-        });
-
         it('checks zns service name', () => {
           const resolution = new Resolution();
           const serviceName = resolution.serviceName('domain.zil');
@@ -610,6 +547,13 @@ describe('Resolution', () => {
         expectSpyToBeCalled(spy);
       });
 
+      it('should throw error for unsupported domain', async () => {
+        await expectResolutionErrorCode(
+          resolution.addr('sdncdoncvdinvcsdncs.eth', 'ETH'),
+          ResolutionErrorCode.UnsupportedDomain,
+        );
+      });
+
       it('checks error for email on ryan-testing.zil', async () => {
         const spies = mockAsyncMethods(zns, {
           allRecords: {
@@ -627,14 +571,9 @@ describe('Resolution', () => {
       describe('.Namehash errors', () => {
         it('should be invalid domain', async () => {
           const unsInvalidDomain = 'hello..crypto';
-          const ensInvalidDomain = 'hello..eth';
           const znsInvalidDomain = 'hello..zil';
           await expectResolutionErrorCode(
             () => resolution.namehash(unsInvalidDomain),
-            ResolutionErrorCode.UnsupportedDomain,
-          );
-          await expectResolutionErrorCode(
-            () => resolution.namehash(ensInvalidDomain),
             ResolutionErrorCode.UnsupportedDomain,
           );
           await expectResolutionErrorCode(
@@ -1590,13 +1529,6 @@ describe('Resolution', () => {
       const namehash = resolution.namehash('brad.zil');
       expect(namehash).toEqual(expectedNamehash);
     });
-
-    it('brad.eth', () => {
-      const expectedNamehash =
-        '0xe2cb672a04d6270338f15a428216ca714514dc01fdbdd76e97038a8d4080e01c';
-      const namehash = resolution.namehash('brad.eth');
-      expect(namehash).toEqual(expectedNamehash);
-    });
   });
 
   describe('.childhash', () => {
@@ -1618,17 +1550,6 @@ describe('Resolution', () => {
         '0x9915d0456b878862e822e2361da37232f626a2e47505c8795134a95d36138ed3',
         'brad',
         NamingServiceName.ZNS,
-      );
-      expect(namehash).toEqual(expectedNamehash);
-    });
-
-    it('brad.eth', () => {
-      const expectedNamehash =
-        '0x96a270260d2f9e37845776c17a47ae9b8b7e7e576b2365afd2e7f30f43e9bb49';
-      const namehash = resolution.childhash(
-        '0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae',
-        'beresnev',
-        NamingServiceName.ENS,
       );
       expect(namehash).toEqual(expectedNamehash);
     });

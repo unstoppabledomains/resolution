@@ -1,9 +1,6 @@
 import {Provider} from './publicTypes';
 
 export type Dictionary<T> = {[k: string]: T};
-export type EnsNetworkIdMap = {
-  [key: number]: string;
-};
 export interface BlockhainNetworkUrlMap {
   [key: string]: string | undefined;
 }
@@ -93,8 +90,6 @@ export enum NullAddresses {
   '0x0000000000000000000000000000000000000000000000000000000000000000',
 }
 
-export const EthCoinIndex = '60';
-
 // TypeScript will infer a string union type from the literal values passed to
 // this function. Without `extends string`, it would instead generalize them
 // to the common string type.
@@ -129,13 +124,6 @@ export const UnsSupportedNetwork = StringUnion(
   'rinkeby',
   'polygon-mainnet',
   'polygon-mumbai',
-);
-
-export const EnsSupportedNetwork = StringUnion(
-  'mainnet',
-  'rinkeby',
-  'goerli',
-  'ropsten',
 );
 
 export const ZnsSupportedNetwork = StringUnion('mainnet', 'testnet');

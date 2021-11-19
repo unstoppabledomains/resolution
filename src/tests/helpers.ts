@@ -176,7 +176,7 @@ export function mockAPICalls(testName: string, url = MainnetUrl): void {
  */
 export function protocolLink(
   providerProtocol: ProviderProtocol = ProviderProtocol.http,
-  namingService: NamingServiceName.ENS | 'UNSL1' | 'UNSL2' = 'UNSL1',
+  namingService: 'UNSL1' | 'UNSL2' = 'UNSL1',
 ): string {
   const secret =
     process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID ?? undefined;
@@ -226,11 +226,5 @@ const ethereumDefaultProviders = {
       'https://polygon-mumbai.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
     [ProviderProtocol.wss]:
       'wss://polygon-mumbai.infura.io/ws/v3/c4bb906ed6904c42b19c95825fe55f39',
-  },
-  [NamingServiceName.ENS]: {
-    [ProviderProtocol.http]:
-      'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
-    [ProviderProtocol.wss]:
-      'wss://mainnet.infura.io/ws/v3/d423cf2499584d7fbe171e33b42cfbee',
   },
 };

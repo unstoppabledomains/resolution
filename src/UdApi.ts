@@ -9,8 +9,6 @@ import {
   NamingServiceName,
   Api,
   Locations,
-  DomainLocation,
-  BlockchainType,
 } from './types/publicTypes';
 import Networking from './utils/Networking';
 import {constructRecords, findNamingServiceName, isNullAddress} from './utils';

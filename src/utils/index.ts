@@ -39,11 +39,11 @@ export function constructRecords(
 export const domainExtensionToNamingServiceName = {
   crypto: NamingServiceName.UNS,
   zil: NamingServiceName.ZNS,
-  eth: NamingServiceName.ENS,
-  luxe: NamingServiceName.ENS,
-  xyz: NamingServiceName.ENS,
-  kred: NamingServiceName.ENS,
-  reverse: NamingServiceName.ENS,
+  eth: 'ENS',
+  luxe: 'ENS',
+  xyz: 'ENS',
+  kred: 'ENS',
+  reverse: 'ENS',
 };
 
 export const findNamingServiceName = (
