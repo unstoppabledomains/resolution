@@ -37,13 +37,6 @@ export default class UnsInternal {
   readonly unsLocation: UnsLocation;
   readonly blockchain: BlockchainType;
 
-  static readonly NetworkNameMap = {
-    mainnet: 1,
-    rinkeby: 4,
-    'polygon-mainnet': 137,
-    'polygon-mumbai': 80001,
-  };
-
   constructor(
     unsLocation: UnsLocation,
     source: UnsLayerSource,
@@ -135,7 +128,7 @@ export default class UnsInternal {
           resolverAddress: resolvers[i],
           registryAddress: registries[i][0],
           ownerAddress: owners[i],
-          networkId: UnsInternal.NetworkNameMap[this.network],
+          networkId: EthereumNetworks[this.network],
           blockchain: this.blockchain,
           blockchainProviderUrl: this.url,
         };

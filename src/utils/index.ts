@@ -65,7 +65,7 @@ export const EthereumNetworks = {
   ropsten: 3,
   rinkeby: 4,
   goerli: 5,
-  polygon: 137,
+  'polygon-mainnet': 137,
   'polygon-mumbai': 80001,
 } as const;
 

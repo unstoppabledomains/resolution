@@ -166,7 +166,14 @@ export default class Uns extends NamingService {
   }
 
   async owner(domain: string): Promise<string> {
-    return (await this.getVerifiedData(domain)).owner;
+    const tokenId = this.namehash(domain);
+    const data = await this.get(tokenId, []);
+    if (isNullAddress(data.owner)) {
+      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+        domain,
+      });
+    }
+    return data.owner;
   }
 
   async resolver(domain: string): Promise<string> {

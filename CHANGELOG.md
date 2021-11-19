@@ -1,10 +1,18 @@
-## 6.1.0
+## 6.0.3
 
 - ENS support is completely removed
 - Removes `bip44-constants`, `@ensdomains/address-encoder`, and `content-hash`
   package dependencies
 - Methods that query ENS domains (.eth, .luxe, .xyz, .kred, .reverse) throw
   UnsupportedDomain
+
+## 6.0.2
+
+- `Resolution#owner` method doesn't throw an error in case of empty resolver
+
+## 6.0.1
+
+- Set correct polygon-mainnet provider if use default settings
 
 ## 6.0.0
 

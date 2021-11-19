@@ -1117,6 +1117,21 @@ describe('UNS', () => {
     });
   });
 
+  describe('#owner', () => {
+    it('should not throw when resolver is null', async () => {
+      const spies = mockAsyncMethods(uns, {
+        get: {
+          owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2',
+          resolver: null,
+          records: {},
+        },
+      });
+      const owner = await uns.owner(CryptoDomainLayerOneWithNoResolver);
+      expectSpyToBeCalled(spies);
+      expect(owner).toBe('0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2');
+    });
+  });
+
   describe('.isAvailable', () => {
     it('should return false', async () => {
       const spies = mockAsyncMethods(uns.unsl1.readerContract, {
