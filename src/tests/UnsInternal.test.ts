@@ -13,11 +13,10 @@ import {
 } from './helpers';
 import {BlockchainType, UnsLocation} from '../types/publicTypes';
 import {
-  ConfigurationError,
   ConfigurationErrorCode,
-  ResolutionError,
-  ResolutionErrorCode,
-} from '..';
+  ConfigurationError,
+} from '../errors/configurationError';
+import {ResolutionError, ResolutionErrorCode} from '../errors/resolutionError';
 import {eip137Namehash, fromHexStringToDecimals} from '../utils/namehash';
 
 let unsInternalL1: UnsInternal;

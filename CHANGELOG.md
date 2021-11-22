@@ -1,3 +1,6 @@
+## 6.0.3
+- Remove relative imports to avoid issues in bundlers. Restrict relative imports by adding eslint rule.
+
 ## 6.0.2
 - `Resolution#owner` method doesn't throw an error in case of empty resolver
 

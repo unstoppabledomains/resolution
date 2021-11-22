@@ -1,18 +1,12 @@
 import {Provider} from './publicTypes';
 
 export type Dictionary<T> = {[k: string]: T};
-export type EnsNetworkIdMap = {
-  [key: number]: string;
-};
 export interface BlockhainNetworkUrlMap {
   [key: string]: string | undefined;
 }
 export interface ProxyReaderMap {
   [key: string]: string;
 }
-export type NetworkIdMap = {
-  [key: number]: string;
-};
 
 export type ProviderParams = unknown[] | object;
 export interface RequestArguments {

@@ -9,8 +9,6 @@ import {
   NamingServiceName,
   Api,
   Locations,
-  DomainLocation,
-  BlockchainType,
 } from './types/publicTypes';
 import Networking from './utils/Networking';
 import {constructRecords, findNamingServiceName, isNullAddress} from './utils';
@@ -26,9 +24,6 @@ export default class Udapi extends NamingService {
   private readonly url: string;
   private readonly headers: {
     [key: string]: string;
-  };
-  static readonly ZnsRegistryMap = {
-    1: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
   };
 
   constructor(api?: Api) {

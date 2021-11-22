@@ -32,5 +32,6 @@ module.exports = {
       {allowArgumentsExplicitlyTypedAsAny: true},
     ],
     '@typescript-eslint/no-non-null-assertion': 'off',
+    'no-restricted-imports': ['error', {paths: ['..', '.', './', '../']}],
   },
 };
