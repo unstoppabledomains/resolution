@@ -75,12 +75,6 @@ describe('Unstoppable API', () => {
     expect(twitterHandle).toBe('Marlene12Bob');
   });
 
-  it('should throw unsupported domain', async () => {
-    const handle = 'ryan.eth';
-    await expect(resolution.twitter(handle)).rejects.toThrowError(
-      `Domain ${handle} is not supported`,
-    );
-  });
   it('should throw unsupported method', async () => {
     const handle = 'ryan.zil';
     await expect(resolution.twitter(handle)).rejects.toThrowError(
