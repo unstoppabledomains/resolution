@@ -3,7 +3,7 @@ import {
   RequestArguments,
   RpcProviderLogEntry,
   TransactionRequest,
-} from '.';
+} from './index';
 
 export type Api = {api: true; url?: string; network?: number};
 

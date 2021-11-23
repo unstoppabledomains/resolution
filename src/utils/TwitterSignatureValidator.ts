@@ -1,4 +1,4 @@
-import {hexToBytes} from '.';
+import {hexToBytes} from './index';
 import {keccak256 as sha3} from 'js-sha3';
 import {recover} from './recoverSignature';
 import {fromHexStringToDecimals} from './namehash';

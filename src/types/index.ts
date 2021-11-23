@@ -7,9 +7,6 @@ export interface BlockhainNetworkUrlMap {
 export interface ProxyReaderMap {
   [key: string]: string;
 }
-export type NetworkIdMap = {
-  [key: number]: string;
-};
 
 export type ProviderParams = unknown[] | object;
 export interface RequestArguments {

@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 import {keccak256 as sha3} from 'js-sha3';
-import {hexToBytes} from '.';
+import {hexToBytes} from './index';
 import {ec} from 'elliptic';
 const secp256k1 = new ec('secp256k1');
 

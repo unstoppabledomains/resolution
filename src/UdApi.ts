@@ -25,9 +25,6 @@ export default class Udapi extends NamingService {
   private readonly headers: {
     [key: string]: string;
   };
-  static readonly ZnsRegistryMap = {
-    1: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
-  };
 
   constructor(api?: Api) {
     super();

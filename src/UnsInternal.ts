@@ -4,7 +4,9 @@ import {
   ProxyReaderMap,
   NullAddress,
 } from './types';
-import {UnsLayerSource, ConfigurationError, ConfigurationErrorCode} from '.';
+import {UnsLayerSource} from './types/publicTypes';
+import ConfigurationError from './errors/configurationError';
+import {ConfigurationErrorCode} from './errors/configurationError';
 import {
   BlockchainType,
   DomainData,
