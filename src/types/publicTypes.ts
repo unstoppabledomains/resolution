@@ -18,11 +18,6 @@ export type UnsSource = {
   locations: {Layer1: UnsLayerSource; Layer2: UnsLayerSource};
 };
 
-export type EnsSource = NamingServiceSource & {
-  network: string;
-  registryAddress?: string;
-};
-
 export type ZnsSource = NamingServiceSource & {
   network: string;
   registryAddress?: string;
@@ -31,7 +26,6 @@ export type ZnsSource = NamingServiceSource & {
 export type SourceConfig = {
   uns?: UnsSource | Api;
   zns?: ZnsSource | Api;
-  ens?: EnsSource | Api;
 };
 
 export enum UnsLocation {
@@ -41,7 +35,6 @@ export enum UnsLocation {
 
 export enum NamingServiceName {
   UNS = 'UNS',
-  ENS = 'ENS',
   ZNS = 'ZNS',
 }
 
@@ -54,7 +47,6 @@ export type AutoNetworkConfigs = {
       Layer2: {url: string} | {provider: Provider};
     };
   };
-  ens?: {url: string} | {provider: Provider};
   zns?: {url: string} | {provider: Provider};
 };
 

@@ -1,3 +1,10 @@
+## 7.0.0
+
+- ENS support is completely removed
+- Removes `bip44-constants`, `@ensdomains/address-encoder`, and `content-hash`
+  package dependencies
+- Methods that query ENS domains (.eth, .luxe, .xyz, .kred, .reverse) throw
+  UnsupportedDomain
 ## 6.0.3
 - Remove relative imports to avoid issues in bundlers. Restrict relative imports by adding eslint rule.
 
