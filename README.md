@@ -155,27 +155,7 @@ resolveCustomRecord('homecakes.crypto', 'custom.record.value');
 
 ### Command Line Interface
 
-To use resolution via the command line install the package globally.
-
-```shell
-yarn global add @unstoppabledomains/resolution
-```
-
-```shell
-npm install -g @unstoppabledomains/resolution
-```
-
-By default, the CLI uses Infura as its primary gateway to the Ethereum
-blockchain. If you'd like to override this default and set another provider you
-can do so using the `--ethereum-url` flag.
-
-For example:
-
-```shell
-resolution --ethereum-url https://mainnet.infura.io/v3/${secret} -d udtestdev-usdt.crypto -a
-```
-
-Use the `-h` or `--help` flag to see all the available CLI options.
+CLI support was removed from the Resolution library starting from version 6.0. Please use the [standalone CLI tool](https://github.com/unstoppabledomains/resolution-cli).
 
 ## Default Ethereum Providers
 
