@@ -46,6 +46,7 @@ import {Eip1993Factories as Eip1193Factories} from '../utils/Eip1993Factories';
 import UnsConfig from '../config/uns-config.json';
 import {NullAddress} from '../types';
 import Networking from '../utils/Networking';
+import {prepareDomain} from "../utils/isDomainValid";
 
 let resolution: Resolution;
 let uns: Uns;
@@ -1633,6 +1634,17 @@ describe('Resolution', () => {
         () => resolution.locations(['testing.zil']),
         ResolutionErrorCode.UnsupportedMethod,
       );
+    });
+
+    it('should throw exception for invalid domains', async () => {
+      await expectResolutionErrorCode(
+        () => prepareDomain('hello.blockchain@#'),
+        ResolutionErrorCode.InvalidDomainAddress,
+      );
+    });
+
+    it('should convert domain name to lower case', async () => {
+      expect(prepareDomain('  HELLO.Blockchain  ')).toEqual('hello.blockchain');
     });
   });
 });
