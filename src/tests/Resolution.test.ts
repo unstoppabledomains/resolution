@@ -46,7 +46,6 @@ import {Eip1993Factories as Eip1193Factories} from '../utils/Eip1993Factories';
 import UnsConfig from '../config/uns-config.json';
 import {NullAddress} from '../types';
 import Networking from '../utils/Networking';
-import {prepareDomain} from "../utils/isDomainValid";
 
 let resolution: Resolution;
 let uns: Uns;
@@ -1636,15 +1635,51 @@ describe('Resolution', () => {
       );
     });
 
-    it('should throw exception for invalid domains', async () => {
+    it('should check all methods for domain validation', async () => {
       await expectResolutionErrorCode(
-        () => prepareDomain('hello.blockchain@#'),
+        () => resolution.twitter('hello#blockchain'),
         ResolutionErrorCode.InvalidDomainAddress,
       );
-    });
-
-    it('should convert domain name to lower case', async () => {
-      expect(prepareDomain('  HELLO.Blockchain  ')).toEqual('hello.blockchain');
+      await expectResolutionErrorCode(
+        () => resolution.ipfsHash('hello#blockchain'),
+        ResolutionErrorCode.InvalidDomainAddress,
+      );
+      await expectResolutionErrorCode(
+        () => resolution.httpUrl('hello#blockchain'),
+        ResolutionErrorCode.InvalidDomainAddress,
+      );
+      await expectResolutionErrorCode(
+        () => resolution.resolver('hello#blockchain'),
+        ResolutionErrorCode.InvalidDomainAddress,
+      );
+      await expectResolutionErrorCode(
+        () => resolution.owner('hello#blockchain'),
+        ResolutionErrorCode.InvalidDomainAddress,
+      );
+      await expectResolutionErrorCode(
+        () => resolution.isRegistered('hello#blockchain'),
+        ResolutionErrorCode.InvalidDomainAddress,
+      );
+      await expectResolutionErrorCode(
+        () => resolution.isAvailable('hello#blockchain'),
+        ResolutionErrorCode.InvalidDomainAddress,
+      );
+      await expectResolutionErrorCode(
+        () => resolution.namehash('hello#blockchain'),
+        ResolutionErrorCode.InvalidDomainAddress,
+      );
+      await expectResolutionErrorCode(
+        () => resolution.isSupportedDomain('hello#blockchain'),
+        ResolutionErrorCode.InvalidDomainAddress,
+      );
+      await expectResolutionErrorCode(
+        () => resolution.serviceName('hello#blockchain'),
+        ResolutionErrorCode.InvalidDomainAddress,
+      );
+      await expectResolutionErrorCode(
+        () => resolution.allRecords('hello#blockchain'),
+        ResolutionErrorCode.InvalidDomainAddress,
+      );
     });
   });
 });
