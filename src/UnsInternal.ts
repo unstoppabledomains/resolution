@@ -26,6 +26,7 @@ export default class UnsInternal {
   static readonly UrlMap: BlockhainNetworkUrlMap = {
     mainnet: 'https://mainnet.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
     rinkeby: 'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+    goerli: 'https://goerli.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
     'polygon-mainnet':
       'https://polygon-mainnet.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
     'polygon-mumbai':
