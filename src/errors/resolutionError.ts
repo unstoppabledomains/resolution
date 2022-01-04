@@ -32,6 +32,7 @@ export enum ResolutionErrorCode {
   ServiceProviderError = 'ServiceProviderError',
   InvalidTwitterVerification = 'InvalidTwitterVerification',
   InconsistentDomainArray = 'InconsistentDomainArray',
+  InvalidDomainAddress = 'InvalidDomainAddress',
 }
 
 /**
@@ -86,6 +87,8 @@ const HandlersByCode = {
     `Failed to query tokenUri ${params.tokenUri}. Error: ${params.errorMessage}`,
   [ResolutionErrorCode.UnsupportedService]: (params: {namingService: string}) =>
     `Naming service ${params.namingService} is not supported`,
+  [ResolutionErrorCode.InvalidDomainAddress]: (params: {domain: string}) =>
+    `Domain address ${params.domain} is invalid`,
 };
 
 /**

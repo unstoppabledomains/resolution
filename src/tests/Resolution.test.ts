@@ -1634,5 +1634,52 @@ describe('Resolution', () => {
         ResolutionErrorCode.UnsupportedMethod,
       );
     });
+
+    it('should check all methods for domain validation', async () => {
+      await expectResolutionErrorCode(
+        () => resolution.twitter('hello#blockchain'),
+        ResolutionErrorCode.InvalidDomainAddress,
+      );
+      await expectResolutionErrorCode(
+        () => resolution.ipfsHash('hello#blockchain'),
+        ResolutionErrorCode.InvalidDomainAddress,
+      );
+      await expectResolutionErrorCode(
+        () => resolution.httpUrl('hello#blockchain'),
+        ResolutionErrorCode.InvalidDomainAddress,
+      );
+      await expectResolutionErrorCode(
+        () => resolution.resolver('hello#blockchain'),
+        ResolutionErrorCode.InvalidDomainAddress,
+      );
+      await expectResolutionErrorCode(
+        () => resolution.owner('hello#blockchain'),
+        ResolutionErrorCode.InvalidDomainAddress,
+      );
+      await expectResolutionErrorCode(
+        () => resolution.isRegistered('hello#blockchain'),
+        ResolutionErrorCode.InvalidDomainAddress,
+      );
+      await expectResolutionErrorCode(
+        () => resolution.isAvailable('hello#blockchain'),
+        ResolutionErrorCode.InvalidDomainAddress,
+      );
+      await expectResolutionErrorCode(
+        () => resolution.namehash('hello#blockchain'),
+        ResolutionErrorCode.InvalidDomainAddress,
+      );
+      await expectResolutionErrorCode(
+        () => resolution.isSupportedDomain('hello#blockchain'),
+        ResolutionErrorCode.InvalidDomainAddress,
+      );
+      await expectResolutionErrorCode(
+        () => resolution.serviceName('hello#blockchain'),
+        ResolutionErrorCode.InvalidDomainAddress,
+      );
+      await expectResolutionErrorCode(
+        () => resolution.allRecords('hello#blockchain'),
+        ResolutionErrorCode.InvalidDomainAddress,
+      );
+    });
   });
 });

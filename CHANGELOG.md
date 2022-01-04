@@ -1,3 +1,7 @@
+## 7.1.0
+
+- Throw `ResolutionErrorCode.InvalidDomainAddress` error if domain contains special characters
+  - Domain name is being validated according to the following regular expression: `^[.a-z0-9-]+$`
 ## 7.0.0
 
 - ENS support is completely removed

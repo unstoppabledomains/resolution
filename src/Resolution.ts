@@ -26,6 +26,7 @@ import {findNamingServiceName, signedInfuraLink} from './utils';
 import {Eip1993Factories as Eip1193Factories} from './utils/Eip1993Factories';
 import {NamingService} from './NamingService';
 import Networking from './utils/Networking';
+import {prepareAndValidateDomain} from "./utils/prepareAndValidate";
 
 /**
  * Blockchain domain Resolution library - Resolution.
@@ -373,7 +374,7 @@ export default class Resolution {
     ticker: string,
     chain: string,
   ): Promise<string> {
-    domain = this.prepareDomain(domain);
+    domain = prepareAndValidateDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
 
     const recordKey = `crypto.${ticker.toUpperCase()}.version.${chain.toUpperCase()}.address`;
@@ -388,7 +389,7 @@ export default class Resolution {
    * @returns A promise that resolves in a verified twitter handle
    */
   async twitter(domain: string): Promise<string> {
-    domain = this.prepareDomain(domain);
+    domain = prepareAndValidateDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
     return method.twitter(domain);
   }
@@ -419,7 +420,7 @@ export default class Resolution {
    * @throws [[ResolutionError]]
    */
   async ipfsHash(domain: string): Promise<string> {
-    domain = this.prepareDomain(domain);
+    domain = prepareAndValidateDomain(domain);
     return this.getPreferableNewRecord(
       domain,
       'dweb.ipfs.hash',
@@ -432,7 +433,7 @@ export default class Resolution {
    * @param domain - domain name
    */
   async httpUrl(domain: string): Promise<string> {
-    domain = this.prepareDomain(domain);
+    domain = prepareAndValidateDomain(domain);
     return this.getPreferableNewRecord(
       domain,
       'browser.redirect_url',
@@ -455,7 +456,7 @@ export default class Resolution {
    * @param domain - domain to look for
    */
   async resolver(domain: string): Promise<string> {
-    domain = this.prepareDomain(domain);
+    domain = prepareAndValidateDomain(domain);
     const resolver = await this.getNamingMethodOrThrow(domain).resolver(domain);
     if (!resolver) {
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
@@ -470,7 +471,7 @@ export default class Resolution {
    * @returns An owner address of the domain
    */
   async owner(domain: string): Promise<string | null> {
-    domain = this.prepareDomain(domain);
+    domain = prepareAndValidateDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
     return (await method.owner(domain)) || null;
   }
@@ -481,7 +482,7 @@ export default class Resolution {
    * @returns A record value promise for a given record name
    */
   async record(domain: string, recordKey: string): Promise<string> {
-    domain = this.prepareDomain(domain);
+    domain = prepareAndValidateDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
     return method.record(domain, recordKey);
   }
@@ -492,7 +493,7 @@ export default class Resolution {
    * @returns A Promise with key-value mapping of domain records
    */
   async records(domain: string, keys: string[]): Promise<CryptoRecords> {
-    domain = this.prepareDomain(domain);
+    domain = prepareAndValidateDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
     return method.records(domain, keys);
   }
@@ -502,7 +503,7 @@ export default class Resolution {
    * @returns A Promise of whether or not the domain belongs to a wallet
    */
   async isRegistered(domain: string): Promise<Boolean> {
-    domain = this.prepareDomain(domain);
+    domain = prepareAndValidateDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
     return method.isRegistered(domain);
   }
@@ -512,7 +513,7 @@ export default class Resolution {
    * @returns A Promise of whether or not the domain is available
    */
   async isAvailable(domain: string): Promise<Boolean> {
-    domain = this.prepareDomain(domain);
+    domain = prepareAndValidateDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
     return method.isAvailable(domain);
   }
@@ -528,7 +529,7 @@ export default class Resolution {
     domain: string,
     options: NamehashOptions = NamehashOptionsDefault,
   ): string {
-    domain = this.prepareDomain(domain);
+    domain = prepareAndValidateDomain(domain);
     return this.formatNamehash(
       this.getNamingMethodOrThrow(domain).namehash(domain),
       options,
@@ -572,7 +573,7 @@ export default class Resolution {
    * @param hash - hash obtained from the blockchain
    */
   isValidHash(domain: string, hash: string): boolean {
-    domain = this.prepareDomain(domain);
+    domain = prepareAndValidateDomain(domain);
     return this.namehash(domain) === hash;
   }
 
@@ -582,7 +583,7 @@ export default class Resolution {
    * @param domain - domain name to be checked
    */
   async isSupportedDomain(domain: string): Promise<boolean> {
-    domain = this.prepareDomain(domain);
+    domain = prepareAndValidateDomain(domain);
     const namingMethod = this.getNamingMethod(domain);
     return namingMethod ? await namingMethod.isSupportedDomain(domain) : false;
   }
@@ -592,7 +593,7 @@ export default class Resolution {
    * @param domain - domain name to look for
    */
   serviceName(domain: string): ResolutionMethod {
-    domain = this.prepareDomain(domain);
+    domain = prepareAndValidateDomain(domain);
     return this.getNamingMethodOrThrow(domain).serviceName();
   }
 
@@ -602,7 +603,7 @@ export default class Resolution {
    * @param domain - domain name
    */
   async allRecords(domain: string): Promise<CryptoRecords> {
-    domain = this.prepareDomain(domain);
+    domain = prepareAndValidateDomain(domain);
     return this.getNamingMethodOrThrow(domain).allRecords(domain);
   }
 
@@ -619,7 +620,7 @@ export default class Resolution {
 
   async dns(domain: string, types: DnsRecordType[]): Promise<DnsRecord[]> {
     const dnsUtils = new DnsUtils();
-    domain = this.prepareDomain(domain);
+    domain = prepareAndValidateDomain(domain);
     const method = this.getNamingMethodOrThrow(domain);
     const dnsRecordKeys = this.getDnsRecordKeys(types);
     const blockchainData = await method.records(domain, dnsRecordKeys);
@@ -742,10 +743,6 @@ export default class Resolution {
     }
 
     return method;
-  }
-
-  private prepareDomain(domain: string): string {
-    return domain ? domain.trim().toLowerCase() : '';
   }
 }
 
