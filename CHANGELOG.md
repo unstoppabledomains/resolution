@@ -1,7 +1,7 @@
 ## 7.1.0
 
-- Added regular expression check of domain name before preparing
-- Changed method prepareDomain to prepareAndValidateDomain
+- Throw `ResolutionErrorCode.InvalidDomainAddress` error if domain contains special characters
+  - Domain name is being validated accordint to the following regular expression: `^[.a-z0-9-]+$`
 ## 7.0.0
 
 - ENS support is completely removed
