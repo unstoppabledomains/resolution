@@ -1,3 +1,7 @@
+## 7.1.0
+
+- Added regular expression check of domain name before preparing
+- Changed method prepareDomain to prepareAndValidateDomain
 ## 7.0.0
 
 - ENS support is completely removed
