@@ -1,6 +1,5 @@
 import {toBech32Address} from './utils/znsUtils';
 import {ResolutionError, ResolutionErrorCode} from './errors/resolutionError';
-import pckg from './package.json';
 import {isValidTwitterSignature} from './utils/TwitterSignatureValidator';
 import {
   CryptoRecords,
@@ -32,8 +31,7 @@ export default class Udapi extends NamingService {
     this.url = api?.url || 'https://unstoppabledomains.com/api/v1';
     const DefaultUserAgent =
       'cross-fetch/3.1.4 (+https://github.com/lquixada/cross-fetch)';
-    const version = pckg.version;
-    const CustomUserAgent = `${DefaultUserAgent} Resolution/${version}`;
+    const CustomUserAgent = `${DefaultUserAgent} Resolution`;
     this.headers = {'X-user-agent': CustomUserAgent};
     this.network = api?.network || 1;
   }

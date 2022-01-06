@@ -1,3 +1,6 @@
+## 7.1.2
+- Removed unused code which caused build issues on some environments
+
 ## 7.1.0
 
 - Throw `ResolutionErrorCode.InvalidDomainAddress` error if domain contains special characters
