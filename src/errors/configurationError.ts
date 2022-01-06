@@ -16,7 +16,6 @@ export enum ConfigurationErrorCode {
   IncorrectProvider = 'IncorrectProvider',
   UnsupportedNetwork = 'UnsupportedNetwork',
   UnspecifiedUrl = 'UnspecifiedUrl',
-  DependencyMissing = 'DependencyMissing',
   NetworkConfigMissing = 'NetworkConfigMissing',
   CustomNetworkConfigMissing = 'CustomNetworkConfigMissing',
   InvalidConfigurationField = 'InvalidProxyReader',
@@ -36,11 +35,6 @@ const HandlersByCode = {
   [ConfigurationErrorCode.UnspecifiedUrl]: (params: {
     method: ResolutionMethod;
   }) => `Unspecified url in Resolution ${params.method} configuration`,
-  [ConfigurationErrorCode.DependencyMissing]: (params: {
-    dependency: string;
-    version: string;
-  }) =>
-    `Missing dependency for this functionality. Please install ${params.dependency} @ ${params.version} via npm or yarn`,
   [ConfigurationErrorCode.NetworkConfigMissing]: (params: {
     method: ResolutionMethod;
     config: string;
