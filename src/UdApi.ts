@@ -13,6 +13,7 @@ import Networking from './utils/Networking';
 import {constructRecords, findNamingServiceName, isNullAddress} from './utils';
 import {znsNamehash, eip137Namehash} from './utils/namehash';
 import {NamingService} from './NamingService';
+import BN from 'bn.js';
 
 /**
  * @internal
@@ -134,10 +135,38 @@ export default class Udapi extends NamingService {
     return (await this.resolve(domain)).records || {};
   }
 
-  getDomainFromTokenId(tokenId: string): Promise<string> {
-    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
-      methodName: 'isSupportedDomain',
+  async getDomainFromTokenId(tokenId: string): Promise<string> {
+    if (!tokenId.startsWith('0x')) {
+      const tokenBN = new BN(tokenId, 10);
+      tokenId = `0x${tokenBN.toString(16)}`;
+    }
+    const metadata = await this.getMetadata(tokenId);
+    return metadata.meta.domain;
+  }
+
+  private async getMetadata(tokenId: string): Promise<ResolutionResponse> {
+    const tokenUri = `${this.url}/${tokenId}`;
+    const resp = await Networking.fetch(tokenUri, {}).catch((err) => {
+      throw new ResolutionError(ResolutionErrorCode.MetadataEndpointError, {
+        tokenUri: tokenUri || 'undefined',
+        errorMessage: err.message,
+      });
     });
+
+    const metadata: ResolutionResponse = await resp.json();
+    if (!metadata.meta || !metadata.meta.domain) {
+      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+        domain: `with tokenId ${tokenId}`,
+      });
+    }
+    if (this.namehash(metadata.meta.domain) !== tokenId) {
+      throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
+        methodName: 'unhash',
+        domain: metadata.meta.domain,
+        providerMessage: 'Service provider returned an invalid domain name',
+      });
+    }
+    return metadata;
   }
 
   async resolve(domain: string): Promise<ResolutionResponse> {

@@ -255,3 +255,45 @@ describe('Unstoppable API', () => {
     });
   });
 });
+
+describe('unhash token', () => {
+  it('should unhash token', async () => {
+    mockAsyncMethod(Networking, 'fetch', {
+      json: () => ({
+        meta: {
+          domain: 'brad.crypto',
+          namehash:
+            '0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9',
+          tokenId:
+            '53115498937382692782103703677178119840631903773202805882273058578308100329417',
+        },
+      }),
+    });
+    expect(
+      await unsApi.getDomainFromTokenId(
+        '53115498937382692782103703677178119840631903773202805882273058578308100329417',
+      ),
+    ).toEqual('brad.crypto');
+  });
+
+  it('should throw exception for empty response', async () => {
+    mockAsyncMethod(Networking, 'fetch', {
+      json: () => ({
+        meta: {
+          domain: '',
+          namehash:
+            '0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9',
+          tokenId:
+            '53115498937382692782103703677178119840631903773202805882273058578308100329417',
+        },
+      }),
+    });
+    await expectResolutionErrorCode(
+      () =>
+        unsApi.getDomainFromTokenId(
+          '53115498937382692782103703677178119840631903773202805882273058578308100329417',
+        ),
+      ResolutionErrorCode.UnregisteredDomain,
+    );
+  });
+});
