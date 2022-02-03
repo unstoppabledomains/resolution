@@ -26,7 +26,8 @@ import {findNamingServiceName, signedInfuraLink} from './utils';
 import {Eip1993Factories as Eip1193Factories} from './utils/Eip1993Factories';
 import {NamingService} from './NamingService';
 import Networking from './utils/Networking';
-import {prepareAndValidateDomain} from "./utils/prepareAndValidate";
+import {prepareAndValidateDomain} from './utils/prepareAndValidate';
+import {fromDecStringToHex} from './utils/namehash';
 
 /**
  * Blockchain domain Resolution library - Resolution.
@@ -665,6 +666,7 @@ export default class Resolution {
    * @param service - nameservice which is used for lookup
    */
   async unhash(hash: string, service: NamingServiceName): Promise<string> {
+    hash = fromDecStringToHex(hash);
     const name = await this.serviceMap[service].getDomainFromTokenId(hash);
     if (this.namehash(name) !== hash) {
       throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {

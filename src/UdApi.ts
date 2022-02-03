@@ -11,9 +11,12 @@ import {
 } from './types/publicTypes';
 import Networking from './utils/Networking';
 import {constructRecords, findNamingServiceName, isNullAddress} from './utils';
-import {znsNamehash, eip137Namehash} from './utils/namehash';
+import {
+  znsNamehash,
+  eip137Namehash,
+  fromDecStringToHex,
+} from './utils/namehash';
 import {NamingService} from './NamingService';
-import BN from 'bn.js';
 
 /**
  * @internal
@@ -136,10 +139,7 @@ export default class Udapi extends NamingService {
   }
 
   async getDomainFromTokenId(tokenId: string): Promise<string> {
-    if (!tokenId.startsWith('0x')) {
-      const tokenBN = new BN(tokenId, 10);
-      tokenId = `0x${tokenBN.toString(16)}`;
-    }
+    tokenId = fromDecStringToHex(tokenId);
     const metadata = await this.getMetadata(tokenId);
     return metadata.meta.domain;
   }

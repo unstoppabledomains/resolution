@@ -256,7 +256,7 @@ describe('Unstoppable API', () => {
   });
 });
 
-describe('unhash token', () => {
+describe('.Unhash token', () => {
   it('should unhash token', async () => {
     mockAsyncMethod(Networking, 'fetch', {
       json: () => ({

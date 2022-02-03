@@ -57,3 +57,12 @@ export function fromHexStringToDecimals(value: string): string {
 
   return value;
 }
+
+export function fromDecStringToHex(value: string): string {
+  if (!value.startsWith('0x')) {
+    const bn = new BN(value, 10);
+    return `0x${bn.toString(16)}`;
+  }
+
+  return value;
+}
