@@ -1,3 +1,6 @@
+## 7.1.3
+- Implemented function getDomainFromTokenId in UdApi
+
 ## 7.1.2
 - Removed unused code which caused build issues on some environments
 

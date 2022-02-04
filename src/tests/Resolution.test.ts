@@ -1682,4 +1682,86 @@ describe('Resolution', () => {
       );
     });
   });
+
+  describe('.Unhash token by UdApi', () => {
+    it('should unhash token', async () => {
+      resolution = new Resolution({
+        sourceConfig: {
+          zns: {api: true},
+          uns: {api: true},
+        },
+      });
+      mockAsyncMethod(Networking, 'fetch', {
+        json: () => ({
+          meta: {
+            domain: 'brad.crypto',
+            namehash:
+              '0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9',
+            tokenId:
+              '53115498937382692782103703677178119840631903773202805882273058578308100329417',
+          },
+        }),
+      });
+      expect(
+        await resolution.unhash(
+          '53115498937382692782103703677178119840631903773202805882273058578308100329417',
+          NamingServiceName.UNS,
+        ),
+      ).toEqual('brad.crypto');
+    });
+
+    it('should throw exception for empty response', async () => {
+      resolution = new Resolution({
+        sourceConfig: {
+          zns: {api: true},
+          uns: {api: true},
+        },
+      });
+      mockAsyncMethod(Networking, 'fetch', {
+        json: () => ({
+          meta: {
+            domain: '',
+            namehash:
+              '0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9',
+            tokenId:
+              '53115498937382692782103703677178119840631903773202805882273058578308100329417',
+          },
+        }),
+      });
+      await expectResolutionErrorCode(
+        () =>
+          resolution.unhash(
+            '53115498937382692782103703677178119840631903773202805882273058578308100329417',
+            NamingServiceName.UNS,
+          ),
+        ResolutionErrorCode.UnregisteredDomain,
+      );
+    });
+
+    it('should unhash token for ZNS', async () => {
+      resolution = new Resolution({
+        sourceConfig: {
+          zns: {api: true},
+          uns: {api: true},
+        },
+      });
+      mockAsyncMethod(Networking, 'fetch', {
+        json: () => ({
+          meta: {
+            domain: 'brad.zil',
+            namehash:
+              '0x5fc604da00f502da70bfbc618088c0ce468ec9d18d05540935ae4118e8f50787',
+            tokenId:
+              '43319589818590979333002700458407583892978809980702780436022141697532225718151',
+          },
+        }),
+      });
+      expect(
+        await resolution.unhash(
+          '43319589818590979333002700458407583892978809980702780436022141697532225718151',
+          NamingServiceName.ZNS,
+        ),
+      ).toEqual('brad.zil');
+    });
+  });
 });
