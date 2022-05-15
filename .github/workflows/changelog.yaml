@@ -1,0 +1,38 @@
+name: Generate CHANGELOG.md
+
+# runs manually for now
+on:
+  workflow_dispatch:
+
+jobs:
+  updateChangelog:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write 
+    steps:
+      # Checkout the branch
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: generate-changelog
+        # https://github.com/marketplace/actions/generate-changelog for more options
+        uses: heinrichreimer/github-changelog-generator-action@v2.3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          output: 'CHANGELOG.md'
+
+      - name: setup git config
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+          
+      - name: add changelog, does nothing if already there
+        run: |
+          git add CHANGELOG.md
+
+      - name: commit
+        run: |
+          # Stage the file, commit and push
+          git commit -am "updated changelog"
+          git push origin ${GITHUB_REF##*/}
