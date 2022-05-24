@@ -2,20 +2,21 @@ import {toBech32Address} from './utils/znsUtils';
 import {ResolutionError, ResolutionErrorCode} from './errors/resolutionError';
 import {isValidTwitterSignature} from './utils/TwitterSignatureValidator';
 import {
-  CryptoRecords,
-  ResolutionResponse,
-  ResolutionMethod,
-  NamingServiceName,
   Api,
+  BlockchainType,
+  CryptoRecords,
   Locations,
   UnsLocation,
+  NamingServiceName,
+  ResolutionMethod,
+  ResolutionResponse,
 } from './types/publicTypes';
 import Networking from './utils/Networking';
 import {constructRecords, findNamingServiceName, isNullAddress} from './utils';
 import {
-  znsNamehash,
   eip137Namehash,
   fromDecStringToHex,
+  znsNamehash,
 } from './utils/namehash';
 import {NamingService} from './NamingService';
 
@@ -23,9 +24,9 @@ import {NamingService} from './NamingService';
  * @internal
  */
 export default class Udapi extends NamingService {
+  public readonly url: string;
   private readonly network: number;
   private readonly name: ResolutionMethod;
-  private readonly url: string;
   private readonly headers: {
     [key: string]: string;
   };
@@ -48,16 +49,11 @@ export default class Udapi extends NamingService {
   }
 
   namehash(domain: string): string {
-    const serviceName = findNamingServiceName(domain);
-    if (serviceName === NamingServiceName.ZNS) {
-      return znsNamehash(domain);
-    }
-
-    return eip137Namehash(domain);
+    throw new Error('Unsupported method when using UD Resolution API');
   }
 
   childhash(parentHash: string, label: string): string {
-    throw new Error('Unsupported method whe using UD Resolution API');
+    throw new Error('Unsupported method when using UD Resolution API');
   }
 
   async record(domain: string, key: string): Promise<string> {
@@ -70,15 +66,16 @@ export default class Udapi extends NamingService {
   }
 
   async owner(domain: string): Promise<string> {
-    const {owner} = (await this.resolve(domain)).meta;
+    const response = await this.resolve(domain);
+    const {owner, blockchain} = response.meta;
     if (!owner) {
       throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
         domain,
       });
     }
 
-    if (domain.endsWith('.zil')) {
-      return owner.startsWith('zil1') ? owner : toBech32Address(owner);
+    if (blockchain === BlockchainType.ZIL && !owner.startsWith('zil1')) {
+      return toBech32Address(owner);
     }
     return owner;
   }
@@ -160,7 +157,13 @@ export default class Udapi extends NamingService {
         domain: `with tokenId ${tokenId}`,
       });
     }
-    if (this.namehash(metadata.meta.domain) !== tokenId) {
+
+    const namehash =
+      metadata.meta.blockchain === BlockchainType.ZIL
+        ? znsNamehash(metadata.meta.domain)
+        : eip137Namehash(metadata.meta.domain);
+
+    if (namehash !== tokenId) {
       throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
         methodName: 'unhash',
         domain: metadata.meta.domain,

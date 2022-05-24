@@ -1,6 +1,6 @@
 import nock from 'nock';
 import Resolution from '../index';
-import Udapi from '../UdApi';
+import UdApi from '../UdApi';
 import Networking from '../utils/Networking';
 import {
   DefaultUrl,
@@ -14,7 +14,7 @@ import {NamingServiceName} from '../types/publicTypes';
 import {ResolutionErrorCode} from '../errors/resolutionError';
 
 let resolution: Resolution;
-let unsApi: Udapi;
+let udApi: UdApi;
 
 beforeEach(() => {
   nock.cleanAll();
@@ -25,7 +25,7 @@ beforeEach(() => {
       uns: {api: true},
     },
   });
-  unsApi = resolution.serviceMap[NamingServiceName.UNS] as Udapi;
+  udApi = resolution.serviceMap[NamingServiceName.UNS].usedServices[0] as UdApi;
 });
 
 describe('Unstoppable API', () => {
@@ -37,7 +37,10 @@ describe('Unstoppable API', () => {
   });
 
   it('namehashes zil domain', async () => {
-    expect(resolution.namehash('cofounding.zil')).toEqual(
+    // Even though unsupported in `UdApi`, this should still work by calling a native method.
+    expect(
+      resolution.namehash('cofounding.zil', NamingServiceName.ZNS),
+    ).toEqual(
       '0x1cc365ffd60bb50538e01d24c1f1e26c887c36f26a0de250660b8a1465c60667',
     );
   });
@@ -163,16 +166,16 @@ describe('Unstoppable API', () => {
   });
 
   it('should return true for registered domain', async () => {
-    const spies = mockAsyncMethod(unsApi, 'resolve', {
+    const spies = mockAsyncMethod(udApi, 'resolve', {
       meta: {owner: '0x58cA45E932a88b2E7D0130712B3AA9fB7c5781e2'},
     });
-    const isRegistered = await unsApi.isRegistered('ryan.crypto');
+    const isRegistered = await udApi.isRegistered('ryan.crypto');
     expectSpyToBeCalled([spies]);
     expect(isRegistered).toBe(true);
   });
 
   it('should return false for unregistered domain', async () => {
-    const spies = mockAsyncMethod(unsApi, 'resolve', {meta: {owner: ''}});
+    const spies = mockAsyncMethod(udApi, 'resolve', {meta: {owner: ''}});
     const isRegistered = await resolution.isRegistered(
       'thisdomainisdefinitelynotregistered123.crypto',
     );
@@ -270,7 +273,7 @@ describe('.Unhash token', () => {
       }),
     });
     expect(
-      await unsApi.getDomainFromTokenId(
+      await udApi.getDomainFromTokenId(
         '53115498937382692782103703677178119840631903773202805882273058578308100329417',
       ),
     ).toEqual('brad.crypto');
@@ -290,7 +293,7 @@ describe('.Unhash token', () => {
     });
     await expectResolutionErrorCode(
       () =>
-        unsApi.getDomainFromTokenId(
+        udApi.getDomainFromTokenId(
           '53115498937382692782103703677178119840631903773202805882273058578308100329417',
         ),
       ResolutionErrorCode.UnregisteredDomain,

@@ -64,6 +64,7 @@ export type ResolutionResponse = {
     domain: string;
     owner: string | null;
     type: string; // available domain
+    blockchain: BlockchainType | null;
     namehash: string;
     resolver: string;
     ttl: number;
@@ -110,6 +111,7 @@ export const UnclaimedDomainResponse: ResolutionResponse = {
     owner: null, // available domain
     type: '',
     ttl: 0,
+    blockchain: null,
   },
   records: {},
 };
@@ -142,9 +144,14 @@ export const UDApiDefaultUrl = 'https://unstoppabledomains.com/api/v1';
 export type NamehashOptions = {
   readonly format?: 'dec' | 'hex';
   readonly prefix?: boolean;
+  readonly zns?: boolean;
 };
 
-export const NamehashOptionsDefault = {format: 'hex', prefix: true} as const;
+export const NamehashOptionsDefault = {
+  format: 'hex',
+  prefix: true,
+  zns: false,
+} as const;
 
 export enum DnsRecordType {
   A = 'A',

@@ -147,7 +147,7 @@ describe('UnsInternal', () => {
   });
   describe('.registryAddress()', () => {
     it('should throw error for invalid domain', async () => {
-      const domain = 'invaliddomain.zil';
+      const domain = '.crypto';
       expect(() => unsInternalL1.registryAddress(domain)).rejects.toThrow(
         new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
           domain,

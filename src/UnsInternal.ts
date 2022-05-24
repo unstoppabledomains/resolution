@@ -165,7 +165,6 @@ export default class UnsInternal {
     const tokens = domain.split('.');
     return (
       !!tokens.length &&
-      tokens[tokens.length - 1] !== 'zil' &&
       !(
         domain === 'eth' ||
         /^[^-]*[^-]*\.(eth|luxe|xyz|kred|addr\.reverse)$/.test(domain)

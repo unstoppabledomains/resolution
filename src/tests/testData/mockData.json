@@ -11,7 +11,8 @@
         "meta": {
           "owner": "0x267ca17e8b3bbf49c52a4c3b473cdebcbaf9025e",
           "type": "zns",
-          "ttl": 0
+          "ttl": 0,
+          "blockchain": "ZIL"
         },
         "records": {
           "crypto.BTC.address": "1NZKHwpfqprxzcaijcjf71CZr27D8osagR",

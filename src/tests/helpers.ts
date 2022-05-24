@@ -42,7 +42,7 @@ try {
 export function mockAsyncMethod(
   object: any,
   method: string,
-  value: any,
+  value: unknown,
 ): jest.SpyInstance {
   const spy = jest.spyOn(object, method);
   if (!isLive()) {
@@ -149,8 +149,8 @@ export function mockAPICalls(testName: string, url = MainnetUrl): void {
     return;
   }
 
-  const mcdt = mockData as any;
-  const mockCall = mcdt[testName] as [any];
+  const mcdt = mockData;
+  const mockCall = mcdt[testName];
 
   mockCall.forEach(({METHOD, REQUEST, RESPONSE}) => {
     switch (METHOD) {

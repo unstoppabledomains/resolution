@@ -389,7 +389,13 @@ export default class Uns extends NamingService {
 
   async getDomainFromTokenId(tokenId: string): Promise<string> {
     const metadata = await this.getMetadata(tokenId);
-
+    if (this.namehash(metadata.name) !== tokenId) {
+      throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
+        methodName: 'unhash',
+        domain: name,
+        providerMessage: 'Service provider returned an invalid domain name',
+      });
+    }
     return metadata.name;
   }
 
@@ -482,7 +488,6 @@ export default class Uns extends NamingService {
     const tokens = domain.split('.');
     return (
       !!tokens.length &&
-      tokens[tokens.length - 1] !== 'zil' &&
       !(
         domain === 'eth' ||
         /^[^-]*[^-]*\.(eth|luxe|xyz|kred|addr\.reverse)$/.test(domain)

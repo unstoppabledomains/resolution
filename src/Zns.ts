@@ -125,14 +125,15 @@ export default class Zns extends NamingService {
   }
 
   async record(domain: string, key: string): Promise<string> {
-    const returnee = (await this.records(domain, [key]))[key];
-    if (!returnee) {
+    const records = await this.records(domain, [key]);
+    const record = records[key];
+    if (!record) {
       throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
         domain,
         recordName: key,
       });
     }
-    return returnee;
+    return record;
   }
 
   async records(domain: string, keys: string[]): Promise<CryptoRecords> {

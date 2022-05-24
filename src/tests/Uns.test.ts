@@ -49,7 +49,7 @@ beforeEach(async () => {
       },
     },
   });
-  uns = resolution.serviceMap[NamingServiceName.UNS] as Uns;
+  uns = resolution.serviceMap[NamingServiceName.UNS].native as Uns;
 });
 
 describe('UNS', () => {
@@ -145,7 +145,7 @@ describe('UNS', () => {
     });
     const twitterHandle = await resolution.serviceMap[
       NamingServiceName.UNS
-    ].twitter(CryptoDomainWithTwitterVerification);
+    ].native.twitter(CryptoDomainWithTwitterVerification);
     expectSpyToBeCalled(spies);
     expect(twitterHandle).toBe('Marlene12Bob');
   });
@@ -162,7 +162,7 @@ describe('UNS', () => {
         },
       });
       expect(() =>
-        resolution.serviceMap[NamingServiceName.UNS].twitter(
+        resolution.serviceMap[NamingServiceName.UNS].native.twitter(
           WalletDomainLayerTwoWithAllRecords,
         ),
       ).rejects.toThrow(
@@ -184,7 +184,7 @@ describe('UNS', () => {
       },
     });
     expect(() =>
-      resolution.serviceMap[NamingServiceName.UNS].twitter(
+      resolution.serviceMap[NamingServiceName.UNS].native.twitter(
         WalletDomainLayerTwoWithAllRecords,
       ),
     ).rejects.toThrow(
@@ -207,7 +207,7 @@ describe('UNS', () => {
         },
       });
       expect(() =>
-        resolution.serviceMap[NamingServiceName.UNS].twitter(
+        resolution.serviceMap[NamingServiceName.UNS].native.twitter(
           WalletDomainLayerTwoWithAllRecords,
         ),
       ).rejects.toThrow(
@@ -221,7 +221,7 @@ describe('UNS', () => {
   );
 
   it('should return NoRecord Resolution error', async () => {
-    const uns = resolution.serviceMap[NamingServiceName.UNS] as Uns;
+    const uns = resolution.serviceMap[NamingServiceName.UNS].native as Uns;
     const spies = mockAsyncMethods(uns.unsl2.readerContract, {
       call: [NullAddress, NullAddress, []],
     });
@@ -241,7 +241,7 @@ describe('UNS', () => {
   }, 20000);
 
   it('should return NoRecord Resolution error for L2', async () => {
-    const uns = resolution.serviceMap[NamingServiceName.UNS] as Uns;
+    const uns = resolution.serviceMap[NamingServiceName.UNS].native as Uns;
     const spies = mockAsyncMethods(uns.unsl2.readerContract, {
       call: [NullAddress, NullAddress, []],
     });
@@ -273,7 +273,7 @@ describe('UNS', () => {
 
   it('should return true for supported domain', async () => {
     mockAPICalls('uns_domain_exists_test_true', protocolLink());
-    const uns = resolution.serviceMap[NamingServiceName.UNS] as Uns;
+    const uns = resolution.serviceMap[NamingServiceName.UNS].native as Uns;
     mockAsyncMethods(uns.unsl2.readerContract, {
       call: [false],
     });
@@ -287,11 +287,11 @@ describe('UNS', () => {
 
   it('should return false for unsupported domain', async () => {
     mockAPICalls('uns_domain_exists_test', protocolLink());
-    const uns = resolution.serviceMap[NamingServiceName.UNS] as Uns;
+    const uns = resolution.serviceMap[NamingServiceName.UNS].native as Uns;
     mockAsyncMethods(uns.unsl2.readerContract, {
       call: [false],
     });
-    expect(await uns.isSupportedDomain('brad.zil')).toBe(false);
+    expect(await uns.isSupportedDomain('.crypto')).toBe(false);
     expect(await uns.isSupportedDomain('brad.invalid')).toBe(false);
   });
 
@@ -672,7 +672,7 @@ describe('UNS', () => {
     skipItInLive('should work without any configs', async () => {
       resolution = new Resolution();
 
-      const uns = resolution.serviceMap['UNS'] as unknown as Uns;
+      const uns = resolution.serviceMap['UNS'].native as Uns;
 
       const spies = mockAsyncMethods(uns.unsl1.readerContract, {
         call: [
@@ -693,7 +693,7 @@ describe('UNS', () => {
     skipItInLive('should work without any configs for L2', async () => {
       resolution = new Resolution();
 
-      const uns = resolution.serviceMap['UNS'] as unknown as Uns;
+      const uns = resolution.serviceMap['UNS'].native as Uns;
 
       const spies = mockAsyncMethods(uns.unsl2.readerContract, {
         call: [
@@ -856,25 +856,31 @@ describe('UNS', () => {
   describe('.Hashing', () => {
     describe('.Namehash', () => {
       it('supports root node', async () => {
-        expect(resolution.namehash('crypto')).toEqual(
+        expect(resolution.namehash('crypto', NamingServiceName.UNS)).toEqual(
           '0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f',
         );
       });
 
       it('starts with -', async () => {
-        expect(resolution.namehash('-hello.crypto')).toBe(
+        expect(
+          resolution.namehash('-hello.crypto', NamingServiceName.UNS),
+        ).toBe(
           '0xc4ad028bcae9b201104e15f872d3e85b182939b06829f75a128275177f2ff9b2',
         );
       });
 
       it('ends with -', async () => {
-        expect(resolution.namehash('hello-.crypto')).toBe(
+        expect(
+          resolution.namehash('hello-.crypto', NamingServiceName.UNS),
+        ).toBe(
           '0x82eaa6ef14e438940bfd7747e0e4c4fec42af20cee28ddd0a7d79f52b1c59b72',
         );
       });
 
       it('starts and ends with -', async () => {
-        expect(resolution.namehash('-hello-.crypto')).toBe(
+        expect(
+          resolution.namehash('-hello-.crypto', NamingServiceName.UNS),
+        ).toBe(
           '0x90cc1963ff09ce95ee2dbb3830df4f2115da9756e087a50283b3e65f6ffe2a4e',
         );
       });
@@ -1048,7 +1054,7 @@ describe('UNS', () => {
         Promise.resolve([NullAddress]),
       );
       await expectResolutionErrorCode(
-        () => uns.registryAddress('some-domain.zil'),
+        () => uns.registryAddress('.crypto'),
         ResolutionErrorCode.UnsupportedDomain,
       );
     });
@@ -1183,18 +1189,24 @@ describe('UNS', () => {
 
   describe('#namehash', () => {
     it('supports options', async () => {
-      expect(resolution.namehash('operadingo4.crypto')).toEqual(
+      expect(
+        resolution.namehash('operadingo4.crypto', NamingServiceName.UNS),
+      ).toEqual(
         '0x70f542f09763d3ab404a6d87f6a2fad7d49f01b09c44064b4227d165ead5cf25',
       );
 
       expect(
-        resolution.namehash('operadingo4.crypto', {prefix: false}),
+        resolution.namehash('operadingo4.crypto', NamingServiceName.UNS, {
+          prefix: false,
+        }),
       ).toEqual(
         '70f542f09763d3ab404a6d87f6a2fad7d49f01b09c44064b4227d165ead5cf25',
       );
 
       expect(
-        resolution.namehash('operadingo4.crypto', {format: 'dec'}),
+        resolution.namehash('operadingo4.crypto', NamingServiceName.UNS, {
+          format: 'dec',
+        }),
       ).toEqual(
         '51092378573785850370557709888128643877973998831507731627523713553233928900389',
       );
@@ -1221,7 +1233,7 @@ describe('UNS', () => {
             },
           },
         });
-        const uns = resolution.serviceMap['UNS'] as unknown as Uns;
+        const uns = resolution.serviceMap['UNS'].native as Uns;
         mockAsyncMethods(uns.unsl1.readerContract, {
           call: () => Promise.reject(new Error('error_up')),
         });
@@ -1296,7 +1308,7 @@ describe('UNS', () => {
 
       await expect(resolution.tokenURI(domain)).rejects.toThrow(
         new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-          domain: `with tokenId ${eip137Namehash(domain)}`,
+          domain,
         }),
       );
       expectSpyToBeCalled(spies);
@@ -1409,6 +1421,7 @@ describe('UNS', () => {
       it('should throw error if domain is not found', async () => {
         const unregisteredhash = resolution.namehash(
           'test34230131207328144694.crypto',
+          NamingServiceName.UNS,
         );
         mockAsyncMethod(uns.unsl2, 'getTokenUri', (params) =>
           Promise.reject(
@@ -1461,6 +1474,7 @@ describe('UNS', () => {
         async () => {
           const someHash = resolution.namehash(
             'test34230131207328144693.crypto',
+            NamingServiceName.UNS,
           );
           mockAsyncMethod(Networking, 'fetch', {
             json: () => ({
