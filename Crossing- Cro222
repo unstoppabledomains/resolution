@@ -1,0 +1,102 @@
+README.md
+Unstoppable Domains
+
+The #1 provider of NFT domains
+
+Unstoppable Domains are NFT domains that let you create and own your digital identity and will help shape the future of Web3.
+
+The Unstoppable Name Service (UNS) is built on Ethereum and utilizes Polygon as a Layer 2 scaling solution. This allows us to provide NFT domains directly to individuals and businesses for a one-time purchase with no renewal fees, minting fees, or gas fees.
+
+An Unstoppable NFT domain acts as a cryptocurrency address, login, universal username, and decentralized website URL. Learn more about NFT domains, crypto, NFTs, and Unstoppable Domains by visiting our website, checking out our YouTube channel, and listening to our podcast.
+
+Check out some of the DApps collaborating with Unstoppable like Coinbase Wallet, Dehive, Trust Wallet, Cook.Finance, WallStreetBets, Saddle Finance, and more!
+
+If you are a developer, or would like to submit an app to integrate with Unstoppable Domains, visit our documentation page.
+
+Need assistance? Reach out to us on Twitter, Discord, and Telegram, or visit our Help Center.
+
+
+ {
+  "name": "uns",
+  "version": "0.4.6",
+  "description": "UNS contracts and tools",
+  "main": "index.js",
+  "repository": "https://github.com/unstoppabledomains/uns.git",
+  "private": true,
+  "scripts": {
+    "compile": "hardhat compile",
+    "compile:size": "env ENABLE_CONTRACT_SIZER=true yarn compile",
+    "coverage": "hardhat coverage",
+    "test": "yarn test:sol && yarn test:sandbox",
+    "test:sol": "hardhat test",
+    "test:sandbox": "env HARDHAT_NETWORK=sandbox mocha ./sandbox/**/*.test.js",
+    "rebuild:sandbox": "env HARDHAT_NETWORK=sandbox DEBUG=UNS:* yarn node ./sandbox/rebuild",
+    "lint": "yarn lint:js && yarn lint:sol",
+    "lint:fix": "yarn lint:js:fix && yarn lint:sol:fix",
+    "lint:js": "eslint --ignore-path .gitignore .",
+    "lint:js:fix": "eslint --ignore-path .gitignore . --fix",
+    "lint:sol": "solhint 'contracts/**/*.sol' && prettier -c 'contracts/**/*.sol'",
+    "lint:sol:fix": "prettier --write \"contracts/**/*.sol\"",
+    "deploy:localhost": "hardhat run --network localhost scripts/deploy.js",
+    "deploy:goerli": "hardhat run --network goerli scripts/deploy.js",
+    "deploy:rinkeby": "hardhat run --network rinkeby scripts/deploy.js",
+    "deploy:mainnet": "hardhat run --network mainnet scripts/deploy_UNS.js",
+    "deploy:mumbai": "hardhat run --network mumbai scripts/deploy.js",
+    "upgrade:localhost": "hardhat run --network localhost scripts/upgrade.js",
+    "upgrade:goerli": "hardhat run --network goerli scripts/upgrade.js",
+    "upgrade:rinkeby": "hardhat run --network rinkeby scripts/upgrade.js",
+    "upgrade:mainnet": "hardhat run --network mainnet scripts/upgrade.js",
+    "start:node": "hardhat node",
+    "gas-report": "env ENABLE_GAS_REPORT=true yarn test:sol",
+    "make:uml": "npx sol2uml ./contracts -b UNSRegistry,MintingManager,ProxyReader -o ./assets/uns.svg -i ./contracts/mocks"
+  },
+  "devDependencies": {
+    "@chainlink/contracts": "^0.1.7",
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@nomiclabs/hardhat-etherscan": "3.0.0",
+    "@nomiclabs/hardhat-solhint": "^2.0.0",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@openzeppelin/contracts": "2.3.0",
+    "@openzeppelin/contracts-upgradeable": "^4.1.0",
+    "@openzeppelin/hardhat-upgrades": "^1.16.1",
+    "chai": "^4.3.4",
+    "debug": "^4.3.1",
+    "dot-crypto": "https://github.com/unstoppabledomains/dot-crypto.git#2.0.0",
+    "eslint": "^7.28.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.23.4",
+    "eslint-plugin-mocha-no-only": "^1.1.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.0",
+    "ethereum-waffle": "3.4.0",
+    "ethers": "^5.1.4",
+    "ganache": "^7.0.0",
+    "hardhat": "^2.9.2",
+    "hardhat-abi-exporter": "^2.2.1",
+    "hardhat-contract-sizer": "^2.0.3",
+    "hardhat-gas-reporter": "^1.0.4",
+    "hdkey": "^2.0.1",
+    "lodash.merge": "^4.6.2",
+    "prettier": "^2.3.0",
+    "prettier-plugin-solidity": "1.0.0-beta.15",
+    "solhint": "3.3.6",
+    "solidity-coverage": "^0.7.16",
+    "tar": "^6.1.0",
+    "yargs": "17.0.1"
+  } <picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/25423296/163456776-7f95b81a-f1ed-45f7-b7ab-8fa810d529fa.png">
+  <source media="(prefers-color-scheme: light)" srcset="https://user-images.githubusercontent.com/25423296/163456779-a8556205-d0a5-45e2-ac17-42d089e3c3f8.png">
+  <img alt="Shows an illustrated sun in light color mode and a moon with stars in dark color mode." src="https://user-images.githubusercontent.com/25423296/163456779-a8556205-d0a5-45e2-ac17-42d089e3c3f8.png">
+</picture>
+}
+© 2022 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Docs
+Contact GitHub
+Pricing
+API
+Training
+Blog
