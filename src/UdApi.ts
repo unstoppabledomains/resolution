@@ -23,7 +23,7 @@ import {NamingService} from './NamingService';
 /**
  * @internal
  */
-export default class Udapi extends NamingService {
+export default class UdApi extends NamingService {
   public readonly url: string;
   private readonly network: number;
   private readonly name: ResolutionMethod;
