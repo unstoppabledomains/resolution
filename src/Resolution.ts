@@ -627,16 +627,6 @@ export default class Resolution {
   }
 
   /**
-   * Returns the name of the service for a domain UNS | ZNS
-   * @param domain - domain name to look for
-   */
-  async serviceName(domain: string): Promise<ResolutionMethod> {
-    domain = prepareAndValidateDomain(domain);
-    // TODO! rewrite this method as it behaves incorrectly atm (or remove, as we have `locations`).
-    return this.callForDomain(domain, 'serviceName', []);
-  }
-
-  /**
    * Returns all record keys of the domain.
    * This method is strongly unrecommended for production use due to lack of support for many ethereum service providers and low performance
    * @param domain - domain name

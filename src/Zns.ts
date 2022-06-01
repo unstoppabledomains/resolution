@@ -70,10 +70,6 @@ export default class Zns extends NamingService {
     }
   }
 
-  serviceName(): NamingServiceName {
-    return this.name;
-  }
-
   async owner(domain: string): Promise<string> {
     const recordAddresses = await this.getRecordsAddresses(domain);
     if (!recordAddresses) {

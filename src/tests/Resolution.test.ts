@@ -474,41 +474,6 @@ describe('Resolution', () => {
           },
         );
       });
-
-      // TODO! decide with Mike what to do with this method.
-      describe.skip('serviceName', () => {
-        it('checks zns service name', () => {
-          const resolution = new Resolution();
-          const serviceName = resolution.serviceName('domain.zil');
-          expect(serviceName).toBe('ZNS');
-        });
-
-        it('checks uns service name', () => {
-          const resolution = new Resolution();
-          const serviceName = resolution.serviceName('domain.crypto');
-          expect(serviceName).toBe('UNS');
-        });
-        it('checks uns service name', () => {
-          const resolution = new Resolution();
-          const serviceName = resolution.serviceName('domain.wallet');
-          expect(serviceName).toBe('UNS');
-        });
-        it('checks uns service name', () => {
-          const resolution = new Resolution();
-          const serviceName = resolution.serviceName('domain.coin');
-          expect(serviceName).toBe('UNS');
-        });
-        it('checks uns service name', () => {
-          const resolution = new Resolution();
-          const serviceName = resolution.serviceName('domain.bitcoin');
-          expect(serviceName).toBe('UNS');
-        });
-        it('checks uns service name', () => {
-          const resolution = new Resolution();
-          const serviceName = resolution.serviceName('domain.x');
-          expect(serviceName).toBe('UNS');
-        });
-      });
     });
 
     describe('.Errors', () => {
@@ -1778,10 +1743,6 @@ describe('Resolution', () => {
       );
       await expectResolutionErrorCode(
         () => resolution.isSupportedDomain('hello#blockchain'),
-        ResolutionErrorCode.InvalidDomainAddress,
-      );
-      await expectResolutionErrorCode(
-        () => resolution.serviceName('hello#blockchain'),
         ResolutionErrorCode.InvalidDomainAddress,
       );
       await expectResolutionErrorCode(

@@ -181,10 +181,6 @@ export default class UdApi extends NamingService {
     return response.json();
   }
 
-  serviceName(): ResolutionMethod {
-    return this.name;
-  }
-
   async resolver(domain: string): Promise<string> {
     const record = await this.resolve(domain);
     return record.meta.resolver;

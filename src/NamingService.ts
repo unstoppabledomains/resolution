@@ -14,7 +14,6 @@ export abstract class NamingService {
     domain: string,
     keys: string[],
   ): Promise<Record<string, string>>;
-  abstract serviceName(): ResolutionMethod;
   abstract twitter(domain: string): Promise<string>;
   abstract reverse(
     address: string,

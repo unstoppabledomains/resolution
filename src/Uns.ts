@@ -150,10 +150,6 @@ export default class Uns extends NamingService {
     return eip137Childhash(parentHash, label);
   }
 
-  serviceName(): NamingServiceName {
-    return this.name;
-  }
-
   async isSupportedDomain(domain: string): Promise<boolean> {
     if (!this.checkDomain(domain)) {
       return false;
