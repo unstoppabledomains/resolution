@@ -1,6 +1,5 @@
 import {CryptoRecords, NamingServiceName} from '../types/publicTypes';
 import {NullAddresses} from '../types';
-import {NamingService} from '../NamingService';
 
 export function signedLink(key: string, network = 'mainnet'): string {
   let url = 'https://eth-mainnet.alchemyapi.io/v2/';

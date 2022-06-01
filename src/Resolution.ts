@@ -14,7 +14,6 @@ import {
   NamehashOptionsDefault,
   NamingServiceName,
   Provider,
-  ResolutionMethod,
   SourceConfig,
   TokenUriMetadata,
   Web3Version0Provider,
@@ -29,7 +28,6 @@ import {
   signedLink,
   UnwrapPromise,
   wrapResult,
-  WrappedResult,
   unwrapResult,
 } from './utils';
 import {Eip1993Factories as Eip1193Factories} from './utils/Eip1993Factories';
@@ -262,21 +260,21 @@ export default class Resolution {
     return this.fromEthereumEip1193Provider({
       uns: networks.uns
         ? {
-            locations: {
-              Layer1: {
-                network: networks.uns.locations.Layer1.network,
-                provider: Eip1193Factories.fromWeb3Version0Provider(
-                  networks.uns.locations.Layer1.provider,
-                ),
-              },
-              Layer2: {
-                network: networks.uns.locations.Layer2.network,
-                provider: Eip1193Factories.fromWeb3Version0Provider(
-                  networks.uns.locations.Layer2.provider,
-                ),
-              },
+          locations: {
+            Layer1: {
+              network: networks.uns.locations.Layer1.network,
+              provider: Eip1193Factories.fromWeb3Version0Provider(
+                networks.uns.locations.Layer1.provider,
+              ),
             },
-          }
+            Layer2: {
+              network: networks.uns.locations.Layer2.network,
+              provider: Eip1193Factories.fromWeb3Version0Provider(
+                networks.uns.locations.Layer2.provider,
+              ),
+            },
+          },
+        }
         : undefined,
     });
   }
@@ -304,21 +302,21 @@ export default class Resolution {
     return this.fromEthereumEip1193Provider({
       uns: networks.uns
         ? {
-            locations: {
-              Layer1: {
-                network: networks.uns.locations.Layer1.network,
-                provider: Eip1193Factories.fromWeb3Version1Provider(
-                  networks.uns.locations.Layer1.provider,
-                ),
-              },
-              Layer2: {
-                network: networks.uns.locations.Layer2.network,
-                provider: Eip1193Factories.fromWeb3Version1Provider(
-                  networks.uns.locations.Layer2.provider,
-                ),
-              },
+          locations: {
+            Layer1: {
+              network: networks.uns.locations.Layer1.network,
+              provider: Eip1193Factories.fromWeb3Version1Provider(
+                networks.uns.locations.Layer1.provider,
+              ),
             },
-          }
+            Layer2: {
+              network: networks.uns.locations.Layer2.network,
+              provider: Eip1193Factories.fromWeb3Version1Provider(
+                networks.uns.locations.Layer2.provider,
+              ),
+            },
+          },
+        }
         : undefined,
     });
   }
@@ -349,21 +347,21 @@ export default class Resolution {
     return this.fromEthereumEip1193Provider({
       uns: networks.uns
         ? {
-            locations: {
-              Layer1: {
-                network: networks.uns.locations.Layer1.network,
-                provider: Eip1193Factories.fromEthersProvider(
-                  networks.uns.locations.Layer1.provider,
-                ),
-              },
-              Layer2: {
-                network: networks.uns.locations.Layer2.network,
-                provider: Eip1193Factories.fromEthersProvider(
-                  networks.uns.locations.Layer2.provider,
-                ),
-              },
+          locations: {
+            Layer1: {
+              network: networks.uns.locations.Layer1.network,
+              provider: Eip1193Factories.fromEthersProvider(
+                networks.uns.locations.Layer1.provider,
+              ),
             },
-          }
+            Layer2: {
+              network: networks.uns.locations.Layer2.network,
+              provider: Eip1193Factories.fromEthersProvider(
+                networks.uns.locations.Layer2.provider,
+              ),
+            },
+          },
+        }
         : undefined,
     });
   }
@@ -396,7 +394,9 @@ export default class Resolution {
   ): Promise<string> {
     domain = prepareAndValidateDomain(domain);
     const recordKey = `crypto.${ticker.toUpperCase()}.version.${chain.toUpperCase()}.address`;
-    return this.callForDomain(domain, 'record', [domain, recordKey]);
+    return this.callServiceForDomain(domain, (service) =>
+      service.record(domain, recordKey),
+    );
   }
 
   /**
@@ -408,7 +408,9 @@ export default class Resolution {
    */
   async twitter(domain: string): Promise<string> {
     domain = prepareAndValidateDomain(domain);
-    return this.callForDomain(domain, 'twitter', [domain]);
+    return this.callServiceForDomain(domain, (service) =>
+      service.twitter(domain),
+    );
   }
 
   /**
@@ -474,7 +476,9 @@ export default class Resolution {
    */
   async resolver(domain: string): Promise<string> {
     domain = prepareAndValidateDomain(domain);
-    const resolver = await this.callForDomain(domain, 'resolver', [domain]);
+    const resolver = await this.callServiceForDomain(domain, (service) =>
+      service.resolver(domain),
+    );
     if (!resolver) {
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
         domain,
@@ -489,7 +493,9 @@ export default class Resolution {
    */
   async owner(domain: string): Promise<string | null> {
     domain = prepareAndValidateDomain(domain);
-    return this.callForDomain(domain, 'owner', [domain]);
+    return this.callServiceForDomain(domain, (service) =>
+      service.owner(domain),
+    );
   }
 
   /**
@@ -499,7 +505,9 @@ export default class Resolution {
    */
   async record(domain: string, recordKey: string): Promise<string> {
     domain = prepareAndValidateDomain(domain);
-    return this.callForDomain(domain, 'record', [domain, recordKey]);
+    return this.callServiceForDomain(domain, (service) =>
+      service.record(domain, recordKey),
+    );
   }
 
   /**
@@ -509,7 +517,9 @@ export default class Resolution {
    */
   async records(domain: string, keys: string[]): Promise<CryptoRecords> {
     domain = prepareAndValidateDomain(domain);
-    return this.callForDomain(domain, 'records', [domain, keys]);
+    return this.callServiceForDomain(domain, (service) =>
+      service.records(domain, keys),
+    );
   }
 
   /**
@@ -518,9 +528,13 @@ export default class Resolution {
    */
   async isRegistered(domain: string): Promise<boolean> {
     domain = prepareAndValidateDomain(domain);
-    return this.callForDomainBoolean(domain, 'isRegistered', [domain], {
-      throwIfUnsupportedDomain: true,
-    });
+    return this.callServiceForDomainBoolean(
+      domain,
+      (service) => service.isRegistered(domain),
+      {
+        throwIfUnsupportedDomain: true,
+      },
+    );
   }
 
   /**
@@ -529,9 +543,13 @@ export default class Resolution {
    */
   async isAvailable(domain: string): Promise<boolean> {
     domain = prepareAndValidateDomain(domain);
-    return this.callForDomainBoolean(domain, 'isAvailable', [domain], {
-      throwIfUnsupportedDomain: true,
-    });
+    return this.callServiceForDomainBoolean(
+      domain,
+      (service) => service.isAvailable(domain),
+      {
+        throwIfUnsupportedDomain: true,
+      },
+    );
   }
 
   /**
@@ -621,9 +639,13 @@ export default class Resolution {
    */
   async isSupportedDomain(domain: string): Promise<boolean> {
     domain = prepareAndValidateDomain(domain);
-    return this.callForDomainBoolean(domain, 'isSupportedDomain', [domain], {
-      throwIfUnsupportedDomain: false,
-    });
+    return this.callServiceForDomainBoolean(
+      domain,
+      (service) => service.isSupportedDomain(domain),
+      {
+        throwIfUnsupportedDomain: false,
+      },
+    );
   }
 
   /**
@@ -633,7 +655,9 @@ export default class Resolution {
    */
   async allRecords(domain: string): Promise<CryptoRecords> {
     domain = prepareAndValidateDomain(domain);
-    return this.callForDomain(domain, 'allRecords', [domain]);
+    return this.callServiceForDomain(domain, (service) =>
+      service.allRecords(domain),
+    );
   }
 
   async allNonEmptyRecords(domain: string): Promise<CryptoRecords> {
@@ -651,10 +675,9 @@ export default class Resolution {
     const dnsUtils = new DnsUtils();
     domain = prepareAndValidateDomain(domain);
     const dnsRecordKeys = this.getDnsRecordKeys(types);
-    const blockchainData = await this.callForDomain(domain, 'records', [
-      domain,
-      dnsRecordKeys,
-    ]);
+    const blockchainData = await this.callServiceForDomain(domain, (service) =>
+      service.records(domain, dnsRecordKeys),
+    );
     return dnsUtils.toList(blockchainData);
   }
 
@@ -666,7 +689,9 @@ export default class Resolution {
   async tokenURI(domain: string): Promise<string> {
     // TODO! even though only UNS is supported, we should rewrite this for extensibility.
     const namehash = this.namehash(domain, NamingServiceName.UNS);
-    return this.callForDomain(domain, 'getTokenUri', [namehash]);
+    return this.callServiceForDomain(domain, (service) =>
+      service.getTokenUri(namehash),
+    );
   }
 
   /**
@@ -685,7 +710,9 @@ export default class Resolution {
    * @returns Registry contract address
    */
   async registryAddress(domain: string): Promise<string> {
-    return this.callForDomain(domain, 'registryAddress', [domain]);
+    return this.callServiceForDomain(domain, (service) =>
+      service.registryAddress(domain),
+    );
   }
 
   /**
@@ -818,11 +845,10 @@ export default class Resolution {
     return records[newRecord] || records[oldRecord];
   }
 
-  private async callForDomain<F extends keyof NamingService>(
+  private async callServiceForDomain<T>(
     domain: string,
-    func: F,
-    args: Parameters<NamingService[F]>,
-  ): Promise<UnwrapPromise<ReturnType<NamingService[F]>>> {
+    func: (service: NamingService) => T,
+  ): Promise<UnwrapPromise<T>> {
     const serviceName = findNamingServiceName(domain);
     if (!serviceName) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
@@ -830,10 +856,8 @@ export default class Resolution {
       });
     }
 
-    const servicePromises = this.prepareServiceCalls(
-      this.serviceMap[serviceName].usedServices,
-      func,
-      args,
+    const servicePromises = this.serviceMap[serviceName].usedServices.map(
+      (service) => wrapResult(() => func(service)),
     );
 
     for (const servicePromise of servicePromises) {
@@ -859,10 +883,9 @@ export default class Resolution {
   }
 
   // Expects that a called method never throws the `ResolutionErrorCode.UnregisteredDomain` (it doesn't handle it).
-  private async callForDomainBoolean<F extends NamingServiceBooleanMethods>(
+  private async callServiceForDomainBoolean(
     domain: string,
-    func: F,
-    args: Parameters<NamingService[F]>,
+    func: (service: NamingService) => Promise<boolean>,
     options: {throwIfUnsupportedDomain: boolean},
   ): Promise<boolean> {
     const serviceName = findNamingServiceName(domain);
@@ -875,10 +898,8 @@ export default class Resolution {
       });
     }
 
-    const servicePromises = this.prepareServiceCalls(
-      this.serviceMap[serviceName].usedServices,
-      func,
-      args,
+    const servicePromises = this.serviceMap[serviceName].usedServices.map(
+      (service) => wrapResult(() => func(service)),
     );
 
     for (const servicePromise of servicePromises) {
@@ -901,16 +922,6 @@ export default class Resolution {
     return false;
   }
 
-  private prepareServiceCalls<F extends keyof NamingService>(
-    services: NamingService[],
-    func: F,
-    args: Parameters<NamingService[F]>,
-  ): Promise<WrappedResult<ReturnType<NamingService[F]>>>[] {
-    return services.map((method) =>
-      wrapResult(() => method[func].call(method, ...args)),
-    );
-  }
-
   private async reverseGetTokenId(
     address: string,
     location?: UnsLocation,
@@ -920,21 +931,6 @@ export default class Resolution {
     return tokenId as string;
   }
 }
-
-// If we create a type where we substitute every non-boolean method with `never`, it won't quite work for
-// `callForDomainBoolean` (as `keyof NamingServiceWithOnlyBooleanMethods[F]` will still return every method name), hence
-// this cursed type.
-type NamingServiceBooleanMethods = {
-  [K in keyof NamingService]: NamingService[K] extends (
-    ...args: any
-  ) => boolean | Promise<boolean>
-    ? K
-    : never;
-} extends {
-  [_ in keyof NamingService]: infer U;
-}
-  ? U
-  : never;
 
 export {Resolution};
 
