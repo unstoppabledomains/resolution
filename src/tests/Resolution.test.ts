@@ -1670,6 +1670,10 @@ describe('Resolution', () => {
       mockAsyncMethods(uns.unsl1.readerContract, mockValuesL1);
       mockAsyncMethods(uns.unsl2.readerContract, mockValuesL2);
       mockAsyncMethods(uns, {isSupportedDomain: true});
+      mockAsyncMethod(zns, 'getRecordsAddresses', [
+        'zil1xftz4cd425mer6jxmtl29l28xr0zu8s5hnp9he',
+        'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
+      ]);
 
       const location = await resolution.locations([
         'udtestdev-check.wallet',
@@ -1719,7 +1723,7 @@ describe('Resolution', () => {
       expect(
         location['testing-domain-doesnt-exist-12345abc.blockchain'],
       ).toBeNull();
-      // TODO! mint a domain that will be owned by the devtools team.
+      // TODO! mint a domain that will be owned by the devtools team for the LIVE tests.
       expect(location['uns-devtest-testnet-domain.zil']).toEqual({
         registryAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
         resolverAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
@@ -1729,8 +1733,14 @@ describe('Resolution', () => {
         blockchainProviderUrl:
           'https://polygon-mumbai.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
       });
-      // TODO! implement it in ZNS and change the test.
-      expect(location['zns-devtest-testnet-domain.zil']).toBeNull();
+      expect(location['zns-devtest-testnet-domain.zil']).toEqual({
+        registryAddress: 'zil1hyj6m5w4atcn7s806s69r0uh5g4t84e8gp6nps',
+        resolverAddress: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
+        networkId: 333,
+        blockchain: BlockchainType.ZIL,
+        ownerAddress: 'zil1xftz4cd425mer6jxmtl29l28xr0zu8s5hnp9he',
+        blockchainProviderUrl: 'https://dev-api.zilliqa.com',
+      });
     });
 
     it('should check all methods for domain validation', async () => {

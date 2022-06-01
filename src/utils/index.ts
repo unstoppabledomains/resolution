@@ -1,5 +1,6 @@
 import {CryptoRecords, NamingServiceName} from '../types/publicTypes';
 import {NullAddresses} from '../types';
+import {NamingService} from '../NamingService';
 
 export function signedLink(key: string, network = 'mainnet'): string {
   let url = 'https://eth-mainnet.alchemyapi.io/v2/';
@@ -83,3 +84,46 @@ export const EthereumNetworksInverted = {
   137: 'polygon-mainnet',
   80001: 'polygon-mumbai',
 } as const;
+
+export const wrapResult = <T>(func: () => T): Promise<WrappedResult<T>> => {
+  let callResult;
+  // Catch immediately in case it's not an async call.
+  try {
+    callResult = func();
+  } catch (error) {
+    return Promise.resolve({result: null, error});
+  }
+
+  // `Promise.resolve` will convert both promise-like objects and plain values to promises.
+  const promise =
+    callResult instanceof Promise ? callResult : Promise.resolve(callResult);
+  // We wrap results and errors to avoid unhandled promise rejections in case we won't `await` every promise
+  // and return earlier.
+  return promise.then(
+    (result) => ({result, error: null}),
+    (error) => ({result: null, error}),
+  );
+};
+
+export const unwrapResult = <T>(
+  wrappedResult: WrappedResult<T>,
+): UnwrapPromise<T> => {
+  if (wrappedResult.error !== null) {
+    throw wrappedResult.error;
+  }
+  return wrappedResult.result;
+};
+
+export type WrappedResult<T> =
+  | {
+      result: UnwrapPromise<T>;
+      error: null;
+    }
+  | {
+      result: null;
+      // The correct type would be `any` or `unknown`, but we don't care about it in this particular context.
+      // We need a more narrow type to let TypeScript infer that `result` is not `null` if `error` is.
+      error: Error;
+    };
+
+export type UnwrapPromise<T> = T extends Promise<infer U> ? U : T;

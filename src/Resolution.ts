@@ -24,7 +24,14 @@ import {
 } from './types/publicTypes';
 import ResolutionError, {ResolutionErrorCode} from './errors/resolutionError';
 import DnsUtils from './utils/DnsUtils';
-import {findNamingServiceName, signedLink} from './utils';
+import {
+  findNamingServiceName,
+  signedLink,
+  UnwrapPromise,
+  wrapResult,
+  WrappedResult,
+  unwrapResult,
+} from './utils';
 import {Eip1993Factories as Eip1193Factories} from './utils/Eip1993Factories';
 import {NamingService} from './NamingService';
 import Networking from './utils/Networking';
@@ -255,21 +262,21 @@ export default class Resolution {
     return this.fromEthereumEip1193Provider({
       uns: networks.uns
         ? {
-          locations: {
-            Layer1: {
-              network: networks.uns.locations.Layer1.network,
-              provider: Eip1193Factories.fromWeb3Version0Provider(
-                networks.uns.locations.Layer1.provider,
-              ),
+            locations: {
+              Layer1: {
+                network: networks.uns.locations.Layer1.network,
+                provider: Eip1193Factories.fromWeb3Version0Provider(
+                  networks.uns.locations.Layer1.provider,
+                ),
+              },
+              Layer2: {
+                network: networks.uns.locations.Layer2.network,
+                provider: Eip1193Factories.fromWeb3Version0Provider(
+                  networks.uns.locations.Layer2.provider,
+                ),
+              },
             },
-            Layer2: {
-              network: networks.uns.locations.Layer2.network,
-              provider: Eip1193Factories.fromWeb3Version0Provider(
-                networks.uns.locations.Layer2.provider,
-              ),
-            },
-          },
-        }
+          }
         : undefined,
     });
   }
@@ -297,21 +304,21 @@ export default class Resolution {
     return this.fromEthereumEip1193Provider({
       uns: networks.uns
         ? {
-          locations: {
-            Layer1: {
-              network: networks.uns.locations.Layer1.network,
-              provider: Eip1193Factories.fromWeb3Version1Provider(
-                networks.uns.locations.Layer1.provider,
-              ),
+            locations: {
+              Layer1: {
+                network: networks.uns.locations.Layer1.network,
+                provider: Eip1193Factories.fromWeb3Version1Provider(
+                  networks.uns.locations.Layer1.provider,
+                ),
+              },
+              Layer2: {
+                network: networks.uns.locations.Layer2.network,
+                provider: Eip1193Factories.fromWeb3Version1Provider(
+                  networks.uns.locations.Layer2.provider,
+                ),
+              },
             },
-            Layer2: {
-              network: networks.uns.locations.Layer2.network,
-              provider: Eip1193Factories.fromWeb3Version1Provider(
-                networks.uns.locations.Layer2.provider,
-              ),
-            },
-          },
-        }
+          }
         : undefined,
     });
   }
@@ -342,21 +349,21 @@ export default class Resolution {
     return this.fromEthereumEip1193Provider({
       uns: networks.uns
         ? {
-          locations: {
-            Layer1: {
-              network: networks.uns.locations.Layer1.network,
-              provider: Eip1193Factories.fromEthersProvider(
-                networks.uns.locations.Layer1.provider,
-              ),
+            locations: {
+              Layer1: {
+                network: networks.uns.locations.Layer1.network,
+                provider: Eip1193Factories.fromEthersProvider(
+                  networks.uns.locations.Layer1.provider,
+                ),
+              },
+              Layer2: {
+                network: networks.uns.locations.Layer2.network,
+                provider: Eip1193Factories.fromEthersProvider(
+                  networks.uns.locations.Layer2.provider,
+                ),
+              },
             },
-            Layer2: {
-              network: networks.uns.locations.Layer2.network,
-              provider: Eip1193Factories.fromEthersProvider(
-                networks.uns.locations.Layer2.provider,
-              ),
-            },
-          },
-        }
+          }
         : undefined,
     });
   }
@@ -713,8 +720,42 @@ export default class Resolution {
    * @returns Promise<Locations> - A map of domain name and Location (a set of attributes like blockchain,
    */
   async locations(domains: string[]): Promise<Locations> {
-    // TODO! it will still fail if the first domain is a UNS one and we also have ZNS ones in the array.
-    return this.callForDomain(domains[0], 'locations', [domains]);
+    const zilDomains = domains.filter((domain) => domain.endsWith('.zil'));
+
+    // Here, we call both UNS and ZNS methods and merge the results.
+    // If any of the calls fails, this method will fail as well as we aren't interested in partial results.
+    // For example, if one of the providers is configured as `UdApi`, it'll fail as the method is unsupported.
+    // But if there are no .zil domains with absent UNS locations (i.e. all the requested .zil domains have been
+    // migrated to UNS), the ZNS call result will be ignored and an error, if there's one, won't be thrown.
+
+    const unsPromise = this.serviceMap.UNS.usedServices[0].locations(domains);
+    if (!zilDomains.length) {
+      return unsPromise;
+    }
+
+    const znsServices = this.serviceMap.ZNS.usedServices;
+    // The actual ZNS service is the last one in the array.
+    const znsService = znsServices[znsServices.length - 1];
+    // Start fetching ZNS locations before awaiting UNS ones for the concurrency sake, wrap errors to avoid unhandled
+    // exceptions in case we decide that we aren't interested in the result.
+    const znsPromise = wrapResult(() => znsService.locations(zilDomains));
+
+    // Fetch UNS locations first. If we see that there are no .zil domains with absent locations, we can return early.
+    const unsLocations = await unsPromise;
+    const emptyZilEntries = Object.entries(unsLocations).filter(
+      ([domain, location]) => domain.endsWith('.zil') && !location,
+    );
+    if (!emptyZilEntries.length) {
+      return unsLocations;
+    }
+    // If we don't have locations for some .zil domains in UNS, we want to check whether they are present in ZNS and
+    // merge them if that's the case.
+    const znsLocations = await znsPromise.then(unwrapResult);
+    for (const [domain, _location] of emptyZilEntries) {
+      unsLocations[domain] = znsLocations[domain];
+    }
+
+    return unsLocations;
   }
 
   /**
@@ -874,51 +915,21 @@ export default class Resolution {
     services: NamingService[],
     func: F,
     args: Parameters<NamingService[F]>,
-  ): Promise<NamingServiceResult<F>>[] {
-    return services.map((method) => {
-      let callResult;
-      // Catch immediately in case it's not an async call.
-      try {
-        callResult = method[func].call(method, ...args);
-      } catch (error) {
-        return Promise.resolve({result: null, error});
-      }
-
-      // `Promise.resolve` will convert both promise-like objects and plain values to promises.
-      const promise =
-        callResult instanceof Promise
-          ? callResult
-          : Promise.resolve(callResult);
-      // We wrap results and errors to avoid unhandled promise rejections in case we won't `await` every promise
-      // and return earlier.
-      return promise.then(
-        (result) => ({result, error: null}),
-        (error) => ({result: null, error}),
-      );
-    });
+  ): Promise<WrappedResult<ReturnType<NamingService[F]>>>[] {
+    return services.map((method) =>
+      wrapResult(() => method[func].call(method, ...args)),
+    );
   }
 
   private async reverseGetTokenId(
     address: string,
     location?: UnsLocation,
   ): Promise<string> {
-    const service = this.serviceMap['UNS'];
+    const service = this.serviceMap['UNS'].native;
     const tokenId = await service.reverseOf(address, location);
     return tokenId as string;
   }
 }
-
-type NamingServiceResult<F extends keyof NamingService> =
-  | {
-      result: UnwrapPromise<ReturnType<NamingService[F]>>;
-      error: null;
-    }
-  | {
-      result: null;
-      // The correct type would be `any` or `unknown`, but we don't care about it in this particular context.
-      // We need a more narrow type to let TypeScript infer that `result` is not `null` if `error` is.
-      error: Error;
-    };
 
 // If we create a type where we substitute every non-boolean method with `never`, it won't quite work for
 // `callForDomainBoolean` (as `keyof NamingServiceWithOnlyBooleanMethods[F]` will still return every method name), hence
@@ -936,8 +947,6 @@ type NamingServiceBooleanMethods = {
   : never;
 
 export {Resolution};
-
-type UnwrapPromise<T> = T extends Promise<infer U> ? U : T;
 
 type ServicesEntry = {
   usedServices: NamingService[];
