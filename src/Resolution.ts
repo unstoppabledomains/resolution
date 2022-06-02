@@ -556,7 +556,7 @@ export default class Resolution {
    * @returns Produces a namehash from supported naming service in hex format with 0x prefix.
    * Corresponds to ERC721 token id in case of Ethereum based naming service like UNS.
    * @param domain domain name to be converted
-   * @param namingService TODO!
+   * @param namingService "UNS" or "ZNS" (uses keccak256 or sha256 algorithm respectively)
    * @param options formatting options
    * @throws [[ResolutionError]] with UnsupportedDomain error code if domain extension is unknown
    */
@@ -580,7 +580,7 @@ export default class Resolution {
    * @returns a namehash of a subdomain with name label
    * @param parent namehash of a parent domain
    * @param label subdomain name
-   * @param namingService "UNS" or "ZNS"
+   * @param namingService "UNS" or "ZNS" (uses keccak256 or sha256 algorithm respectively)
    * @param options formatting options
    */
   childhash(
@@ -614,7 +614,7 @@ export default class Resolution {
    * Checks weather the domain name matches the hash
    * @param domain - domain name to check against
    * @param hash - hash obtained from the blockchain
-   * @param namingService - TODO!
+   * @param namingService - "UNS" or "ZNS" (uses keccak256 or sha256 algorithm respectively)
    */
   isValidHash(
     domain: string,
@@ -687,7 +687,8 @@ export default class Resolution {
    * @param domain - domain name
    */
   async tokenURI(domain: string): Promise<string> {
-    // TODO! even though only UNS is supported, we should rewrite this for extensibility.
+    // The `getTokenUri` method isn't supported in ZNS (it'll throw in the next call), so we just assume that we need
+    // to calculate a UNS namehash.
     const namehash = this.namehash(domain, NamingServiceName.UNS);
     return this.callServiceForDomain(domain, (service) =>
       service.getTokenUri(namehash),
