@@ -260,21 +260,21 @@ export default class Resolution {
     return this.fromEthereumEip1193Provider({
       uns: networks.uns
         ? {
-          locations: {
-            Layer1: {
-              network: networks.uns.locations.Layer1.network,
-              provider: Eip1193Factories.fromWeb3Version0Provider(
-                networks.uns.locations.Layer1.provider,
-              ),
+            locations: {
+              Layer1: {
+                network: networks.uns.locations.Layer1.network,
+                provider: Eip1193Factories.fromWeb3Version0Provider(
+                  networks.uns.locations.Layer1.provider,
+                ),
+              },
+              Layer2: {
+                network: networks.uns.locations.Layer2.network,
+                provider: Eip1193Factories.fromWeb3Version0Provider(
+                  networks.uns.locations.Layer2.provider,
+                ),
+              },
             },
-            Layer2: {
-              network: networks.uns.locations.Layer2.network,
-              provider: Eip1193Factories.fromWeb3Version0Provider(
-                networks.uns.locations.Layer2.provider,
-              ),
-            },
-          },
-        }
+          }
         : undefined,
     });
   }
@@ -302,21 +302,21 @@ export default class Resolution {
     return this.fromEthereumEip1193Provider({
       uns: networks.uns
         ? {
-          locations: {
-            Layer1: {
-              network: networks.uns.locations.Layer1.network,
-              provider: Eip1193Factories.fromWeb3Version1Provider(
-                networks.uns.locations.Layer1.provider,
-              ),
+            locations: {
+              Layer1: {
+                network: networks.uns.locations.Layer1.network,
+                provider: Eip1193Factories.fromWeb3Version1Provider(
+                  networks.uns.locations.Layer1.provider,
+                ),
+              },
+              Layer2: {
+                network: networks.uns.locations.Layer2.network,
+                provider: Eip1193Factories.fromWeb3Version1Provider(
+                  networks.uns.locations.Layer2.provider,
+                ),
+              },
             },
-            Layer2: {
-              network: networks.uns.locations.Layer2.network,
-              provider: Eip1193Factories.fromWeb3Version1Provider(
-                networks.uns.locations.Layer2.provider,
-              ),
-            },
-          },
-        }
+          }
         : undefined,
     });
   }
@@ -347,21 +347,21 @@ export default class Resolution {
     return this.fromEthereumEip1193Provider({
       uns: networks.uns
         ? {
-          locations: {
-            Layer1: {
-              network: networks.uns.locations.Layer1.network,
-              provider: Eip1193Factories.fromEthersProvider(
-                networks.uns.locations.Layer1.provider,
-              ),
+            locations: {
+              Layer1: {
+                network: networks.uns.locations.Layer1.network,
+                provider: Eip1193Factories.fromEthersProvider(
+                  networks.uns.locations.Layer1.provider,
+                ),
+              },
+              Layer2: {
+                network: networks.uns.locations.Layer2.network,
+                provider: Eip1193Factories.fromEthersProvider(
+                  networks.uns.locations.Layer2.provider,
+                ),
+              },
             },
-            Layer2: {
-              network: networks.uns.locations.Layer2.network,
-              provider: Eip1193Factories.fromEthersProvider(
-                networks.uns.locations.Layer2.provider,
-              ),
-            },
-          },
-        }
+          }
         : undefined,
     });
   }
@@ -533,6 +533,7 @@ export default class Resolution {
       (service) => service.isRegistered(domain),
       {
         throwIfUnsupportedDomain: true,
+        expectedValue: true,
       },
     );
   }
@@ -548,6 +549,7 @@ export default class Resolution {
       (service) => service.isAvailable(domain),
       {
         throwIfUnsupportedDomain: true,
+        expectedValue: false,
       },
     );
   }
@@ -644,6 +646,7 @@ export default class Resolution {
       (service) => service.isSupportedDomain(domain),
       {
         throwIfUnsupportedDomain: false,
+        expectedValue: true,
       },
     );
   }
@@ -887,12 +890,12 @@ export default class Resolution {
   private async callServiceForDomainBoolean(
     domain: string,
     func: (service: NamingService) => Promise<boolean>,
-    options: {throwIfUnsupportedDomain: boolean},
+    options: {throwIfUnsupportedDomain: boolean; expectedValue: boolean},
   ): Promise<boolean> {
     const serviceName = findNamingServiceName(domain);
     if (!serviceName) {
       if (!options.throwIfUnsupportedDomain) {
-        return false;
+        return !options.expectedValue;
       }
       throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
         domain,
@@ -914,13 +917,13 @@ export default class Resolution {
         ) {
           throw error;
         }
-      } else if (result) {
-        // If the result is `false`, we don't want to return it immediately.
+      } else if (result === options.expectedValue) {
+        // If the result is not the one which is expected, we don't want to return it immediately.
         return result;
       }
     }
 
-    return false;
+    return !options.expectedValue;
   }
 
   private async reverseGetTokenId(

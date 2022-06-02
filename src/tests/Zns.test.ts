@@ -200,7 +200,7 @@ describe('ZNS', () => {
   });
 
   describe('.Resolve', () => {
-    it('resolves .zil name using blockchain', async () => {
+    it('resolves .zil name using ZNS', async () => {
       const unsSpy = mockAsyncMethod(uns, 'allRecords', () => {
         throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
       });
@@ -225,7 +225,7 @@ describe('ZNS', () => {
       );
     });
 
-    it('resolves domain using blockchain #2', async () => {
+    it('resolves domain using ZNS #2', async () => {
       const unsSpy = mockAsyncMethod(uns, 'allRecords', async () => {
         throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
       });
