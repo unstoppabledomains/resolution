@@ -1,3 +1,21 @@
+## Unreleased
+
+- Added Node.js v16 support
+- .zil domains are now also looked up via UNS
+- The `locations` method was implemented for ZNS
+
+### Breaking changes
+
+- Dropped Node.js v10 support
+- The `serviceName` method was removed
+- The following methods got a new mandatory argument to specify NamingService:
+  - `namehash`
+  - `isValidHash`
+
+  Note: if you used them for .zil domains, you should now determine where a domain is located first,
+  It's possible that a domain has been migrated from ZNS to UNS, which would imply the usage of a different
+  namehashing algorithm to calculate its token id.
+
 ## 7.2.0
 - Implementation of reverse resolution methods
 
