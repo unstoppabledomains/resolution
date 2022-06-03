@@ -18,7 +18,11 @@ import {
 } from './types/publicTypes';
 import {isValidTwitterSignature} from './utils/TwitterSignatureValidator';
 import FetchProvider from './FetchProvider';
-import {eip137Childhash, eip137Namehash} from './utils/namehash';
+import {
+  eip137Childhash,
+  eip137Namehash,
+  fromHexStringToDecimals,
+} from './utils/namehash';
 import {NamingService} from './NamingService';
 import ConfigurationError, {
   ConfigurationErrorCode,
@@ -333,6 +337,54 @@ export default class Uns extends NamingService {
       ...resultL1,
       ...nonEmptyRecordsFromL2,
     };
+  }
+
+  async reverseOf(
+    addr: string,
+    location?: UnsLocation,
+  ): Promise<string | null> {
+    const [resultOrErrorL1, resultOrErrorL2] = await Promise.all([
+      this.unsl1.reverseOf(addr).catch((err) => err),
+      this.unsl2.reverseOf(addr).catch((err) => err),
+    ]);
+
+    const reverseL1 = () => {
+      validResultOrThrow(resultOrErrorL1);
+      if (resultOrErrorL1._hex !== '0x00') {
+        return fromHexStringToDecimals(resultOrErrorL1._hex);
+      } else {
+        return null;
+      }
+    };
+
+    const reverseL2 = () => {
+      validResultOrThrow(resultOrErrorL2);
+      if (resultOrErrorL2._hex !== '0x00') {
+        return fromHexStringToDecimals(resultOrErrorL2._hex);
+      } else {
+        return null;
+      }
+    };
+
+    if (location === UnsLocation.Layer1) {
+      return reverseL1() as string;
+    }
+
+    if (location === UnsLocation.Layer2) {
+      return reverseL2() as string;
+    }
+
+    const reversedL1 = reverseL1();
+    if (reversedL1) {
+      return reversedL1;
+    }
+
+    const reversedL2 = reverseL2();
+    if (reversedL2) {
+      return reversedL2;
+    }
+
+    return null;
   }
 
   async getDomainFromTokenId(tokenId: string): Promise<string> {

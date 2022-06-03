@@ -8,6 +8,7 @@ import {
   NamingServiceName,
   Api,
   Locations,
+  UnsLocation,
 } from './types/publicTypes';
 import Networking from './utils/Networking';
 import {constructRecords, findNamingServiceName, isNullAddress} from './utils';
@@ -194,6 +195,16 @@ export default class Udapi extends NamingService {
       methodName: 'reverse',
     });
   }
+
+  async reverseOf(
+    address: string,
+    location?: UnsLocation,
+  ): Promise<string | null> {
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+      methodName: 'reverseOf',
+    });
+  }
+
   async isRegistered(domain: string): Promise<boolean> {
     const record = await this.resolve(domain);
 

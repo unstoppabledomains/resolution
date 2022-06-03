@@ -267,3 +267,7 @@ export type DomainLocation = {
 };
 
 export type Locations = Record<string, DomainLocation | null>;
+
+export type ReverseResolutionOptions = {
+  location?: UnsLocation;
+};

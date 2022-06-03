@@ -12,6 +12,7 @@ import {
   ZnsSource,
   NamingServiceName,
   Locations,
+  UnsLocation,
 } from './types/publicTypes';
 import FetchProvider from './FetchProvider';
 import {znsChildhash, znsNamehash} from './utils/namehash';
@@ -157,6 +158,15 @@ export default class Zns extends NamingService {
   ): Promise<string | null> {
     throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
       methodName: 'reverse',
+    });
+  }
+
+  async reverseOf(
+    address: string,
+    location?: UnsLocation,
+  ): Promise<string | null> {
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+      methodName: 'reverseOf',
     });
   }
 

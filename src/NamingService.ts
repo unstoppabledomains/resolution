@@ -1,4 +1,4 @@
-import {Locations, ResolutionMethod} from './types/publicTypes';
+import {Locations, ResolutionMethod, UnsLocation} from './types/publicTypes';
 
 /**
  * @internal
@@ -19,6 +19,10 @@ export abstract class NamingService {
   abstract reverse(
     address: string,
     currencyTicker: string,
+  ): Promise<string | null>;
+  abstract reverseOf(
+    address: string,
+    location?: UnsLocation,
   ): Promise<string | null>;
   abstract allRecords(domain: string): Promise<Record<string, string>>;
   abstract isRegistered(domain: string): Promise<boolean>;
