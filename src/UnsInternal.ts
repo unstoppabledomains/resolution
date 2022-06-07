@@ -26,8 +26,10 @@ export default class UnsInternal {
   static readonly UrlMap: BlockhainNetworkUrlMap = {
     mainnet:
       'https://eth-mainnet.alchemyapi.io/v2/GmQ8X1FHf-WDEry0BBSn0RgjVhjHkRmS',
-    rinkeby: 'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
-    goerli: 'https://goerli.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+    rinkeby:
+      'https://eth-rinkeby.alchemyapi.io/v2/ZDERxOLIj120dh2-Io2Q9RTh9RfWEssT',
+    goerli:
+      'https://eth-goerli.alchemyapi.io/v2/J-ff_OlmWzw41ocqwpkRccHdfqSZML4q',
     'polygon-mainnet':
       'https://polygon-mainnet.g.alchemy.com/v2/iG-oHZ2FvjqC9D43O5q9sj62out5ubsy',
     'polygon-mumbai':

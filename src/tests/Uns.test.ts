@@ -272,7 +272,7 @@ describe('UNS', () => {
   });
 
   it('should return true for supported domain', async () => {
-    mockAPICalls('uns_domain_exists_test', protocolLink());
+    mockAPICalls('uns_domain_exists_test_true', protocolLink());
     const uns = resolution.serviceMap[NamingServiceName.UNS] as Uns;
     mockAsyncMethods(uns.unsl2.readerContract, {
       call: [false],
