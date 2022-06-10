@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        node: [10, 12]
+        node: [12, 14, 16]
 
     name: ${{ matrix.os }} - Node ${{ matrix.node }}
 

@@ -303,7 +303,7 @@ describe('UnsInternal', () => {
     expect(exists).toBe(true);
   });
   it('should return true for domain exists', async () => {
-    mockAPICalls('uns_domain_exists_test', protocolLink());
+    mockAPICalls('uns_domain_exists_true_test', protocolLink());
     const exists = await unsInternalL1.exists(CryptoDomainWithAllRecords);
     expect(exists).toBe(true);
   });

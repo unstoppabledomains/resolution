@@ -1,6 +1,6 @@
 {
   "name": "@unstoppabledomains/resolution",
-  "version": "7.1.5",
+  "version": "7.2.0",
   "description": "Domain Resolution for blockchain domains",
   "main": "./build/index.js",
   "directories": {
@@ -70,7 +70,7 @@
     "@typescript-eslint/eslint-plugin": "^3.9.0",
     "@typescript-eslint/parser": "^3.9.0",
     "@unstoppabledomains/sizecheck": "^4.0.0",
-    "@zilliqa-js/core": "2.3.0-alpha.0",
+    "@zilliqa-js/core": "^3.3.4",
     "audit-ci": "^3.1.1",
     "dotenv": "^8.2.0",
     "eslint": "^7.7.0",
@@ -88,7 +88,7 @@
     "ts-loader": "6.2.1",
     "ts-node": "^8.6.2",
     "typedoc": "0.18.0",
-    "typescript": "3.8.3",
+    "typescript": "^4.2.0",
     "web3-0.20.7": "npm:web3@0.20.7",
     "web3-providers-http": "^1.3.6",
     "web3-providers-ws": "^1.3.6"

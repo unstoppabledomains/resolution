@@ -1,3 +1,6 @@
+## 7.2.0
+- Implementation of reverse resolution methods
+
 ## 7.1.3
 - Implemented function getDomainFromTokenId in UdApi
 

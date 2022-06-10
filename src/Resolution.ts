@@ -19,10 +19,12 @@ import {
   Web3Version1Provider,
   TokenUriMetadata,
   Locations,
+  ReverseResolutionOptions,
+  UnsLocation,
 } from './types/publicTypes';
 import ResolutionError, {ResolutionErrorCode} from './errors/resolutionError';
 import DnsUtils from './utils/DnsUtils';
-import {findNamingServiceName, signedInfuraLink} from './utils';
+import {findNamingServiceName, signedLink} from './utils';
 import {Eip1993Factories as Eip1193Factories} from './utils/Eip1993Factories';
 import {NamingService} from './NamingService';
 import Networking from './utils/Networking';
@@ -37,7 +39,7 @@ import {fromDecStringToHex} from './utils/namehash';
  *
  * let resolution = new Resolution({ blockchain: {
  *        uns: {
- *           url: "https://mainnet.infura.io/v3/12351245223",
+ *           url: "https://eth-mainnet.alchemyapi.io/v2/GmQ8X1FHf-WDEry0BBSn0RgjVhjHkRmS",
  *           network: "mainnet"
  *        }
  *      }
@@ -111,17 +113,11 @@ export default class Resolution {
         uns: {
           locations: {
             Layer1: {
-              url: signedInfuraLink(
-                infura,
-                networks?.uns?.locations.Layer1.network,
-              ),
+              url: signedLink(infura, networks?.uns?.locations.Layer1.network),
               network: networks?.uns?.locations.Layer1.network || 'mainnet',
             },
             Layer2: {
-              url: signedInfuraLink(
-                infura,
-                networks?.uns?.locations.Layer2.network,
-              ),
+              url: signedLink(infura, networks?.uns?.locations.Layer2.network),
               network:
                 networks?.uns?.locations.Layer2.network || 'polygon-mainnet',
             },
@@ -693,6 +689,37 @@ export default class Resolution {
     return method.locations(domains);
   }
 
+  /**
+   * Returns the token ID that is the primary resolution of the provided address
+   * @param address - owner's address
+   * @returns Promise<tokenId> - token ID that is the primary resolution of the provided address
+   */
+  async reverseTokenId(
+    address: string,
+    options?: ReverseResolutionOptions,
+  ): Promise<string> {
+    const tokenId = this.reverseGetTokenId(address, options?.location);
+    return tokenId;
+  }
+
+  /**
+   * Returns the domain that is the primary resolution of the provided address
+   * @param address - owner's address
+   * @returns Promise<URL> - domain URL that is the primary resolution of the provided addresss
+   */
+  async reverse(
+    address: string,
+    options?: ReverseResolutionOptions,
+  ): Promise<string | null> {
+    const tokenId = await this.reverseGetTokenId(address, options?.location);
+
+    if (tokenId) {
+      return this.unhash(tokenId as string, NamingServiceName.UNS);
+    }
+
+    return null;
+  }
+
   private async getMetadataFromTokenURI(
     tokenUri: string,
   ): Promise<TokenUriMetadata> {
@@ -745,6 +772,15 @@ export default class Resolution {
     }
 
     return method;
+  }
+
+  private async reverseGetTokenId(
+    address: string,
+    location?: UnsLocation,
+  ): Promise<string> {
+    const service = this.serviceMap['UNS'];
+    const tokenId = await service.reverseOf(address, location);
+    return tokenId as string;
   }
 }
 

@@ -1,8 +1,19 @@
 import {CryptoRecords, NamingServiceName} from '../types/publicTypes';
 import {NullAddresses} from '../types';
 
-export function signedInfuraLink(infura: string, network = 'mainnet'): string {
-  return `https://${network}.infura.io/v3/${infura}`;
+export function signedLink(key: string, network = 'mainnet'): string {
+  let url = 'https://eth-mainnet.alchemyapi.io/v2/';
+
+  switch (network) {
+  case 'polygon-mumbai':
+    url = 'https://polygon-mumbai.g.alchemy.com/v2/';
+    break;
+  case 'rinkeby':
+    url = 'https://eth-rinkeby.alchemyapi.io/v2/';
+    break;
+  }
+
+  return `${url}${key}`;
 }
 
 export function hexToBytes(hexString: string): number[] {

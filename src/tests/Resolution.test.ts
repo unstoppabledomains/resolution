@@ -10,6 +10,7 @@ import {
   DnsRecordType,
   JsonRpcPayload,
   NamingServiceName,
+  Web3Version1Provider,
 } from '../types/publicTypes';
 import {JsonRpcProvider, InfuraProvider} from '@ethersproject/providers';
 import Web3HttpProvider from 'web3-providers-http';
@@ -341,8 +342,12 @@ describe('Resolution', () => {
         },
       });
       uns = resolution.serviceMap[NamingServiceName.UNS] as unknown as Uns;
-      expect(uns.unsl1.url).toBe(`https://rinkeby.infura.io/v3/api-key`);
-      expect(uns.unsl2.url).toBe(`https://polygon-mumbai.infura.io/v3/api-key`);
+      expect(uns.unsl1.url).toBe(
+        `https://eth-rinkeby.alchemyapi.io/v2/api-key`,
+      );
+      expect(uns.unsl2.url).toBe(
+        `https://polygon-mumbai.g.alchemy.com/v2/api-key`,
+      );
     });
 
     it('should throw on unspecified network', async () => {
@@ -780,13 +785,19 @@ describe('Resolution', () => {
           const resolution = Resolution.fromWeb3Version1Provider({
             uns: {
               locations: {
-                Layer1: {network: 'rinkeby', provider},
-                Layer2: {network: 'polygon-mumbai', provider: polygonProvider},
+                Layer1: {
+                  network: 'rinkeby',
+                  provider: provider as unknown as Web3Version1Provider,
+                },
+                Layer2: {
+                  network: 'polygon-mumbai',
+                  provider: polygonProvider as unknown as Web3Version1Provider,
+                },
               },
             },
           });
           const uns = resolution.serviceMap['UNS'] as unknown as Uns;
-          mockAsyncMethod(uns.unsl2.readerContract, 'call', (params) =>
+          mockAsyncMethod(uns.unsl2.readerContract, 'call', () =>
             Promise.resolve([NullAddress, NullAddress, {}]),
           );
           const ethAddress = await resolution.addr('brad.crypto', 'ETH');
@@ -817,8 +828,14 @@ describe('Resolution', () => {
           const resolution = Resolution.fromWeb3Version1Provider({
             uns: {
               locations: {
-                Layer1: {network: 'rinkeby', provider},
-                Layer2: {network: 'polygon-mumbai', provider: polygonProvider},
+                Layer1: {
+                  network: 'rinkeby',
+                  provider: provider as unknown as Web3Version1Provider,
+                },
+                Layer2: {
+                  network: 'polygon-mumbai',
+                  provider: polygonProvider as unknown as Web3Version1Provider,
+                },
               },
             },
           });
@@ -1054,8 +1071,7 @@ describe('Resolution', () => {
               'crypto.ETH.address':
                 '0x1C42088b82f6Fa5fB883A14240C4E066dDFf1517',
               'crypto.LTC.address': 'MTnTNwKikiMi97Teq8XQRabL9SZ4HjnKNB',
-              'crypto.ADA.address':
-                'DdzFFzCqrhsfc3MQvjsLr9BHkaFYeE7BotyTATdETRoSPj6QPiotK4xpcFZk66KVmtr87tvUFTcbTHZRkcdbMR5Ss6jCfzCVtFRMB7WE',
+              'crypto.ADA.address': '',
               'ipfs.html.value':
                 'QmYqX8D8SkaF5YcpaWMyi5xM43UEteFiSNKYsjLcdvCWud',
               'ipfs.redirect_domain.value':
@@ -1079,7 +1095,7 @@ describe('Resolution', () => {
                     network: 'custom',
                     proxyReaderAddress:
                       '0x332a8191905fa8e6eea7350b5799f225b8ed30a9',
-                    url: 'https://polygon-mumbai.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+                    url: 'https://polygon-mumbai.g.alchemy.com/v2/c4bb906ed6904c42b19c95825fe55f39',
                   },
                 },
               },
@@ -1594,7 +1610,7 @@ describe('Resolution', () => {
         blockchain: BlockchainType.ETH,
         ownerAddress: '0x0e43F36e4B986dfbE1a75cacfA60cA2bD44Ae962',
         blockchainProviderUrl:
-          'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+          'https://eth-rinkeby.alchemyapi.io/v2/ZDERxOLIj120dh2-Io2Q9RTh9RfWEssT',
       });
       expect(location['brad.crypto']).toEqual({
         registryAddress: '0xAad76bea7CFEc82927239415BB18D2e93518ecBB',
@@ -1603,7 +1619,7 @@ describe('Resolution', () => {
         blockchain: BlockchainType.ETH,
         ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
         blockchainProviderUrl:
-          'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+          'https://eth-rinkeby.alchemyapi.io/v2/ZDERxOLIj120dh2-Io2Q9RTh9RfWEssT',
       });
       expect(location['udtestdev-test-l2-domain-784391.wallet']).toEqual({
         registryAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
@@ -1612,7 +1628,7 @@ describe('Resolution', () => {
         blockchain: BlockchainType.MATIC,
         ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
         blockchainProviderUrl:
-          'https://polygon-mumbai.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+          'https://polygon-mumbai.g.alchemy.com/v2/c4bb906ed6904c42b19c95825fe55f39',
       });
       expect(location['udtestdev-test-l1-and-l2-ownership.wallet']).toEqual({
         registryAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
@@ -1621,7 +1637,7 @@ describe('Resolution', () => {
         blockchain: BlockchainType.MATIC,
         ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
         blockchainProviderUrl:
-          'https://polygon-mumbai.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+          'https://polygon-mumbai.g.alchemy.com/v2/c4bb906ed6904c42b19c95825fe55f39',
       });
       expect(
         location['testing-domain-doesnt-exist-12345abc.blockchain'],

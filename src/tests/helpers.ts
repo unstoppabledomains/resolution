@@ -9,7 +9,7 @@ import ConfigurationError, {
 import DnsRecordsError, {DnsRecordsErrorCode} from '../errors/dnsRecordsError';
 import {NamingServiceName} from '../types/publicTypes';
 
-export const MainnetUrl = 'https://rinkeby.infura.io';
+export const MainnetUrl = 'https://eth-rinkeby.alchemyapi.io';
 export const ZilliqaUrl = 'https://api.zilliqa.com';
 export const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
 
@@ -187,13 +187,13 @@ export function protocolLink(
 
   if (namingService === 'UNSL2') {
     return providerProtocol === ProviderProtocol.wss
-      ? `wss://polygon-mumbai.infura.io/ws/v3/${secret}`
-      : `https://polygon-mumbai.infura.io/v3/${secret}`;
+      ? `wss://eth-rinkeby.alchemyapi.io/v2/${secret}`
+      : `https://eth-rinkeby.alchemyapi.io/v2/${secret}`;
   }
 
   return providerProtocol === ProviderProtocol.wss
-    ? `wss://rinkeby.infura.io/ws/v3/${secret}`
-    : `https://rinkeby.infura.io/v3/${secret}`;
+    ? `wss://eth-rinkeby.alchemyapi.io/v2/${secret}`
+    : `https://eth-rinkeby.alchemyapi.io/v2/${secret}`;
 }
 
 export enum ProviderProtocol {
@@ -216,15 +216,11 @@ export const caseMock = <T, U>(
 
 const ethereumDefaultProviders = {
   UNSL1: {
-    [ProviderProtocol.http]:
-      'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
-    [ProviderProtocol.wss]:
-      'wss://rinkeby.infura.io/ws/v3/c4bb906ed6904c42b19c95825fe55f39',
+    http: 'https://eth-rinkeby.alchemyapi.io/v2/ZDERxOLIj120dh2-Io2Q9RTh9RfWEssT',
+    wss: 'wss://eth-rinkeby.alchemyapi.io/v2/ZDERxOLIj120dh2-Io2Q9RTh9RfWEssT',
   },
   UNSL2: {
-    [ProviderProtocol.http]:
-      'https://polygon-mumbai.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
-    [ProviderProtocol.wss]:
-      'wss://polygon-mumbai.infura.io/ws/v3/c4bb906ed6904c42b19c95825fe55f39',
+    http: 'https://polygon-mumbai.g.alchemy.com/v2/c4bb906ed6904c42b19c95825fe55f39',
+    wss: 'wss://polygon-mumbai.g.alchemy.com/v2/c4bb906ed6904c42b19c95825fe55f39',
   },
 };
