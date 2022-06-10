@@ -8,6 +8,7 @@
 [![Get help on Discord](https://img.shields.io/badge/Get%20help%20on-Discord-blueviolet)](https://discord.gg/b6ZVxSZ9Hn)
 
 - [Installing Resolution](README.md#installing-resolution)
+- [Updating Resolution](README.md#updating-resolution)
 - [Using Resolution](README.md#using-resolution)
 - [Default Ethereum Providers](README.md#default-ethereum-providers)
 - [Error Handling](README.md#error-handling)
@@ -60,7 +61,19 @@ npm install @unstoppabledomains/resolution --save
 If you're interested in resolving domains via the command line, see our
 [CLI section](#command-line-interface).
 
+## Updating Resolution
+
+Resolution can be updated with either `yarn` or `npm`.
+
 ## Using Resolution
+
+```shell
+yarn upgrade @unstoppabledomains/resolution --latest
+```
+
+```shell
+npm update @unstoppabledomains/resolution --save
+```
 
 Create a new project.
 
