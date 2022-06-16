@@ -1,4 +1,4 @@
-## Unreleased
+## 8.0.0
 
 - Added Node.js v16 support
 - .zil domains are now also looked up via UNS
