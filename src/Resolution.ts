@@ -260,21 +260,21 @@ export default class Resolution {
     return this.fromEthereumEip1193Provider({
       uns: networks.uns
         ? {
-            locations: {
-              Layer1: {
-                network: networks.uns.locations.Layer1.network,
-                provider: Eip1193Factories.fromWeb3Version0Provider(
-                  networks.uns.locations.Layer1.provider,
-                ),
-              },
-              Layer2: {
-                network: networks.uns.locations.Layer2.network,
-                provider: Eip1193Factories.fromWeb3Version0Provider(
-                  networks.uns.locations.Layer2.provider,
-                ),
-              },
+          locations: {
+            Layer1: {
+              network: networks.uns.locations.Layer1.network,
+              provider: Eip1193Factories.fromWeb3Version0Provider(
+                networks.uns.locations.Layer1.provider,
+              ),
             },
-          }
+            Layer2: {
+              network: networks.uns.locations.Layer2.network,
+              provider: Eip1193Factories.fromWeb3Version0Provider(
+                networks.uns.locations.Layer2.provider,
+              ),
+            },
+          },
+        }
         : undefined,
     });
   }
@@ -302,21 +302,21 @@ export default class Resolution {
     return this.fromEthereumEip1193Provider({
       uns: networks.uns
         ? {
-            locations: {
-              Layer1: {
-                network: networks.uns.locations.Layer1.network,
-                provider: Eip1193Factories.fromWeb3Version1Provider(
-                  networks.uns.locations.Layer1.provider,
-                ),
-              },
-              Layer2: {
-                network: networks.uns.locations.Layer2.network,
-                provider: Eip1193Factories.fromWeb3Version1Provider(
-                  networks.uns.locations.Layer2.provider,
-                ),
-              },
+          locations: {
+            Layer1: {
+              network: networks.uns.locations.Layer1.network,
+              provider: Eip1193Factories.fromWeb3Version1Provider(
+                networks.uns.locations.Layer1.provider,
+              ),
             },
-          }
+            Layer2: {
+              network: networks.uns.locations.Layer2.network,
+              provider: Eip1193Factories.fromWeb3Version1Provider(
+                networks.uns.locations.Layer2.provider,
+              ),
+            },
+          },
+        }
         : undefined,
     });
   }
@@ -347,21 +347,21 @@ export default class Resolution {
     return this.fromEthereumEip1193Provider({
       uns: networks.uns
         ? {
-            locations: {
-              Layer1: {
-                network: networks.uns.locations.Layer1.network,
-                provider: Eip1193Factories.fromEthersProvider(
-                  networks.uns.locations.Layer1.provider,
-                ),
-              },
-              Layer2: {
-                network: networks.uns.locations.Layer2.network,
-                provider: Eip1193Factories.fromEthersProvider(
-                  networks.uns.locations.Layer2.provider,
-                ),
-              },
+          locations: {
+            Layer1: {
+              network: networks.uns.locations.Layer1.network,
+              provider: Eip1193Factories.fromEthersProvider(
+                networks.uns.locations.Layer1.provider,
+              ),
             },
-          }
+            Layer2: {
+              network: networks.uns.locations.Layer2.network,
+              provider: Eip1193Factories.fromEthersProvider(
+                networks.uns.locations.Layer2.provider,
+              ),
+            },
+          },
+        }
         : undefined,
     });
   }
@@ -396,20 +396,6 @@ export default class Resolution {
     const recordKey = `crypto.${ticker.toUpperCase()}.version.${chain.toUpperCase()}.address`;
     return this.callServiceForDomain(domain, (service) =>
       service.record(domain, recordKey),
-    );
-  }
-
-  /**
-   * Resolves given domain name to a verified twitter handle
-   * @async
-   * @param domain - domain name to be resolved
-   * @throws [[ResolutionError]] if twitter is not found
-   * @returns A promise that resolves in a verified twitter handle
-   */
-  async twitter(domain: string): Promise<string> {
-    domain = prepareAndValidateDomain(domain);
-    return this.callServiceForDomain(domain, (service) =>
-      service.twitter(domain),
     );
   }
 

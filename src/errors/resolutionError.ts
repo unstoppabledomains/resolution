@@ -31,7 +31,6 @@ export enum ResolutionErrorCode {
   RecordNotFound = 'RecordNotFound',
   MetadataEndpointError = 'MetadataEndpointError',
   ServiceProviderError = 'ServiceProviderError',
-  InvalidTwitterVerification = 'InvalidTwitterVerification',
   InconsistentDomainArray = 'InconsistentDomainArray',
   InvalidDomainAddress = 'InvalidDomainAddress',
 }
@@ -63,13 +62,6 @@ const HandlersByCode = {
     return `Method ${params.methodName} is not supported for ${params.domain}${zilHelp}`;
   },
 
-  [ResolutionErrorCode.InvalidTwitterVerification]: (params: {
-    domain?: string;
-    location?: UnsLocation;
-  }) =>
-    `${params.location ? `${params.location}: ` : ''}Domain ${
-      params.domain
-    } has invalid Twitter signature verification`,
   [ResolutionErrorCode.UnsupportedCurrency]: (params: {
     currencyTicker: string;
   }) => `${params.currencyTicker} is not supported`,

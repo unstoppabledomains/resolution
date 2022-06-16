@@ -16,7 +16,6 @@ import {
   BlockchainType,
   DomainMetadata,
 } from './types/publicTypes';
-import {isValidTwitterSignature} from './utils/TwitterSignatureValidator';
 import FetchProvider from './FetchProvider';
 import {
   eip137Childhash,
@@ -205,52 +204,6 @@ export default class Uns extends NamingService {
       ...Object.keys(SupportedKeys.keys),
       ...Object.keys(metadata.properties.records),
     ]);
-  }
-
-  async twitter(domain: string): Promise<string> {
-    const tokenId = this.namehash(domain);
-    const keys = [
-      'validation.social.twitter.username',
-      'social.twitter.username',
-    ];
-    const data = await this.getVerifiedData(domain, keys);
-    const {records, location} = data;
-    const validationSignature = records['validation.social.twitter.username'];
-    const twitterHandle = records['social.twitter.username'];
-    if (isNullAddress(validationSignature)) {
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-        domain,
-        location,
-        recordName: 'validation.social.twitter.username',
-      });
-    }
-
-    if (!twitterHandle) {
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-        domain,
-        location,
-        recordName: 'social.twitter.username',
-      });
-    }
-
-    const owner = data.owner;
-    if (
-      !isValidTwitterSignature({
-        tokenId,
-        owner,
-        twitterHandle,
-        validationSignature,
-      })
-    ) {
-      throw new ResolutionError(
-        ResolutionErrorCode.InvalidTwitterVerification,
-        {
-          domain,
-        },
-      );
-    }
-
-    return twitterHandle;
   }
 
   async reverse(

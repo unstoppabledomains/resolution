@@ -7,7 +7,6 @@ import {
   mockAPICalls,
   mockAsyncMethod,
   expectSpyToBeCalled,
-  CryptoDomainWithTwitterVerification,
   expectResolutionErrorCode,
 } from './helpers';
 import {NamingServiceName} from '../types/publicTypes';
@@ -45,45 +44,6 @@ describe('Unstoppable API', () => {
     );
   });
 
-  it('should return verified twitter handle', async () => {
-    const eyes = mockAsyncMethod(Networking, 'fetch', {
-      json: () => ({
-        addresses: {},
-        whois: {},
-        ipfs: {},
-        gundb: {},
-        social: {},
-        meta: {
-          domain: 'reseller-test-udtesting-052523593694.crypto',
-          namehash:
-            '0x0ef61568699a847f9994473ba65185dc75906121d3e10cb9deb37bc722ce6334',
-          tokenId:
-            '6767172009730303435244989139041815165136673026550796813275243310476136702772',
-          owner: '0x499dd6d875787869670900a2130223d85d4f6aa7',
-          resolver: '0xb66dce2da6afaaa98f2013446dbcb0f4b0ab2842',
-          type: 'CNS',
-          ttl: 0,
-        },
-        records: {
-          'social.twitter.username': 'Marlene12Bob',
-          'validation.social.twitter.username':
-            '0x01882395ce631866b76f43535843451444ef4a8ff44db0a9432d5d00658a510512c7519a87c78ba9cad7553e26262ada55c254434a1a3784cd98d06fb4946cfb1b',
-        },
-      }),
-    });
-    const twitterHandle = await resolution.twitter(
-      CryptoDomainWithTwitterVerification,
-    );
-    expectSpyToBeCalled([eyes]);
-    expect(twitterHandle).toBe('Marlene12Bob');
-  });
-
-  it('should throw unsupported method', async () => {
-    const handle = 'ryan.zil';
-    await expect(resolution.twitter(handle)).rejects.toThrowError(
-      `Method twitter is not supported for ${handle}`,
-    );
-  });
   it('returns owner of the domain', async () => {
     mockAPICalls('ud_api_generic_test', DefaultUrl);
     expect(await resolution.owner('cofounding.zil')).toEqual(

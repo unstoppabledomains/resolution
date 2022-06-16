@@ -24,7 +24,6 @@ import {
   ProviderProtocol,
   caseMock,
   mockAsyncMethod,
-  CryptoDomainWithTwitterVerification,
   skipItInLive,
   isLive,
   CryptoDomainWithUsdtMultiChainRecords,
@@ -1187,47 +1186,6 @@ describe('Resolution', () => {
           });
         });
       });
-
-      describe('.Verifications', () => {
-        describe('.Twitter', () => {
-          it('should return verified twitter handle', async () => {
-            const readerSpies = mockAsyncMethods(uns, {
-              get: {
-                resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
-                owner: '0x499dd6d875787869670900a2130223d85d4f6aa7',
-                records: {
-                  ['validation.social.twitter.username']:
-                    '0x01882395ce631866b76f43535843451444ef4a8ff44db0a9432d5d00658a510512c7519a87c78ba9cad7553e26262ada55c254434a1a3784cd98d06fb4946cfb1b',
-                  ['social.twitter.username']: 'Marlene12Bob',
-                },
-              },
-            });
-            const twitterHandle = await resolution.twitter(
-              CryptoDomainWithTwitterVerification,
-            );
-            expectSpyToBeCalled(readerSpies);
-            expect(twitterHandle).toBe('Marlene12Bob');
-          });
-
-          it('should throw unsupported method', async () => {
-            const resolution = new Resolution();
-            const unsSpy = mockAsyncMethod(
-              resolution.serviceMap.UNS.native,
-              'twitter',
-              async () => {
-                throw new ResolutionError(
-                  ResolutionErrorCode.UnregisteredDomain,
-                );
-              },
-            );
-            await expectResolutionErrorCode(
-              resolution.twitter('ryan.zil'),
-              ResolutionErrorCode.UnsupportedMethod,
-            );
-            expectSpyToBeCalled([unsSpy]);
-          });
-        });
-      });
     });
   });
 
@@ -1723,10 +1681,6 @@ describe('Resolution', () => {
     );
 
     it('should check all methods for domain validation', async () => {
-      await expectResolutionErrorCode(
-        () => resolution.twitter('hello#blockchain'),
-        ResolutionErrorCode.InvalidDomainAddress,
-      );
       await expectResolutionErrorCode(
         () => resolution.ipfsHash('hello#blockchain'),
         ResolutionErrorCode.InvalidDomainAddress,

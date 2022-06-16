@@ -1,6 +1,5 @@
 import {toBech32Address} from './utils/znsUtils';
 import {ResolutionError, ResolutionErrorCode} from './errors/resolutionError';
-import {isValidTwitterSignature} from './utils/TwitterSignatureValidator';
 import {
   Api,
   BlockchainType,
@@ -78,58 +77,6 @@ export default class UdApi extends NamingService {
       return toBech32Address(owner);
     }
     return owner;
-  }
-
-  async twitter(domain: string): Promise<string> {
-    const serviceName = findNamingServiceName(domain);
-    if (serviceName !== NamingServiceName.UNS) {
-      throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
-        domain,
-        methodName: 'twitter',
-      });
-    }
-
-    const domainMetaData = await this.resolve(domain);
-    if (!domainMetaData.meta.owner) {
-      throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-        domain,
-      });
-    }
-    const owner = domainMetaData.meta.owner;
-    const records = domainMetaData.records || {};
-    const validationSignature = records['validation.social.twitter.username'];
-    const twitterHandle = records['social.twitter.username'];
-
-    if (!validationSignature) {
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-        recordName: 'validation.social.twitter.username',
-        domain: domain,
-      });
-    }
-    if (!twitterHandle) {
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-        recordName: 'social.twitter.username',
-        domain: domain,
-      });
-    }
-
-    if (
-      !isValidTwitterSignature({
-        tokenId: domainMetaData.meta.namehash,
-        owner,
-        twitterHandle,
-        validationSignature,
-      })
-    ) {
-      throw new ResolutionError(
-        ResolutionErrorCode.InvalidTwitterVerification,
-        {
-          domain,
-        },
-      );
-    }
-
-    return twitterHandle;
   }
 
   async allRecords(domain: string): Promise<CryptoRecords> {

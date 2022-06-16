@@ -13,8 +13,6 @@ export const MainnetUrl = 'https://eth-rinkeby.alchemyapi.io';
 export const ZilliqaUrl = 'https://api.zilliqa.com';
 export const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
 
-export const CryptoDomainWithTwitterVerification =
-  'reseller-test-udtesting-052523593694.crypto';
 export const CryptoDomainWithUsdtMultiChainRecords =
   'test-usdt-and-dns-records.crypto';
 export const ZilDomainWithUsdtMultiChainRecords =

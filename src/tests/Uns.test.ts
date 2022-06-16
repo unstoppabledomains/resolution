@@ -3,7 +3,6 @@ import ResolutionError, {ResolutionErrorCode} from '../errors/resolutionError';
 import {NullAddress} from '../types';
 import {
   CryptoDomainLayerOneWithNoResolver,
-  CryptoDomainWithTwitterVerification,
   mockAsyncMethods,
   expectSpyToBeCalled,
   expectResolutionErrorCode,
@@ -137,95 +136,6 @@ describe('UNS', () => {
     expectSpyToBeCalled(eyes);
     expect(ipfsHash).toBe('QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu');
   });
-
-  it('should return verified twitter handle', async () => {
-    const spies = mockAsyncMethods(uns, {
-      get: {
-        resolver: '0xb66dce2da6afaaa98f2013446dbcb0f4b0ab2842',
-        owner: '0x499dd6d875787869670900a2130223d85d4f6aa7',
-        records: {
-          ['validation.social.twitter.username']:
-            '0x01882395ce631866b76f43535843451444ef4a8ff44db0a9432d5d00658a510512c7519a87c78ba9cad7553e26262ada55c254434a1a3784cd98d06fb4946cfb1b',
-          ['social.twitter.username']: 'Marlene12Bob',
-        },
-      },
-    });
-    const twitterHandle = await resolution.serviceMap[
-      NamingServiceName.UNS
-    ].native.twitter(CryptoDomainWithTwitterVerification);
-    expectSpyToBeCalled(spies);
-    expect(twitterHandle).toBe('Marlene12Bob');
-  });
-
-  skipItInLive(
-    'should throw error if record not found for twitter handle',
-    async () => {
-      mockAsyncMethods(uns, {
-        get: {
-          resolver: '0xb66dce2da6afaaa98f2013446dbcb0f4b0ab2842',
-          owner: '0x499dd6d875787869670900a2130223d85d4f6aa7',
-          records: {},
-          location: UnsLocation.Layer2,
-        },
-      });
-      expect(() =>
-        resolution.serviceMap[NamingServiceName.UNS].native.twitter(
-          WalletDomainLayerTwoWithAllRecords,
-        ),
-      ).rejects.toThrow(
-        new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-          domain: WalletDomainLayerTwoWithAllRecords,
-          location: UnsLocation.Layer2,
-          recordName: 'validation.social.twitter.username',
-        }),
-      );
-    },
-  );
-  it('should throw error if twitter validation signature is null', async () => {
-    mockAsyncMethods(uns, {
-      get: {
-        resolver: '0xb66dce2da6afaaa98f2013446dbcb0f4b0ab2842',
-        owner: '0x499dd6d875787869670900a2130223d85d4f6aa7',
-        records: {'validation.social.twitter.username': NullAddress},
-        location: UnsLocation.Layer2,
-      },
-    });
-    expect(() =>
-      resolution.serviceMap[NamingServiceName.UNS].native.twitter(
-        WalletDomainLayerTwoWithAllRecords,
-      ),
-    ).rejects.toThrow(
-      new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-        domain: WalletDomainLayerTwoWithAllRecords,
-        location: UnsLocation.Layer2,
-        recordName: 'validation.social.twitter.username',
-      }),
-    );
-  });
-  skipItInLive(
-    'should throw error if twitter handle is undefined',
-    async () => {
-      mockAsyncMethods(uns, {
-        get: {
-          resolver: '0xb66dce2da6afaaa98f2013446dbcb0f4b0ab2842',
-          owner: '0x499dd6d875787869670900a2130223d85d4f6aa7',
-          records: {'validation.social.twitter.username': 'random-signuture'},
-          location: UnsLocation.Layer2,
-        },
-      });
-      expect(() =>
-        resolution.serviceMap[NamingServiceName.UNS].native.twitter(
-          WalletDomainLayerTwoWithAllRecords,
-        ),
-      ).rejects.toThrow(
-        new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-          domain: WalletDomainLayerTwoWithAllRecords,
-          location: UnsLocation.Layer2,
-          recordName: 'social.twitter.username',
-        }),
-      );
-    },
-  );
 
   it('should return NoRecord Resolution error', async () => {
     const uns = resolution.serviceMap[NamingServiceName.UNS].native as Uns;

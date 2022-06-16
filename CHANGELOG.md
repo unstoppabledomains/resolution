@@ -8,6 +8,7 @@
 
 - Dropped Node.js v10 support
 - The `serviceName` method was removed
+- The `twitter` method was removed
 - The following methods got a new mandatory argument to specify NamingService:
   - `namehash`
   - `isValidHash`
