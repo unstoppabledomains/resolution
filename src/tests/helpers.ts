@@ -22,6 +22,9 @@ export const ZilDomainWithUsdtMultiChainRecords =
 export const CryptoDomainLayerOneWithNoResolver =
   'udtestdev-test-l1-domain-no-resolver.crypto';
 export const CryptoDomainWithAllRecords = 'test-usdt-and-dns-records.crypto';
+export const ZilDomainWithAllRecords = 'test-usdt-and-dns-records.zil';
+export const ZilDomainWithNoResolver =
+  'udtestdev-test-l1-domain-no-resolver.zil';
 export const WalletDomainLayerTwoWithAllRecords =
   'udtestdev-test-l2-domain-784391.wallet';
 export const WalletDomainLayerTwoWithNoRecords =
@@ -42,7 +45,7 @@ try {
 export function mockAsyncMethod(
   object: any,
   method: string,
-  value: any,
+  value: unknown,
 ): jest.SpyInstance {
   const spy = jest.spyOn(object, method);
   if (!isLive()) {
@@ -149,8 +152,8 @@ export function mockAPICalls(testName: string, url = MainnetUrl): void {
     return;
   }
 
-  const mcdt = mockData as any;
-  const mockCall = mcdt[testName] as [any];
+  const mcdt = mockData;
+  const mockCall = mcdt[testName];
 
   mockCall.forEach(({METHOD, REQUEST, RESPONSE}) => {
     switch (METHOD) {

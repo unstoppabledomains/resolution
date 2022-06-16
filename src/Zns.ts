@@ -13,6 +13,8 @@ import {
   NamingServiceName,
   Locations,
   UnsLocation,
+  BlockchainType,
+  DomainLocation,
 } from './types/publicTypes';
 import FetchProvider from './FetchProvider';
 import {znsChildhash, znsNamehash} from './utils/namehash';
@@ -68,10 +70,6 @@ export default class Zns extends NamingService {
     }
   }
 
-  serviceName(): NamingServiceName {
-    return this.name;
-  }
-
   async owner(domain: string): Promise<string> {
     const recordAddresses = await this.getRecordsAddresses(domain);
     if (!recordAddresses) {
@@ -125,14 +123,15 @@ export default class Zns extends NamingService {
   }
 
   async record(domain: string, key: string): Promise<string> {
-    const returnee = (await this.records(domain, [key]))[key];
-    if (!returnee) {
+    const records = await this.records(domain, [key]);
+    const record = records[key];
+    if (!record) {
       throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
         domain,
         recordName: key,
       });
     }
-    return returnee;
+    return record;
   }
 
   async records(domain: string, keys: string[]): Promise<CryptoRecords> {
@@ -195,11 +194,29 @@ export default class Zns extends NamingService {
     return this.registryAddr;
   }
 
-  locations(domains: string[]): Promise<Locations> {
-    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
-      method: NamingServiceName.ZNS,
-      methodName: 'locations',
-    });
+  async locations(domains: string[]): Promise<Locations> {
+    const recordsAddresses = await Promise.all(
+      domains.map((domain) => this.getRecordsAddresses(domain)),
+    );
+    return domains.reduce((locations, domain, i) => {
+      let location: DomainLocation | null = null;
+      const domainRecordsAddresses = recordsAddresses[i];
+      if (domainRecordsAddresses) {
+        const [ownerAddress, resolverAddress] = domainRecordsAddresses;
+        location = {
+          registryAddress: this.registryAddr,
+          resolverAddress,
+          networkId: this.network,
+          blockchain: BlockchainType.ZIL,
+          ownerAddress,
+          blockchainProviderUrl: this.url,
+        };
+      }
+      return {
+        ...locations,
+        [domain]: location,
+      };
+    }, {} as Locations);
   }
 
   private async getRecordsAddresses(

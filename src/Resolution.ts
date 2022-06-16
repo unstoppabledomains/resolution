@@ -9,22 +9,27 @@ import {
   DnsRecord,
   DnsRecordType,
   EthersProvider,
+  Locations,
   NamehashOptions,
   NamehashOptionsDefault,
   NamingServiceName,
   Provider,
-  ResolutionMethod,
   SourceConfig,
+  TokenUriMetadata,
   Web3Version0Provider,
   Web3Version1Provider,
-  TokenUriMetadata,
-  Locations,
   ReverseResolutionOptions,
   UnsLocation,
 } from './types/publicTypes';
 import ResolutionError, {ResolutionErrorCode} from './errors/resolutionError';
 import DnsUtils from './utils/DnsUtils';
-import {findNamingServiceName, signedLink} from './utils';
+import {
+  findNamingServiceName,
+  signedLink,
+  UnwrapPromise,
+  wrapResult,
+  unwrapResult,
+} from './utils';
 import {Eip1993Factories as Eip1193Factories} from './utils/Eip1993Factories';
 import {NamingService} from './NamingService';
 import Networking from './utils/Networking';
@@ -53,7 +58,7 @@ export default class Resolution {
   /**
    * @internal
    */
-  readonly serviceMap: Record<NamingServiceName, NamingService>;
+  readonly serviceMap: Record<NamingServiceName, ServicesEntry>;
 
   constructor({sourceConfig = undefined}: {sourceConfig?: SourceConfig} = {}) {
     const uns = isApi(sourceConfig?.uns)
@@ -62,9 +67,23 @@ export default class Resolution {
     const zns = isApi(sourceConfig?.zns)
       ? new UdApi(sourceConfig?.zns)
       : new Zns(sourceConfig?.zns);
+
+    // If both UNS and ZNS use the same UdApi providers, we don't want to call the API twice as it would return same
+    // responses. It should be enough to compare just the URLs, as the network param isn't actually used in the calls.
+    const equalUdApiProviders =
+      uns instanceof UdApi && zns instanceof UdApi && uns.url === zns.url;
+
+    // If a user configures the lib with an API source, we still want to initialise native blockchain services to access
+    // some non-async methods such as namehash, as they are unavailable in the UdApi service.
     this.serviceMap = {
-      [NamingServiceName.UNS]: uns,
-      [NamingServiceName.ZNS]: zns,
+      [NamingServiceName.UNS]: {
+        usedServices: [uns],
+        native: isApi(sourceConfig?.uns) ? new Uns() : uns,
+      },
+      [NamingServiceName.ZNS]: {
+        usedServices: equalUdApiProviders ? [uns] : [uns, zns],
+        native: isApi(sourceConfig?.zns) ? new Zns() : zns,
+      },
     };
   }
 
@@ -80,9 +99,11 @@ export default class Resolution {
     const resolution = new this();
 
     if (sourceConfig.uns) {
-      resolution.serviceMap[NamingServiceName.UNS] = await Uns.autoNetwork(
-        sourceConfig.uns,
-      );
+      const uns = await Uns.autoNetwork(sourceConfig.uns);
+      resolution.serviceMap[NamingServiceName.UNS] = {
+        usedServices: [uns],
+        native: uns,
+      };
     }
 
     return resolution;
@@ -239,21 +260,21 @@ export default class Resolution {
     return this.fromEthereumEip1193Provider({
       uns: networks.uns
         ? {
-          locations: {
-            Layer1: {
-              network: networks.uns.locations.Layer1.network,
-              provider: Eip1193Factories.fromWeb3Version0Provider(
-                networks.uns.locations.Layer1.provider,
-              ),
+            locations: {
+              Layer1: {
+                network: networks.uns.locations.Layer1.network,
+                provider: Eip1193Factories.fromWeb3Version0Provider(
+                  networks.uns.locations.Layer1.provider,
+                ),
+              },
+              Layer2: {
+                network: networks.uns.locations.Layer2.network,
+                provider: Eip1193Factories.fromWeb3Version0Provider(
+                  networks.uns.locations.Layer2.provider,
+                ),
+              },
             },
-            Layer2: {
-              network: networks.uns.locations.Layer2.network,
-              provider: Eip1193Factories.fromWeb3Version0Provider(
-                networks.uns.locations.Layer2.provider,
-              ),
-            },
-          },
-        }
+          }
         : undefined,
     });
   }
@@ -281,21 +302,21 @@ export default class Resolution {
     return this.fromEthereumEip1193Provider({
       uns: networks.uns
         ? {
-          locations: {
-            Layer1: {
-              network: networks.uns.locations.Layer1.network,
-              provider: Eip1193Factories.fromWeb3Version1Provider(
-                networks.uns.locations.Layer1.provider,
-              ),
+            locations: {
+              Layer1: {
+                network: networks.uns.locations.Layer1.network,
+                provider: Eip1193Factories.fromWeb3Version1Provider(
+                  networks.uns.locations.Layer1.provider,
+                ),
+              },
+              Layer2: {
+                network: networks.uns.locations.Layer2.network,
+                provider: Eip1193Factories.fromWeb3Version1Provider(
+                  networks.uns.locations.Layer2.provider,
+                ),
+              },
             },
-            Layer2: {
-              network: networks.uns.locations.Layer2.network,
-              provider: Eip1193Factories.fromWeb3Version1Provider(
-                networks.uns.locations.Layer2.provider,
-              ),
-            },
-          },
-        }
+          }
         : undefined,
     });
   }
@@ -326,21 +347,21 @@ export default class Resolution {
     return this.fromEthereumEip1193Provider({
       uns: networks.uns
         ? {
-          locations: {
-            Layer1: {
-              network: networks.uns.locations.Layer1.network,
-              provider: Eip1193Factories.fromEthersProvider(
-                networks.uns.locations.Layer1.provider,
-              ),
+            locations: {
+              Layer1: {
+                network: networks.uns.locations.Layer1.network,
+                provider: Eip1193Factories.fromEthersProvider(
+                  networks.uns.locations.Layer1.provider,
+                ),
+              },
+              Layer2: {
+                network: networks.uns.locations.Layer2.network,
+                provider: Eip1193Factories.fromEthersProvider(
+                  networks.uns.locations.Layer2.provider,
+                ),
+              },
             },
-            Layer2: {
-              network: networks.uns.locations.Layer2.network,
-              provider: Eip1193Factories.fromEthersProvider(
-                networks.uns.locations.Layer2.provider,
-              ),
-            },
-          },
-        }
+          }
         : undefined,
     });
   }
@@ -372,10 +393,10 @@ export default class Resolution {
     chain: string,
   ): Promise<string> {
     domain = prepareAndValidateDomain(domain);
-    const method = this.getNamingMethodOrThrow(domain);
-
     const recordKey = `crypto.${ticker.toUpperCase()}.version.${chain.toUpperCase()}.address`;
-    return method.record(domain, recordKey);
+    return this.callServiceForDomain(domain, (service) =>
+      service.record(domain, recordKey),
+    );
   }
 
   /**
@@ -387,8 +408,9 @@ export default class Resolution {
    */
   async twitter(domain: string): Promise<string> {
     domain = prepareAndValidateDomain(domain);
-    const method = this.getNamingMethodOrThrow(domain);
-    return method.twitter(domain);
+    return this.callServiceForDomain(domain, (service) =>
+      service.twitter(domain),
+    );
   }
 
   /**
@@ -454,7 +476,9 @@ export default class Resolution {
    */
   async resolver(domain: string): Promise<string> {
     domain = prepareAndValidateDomain(domain);
-    const resolver = await this.getNamingMethodOrThrow(domain).resolver(domain);
+    const resolver = await this.callServiceForDomain(domain, (service) =>
+      service.resolver(domain),
+    );
     if (!resolver) {
       throw new ResolutionError(ResolutionErrorCode.UnspecifiedResolver, {
         domain,
@@ -469,8 +493,9 @@ export default class Resolution {
    */
   async owner(domain: string): Promise<string | null> {
     domain = prepareAndValidateDomain(domain);
-    const method = this.getNamingMethodOrThrow(domain);
-    return (await method.owner(domain)) || null;
+    return this.callServiceForDomain(domain, (service) =>
+      service.owner(domain),
+    );
   }
 
   /**
@@ -480,8 +505,9 @@ export default class Resolution {
    */
   async record(domain: string, recordKey: string): Promise<string> {
     domain = prepareAndValidateDomain(domain);
-    const method = this.getNamingMethodOrThrow(domain);
-    return method.record(domain, recordKey);
+    return this.callServiceForDomain(domain, (service) =>
+      service.record(domain, recordKey),
+    );
   }
 
   /**
@@ -491,53 +517,72 @@ export default class Resolution {
    */
   async records(domain: string, keys: string[]): Promise<CryptoRecords> {
     domain = prepareAndValidateDomain(domain);
-    const method = this.getNamingMethodOrThrow(domain);
-    return method.records(domain, keys);
+    return this.callServiceForDomain(domain, (service) =>
+      service.records(domain, keys),
+    );
   }
 
   /**
    * @param domain domain name
    * @returns A Promise of whether or not the domain belongs to a wallet
    */
-  async isRegistered(domain: string): Promise<Boolean> {
+  async isRegistered(domain: string): Promise<boolean> {
     domain = prepareAndValidateDomain(domain);
-    const method = this.getNamingMethodOrThrow(domain);
-    return method.isRegistered(domain);
+    return this.callServiceForDomainBoolean(
+      domain,
+      (service) => service.isRegistered(domain),
+      {
+        throwIfUnsupportedDomain: true,
+        expectedValue: true,
+      },
+    );
   }
 
   /**
    * @param domain domain name
    * @returns A Promise of whether or not the domain is available
    */
-  async isAvailable(domain: string): Promise<Boolean> {
+  async isAvailable(domain: string): Promise<boolean> {
     domain = prepareAndValidateDomain(domain);
-    const method = this.getNamingMethodOrThrow(domain);
-    return method.isAvailable(domain);
+    return this.callServiceForDomainBoolean(
+      domain,
+      (service) => service.isAvailable(domain),
+      {
+        throwIfUnsupportedDomain: true,
+        expectedValue: false,
+      },
+    );
   }
 
   /**
    * @returns Produces a namehash from supported naming service in hex format with 0x prefix.
    * Corresponds to ERC721 token id in case of Ethereum based naming service like UNS.
    * @param domain domain name to be converted
+   * @param namingService "UNS" or "ZNS" (uses keccak256 or sha256 algorithm respectively)
    * @param options formatting options
    * @throws [[ResolutionError]] with UnsupportedDomain error code if domain extension is unknown
    */
   namehash(
     domain: string,
+    namingService: NamingServiceName,
     options: NamehashOptions = NamehashOptionsDefault,
   ): string {
+    const service = this.serviceMap[namingService];
+    if (!service) {
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedService, {
+        namingService,
+      });
+    }
+
     domain = prepareAndValidateDomain(domain);
-    return this.formatNamehash(
-      this.getNamingMethodOrThrow(domain).namehash(domain),
-      options,
-    );
+    return this.formatNamehash(service.native.namehash(domain), options);
   }
 
   /**
    * @returns a namehash of a subdomain with name label
    * @param parent namehash of a parent domain
    * @param label subdomain name
-   * @param namingService "UNS" or "ZNS"
+   * @param namingService "UNS" or "ZNS" (uses keccak256 or sha256 algorithm respectively)
    * @param options formatting options
    */
   childhash(
@@ -552,7 +597,10 @@ export default class Resolution {
         namingService,
       });
     }
-    return this.formatNamehash(service.childhash(parent, label), options);
+    return this.formatNamehash(
+      service.native.childhash(parent, label),
+      options,
+    );
   }
 
   private formatNamehash(hash, options: NamehashOptions) {
@@ -566,12 +614,24 @@ export default class Resolution {
 
   /**
    * Checks weather the domain name matches the hash
-   * @param domain - domain name to check againt
+   * @param domain - domain name to check against
    * @param hash - hash obtained from the blockchain
+   * @param namingService - "UNS" or "ZNS" (uses keccak256 or sha256 algorithm respectively)
    */
-  isValidHash(domain: string, hash: string): boolean {
+  isValidHash(
+    domain: string,
+    hash: string,
+    namingService: NamingServiceName,
+  ): boolean {
+    const service = this.serviceMap[namingService];
+    if (!service) {
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedService, {
+        namingService,
+      });
+    }
+
     domain = prepareAndValidateDomain(domain);
-    return this.namehash(domain) === hash;
+    return service.native.namehash(domain) === hash;
   }
 
   /**
@@ -581,17 +641,14 @@ export default class Resolution {
    */
   async isSupportedDomain(domain: string): Promise<boolean> {
     domain = prepareAndValidateDomain(domain);
-    const namingMethod = this.getNamingMethod(domain);
-    return namingMethod ? await namingMethod.isSupportedDomain(domain) : false;
-  }
-
-  /**
-   * Returns the name of the service for a domain UNS | ZNS
-   * @param domain - domain name to look for
-   */
-  serviceName(domain: string): ResolutionMethod {
-    domain = prepareAndValidateDomain(domain);
-    return this.getNamingMethodOrThrow(domain).serviceName();
+    return this.callServiceForDomainBoolean(
+      domain,
+      (service) => service.isSupportedDomain(domain),
+      {
+        throwIfUnsupportedDomain: false,
+        expectedValue: true,
+      },
+    );
   }
 
   /**
@@ -601,7 +658,9 @@ export default class Resolution {
    */
   async allRecords(domain: string): Promise<CryptoRecords> {
     domain = prepareAndValidateDomain(domain);
-    return this.getNamingMethodOrThrow(domain).allRecords(domain);
+    return this.callServiceForDomain(domain, (service) =>
+      service.allRecords(domain),
+    );
   }
 
   async allNonEmptyRecords(domain: string): Promise<CryptoRecords> {
@@ -618,9 +677,10 @@ export default class Resolution {
   async dns(domain: string, types: DnsRecordType[]): Promise<DnsRecord[]> {
     const dnsUtils = new DnsUtils();
     domain = prepareAndValidateDomain(domain);
-    const method = this.getNamingMethodOrThrow(domain);
     const dnsRecordKeys = this.getDnsRecordKeys(types);
-    const blockchainData = await method.records(domain, dnsRecordKeys);
+    const blockchainData = await this.callServiceForDomain(domain, (service) =>
+      service.records(domain, dnsRecordKeys),
+    );
     return dnsUtils.toList(blockchainData);
   }
 
@@ -630,8 +690,12 @@ export default class Resolution {
    * @param domain - domain name
    */
   async tokenURI(domain: string): Promise<string> {
-    const namehash = this.namehash(domain);
-    return this.getNamingMethodOrThrow(domain).getTokenUri(namehash);
+    // The `getTokenUri` method isn't supported in ZNS (it'll throw in the next call), so we just assume that we need
+    // to calculate a UNS namehash.
+    const namehash = this.namehash(domain, NamingServiceName.UNS);
+    return this.callServiceForDomain(domain, (service) =>
+      service.getTokenUri(namehash),
+    );
   }
 
   /**
@@ -650,8 +714,9 @@ export default class Resolution {
    * @returns Registry contract address
    */
   async registryAddress(domain: string): Promise<string> {
-    const method = this.getNamingMethodOrThrow(domain);
-    return method.registryAddress(domain);
+    return this.callServiceForDomain(domain, (service) =>
+      service.registryAddress(domain),
+    );
   }
 
   /**
@@ -663,15 +728,11 @@ export default class Resolution {
    */
   async unhash(hash: string, service: NamingServiceName): Promise<string> {
     hash = fromDecStringToHex(hash);
-    const name = await this.serviceMap[service].getDomainFromTokenId(hash);
-    if (this.namehash(name) !== hash) {
-      throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
-        methodName: 'unhash',
-        domain: name,
-        providerMessage: 'Service provider returned an invalid domain name',
-      });
-    }
-    return name;
+    const services = this.serviceMap[service].usedServices;
+    // UNS is the only service and ZNS is the one with the lowest priority.
+    // We don't want to access the `native` service, as a user may want to call `UdApi`.
+    const method = services[services.length - 1];
+    return method.getDomainFromTokenId(hash);
   }
 
   /**
@@ -680,13 +741,42 @@ export default class Resolution {
    * @returns Promise<Locations> - A map of domain name and Location (a set of attributes like blockchain,
    */
   async locations(domains: string[]): Promise<Locations> {
-    const method = this.getNamingMethodOrThrow(domains[0]);
-    for (const domain of domains) {
-      if (!(await method.isSupportedDomain(domain))) {
-        throw new ResolutionError(ResolutionErrorCode.InconsistentDomainArray);
-      }
+    const zilDomains = domains.filter((domain) => domain.endsWith('.zil'));
+
+    // Here, we call both UNS and ZNS methods and merge the results.
+    // If any of the calls fails, this method will fail as well as we aren't interested in partial results.
+    // For example, if one of the providers is configured as `UdApi`, it'll fail as the method is unsupported.
+    // But if there are no .zil domains with absent UNS locations (i.e. all the requested .zil domains have been
+    // migrated to UNS), the ZNS call result will be ignored and an error, if there's one, won't be thrown.
+
+    const unsPromise = this.serviceMap.UNS.usedServices[0].locations(domains);
+    if (!zilDomains.length) {
+      return unsPromise;
     }
-    return method.locations(domains);
+
+    const znsServices = this.serviceMap.ZNS.usedServices;
+    // The actual ZNS service is the last one in the array.
+    const znsService = znsServices[znsServices.length - 1];
+    // Start fetching ZNS locations before awaiting UNS ones for the concurrency sake, wrap errors to avoid unhandled
+    // exceptions in case we decide that we aren't interested in the result.
+    const znsPromise = wrapResult(() => znsService.locations(zilDomains));
+
+    // Fetch UNS locations first. If we see that there are no .zil domains with absent locations, we can return early.
+    const unsLocations = await unsPromise;
+    const emptyZilEntries = Object.entries(unsLocations).filter(
+      ([domain, location]) => domain.endsWith('.zil') && !location,
+    );
+    if (!emptyZilEntries.length) {
+      return unsLocations;
+    }
+    // If we don't have locations for some .zil domains in UNS, we want to check whether they are present in ZNS and
+    // merge them if that's the case.
+    const znsLocations = await znsPromise.then(unwrapResult);
+    for (const [domain, _location] of emptyZilEntries) {
+      unsLocations[domain] = znsLocations[domain];
+    }
+
+    return unsLocations;
   }
 
   /**
@@ -759,32 +849,100 @@ export default class Resolution {
     return records[newRecord] || records[oldRecord];
   }
 
-  private getNamingMethod(domain: string): NamingService | undefined {
-    return this.serviceMap[findNamingServiceName(domain)];
-  }
-
-  private getNamingMethodOrThrow(domain: string): NamingService {
-    const method = this.getNamingMethod(domain);
-    if (!method) {
+  private async callServiceForDomain<T>(
+    domain: string,
+    func: (service: NamingService) => T,
+  ): Promise<UnwrapPromise<T>> {
+    const serviceName = findNamingServiceName(domain);
+    if (!serviceName) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
         domain,
       });
     }
 
-    return method;
+    const servicePromises = this.serviceMap[serviceName].usedServices.map(
+      (service) => wrapResult(() => func(service)),
+    );
+
+    for (const servicePromise of servicePromises) {
+      const serviceCallResult = await servicePromise;
+      if (serviceCallResult.error !== null) {
+        if (
+          !(
+            serviceCallResult.error instanceof ResolutionError &&
+            serviceCallResult.error.code ===
+              ResolutionErrorCode.UnregisteredDomain
+          )
+        ) {
+          throw serviceCallResult.error;
+        }
+      } else {
+        return serviceCallResult.result;
+      }
+    }
+
+    throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+      domain,
+    });
+  }
+
+  // Expects that a called method never throws the `ResolutionErrorCode.UnregisteredDomain` (it doesn't handle it).
+  private async callServiceForDomainBoolean(
+    domain: string,
+    func: (service: NamingService) => Promise<boolean>,
+    options: {throwIfUnsupportedDomain: boolean; expectedValue: boolean},
+  ): Promise<boolean> {
+    const serviceName = findNamingServiceName(domain);
+    if (!serviceName) {
+      if (!options.throwIfUnsupportedDomain) {
+        return !options.expectedValue;
+      }
+      throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
+        domain,
+      });
+    }
+
+    const servicePromises = this.serviceMap[serviceName].usedServices.map(
+      (service) => wrapResult(() => func(service)),
+    );
+
+    for (const servicePromise of servicePromises) {
+      const {result, error} = await servicePromise;
+      if (error) {
+        if (
+          !(
+            error instanceof ResolutionError &&
+            error.code === ResolutionErrorCode.UnregisteredDomain
+          )
+        ) {
+          throw error;
+        }
+      } else if (result === options.expectedValue) {
+        // If the result is not the one which is expected, we don't want to return it immediately.
+        return result;
+      }
+    }
+
+    return !options.expectedValue;
   }
 
   private async reverseGetTokenId(
     address: string,
     location?: UnsLocation,
   ): Promise<string> {
-    const service = this.serviceMap['UNS'];
+    const service = this.serviceMap['UNS'].native;
     const tokenId = await service.reverseOf(address, location);
     return tokenId as string;
   }
 }
 
 export {Resolution};
+
+type ServicesEntry = {
+  usedServices: NamingService[];
+  // Note: even if a user configures the lib in the API mode, this will contain a blockchain naming service.
+  native: NamingService;
+};
 
 function isApi(obj: any): obj is Api {
   return obj && obj.api;

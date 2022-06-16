@@ -194,7 +194,7 @@ export const toChecksumAddress = (address: string): string => {
 
   address = address.toLowerCase().replace('0x', '');
   const hash = sha256(hexToBytes(address));
-  const v = new BN(hash as unknown as string, 'hex', 'be');
+  const v = new BN(hash, 'hex', 'be');
   let ret = '0x';
 
   for (let i = 0; i < address.length; i++) {

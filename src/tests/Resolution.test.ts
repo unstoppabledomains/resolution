@@ -69,8 +69,8 @@ beforeEach(() => {
       zns: {network: 'testnet'},
     },
   });
-  uns = resolution.serviceMap[NamingServiceName.UNS] as unknown as Uns;
-  zns = resolution.serviceMap[NamingServiceName.ZNS] as unknown as Zns;
+  uns = resolution.serviceMap[NamingServiceName.UNS].native as Uns;
+  zns = resolution.serviceMap[NamingServiceName.ZNS].native as Zns;
 });
 
 describe('Resolution', () => {
@@ -105,11 +105,11 @@ describe('Resolution', () => {
       // We need to manually restore the function as jest.restoreAllMocks and simillar works only with spyOn
       Uns.autoNetwork = UnsGetNetworkOriginal;
       expect(
-        (resolution.serviceMap[NamingServiceName.UNS] as unknown as Uns).unsl1
+        (resolution.serviceMap[NamingServiceName.UNS].native as Uns).unsl1
           .network,
       ).toBe('rinkeby');
       expect(
-        (resolution.serviceMap[NamingServiceName.UNS] as unknown as Uns).unsl2
+        (resolution.serviceMap[NamingServiceName.UNS].native as Uns).unsl2
           .network,
       ).toBe('polygon-mumbai');
     });
@@ -253,11 +253,11 @@ describe('Resolution', () => {
       expect(spy).toBeCalledTimes(1);
       expect(spyTwo).toBeCalledTimes(1);
       expect(
-        (resolution.serviceMap[NamingServiceName.UNS] as unknown as Uns).unsl1
+        (resolution.serviceMap[NamingServiceName.UNS].native as Uns).unsl1
           .network,
       ).toBe('mainnet');
       expect(
-        (resolution.serviceMap[NamingServiceName.UNS] as unknown as Uns).unsl2
+        (resolution.serviceMap[NamingServiceName.UNS].native as Uns).unsl2
           .network,
       ).toBe('polygon-mumbai');
     });
@@ -341,7 +341,7 @@ describe('Resolution', () => {
           },
         },
       });
-      uns = resolution.serviceMap[NamingServiceName.UNS] as unknown as Uns;
+      uns = resolution.serviceMap[NamingServiceName.UNS].native as Uns;
       expect(uns.unsl1.url).toBe(
         `https://eth-rinkeby.alchemyapi.io/v2/api-key`,
       );
@@ -368,31 +368,27 @@ describe('Resolution', () => {
       });
       expect(
         (
-          resolutionFromZilliqaProvider.serviceMap[
-            NamingServiceName.ZNS
-          ] as unknown as Zns
+          resolutionFromZilliqaProvider.serviceMap[NamingServiceName.ZNS]
+            .native as Zns
         ).url,
       ).toEqual(
-        (resolution.serviceMap[NamingServiceName.ZNS] as unknown as Zns).url,
+        (resolution.serviceMap[NamingServiceName.ZNS].native as Zns).url,
       );
       expect(
         (
-          resolutionFromZilliqaProvider.serviceMap[
-            NamingServiceName.ZNS
-          ] as unknown as Zns
+          resolutionFromZilliqaProvider.serviceMap[NamingServiceName.ZNS]
+            .native as Zns
         ).network,
       ).toEqual(
-        (resolution.serviceMap[NamingServiceName.ZNS] as unknown as Zns)
-          .network,
+        (resolution.serviceMap[NamingServiceName.ZNS].native as Zns).network,
       );
       expect(
         (
-          resolutionFromZilliqaProvider.serviceMap[
-            NamingServiceName.ZNS
-          ] as unknown as Zns
+          resolutionFromZilliqaProvider.serviceMap[NamingServiceName.ZNS]
+            .native as Zns
         ).registryAddr,
       ).toEqual(
-        (resolution.serviceMap[NamingServiceName.ZNS] as unknown as Zns)
+        (resolution.serviceMap[NamingServiceName.ZNS].native as Zns)
           .registryAddr,
       );
     });
@@ -401,14 +397,17 @@ describe('Resolution', () => {
       const zilliqaProvider = new HTTPProvider('https://api.zilliqa.com');
       const provider = Eip1193Factories.fromZilliqaProvider(zilliqaProvider);
       const resolution = Resolution.fromZilliqaProvider(provider);
-      zns = resolution.serviceMap[NamingServiceName.ZNS] as unknown as Zns;
-      const spies = mockAsyncMethods(zns, {
-        allRecords: {
-          'crypto.ETH.address': '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
-        },
+      uns = resolution.serviceMap[NamingServiceName.UNS].native as Uns;
+      zns = resolution.serviceMap[NamingServiceName.ZNS].native as Zns;
+
+      const unsSpy = mockAsyncMethod(uns, 'record', async () => {
+        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
+      });
+      const znsSpy = mockAsyncMethod(zns, 'allRecords', {
+        'crypto.ETH.address': '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
       });
       const ethAddress = await resolution.addr('brad.zil', 'ETH');
-      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled([unsSpy, znsSpy]);
       expect(ethAddress).toBe('0x45b31e01AA6f42F0549aD482BE81635ED3149abb');
     });
 
@@ -475,54 +474,22 @@ describe('Resolution', () => {
           },
         );
       });
-
-      describe('serviceName', () => {
-        it('checks zns service name', () => {
-          const resolution = new Resolution();
-          const serviceName = resolution.serviceName('domain.zil');
-          expect(serviceName).toBe('ZNS');
-        });
-
-        it('checks uns service name', () => {
-          const resolution = new Resolution();
-          const serviceName = resolution.serviceName('domain.crypto');
-          expect(serviceName).toBe('UNS');
-        });
-        it('checks uns service name', () => {
-          const resolution = new Resolution();
-          const serviceName = resolution.serviceName('domain.wallet');
-          expect(serviceName).toBe('UNS');
-        });
-        it('checks uns service name', () => {
-          const resolution = new Resolution();
-          const serviceName = resolution.serviceName('domain.coin');
-          expect(serviceName).toBe('UNS');
-        });
-        it('checks uns service name', () => {
-          const resolution = new Resolution();
-          const serviceName = resolution.serviceName('domain.bitcoin');
-          expect(serviceName).toBe('UNS');
-        });
-        it('checks uns service name', () => {
-          const resolution = new Resolution();
-          const serviceName = resolution.serviceName('domain.x');
-          expect(serviceName).toBe('UNS');
-        });
-      });
     });
 
     describe('.Errors', () => {
       it('checks Resolution#addr error #1', async () => {
         const resolution = new Resolution();
-        zns = resolution.serviceMap[NamingServiceName.ZNS] as unknown as Zns;
-        const spy = mockAsyncMethods(zns, {
-          getRecordsAddresses: undefined,
+        uns = resolution.serviceMap[NamingServiceName.UNS].native as Uns;
+        zns = resolution.serviceMap[NamingServiceName.ZNS].native as Zns;
+        const unsSpy = mockAsyncMethod(uns, 'record', async () => {
+          throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
         });
+        const znsSpy = mockAsyncMethod(zns, 'getRecordsAddresses', undefined);
         await expectResolutionErrorCode(
           resolution.addr('sdncdoncvdinvcsdncs.zil', 'ZIL'),
           ResolutionErrorCode.UnregisteredDomain,
         );
-        expectSpyToBeCalled(spy);
+        expectSpyToBeCalled([unsSpy, znsSpy]);
       });
       it('checks Resolution#addr error #2', async () => {
         const resolution = new Resolution({
@@ -541,7 +508,7 @@ describe('Resolution', () => {
             },
           },
         });
-        uns = resolution.serviceMap[NamingServiceName.UNS] as unknown as Uns;
+        uns = resolution.serviceMap[NamingServiceName.UNS].native as Uns;
         const spy = mockAsyncMethods(uns, {
           get: {},
         });
@@ -560,17 +527,18 @@ describe('Resolution', () => {
       });
 
       it('checks error for email on ryan-testing.zil', async () => {
-        const spies = mockAsyncMethods(zns, {
-          allRecords: {
-            'crypto.ETH.address': '0xc101679df8e2d6092da6d7ca9bced5bfeeb5abd8',
-            'crypto.ZIL.address': 'zil1k78e8zkh79lc47mrpcwqyhdrdkz7ptumk7ud90',
-          },
+        const unsSpy = mockAsyncMethod(uns, 'record', async () => {
+          throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
         });
+        const znsSpy = mockAsyncMethod(zns, 'allRecords', async () => ({
+          'crypto.ETH.address': '0xc101679df8e2d6092da6d7ca9bced5bfeeb5abd8',
+          'crypto.ZIL.address': 'zil1k78e8zkh79lc47mrpcwqyhdrdkz7ptumk7ud90',
+        }));
         await expectResolutionErrorCode(
           resolution.email('ryan-testing.zil'),
           ResolutionErrorCode.RecordNotFound,
         );
-        expectSpyToBeCalled(spies);
+        expectSpyToBeCalled([unsSpy, znsSpy]);
       });
 
       describe('.Namehash errors', () => {
@@ -578,11 +546,11 @@ describe('Resolution', () => {
           const unsInvalidDomain = 'hello..crypto';
           const znsInvalidDomain = 'hello..zil';
           await expectResolutionErrorCode(
-            () => resolution.namehash(unsInvalidDomain),
+            () => resolution.namehash(unsInvalidDomain, NamingServiceName.UNS),
             ResolutionErrorCode.UnsupportedDomain,
           );
           await expectResolutionErrorCode(
-            () => resolution.namehash(znsInvalidDomain),
+            () => resolution.namehash(znsInvalidDomain, NamingServiceName.UNS),
             ResolutionErrorCode.UnsupportedDomain,
           );
         });
@@ -648,19 +616,18 @@ describe('Resolution', () => {
 
       describe('.Metadata', () => {
         it('checks return of email for testing.zil', async () => {
-          const spies = mockAsyncMethods(zns, {
-            allRecords: {
-              'ipfs.html.hash':
-                'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
-              'ipfs.html.value':
-                'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu',
-              'ipfs.redirect_domain.value': 'www.unstoppabledomains.com',
-              'whois.email.value': 'derainberk@gmail.com',
-              'whois.for_sale.value': 'true',
-            },
+          const unsSpy = mockAsyncMethod(uns, 'record', async () => {
+            throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
           });
+          const znsSpy = mockAsyncMethod(zns, 'allRecords', async () => ({
+            'ipfs.html.hash': 'QmefehFs5n8yQcGCVJnBMY3Hr6aMRHtsoniAhsM1KsHMSe',
+            'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu',
+            'ipfs.redirect_domain.value': 'www.unstoppabledomains.com',
+            'whois.email.value': 'derainberk@gmail.com',
+            'whois.for_sale.value': 'true',
+          }));
           const email = await resolution.email('testing.zil');
-          expectSpyToBeCalled(spies);
+          expectSpyToBeCalled([unsSpy, znsSpy]);
           expect(email).toBe('derainberk@gmail.com');
         });
       });
@@ -758,13 +725,10 @@ describe('Resolution', () => {
       describe('.Providers', () => {
         it('should work with web3HttpProvider', async () => {
           // web3-providers-http has problems with type definitions
-          // We still prefer everything to be statically typed on our end for better mocking
-          const provider = new (Web3HttpProvider as any)(
-            protocolLink(),
-          ) as Web3HttpProvider.HttpProvider;
+          const provider = new (Web3HttpProvider as any)(protocolLink());
           const polygonProvider = new (Web3HttpProvider as any)(
             protocolLink(ProviderProtocol.http, 'UNSL2'),
-          ) as Web3HttpProvider.HttpProvider;
+          );
           // mock the send function with different implementations (each should call callback right away with different answers)
           const eye = mockAsyncMethod(
             provider,
@@ -796,7 +760,7 @@ describe('Resolution', () => {
               },
             },
           });
-          const uns = resolution.serviceMap['UNS'] as unknown as Uns;
+          const uns = resolution.serviceMap['UNS'].native as Uns;
           mockAsyncMethod(uns.unsl2.readerContract, 'call', () =>
             Promise.resolve([NullAddress, NullAddress, {}]),
           );
@@ -809,13 +773,12 @@ describe('Resolution', () => {
 
         it('should work with webSocketProvider', async () => {
           // web3-providers-ws has problems with type definitions
-          // We still prefer everything to be statically typed on our end for better mocking
           const provider = new (Web3WsProvider as any)(
             protocolLink(ProviderProtocol.wss),
-          ) as Web3WsProvider.WebsocketProvider;
+          );
           const polygonProvider = new (Web3WsProvider as any)(
             protocolLink(ProviderProtocol.wss, 'UNSL2'),
-          ) as Web3WsProvider.WebsocketProvider;
+          );
           const eye = mockAsyncMethod(provider, 'send', (payload, callback) => {
             const result = caseMock(payload.params?.[0], RpcProviderTestCases);
             callback(null, {
@@ -839,7 +802,7 @@ describe('Resolution', () => {
               },
             },
           });
-          const uns = resolution.serviceMap['UNS'] as unknown as Uns;
+          const uns = resolution.serviceMap['UNS'].native as Uns;
           mockAsyncMethod(uns.unsl2.readerContract, 'call', (params) =>
             Promise.resolve([NullAddress, NullAddress, {}]),
           );
@@ -866,7 +829,7 @@ describe('Resolution', () => {
               },
             },
           });
-          const uns = resolution.serviceMap['UNS'] as unknown as Uns;
+          const uns = resolution.serviceMap['UNS'].native as Uns;
           mockAsyncMethod(uns.unsl2.readerContract, 'call', (params) =>
             Promise.resolve([NullAddress, NullAddress, {}]),
           );
@@ -899,7 +862,7 @@ describe('Resolution', () => {
               },
             },
           });
-          const uns = resolution.serviceMap['UNS'] as unknown as Uns;
+          const uns = resolution.serviceMap['UNS'].native as Uns;
           mockAsyncMethod(uns.unsl2.readerContract, 'call', (params) =>
             Promise.resolve([NullAddress, NullAddress, {}]),
           );
@@ -946,7 +909,7 @@ describe('Resolution', () => {
               },
             },
           });
-          const uns = resolution.serviceMap['UNS'] as unknown as Uns;
+          const uns = resolution.serviceMap['UNS'].native as Uns;
           mockAsyncMethod(uns.unsl2.readerContract, 'call', (params) =>
             Promise.resolve([NullAddress, NullAddress, {}]),
           );
@@ -1047,7 +1010,7 @@ describe('Resolution', () => {
                 },
               },
             });
-            const uns = resolution.serviceMap['UNS'] as unknown as Uns;
+            const uns = resolution.serviceMap['UNS'].native as Uns;
 
             mockAsyncMethod(uns.unsl2, 'get', (params) =>
               Promise.resolve([NullAddress, NullAddress, {}]),
@@ -1080,7 +1043,7 @@ describe('Resolution', () => {
           });
         });
 
-        it('should get all records using custom networks', async () => {
+        it('should get all records using custom UNS networks', async () => {
           const resolution = new Resolution({
             sourceConfig: {
               uns: {
@@ -1099,15 +1062,9 @@ describe('Resolution', () => {
                   },
                 },
               },
-              zns: {
-                network: 'custom',
-                registryAddress: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
-                url: 'https://api.zilliqa.com',
-              },
             },
           });
-          const uns = resolution.serviceMap['UNS'] as unknown as Uns;
-          const zns = resolution.serviceMap['ZNS'] as unknown as Zns;
+          const uns = resolution.serviceMap['UNS'].native as Uns;
           const unsl1 = uns.unsl1;
           const unsl2 = uns.unsl2;
           const unsL1GetMock = mockAsyncMethods(unsl1, {
@@ -1141,6 +1098,29 @@ describe('Resolution', () => {
 
           mockAsyncMethod(uns, 'getTokenUri', endpoint);
 
+          const unsRecords = await resolution.allRecords('brad.crypto');
+          expectSpyToBeCalled(unsL1GetMock);
+          expectSpyToBeCalled(unsL2GetMock);
+          expect(unsRecords['crypto.ETH.address']).toEqual(
+            '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
+          );
+        });
+
+        it('should get all records using custom ZNS networks', async () => {
+          const resolution = new Resolution({
+            sourceConfig: {
+              zns: {
+                network: 'custom',
+                registryAddress: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
+                url: 'https://api.zilliqa.com',
+              },
+            },
+          });
+          const uns = resolution.serviceMap['UNS'].native as Uns;
+          const zns = resolution.serviceMap['ZNS'].native as Zns;
+          const unsSpy = mockAsyncMethod(uns, 'allRecords', async () => {
+            throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
+          });
           const znsAllRecordsMock = mockAsyncMethods(zns, {
             resolver: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
             getResolverRecords: {
@@ -1149,13 +1129,7 @@ describe('Resolution', () => {
             },
           });
           const znsRecords = await resolution.allRecords('brad.zil');
-          const unsRecords = await resolution.allRecords('brad.crypto');
-          expectSpyToBeCalled(znsAllRecordsMock);
-          expectSpyToBeCalled(unsL1GetMock);
-          expectSpyToBeCalled(unsL2GetMock);
-          expect(unsRecords['crypto.ETH.address']).toEqual(
-            '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
-          );
+          expectSpyToBeCalled([unsSpy, ...znsAllRecordsMock]);
           expect(znsRecords['crypto.ZIL.address']).toEqual(
             'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
           );
@@ -1165,30 +1139,31 @@ describe('Resolution', () => {
       describe('.Dweb', () => {
         describe('.IPFS', () => {
           it('checks return of IPFS hash for brad.zil', async () => {
-            const spies = mockAsyncMethods(zns, {
-              allRecords: {
-                'ipfs.html.value':
-                  'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
-                'whois.email.value': 'derainberk@gmail.com',
-                'crypto.BCH.address':
-                  'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6',
-                'crypto.BTC.address': '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB',
-                'crypto.ETH.address':
-                  '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
-                'crypto.LTC.address': 'LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL',
-                'crypto.XMR.address':
-                  '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d',
-                'crypto.ZEC.address': 't1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV',
-                'crypto.ZIL.address':
-                  'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
-                'crypto.DASH.address': 'XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j',
-                'ipfs.redirect_domain.value': 'www.unstoppabledomains.com',
-                'crypto.USDT.version.ERC20.address':
-                  '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
-              },
+            const unsSpy = mockAsyncMethod(uns, 'records', async () => {
+              throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
             });
+            const znsSpy = mockAsyncMethod(zns, 'allRecords', async () => ({
+              'ipfs.html.value':
+                'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
+              'whois.email.value': 'derainberk@gmail.com',
+              'crypto.BCH.address':
+                'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6',
+              'crypto.BTC.address': '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB',
+              'crypto.ETH.address':
+                '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
+              'crypto.LTC.address': 'LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL',
+              'crypto.XMR.address':
+                '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d',
+              'crypto.ZEC.address': 't1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV',
+              'crypto.ZIL.address':
+                'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
+              'crypto.DASH.address': 'XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j',
+              'ipfs.redirect_domain.value': 'www.unstoppabledomains.com',
+              'crypto.USDT.version.ERC20.address':
+                '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
+            }));
             const hash = await resolution.ipfsHash('testing.zil');
-            expectSpyToBeCalled(spies);
+            expectSpyToBeCalled([unsSpy, znsSpy]);
             expect(hash).toBe('QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK');
           });
         });
@@ -1236,10 +1211,20 @@ describe('Resolution', () => {
 
           it('should throw unsupported method', async () => {
             const resolution = new Resolution();
+            const unsSpy = mockAsyncMethod(
+              resolution.serviceMap.UNS.native,
+              'twitter',
+              async () => {
+                throw new ResolutionError(
+                  ResolutionErrorCode.UnregisteredDomain,
+                );
+              },
+            );
             await expectResolutionErrorCode(
               resolution.twitter('ryan.zil'),
               ResolutionErrorCode.UnsupportedMethod,
             );
+            expectSpyToBeCalled([unsSpy]);
           });
         });
       });
@@ -1248,10 +1233,18 @@ describe('Resolution', () => {
 
   describe('.registryAddress', () => {
     it('should return zns mainnet registry address', async () => {
+      const unsSpy = mockAsyncMethod(
+        resolution.serviceMap.UNS.native,
+        'registryAddress',
+        async () => {
+          throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
+        },
+      );
       const registryAddress = await resolution.registryAddress('testi.zil');
       expect(registryAddress).toBe(
         'zil1hyj6m5w4atcn7s806s69r0uh5g4t84e8gp6nps',
       );
+      expectSpyToBeCalled([unsSpy]);
     });
 
     it('should return cns mainnet registry address #1', async () => {
@@ -1391,25 +1384,30 @@ describe('Resolution', () => {
       expect(isRegistered).toBe(false);
     });
 
-    it('should return true', async () => {
-      const spies = mockAsyncMethods(zns, {
-        getRecordsAddresses: ['zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz'],
+    it('should return true for a .zil domain', async () => {
+      const unsSpy = mockAsyncMethod(uns, 'isRegistered', async () => {
+        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
       });
+      const znsSpy = mockAsyncMethod(zns, 'getRecordsAddresses', [
+        'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
+      ]);
       const isRegistered = await resolution.isRegistered('testing.zil');
-      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled([unsSpy, znsSpy]);
       expect(isRegistered).toBe(true);
     });
 
-    it('should return false', async () => {
-      const spies = mockAsyncMethods(zns, {
-        getRecordsAddresses: [''],
+    skipItInLive('should return false for a .zil domain', async () => {
+      const unsSpy = mockAsyncMethod(uns, 'isRegistered', async () => {
+        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
       });
+      const znsSpy = mockAsyncMethod(zns, 'getRecordsAddresses', ['']);
       const isRegistered = await resolution.isRegistered(
         'thisdomainisdefinitelynotregistered123.zil',
       );
-      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled([unsSpy, znsSpy]);
       expect(isRegistered).toBe(false);
     });
+
     it('should return true if registered on l2 but not l1', async () => {
       const spies = mockAsyncMethods(uns.unsl1, {
         get: {
@@ -1434,6 +1432,7 @@ describe('Resolution', () => {
       expectSpyToBeCalled(spies2);
       expect(isRegistered).toBe(true);
     });
+
     it('should return true if registered on l1 but not l2', async () => {
       const spies = mockAsyncMethods(uns.unsl1, {
         get: {
@@ -1489,6 +1488,7 @@ describe('Resolution', () => {
       expectSpyToBeCalled(spies);
       expect(isAvailable).toBe(true);
     });
+
     it('should return false is available on l1 but not l2', async () => {
       const spies = mockAsyncMethods(uns.unsl1, {
         get: {
@@ -1512,21 +1512,25 @@ describe('Resolution', () => {
       expect(isAvailable).toBe(false);
     });
 
-    it('should return false', async () => {
-      const spies = mockAsyncMethods(zns, {
-        getRecordsAddresses: ['zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz'],
+    skipItInLive('should return false for a .zil domain', async () => {
+      const unsSpy = mockAsyncMethod(uns, 'isAvailable', async () => {
+        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
       });
+      const znsSpy = mockAsyncMethod(zns, 'getRecordsAddresses', [
+        'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
+      ]);
       const isAvailable = await resolution.isAvailable('testing.zil');
-      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled([unsSpy, znsSpy]);
       expect(isAvailable).toBe(false);
     });
 
     it('should return true', async () => {
-      const spies = mockAsyncMethods(zns, {
-        getRecordsAddresses: [''],
+      const unsSpy = mockAsyncMethod(uns, 'isAvailable', async () => {
+        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
       });
+      const znsSpy = mockAsyncMethod(zns, 'getRecordsAddresses', ['']);
       const isAvailable = await resolution.isAvailable('ryan.zil');
-      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled([unsSpy, znsSpy]);
       expect(isAvailable).toBe(true);
     });
   });
@@ -1535,14 +1539,24 @@ describe('Resolution', () => {
     it('brad.crypto', () => {
       const expectedNamehash =
         '0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9';
-      const namehash = resolution.namehash('brad.crypto');
+      const namehash = resolution.namehash(
+        'brad.crypto',
+        NamingServiceName.UNS,
+      );
       expect(namehash).toEqual(expectedNamehash);
     });
 
-    it('brad.zil', () => {
+    it('brad.zil (UNS)', () => {
+      const expectedNamehash =
+        '0x88e6867a2a7c3884e6565d03a9baf909232426adb433d908f9ae9541a66db9ac';
+      const namehash = resolution.namehash('brad.zil', NamingServiceName.UNS);
+      expect(namehash).toEqual(expectedNamehash);
+    });
+
+    it('brad.zil (ZNS)', () => {
       const expectedNamehash =
         '0x5fc604da00f502da70bfbc618088c0ce468ec9d18d05540935ae4118e8f50787';
-      const namehash = resolution.namehash('brad.zil');
+      const namehash = resolution.namehash('brad.zil', NamingServiceName.ZNS);
       expect(namehash).toEqual(expectedNamehash);
     });
   });
@@ -1553,6 +1567,17 @@ describe('Resolution', () => {
         '0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9';
       const namehash = resolution.childhash(
         '0x0f4a10a4f46c288cea365fcf45cccf0e9d901b945b9829ccdb54c10dc3cb7a6f',
+        'brad',
+        NamingServiceName.UNS,
+      );
+      expect(namehash).toEqual(expectedNamehash);
+    });
+
+    it('brad.zil (UNS)', () => {
+      const expectedNamehash =
+        '0x88e6867a2a7c3884e6565d03a9baf909232426adb433d908f9ae9541a66db9ac';
+      const namehash = resolution.childhash(
+        '0xd81bbfcee722494b885e891546eeac23d0eedcd44038d7a2f6ef9ec2f9e0d239',
         'brad',
         NamingServiceName.UNS,
       );
@@ -1582,74 +1607,120 @@ describe('Resolution', () => {
   });
 
   describe('.location', () => {
-    it('should get location for uns l1 and l2 domains', async () => {
-      const mockValuesL1 = {
-        callEth:
-          '0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000420000000000000000000000000000000000000000000000000000000000000046000000000000000000000000000000000000000000000000000000000000004a000000000000000000000000000000000000000000000000000000000000004e0000000000000000000000000000000000000000000000000000000000000052000000000000000000000000000000000000000000000000000000000000003400000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000012000000000000000000000000000000000000000000000000000000000000001e000000000000000000000000000000000000000000000000000000000000000050000000000000000000000007fb83000b8ed59d3ead22f0d584df3a85fbc008600000000000000000000000095ae1515367aa64c462c71e87157771165b1287a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000050000000000000000000000000e43f36e4b986dfbe1a75cacfa60ca2bd44ae962000000000000000000000000499dd6d875787869670900a2130223d85d4f6aa7000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000500000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000c000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000000007fb83000b8ed59d3ead22f0d584df3a85fbc00860000000000000000000000000000000000000000000000000000000000000020000000000000000000000000aad76bea7cfec82927239415bb18d2e93518ecbb000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000',
-      };
-      const mockValuesL2 = {
-        callEth:
-          '0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000420000000000000000000000000000000000000000000000000000000000000046000000000000000000000000000000000000000000000000000000000000004a000000000000000000000000000000000000000000000000000000000000004e0000000000000000000000000000000000000000000000000000000000000052000000000000000000000000000000000000000000000000000000000000003400000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000012000000000000000000000000000000000000000000000000000000000000001e00000000000000000000000000000000000000000000000000000000000000005000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002a93c52e7b6e7054870758e15a1446e769edfb930000000000000000000000002a93c52e7b6e7054870758e15a1446e769edfb930000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000499dd6d875787869670900a2130223d85d4f6aa7000000000000000000000000499dd6d875787869670900a2130223d85d4f6aa70000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000500000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000c000000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000012000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000000002a93c52e7b6e7054870758e15a1446e769edfb9300000000000000000000000000000000000000000000000000000000000000200000000000000000000000002a93c52e7b6e7054870758e15a1446e769edfb9300000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000',
-      };
+    skipItInLive(
+      'should get location for uns l1, uns l2 and zns domains',
+      async () => {
+        // https://github.com/rust-ethereum/ethabi
+        //
+        // # getDataForMany return data
+        // ethabi encode params -v 'address[]' '[7fb83000b8ed59d3ead22f0d584df3a85fbc0086,95ae1515367aa64c462c71e87157771165b1287a,0000000000000000000000000000000000000000,0000000000000000000000000000000000000000,0000000000000000000000000000000000000000,0000000000000000000000000000000000000000,0000000000000000000000000000000000000000]' -v 'address[]' '[0e43f36e4b986dfbe1a75cacfa60ca2bd44ae962,499dd6d875787869670900a2130223d85d4f6aa7,0000000000000000000000000000000000000000,0000000000000000000000000000000000000000,0000000000000000000000000000000000000000,0000000000000000000000000000000000000000,0000000000000000000000000000000000000000]' -v 'string[][]' '[[],[],[],[],[],[],[]]'
+        // # registryOf return data
+        // ethabi encode params -v address 7fb83000b8ed59d3ead22f0d584df3a85fbc0086
+        // ethabi encode params -v address aad76bea7cfec82927239415bb18d2e93518ecbb
+        // ethabi encode params -v address 0000000000000000000000000000000000000000
+        // ethabi encode params -v address 0000000000000000000000000000000000000000
+        // ethabi encode params -v address 0000000000000000000000000000000000000000
+        // ethabi encode params -v address 0000000000000000000000000000000000000000
+        // ethabi encode params -v address 0000000000000000000000000000000000000000
+        // # multicall return data
+        // ethabi encode params -v 'bytes[]' '[...]' # put the output of the commands above into the array
+        const mockValuesL1 = {
+          callEth:
+            '0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000056000000000000000000000000000000000000000000000000000000000000005a000000000000000000000000000000000000000000000000000000000000005e00000000000000000000000000000000000000000000000000000000000000620000000000000000000000000000000000000000000000000000000000000066000000000000000000000000000000000000000000000000000000000000006a000000000000000000000000000000000000000000000000000000000000006e0000000000000000000000000000000000000000000000000000000000000044000000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000160000000000000000000000000000000000000000000000000000000000000026000000000000000000000000000000000000000000000000000000000000000070000000000000000000000007fb83000b8ed59d3ead22f0d584df3a85fbc008600000000000000000000000095ae1515367aa64c462c71e87157771165b1287a0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000070000000000000000000000000e43f36e4b986dfbe1a75cacfa60ca2bd44ae962000000000000000000000000499dd6d875787869670900a2130223d85d4f6aa700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000700000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000012000000000000000000000000000000000000000000000000000000000000001400000000000000000000000000000000000000000000000000000000000000160000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000001a0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000000007fb83000b8ed59d3ead22f0d584df3a85fbc00860000000000000000000000000000000000000000000000000000000000000020000000000000000000000000aad76bea7cfec82927239415bb18d2e93518ecbb0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000',
+        };
+        // # getDataForMany return data
+        // ethabi encode params -v 'address[]' '[0000000000000000000000000000000000000000,0000000000000000000000000000000000000000,2a93c52e7b6e7054870758e15a1446e769edfb93,2a93c52e7b6e7054870758e15a1446e769edfb93,0000000000000000000000000000000000000000,2a93c52e7b6e7054870758e15a1446e769edfb93,0000000000000000000000000000000000000000]' -v 'address[]' '[0000000000000000000000000000000000000000,0000000000000000000000000000000000000000,499dd6d875787869670900a2130223d85d4f6aa7,499dd6d875787869670900a2130223d85d4f6aa7,0000000000000000000000000000000000000000,499dd6d875787869670900a2130223d85d4f6aa7,0000000000000000000000000000000000000000]' -v 'string[][]' '[[],[],[],[],[],[],[]]'
+        // # registryOf return data
+        // ethabi encode params -v address 0000000000000000000000000000000000000000
+        // ethabi encode params -v address 0000000000000000000000000000000000000000
+        // ethabi encode params -v address 2a93c52e7b6e7054870758e15a1446e769edfb93
+        // ethabi encode params -v address 2a93c52e7b6e7054870758e15a1446e769edfb93
+        // ethabi encode params -v address 0000000000000000000000000000000000000000
+        // ethabi encode params -v address 2a93c52e7b6e7054870758e15a1446e769edfb93
+        // ethabi encode params -v address 0000000000000000000000000000000000000000
+        // # multicall return data
+        // ethabi encode params -v 'bytes[]' '[...]' # put the output of the commands above into the array
+        const mockValuesL2 = {
+          callEth:
+            '0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000056000000000000000000000000000000000000000000000000000000000000005a000000000000000000000000000000000000000000000000000000000000005e00000000000000000000000000000000000000000000000000000000000000620000000000000000000000000000000000000000000000000000000000000066000000000000000000000000000000000000000000000000000000000000006a000000000000000000000000000000000000000000000000000000000000006e000000000000000000000000000000000000000000000000000000000000004400000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000016000000000000000000000000000000000000000000000000000000000000002600000000000000000000000000000000000000000000000000000000000000007000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002a93c52e7b6e7054870758e15a1446e769edfb930000000000000000000000002a93c52e7b6e7054870758e15a1446e769edfb9300000000000000000000000000000000000000000000000000000000000000000000000000000000000000002a93c52e7b6e7054870758e15a1446e769edfb930000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000499dd6d875787869670900a2130223d85d4f6aa7000000000000000000000000499dd6d875787869670900a2130223d85d4f6aa70000000000000000000000000000000000000000000000000000000000000000000000000000000000000000499dd6d875787869670900a2130223d85d4f6aa70000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000700000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000012000000000000000000000000000000000000000000000000000000000000001400000000000000000000000000000000000000000000000000000000000000160000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000001a00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000000002a93c52e7b6e7054870758e15a1446e769edfb9300000000000000000000000000000000000000000000000000000000000000200000000000000000000000002a93c52e7b6e7054870758e15a1446e769edfb930000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000000002a93c52e7b6e7054870758e15a1446e769edfb9300000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000',
+        };
 
-      mockAsyncMethods(uns.unsl1.readerContract, mockValuesL1);
-      mockAsyncMethods(uns.unsl2.readerContract, mockValuesL2);
-      mockAsyncMethods(uns, {isSupportedDomain: true});
+        mockAsyncMethods(uns.unsl1.readerContract, mockValuesL1);
+        mockAsyncMethods(uns.unsl2.readerContract, mockValuesL2);
+        mockAsyncMethods(uns, {isSupportedDomain: true});
+        mockAsyncMethod(zns, 'getRecordsAddresses', [
+          'zil1xftz4cd425mer6jxmtl29l28xr0zu8s5hnp9he',
+          'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
+        ]);
 
-      const location = await resolution.locations([
-        'udtestdev-check.wallet',
-        'brad.crypto',
-        'udtestdev-test-l2-domain-784391.wallet',
-        'udtestdev-test-l1-and-l2-ownership.wallet',
-        'testing-domain-doesnt-exist-12345abc.blockchain',
-      ]);
-      expect(location['udtestdev-check.wallet']).toEqual({
-        registryAddress: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
-        resolverAddress: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
-        networkId: 4,
-        blockchain: BlockchainType.ETH,
-        ownerAddress: '0x0e43F36e4B986dfbE1a75cacfA60cA2bD44Ae962',
-        blockchainProviderUrl:
-          'https://eth-rinkeby.alchemyapi.io/v2/ZDERxOLIj120dh2-Io2Q9RTh9RfWEssT',
-      });
-      expect(location['brad.crypto']).toEqual({
-        registryAddress: '0xAad76bea7CFEc82927239415BB18D2e93518ecBB',
-        resolverAddress: '0x95AE1515367aa64C462c71e87157771165B1287A',
-        networkId: 4,
-        blockchain: BlockchainType.ETH,
-        ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
-        blockchainProviderUrl:
-          'https://eth-rinkeby.alchemyapi.io/v2/ZDERxOLIj120dh2-Io2Q9RTh9RfWEssT',
-      });
-      expect(location['udtestdev-test-l2-domain-784391.wallet']).toEqual({
-        registryAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
-        resolverAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
-        networkId: 80001,
-        blockchain: BlockchainType.MATIC,
-        ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
-        blockchainProviderUrl:
-          'https://polygon-mumbai.g.alchemy.com/v2/c4bb906ed6904c42b19c95825fe55f39',
-      });
-      expect(location['udtestdev-test-l1-and-l2-ownership.wallet']).toEqual({
-        registryAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
-        resolverAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
-        networkId: 80001,
-        blockchain: BlockchainType.MATIC,
-        ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
-        blockchainProviderUrl:
-          'https://polygon-mumbai.g.alchemy.com/v2/c4bb906ed6904c42b19c95825fe55f39',
-      });
-      expect(
-        location['testing-domain-doesnt-exist-12345abc.blockchain'],
-      ).toBeNull();
-    });
-
-    it('should get location for zns domains', async () => {
-      await expectResolutionErrorCode(
-        () => resolution.locations(['testing.zil']),
-        ResolutionErrorCode.UnsupportedMethod,
-      );
-    });
+        const location = await resolution.locations([
+          'udtestdev-check.wallet',
+          'brad.crypto',
+          'udtestdev-test-l2-domain-784391.wallet',
+          'udtestdev-test-l1-and-l2-ownership.wallet',
+          'testing-domain-doesnt-exist-12345abc.blockchain',
+          'uns-devtest-testnet-domain.zil',
+          'zns-devtest-testnet-domain.zil',
+        ]);
+        expect(location['udtestdev-check.wallet']).toEqual({
+          registryAddress: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
+          resolverAddress: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
+          networkId: 4,
+          blockchain: BlockchainType.ETH,
+          ownerAddress: '0x0e43F36e4B986dfbE1a75cacfA60cA2bD44Ae962',
+          blockchainProviderUrl:
+            'https://eth-rinkeby.alchemyapi.io/v2/ZDERxOLIj120dh2-Io2Q9RTh9RfWEssT',
+        });
+        expect(location['brad.crypto']).toEqual({
+          registryAddress: '0xAad76bea7CFEc82927239415BB18D2e93518ecBB',
+          resolverAddress: '0x95AE1515367aa64C462c71e87157771165B1287A',
+          networkId: 4,
+          blockchain: BlockchainType.ETH,
+          ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
+          blockchainProviderUrl:
+            'https://eth-rinkeby.alchemyapi.io/v2/ZDERxOLIj120dh2-Io2Q9RTh9RfWEssT',
+        });
+        expect(location['udtestdev-test-l2-domain-784391.wallet']).toEqual({
+          registryAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
+          resolverAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
+          networkId: 80001,
+          blockchain: BlockchainType.MATIC,
+          ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
+          blockchainProviderUrl:
+            'https://polygon-mumbai.g.alchemy.com/v2/c4bb906ed6904c42b19c95825fe55f39',
+        });
+        expect(location['udtestdev-test-l1-and-l2-ownership.wallet']).toEqual({
+          registryAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
+          resolverAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
+          networkId: 80001,
+          blockchain: BlockchainType.MATIC,
+          ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
+          blockchainProviderUrl:
+            'https://polygon-mumbai.g.alchemy.com/v2/c4bb906ed6904c42b19c95825fe55f39',
+        });
+        expect(
+          location['testing-domain-doesnt-exist-12345abc.blockchain'],
+        ).toBeNull();
+        // TODO! mint a domain that will be owned by the devtools team for the LIVE tests.
+        expect(location['uns-devtest-testnet-domain.zil']).toEqual({
+          registryAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
+          resolverAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
+          networkId: 80001,
+          blockchain: BlockchainType.MATIC,
+          ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
+          blockchainProviderUrl:
+            'https://polygon-mumbai.g.alchemy.com/v2/c4bb906ed6904c42b19c95825fe55f39',
+        });
+        expect(location['zns-devtest-testnet-domain.zil']).toEqual({
+          registryAddress: 'zil1hyj6m5w4atcn7s806s69r0uh5g4t84e8gp6nps',
+          resolverAddress: 'zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz',
+          networkId: 333,
+          blockchain: BlockchainType.ZIL,
+          ownerAddress: 'zil1xftz4cd425mer6jxmtl29l28xr0zu8s5hnp9he',
+          blockchainProviderUrl: 'https://dev-api.zilliqa.com',
+        });
+      },
+    );
 
     it('should check all methods for domain validation', async () => {
       await expectResolutionErrorCode(
@@ -1681,15 +1752,11 @@ describe('Resolution', () => {
         ResolutionErrorCode.InvalidDomainAddress,
       );
       await expectResolutionErrorCode(
-        () => resolution.namehash('hello#blockchain'),
+        () => resolution.namehash('hello#blockchain', NamingServiceName.UNS),
         ResolutionErrorCode.InvalidDomainAddress,
       );
       await expectResolutionErrorCode(
         () => resolution.isSupportedDomain('hello#blockchain'),
-        ResolutionErrorCode.InvalidDomainAddress,
-      );
-      await expectResolutionErrorCode(
-        () => resolution.serviceName('hello#blockchain'),
         ResolutionErrorCode.InvalidDomainAddress,
       );
       await expectResolutionErrorCode(
@@ -1769,6 +1836,7 @@ describe('Resolution', () => {
               '0x5fc604da00f502da70bfbc618088c0ce468ec9d18d05540935ae4118e8f50787',
             tokenId:
               '43319589818590979333002700458407583892978809980702780436022141697532225718151',
+            blockchain: 'ZIL',
           },
         }),
       });
