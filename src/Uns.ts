@@ -388,7 +388,7 @@ export default class Uns extends NamingService {
     if (this.namehash(metadata.name) !== tokenId) {
       throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
         methodName: 'unhash',
-        domain: name,
+        domain: metadata.name,
         providerMessage: 'Service provider returned an invalid domain name',
       });
     }
