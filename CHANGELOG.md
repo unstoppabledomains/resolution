@@ -1,3 +1,8 @@
+## 8.1.0
+
+- Fixed default library configuration
+- Added function for alchemy configuration `Resolution#alchemy`
+
 ## 8.0.0
 
 - Added Node.js v16 support

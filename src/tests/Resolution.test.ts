@@ -332,8 +332,22 @@ describe('Resolution', () => {
       throw new Error('nock is not configured correctly!');
     });
 
-    it('should get a valid resolution instance', async () => {
+    it('should get a valid resolution instance with .infura', async () => {
       const resolution = Resolution.infura('api-key', {
+        uns: {
+          locations: {
+            Layer1: {network: 'rinkeby'},
+            Layer2: {network: 'polygon-mumbai'},
+          },
+        },
+      });
+      uns = resolution.serviceMap[NamingServiceName.UNS].native as Uns;
+      expect(uns.unsl1.url).toBe(`https://rinkeby.infura.io/v3/api-key`);
+      expect(uns.unsl2.url).toBe(`https://polygon-mumbai.infura.io/v3/api-key`);
+    });
+
+    it('should get a valid resolution instance with .alchemy', async () => {
+      const resolution = Resolution.alchemy('api-key', {
         uns: {
           locations: {
             Layer1: {network: 'rinkeby'},
