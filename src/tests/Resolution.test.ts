@@ -15,7 +15,6 @@ import {
 import {JsonRpcProvider, InfuraProvider} from '@ethersproject/providers';
 import Web3HttpProvider from 'web3-providers-http';
 import Web3WsProvider from 'web3-providers-ws';
-import Web3V027Provider from 'web3-0.20.7/lib/web3/httpprovider';
 import {
   expectResolutionErrorCode,
   expectSpyToBeCalled,
@@ -332,8 +331,22 @@ describe('Resolution', () => {
       throw new Error('nock is not configured correctly!');
     });
 
-    it('should get a valid resolution instance', async () => {
+    it('should get a valid resolution instance with .infura', async () => {
       const resolution = Resolution.infura('api-key', {
+        uns: {
+          locations: {
+            Layer1: {network: 'rinkeby'},
+            Layer2: {network: 'polygon-mumbai'},
+          },
+        },
+      });
+      uns = resolution.serviceMap[NamingServiceName.UNS].native as Uns;
+      expect(uns.unsl1.url).toBe(`https://rinkeby.infura.io/v3/api-key`);
+      expect(uns.unsl2.url).toBe(`https://polygon-mumbai.infura.io/v3/api-key`);
+    });
+
+    it('should get a valid resolution instance with .alchemy', async () => {
+      const resolution = Resolution.alchemy('api-key', {
         uns: {
           locations: {
             Layer1: {network: 'rinkeby'},
@@ -855,53 +868,6 @@ describe('Resolution', () => {
             Promise.resolve(caseMock(params, RpcProviderTestCases)),
           );
           const resolution = Resolution.fromEthersProvider({
-            uns: {
-              locations: {
-                Layer1: {network: 'rinkeby', provider},
-                Layer2: {network: 'polygon-mumbai', provider: polygonProvider},
-              },
-            },
-          });
-          const uns = resolution.serviceMap['UNS'].native as Uns;
-          mockAsyncMethod(uns.unsl2.readerContract, 'call', (params) =>
-            Promise.resolve([NullAddress, NullAddress, {}]),
-          );
-          const ethAddress = await resolution.addr('brad.crypto', 'eth');
-          expectSpyToBeCalled([eye]);
-          expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
-        });
-
-        it('should work with web3@0.20.7 provider', async () => {
-          const provider = new Web3V027Provider(
-            protocolLink(ProviderProtocol.http),
-            5000,
-            null,
-            null,
-            null,
-          );
-          const polygonProvider = new Web3V027Provider(
-            protocolLink(ProviderProtocol.http, 'UNSL2'),
-            5000,
-            null,
-            null,
-            null,
-          );
-          const eye = mockAsyncMethod(
-            provider,
-            'sendAsync',
-            (payload: JsonRpcPayload, callback: any) => {
-              const result = caseMock(
-                payload.params?.[0],
-                RpcProviderTestCases,
-              );
-              callback(undefined, {
-                jsonrpc: '2.0',
-                id: 1,
-                result,
-              });
-            },
-          );
-          const resolution = Resolution.fromWeb3Version0Provider({
             uns: {
               locations: {
                 Layer1: {network: 'rinkeby', provider},

@@ -1,18 +1,32 @@
 import {CryptoRecords, NamingServiceName} from '../types/publicTypes';
 import {NullAddresses} from '../types';
+import {UnsSupportedNetwork} from '../types';
 
-export function signedLink(key: string, network = 'mainnet'): string {
-  let url = 'https://eth-mainnet.alchemyapi.io/v2/';
+type Providers = 'infura' | 'alchemy';
+type NetworkSignedLinkURLs = Record<UnsSupportedNetwork, string>;
+const ProviderURLMap: Record<Providers, NetworkSignedLinkURLs> = {
+  infura: {
+    mainnet: 'https://mainnet.infura.io/v3/',
+    rinkeby: 'https://rinkeby.infura.io/v3/',
+    goerli: 'https://goerli.infura.io/v3/',
+    'polygon-mainnet': 'https://polygon-mainnet.infura.io/v3/',
+    'polygon-mumbai': 'https://polygon-mumbai.infura.io/v3/',
+  },
+  alchemy: {
+    mainnet: 'https://eth-mainnet.alchemyapi.io/v2/',
+    rinkeby: 'https://eth-rinkeby.alchemyapi.io/v2/',
+    goerli: 'https://eth-goerli.alchemyapi.io/v2/',
+    'polygon-mainnet': 'https://polygon-mainnet.g.alchemy.com/v2/',
+    'polygon-mumbai': 'https://polygon-mumbai.g.alchemy.com/v2/',
+  },
+};
 
-  switch (network) {
-  case 'polygon-mumbai':
-    url = 'https://polygon-mumbai.g.alchemy.com/v2/';
-    break;
-  case 'rinkeby':
-    url = 'https://eth-rinkeby.alchemyapi.io/v2/';
-    break;
-  }
-
+export function signedLink(
+  key: string,
+  network: UnsSupportedNetwork = 'mainnet',
+  provider: Providers = 'infura',
+): string {
+  const url = ProviderURLMap[provider][network];
   return `${url}${key}`;
 }
 

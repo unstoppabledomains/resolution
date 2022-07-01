@@ -35,6 +35,7 @@ import {NamingService} from './NamingService';
 import Networking from './utils/Networking';
 import {prepareAndValidateDomain} from './utils/prepareAndValidate';
 import {fromDecStringToHex} from './utils/namehash';
+import {UnsSupportedNetwork} from './types';
 
 /**
  * Blockchain domain Resolution library - Resolution.
@@ -120,10 +121,10 @@ export default class Resolution {
       uns?: {
         locations: {
           Layer1: {
-            network: string;
+            network: UnsSupportedNetwork;
           };
           Layer2: {
-            network: string;
+            network: UnsSupportedNetwork;
           };
         };
       };
@@ -134,11 +135,64 @@ export default class Resolution {
         uns: {
           locations: {
             Layer1: {
-              url: signedLink(infura, networks?.uns?.locations.Layer1.network),
+              url: signedLink(
+                infura,
+                networks?.uns?.locations.Layer1.network || 'mainnet',
+              ),
               network: networks?.uns?.locations.Layer1.network || 'mainnet',
             },
             Layer2: {
-              url: signedLink(infura, networks?.uns?.locations.Layer2.network),
+              url: signedLink(
+                infura,
+                networks?.uns?.locations.Layer2.network || 'polygon-mainnet',
+              ),
+              network:
+                networks?.uns?.locations.Layer2.network || 'polygon-mainnet',
+            },
+          },
+        },
+      },
+    });
+  }
+
+  /**
+   * Creates a resolution with configured alchemy API keys for uns
+   * @param alchemy - alchemy API keys
+   * @param networks - an optional object that describes what network to use when connecting UNS default is mainnet
+   */
+  static alchemy(
+    alchemy: string,
+    networks?: {
+      uns?: {
+        locations: {
+          Layer1: {
+            network: UnsSupportedNetwork;
+          };
+          Layer2: {
+            network: UnsSupportedNetwork;
+          };
+        };
+      };
+    },
+  ): Resolution {
+    return new this({
+      sourceConfig: {
+        uns: {
+          locations: {
+            Layer1: {
+              url: signedLink(
+                alchemy,
+                networks?.uns?.locations.Layer1.network || 'mainnet',
+                'alchemy',
+              ),
+              network: networks?.uns?.locations.Layer1.network || 'mainnet',
+            },
+            Layer2: {
+              url: signedLink(
+                alchemy,
+                networks?.uns?.locations.Layer2.network || 'polygon-mainnet',
+                'alchemy',
+              ),
               network:
                 networks?.uns?.locations.Layer2.network || 'polygon-mainnet',
             },
@@ -260,21 +314,21 @@ export default class Resolution {
     return this.fromEthereumEip1193Provider({
       uns: networks.uns
         ? {
-            locations: {
-              Layer1: {
-                network: networks.uns.locations.Layer1.network,
-                provider: Eip1193Factories.fromWeb3Version0Provider(
-                  networks.uns.locations.Layer1.provider,
-                ),
-              },
-              Layer2: {
-                network: networks.uns.locations.Layer2.network,
-                provider: Eip1193Factories.fromWeb3Version0Provider(
-                  networks.uns.locations.Layer2.provider,
-                ),
-              },
+          locations: {
+            Layer1: {
+              network: networks.uns.locations.Layer1.network,
+              provider: Eip1193Factories.fromWeb3Version0Provider(
+                networks.uns.locations.Layer1.provider,
+              ),
             },
-          }
+            Layer2: {
+              network: networks.uns.locations.Layer2.network,
+              provider: Eip1193Factories.fromWeb3Version0Provider(
+                networks.uns.locations.Layer2.provider,
+              ),
+            },
+          },
+        }
         : undefined,
     });
   }
@@ -302,21 +356,21 @@ export default class Resolution {
     return this.fromEthereumEip1193Provider({
       uns: networks.uns
         ? {
-            locations: {
-              Layer1: {
-                network: networks.uns.locations.Layer1.network,
-                provider: Eip1193Factories.fromWeb3Version1Provider(
-                  networks.uns.locations.Layer1.provider,
-                ),
-              },
-              Layer2: {
-                network: networks.uns.locations.Layer2.network,
-                provider: Eip1193Factories.fromWeb3Version1Provider(
-                  networks.uns.locations.Layer2.provider,
-                ),
-              },
+          locations: {
+            Layer1: {
+              network: networks.uns.locations.Layer1.network,
+              provider: Eip1193Factories.fromWeb3Version1Provider(
+                networks.uns.locations.Layer1.provider,
+              ),
             },
-          }
+            Layer2: {
+              network: networks.uns.locations.Layer2.network,
+              provider: Eip1193Factories.fromWeb3Version1Provider(
+                networks.uns.locations.Layer2.provider,
+              ),
+            },
+          },
+        }
         : undefined,
     });
   }
@@ -347,21 +401,21 @@ export default class Resolution {
     return this.fromEthereumEip1193Provider({
       uns: networks.uns
         ? {
-            locations: {
-              Layer1: {
-                network: networks.uns.locations.Layer1.network,
-                provider: Eip1193Factories.fromEthersProvider(
-                  networks.uns.locations.Layer1.provider,
-                ),
-              },
-              Layer2: {
-                network: networks.uns.locations.Layer2.network,
-                provider: Eip1193Factories.fromEthersProvider(
-                  networks.uns.locations.Layer2.provider,
-                ),
-              },
+          locations: {
+            Layer1: {
+              network: networks.uns.locations.Layer1.network,
+              provider: Eip1193Factories.fromEthersProvider(
+                networks.uns.locations.Layer1.provider,
+              ),
             },
-          }
+            Layer2: {
+              network: networks.uns.locations.Layer2.network,
+              provider: Eip1193Factories.fromEthersProvider(
+                networks.uns.locations.Layer2.provider,
+              ),
+            },
+          },
+        }
         : undefined,
     });
   }
