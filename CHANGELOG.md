@@ -1,4 +1,4 @@
-## 8.1.0
+## 8.2.0
 
 - Fixed default library configuration
 - Added function for alchemy configuration `Resolution#alchemy`
