@@ -187,6 +187,37 @@ Default provider can be changed by changing constructor options
 To see all constructor options and factory methods check
 [Unstoppable API reference](https://unstoppabledomains.github.io/resolution).
 
+## Custom Ethereum Provider configuration
+
+```javascript
+const {default: Resolution} = require('@unstoppabledomains/resolution');
+
+const infuraApiKey = INFURA_PROJECT_ID;
+const infuraProviderUrl = `https://mainnet.infura.io/v3/${infuraApiKey}`;
+const polygonProviderUrl = `https://polygon-mainnet.infura.io/v3/${infuraApiKey}`;
+
+// custom provider config using the `Resolution` constructor options
+const resolution = new Resolution({
+    sourceConfig: {
+      uns: {
+        locations: {
+          Layer1: {
+            url: infuraProviderUrl,
+            network: 'mainnet'
+          },
+          Layer2: {
+            url: polygonProviderUrl,
+            network: 'polygon-mainnet',
+          },
+        },
+      },
+    },
+  });
+
+// custom provider config using the `Resolution.infura()` method
+const resolution = Resolution.infura(infuraApiKey);
+```
+
 ## Autoconfiguration of blockchain network
 
 In some scenarios system might not be flexible enough to easy distinguish
