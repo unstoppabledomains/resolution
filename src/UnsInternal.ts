@@ -81,14 +81,13 @@ export default class UnsInternal {
   }
 
   async registryAddress(domainOrNamehash: string): Promise<string> {
-    if (
-      !this.checkDomain(domainOrNamehash, domainOrNamehash.startsWith('0x'))
-    ) {
+    const isNamehash = !domainOrNamehash.includes('.');
+    if (!this.checkDomain(domainOrNamehash, isNamehash)) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
         domain: domainOrNamehash,
       });
     }
-    const namehash = domainOrNamehash.startsWith('0x')
+    const namehash = isNamehash
       ? domainOrNamehash
       : this.namehash(domainOrNamehash);
     const [address] = await this.readerContract.call('registryOf', [namehash]);
