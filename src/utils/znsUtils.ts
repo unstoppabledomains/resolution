@@ -4,8 +4,8 @@
  */
 
 import BN from 'bn.js';
-import {sha256} from 'js-sha256';
-import {hexToBytes} from './index';
+import sha256 from 'crypto-js/sha256';
+import hex from 'crypto-js/enc-hex';
 
 const CHARSET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
 
@@ -193,7 +193,7 @@ export const toChecksumAddress = (address: string): string => {
   }
 
   address = address.toLowerCase().replace('0x', '');
-  const hash = sha256(hexToBytes(address));
+  const hash = hex.stringify(sha256(hex.parse(address)));
   const v = new BN(hash, 'hex', 'be');
   let ret = '0x';
 
