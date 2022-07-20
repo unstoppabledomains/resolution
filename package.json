@@ -16,6 +16,8 @@
     "fix": "yarn prettier:fix && yarn lint:fix --ext ts src",
     "lint": "eslint --ext ts src",
     "lint:fix": "eslint --fix --ext ts src",
+    "prettier": "prettier -l \"src/**/*.{ts,tsx,js,jsx,json,md}\"",
+    "prettier:fix": "prettier --write -l \"src/**/*.{ts,tsx,js,jsx,json,md}\"",
     "test": "jest",
     "test:single": "jest",
     "test:live": "LIVE=1 yarn test",
@@ -32,7 +34,6 @@
     "config:pull": "yarn network-config:pull && yarn resolver-keys:pull",
     "network-config:pull": "curl https://raw.githubusercontent.com/unstoppabledomains/uns/main/uns-config.json -o src/config/uns-config.json",
     "resolver-keys:pull": "curl https://raw.githubusercontent.com/unstoppabledomains/uns/main/resolver-keys.json -o src/config/resolver-keys.json",
-    "prettier:fix": "prettier --write -l \"src/**/*.{ts,tsx,js,jsx,json,md}\"",
     "prepare": "([ -d ./.git ] && husky install) || echo \"Skip husky install since package does not have .git folder\""
   },
   "files": [

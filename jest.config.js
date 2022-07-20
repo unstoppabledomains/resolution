@@ -9,9 +9,6 @@ module.exports = {
     },
   },
   testTimeout: 40000,
-  coveragePathIgnorePatterns : [
-    '/node_modules/',
-    '/src/tests/',
-  ],
+  coveragePathIgnorePatterns: ['/node_modules/', '/src/tests/'],
   setupFilesAfterEnv: ['<rootDir>/src/tests/jestSetup.ts'],
 };
