@@ -138,6 +138,7 @@ export default class Resolution {
               url: signedLink(
                 infura,
                 networks?.uns?.locations.Layer1.network || 'mainnet',
+                'infura',
               ),
               network: networks?.uns?.locations.Layer1.network || 'mainnet',
             },
@@ -145,6 +146,7 @@ export default class Resolution {
               url: signedLink(
                 infura,
                 networks?.uns?.locations.Layer2.network || 'polygon-mainnet',
+                'infura',
               ),
               network:
                 networks?.uns?.locations.Layer2.network || 'polygon-mainnet',
@@ -183,7 +185,6 @@ export default class Resolution {
               url: signedLink(
                 alchemy,
                 networks?.uns?.locations.Layer1.network || 'mainnet',
-                'alchemy',
               ),
               network: networks?.uns?.locations.Layer1.network || 'mainnet',
             },
@@ -191,7 +192,6 @@ export default class Resolution {
               url: signedLink(
                 alchemy,
                 networks?.uns?.locations.Layer2.network || 'polygon-mainnet',
-                'alchemy',
               ),
               network:
                 networks?.uns?.locations.Layer2.network || 'polygon-mainnet',

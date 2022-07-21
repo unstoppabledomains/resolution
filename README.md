@@ -173,12 +173,21 @@ CLI support was removed from the Resolution library starting from version 6.0. P
 ## Default Ethereum Providers
 
 Resolution provides zero-configuration experience by using built-in
-production-ready [Infura](http://infura.io/) endpoint by default.  
+production-ready [Alchemy](http://alchemy.com/) endpoint by default.  
 Default Ethereum provider is free to use without restrictions and rate-limits
-for `UNS` resolution.  
+for `UNS` resolution.
+
+## Custom Ethereum Provider configuration
+
+You may want to specify a custom provider:
+ - if you want to use a dedicated blockchain node
+ - if you want to monitor app usage
+ - if you already have a provider in your app to re-use it for domain resolution
+
 Default provider can be changed by changing constructor options
 `new Resolution(options)` or by using one of the factory methods:
 
+- `Resolution.alchemy()`
 - `Resolution.infura()`
 - `Resolution.fromWeb3Version1Provider()`
 - `Resolution.fromEthersProvider()`
@@ -187,14 +196,11 @@ Default provider can be changed by changing constructor options
 To see all constructor options and factory methods check
 [Unstoppable API reference](https://unstoppabledomains.github.io/resolution).
 
-## Custom Ethereum Provider configuration
-
 ```javascript
 const {default: Resolution} = require('@unstoppabledomains/resolution');
 
-const infuraApiKey = INFURA_PROJECT_ID;
-const infuraProviderUrl = `https://mainnet.infura.io/v3/${infuraApiKey}`;
-const polygonProviderUrl = `https://polygon-mainnet.infura.io/v3/${infuraApiKey}`;
+const ethereumProviderUrl = ALCHEMY_ETHEREUM_API;
+const polygonProviderUrl = ALCHEMY_POLYGON_API;
 
 // custom provider config using the `Resolution` constructor options
 const resolution = new Resolution({
@@ -202,7 +208,7 @@ const resolution = new Resolution({
       uns: {
         locations: {
           Layer1: {
-            url: infuraProviderUrl,
+            url: ethereumProviderUrl,
             network: 'mainnet'
           },
           Layer2: {
@@ -213,9 +219,6 @@ const resolution = new Resolution({
       },
     },
   });
-
-// custom provider config using the `Resolution.infura()` method
-const resolution = Resolution.infura(infuraApiKey);
 ```
 
 ## Autoconfiguration of blockchain network
