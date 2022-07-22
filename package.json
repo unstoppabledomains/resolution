@@ -19,9 +19,7 @@
     "prettier": "prettier -l \"src/**/*.{ts,tsx,js,jsx,json,md}\"",
     "prettier:fix": "prettier --write -l \"src/**/*.{ts,tsx,js,jsx,json,md}\"",
     "test": "jest",
-    "test:single": "jest",
-    "test:live": "LIVE=1 yarn test",
-    "test:live:win": "set LIVE=1&& yarn test",
+    "test:live:win": "set LIVE=1 && yarn test",
     "start": "npm run build:live",
     "build": "rm -rf build && tsc -p .",
     "build:live": "nodemon --watch 'src/**/*.ts' --exec yarn build",
@@ -45,7 +43,6 @@
     "url": "https://github.com/unstoppabledomains/resolution.git"
   },
   "keywords": [
-    "cns",
     ".crypto",
     "zns",
     "ethereum",
