@@ -70,7 +70,6 @@ export function mockAsyncMethods(
 }
 
 export function isLive(): boolean {
-  // eslint-disable-next-line no-undef
   return !!process.env.LIVE;
 }
 
@@ -130,7 +129,6 @@ async function expectError(
   }
 
   return callback.then(
-    // eslint-disable-next-line no-undef
     () => {
       throw new Error(`Expected ${klass.name} to be thrown but wasn't`);
     },
