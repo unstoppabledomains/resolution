@@ -24,7 +24,7 @@ const ProviderURLMap: Record<Providers, NetworkSignedLinkURLs> = {
 export function signedLink(
   key: string,
   network: UnsSupportedNetwork = 'mainnet',
-  provider: Providers = 'infura',
+  provider: Providers = 'alchemy',
 ): string {
   const url = ProviderURLMap[provider][network];
   return `${url}${key}`;

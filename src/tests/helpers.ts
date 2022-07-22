@@ -174,15 +174,14 @@ export function mockAPICalls(testName: string, url = MainnetUrl): void {
 
 /**
  * returns either a standard ethereum provider url
- * or the one with attached INFURA SECRET key from
- * UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID env variable if any
+ * or the one with attached SECRET key from
+ * UNSTOPPABLE_RESOLUTION_PROJECTID env variable if any
  */
 export function protocolLink(
   providerProtocol: ProviderProtocol = ProviderProtocol.http,
   namingService: 'UNSL1' | 'UNSL2' = 'UNSL1',
 ): string {
-  const secret =
-    process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID ?? undefined;
+  const secret = process.env.UNSTOPPABLE_RESOLUTION_PROJECTID ?? undefined;
 
   if (!secret) {
     return ethereumDefaultProviders[namingService][providerProtocol];
