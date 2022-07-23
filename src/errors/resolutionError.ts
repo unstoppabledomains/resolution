@@ -1,4 +1,5 @@
 import {ResolutionMethod, UnsLocation} from '../types/publicTypes';
+
 /**
  * Alias for Resolution error handler function
  * @internal
@@ -54,7 +55,13 @@ const HandlersByCode = {
   [ResolutionErrorCode.UnsupportedMethod]: (params: {
     methodName: string;
     domain: string;
-  }) => `Method ${params.methodName} is not supported for ${params.domain}`,
+  }) => {
+    // We normally expect a domain name, but in can be absent in the tests.
+    const zilHelp = params.domain?.endsWith('.zil')
+      ? " (if this method was called via the Resolution class with both UNS and ZNS providers configured not in the API mode, this error also means that the domain doesn't exist in UNS)"
+      : '';
+    return `Method ${params.methodName} is not supported for ${params.domain}${zilHelp}`;
+  },
 
   [ResolutionErrorCode.InvalidTwitterVerification]: (params: {
     domain?: string;
@@ -124,4 +131,5 @@ export class ResolutionError extends Error {
     Object.setPrototypeOf(this, ResolutionError.prototype);
   }
 }
+
 export default ResolutionError;

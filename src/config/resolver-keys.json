@@ -1,10 +1,15 @@
 {
-  "version": "1.1.1",
+  "version": "2.1.1",
+  "information": {
+    "description": "This file desribes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
+    "documentation": "https://docs.unstoppabledomains.com/domain-registry-essentials/records-reference",
+    "contribution": "https://github.com/unstoppabledomains/uns/blob/main/resolver-keys.json"
+  },
   "keys": {
     "crypto.BTC.address": {
       "deprecatedKeyName": "BTC",
       "deprecated": false,
-      "validationRegex": "^(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,39}$"
+      "validationRegex": "^bc1[ac-hj-np-z02-9]{6,87}$|^[13][a-km-zA-HJ-NP-Z1-9]{25,39}$"
     },
     "crypto.ETH.address": {
       "deprecatedKeyName": "ETH",
@@ -14,7 +19,7 @@
     "crypto.ZIL.address": {
       "deprecatedKeyName": "ZIL",
       "deprecated": false,
-      "validationRegex": "^0x[a-fA-F0-9]{40}$|^zil1[qpzry9x8gf2tvdw0s3jn54khce6mua7l]{38}$"
+      "validationRegex": "^zil1[qpzry9x8gf2tvdw0s3jn54khce6mua7l]{38}$"
     },
     "crypto.LTC.address": {
       "deprecatedKeyName": "LTC",
@@ -99,7 +104,12 @@
     "crypto.ZEC.address": {
       "deprecatedKeyName": "ZEC",
       "deprecated": false,
-      "validationRegex": "^z([a-zA-Z0-9]){94}$|^zs([a-zA-Z0-9]){75}$|^t([a-zA-Z0-9]){34}$"
+      "validationRegex": "^z([a-zA-Z0-9]){94}$|^zs1([a-zA-Z0-9]){75}$|^t([a-zA-Z0-9]){34}$"
+    },
+    "crypto.YEC.address": {
+      "deprecatedKeyName": "YEC",
+      "deprecated": false,
+      "validationRegex": "^y([a-zA-Z0-9]){94}$|^ys1([a-zA-Z0-9]){75}$|^s([a-zA-Z0-9]){34}$"
     },
     "crypto.ADA.address": {
       "deprecatedKeyName": "ADA",
@@ -421,6 +431,11 @@
       "validationRegex": "^NQ[0-9]{2} ([A-Z0-9]{4} ){7}[A-Z0-9]{4}$",
       "deprecated": false
     },
+    "crypto.GUAP.address": {
+      "deprecatedKeyName": "GUAP",
+      "validationRegex": "^(G|P)[a-zA-HJ-NP-Z0-9]{25,39}$",
+      "deprecated": false
+    },
     "crypto.ELA.version.ELA.address": {
       "deprecatedKeyName": "ELA_ELA",
       "validationRegex": "E[a-zA-HJ-NP-Z0-9]{33}",
@@ -428,16 +443,6 @@
     },
     "crypto.ELA.version.ESC.address": {
       "deprecatedKeyName": "ELA_ESC",
-      "validationRegex": "^0x[a-fA-F0-9]{40}$",
-      "deprecated": false
-    },
-    "crypto.ELA.version.HRC20.address": {
-      "deprecatedKeyName": "ELA_HRC20",
-      "validationRegex": "^0x[a-fA-F0-9]{40}$",
-      "deprecated": false
-    },
-    "crypto.ELA.version.ERC20.address": {
-      "deprecatedKeyName": "ELA_ERC20",
       "validationRegex": "^0x[a-fA-F0-9]{40}$",
       "deprecated": false
     },

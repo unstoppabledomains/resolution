@@ -8,6 +8,7 @@
 [![Get help on Discord](https://img.shields.io/badge/Get%20help%20on-Discord-blueviolet)](https://discord.gg/b6ZVxSZ9Hn)
 
 - [Installing Resolution](README.md#installing-resolution)
+- [Updating Resolution](README.md#updating-resolution)
 - [Using Resolution](README.md#using-resolution)
 - [Default Ethereum Providers](README.md#default-ethereum-providers)
 - [Error Handling](README.md#error-handling)
@@ -59,6 +60,18 @@ npm install @unstoppabledomains/resolution --save
 
 If you're interested in resolving domains via the command line, see our
 [CLI section](#command-line-interface).
+
+## Updating Resolution
+
+Resolution can be updated with either `yarn` or `npm`.
+
+```shell
+yarn upgrade @unstoppabledomains/resolution --latest
+```
+
+```shell
+npm update @unstoppabledomains/resolution --save
+```
 
 ## Using Resolution
 
@@ -160,12 +173,21 @@ CLI support was removed from the Resolution library starting from version 6.0. P
 ## Default Ethereum Providers
 
 Resolution provides zero-configuration experience by using built-in
-production-ready [Infura](http://infura.io/) endpoint by default.  
+production-ready [Alchemy](http://alchemy.com/) endpoint by default.  
 Default Ethereum provider is free to use without restrictions and rate-limits
-for `UNS` resolution.  
+for `UNS` resolution.
+
+## Custom Ethereum Provider configuration
+
+You may want to specify a custom provider:
+ - if you want to use a dedicated blockchain node
+ - if you want to monitor app usage
+ - if you already have a provider in your app to re-use it for domain resolution
+
 Default provider can be changed by changing constructor options
 `new Resolution(options)` or by using one of the factory methods:
 
+- `Resolution.alchemy()`
 - `Resolution.infura()`
 - `Resolution.fromWeb3Version1Provider()`
 - `Resolution.fromEthersProvider()`
@@ -173,6 +195,31 @@ Default provider can be changed by changing constructor options
 
 To see all constructor options and factory methods check
 [Unstoppable API reference](https://unstoppabledomains.github.io/resolution).
+
+```javascript
+const {default: Resolution} = require('@unstoppabledomains/resolution');
+
+const ethereumProviderUrl = ALCHEMY_ETHEREUM_API;
+const polygonProviderUrl = ALCHEMY_POLYGON_API;
+
+// custom provider config using the `Resolution` constructor options
+const resolution = new Resolution({
+    sourceConfig: {
+      uns: {
+        locations: {
+          Layer1: {
+            url: ethereumProviderUrl,
+            network: 'mainnet'
+          },
+          Layer2: {
+            url: polygonProviderUrl,
+            network: 'polygon-mainnet',
+          },
+        },
+      },
+    },
+  });
+```
 
 ## Autoconfiguration of blockchain network
 
@@ -254,5 +301,8 @@ business.
 
 ## Get help
 
-[Join our discord community](https://discord.com/invite/b6ZVxSZ9Hn) and ask
-questions.
+[Join our discord community](https://discord.gg/unstoppabledomains) and ask questions.
+
+## Help us improve
+
+We're always looking for ways to improve how developers use and integrate our products into their applications. We'd love to hear about your experience to help us improve by [taking our survey](https://form.typeform.com/to/uHPQyHO6).

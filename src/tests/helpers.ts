@@ -9,7 +9,7 @@ import ConfigurationError, {
 import DnsRecordsError, {DnsRecordsErrorCode} from '../errors/dnsRecordsError';
 import {NamingServiceName} from '../types/publicTypes';
 
-export const MainnetUrl = 'https://rinkeby.infura.io';
+export const MainnetUrl = 'https://eth-rinkeby.alchemyapi.io';
 export const ZilliqaUrl = 'https://api.zilliqa.com';
 export const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
 
@@ -22,6 +22,9 @@ export const ZilDomainWithUsdtMultiChainRecords =
 export const CryptoDomainLayerOneWithNoResolver =
   'udtestdev-test-l1-domain-no-resolver.crypto';
 export const CryptoDomainWithAllRecords = 'test-usdt-and-dns-records.crypto';
+export const ZilDomainWithAllRecords = 'test-usdt-and-dns-records.zil';
+export const ZilDomainWithNoResolver =
+  'udtestdev-test-l1-domain-no-resolver.zil';
 export const WalletDomainLayerTwoWithAllRecords =
   'udtestdev-test-l2-domain-784391.wallet';
 export const WalletDomainLayerTwoWithNoRecords =
@@ -42,7 +45,7 @@ try {
 export function mockAsyncMethod(
   object: any,
   method: string,
-  value: any,
+  value: unknown,
 ): jest.SpyInstance {
   const spy = jest.spyOn(object, method);
   if (!isLive()) {
@@ -149,8 +152,8 @@ export function mockAPICalls(testName: string, url = MainnetUrl): void {
     return;
   }
 
-  const mcdt = mockData as any;
-  const mockCall = mcdt[testName] as [any];
+  const mcdt = mockData;
+  const mockCall = mcdt[testName];
 
   mockCall.forEach(({METHOD, REQUEST, RESPONSE}) => {
     switch (METHOD) {
@@ -171,15 +174,14 @@ export function mockAPICalls(testName: string, url = MainnetUrl): void {
 
 /**
  * returns either a standard ethereum provider url
- * or the one with attached INFURA SECRET key from
- * UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID env variable if any
+ * or the one with attached SECRET key from
+ * UNSTOPPABLE_RESOLUTION_PROJECTID env variable if any
  */
 export function protocolLink(
   providerProtocol: ProviderProtocol = ProviderProtocol.http,
   namingService: 'UNSL1' | 'UNSL2' = 'UNSL1',
 ): string {
-  const secret =
-    process.env.UNSTOPPABLE_RESOLUTION_INFURA_PROJECTID ?? undefined;
+  const secret = process.env.UNSTOPPABLE_RESOLUTION_PROJECTID ?? undefined;
 
   if (!secret) {
     return ethereumDefaultProviders[namingService][providerProtocol];
@@ -187,13 +189,13 @@ export function protocolLink(
 
   if (namingService === 'UNSL2') {
     return providerProtocol === ProviderProtocol.wss
-      ? `wss://polygon-mumbai.infura.io/ws/v3/${secret}`
-      : `https://polygon-mumbai.infura.io/v3/${secret}`;
+      ? `wss://eth-rinkeby.alchemyapi.io/v2/${secret}`
+      : `https://eth-rinkeby.alchemyapi.io/v2/${secret}`;
   }
 
   return providerProtocol === ProviderProtocol.wss
-    ? `wss://rinkeby.infura.io/ws/v3/${secret}`
-    : `https://rinkeby.infura.io/v3/${secret}`;
+    ? `wss://eth-rinkeby.alchemyapi.io/v2/${secret}`
+    : `https://eth-rinkeby.alchemyapi.io/v2/${secret}`;
 }
 
 export enum ProviderProtocol {
@@ -216,15 +218,11 @@ export const caseMock = <T, U>(
 
 const ethereumDefaultProviders = {
   UNSL1: {
-    [ProviderProtocol.http]:
-      'https://rinkeby.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
-    [ProviderProtocol.wss]:
-      'wss://rinkeby.infura.io/ws/v3/c4bb906ed6904c42b19c95825fe55f39',
+    http: 'https://eth-rinkeby.alchemyapi.io/v2/ZDERxOLIj120dh2-Io2Q9RTh9RfWEssT',
+    wss: 'wss://eth-rinkeby.alchemyapi.io/v2/ZDERxOLIj120dh2-Io2Q9RTh9RfWEssT',
   },
   UNSL2: {
-    [ProviderProtocol.http]:
-      'https://polygon-mumbai.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
-    [ProviderProtocol.wss]:
-      'wss://polygon-mumbai.infura.io/ws/v3/c4bb906ed6904c42b19c95825fe55f39',
+    http: 'https://polygon-mumbai.g.alchemy.com/v2/c4bb906ed6904c42b19c95825fe55f39',
+    wss: 'wss://polygon-mumbai.g.alchemy.com/v2/c4bb906ed6904c42b19c95825fe55f39',
   },
 };

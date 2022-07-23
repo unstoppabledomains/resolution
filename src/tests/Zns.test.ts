@@ -10,9 +10,12 @@ import {NullAddress} from '../types';
 import {NamingServiceName} from '../types/publicTypes';
 import Zns from '../Zns';
 import {ConfigurationErrorCode} from '../errors/configurationError';
+import Uns from '../Uns';
+import ResolutionError from '../errors/resolutionError';
 
 let resolution: Resolution;
 let zns: Zns;
+let uns: Uns;
 
 describe('ZNS', () => {
   beforeEach(() => {
@@ -24,7 +27,8 @@ describe('ZNS', () => {
         },
       },
     });
-    zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
+    zns = resolution.serviceMap[NamingServiceName.ZNS].native as Zns;
+    uns = resolution.serviceMap[NamingServiceName.UNS].native as Uns;
   });
 
   describe('.NormalizeSource', () => {
@@ -44,7 +48,7 @@ describe('ZNS', () => {
           zns: {url: 'https://dev-api.zilliqa.com', network: 'testnet'},
         },
       });
-      zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
+      zns = resolution.serviceMap[NamingServiceName.ZNS].native as Zns;
       expect(zns.network).toBe(333);
       expect(zns.url).toBe('https://dev-api.zilliqa.com');
     });
@@ -55,7 +59,7 @@ describe('ZNS', () => {
           zns: {url: 'https://dev-api.zilliqa.com', network: 'testnet'},
         },
       });
-      zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
+      zns = resolution.serviceMap[NamingServiceName.ZNS].native as Zns;
       expect(zns.network).toBe(333);
       expect(zns.url).toBe('https://dev-api.zilliqa.com');
     });
@@ -66,7 +70,7 @@ describe('ZNS', () => {
           zns: {url: 'https://dev-api.zilliqa.com', network: 'testnet'},
         },
       });
-      zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
+      zns = resolution.serviceMap[NamingServiceName.ZNS].native as Zns;
       expect(zns.network).toBe(333);
       expect(zns.url).toBe('https://dev-api.zilliqa.com');
     });
@@ -146,7 +150,7 @@ describe('ZNS', () => {
       const resolution = new Resolution({
         sourceConfig: {zns: {network: 'testnet'}},
       });
-      zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
+      zns = resolution.serviceMap[NamingServiceName.ZNS].native as Zns;
       expect(zns.network).toBe(333);
       expect(zns.url).toBe('https://dev-api.zilliqa.com');
     });
@@ -160,7 +164,7 @@ describe('ZNS', () => {
           },
         },
       });
-      zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
+      zns = resolution.serviceMap[NamingServiceName.ZNS].native as Zns;
       expect(zns.network).toBe(333);
       expect(zns.registryAddr).toBe(
         'zil1hyj6m5w4atcn7s806s69r0uh5g4t84e8gp6nps',
@@ -177,7 +181,7 @@ describe('ZNS', () => {
           },
         },
       });
-      zns = resolution.serviceMap[NamingServiceName.ZNS] as Zns;
+      zns = resolution.serviceMap[NamingServiceName.ZNS].native as Zns;
       expect(zns.network).toBe(333);
       expect(zns.url).toBe('https://dev-api.zilliqa.com');
       expect(zns.registryAddr).toBe(
@@ -196,8 +200,11 @@ describe('ZNS', () => {
   });
 
   describe('.Resolve', () => {
-    it('resolves .zil name using blockchain', async () => {
-      const eyes = mockAsyncMethods(zns, {
+    it('resolves .zil name using ZNS', async () => {
+      const unsSpy = mockAsyncMethod(uns, 'allRecords', () => {
+        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
+      });
+      const znsEyes = mockAsyncMethods(zns, {
         getRecordsAddresses: [
           'zil1ye72zl5t8wl5n3f2fsa5w0x7hja0jqj7mhct23',
           '0xb17c35e557a8c13a730696c92d716a58421e36ca',
@@ -208,7 +215,7 @@ describe('ZNS', () => {
         },
       });
       const result = await resolution.allRecords('testing.zil');
-      expectSpyToBeCalled(eyes);
+      expectSpyToBeCalled([unsSpy, ...znsEyes]);
       expect(result).toBeDefined();
       expect(result['crypto.ETH.address']).toEqual(
         '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
@@ -218,8 +225,11 @@ describe('ZNS', () => {
       );
     });
 
-    it('resolves domain using blockchain #2', async () => {
-      const spyes = mockAsyncMethods(zns, {
+    it('resolves domain using ZNS #2', async () => {
+      const unsSpy = mockAsyncMethod(uns, 'allRecords', async () => {
+        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
+      });
+      const spies = mockAsyncMethods(zns, {
         getRecordsAddresses: [
           'zil1zzpjwyp2nu29pcv3sh04qxq9x5l45vke0hrwec',
           '0x3f329078d95f043fd902d5c3ea2fbce0b3fca003',
@@ -242,7 +252,7 @@ describe('ZNS', () => {
         },
       });
       const result = await resolution.allRecords('testing.zil');
-      expectSpyToBeCalled(spyes);
+      expectSpyToBeCalled([unsSpy, ...spies]);
       expect(result).toEqual({
         'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
         'whois.email.value': 'derainberk@gmail.com',
@@ -262,6 +272,9 @@ describe('ZNS', () => {
     });
 
     it('should return a valid resolver address', async () => {
+      const unsSpy = mockAsyncMethod(uns, 'resolver', async () => {
+        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
+      });
       const spies = mockAsyncMethods(zns, {
         getRecordsAddresses: [
           'zil1qf3pce990c2zft07zgjknu34v9zlqh20mqqvhy',
@@ -269,13 +282,16 @@ describe('ZNS', () => {
         ],
       });
       const resolverAddress = await resolution.resolver('testing.zil');
-      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled([unsSpy, ...spies]);
       expect(resolverAddress).toBe(
         '0x02621c64a57e1424adfe122569f2356145f05d4f',
       );
     });
 
     it('should return a valid owner address', async () => {
+      const unsSpy = mockAsyncMethod(uns, 'owner', async () => {
+        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
+      });
       const spies = mockAsyncMethods(zns, {
         getRecordsAddresses: [
           'zil1qqlrehlvat5kalsq07qedgd3k804glhwhv8ppa',
@@ -283,11 +299,14 @@ describe('ZNS', () => {
         ],
       });
       const ownerAddress = await resolution.owner('testing.zil');
-      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled([unsSpy, ...spies]);
       expect(ownerAddress).toBe('zil1qqlrehlvat5kalsq07qedgd3k804glhwhv8ppa');
     });
 
     it('should not find a resolverAddress', async () => {
+      const unsSpy = mockAsyncMethod(uns, 'resolver', async () => {
+        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
+      });
       const spies = mockAsyncMethods(zns, {
         getRecordsAddresses: undefined,
       });
@@ -295,10 +314,13 @@ describe('ZNS', () => {
         resolution.resolver('sopmethingveryweirdthatnoonewilltakeever.zil'),
         ResolutionErrorCode.UnregisteredDomain,
       );
-      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled([unsSpy, ...spies]);
     });
 
     it('should have a zero resolver hahaha', async () => {
+      const unsSpy = mockAsyncMethod(uns, 'resolver', async () => {
+        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
+      });
       const spies = mockAsyncMethods(zns, {
         getRecordsAddresses: [
           'zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz',
@@ -309,10 +331,13 @@ describe('ZNS', () => {
         resolution.resolver('uihui12d.zil'),
         ResolutionErrorCode.UnspecifiedResolver,
       );
-      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled([unsSpy, ...spies]);
     });
 
     it('should have a zero resolver 2', async () => {
+      const unsSpy = mockAsyncMethod(uns, 'resolver', async () => {
+        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
+      });
       const spies = mockAsyncMethods(zns, {
         getRecordsAddresses: [
           'zil10scu59zrf8fr6gyw5vnwcz43hg7rvah747pz5h',
@@ -323,41 +348,47 @@ describe('ZNS', () => {
         resolution.resolver('paulalcock.zil'),
         ResolutionErrorCode.UnspecifiedResolver,
       );
-      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled([unsSpy, ...spies]);
     });
   });
 
+  // Here, we pretend that .zil support is not released in UNS to test that we actually call ZNS.
   describe('.isSupportedDomain', () => {
     it('starts with -', async () => {
+      mockAsyncMethod(uns, 'isSupportedDomain', false);
       expect(await resolution.isSupportedDomain('-hello.zil')).toEqual(true);
     });
 
     it('ends with -', async () => {
+      mockAsyncMethod(uns, 'isSupportedDomain', false);
       expect(await resolution.isSupportedDomain('hello-.zil')).toEqual(true);
     });
 
     it('starts and ends with -', async () => {
+      mockAsyncMethod(uns, 'isSupportedDomain', false);
       expect(await resolution.isSupportedDomain('-hello-.zil')).toEqual(true);
     });
   });
 
   describe('.isRegistered', () => {
     it('should return true', async () => {
+      const unsSpy = mockAsyncMethod(uns, 'isRegistered', false);
       const spies = mockAsyncMethods(zns, {
         getRecordsAddresses: ['zil1jcgu2wlx6xejqk9jw3aaankw6lsjzeunx2j0jz'],
       });
       const isRegistered = await resolution.isRegistered('testing.zil');
-      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled([unsSpy, ...spies]);
       expect(isRegistered).toBe(true);
     });
     it('should return false', async () => {
+      const unsSpy = mockAsyncMethod(uns, 'isRegistered', false);
       const spies = mockAsyncMethods(zns, {
         getRecordsAddresses: [''],
       });
       const isRegistered = await resolution.isRegistered(
         'thisdomainisdefinitelynotregistered123.zil',
       );
-      expectSpyToBeCalled(spies);
+      expectSpyToBeCalled([unsSpy, ...spies]);
       expect(isRegistered).toBe(false);
     });
   });
@@ -384,13 +415,13 @@ describe('ZNS', () => {
   describe('.Hashing', () => {
     describe('.Namehash', () => {
       it('supports standard domain', () => {
-        expect(resolution.namehash('ny.zil')).toEqual(
+        expect(resolution.namehash('ny.zil', NamingServiceName.ZNS)).toEqual(
           '0xd45bcb80c1ca68da09082d7618280839a1102446b639b294d07e9a1692ec241f',
         );
       });
 
       it('supports root "zil" domain', () => {
-        expect(resolution.namehash('zil')).toEqual(
+        expect(resolution.namehash('zil', NamingServiceName.ZNS)).toEqual(
           '0x9915d0456b878862e822e2361da37232f626a2e47505c8795134a95d36138ed3',
         );
       });
@@ -399,6 +430,9 @@ describe('ZNS', () => {
 
   describe('.Record Data', () => {
     it('should return IPFS hash from zns', async () => {
+      const unsSpy = mockAsyncMethod(uns, 'records', async () => {
+        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
+      });
       const eye = mockAsyncMethod(zns, 'getContractMapValue', {
         argtypes: [],
         arguments: [
@@ -415,13 +449,16 @@ describe('ZNS', () => {
         'whois.for_sale.value': 'true',
       });
       const hash = await resolution.ipfsHash('testing.zil');
-      expectSpyToBeCalled([eye, secondEye]);
+      expectSpyToBeCalled([unsSpy, eye, secondEye]);
       expect(hash).toStrictEqual(
         'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
       );
     });
 
     it('should return httpUrl associated with the domain', async () => {
+      const unsSpy = mockAsyncMethod(uns, 'records', async () => {
+        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
+      });
       const eye = mockAsyncMethod(zns, 'getContractMapValue', {
         argtypes: [],
         arguments: [
@@ -438,11 +475,14 @@ describe('ZNS', () => {
         'whois.for_sale.value': 'true',
       });
       const httpUrl = await resolution.httpUrl('testing.zil');
-      expectSpyToBeCalled([eye, secondEye]);
+      expectSpyToBeCalled([unsSpy, eye, secondEye]);
       expect(httpUrl).toBe('www.unstoppabledomains.com');
     });
 
     it('should return all records for zil domain', async () => {
+      const unsSpy = mockAsyncMethod(uns, 'allRecords', async () => {
+        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
+      });
       const eye = mockAsyncMethod(zns, 'getContractMapValue', {
         argtypes: [],
         arguments: [
@@ -457,7 +497,7 @@ describe('ZNS', () => {
         'whois.email.value': 'derainberk@gmail.com',
       });
       const records = await resolution.allRecords('testing.zil');
-      expectSpyToBeCalled([eye, secondEye]);
+      expectSpyToBeCalled([unsSpy, eye, secondEye]);
       expect(records).toMatchObject({
         'crypto.ETH.address': '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
         'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
@@ -468,19 +508,27 @@ describe('ZNS', () => {
 
   describe('.tokenURI', () => {
     it('should throw an unsupported method error', async () => {
+      const unsSpy = mockAsyncMethod(uns, 'getTokenUri', async () => {
+        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
+      });
       await expectResolutionErrorCode(
         () => resolution.tokenURI('test.zil'),
         ResolutionErrorCode.UnsupportedMethod,
       );
+      expect(unsSpy).toBeCalled();
     });
   });
 
   describe('.tokenURIMetadata', () => {
     it('should throw an unsupported method error', async () => {
+      const unsSpy = mockAsyncMethod(uns, 'getTokenUri', async () => {
+        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
+      });
       await expectResolutionErrorCode(
         () => resolution.tokenURIMetadata('test.zil'),
         ResolutionErrorCode.UnsupportedMethod,
       );
+      expect(unsSpy).toBeCalled();
     });
   });
 

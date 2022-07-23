@@ -1,51 +1,55 @@
-import {Hash, keccak_256 as sha3} from 'js-sha3';
-import {sha256} from 'js-sha256';
-import {Buffer} from 'buffer';
+import sha256 from 'crypto-js/sha256';
+import sha3 from 'crypto-js/sha3';
+import hex from 'crypto-js/enc-hex';
+import WordArray from 'crypto-js/lib-typedarrays';
 import BN from 'bn.js';
 
 export function eip137Namehash(domain: string): string {
-  const arr = hashArray(domain, sha3);
+  const arr = hashArray(domain, 'sha3');
   return arrayToHex(arr);
 }
 
 export function eip137Childhash(parentHash: string, label: string): string {
-  return childhash(parentHash, label, sha3);
+  return childhash(parentHash, label, 'sha3');
 }
 
 export function znsNamehash(domain: string): string {
-  const arr = hashArray(domain, sha256);
+  const arr = hashArray(domain, 'sha256');
   return arrayToHex(arr);
 }
 
 export function znsChildhash(parentHash: string, label: string): string {
-  return childhash(parentHash, label, sha256);
+  return childhash(parentHash, label, 'sha256');
 }
 
 function childhash(
   parentHash: string,
   label: string,
-  hashingAlgo: Hash,
+  hashingAlgo: 'sha256' | 'sha3',
 ): string {
+  const hash = hashingAlgo === 'sha256' ? sha256 : sha3;
+  const opts = {outputLength: 256};
   const parent = parentHash.replace(/^0x/, '');
-  const childHash = hashingAlgo.hex(label);
-  return `0x${hashingAlgo.hex(Buffer.from(`${parent}${childHash}`, 'hex'))}`;
+  const childHash = hex.stringify(hash(label, opts));
+  return `0x${hex.stringify(hash(hex.parse(`${parent}${childHash}`), opts))}`;
 }
 
-function hashArray(domain: string, hashingAlgo: Hash): number[] {
+function hashArray(domain: string, hashingAlgo: 'sha256' | 'sha3'): WordArray {
   if (!domain) {
-    return Array.from(new Uint8Array(32));
+    return WordArray.create(Array.from(new Uint8Array(8)));
   }
 
+  const hash = hashingAlgo === 'sha256' ? sha256 : sha3;
+  const opts = {outputLength: 256};
+
   const [label, ...remainder] = domain.split('.');
-  const labelHash = hashingAlgo.array(label);
+  const labelHash = hash(label, opts);
   const remainderHash = hashArray(remainder.join('.'), hashingAlgo);
-  return hashingAlgo.array(new Uint8Array([...remainderHash, ...labelHash]));
+  return hash(remainderHash.concat(labelHash), opts);
 }
 
-function arrayToHex(arr: number[]) {
-  return `0x${Array.prototype.map
-    .call(arr, (x) => ('00' + x.toString(16)).slice(-2))
-    .join('')}`;
+function arrayToHex(arr: WordArray) {
+  return `0x${hex.stringify(arr)}`;
 }
 
 export function fromHexStringToDecimals(value: string): string {

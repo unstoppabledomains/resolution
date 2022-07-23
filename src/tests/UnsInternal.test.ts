@@ -147,7 +147,7 @@ describe('UnsInternal', () => {
   });
   describe('.registryAddress()', () => {
     it('should throw error for invalid domain', async () => {
-      const domain = 'invaliddomain.zil';
+      const domain = '.crypto';
       expect(() => unsInternalL1.registryAddress(domain)).rejects.toThrow(
         new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
           domain,
@@ -303,7 +303,7 @@ describe('UnsInternal', () => {
     expect(exists).toBe(true);
   });
   it('should return true for domain exists', async () => {
-    mockAPICalls('uns_domain_exists_test', protocolLink());
+    mockAPICalls('uns_domain_exists_true_test', protocolLink());
     const exists = await unsInternalL1.exists(CryptoDomainWithAllRecords);
     expect(exists).toBe(true);
   });
@@ -358,26 +358,44 @@ describe('UnsInternal', () => {
       location['testing-domain-doesnt-exist-12345abc.blockchain'],
     ).toBeNull();
   });
-});
 
-it('should return location for L2 domains', async () => {
-  mockAPICalls(
-    'uns_l2_location_test',
-    protocolLink(ProviderProtocol.http, 'UNSL2'),
-  );
-  const location = await unsInternalL2.locations([
-    'udtestdev-test-l2-domain-784391.wallet',
-    'testing-domain-doesnt-exist-12345abc.blockchain',
-  ]);
-  expect(location['udtestdev-test-l2-domain-784391.wallet']).toEqual({
-    registryAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
-    resolverAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
-    networkId: 80001,
-    blockchain: BlockchainType.MATIC,
-    ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
-    blockchainProviderUrl: protocolLink(ProviderProtocol.http, 'UNSL2'),
+  it('should return location for L2 domains', async () => {
+    mockAPICalls(
+      'uns_l2_location_test',
+      protocolLink(ProviderProtocol.http, 'UNSL2'),
+    );
+    const location = await unsInternalL2.locations([
+      'udtestdev-test-l2-domain-784391.wallet',
+      'testing-domain-doesnt-exist-12345abc.blockchain',
+    ]);
+    expect(location['udtestdev-test-l2-domain-784391.wallet']).toEqual({
+      registryAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
+      resolverAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
+      networkId: 80001,
+      blockchain: BlockchainType.MATIC,
+      ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
+      blockchainProviderUrl: protocolLink(ProviderProtocol.http, 'UNSL2'),
+    });
+    expect(
+      location['testing-domain-doesnt-exist-12345abc.blockchain'],
+    ).toBeNull();
   });
-  expect(
-    location['testing-domain-doesnt-exist-12345abc.blockchain'],
-  ).toBeNull();
+
+  it('should return location for domains starting with 0x', async () => {
+    mockAPICalls(
+      'uns_l2_0x_location_test',
+      protocolLink(ProviderProtocol.http, 'UNSL2'),
+    );
+    const location = await unsInternalL2.locations([
+      '0xtestdomain-dev-test.wallet',
+    ]);
+    expect(location['0xtestdomain-dev-test.wallet']).toEqual({
+      registryAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
+      resolverAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
+      networkId: 80001,
+      blockchain: BlockchainType.MATIC,
+      ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
+      blockchainProviderUrl: protocolLink(ProviderProtocol.http, 'UNSL2'),
+    });
+  });
 });
