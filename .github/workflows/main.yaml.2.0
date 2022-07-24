@@ -48,5 +48,39 @@ jobs:
 
       - name: Install Dependencies
         run: yarn install
+        
+     `{
+  "vulnerabilities": [],
+  "ok": true,
+  "dependencyCount": 13,
+  ...
+  "packageManager": "apk",
+  "summary": "No known vulnerabilities",
+  "uniqueCount": 0,
+  "projectName": "docker-image|snykgoof/os-app",
+  "platform": "linux/amd64",
+  "path": "snykgoof/os-app:node-snykin/os-app",
+  "applications": [
+    {
+      "vulnerabilities": [
+        {
+          A bunch of vulns
+        },
+        ...
+      ],
+      "ok": false,
+      "dependencyCount": 116,
+      "packageManager": "yarn",
+      "summary": "14 vulnerable dependency paths",
+      "uniqueCount": 9,
+      "targetFile": "/app2/package.json",
+      "projectName": "snykin",
+      "displayTargetFile": "/app2/package.json",
+      "path": "snykgoof/os-app:node-snykin"
+    }
+  ]
+}`   
+        
+        
 
       - run: yarn size
