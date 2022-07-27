@@ -1024,7 +1024,7 @@ describe('Resolution', () => {
                     network: 'custom',
                     proxyReaderAddress:
                       '0x332a8191905fa8e6eea7350b5799f225b8ed30a9',
-                    url: 'https://polygon-mumbai.g.alchemy.com/v2/c4bb906ed6904c42b19c95825fe55f39',
+                    url: 'https://polygon-mumbai.g.alchemy.com/v2/ymbY17ik_HyGfXnPWxBAGhuZE7MwtErX',
                   },
                 },
               },
@@ -1653,7 +1653,7 @@ describe('Resolution', () => {
           blockchain: BlockchainType.MATIC,
           ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
           blockchainProviderUrl:
-            'https://polygon-mumbai.g.alchemy.com/v2/c4bb906ed6904c42b19c95825fe55f39',
+            'https://polygon-mumbai.g.alchemy.com/v2/ymbY17ik_HyGfXnPWxBAGhuZE7MwtErX',
         });
         expect(location['udtestdev-test-l1-and-l2-ownership.wallet']).toEqual({
           registryAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
@@ -1662,7 +1662,7 @@ describe('Resolution', () => {
           blockchain: BlockchainType.MATIC,
           ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
           blockchainProviderUrl:
-            'https://polygon-mumbai.g.alchemy.com/v2/c4bb906ed6904c42b19c95825fe55f39',
+            'https://polygon-mumbai.g.alchemy.com/v2/ymbY17ik_HyGfXnPWxBAGhuZE7MwtErX',
         });
         expect(
           location['testing-domain-doesnt-exist-12345abc.blockchain'],
@@ -1675,7 +1675,7 @@ describe('Resolution', () => {
           blockchain: BlockchainType.MATIC,
           ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
           blockchainProviderUrl:
-            'https://polygon-mumbai.g.alchemy.com/v2/c4bb906ed6904c42b19c95825fe55f39',
+            'https://polygon-mumbai.g.alchemy.com/v2/ymbY17ik_HyGfXnPWxBAGhuZE7MwtErX',
         });
         expect(location['zns-devtest-testnet-domain.zil']).toEqual({
           registryAddress: 'zil1hyj6m5w4atcn7s806s69r0uh5g4t84e8gp6nps',
