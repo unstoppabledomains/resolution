@@ -1500,14 +1500,7 @@ describe('UNS', () => {
           'https://metadata.staging.unstoppabledomains.com/metadata/brad.crypto',
         ],
       });
-      mockAsyncMethod(uns.unsl2.readerContract, 'call', (params) =>
-        Promise.reject(
-          new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
-            providerMessage:
-              'execution reverted: ERC721Metadata: URI query for nonexistent token',
-          }),
-        ),
-      );
+      mockAsyncMethod(uns.unsl2.readerContract, 'call', ['']);
 
       const uri = await resolution.tokenURI('brad.crypto');
 
@@ -1543,14 +1536,7 @@ describe('UNS', () => {
           'https://metadata.staging.unstoppabledomains.com/metadata/brad.zil',
         ],
       });
-      mockAsyncMethod(uns.unsl2.readerContract, 'call', (params) =>
-        Promise.reject(
-          new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
-            providerMessage:
-              'execution reverted: ERC721Metadata: URI query for nonexistent token',
-          }),
-        ),
-      );
+      mockAsyncMethod(uns.unsl2.readerContract, 'call', ['']);
 
       const uri = await resolution.tokenURI('brad.zil');
 
@@ -1563,15 +1549,10 @@ describe('UNS', () => {
     it('should throw error', async () => {
       const domain = 'fakedomainthatdoesnotexist.crypto';
       const spies = mockAsyncMethods(uns.unsl1.readerContract, {
-        call: new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
-          providerMessage: 'execution reverted',
-        }),
+        call: [''],
       });
       const polygonSpies = mockAsyncMethods(uns.unsl2.readerContract, {
-        call: new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
-          providerMessage:
-            'execution reverted: ERC721Metadata: URI query for nonexistent token',
-        }),
+        call: [''],
       });
 
       await expect(resolution.tokenURI(domain)).rejects.toThrow(
@@ -1708,21 +1689,8 @@ describe('UNS', () => {
           'test34230131207328144694.crypto',
           NamingServiceName.UNS,
         );
-        mockAsyncMethod(uns.unsl2, 'getTokenUri', (params) =>
-          Promise.reject(
-            new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
-              providerMessage:
-                'execution reverted: ERC721Metadata: URI query for nonexistent token',
-            }),
-          ),
-        );
-        mockAsyncMethod(uns.unsl1, 'getTokenUri', (params) =>
-          Promise.reject(
-            new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
-              providerMessage: 'execution reverted',
-            }),
-          ),
-        );
+        mockAsyncMethod(uns.unsl2, 'getTokenUri', '');
+        mockAsyncMethod(uns.unsl1, 'getTokenUri', '');
         await expect(
           resolution.unhash(unregisteredhash, NamingServiceName.UNS),
         ).rejects.toThrow(
