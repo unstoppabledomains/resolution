@@ -58,7 +58,7 @@ beforeEach(() => {
     sourceConfig: {
       uns: {
         locations: {
-          Layer1: {url: protocolLink(), network: 'rinkeby'},
+          Layer1: {url: protocolLink(), network: 'goerli'},
           Layer2: {
             url: protocolLink(ProviderProtocol.http, 'UNSL2'),
             network: 'polygon-mumbai',
@@ -76,8 +76,7 @@ describe('Resolution', () => {
   describe('.Basic setup', () => {
     it('should work with autonetwork url configuration', async () => {
       const polygonUrl = protocolLink(ProviderProtocol.http, 'UNSL2');
-      const rinkebyUrl = protocolLink();
-      const goerliUrl = rinkebyUrl.replace('rinkeby', 'goerli');
+      const rinkebyUrl = protocolLink().replace('goerli', 'rinkeby'); // use rinkeby as custom network here
       // mocking getNetworkConfigs because no access to inner provider.request
       const UnsGetNetworkOriginal = Uns.autoNetwork;
       if (!isLive()) {
@@ -238,7 +237,7 @@ describe('Resolution', () => {
     it('should work with autonetwork provider configuration', async () => {
       const provider = new FetchProvider(
         'UDAPI',
-        protocolLink().replace('rinkeby', 'mainnet'),
+        protocolLink().replace('goerli', 'mainnet'),
       );
       const polygonUrl = protocolLink(ProviderProtocol.http, 'UNSL2');
       const polygonProvider = new FetchProvider(UnsLocation.Layer2, polygonUrl);
@@ -298,7 +297,7 @@ describe('Resolution', () => {
     });
 
     it('should fail because of unsupported test network for uns', async () => {
-      const blockchainUrl = protocolLink().replace('rinkeby', 'ropsten');
+      const blockchainUrl = protocolLink().replace('goerli', 'ropsten');
       const polygonUrl = protocolLink(ProviderProtocol.http, 'UNSL2');
       const mockedProvider = new FetchProvider(
         NamingServiceName.UNS,
@@ -511,7 +510,7 @@ describe('Resolution', () => {
               locations: {
                 Layer1: {
                   url: protocolLink(ProviderProtocol.http, 'UNSL1'),
-                  network: 'rinkeby',
+                  network: 'goerli',
                 },
                 Layer2: {
                   url: protocolLink(ProviderProtocol.http, 'UNSL2'),
@@ -646,7 +645,7 @@ describe('Resolution', () => {
       });
 
       describe('.Crypto', () => {
-        it(`domains "brad.crypto" and "Brad.crypto" should return the same results`, async () => {
+        it(`domains "reseller-test-udtesting-459239285.crypto" and "RESELLER-test-UDTESTING-459239285.crypto" should return the same results`, async () => {
           const eyes = mockAsyncMethods(uns, {
             get: {
               resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
@@ -656,8 +655,14 @@ describe('Resolution', () => {
               },
             },
           });
-          const capital = await resolution.addr('Brad.crypto', 'eth');
-          const lower = await resolution.addr('brad.crypto', 'eth');
+          const capital = await resolution.addr(
+            'RESELLER-test-UDTESTING-459239285.crypto',
+            'eth',
+          );
+          const lower = await resolution.addr(
+            'reseller-test-udtesting-459239285.crypto',
+            'eth',
+          );
           expectSpyToBeCalled(eyes, 2);
           expect(capital).toStrictEqual(lower);
         });
@@ -763,7 +768,7 @@ describe('Resolution', () => {
             uns: {
               locations: {
                 Layer1: {
-                  network: 'rinkeby',
+                  network: 'goerli',
                   provider: provider as unknown as Web3Version1Provider,
                 },
                 Layer2: {
@@ -777,7 +782,10 @@ describe('Resolution', () => {
           mockAsyncMethod(uns.unsl2.readerContract, 'call', () =>
             Promise.resolve([NullAddress, NullAddress, {}]),
           );
-          const ethAddress = await resolution.addr('brad.crypto', 'ETH');
+          const ethAddress = await resolution.addr(
+            'reseller-test-udtesting-459239285.crypto',
+            'ETH',
+          );
 
           // expect each mock to be called at least once.
           expectSpyToBeCalled([eye]);
@@ -805,7 +813,7 @@ describe('Resolution', () => {
             uns: {
               locations: {
                 Layer1: {
-                  network: 'rinkeby',
+                  network: 'goerli',
                   provider: provider as unknown as Web3Version1Provider,
                 },
                 Layer2: {
@@ -828,7 +836,7 @@ describe('Resolution', () => {
         it('should work for ethers jsonrpc provider', async () => {
           const provider = new JsonRpcProvider(
             protocolLink(ProviderProtocol.http),
-            'rinkeby',
+            'goerli',
           );
           const polygonProvider = new JsonRpcProvider(
             protocolLink(ProviderProtocol.http, 'UNSL2'),
@@ -837,7 +845,7 @@ describe('Resolution', () => {
           const resolution = Resolution.fromEthersProvider({
             uns: {
               locations: {
-                Layer1: {network: 'rinkeby', provider},
+                Layer1: {network: 'goerli', provider},
                 Layer2: {network: 'polygon-mumbai', provider: polygonProvider},
               },
             },
@@ -849,14 +857,17 @@ describe('Resolution', () => {
           const eye = mockAsyncMethod(provider, 'call', (params) =>
             Promise.resolve(caseMock(params, RpcProviderTestCases)),
           );
-          const ethAddress = await resolution.addr('brad.crypto', 'ETH');
+          const ethAddress = await resolution.addr(
+            'reseller-test-udtesting-459239285.crypto',
+            'ETH',
+          );
           expectSpyToBeCalled([eye]);
           expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
         });
 
         it('should work with ethers default provider', async () => {
           const provider = new InfuraProvider(
-            'rinkeby',
+            'goerli',
             '213fff28936343858ca9c5115eff1419',
           );
           const polygonProvider = new InfuraProvider(
@@ -870,7 +881,7 @@ describe('Resolution', () => {
           const resolution = Resolution.fromEthersProvider({
             uns: {
               locations: {
-                Layer1: {network: 'rinkeby', provider},
+                Layer1: {network: 'goerli', provider},
                 Layer2: {network: 'polygon-mumbai', provider: polygonProvider},
               },
             },
@@ -879,7 +890,10 @@ describe('Resolution', () => {
           mockAsyncMethod(uns.unsl2.readerContract, 'call', (params) =>
             Promise.resolve([NullAddress, NullAddress, {}]),
           );
-          const ethAddress = await resolution.addr('brad.crypto', 'eth');
+          const ethAddress = await resolution.addr(
+            'reseller-test-udtesting-459239285.crypto',
+            'eth',
+          );
           expectSpyToBeCalled([eye]);
           expect(ethAddress).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
         });
@@ -1001,10 +1015,6 @@ describe('Resolution', () => {
                 '0x1C42088b82f6Fa5fB883A14240C4E066dDFf1517',
               'crypto.LTC.address': 'MTnTNwKikiMi97Teq8XQRabL9SZ4HjnKNB',
               'crypto.ADA.address': '',
-              'ipfs.html.value':
-                'QmYqX8D8SkaF5YcpaWMyi5xM43UEteFiSNKYsjLcdvCWud',
-              'ipfs.redirect_domain.value':
-                'https://abbfe6z95qov3d40hf6j30g7auo7afhp.mypinata.cloud/ipfs/QmYqX8D8SkaF5YcpaWMyi5xM43UEteFiSNKYsjLcdvCWud',
             });
           });
         });
@@ -1024,7 +1034,7 @@ describe('Resolution', () => {
                     network: 'custom',
                     proxyReaderAddress:
                       '0x332a8191905fa8e6eea7350b5799f225b8ed30a9',
-                    url: 'https://polygon-mumbai.g.alchemy.com/v2/c4bb906ed6904c42b19c95825fe55f39',
+                    url: 'https://polygon-mumbai.g.alchemy.com/v2/ymbY17ik_HyGfXnPWxBAGhuZE7MwtErX',
                   },
                 },
               },
@@ -1215,32 +1225,32 @@ describe('Resolution', () => {
 
     it('should return cns mainnet registry address #1', async () => {
       const spies = mockAsyncMethods(uns, {
-        registryAddress: UnsConfig.networks[4].contracts.CNSRegistry.address,
+        registryAddress: UnsConfig.networks[5].contracts.CNSRegistry.address,
       });
       const registryAddress = await resolution.registryAddress(
         'udtestdev-crewe.crypto',
       );
       expectSpyToBeCalled(spies);
       expect(registryAddress).toBe(
-        UnsConfig.networks[4].contracts.CNSRegistry.address,
+        UnsConfig.networks[5].contracts.CNSRegistry.address,
       );
     });
 
     it('should return uns mainnet registry address', async () => {
       const spies = mockAsyncMethods(uns, {
-        registryAddress: UnsConfig.networks[4].contracts.UNSRegistry.address,
+        registryAddress: UnsConfig.networks[5].contracts.UNSRegistry.address,
       });
       const registryAddress = await resolution.registryAddress(
-        'udtestdev-check.wallet',
+        'uns-devtest-265f8f.wallet',
       );
       expectSpyToBeCalled(spies);
       expect(registryAddress).toBe(
-        UnsConfig.networks[4].contracts.UNSRegistry.address,
+        UnsConfig.networks[5].contracts.UNSRegistry.address,
       );
     });
     it('should return uns l2 mainnet registry address if domain exists on both', async () => {
       const spies = mockAsyncMethods(uns.unsl1, {
-        registryAddress: UnsConfig.networks[4].contracts.UNSRegistry.address,
+        registryAddress: UnsConfig.networks[5].contracts.UNSRegistry.address,
       });
       const spies2 = mockAsyncMethods(uns.unsl2, {
         registryAddress:
@@ -1579,10 +1589,10 @@ describe('Resolution', () => {
         // https://github.com/rust-ethereum/ethabi
         //
         // # getDataForMany return data
-        // ethabi encode params -v 'address[]' '[7fb83000b8ed59d3ead22f0d584df3a85fbc0086,95ae1515367aa64c462c71e87157771165b1287a,0000000000000000000000000000000000000000,0000000000000000000000000000000000000000,0000000000000000000000000000000000000000,0000000000000000000000000000000000000000,0000000000000000000000000000000000000000]' -v 'address[]' '[0e43f36e4b986dfbe1a75cacfa60ca2bd44ae962,499dd6d875787869670900a2130223d85d4f6aa7,0000000000000000000000000000000000000000,0000000000000000000000000000000000000000,0000000000000000000000000000000000000000,0000000000000000000000000000000000000000,0000000000000000000000000000000000000000]' -v 'string[][]' '[[],[],[],[],[],[],[]]'
+        // ethabi encode params -v 'address[]' '[070e83fced225184e67c86302493fffcdb953f71,95ae1515367aa64c462c71e87157771165b1287a,0000000000000000000000000000000000000000,0000000000000000000000000000000000000000,0000000000000000000000000000000000000000,0000000000000000000000000000000000000000,0000000000000000000000000000000000000000]' -v 'address[]' '[0e43f36e4b986dfbe1a75cacfa60ca2bd44ae962,499dd6d875787869670900a2130223d85d4f6aa7,0000000000000000000000000000000000000000,0000000000000000000000000000000000000000,0000000000000000000000000000000000000000,0000000000000000000000000000000000000000,0000000000000000000000000000000000000000]' -v 'string[][]' '[[],[],[],[],[],[],[]]'
         // # registryOf return data
-        // ethabi encode params -v address 7fb83000b8ed59d3ead22f0d584df3a85fbc0086
-        // ethabi encode params -v address aad76bea7cfec82927239415bb18d2e93518ecbb
+        // ethabi encode params -v address 070e83fced225184e67c86302493fffcdb953f71
+        // ethabi encode params -v address 801452cfac27e79a11c6b185986fde09e8637589
         // ethabi encode params -v address 0000000000000000000000000000000000000000
         // ethabi encode params -v address 0000000000000000000000000000000000000000
         // ethabi encode params -v address 0000000000000000000000000000000000000000
@@ -1592,7 +1602,7 @@ describe('Resolution', () => {
         // ethabi encode params -v 'bytes[]' '[...]' # put the output of the commands above into the array
         const mockValuesL1 = {
           callEth:
-            '0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000056000000000000000000000000000000000000000000000000000000000000005a000000000000000000000000000000000000000000000000000000000000005e00000000000000000000000000000000000000000000000000000000000000620000000000000000000000000000000000000000000000000000000000000066000000000000000000000000000000000000000000000000000000000000006a000000000000000000000000000000000000000000000000000000000000006e0000000000000000000000000000000000000000000000000000000000000044000000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000160000000000000000000000000000000000000000000000000000000000000026000000000000000000000000000000000000000000000000000000000000000070000000000000000000000007fb83000b8ed59d3ead22f0d584df3a85fbc008600000000000000000000000095ae1515367aa64c462c71e87157771165b1287a0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000070000000000000000000000000e43f36e4b986dfbe1a75cacfa60ca2bd44ae962000000000000000000000000499dd6d875787869670900a2130223d85d4f6aa700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000700000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000012000000000000000000000000000000000000000000000000000000000000001400000000000000000000000000000000000000000000000000000000000000160000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000001a0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000000007fb83000b8ed59d3ead22f0d584df3a85fbc00860000000000000000000000000000000000000000000000000000000000000020000000000000000000000000aad76bea7cfec82927239415bb18d2e93518ecbb0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000',
+            '0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000056000000000000000000000000000000000000000000000000000000000000005a000000000000000000000000000000000000000000000000000000000000005e00000000000000000000000000000000000000000000000000000000000000620000000000000000000000000000000000000000000000000000000000000066000000000000000000000000000000000000000000000000000000000000006a000000000000000000000000000000000000000000000000000000000000006e000000000000000000000000000000000000000000000000000000000000004400000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000016000000000000000000000000000000000000000000000000000000000000002600000000000000000000000000000000000000000000000000000000000000007000000000000000000000000070e83fced225184e67c86302493fffcdb953f7100000000000000000000000095ae1515367aa64c462c71e87157771165b1287a0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000070000000000000000000000000e43f36e4b986dfbe1a75cacfa60ca2bd44ae962000000000000000000000000499dd6d875787869670900a2130223d85d4f6aa700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000700000000000000000000000000000000000000000000000000000000000000e00000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000012000000000000000000000000000000000000000000000000000000000000001400000000000000000000000000000000000000000000000000000000000000160000000000000000000000000000000000000000000000000000000000000018000000000000000000000000000000000000000000000000000000000000001a000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000070e83fced225184e67c86302493fffcdb953f710000000000000000000000000000000000000000000000000000000000000020000000000000000000000000801452cfac27e79a11c6b185986fde09e86375890000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000',
         };
         // # getDataForMany return data
         // ethabi encode params -v 'address[]' '[0000000000000000000000000000000000000000,0000000000000000000000000000000000000000,2a93c52e7b6e7054870758e15a1446e769edfb93,2a93c52e7b6e7054870758e15a1446e769edfb93,0000000000000000000000000000000000000000,2a93c52e7b6e7054870758e15a1446e769edfb93,0000000000000000000000000000000000000000]' -v 'address[]' '[0000000000000000000000000000000000000000,0000000000000000000000000000000000000000,499dd6d875787869670900a2130223d85d4f6aa7,499dd6d875787869670900a2130223d85d4f6aa7,0000000000000000000000000000000000000000,499dd6d875787869670900a2130223d85d4f6aa7,0000000000000000000000000000000000000000]' -v 'string[][]' '[[],[],[],[],[],[],[]]'
@@ -1620,7 +1630,7 @@ describe('Resolution', () => {
         ]);
 
         const location = await resolution.locations([
-          'udtestdev-check.wallet',
+          'reseller-test-udtesting-459239285.crypto',
           'brad.crypto',
           'udtestdev-test-l2-domain-784391.wallet',
           'udtestdev-test-l1-and-l2-ownership.wallet',
@@ -1628,23 +1638,23 @@ describe('Resolution', () => {
           'uns-devtest-testnet-domain.zil',
           'zns-devtest-testnet-domain.zil',
         ]);
-        expect(location['udtestdev-check.wallet']).toEqual({
-          registryAddress: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
-          resolverAddress: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
-          networkId: 4,
+        expect(location['reseller-test-udtesting-459239285.crypto']).toEqual({
+          registryAddress: '0x070e83FCed225184E67c86302493ffFCDB953f71',
+          resolverAddress: '0x070e83FCed225184E67c86302493ffFCDB953f71',
+          networkId: 5,
           blockchain: BlockchainType.ETH,
           ownerAddress: '0x0e43F36e4B986dfbE1a75cacfA60cA2bD44Ae962',
           blockchainProviderUrl:
-            'https://eth-rinkeby.alchemyapi.io/v2/ZDERxOLIj120dh2-Io2Q9RTh9RfWEssT',
+            'https://eth-goerli.alchemyapi.io/v2/J-ff_OlmWzw41ocqwpkRccHdfqSZML4q',
         });
         expect(location['brad.crypto']).toEqual({
-          registryAddress: '0xAad76bea7CFEc82927239415BB18D2e93518ecBB',
+          registryAddress: '0x801452cFAC27e79a11c6b185986fdE09e8637589',
           resolverAddress: '0x95AE1515367aa64C462c71e87157771165B1287A',
-          networkId: 4,
+          networkId: 5,
           blockchain: BlockchainType.ETH,
           ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
           blockchainProviderUrl:
-            'https://eth-rinkeby.alchemyapi.io/v2/ZDERxOLIj120dh2-Io2Q9RTh9RfWEssT',
+            'https://eth-goerli.alchemyapi.io/v2/J-ff_OlmWzw41ocqwpkRccHdfqSZML4q',
         });
         expect(location['udtestdev-test-l2-domain-784391.wallet']).toEqual({
           registryAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
@@ -1653,7 +1663,7 @@ describe('Resolution', () => {
           blockchain: BlockchainType.MATIC,
           ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
           blockchainProviderUrl:
-            'https://polygon-mumbai.g.alchemy.com/v2/c4bb906ed6904c42b19c95825fe55f39',
+            'https://polygon-mumbai.g.alchemy.com/v2/ymbY17ik_HyGfXnPWxBAGhuZE7MwtErX',
         });
         expect(location['udtestdev-test-l1-and-l2-ownership.wallet']).toEqual({
           registryAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
@@ -1662,7 +1672,7 @@ describe('Resolution', () => {
           blockchain: BlockchainType.MATIC,
           ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
           blockchainProviderUrl:
-            'https://polygon-mumbai.g.alchemy.com/v2/c4bb906ed6904c42b19c95825fe55f39',
+            'https://polygon-mumbai.g.alchemy.com/v2/ymbY17ik_HyGfXnPWxBAGhuZE7MwtErX',
         });
         expect(
           location['testing-domain-doesnt-exist-12345abc.blockchain'],
@@ -1675,7 +1685,7 @@ describe('Resolution', () => {
           blockchain: BlockchainType.MATIC,
           ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
           blockchainProviderUrl:
-            'https://polygon-mumbai.g.alchemy.com/v2/c4bb906ed6904c42b19c95825fe55f39',
+            'https://polygon-mumbai.g.alchemy.com/v2/ymbY17ik_HyGfXnPWxBAGhuZE7MwtErX',
         });
         expect(location['zns-devtest-testnet-domain.zil']).toEqual({
           registryAddress: 'zil1hyj6m5w4atcn7s806s69r0uh5g4t84e8gp6nps',

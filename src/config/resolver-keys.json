@@ -1,8 +1,8 @@
 {
-  "version": "2.1.1",
+  "version": "2.1.5",
   "information": {
-    "description": "This file desribes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
-    "documentation": "https://docs.unstoppabledomains.com/domain-registry-essentials/records-reference",
+    "description": "This file describes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
+    "documentation": "https://docs.unstoppabledomains.com/developer-toolkit/records-reference/",
     "contribution": "https://github.com/unstoppabledomains/uns/blob/main/resolver-keys.json"
   },
   "keys": {
@@ -436,6 +436,16 @@
       "validationRegex": "^(G|P)[a-zA-HJ-NP-Z0-9]{25,39}$",
       "deprecated": false
     },
+    "crypto.YLD.address": {
+      "deprecatedKeyName": "YLD",
+      "deprecated": false,
+      "validationRegex": "^0x[a-fA-F0-9]{40}$"
+    },
+    "crypto.OKT.address": {
+      "deprecatedKeyName": "OKT",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$|^ex[a-zA-HJ-NP-Z0-9]{6,90}$",
+      "deprecated": false
+    },
     "crypto.ELA.version.ELA.address": {
       "deprecatedKeyName": "ELA_ELA",
       "validationRegex": "E[a-zA-HJ-NP-Z0-9]{33}",
@@ -464,6 +474,11 @@
     "crypto.USDT.version.OMNI.address": {
       "deprecatedKeyName": "USDT_OMNI",
       "validationRegex": "^(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,39}$",
+      "deprecated": false
+    },
+    "crypto.USDT.version.OKC.address": {
+      "deprecatedKeyName": "USDT_OKC",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$|^ex[a-zA-HJ-NP-Z0-9]{6,90}$",
       "deprecated": false
     },
     "crypto.FTM.version.ERC20.address": {
@@ -1178,6 +1193,11 @@
     },
     "crypto.AAVE.version.HRC20.address": {
       "deprecatedKeyName": "AAVE_HRC20",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
+    "crypto.BLOCKS.address": {
+      "deprecatedKeyName": "BLOCKS",
       "validationRegex": "^0x[a-fA-F0-9]{40}$",
       "deprecated": false
     },
@@ -2408,6 +2428,31 @@
     },
     "crypto.DPI.version.MATIC.address": {
       "deprecatedKeyName": "DPI_MATIC",
+      "validationRegex": null,
+      "deprecated": false
+    },
+    "crypto.DOG.version.MATIC.address": {
+      "deprecatedKeyName": "DOG_MATIC",
+      "validationRegex": null,
+      "deprecated": false
+    },
+    "crypto.DOG.version.BEP20.address": {
+      "deprecatedKeyName": "DOG_BEP20",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
+    "crypto.DOG.version.ERC20.address": {
+      "deprecatedKeyName": "DOG_ERC20",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
+    "crypto.DOG.version.AETH.address": {
+      "deprecatedKeyName": "DOG_AETH",
+      "validationRegex": null,
+      "deprecated": false
+    },
+    "crypto.DOG.version.OP.address": {
+      "deprecatedKeyName": "DOG_OP",
       "validationRegex": null,
       "deprecated": false
     }

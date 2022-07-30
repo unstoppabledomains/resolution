@@ -28,7 +28,7 @@ beforeEach(async () => {
     UnsLocation.Layer1,
     {
       url: protocolLink(ProviderProtocol.http, 'UNSL1'),
-      network: 'rinkeby',
+      network: 'goerli',
     },
     BlockchainType.ETH,
   );
@@ -334,24 +334,15 @@ describe('UnsInternal', () => {
       protocolLink(ProviderProtocol.http, 'UNSL1'),
     );
     const location = await unsInternalL1.locations([
-      'udtestdev-check.wallet',
-      'brad.crypto',
+      'reseller-test-udtesting-459239285.crypto',
       'testing-domain-doesnt-exist-12345abc.blockchain',
     ]);
-    expect(location['udtestdev-check.wallet']).toEqual({
-      registryAddress: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
-      resolverAddress: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
-      networkId: 4,
+    expect(location['reseller-test-udtesting-459239285.crypto']).toEqual({
+      registryAddress: '0x801452cFAC27e79a11c6b185986fdE09e8637589',
+      resolverAddress: '0x0555344A5F440Bd1d8cb6B42db46c5e5D4070437',
+      networkId: 5,
       blockchain: BlockchainType.ETH,
-      ownerAddress: '0x0e43F36e4B986dfbE1a75cacfA60cA2bD44Ae962',
-      blockchainProviderUrl: protocolLink(ProviderProtocol.http, 'UNSL1'),
-    });
-    expect(location['brad.crypto']).toEqual({
-      registryAddress: '0xAad76bea7CFEc82927239415BB18D2e93518ecBB',
-      resolverAddress: '0x95AE1515367aa64C462c71e87157771165B1287A',
-      networkId: 4,
-      blockchain: BlockchainType.ETH,
-      ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
+      ownerAddress: '0xe586d5Bf4d7779498648DF67b73c88a712E4359d',
       blockchainProviderUrl: protocolLink(ProviderProtocol.http, 'UNSL1'),
     });
     expect(

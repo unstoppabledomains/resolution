@@ -32,6 +32,7 @@
     "config:pull": "yarn network-config:pull && yarn resolver-keys:pull",
     "network-config:pull": "curl https://raw.githubusercontent.com/unstoppabledomains/uns/main/uns-config.json -o src/config/uns-config.json",
     "resolver-keys:pull": "curl https://raw.githubusercontent.com/unstoppabledomains/uns/main/resolver-keys.json -o src/config/resolver-keys.json",
+    "contracts-abi:pull": "./pull-contracts-abi.sh",
     "prettier:fix": "prettier --write -l \"src/**/*.{ts,tsx,js,jsx,json,md}\"",
     "prepare": "([ -d ./.git ] && husky install) || echo \"Skip husky install since package does not have .git folder\""
   },
