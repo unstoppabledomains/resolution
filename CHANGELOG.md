@@ -1,3 +1,6 @@
+## 8.3.0
+- Fixed tokenURI error handling
+
 ## 8.2.0
 
 - Fixed default library configuration
