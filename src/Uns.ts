@@ -4,6 +4,8 @@ import {
   constructRecords,
   isNullAddress,
   EthereumNetworksInverted,
+  wrapResult,
+  unwrapResult,
 } from './utils';
 import {
   UnsSource,
@@ -270,33 +272,22 @@ export default class Uns extends NamingService {
   }
 
   async getTokenUri(tokenId: string): Promise<string> {
-    const [resultOrErrorL1, resultOrErrorL2] = await Promise.all([
-      this.unsl1.getTokenUri(tokenId).catch((err) => err),
-      this.unsl2.getTokenUri(tokenId).catch((err) => err),
-    ]);
-    if (resultOrErrorL2 instanceof Error) {
-      if (
-        !resultOrErrorL2.message.includes(
-          'ERC721Metadata: URI query for nonexistent token',
-        )
-      ) {
-        throw resultOrErrorL2;
-      }
-    } else {
-      return resultOrErrorL2;
-    }
-    if (resultOrErrorL1 instanceof Error) {
-      validResolutionErrorOrThrow(
-        resultOrErrorL1,
-        ResolutionErrorCode.ServiceProviderError,
-      );
-      if (resultOrErrorL1.message === '< execution reverted >') {
-        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
-          domain: `with tokenId ${tokenId}`,
-        });
+    // Kick off both requests concurrently and wrap the results to avoid unhandled promise rejections.
+    for await (const result of [
+      wrapResult(() => this.unsl2.getTokenUri(tokenId)),
+      wrapResult(() => this.unsl1.getTokenUri(tokenId)),
+    ]) {
+      const tokenUri = unwrapResult(result);
+      if (tokenUri) {
+        return tokenUri;
       }
     }
-    return resultOrErrorL1;
+
+    // Note: if a token doesn't exist, ProxyReader returns an empty string. If both responses are empty,
+    // we know for sure that the domain isn't registered.
+    throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain, {
+      domain: `with tokenId ${tokenId}`,
+    });
   }
 
   async isAvailable(domain: string): Promise<boolean> {
