@@ -14,6 +14,8 @@
 - [Error Handling](README.md#error-handling)
 - [Free advertising for integrated apps](README.md#free-advertising-for-integrated-apps)
 
+> ⚠️ We are no longer offering .coin support. Please check our [blog post](url) for more details.
+
 Resolution is a library for interacting with blockchain domain names. It can be
 used to retrieve
 [payment addresses](https://unstoppabledomains.com/features#Add-Crypto-Addresses),
