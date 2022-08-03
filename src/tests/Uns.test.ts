@@ -45,7 +45,7 @@ beforeEach(async () => {
         locations: {
           Layer1: {
             url: protocolLink(ProviderProtocol.http, 'UNSL1'),
-            network: 'rinkeby',
+            network: 'goerli',
           },
           Layer2: {
             url: protocolLink(ProviderProtocol.http, 'UNSL2'),
@@ -62,7 +62,7 @@ beforeEach(async () => {
 describe('UNS', () => {
   it('should define the default uns contract', () => {
     expect(uns).toBeDefined();
-    expect(uns.unsl1.network).toBe('rinkeby');
+    expect(uns.unsl1.network).toBe('goerli');
     expect(uns.unsl1.url).toBe(protocolLink());
     expect(uns.unsl2.network).toBe('polygon-mumbai');
     expect(uns.unsl2.url).toBe(protocolLink(ProviderProtocol.http, 'UNSL2'));
@@ -1155,7 +1155,7 @@ describe('UNS', () => {
         'udtestdev-265f8f.crypto',
       );
       expect(registryAddress).toBe(
-        UnsConfig.networks[4].contracts.CNSRegistry.address,
+        UnsConfig.networks[5].contracts.CNSRegistry.address,
       );
     });
 
@@ -1168,7 +1168,7 @@ describe('UNS', () => {
       mockAPICalls('uns_registry_address_tests', protocolLink());
       const registryAddress = await uns.registryAddress('some-domain.888');
       expect(registryAddress).toBe(
-        UnsConfig.networks[4].contracts.UNSRegistry.address,
+        UnsConfig.networks[5].contracts.UNSRegistry.address,
       );
     });
 
@@ -1472,7 +1472,7 @@ describe('UNS', () => {
           sourceConfig: {
             uns: {
               locations: {
-                Layer1: {url, provider, network: 'rinkeby'},
+                Layer1: {url, provider, network: 'goerli'},
                 Layer2: {network: 'polygon-mumbai', provider: polygonProvider},
               },
             },
