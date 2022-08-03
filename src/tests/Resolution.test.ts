@@ -1316,6 +1316,17 @@ describe('Resolution', () => {
       });
       expectSpyToBeCalled([...eyes]);
     });
+    it('should return error for coin tld', async () => {
+      expectResolutionErrorCode(
+        resolution.record('test.coin', 'crypto.ETH.address'),
+        ResolutionErrorCode.UnsupportedDomain,
+      );
+
+      expectResolutionErrorCode(
+        resolution.addr('test.coin', 'ETH'),
+        ResolutionErrorCode.UnsupportedDomain,
+      );
+    });
   });
 
   describe('.isRegistered', () => {

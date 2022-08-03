@@ -36,7 +36,6 @@ Resolution supports decentralized domains across three main zones:
   - `.nft`
   - `.blockchain`
   - `.bitcoin`
-  - `.coin`
   - `.wallet`
   - `.888`
   - `.dao`

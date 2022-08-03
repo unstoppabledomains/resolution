@@ -13,5 +13,10 @@ export function prepareAndValidateDomain(domain: string): string {
       domain,
     });
   }
+  if (retVal.endsWith('.coin')) {
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
+      domain,
+    });
+  }
   return retVal;
 }

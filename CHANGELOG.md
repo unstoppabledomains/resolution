@@ -1,3 +1,6 @@
+## 8.4.0
+ - Disabled `.coin` resolution due to registry conflicts
+
 ## 8.3.1
 - Fixed tokenURI error handling
 
