@@ -61,11 +61,6 @@ export function constructRecords(
   return records;
 }
 
-export const domainExtensionToNamingServiceName = {
-  crypto: NamingServiceName.UNS,
-  zil: NamingServiceName.ZNS,
-};
-
 export const findNamingServiceName = (
   domain: string,
 ): NamingServiceName | '' => {
@@ -73,11 +68,13 @@ export const findNamingServiceName = (
 
   if (!extension) {
     return '';
-  } else if (extension in domainExtensionToNamingServiceName) {
-    return domainExtensionToNamingServiceName[extension];
-  } else {
-    return domainExtensionToNamingServiceName.crypto;
   }
+
+  if (extension === 'zil') {
+    return NamingServiceName.ZNS;
+  }
+
+  return NamingServiceName.UNS;
 };
 
 export const EthereumNetworks = {
