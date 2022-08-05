@@ -746,6 +746,7 @@ export default class Resolution {
   async tokenURI(domain: string): Promise<string> {
     // The `getTokenUri` method isn't supported in ZNS (it'll throw in the next call), so we just assume that we need
     // to calculate a UNS namehash.
+    domain = prepareAndValidateDomain(domain);
     const namehash = this.namehash(domain, NamingServiceName.UNS);
     return this.callServiceForDomain(domain, (service) =>
       service.getTokenUri(namehash),
@@ -768,6 +769,7 @@ export default class Resolution {
    * @returns Registry contract address
    */
   async registryAddress(domain: string): Promise<string> {
+    domain = prepareAndValidateDomain(domain);
     return this.callServiceForDomain(domain, (service) =>
       service.registryAddress(domain),
     );
@@ -795,6 +797,7 @@ export default class Resolution {
    * @returns Promise<Locations> - A map of domain name and Location (a set of attributes like blockchain,
    */
   async locations(domains: string[]): Promise<Locations> {
+    domains = domains.map(prepareAndValidateDomain);
     const zilDomains = domains.filter((domain) => domain.endsWith('.zil'));
 
     // Here, we call both UNS and ZNS methods and merge the results.
