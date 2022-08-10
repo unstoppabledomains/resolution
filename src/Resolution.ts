@@ -314,21 +314,21 @@ export default class Resolution {
     return this.fromEthereumEip1193Provider({
       uns: networks.uns
         ? {
-          locations: {
-            Layer1: {
-              network: networks.uns.locations.Layer1.network,
-              provider: Eip1193Factories.fromWeb3Version0Provider(
-                networks.uns.locations.Layer1.provider,
-              ),
+            locations: {
+              Layer1: {
+                network: networks.uns.locations.Layer1.network,
+                provider: Eip1193Factories.fromWeb3Version0Provider(
+                  networks.uns.locations.Layer1.provider,
+                ),
+              },
+              Layer2: {
+                network: networks.uns.locations.Layer2.network,
+                provider: Eip1193Factories.fromWeb3Version0Provider(
+                  networks.uns.locations.Layer2.provider,
+                ),
+              },
             },
-            Layer2: {
-              network: networks.uns.locations.Layer2.network,
-              provider: Eip1193Factories.fromWeb3Version0Provider(
-                networks.uns.locations.Layer2.provider,
-              ),
-            },
-          },
-        }
+          }
         : undefined,
     });
   }
@@ -356,21 +356,21 @@ export default class Resolution {
     return this.fromEthereumEip1193Provider({
       uns: networks.uns
         ? {
-          locations: {
-            Layer1: {
-              network: networks.uns.locations.Layer1.network,
-              provider: Eip1193Factories.fromWeb3Version1Provider(
-                networks.uns.locations.Layer1.provider,
-              ),
+            locations: {
+              Layer1: {
+                network: networks.uns.locations.Layer1.network,
+                provider: Eip1193Factories.fromWeb3Version1Provider(
+                  networks.uns.locations.Layer1.provider,
+                ),
+              },
+              Layer2: {
+                network: networks.uns.locations.Layer2.network,
+                provider: Eip1193Factories.fromWeb3Version1Provider(
+                  networks.uns.locations.Layer2.provider,
+                ),
+              },
             },
-            Layer2: {
-              network: networks.uns.locations.Layer2.network,
-              provider: Eip1193Factories.fromWeb3Version1Provider(
-                networks.uns.locations.Layer2.provider,
-              ),
-            },
-          },
-        }
+          }
         : undefined,
     });
   }
@@ -401,21 +401,21 @@ export default class Resolution {
     return this.fromEthereumEip1193Provider({
       uns: networks.uns
         ? {
-          locations: {
-            Layer1: {
-              network: networks.uns.locations.Layer1.network,
-              provider: Eip1193Factories.fromEthersProvider(
-                networks.uns.locations.Layer1.provider,
-              ),
+            locations: {
+              Layer1: {
+                network: networks.uns.locations.Layer1.network,
+                provider: Eip1193Factories.fromEthersProvider(
+                  networks.uns.locations.Layer1.provider,
+                ),
+              },
+              Layer2: {
+                network: networks.uns.locations.Layer2.network,
+                provider: Eip1193Factories.fromEthersProvider(
+                  networks.uns.locations.Layer2.provider,
+                ),
+              },
             },
-            Layer2: {
-              network: networks.uns.locations.Layer2.network,
-              provider: Eip1193Factories.fromEthersProvider(
-                networks.uns.locations.Layer2.provider,
-              ),
-            },
-          },
-        }
+          }
         : undefined,
     });
   }
@@ -826,7 +826,7 @@ export default class Resolution {
     // If we don't have locations for some .zil domains in UNS, we want to check whether they are present in ZNS and
     // merge them if that's the case.
     const znsLocations = await znsPromise.then(unwrapResult);
-    for (const [domain, _location] of emptyZilEntries) {
+    for (const [domain] of emptyZilEntries) {
       unsLocations[domain] = znsLocations[domain];
     }
 

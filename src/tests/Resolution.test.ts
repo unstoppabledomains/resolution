@@ -85,8 +85,8 @@ describe('Resolution', () => {
           new Uns({
             locations: {
               Layer1: {
-                network: 'rinkeby',
-                provider: new FetchProvider(UnsLocation.Layer1, rinkebyUrl),
+                network: 'goerli',
+                provider: new FetchProvider(UnsLocation.Layer1, goerliUrl),
               },
               Layer2: {
                 network: 'polygon-mumbai',
@@ -106,7 +106,7 @@ describe('Resolution', () => {
       expect(
         (resolution.serviceMap[NamingServiceName.UNS].native as Uns).unsl1
           .network,
-      ).toBe('rinkeby');
+      ).toBe('goerli');
       expect(
         (resolution.serviceMap[NamingServiceName.UNS].native as Uns).unsl2
           .network,
@@ -322,7 +322,7 @@ describe('Resolution', () => {
 
     skipItInLive('should fail in test development', async () => {
       try {
-        await fetch('https://pokeres.bastionbot.org/images/pokemon/10.png');
+        await fetch('https://pokeres.bastionbot.org/images/pokemon/10.png', {});
       } catch (err) {
         // nock should prevent all outgoing traffic
         expect(err).toBeInstanceOf(FetchError);

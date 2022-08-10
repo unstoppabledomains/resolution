@@ -7,7 +7,6 @@ import ConfigurationError, {
   ConfigurationErrorCode,
 } from '../errors/configurationError';
 import DnsRecordsError, {DnsRecordsErrorCode} from '../errors/dnsRecordsError';
-import {NamingServiceName} from '../types/publicTypes';
 
 export const MainnetUrl = 'https://eth-rinkeby.alchemyapi.io';
 export const ZilliqaUrl = 'https://api.zilliqa.com';
@@ -71,7 +70,6 @@ export function mockAsyncMethods(
 }
 
 export function isLive(): boolean {
-  // eslint-disable-next-line no-undef
   return !!process.env.LIVE;
 }
 
@@ -131,7 +129,6 @@ async function expectError(
   }
 
   return callback.then(
-    // eslint-disable-next-line no-undef
     () => {
       throw new Error(`Expected ${klass.name} to be thrown but wasn't`);
     },
@@ -157,17 +154,17 @@ export function mockAPICalls(testName: string, url = MainnetUrl): void {
 
   mockCall.forEach(({METHOD, REQUEST, RESPONSE}) => {
     switch (METHOD) {
-    case 'POST': {
-      nock(url)
-        .post('', JSON.stringify(REQUEST), undefined)
-        .reply(200, JSON.stringify(RESPONSE));
-      break;
-    }
-    default: {
-      nock(url)
-        .get(REQUEST as string, undefined, undefined)
-        .reply(200, RESPONSE);
-    }
+      case 'POST': {
+        nock(url)
+          .post('', JSON.stringify(REQUEST), undefined)
+          .reply(200, JSON.stringify(RESPONSE));
+        break;
+      }
+      default: {
+        nock(url)
+          .get(REQUEST as string, undefined, undefined)
+          .reply(200, RESPONSE);
+      }
     }
   });
 }

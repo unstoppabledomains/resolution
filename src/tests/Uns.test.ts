@@ -30,8 +30,6 @@ import UnsConfig from '../config/uns-config.json';
 import UnsInternal from '../UnsInternal';
 import {eip137Namehash, fromHexStringToDecimals} from '../utils/namehash';
 import Zns from '../Zns';
-import {util} from 'prettier';
-import skip = util.skip;
 
 let resolution: Resolution;
 let uns: Uns;
