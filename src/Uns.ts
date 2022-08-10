@@ -32,6 +32,7 @@ import ConfigurationError, {
 import UnsInternal from './UnsInternal';
 import Networking from './utils/Networking';
 import SupportedKeys from './config/resolver-keys.json';
+import {prepareAndValidateDomain} from './utils/prepareAndValidate';
 
 /**
  * @internal
@@ -383,7 +384,8 @@ export default class Uns extends NamingService {
         providerMessage: 'Service provider returned an invalid domain name',
       });
     }
-    return metadata.name;
+    const domainName = prepareAndValidateDomain(metadata.name);
+    return domainName;
   }
 
   private async getMetadata(tokenId: string): Promise<DomainMetadata> {
