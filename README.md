@@ -7,41 +7,23 @@
 [![Unstoppable Domains Documentation](https://img.shields.io/badge/Documentation-unstoppabledomains.com-blue)](https://docs.unstoppabledomains.com/)
 [![Get help on Discord](https://img.shields.io/badge/Get%20help%20on-Discord-blueviolet)](https://discord.gg/b6ZVxSZ9Hn)
 
-- [Installing Resolution](README.md#installing-resolution)
-- [Updating Resolution](README.md#updating-resolution)
-- [Using Resolution](README.md#using-resolution)
-- [Default Ethereum Providers](README.md#default-ethereum-providers)
-- [Error Handling](README.md#error-handling)
-- [Free advertising for integrated apps](README.md#free-advertising-for-integrated-apps)
+- [Installing Resolution](#installing-resolution)
+- [Updating Resolution](#updating-resolution)
+- [Using Resolution](#using-resolution)
+- [Default Ethereum Providers](#default-ethereum-providers)
+- [Error Handling](#error-handling)
+- [Free advertising for integrated apps](#free-advertising-for-integrated-apps)
 
 Resolution is a library for interacting with blockchain domain names. It can be
 used to retrieve
-[payment addresses](https://unstoppabledomains.com/features#Add-Crypto-Addresses),
-IPFS hashes for
-[decentralized websites](https://unstoppabledomains.com/features#Build-Website),
-and GunDB usernames for
-[decentralized chat](https://unstoppabledomains.com/chat).
+[payment addresses](https://unstoppabledomains.com/learn/how-to-send-crypto-using-your-domain)
+and IPFS hashes for
+[decentralized websites](https://support.unstoppabledomains.com/support/solutions/articles/48001181925-build-website).
 
 Resolution is primarily built and maintained by
 [Unstoppable Domains](https://unstoppabledomains.com/).
 
-Resolution supports decentralized domains across three main zones:
-
-- Zilliqa Name Service (ZNS)
-
-  - `.zil`
-
-- Unstoppable Name Service (UNS)
-  - `.crypto`
-  - `.nft`
-  - `.blockchain`
-  - `.bitcoin`
-  - `.coin`
-  - `.wallet`
-  - `.888`
-  - `.dao`
-  - `.x`
-  - ...
+Resolution supports different decentralized domains. Please, refer to the [Top Level Domains List](https://resolve.unstoppabledomains.com/supported_tlds)
 
 For more information, see our detailed
 [API Referrence](https://unstoppabledomains.github.io/resolution/).
@@ -98,17 +80,8 @@ function resolve(domain, currency) {
     .catch(console.error);
 }
 
-function resolveMultiChain(domain, currency, chain) {
-  resolution
-    .multiChainAddr(domain, currency, chain)
-    .then((address) => console.log(domain, 'resolves to', address, version))
-    .catch(console.error);
-}
-
 resolve('brad.crypto', 'ETH');
 resolve('brad.zil', 'ZIL');
-resolveMultiChain('brad.crypto', 'USDT', 'ERC20');
-resolveMultiChain('brad.crypto', 'USDT', 'OMNI');
 ```
 
 Execute the script.
@@ -234,7 +207,7 @@ is going to be used in any cases. You can provide a configured provider or a
 blockchain url as in the following example:
 
 ```
-await Resolution.autonetwork({
+await Resolution.autoNetwork({
   uns: {provider},
 });
 ```
@@ -252,13 +225,13 @@ or **Linux shell**).
 1. Install `nvm`
 
    ```bash
-   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.36.0/install.sh | bash
+   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
    ```
 
 2. Install concrete version of `node.js`
 
    ```bash
-   nvm install 12.12.0
+   nvm install 16.15.0
    ```
 
 3. Install `yarn`

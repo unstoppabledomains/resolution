@@ -8,7 +8,6 @@ import {
   Locations,
   UnsLocation,
   NamingServiceName,
-  ResolutionMethod,
   ResolutionResponse,
 } from './types/publicTypes';
 import Networking from './utils/Networking';
@@ -25,34 +24,30 @@ import {NamingService} from './NamingService';
  */
 export default class UdApi extends NamingService {
   public readonly url: string;
-  private readonly network: number;
-  private readonly name: ResolutionMethod;
   private readonly headers: {
     [key: string]: string;
   };
 
   constructor(api?: Api) {
     super();
-    this.name = 'UDAPI';
     this.url = api?.url || 'https://unstoppabledomains.com/api/v1';
     const DefaultUserAgent =
       'cross-fetch/3.1.4 (+https://github.com/lquixada/cross-fetch)';
     const CustomUserAgent = `${DefaultUserAgent} Resolution`;
     this.headers = {'X-user-agent': CustomUserAgent};
-    this.network = api?.network || 1;
   }
 
-  async isSupportedDomain(domain: string): Promise<boolean> {
+  async isSupportedDomain(_domain: string): Promise<boolean> {
     throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
       methodName: 'isSupportedDomain',
     });
   }
 
-  namehash(domain: string): string {
+  namehash(_domain: string): string {
     throw new Error('Unsupported method when using UD Resolution API');
   }
 
-  childhash(parentHash: string, label: string): string {
+  childhash(_parentHash: string, _label: string): string {
     throw new Error('Unsupported method when using UD Resolution API');
   }
 
@@ -187,8 +182,8 @@ export default class UdApi extends NamingService {
   }
 
   async reverse(
-    address: string,
-    currencyTicker: string,
+    _address: string,
+    _currencyTicker: string,
   ): Promise<string | null> {
     throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
       methodName: 'reverse',
@@ -196,8 +191,8 @@ export default class UdApi extends NamingService {
   }
 
   async reverseOf(
-    address: string,
-    location?: UnsLocation,
+    _address: string,
+    _location?: UnsLocation,
   ): Promise<string | null> {
     throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
       methodName: 'reverseOf',
@@ -210,7 +205,7 @@ export default class UdApi extends NamingService {
     return !isNullAddress(record.meta.owner);
   }
 
-  async getTokenUri(tokenId: string): Promise<string> {
+  async getTokenUri(_tokenId: string): Promise<string> {
     throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
       methodName: 'getTokenUri',
     });
@@ -227,7 +222,7 @@ export default class UdApi extends NamingService {
     });
   }
 
-  async locations(domains: string[]): Promise<Locations> {
+  async locations(_domains: string[]): Promise<Locations> {
     throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
       methodName: 'locations',
     });

@@ -1,8 +1,5 @@
-import {Locations, ResolutionMethod, UnsLocation} from './types/publicTypes';
+import {Locations, UnsLocation} from './types/publicTypes';
 
-/**
- * @internal
- */
 export abstract class NamingService {
   abstract owner(domain: string): Promise<string>;
   abstract resolver(domain: string): Promise<string>;
