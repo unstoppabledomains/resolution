@@ -1,11 +1,27 @@
 import {
   eip137Childhash,
   eip137Namehash,
+  fromDecStringToHex,
+  fromHexStringToDecimals,
   znsChildhash,
   znsNamehash,
 } from '../utils/namehash';
 
 describe('Namehash', () => {
+  describe('fromDecStringToHex', () => {
+    it('should return padded bn', () => {
+      const oneHex = fromDecStringToHex('1');
+      const zeroHex = fromDecStringToHex('0');
+      const maxLengthHex =
+        '0x756e4e998dbffd803c21d23b06cd855cdc7a4b57706c95964a37e24b47c10fc9';
+
+      const maxLengthDecimal = fromHexStringToDecimals(maxLengthHex);
+
+      expect(oneHex).toEqual('0x' + '0'.repeat(63) + '1');
+      expect(zeroHex).toEqual('0x' + '0'.repeat(64));
+      expect(fromDecStringToHex(maxLengthDecimal)).toEqual(maxLengthHex);
+    });
+  });
   describe('EIP-137', () => {
     it('should return namehash', () => {
       const expectedNamehash =
