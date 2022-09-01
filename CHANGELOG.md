@@ -1,4 +1,9 @@
+## 8.3.2
+
+- Fixed reverse function padding issue
+
 ## 8.3.1
+
 - Fixed tokenURI error handling
 
 ## 8.2.0
@@ -17,26 +22,34 @@
 - Dropped Node.js v10 support
 - The `serviceName` method was removed
 - The following methods got a new mandatory argument to specify NamingService:
+
   - `namehash`
   - `isValidHash`
 
-  Note: if you used them for .zil domains, you should now determine where a domain is located first,
-  It's possible that a domain has been migrated from ZNS to UNS, which would imply the usage of a different
-  namehashing algorithm to calculate its token id.
+  Note: if you used them for .zil domains, you should now determine where a
+  domain is located first, It's possible that a domain has been migrated from
+  ZNS to UNS, which would imply the usage of a different namehashing algorithm
+  to calculate its token id.
 
 ## 7.2.0
+
 - Implementation of reverse resolution methods
 
 ## 7.1.3
+
 - Implemented function getDomainFromTokenId in UdApi
 
 ## 7.1.2
+
 - Removed unused code which caused build issues on some environments
 
 ## 7.1.0
 
-- Throw `ResolutionErrorCode.InvalidDomainAddress` error if domain contains special characters
-  - Domain name is being validated according to the following regular expression: `^[.a-z0-9-]+$`
+- Throw `ResolutionErrorCode.InvalidDomainAddress` error if domain contains
+  special characters
+  - Domain name is being validated according to the following regular
+    expression: `^[.a-z0-9-]+$`
+
 ## 7.0.0
 
 - ENS support is completely removed
@@ -44,21 +57,31 @@
   package dependencies
 - Methods that query ENS domains (.eth, .luxe, .xyz, .kred, .reverse) throw
   UnsupportedDomain
+
 ## 6.0.3
-- Remove relative imports to avoid issues in bundlers. Restrict relative imports by adding eslint rule.
+
+- Remove relative imports to avoid issues in bundlers. Restrict relative imports
+  by adding eslint rule.
 
 ## 6.0.2
+
 - `Resolution#owner` method doesn't throw an error in case of empty resolver
 
 ## 6.0.1
+
 - Set correct polygon-mainnet provider if use default settings
 
 ## 6.0.0
+
 ### Breaking changes
-- CLI tool was removed. Please use new binary CLI tool instead: [Github repo](https://github.com/unstoppabledomains/resolution-cli/releases).
-- Constructor has changed. If you used `uns` configuration you have to specify parameters for L1 and L2 locations (Ethereum and Polygon mainnets).
+
+- CLI tool was removed. Please use new binary CLI tool instead:
+  [Github repo](https://github.com/unstoppabledomains/resolution-cli/releases).
+- Constructor has changed. If you used `uns` configuration you have to specify
+  parameters for L1 and L2 locations (Ethereum and Polygon mainnets).
 - ENS support is deprecated and will be removed in future.
-- Factory methods has changed. All of them requires provide L1 and L2 locations configuration for UNS. For example: `uns: {locations: {L1: ..., L2...}}`.
+- Factory methods has changed. All of them requires provide L1 and L2 locations
+  configuration for UNS. For example: `uns: {locations: {L1: ..., L2...}}`.
   - The list of affected methods:
     - `Resolution#infura`
     - `Resolution#fromResolutionProvider`
@@ -69,8 +92,11 @@
 - `Resolution#location` method is replaced by `Resolution#locations`.
 
 ### New methods and features
+
 - 🎉 🎉 🎉 Add Polygon Layer 2 support!
-- Add `Resolution#locations` method which will help to determine domains location (blockhain, networkId) and useful metadata like owner, resolver, registry addresses, provider url if possible.
+- Add `Resolution#locations` method which will help to determine domains
+  location (blockhain, networkId) and useful metadata like owner, resolver,
+  registry addresses, provider url if possible.
   - Method returns:
     - Domain blockhain (ETH or MATIC)
     - Blockchain network id (numeric)
@@ -81,37 +107,57 @@
       - Infura URL by default
 
 ## 5.0.2
+
 - Replaces `node-fetch` with `cross-fetch` package
 
 ## 5.0.1
-- Add `elliptic` package dependency in order to enable twitter verification support by default
+
+- Add `elliptic` package dependency in order to enable twitter verification
+  support by default
 
 ## 5.0.0
+
 ### Breaking changes
- - Constructor has changed. If you used cns configurations rename "cns" it to "uns" instead.
-    - For example: `new Resolution({sourceConfig: {uns: {...uns config}}})`
- - Method `Resolution#fromEip1193Provider` was renamed to `Resolution#fromEthereumEip1193Provider`  
- - Factory methods has changed. All of them requires `{uns: {... uns config}}` in parameters instead of `cns`.
-   - The list of affected factory methods:
-     - `Resolution#autoNetwork` 
-     - `Resolution#infura` 
-     - `Resolution#fromEthereumEip1193Provider` (former `Resolution#fromEip1193Provider`)
-     - `Resolution#fromWeb3Version0Provider`
-     - `Resolution#fromWeb3Version1Provider`
-     - `Resolution#fromEthersProvider`
- - `Resolution#isSupportedDomain` method is now asynchronous
+
+- Constructor has changed. If you used cns configurations rename "cns" it to
+  "uns" instead.
+  - For example: `new Resolution({sourceConfig: {uns: {...uns config}}})`
+- Method `Resolution#fromEip1193Provider` was renamed to
+  `Resolution#fromEthereumEip1193Provider`
+- Factory methods has changed. All of them requires `{uns: {... uns config}}` in
+  parameters instead of `cns`.
+  - The list of affected factory methods:
+    - `Resolution#autoNetwork`
+    - `Resolution#infura`
+    - `Resolution#fromEthereumEip1193Provider` (former
+      `Resolution#fromEip1193Provider`)
+    - `Resolution#fromWeb3Version0Provider`
+    - `Resolution#fromWeb3Version1Provider`
+    - `Resolution#fromEthersProvider`
+- `Resolution#isSupportedDomain` method is now asynchronous
 
 ### New methods and features
-- 🎉 🎉 🎉 Added support for new TLD's ( .888, .nft, .coin, .blockchain, .wallet, .x, .bitcoin, .dao )
-- Typo fix: Rename `Eip1993Factories()` -> `Eip1193Factories()`. Old name is still available under the alias `Eip1993Factories`
-- Introduced new method `Resolution#registryAddress -> Retrieves address of registry contract used for domain`
-- Introduced new method `Resolution#unhash -> Retrieves the domain name from tokenId by parsing registry smart contract event logs`
-- Introduced new method `Resolution#reverse -> This method is only for ens at the moment. Reverse the ens address to a ens registered domain name`
-- Introduced new method `Resolution#tokenURI -> Retrieves the tokenURI from the registry smart contract`
-- Introduced new method `Resolution#tokenURIMetadata -> etrieves the data from the endpoint provided by tokenURI from the registry smart contract`
-- Introduced new factory method `Resolution#fromZilliqaProvider -> Creates a resolution instance with configured provider from Zilliqa provider`
-- Introduced new factory method `Resolution#fromResolutionProvider -> Creates a resolution from Resolution compatitable provider`
-- Introduced new factory method `Resolution#fromEthereumEip1193Provider -> Creates a resolution from EIP-1193 compatitable provider`
+
+- 🎉 🎉 🎉 Added support for new TLD's ( .888, .nft, .coin, .blockchain,
+  .wallet, .x, .bitcoin, .dao )
+- Typo fix: Rename `Eip1993Factories()` -> `Eip1193Factories()`. Old name is
+  still available under the alias `Eip1993Factories`
+- Introduced new method
+  `Resolution#registryAddress -> Retrieves address of registry contract used for domain`
+- Introduced new method
+  `Resolution#unhash -> Retrieves the domain name from tokenId by parsing registry smart contract event logs`
+- Introduced new method
+  `Resolution#reverse -> This method is only for ens at the moment. Reverse the ens address to a ens registered domain name`
+- Introduced new method
+  `Resolution#tokenURI -> Retrieves the tokenURI from the registry smart contract`
+- Introduced new method
+  `Resolution#tokenURIMetadata -> etrieves the data from the endpoint provided by tokenURI from the registry smart contract`
+- Introduced new factory method
+  `Resolution#fromZilliqaProvider -> Creates a resolution instance with configured provider from Zilliqa provider`
+- Introduced new factory method
+  `Resolution#fromResolutionProvider -> Creates a resolution from Resolution compatitable provider`
+- Introduced new factory method
+  `Resolution#fromEthereumEip1193Provider -> Creates a resolution from EIP-1193 compatitable provider`
 - Return ENS support
 - Add custom network support for ENS
 
