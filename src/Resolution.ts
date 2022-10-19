@@ -1,4 +1,5 @@
 import BN from 'bn.js';
+import Ens from './Ens';
 import Zns from './Zns';
 import Uns from './Uns';
 import UdApi from './UdApi';
@@ -25,6 +26,7 @@ import ResolutionError, {ResolutionErrorCode} from './errors/resolutionError';
 import DnsUtils from './utils/DnsUtils';
 import {
   findNamingServiceName,
+  signedInfuraLink,
   signedLink,
   UnwrapPromise,
   wrapResult,
@@ -32,6 +34,8 @@ import {
 } from './utils';
 import {Eip1993Factories as Eip1193Factories} from './utils/Eip1993Factories';
 import {NamingService} from './NamingService';
+import ConfigurationError from './errors/configurationError';
+import {ConfigurationErrorCode} from './errors/configurationError';
 import Networking from './utils/Networking';
 import {prepareAndValidateDomain} from './utils/prepareAndValidate';
 import {fromDecStringToHex} from './utils/namehash';
@@ -62,6 +66,9 @@ export default class Resolution {
   readonly serviceMap: Record<NamingServiceName, ServicesEntry>;
 
   constructor({sourceConfig = undefined}: {sourceConfig?: SourceConfig} = {}) {
+    const ens = isApi(sourceConfig?.ens)
+      ? new UdApi(sourceConfig?.ens)
+      : new Ens(sourceConfig?.ens);
     const uns = isApi(sourceConfig?.uns)
       ? new UdApi(sourceConfig?.uns)
       : new Uns(sourceConfig?.uns);
@@ -85,19 +92,26 @@ export default class Resolution {
         usedServices: equalUdApiProviders ? [uns] : [uns, zns],
         native: isApi(sourceConfig?.zns) ? new Zns() : zns,
       },
+      [NamingServiceName.ENS]: {
+        usedServices: [ens],
+        native: isApi(sourceConfig?.ens) ? new Ens() : ens,
+      },
     };
   }
 
   /**
-   * AutoConfigure the blockchain network for UNS
+   * AutoConfigure the blockchain network between different testnets for ENS and UNS
    * We make a "net_version" JSON RPC call to the blockchain either via url or with the help of given provider.
-   * @param sourceConfig - configuration object for uns
+   * @param sourceConfig - configuration object for ens and uns
    * @returns configured Resolution object
    */
   static async autoNetwork(
     sourceConfig: AutoNetworkConfigs,
   ): Promise<Resolution> {
     const resolution = new this();
+    if (!sourceConfig.uns && !sourceConfig.ens) {
+      throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork);
+    }
 
     if (sourceConfig.uns) {
       const uns = await Uns.autoNetwork(sourceConfig.uns);
@@ -107,17 +121,28 @@ export default class Resolution {
       };
     }
 
+    if (sourceConfig.ens) {
+      const ens = await Ens.autoNetwork(sourceConfig.ens);
+      resolution.serviceMap[NamingServiceName.ENS] = {
+        usedServices: [ens],
+        native: ens,
+      };
+    }
+
     return resolution;
   }
 
   /**
-   * Creates a resolution with configured infura id for uns
+   * Creates a resolution with configured infura id for ens and uns
    * @param infura - infura project id
-   * @param networks - an optional object that describes what network to use when connecting UNS default is mainnet
+   * @param networks - an optional object that describes what network to use when connecting ENS or UNS default is mainnet
    */
   static infura(
     infura: string,
     networks?: {
+      ens?: {
+        network: string;
+      };
       uns?: {
         locations: {
           Layer1: {
@@ -132,6 +157,10 @@ export default class Resolution {
   ): Resolution {
     return new this({
       sourceConfig: {
+        ens: {
+          url: signedInfuraLink(infura, networks?.ens?.network),
+          network: networks?.ens?.network || 'mainnet',
+        },
         uns: {
           locations: {
             Layer1: {
@@ -204,10 +233,14 @@ export default class Resolution {
 
   /**
    * Creates a resolution instance with configured provider
-   * @param networks - an object that describes what network to use when connecting UNS or ZNS default is mainnet
+   * @param networks - an object that describes what network to use when connecting UNS, ENS, or ZNS default is mainnet
    * @see https://eips.ethereum.org/EIPS/eip-1193
    */
   static fromResolutionProvider(networks: {
+    ens?: {
+      provider: Provider;
+      network: string;
+    };
     uns?: {
       locations: {
         Layer1: {provider: Provider; network: string};
@@ -219,8 +252,9 @@ export default class Resolution {
       network: string;
     };
   }): Resolution {
-    if (networks.uns) {
+    if (networks.ens || networks.uns) {
       return this.fromEthereumEip1193Provider({
+        ens: networks.ens,
         uns: networks.uns,
       });
     }
@@ -228,16 +262,20 @@ export default class Resolution {
       return this.fromZilliqaProvider(networks.zns.provider, networks);
     }
     throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
-      providerMessage: 'Must specify network for uns or zns',
+      providerMessage: 'Must specify network for uns, ens, or zns',
     });
   }
 
   /**
    * Creates a resolution instance with configured provider
-   * @param networks - an object that describes what network to use when connecting UNS default is mainnet
+   * @param networks - an object that describes what network to use when connecting UNS and ENS default is mainnet
    * @see https://eips.ethereum.org/EIPS/eip-1193
    */
   static fromEthereumEip1193Provider(networks: {
+    ens?: {
+      network?: string;
+      provider: Provider;
+    };
     uns?: {
       locations: {
         Layer1: {
@@ -252,6 +290,12 @@ export default class Resolution {
     };
   }): Resolution {
     const sourceConfig: SourceConfig = {};
+    if (networks.ens) {
+      sourceConfig.ens = {
+        provider: networks.ens.provider,
+        network: networks?.ens?.network || 'mainnet',
+      };
+    }
     if (networks.uns) {
       sourceConfig.uns = {
         locations: {
@@ -298,6 +342,10 @@ export default class Resolution {
    * @see https://github.com/ethereum/web3.js/blob/0.20.7/lib/web3/httpprovider.js#L116
    */
   static fromWeb3Version0Provider(networks: {
+    ens?: {
+      provider: Web3Version0Provider;
+      network: string;
+    };
     uns?: {
       locations: {
         Layer1: {
@@ -312,6 +360,14 @@ export default class Resolution {
     };
   }): Resolution {
     return this.fromEthereumEip1193Provider({
+      ens: networks.ens
+        ? {
+            network: networks.ens.network,
+            provider: Eip1193Factories.fromWeb3Version0Provider(
+              networks.ens.provider,
+            ),
+          }
+        : undefined,
       uns: networks.uns
         ? {
             locations: {
@@ -335,11 +391,15 @@ export default class Resolution {
 
   /**
    * Create a resolution instance from web3 1.x version provider
-   * @param networks - an optional object with 1.x version provider from web3 ( must implement send(payload, callback) ) that describes what network to use when connecting UNS default is mainnet
+   * @param networks - an optional object with 1.x version provider from web3 ( must implement send(payload, callback) ) that describes what network to use when connecting ENS or UNS default is mainnet
    * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-core-helpers/types/index.d.ts#L165
    * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-providers-http/src/index.js#L95
    */
   static fromWeb3Version1Provider(networks: {
+    ens?: {
+      provider: Web3Version1Provider;
+      network: string;
+    };
     uns?: {
       locations: {
         Layer1: {
@@ -354,6 +414,14 @@ export default class Resolution {
     };
   }): Resolution {
     return this.fromEthereumEip1193Provider({
+      ens: networks.ens
+        ? {
+            network: networks.ens.network,
+            provider: Eip1193Factories.fromWeb3Version1Provider(
+              networks.ens.provider,
+            ),
+          }
+        : undefined,
       uns: networks.uns
         ? {
             locations: {
@@ -378,13 +446,17 @@ export default class Resolution {
   /**
    * Creates instance of resolution from provider that implements Ethers Provider#call interface.
    * This wrapper support only `eth_call` method for now, which is enough for all the current Resolution functionality
-   * @param networks - an object that describes what network to use when connecting UNS default is mainnet
+   * @param networks - an object that describes what network to use when connecting ENS or UNS default is mainnet
    * @see https://github.com/ethers-io/ethers.js/blob/v4-legacy/providers/abstract-provider.d.ts#L91
    * @see https://github.com/ethers-io/ethers.js/blob/v5.0.4/packages/abstract-provider/src.ts/index.ts#L224
    * @see https://docs.ethers.io/ethers.js/v5-beta/api-providers.html#jsonrpcprovider-inherits-from-provider
    * @see https://github.com/ethers-io/ethers.js/blob/master/packages/providers/src.ts/json-rpc-provider.ts
    */
   static fromEthersProvider(networks: {
+    ens?: {
+      network: string;
+      provider: EthersProvider;
+    };
     uns?: {
       locations: {
         Layer1: {
@@ -399,6 +471,14 @@ export default class Resolution {
     };
   }): Resolution {
     return this.fromEthereumEip1193Provider({
+      ens: networks.ens
+        ? {
+            network: networks.ens.network,
+            provider: Eip1193Factories.fromEthersProvider(
+              networks.ens.provider,
+            ),
+          }
+        : undefined,
       uns: networks.uns
         ? {
             locations: {
@@ -610,7 +690,7 @@ export default class Resolution {
 
   /**
    * @returns Produces a namehash from supported naming service in hex format with 0x prefix.
-   * Corresponds to ERC721 token id in case of Ethereum based naming service like UNS.
+   * Corresponds to ERC721 token id in case of Ethereum based naming service like ENS or UNS.
    * @param domain domain name to be converted
    * @param namingService "UNS" or "ZNS" (uses keccak256 or sha256 algorithm respectively)
    * @param options formatting options
@@ -636,7 +716,7 @@ export default class Resolution {
    * @returns a namehash of a subdomain with name label
    * @param parent namehash of a parent domain
    * @param label subdomain name
-   * @param namingService "UNS" or "ZNS" (uses keccak256 or sha256 algorithm respectively)
+   * @param namingService "ENS", "UNS" or "ZNS" (uses keccak256 or sha256 algorithm respectively)
    * @param options formatting options
    */
   childhash(
@@ -691,6 +771,7 @@ export default class Resolution {
   /**
    * Checks if the domain name is valid according to naming service rules
    * for valid domain names.
+   * Example: ENS doesn't allow domains that start from '-' symbol.
    * @param domain - domain name to be checked
    */
   async isSupportedDomain(domain: string): Promise<boolean> {
@@ -708,6 +789,7 @@ export default class Resolution {
   /**
    * Returns all record keys of the domain.
    * This method is strongly unrecommended for production use due to lack of support for many ethereum service providers and low performance
+   * Method is not supported by ENS
    * @param domain - domain name
    */
   async allRecords(domain: string): Promise<CryptoRecords> {

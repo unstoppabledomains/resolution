@@ -23,6 +23,7 @@ beforeEach(() => {
     sourceConfig: {
       zns: {api: true},
       uns: {api: true},
+      ens: {api: true},
     },
   });
   udApi = resolution.serviceMap[NamingServiceName.UNS].usedServices[0] as UdApi;
@@ -79,11 +80,12 @@ describe('Unstoppable API', () => {
   });
 
   it('should throw unsupported method', async () => {
-    const handle = 'ryan.zil';
+    const handle = 'ryan.eth';
     await expect(resolution.twitter(handle)).rejects.toThrowError(
       `Method twitter is not supported for ${handle}`,
     );
   });
+
   it('returns owner of the domain', async () => {
     mockAPICalls('ud_api_generic_test', DefaultUrl);
     expect(await resolution.owner('cofounding.zil')).toEqual(

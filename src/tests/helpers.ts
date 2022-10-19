@@ -7,6 +7,7 @@ import ConfigurationError, {
   ConfigurationErrorCode,
 } from '../errors/configurationError';
 import DnsRecordsError, {DnsRecordsErrorCode} from '../errors/dnsRecordsError';
+import {NamingServiceName} from '../types/publicTypes';
 
 export const MainnetUrl = 'https://eth-rinkeby.alchemyapi.io';
 export const ZilliqaUrl = 'https://api.zilliqa.com';
@@ -176,7 +177,7 @@ export function mockAPICalls(testName: string, url = MainnetUrl): void {
  */
 export function protocolLink(
   providerProtocol: ProviderProtocol = ProviderProtocol.http,
-  namingService: 'UNSL1' | 'UNSL2' = 'UNSL1',
+  namingService: NamingServiceName.ENS | 'UNSL1' | 'UNSL2' = 'UNSL1',
 ): string {
   const secret = process.env.UNSTOPPABLE_RESOLUTION_PROJECTID ?? undefined;
 
@@ -221,5 +222,11 @@ const ethereumDefaultProviders = {
   UNSL2: {
     http: 'https://polygon-mumbai.g.alchemy.com/v2/c4bb906ed6904c42b19c95825fe55f39',
     wss: 'wss://polygon-mumbai.g.alchemy.com/v2/c4bb906ed6904c42b19c95825fe55f39',
+  },
+  [NamingServiceName.ENS]: {
+    [ProviderProtocol.http]:
+      'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
+    [ProviderProtocol.wss]:
+      'wss://mainnet.infura.io/ws/v3/d423cf2499584d7fbe171e33b42cfbee',
   },
 };

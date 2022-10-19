@@ -21,6 +21,10 @@ const ProviderURLMap: Record<Providers, NetworkSignedLinkURLs> = {
   },
 };
 
+export function signedInfuraLink(infura: string, network = 'mainnet'): string {
+  return `https://${network}.infura.io/v3/${infura}`;
+}
+
 export function signedLink(
   key: string,
   network: UnsSupportedNetwork = 'mainnet',
@@ -64,6 +68,11 @@ export function constructRecords(
 export const domainExtensionToNamingServiceName = {
   crypto: NamingServiceName.UNS,
   zil: NamingServiceName.ZNS,
+  eth: NamingServiceName.ENS,
+  luxe: NamingServiceName.ENS,
+  xyz: NamingServiceName.ENS,
+  kred: NamingServiceName.ENS,
+  reverse: NamingServiceName.ENS,
 };
 
 export const findNamingServiceName = (

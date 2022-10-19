@@ -28,6 +28,15 @@ Resolution supports different decentralized domains. Please, refer to the [Top L
 For more information, see our detailed
 [API Referrence](https://unstoppabledomains.github.io/resolution/).
 
+### ENS support
+**Note: Ethereum Name Service requires installing additional packages 
+otherwise library throws error when trying to resolve ENS domain.**
+
+#### Required packages
+- `"bip44-constants": "^8.0.5"`
+- `"@ensdomains/address-encoder": ">= 0.1.x <= 0.2.x"`
+- `"content-hash": "^2.5.2"`
+
 ## Installing Resolution
 
 Resolution can be installed with either `yarn` or `npm`.
@@ -195,23 +204,17 @@ const resolution = new Resolution({
 ```
 
 ## Autoconfiguration of blockchain network
+In some scenarios system might not be flexible enough to easy distinguish between various Ethereum testnets on compile time.
+For this case Resolution library provide a special async constructor which should be waited for 
+`await Resolution.autonetwork(options)`. This method makes a JSON RPC "net_version" call to the provider to get the network id.
 
-In some scenarios system might not be flexible enough to easy distinguish
-between various Ethereum testnets on compile time. For this case Resolution
-library provide a special async constructor which should be waited for
-`await Resolution.autonetwork(options)`. This method makes a JSON RPC
-"net_version" call to the provider to get the network id.
-
-This method configures only Uns. Zns is supported only on Zilliqa mainnet which
-is going to be used in any cases. You can provide a configured provider or a
-blockchain url as in the following example:
-
+This method configures only Ens and Cns, Zns is supported only on Zilliqa mainnet which is going to be used in any cases.
+You can provide a configured provider or a blockchain url as in the following example:
 ```
 await Resolution.autoNetwork({
   uns: {provider},
 });
 ```
-
 ## Error Handling
 
 When resolution encounters an error it returns the error code instead of
@@ -253,7 +256,6 @@ or **Linux shell**).
 ### Internal config
 
 #### To update:
-
 - Network config: `$ yarn network-config:pull`
 - Resolver keys: `$ yarn resolver-keys:pull`
 - Both configs: `$ yarn config:pull`

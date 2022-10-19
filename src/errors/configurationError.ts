@@ -19,6 +19,7 @@ export enum ConfigurationErrorCode {
   NetworkConfigMissing = 'NetworkConfigMissing',
   CustomNetworkConfigMissing = 'CustomNetworkConfigMissing',
   InvalidConfigurationField = 'InvalidProxyReader',
+  DependencyMissing = 'DependencyMissing',
 }
 
 /**
@@ -49,6 +50,11 @@ const HandlersByCode = {
     method: ResolutionMethod;
     field: string;
   }) => `Invalid '${params.field}' in Resolution ${params.method}`,
+  [ConfigurationErrorCode.DependencyMissing]: (params: {
+    dependency: string;
+    version: string;
+  }) =>
+    `Missing dependency for this functionality. Please install ${params.dependency} @ ${params.version} via npm or yarn`,
 };
 
 /**
