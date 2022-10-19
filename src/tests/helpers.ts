@@ -7,6 +7,7 @@ import ConfigurationError, {
   ConfigurationErrorCode,
 } from '../errors/configurationError';
 import DnsRecordsError, {DnsRecordsErrorCode} from '../errors/dnsRecordsError';
+import {NamingServiceName} from '../types/publicTypes';
 
 export const ZilliqaUrl = 'https://api.zilliqa.com';
 export const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
@@ -177,9 +178,9 @@ export function mockAPICalls(testName: string, url: string): void {
 /**
  * return URLs set in env vars if any
  */
-export function getUnsProtocolLinkFromEnv(
+export function getProtocolLinkFromEnv(
   providerProtocol: ProviderProtocol,
-  namingService: 'UNSL1' | 'UNSL2',
+  namingService: NamingServiceName.ENS | 'UNSL1' | 'UNSL2',
 ): string {
   if (
     namingService === 'UNSL1' &&
@@ -227,6 +228,30 @@ export function getUnsProtocolLinkFromEnv(
     }
 
     throw new Error('missing env var L2_TEST_NET_RPC_WSS_URL');
+  }
+
+  if (
+    namingService === NamingServiceName.ENS &&
+    providerProtocol === ProviderProtocol.http &&
+    process.env.ENS_TEST_NET_RPC_URL
+  ) {
+    if (process.env.ENS_TEST_NET_RPC_URL) {
+      return process.env.ENS_TEST_NET_RPC_URL;
+    }
+
+    throw new Error('missing env var ENS_TEST_NET_RPC_URL');
+  }
+
+  if (
+    namingService === NamingServiceName.ENS &&
+    providerProtocol === ProviderProtocol.wss &&
+    process.env.ENS_TEST_NET_RPC_WSS_URL
+  ) {
+    if (process.env.ENS_TEST_NET_RPC_WSS_URL) {
+      return process.env.ENS_TEST_NET_RPC_WSS_URL;
+    }
+
+    throw new Error('missing env var ENS_TEST_NET_RPC_WSS_URL');
   }
 
   throw new Error('Invalid test config');

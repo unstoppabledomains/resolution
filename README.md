@@ -29,6 +29,15 @@ Resolution supports different decentralized domains. Please, refer to the
 For more information, see our detailed
 [API Reference](https://unstoppabledomains.github.io/resolution/).
 
+### ENS support
+**Note: Ethereum Name Service requires installing additional packages 
+otherwise library throws error when trying to resolve ENS domain.**
+
+#### Required packages
+- `"bip44-constants": "^8.0.5"`
+- `"@ensdomains/address-encoder": ">= 0.1.x <= 0.2.x"`
+- `"content-hash": "^2.5.2"`
+
 ## Installing Resolution
 
 Resolution can be installed with either `yarn` or `npm`.
@@ -333,26 +342,6 @@ token.EVM.ETH.USDC.address
 crypto.USDC.address
 token.EVM.ETH.address
 ```
-
-`getAddress(domain, 'ETH', 'USDC')` will lookup records in the following order:
-
-```
-1. token.EVM.ETH.USDC.address
-2. crypto.USDC.address
-3. crypto.USDC.version.ERC20.address
-4. token.EVM.ETH.address
-5. token.EVM.address
-```
-
-> **Warning** please use the API with caution as it's still in beta. Please
-> submit an issue if you find a bug.
-
-### Command Line Interface
-
-CLI support was removed from the Resolution library starting from version 6.0.
-Please use the
-[standalone CLI tool](https://github.com/unstoppabledomains/resolution-cli).
-
 ## Error Handling
 
 When resolution encounters an error it returns the error code instead of
@@ -389,7 +378,6 @@ or **Linux shell**).
 ### Internal config
 
 #### To update:
-
 - Network config: `$ yarn network-config:pull`
 - Resolver keys: `$ yarn resolver-keys:pull`
 - Both configs: `$ yarn config:pull`
