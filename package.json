@@ -60,7 +60,7 @@
   },
   "homepage": "https://github.com/unstoppabledomains/resolution.git#readme",
   "devDependencies": {
-    "@ensdomains/address-encoder": "0.2.6",
+    "@ensdomains/address-encoder": "0.2.18",
     "@ethersproject/providers": "^5.4.5",
     "@types/bn.js": "^4.11.6",
     "@types/crypto-js": "^4.1.1",
@@ -73,7 +73,7 @@
     "@unstoppabledomains/sizecheck": "^4.0.0",
     "@zilliqa-js/core": "^3.3.4",
     "audit-ci": "^3.1.1",
-    "bip44-constants": "^8.0.5",
+    "bip44-constants": "^8.0.103",
     "content-hash": "^2.5.2",
     "dotenv": "^8.2.0",
     "eslint": "^7.7.0",

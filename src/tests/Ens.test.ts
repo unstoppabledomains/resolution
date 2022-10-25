@@ -37,7 +37,7 @@ beforeEach(() => {
 describe('ENS', () => {
   it('allows ens network specified as string', async () => {
     expect(ens.url).toBe(
-      'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
+      'https://eth-goerli.g.alchemy.com/v2/J-ff_OlmWzw41ocqwpkRccHdfqSZML4q',
     );
     expect(ens.network).toEqual(1);
   });
@@ -146,7 +146,7 @@ describe('ENS', () => {
   it('checks normalizeSource ens (boolean)', async () => {
     expect(ens.network).toBe(1);
     expect(ens.url).toBe(
-      'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
+      'https://eth-goerli.g.alchemy.com/v2/J-ff_OlmWzw41ocqwpkRccHdfqSZML4q',
     );
   });
 

@@ -34,7 +34,7 @@ For more information, see our detailed
 otherwise library throws error when trying to resolve ENS domain.**
 
 #### Required packages
-- `"bip44-constants": "^8.0.5"`
+- `"bip44-constants": "^8.0.103"`
 - `"@ensdomains/address-encoder": ">= 0.1.x <= 0.2.x"`
 - `"content-hash": "^2.5.2"`
 
