@@ -942,7 +942,7 @@ describe('Resolution', () => {
 
         it('should work with ethers default provider', async () => {
           const provider = new InfuraProvider(
-            'rinkeby',
+            'mainnet',
             '213fff28936343858ca9c5115eff1419',
           );
           const polygonProvider = new InfuraProvider(
