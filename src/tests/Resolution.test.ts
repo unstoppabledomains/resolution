@@ -31,6 +31,7 @@ import {
   CryptoDomainWithAllRecords,
   WalletDomainLayerTwoWithAllRecords,
   WalletDomainOnBothLayers,
+  SubdomainLayerTwo,
 } from './helpers';
 import {RpcProviderTestCases} from './providerMockData';
 import fetch, {FetchError} from 'node-fetch';
@@ -424,6 +425,23 @@ describe('Resolution', () => {
       expect(ethAddress).toBe('0x45b31e01AA6f42F0549aD482BE81635ED3149abb');
     });
 
+    it('should retrieve subdomain records', async () => {
+      mockAsyncMethods(uns, {
+        get: {
+          resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
+          records: {
+            ['crypto.ETH.address']:
+              '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
+          },
+        },
+      });
+      const ethAddress = await resolution.addr(SubdomainLayerTwo, 'ETH');
+      expect(ethAddress).toBe('0x45b31e01AA6f42F0549aD482BE81635ED3149abb');
+      expect(resolution.addr(SubdomainLayerTwo, 'ABC')).rejects.toThrowError(
+        'No crypto.ABC.address record found for subdomain.resolution-test.wallet',
+      );
+    });
+
     it('provides empty response constant', async () => {
       const response = UnclaimedDomainResponse;
       expect(response.addresses).toEqual({});
@@ -442,6 +460,23 @@ describe('Resolution', () => {
           },
         });
         const gundb = await resolution.chatId('homecakes.crypto');
+        expectSpyToBeCalled(eyes);
+        expect(gundb).toBe(
+          '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c',
+        );
+      });
+
+      it('should resolve gundb chat id for subdomain', async () => {
+        const eyes = mockAsyncMethods(uns, {
+          get: {
+            resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
+            records: {
+              ['gundb.username.value']:
+                '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c',
+            },
+          },
+        });
+        const gundb = await resolution.chatId(SubdomainLayerTwo);
         expectSpyToBeCalled(eyes);
         expect(gundb).toBe(
           '0x47992daf742acc24082842752fdc9c875c87c56864fee59d8b779a91933b159e48961566eec6bd6ce3ea2441c6cb4f112d0eb8e8855cc9cf7647f0d9c82f00831c',
@@ -596,6 +631,30 @@ describe('Resolution', () => {
           ]);
         });
 
+        skipItInLive('getting dns records for subdomains', async () => {
+          const spies = mockAsyncMethods(uns, {
+            get: {
+              resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
+              records: {
+                'dns.ttl': '128',
+                'dns.A': '["10.0.0.1","10.0.0.2"]',
+                'dns.A.ttl': '90',
+                'dns.AAAA': '["10.0.0.120"]',
+              },
+            },
+          });
+          const dnsRecords = await resolution.dns(SubdomainLayerTwo, [
+            DnsRecordType.A,
+            DnsRecordType.AAAA,
+          ]);
+          expectSpyToBeCalled(spies);
+          expect(dnsRecords).toStrictEqual([
+            {TTL: 90, data: '10.0.0.1', type: 'A'},
+            {TTL: 90, data: '10.0.0.2', type: 'A'},
+            {TTL: 128, data: '10.0.0.120', type: 'AAAA'},
+          ]);
+        });
+
         skipItInLive('should work with others records', async () => {
           const spies = mockAsyncMethods(uns, {
             get: {
@@ -642,6 +701,17 @@ describe('Resolution', () => {
           const email = await resolution.email('testing.zil');
           expectSpyToBeCalled([unsSpy, znsSpy]);
           expect(email).toBe('derainberk@gmail.com');
+        });
+
+        it('should return IPFS value for subdomain', async () => {
+          mockAsyncMethod(uns, 'records', async () => ({
+            'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu',
+            'ipfs.redirect_domain.value': 'www.unstoppabledomains.com',
+          }));
+          const ipfsHash = await resolution.ipfsHash(SubdomainLayerTwo);
+          expect(ipfsHash).toBe(
+            'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHu',
+          );
         });
       });
 
@@ -731,6 +801,22 @@ describe('Resolution', () => {
             );
             expect(eosSpy).toBeCalled();
             expect(eos).toBe('letsminesome');
+          });
+
+          it('should work with subdomain', async () => {
+            mockAsyncMethod(uns, 'get', {
+              resolver: '0x95AE1515367aa64C462c71e87157771165B1287A',
+              owner: '0xe7474D07fD2FA286e7e0aa23cd107F8379085037',
+              records: {
+                ['crypto.AAVE.version.MATIC.address']: 'abcabc',
+              },
+            });
+            const matic = await resolution.multiChainAddr(
+              SubdomainLayerTwo,
+              'aave',
+              'matic',
+            );
+            expect(matic).toBe('abcabc');
           });
         });
       });
@@ -856,7 +942,7 @@ describe('Resolution', () => {
 
         it('should work with ethers default provider', async () => {
           const provider = new InfuraProvider(
-            'rinkeby',
+            'mainnet',
             '213fff28936343858ca9c5115eff1419',
           );
           const polygonProvider = new InfuraProvider(
@@ -1812,6 +1898,46 @@ describe('Resolution', () => {
           NamingServiceName.ZNS,
         ),
       ).toEqual('brad.zil');
+    });
+  });
+
+  describe('Reverse resolution', () => {
+    it('should reverse resolve', async () => {
+      mockAsyncMethods(uns, {
+        reverseOf:
+          '53115498937382692782103703677178119840631903773202805882273058578308100329417',
+        getTokenUri:
+          'https://metadata.staging.unstoppabledomains.com/metadata/',
+      });
+      mockAsyncMethod(Networking, 'fetch', {
+        ok: true,
+        json: () => ({
+          name: 'brad.crypto',
+        }),
+      });
+      const reverseDomain = await resolution.reverse(
+        '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
+      );
+      expect(reverseDomain).toBe('brad.crypto');
+    });
+
+    it('should reverse resolve for a subdomain', async () => {
+      mockAsyncMethods(uns, {
+        reverseOf:
+          '44924347734549711771487655536240923593575753005984062220276294864587632017879',
+        getTokenUri:
+          'https://metadata.staging.unstoppabledomains.com/metadata/',
+      });
+      mockAsyncMethod(Networking, 'fetch', {
+        ok: true,
+        json: () => ({
+          name: SubdomainLayerTwo,
+        }),
+      });
+      const reverseDomain = await resolution.reverse(
+        '0xA0a92d77D92934951F07E7CEb96a7f0ec387ebc1',
+      );
+      expect(reverseDomain).toBe(SubdomainLayerTwo);
     });
   });
 });

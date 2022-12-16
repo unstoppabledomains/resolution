@@ -32,6 +32,7 @@ export const WalletDomainOnBothLayers =
   'udtestdev-test-l1-and-l2-ownership.wallet';
 export const CryptoDomainWithoutGunDbRecords =
   'test-usdt-and-dns-records.crypto';
+export const SubdomainLayerTwo = 'subdomain.resolution-test.wallet';
 
 try {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
