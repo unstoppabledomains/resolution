@@ -202,11 +202,7 @@ export default class Uns extends NamingService {
 
   async allRecords(domain: string): Promise<CryptoRecords> {
     const tokenId = this.namehash(domain);
-    const metadata = await this.getMetadata(tokenId);
-    return this.records(domain, [
-      ...Object.keys(SupportedKeys.keys),
-      ...Object.keys(metadata.properties.records),
-    ]);
+    return this.records(domain, [...Object.keys(SupportedKeys.keys)]);
   }
 
   async twitter(domain: string): Promise<string> {
