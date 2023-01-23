@@ -1,3 +1,7 @@
+## 8.4.0
+
+- Deprecate `allRecords` method
+
 ## 8.3.2
 
 - Fixed reverse function padding issue

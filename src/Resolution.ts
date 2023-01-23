@@ -709,23 +709,13 @@ export default class Resolution {
    * Returns all record keys of the domain.
    * This method is strongly unrecommended for production use due to lack of support for many ethereum service providers and low performance
    * @param domain - domain name
+   * @deprecated
    */
   async allRecords(domain: string): Promise<CryptoRecords> {
     domain = prepareAndValidateDomain(domain);
     return this.callServiceForDomain(domain, (service) =>
       service.allRecords(domain),
     );
-  }
-
-  async allNonEmptyRecords(domain: string): Promise<CryptoRecords> {
-    const records = await this.allRecords(domain);
-    const nonEmptyRecords: CryptoRecords = {};
-    for (const [key, value] of Object.entries(records)) {
-      if (value) {
-        nonEmptyRecords[key] = value;
-      }
-    }
-    return nonEmptyRecords;
   }
 
   async dns(domain: string, types: DnsRecordType[]): Promise<DnsRecord[]> {
