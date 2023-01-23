@@ -26,7 +26,7 @@ Resolution is primarily built and maintained by
 Resolution supports different decentralized domains. Please, refer to the [Top Level Domains List](https://resolve.unstoppabledomains.com/supported_tlds)
 
 For more information, see our detailed
-[API Referrence](https://unstoppabledomains.github.io/resolution/).
+[API Reference](https://unstoppabledomains.github.io/resolution/).
 
 ## Installing Resolution
 
@@ -196,9 +196,9 @@ const resolution = new Resolution({
 
 ## Autoconfiguration of blockchain network
 
-In some scenarios system might not be flexible enough to easy distinguish
+In some scenarios system might not be flexible enough to easily distinguish
 between various Ethereum testnets on compile time. For this case Resolution
-library provide a special async constructor which should be waited for
+library provides a special async constructor which should be waited for
 `await Resolution.autonetwork(options)`. This method makes a JSON RPC
 "net_version" call to the provider to get the network id.
 
@@ -268,7 +268,7 @@ apps appear on the Unstoppable Domains
 front of tens of thousands of potential customers per day.
 
 Also, every week we select a newly-integrated app to feature in the Unstoppable
-Update newsletter. This newsletter is delivered to straight into the inbox of
+Update newsletter. This newsletter is delivered straight into the inbox of
 ~100,000 crypto fanatics — all of whom could be new customers to grow your
 business.
 
