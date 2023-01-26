@@ -201,7 +201,6 @@ export default class Uns extends NamingService {
   }
 
   async allRecords(domain: string): Promise<CryptoRecords> {
-    const tokenId = this.namehash(domain);
     return this.records(domain, [...Object.keys(SupportedKeys.keys)]);
   }
 
