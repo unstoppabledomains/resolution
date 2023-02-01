@@ -1,3 +1,7 @@
+## 8.5.0
+
+- Swapped Alchemy to Infura as default provider
+
 ## 8.4.0
 
 - Deprecate `allRecords` method

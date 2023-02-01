@@ -45,7 +45,7 @@ import {UnsSupportedNetwork} from './types';
  *
  * let resolution = new Resolution({ blockchain: {
  *        uns: {
- *           url: "https://eth-mainnet.alchemyapi.io/v2/GmQ8X1FHf-WDEry0BBSn0RgjVhjHkRmS",
+ *           url: "https://mainnet.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39",
  *           network: "mainnet"
  *        }
  *      }
