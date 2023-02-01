@@ -146,7 +146,7 @@ CLI support was removed from the Resolution library starting from version 6.0. P
 ## Default Ethereum Providers
 
 Resolution provides zero-configuration experience by using built-in
-production-ready [Alchemy](http://alchemy.com/) endpoint by default.  
+production-ready [Infura](https://www.infura.io/) endpoint by default.  
 Default Ethereum provider is free to use without restrictions and rate-limits
 for `UNS` resolution.
 
