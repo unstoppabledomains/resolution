@@ -1,3 +1,7 @@
+## 8.5.1
+
+- Update uns config dependency
+
 ## 8.5.0
 
 - Swapped Alchemy to Infura as default provider
