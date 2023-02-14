@@ -145,10 +145,7 @@ CLI support was removed from the Resolution library starting from version 6.0. P
 
 ## Default Ethereum Providers
 
-Resolution provides zero-configuration experience by using built-in
-production-ready [Infura](https://www.infura.io/) endpoint by default.  
-Default Ethereum provider is free to use without restrictions and rate-limits
-for `UNS` resolution.
+The default [Infura](https://www.infura.io/) key provided is rate limited and should only be used for testing. For production applications, please bring your own Infura or Alchemy RPC URL to prevent downtime.
 
 ## Custom Ethereum Provider configuration
 
@@ -169,7 +166,6 @@ Default provider can be changed by changing constructor options
 To see all constructor options and factory methods check
 [Unstoppable API reference](https://unstoppabledomains.github.io/resolution).
 
-> NOTE: The default Infura key provided is rate limited and should only be used for testing. For production applications, please bring your own Infura or Alchemy RPC URL to prevent downtime.
 
 ```javascript
 const {default: Resolution} = require('@unstoppabledomains/resolution');
