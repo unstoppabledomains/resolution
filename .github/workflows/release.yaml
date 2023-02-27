@@ -1,24 +1,73 @@
-name: Release
-
-env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+# Manual workflow to release new package version
+name: Manual-Version-Release
 
 on:
-  release:
-    types: [published]
+  workflow_dispatch:
+    inputs:
+      changeLog:
+        description: "Change Log"
+        required: true
+        default: ""
+      releaseType:
+        type: choice
+        description: Select patch/minor/major
+        options:
+          - patch
+          - minor
+          - major
 
 jobs:
   publish:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
+      - run: echo 'Starting the workflow'
+
+      - uses: oprypin/find-latest-tag@v1
+        id: get-latest-tag
+        with:
+          repository: unstoppabledomains/resolution # current repositiry
+          releases-only: false
+
+      - name: "Get next versions"
+        id: semvers
+        uses: "WyriHaximus/github-action-next-semvers@v1"
+        with:
+          version: ${{ steps.get-latest-tag.outputs.tag }}
+
+      - name: Set new tag
+        id: set-new-tag
+        run: |
+          if [[ ${{ github.event.inputs.releaseType }} == major ]]; then
+            echo "tag=${{ steps.semvers.outputs.v_major }}" >> $GITHUB_OUTPUT
+          elif [[ ${{ github.event.inputs.releaseType }} == minor ]]; then
+            echo "tag=${{ steps.semvers.outputs.v_minor }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=${{ steps.semvers.outputs.v_patch }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: "Log inputs"
+        run: |
+          echo Release Version: ${{ steps.set-new-tag.outputs.tag }}
+
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: New package.json version
+        run: yarn version --new-version ${{ steps.set-new-tag.outputs.tag }} --no-git-tag-version
+
+      - name: "Create tag"
+        run: |
+          git tag ${{ steps.set-new-tag.outputs.tag }}
+          git push origin --tags
 
       - name: Setup node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: 12
+          node-version: 16
           always-auth: true
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: "https://registry.npmjs.org"
 
       - run:
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}"
@@ -34,6 +83,9 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
         run: yarn publish
-
-      - name: Push version tag
-        run: yarn release:tag
+      
+      - name: Commit new version
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          branch: ${{ github.event.release.target_commitish }}
+          commit_message: Release new version ${{ steps.set-new-tag.outputs.tag }}
