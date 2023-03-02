@@ -83,9 +83,12 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
         run: yarn publish
-      
+
       - name: Commit new version
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           branch: ${{ github.event.release.target_commitish }}
           commit_message: Release new version ${{ steps.set-new-tag.outputs.tag }}
+
+      - name: Deploy docs
+        run: yarn docs:deploy
