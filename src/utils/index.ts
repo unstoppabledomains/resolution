@@ -7,14 +7,12 @@ type NetworkSignedLinkURLs = Record<UnsSupportedNetwork, string>;
 const ProviderURLMap: Record<Providers, NetworkSignedLinkURLs> = {
   infura: {
     mainnet: 'https://mainnet.infura.io/v3/',
-    rinkeby: 'https://rinkeby.infura.io/v3/',
     goerli: 'https://goerli.infura.io/v3/',
     'polygon-mainnet': 'https://polygon-mainnet.infura.io/v3/',
     'polygon-mumbai': 'https://polygon-mumbai.infura.io/v3/',
   },
   alchemy: {
     mainnet: 'https://eth-mainnet.alchemyapi.io/v2/',
-    rinkeby: 'https://eth-rinkeby.alchemyapi.io/v2/',
     goerli: 'https://eth-goerli.alchemyapi.io/v2/',
     'polygon-mainnet': 'https://polygon-mainnet.g.alchemy.com/v2/',
     'polygon-mumbai': 'https://polygon-mumbai.g.alchemy.com/v2/',
@@ -82,8 +80,6 @@ export const findNamingServiceName = (
 
 export const EthereumNetworks = {
   mainnet: 1,
-  ropsten: 3,
-  rinkeby: 4,
   goerli: 5,
   'polygon-mainnet': 137,
   'polygon-mumbai': 80001,
@@ -91,8 +87,6 @@ export const EthereumNetworks = {
 
 export const EthereumNetworksInverted = {
   1: 'mainnet',
-  3: 'ropsten',
-  4: 'rinkeby',
   5: 'goerli',
   137: 'polygon-mainnet',
   80001: 'polygon-mumbai',

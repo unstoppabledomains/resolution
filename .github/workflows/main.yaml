@@ -24,10 +24,21 @@ jobs:
       - name: Install Dependencies
         run: yarn install
 
-      - run: yarn test
+      - name: Run Test
+        env:
+          L1_TEST_NET_RPC_URL: ${{ secrets.L1_TEST_NET_RPC_URL }}
+          L1_TEST_NET_RPC_WSS_URL: ${{ secrets.L1_TEST_NET_RPC_WSS_URL }}
+          L2_TEST_NET_RPC_URL: ${{ secrets.L2_TEST_NET_RPC_URL }}
+          L2_TEST_NET_RPC_WSS_URL: ${{ secrets.L2_TEST_NET_RPC_WSS_URL }}
+        run: yarn test
 
       - name: Coverage => (${{ matrix.os }} - Node ${{ matrix.node }})
         if: ${{ matrix.os == 'ubuntu-latest' && matrix.node == 12 }}
+        env:
+          L1_TEST_NET_RPC_URL: ${{ secrets.L1_TEST_NET_RPC_URL }}
+          L1_TEST_NET_RPC_WSS_URL: ${{ secrets.L1_TEST_NET_RPC_WSS_URL }}
+          L2_TEST_NET_RPC_URL: ${{ secrets.L2_TEST_NET_RPC_URL }}
+          L2_TEST_NET_RPC_WSS_URL: ${{ secrets.L2_TEST_NET_RPC_WSS_URL }}
         run: yarn test --coverage
 
       - name: Dependencies Security Audit
