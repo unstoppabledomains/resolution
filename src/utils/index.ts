@@ -19,6 +19,19 @@ const ProviderURLMap: Record<Providers, NetworkSignedLinkURLs> = {
   },
 };
 
+export function getLibAgent(): string {
+  let libAgent = 'resolution-js';
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const pjson = require('../../package.json');
+    libAgent += '/' + pjson.version;
+
+    return libAgent;
+  } catch (e) {
+    return libAgent;
+  }
+}
+
 export function signedLink(
   key: string,
   network: UnsSupportedNetwork = 'mainnet',

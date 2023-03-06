@@ -12,6 +12,7 @@ export type ProviderParams = unknown[] | object;
 export interface RequestArguments {
   method: string;
   params?: ProviderParams;
+  apiKey?: string;
 }
 export type TransactionRequest = {
   to?: unknown;

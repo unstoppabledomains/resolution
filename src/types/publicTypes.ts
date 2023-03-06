@@ -11,6 +11,7 @@ type NamingServiceSource = {url?: string} | {provider?: Provider};
 
 export type UnsLayerSource = NamingServiceSource & {
   network: string;
+  proxyServiceApiKey?: string;
   proxyReaderAddress?: string;
 };
 

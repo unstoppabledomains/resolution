@@ -56,6 +56,7 @@ export default class UnsInternal {
       source.proxyReaderAddress ||
         UnsInternal.ProxyReaderMap[EthereumNetworks[this.network]],
       this.provider,
+      source['proxyServiceApiKey'],
     );
   }
 
