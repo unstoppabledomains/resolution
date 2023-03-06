@@ -8,7 +8,6 @@ import ConfigurationError, {
 } from '../errors/configurationError';
 import DnsRecordsError, {DnsRecordsErrorCode} from '../errors/dnsRecordsError';
 
-export const MainnetUrl = 'https://eth-rinkeby.alchemyapi.io';
 export const ZilliqaUrl = 'https://api.zilliqa.com';
 export const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
 
@@ -145,7 +144,7 @@ async function expectError(
   );
 }
 
-export function mockAPICalls(testName: string, url = MainnetUrl): void {
+export function mockAPICalls(testName: string, url: string): void {
   if (isLive()) {
     return;
   }
@@ -170,6 +169,43 @@ export function mockAPICalls(testName: string, url = MainnetUrl): void {
   });
 }
 
+function protocolLinkFromEnv(
+  providerProtocol: ProviderProtocol,
+  namingService: 'UNSL1' | 'UNSL2',
+): string | undefined {
+  if (
+    namingService === 'UNSL1' &&
+    providerProtocol === ProviderProtocol.http &&
+    process.env.L1_TEST_NET_RPC_URL
+  ) {
+    return process.env.L1_TEST_NET_RPC_URL;
+  }
+
+  if (
+    namingService === 'UNSL1' &&
+    providerProtocol === ProviderProtocol.http &&
+    process.env.L1_TEST_NET_RPC_WSS_URL
+  ) {
+    return process.env.L1_TEST_NET_RPC_WSS_URL;
+  }
+
+  if (
+    namingService === 'UNSL2' &&
+    providerProtocol === ProviderProtocol.http &&
+    process.env.L2_TEST_NET_RPC_URL
+  ) {
+    return process.env.L2_TEST_NET_RPC_URL;
+  }
+
+  if (
+    namingService === 'UNSL2' &&
+    providerProtocol === ProviderProtocol.http &&
+    process.env.L2_TEST_NET_RPC_WSS_URL
+  ) {
+    return process.env.L2_TEST_NET_RPC_WSS_URL;
+  }
+}
+
 /**
  * returns either a standard ethereum provider url
  * or the one with attached SECRET key from
@@ -179,21 +215,13 @@ export function protocolLink(
   providerProtocol: ProviderProtocol = ProviderProtocol.http,
   namingService: 'UNSL1' | 'UNSL2' = 'UNSL1',
 ): string {
-  const secret = process.env.UNSTOPPABLE_RESOLUTION_PROJECTID ?? undefined;
+  const linkFromEnv = protocolLinkFromEnv(providerProtocol, namingService);
 
-  if (!secret) {
-    return ethereumDefaultProviders[namingService][providerProtocol];
+  if (linkFromEnv) {
+    return linkFromEnv;
   }
 
-  if (namingService === 'UNSL2') {
-    return providerProtocol === ProviderProtocol.wss
-      ? `wss://eth-rinkeby.alchemyapi.io/v2/${secret}`
-      : `https://eth-rinkeby.alchemyapi.io/v2/${secret}`;
-  }
-
-  return providerProtocol === ProviderProtocol.wss
-    ? `wss://eth-rinkeby.alchemyapi.io/v2/${secret}`
-    : `https://eth-rinkeby.alchemyapi.io/v2/${secret}`;
+  return ethereumDefaultProviders[namingService][providerProtocol];
 }
 
 export enum ProviderProtocol {
@@ -216,11 +244,11 @@ export const caseMock = <T, U>(
 
 const ethereumDefaultProviders = {
   UNSL1: {
-    http: 'https://eth-rinkeby.alchemyapi.io/v2/ZDERxOLIj120dh2-Io2Q9RTh9RfWEssT',
-    wss: 'wss://eth-rinkeby.alchemyapi.io/v2/ZDERxOLIj120dh2-Io2Q9RTh9RfWEssT',
+    http: 'https://goerli.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
+    wss: 'wss://goerli.infura.io/ws/v3/c4bb906ed6904c42b19c95825fe55f39',
   },
   UNSL2: {
-    http: 'https://polygon-mumbai.g.alchemy.com/v2/c4bb906ed6904c42b19c95825fe55f39',
+    http: 'https://polygon-mumbai.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
     wss: 'wss://polygon-mumbai.g.alchemy.com/v2/c4bb906ed6904c42b19c95825fe55f39',
   },
 };

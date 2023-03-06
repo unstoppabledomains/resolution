@@ -77,8 +77,7 @@ describe('Resolution', () => {
   describe('.Basic setup', () => {
     it('should work with autonetwork url configuration', async () => {
       const polygonUrl = protocolLink(ProviderProtocol.http, 'UNSL2');
-      const rinkebyUrl = protocolLink();
-      const goerliUrl = rinkebyUrl.replace('rinkeby', 'goerli');
+      const goerliUrl = protocolLink(ProviderProtocol.http, 'UNSL1');
       // mocking getNetworkConfigs because no access to inner provider.request
       const UnsGetNetworkOriginal = Uns.autoNetwork;
       if (!isLive()) {
@@ -99,7 +98,7 @@ describe('Resolution', () => {
       }
       const resolution = await Resolution.autoNetwork({
         uns: {
-          locations: {Layer1: {url: rinkebyUrl}, Layer2: {url: polygonUrl}},
+          locations: {Layer1: {url: goerliUrl}, Layer2: {url: polygonUrl}},
         },
       });
       // We need to manually restore the function as jest.restoreAllMocks and simillar works only with spyOn
@@ -239,8 +238,9 @@ describe('Resolution', () => {
     it('should work with autonetwork provider configuration', async () => {
       const provider = new FetchProvider(
         'UDAPI',
-        protocolLink().replace('rinkeby', 'mainnet'),
+        protocolLink(ProviderProtocol.http, 'UNSL1'),
       );
+
       const polygonUrl = protocolLink(ProviderProtocol.http, 'UNSL2');
       const polygonProvider = new FetchProvider(UnsLocation.Layer2, polygonUrl);
       const spy = mockAsyncMethod(provider, 'request', '1');
@@ -299,7 +299,7 @@ describe('Resolution', () => {
     });
 
     it('should fail because of unsupported test network for uns', async () => {
-      const blockchainUrl = protocolLink().replace('rinkeby', 'ropsten');
+      const blockchainUrl = protocolLink(ProviderProtocol.http, 'UNSL1');
       const polygonUrl = protocolLink(ProviderProtocol.http, 'UNSL2');
       const mockedProvider = new FetchProvider(
         NamingServiceName.UNS,
@@ -911,8 +911,8 @@ describe('Resolution', () => {
 
         it('should work for ethers jsonrpc provider', async () => {
           const provider = new JsonRpcProvider(
-            protocolLink(ProviderProtocol.http),
-            'rinkeby',
+            protocolLink(ProviderProtocol.http, 'UNSL1'),
+            'goerli',
           );
           const polygonProvider = new JsonRpcProvider(
             protocolLink(ProviderProtocol.http, 'UNSL2'),
@@ -1501,8 +1501,7 @@ describe('Resolution', () => {
           networkId: 5,
           blockchain: BlockchainType.ETH,
           ownerAddress: '0x0e43F36e4B986dfbE1a75cacfA60cA2bD44Ae962',
-          blockchainProviderUrl:
-            'https://eth-rinkeby.alchemyapi.io/v2/ZDERxOLIj120dh2-Io2Q9RTh9RfWEssT',
+          blockchainProviderUrl: protocolLink(ProviderProtocol.http, 'UNSL1'),
         });
         expect(location['brad.crypto']).toEqual({
           registryAddress: '0x801452cFAC27e79a11c6b185986fdE09e8637589',
@@ -1510,8 +1509,7 @@ describe('Resolution', () => {
           networkId: 5,
           blockchain: BlockchainType.ETH,
           ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
-          blockchainProviderUrl:
-            'https://eth-rinkeby.alchemyapi.io/v2/ZDERxOLIj120dh2-Io2Q9RTh9RfWEssT',
+          blockchainProviderUrl: protocolLink(ProviderProtocol.http, 'UNSL1'),
         });
         expect(location['udtestdev-test-l2-domain-784391.wallet']).toEqual({
           registryAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
@@ -1519,8 +1517,7 @@ describe('Resolution', () => {
           networkId: 80001,
           blockchain: BlockchainType.MATIC,
           ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
-          blockchainProviderUrl:
-            'https://polygon-mumbai.g.alchemy.com/v2/c4bb906ed6904c42b19c95825fe55f39',
+          blockchainProviderUrl: protocolLink(ProviderProtocol.http, 'UNSL2'),
         });
         expect(location['udtestdev-test-l1-and-l2-ownership.wallet']).toEqual({
           registryAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
@@ -1528,8 +1525,7 @@ describe('Resolution', () => {
           networkId: 80001,
           blockchain: BlockchainType.MATIC,
           ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
-          blockchainProviderUrl:
-            'https://polygon-mumbai.g.alchemy.com/v2/c4bb906ed6904c42b19c95825fe55f39',
+          blockchainProviderUrl: protocolLink(ProviderProtocol.http, 'UNSL2'),
         });
         expect(
           location['testing-domain-doesnt-exist-12345abc.blockchain'],
@@ -1541,8 +1537,7 @@ describe('Resolution', () => {
           networkId: 80001,
           blockchain: BlockchainType.MATIC,
           ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
-          blockchainProviderUrl:
-            'https://polygon-mumbai.g.alchemy.com/v2/c4bb906ed6904c42b19c95825fe55f39',
+          blockchainProviderUrl: protocolLink(ProviderProtocol.http, 'UNSL2'),
         });
         expect(location['zns-devtest-testnet-domain.zil']).toEqual({
           registryAddress: 'zil1hyj6m5w4atcn7s806s69r0uh5g4t84e8gp6nps',

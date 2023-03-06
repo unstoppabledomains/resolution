@@ -25,8 +25,6 @@ export default class UnsInternal {
   static readonly ProxyReaderMap: ProxyReaderMap = getProxyReaderMap();
   static readonly UrlMap: BlockhainNetworkUrlMap = {
     mainnet: 'https://mainnet.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
-    rinkeby:
-      'https://eth-rinkeby.alchemyapi.io/v2/ZDERxOLIj120dh2-Io2Q9RTh9RfWEssT',
     goerli: 'https://goerli.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
     'polygon-mainnet':
       'https://polygon-mainnet.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
