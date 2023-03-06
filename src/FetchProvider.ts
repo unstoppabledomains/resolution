@@ -2,6 +2,7 @@ import {RequestArguments} from './types';
 import ResolutionError, {ResolutionErrorCode} from './errors/resolutionError';
 import {ResolutionMethod, Provider} from './types/publicTypes';
 import Networking from './utils/Networking';
+import {getLibAgent} from './utils';
 
 export default class FetchProvider implements Provider {
   readonly url: string;
@@ -33,7 +34,7 @@ export default class FetchProvider implements Provider {
     | {error: {message: string}; result: undefined}
     | {error: undefined; result: unknown}
   > {
-    const response = await Networking.fetch(this.url, {
+    const requestObject = {
       method: 'POST',
       body: JSON.stringify({
         jsonrpc: '2.0',
@@ -44,7 +45,14 @@ export default class FetchProvider implements Provider {
       headers: {
         'Content-Type': 'application/json',
       },
-    });
+    };
+
+    if (args.apiKey) {
+      requestObject.headers['Authorization'] = `Bearer ${args.apiKey}`;
+      requestObject.headers['X-Lib-Agent'] = getLibAgent();
+    }
+
+    const response = await Networking.fetch(this.url, requestObject);
     if (response.status !== 200) {
       throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
         providerMessage: `Request to ${this.url} failed with response status ${response.status}`,
