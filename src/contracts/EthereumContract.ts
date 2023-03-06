@@ -7,7 +7,7 @@ export default class EthereumContract {
   readonly coder: Interface;
   readonly address: string;
   readonly provider: Provider;
-  protected apiKey?: string;
+  readonly apiKey?: string;
 
   constructor(
     abi: JsonFragment[],

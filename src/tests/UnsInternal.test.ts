@@ -18,6 +18,7 @@ import {
 } from '../errors/configurationError';
 import {ResolutionError, ResolutionErrorCode} from '../errors/resolutionError';
 import {eip137Namehash, fromHexStringToDecimals} from '../utils/namehash';
+import Networking from '../utils/Networking';
 
 let unsInternalL1: UnsInternal;
 let unsInternalL2: UnsInternal;
@@ -123,6 +124,20 @@ describe('UnsInternal', () => {
           },
         ),
       );
+    });
+
+    it('should accept an api key', async () => {
+      unsInternalL1 = new UnsInternal(
+        UnsLocation.Layer1,
+        {
+          url: protocolLink(ProviderProtocol.http, 'UNSL1'),
+          network: 'goerli',
+          proxyServiceApiKey: 'some key',
+        },
+        BlockchainType.ETH,
+      );
+
+      expect(unsInternalL1.readerContract.apiKey).toEqual('some key');
     });
   });
   it('should return tokenURI for domain on L2', async () => {
@@ -397,5 +412,34 @@ describe('UnsInternal', () => {
       ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
       blockchainProviderUrl: protocolLink(ProviderProtocol.http, 'UNSL2'),
     });
+  });
+
+  it('should pass api key as header to the rpc provider', async () => {
+    const fetchSpy = jest.spyOn(Networking, 'fetch');
+
+    unsInternalL1 = new UnsInternal(
+      UnsLocation.Layer1,
+      {
+        url: protocolLink(ProviderProtocol.http, 'UNSL1'),
+        network: 'goerli',
+        proxyServiceApiKey: 'some key',
+      },
+      BlockchainType.ETH,
+    );
+
+    mockAPICalls('uns_domain_exists_true_test', protocolLink());
+    const exists = await unsInternalL1.exists(CryptoDomainWithAllRecords);
+    expect(exists).toBe(true);
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    expect(fetchSpy).toHaveBeenLastCalledWith(
+      protocolLink(ProviderProtocol.http, 'UNSL1'),
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer some key',
+        }),
+      }),
+    );
   });
 });
