@@ -55,99 +55,45 @@ yarn upgrade @unstoppabledomains/resolution --latest
 npm update @unstoppabledomains/resolution --save
 ```
 
-## Using Resolution
+## Usage
 
-Create a new project.
-
-```shell
-mkdir resolution && cd $_
-yarn init -y
-yarn add @unstoppabledomains/resolution
-```
-
-### Look up a domain's crypto address
-
-Create a new file in your project, `address.js`.
+## Initialize with Default Ethereum Providers (deprecated)
+> NOTE: The default Infura key provided is rate limited and should only be used for testing. For production applications, please bring your own Infura or Alchemy RPC URL to prevent downtime.
 
 ```javascript
 const {default: Resolution} = require('@unstoppabledomains/resolution');
+
 const resolution = new Resolution();
 
-function resolve(domain, currency) {
-  resolution
-    .addr(domain, currency)
-    .then((address) => console.log(domain, 'resolves to', address))
-    .catch(console.error);
-}
-
-resolve('brad.crypto', 'ETH');
-resolve('brad.zil', 'ZIL');
 ```
 
-Execute the script.
-
-```shell
-$ node address.js
-brad.crypto resolves to 0x8aaD44321A86b170879d7A244c1e8d360c99DdA8
-brad.zil resolves to zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj
-```
-
-### Find the IPFS hash for a decentralized website
-
-Create a new file in your project, `ipfs_hash.js`.
+## Initialize with Unstoppable Domains' Proxy Provider
 
 ```javascript
 const {default: Resolution} = require('@unstoppabledomains/resolution');
-const resolution = new Resolution();
 
-function resolveIpfsHash(domain) {
-  resolution
-    .ipfsHash(domain)
-    .then((hash) =>
-      console.log(
-        `You can access this website via a public IPFS gateway: https://gateway.ipfs.io/ipfs/${hash}`,
-      ),
-    )
-    .catch(console.error);
-}
-
-resolveIpfsHash('homecakes.crypto');
+// obtain a key from https://unstoppabledomains.com/partner-api-dashboard if you are a partner
+const resolution = new Resolution({
+  sourceConfig: {
+    uns: {
+      locations: {
+        Layer1: {
+          url: "http://resolve.unstoppabledomains.com/chains/eth/rpc",
+          network: 'mainnet',
+          proxyServiceApiKey: "<api_key>"
+        },
+        Layer2: {
+          url: "http://resolve.unstoppabledomains.com/chains/matic/rpc",
+          network: 'polygon-mainnet',
+          proxyServiceApiKey: "<api_key>"
+        },
+      },
+    },
+  },
+});
 ```
 
-Execute the script.
-
-```shell
-$ node ipfs_hash.js
-You can access this website via a public IPFS gateway: https://gateway.ipfs.io/ipfs/QmVJ26hBrwwNAPVmLavEFXDUunNDXeFSeMPmHuPxKe6dJv
-```
-
-### Find a custom record
-
-Create a new file in your project, `custom-resolution.js`.
-
-```javascript
-const {default: Resolution} = require('@unstoppabledomains/resolution');
-const resolution = new Resolution();
-
-function resolveCustomRecord(domain, record) {
-  resolution
-    .records(domain, [record])
-    .then((value) => console.log(`Domain ${domain} ${record} is: ${value}`))
-    .catch(console.error);
-}
-
-resolveCustomRecord('homecakes.crypto', 'custom.record.value');
-```
-
-### Command Line Interface
-
-CLI support was removed from the Resolution library starting from version 6.0. Please use the [standalone CLI tool](https://github.com/unstoppabledomains/resolution-cli).
-
-## Default Ethereum Providers
-
-The default [Infura](https://www.infura.io/) key provided is rate limited and should only be used for testing. For production applications, please bring your own Infura or Alchemy RPC URL to prevent downtime.
-
-## Custom Ethereum Provider configuration
+## Initialize with Custom Ethereum Provider Configuration
 
 You may want to specify a custom provider:
  - if you want to use a dedicated blockchain node
@@ -163,34 +109,86 @@ Default provider can be changed by changing constructor options
 - `Resolution.fromEthersProvider()`
 - etc.
 
-To see all constructor options and factory methods check
-[Unstoppable API reference](https://unstoppabledomains.github.io/resolution).
-
-
 ```javascript
+
 const {default: Resolution} = require('@unstoppabledomains/resolution');
 
-const ethereumProviderUrl = ALCHEMY_ETHEREUM_API;
-const polygonProviderUrl = ALCHEMY_POLYGON_API;
-
-// custom provider config using the `Resolution` constructor options
+// obtain a key from https://www.infura.io
 const resolution = new Resolution({
-    sourceConfig: {
-      uns: {
-        locations: {
-          Layer1: {
-            url: ethereumProviderUrl,
-            network: 'mainnet'
-          },
-          Layer2: {
-            url: polygonProviderUrl,
-            network: 'polygon-mainnet',
-          },
+  sourceConfig: {
+    uns: {
+      locations: {
+        Layer1: {
+          url: "https://mainnet.infura.io/v3/<infura_api_key>",
+          network: 'mainnet'
+        },
+        Layer2: {
+          url: "https://polygon-mainnet.infura.io/v3/<infura_api_key>",
+          network: 'polygon-mainnet',
         },
       },
     },
-  });
+  },
+});
 ```
+
+### Examples
+
+To see all constructor options and factory methods check
+[Unstoppable API reference](https://unstoppabledomains.github.io/resolution).
+
+#### Look up a domain's crypto address
+
+```javascript
+
+function resolve(domain, currency) {
+  resolution
+    .addr(domain, currency)
+    .then((address) => console.log(domain, 'resolves to', address))
+    .catch(console.error);
+}
+
+resolve('brad.crypto', 'ETH');
+resolve('brad.zil', 'ZIL');
+```
+
+### Find the IPFS hash for a decentralized website
+
+Create a new file in your project, `ipfs_hash.js`.
+
+```javascript
+function resolveIpfsHash(domain) {
+  resolution
+    .ipfsHash(domain)
+    .then((hash) =>
+      console.log(
+        `You can access this website via a public IPFS gateway: https://gateway.ipfs.io/ipfs/${hash}`,
+      ),
+    )
+    .catch(console.error);
+}
+
+resolveIpfsHash('homecakes.crypto');
+```
+
+### Find a custom record
+
+Create a new file in your project, `custom-resolution.js`.
+
+```javascript
+function resolveCustomRecord(domain, record) {
+  resolution
+    .records(domain, [record])
+    .then((value) => console.log(`Domain ${domain} ${record} is: ${value}`))
+    .catch(console.error);
+}
+
+resolveCustomRecord('homecakes.crypto', 'custom.record.value');
+```
+
+### Command Line Interface
+
+CLI support was removed from the Resolution library starting from version 6.0. Please use the [standalone CLI tool](https://github.com/unstoppabledomains/resolution-cli).
 
 ## Autoconfiguration of blockchain network
 
