@@ -78,12 +78,12 @@ const resolution = new Resolution({
     uns: {
       locations: {
         Layer1: {
-          url: "http://resolve.unstoppabledomains.com/chains/eth/rpc",
+          url: "https://resolve.unstoppabledomains.com/chains/eth/rpc",
           network: 'mainnet',
           proxyServiceApiKey: "<api_key>"
         },
         Layer2: {
-          url: "http://resolve.unstoppabledomains.com/chains/matic/rpc",
+          url: "https://resolve.unstoppabledomains.com/chains/matic/rpc",
           network: 'polygon-mainnet',
           proxyServiceApiKey: "<api_key>"
         },
