@@ -73,24 +73,7 @@ const resolution = new Resolution();
 const {default: Resolution} = require('@unstoppabledomains/resolution');
 
 // obtain a key from https://unstoppabledomains.com/partner-api-dashboard if you are a partner
-const resolution = new Resolution({
-  sourceConfig: {
-    uns: {
-      locations: {
-        Layer1: {
-          url: "https://resolve.unstoppabledomains.com/chains/eth/rpc",
-          network: 'mainnet',
-          proxyServiceApiKey: "<api_key>"
-        },
-        Layer2: {
-          url: "https://resolve.unstoppabledomains.com/chains/matic/rpc",
-          network: 'polygon-mainnet',
-          proxyServiceApiKey: "<api_key>"
-        },
-      },
-    },
-  },
-});
+const resolution = new Resolution({ apiKey: "<api_key>" });
 ```
 
 ## Initialize with Custom Ethereum Provider Configuration

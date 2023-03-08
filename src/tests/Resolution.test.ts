@@ -74,6 +74,18 @@ beforeEach(() => {
 });
 
 describe('Resolution', () => {
+  describe('constructor', () => {
+    it(`should allow to configure with api key`, () => {
+      const resolution = new Resolution({
+        apiKey: 'some key',
+      });
+
+      expect(
+        resolution.serviceMap[NamingServiceName.UNS].native instanceof Uns,
+      ).toBe(true);
+    });
+  });
+
   describe('.Basic setup', () => {
     it('should work with autonetwork url configuration', async () => {
       const polygonUrl = protocolLink(ProviderProtocol.http, 'UNSL2');

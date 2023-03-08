@@ -29,6 +29,11 @@ export type SourceConfig = {
   zns?: ZnsSource | Api;
 };
 
+export type ResolutionConfig = {
+  sourceConfig?: SourceConfig;
+  apiKey?: string;
+};
+
 export enum UnsLocation {
   Layer1 = 'UNSLayer1',
   Layer2 = 'UNSLayer2',
