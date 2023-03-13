@@ -10,8 +10,8 @@
 - [Installing Resolution](#installing-resolution)
 - [Updating Resolution](#updating-resolution)
 - [Using Resolution](#using-resolution)
-- [Default Ethereum Providers](#default-ethereum-providers)
 - [Error Handling](#error-handling)
+- [Development](#development)
 - [Free advertising for integrated apps](#free-advertising-for-integrated-apps)
 
 Resolution is a library for interacting with blockchain domain names. It can be
@@ -55,7 +55,7 @@ yarn upgrade @unstoppabledomains/resolution --latest
 npm update @unstoppabledomains/resolution --save
 ```
 
-## Usage
+## Using Resolution
 
 ## Initialize with Unstoppable Domains' Proxy Provider
 
@@ -102,6 +102,24 @@ const resolution = new Resolution({
       },
     },
   },
+});
+```
+
+## Initialize with Autoconfiguration of blockchain network
+
+In some scenarios system might not be flexible enough to easy distinguish
+between various Ethereum testnets at compilation time. In this case, Resolution
+library provide a special async constructor
+`await Resolution.autonetwork(options)`. This method makes a JSON RPC
+"net_version" call to the provider to get the network id.
+
+This method configures only Uns. Zns is supported only on Zilliqa mainnet which
+is going to be used in any cases. You can provide a configured provider or a
+blockchain url as in the following example:
+
+```
+await Resolution.autoNetwork({
+  uns: {provider},
 });
 ```
 
@@ -163,24 +181,6 @@ resolveCustomRecord('homecakes.crypto', 'custom.record.value');
 
 CLI support was removed from the Resolution library starting from version 6.0. Please use the [standalone CLI tool](https://github.com/unstoppabledomains/resolution-cli).
 
-## Autoconfiguration of blockchain network
-
-In some scenarios system might not be flexible enough to easily distinguish
-between various Ethereum testnets on compile time. For this case Resolution
-library provides a special async constructor which should be waited for
-`await Resolution.autonetwork(options)`. This method makes a JSON RPC
-"net_version" call to the provider to get the network id.
-
-This method configures only Uns. Zns is supported only on Zilliqa mainnet which
-is going to be used in any cases. You can provide a configured provider or a
-blockchain url as in the following example:
-
-```
-await Resolution.autoNetwork({
-  uns: {provider},
-});
-```
-
 ## Error Handling
 
 When resolution encounters an error it returns the error code instead of
@@ -191,33 +191,27 @@ stopping the process. Keep an eye out for return values like `RECORD_NOT_FOUND`.
 Use these commands to set up a local development environment (**macOS Terminal**
 or **Linux shell**).
 
-1. Install `nvm`
+1. Recommended NodeJs version
 
-   ```bash
-   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-   ```
+* Node v16
 
-2. Install concrete version of `node.js`
-
-   ```bash
-   nvm install 16.15.0
-   ```
-
-3. Install `yarn`
-   ```bash
-   npm install -g yarn
-   ```
-4. Clone the repository
+2. Clone the repository
 
    ```bash
    git clone https://github.com/unstoppabledomains/resolution.git
    cd resolution
    ```
 
-5. Install dependencies
-   ```bash
-   yarn install
-   ```
+3. Install dependencies
+
+    ```bash
+    yarn install
+    ```
+    or
+
+    ```bash
+    npm install
+    ```
 
 ### Internal config
 
@@ -226,6 +220,17 @@ or **Linux shell**).
 - Network config: `$ yarn network-config:pull`
 - Resolver keys: `$ yarn resolver-keys:pull`
 - Both configs: `$ yarn config:pull`
+
+#### Unit tests:
+
+Resolution library relies on environment variables to load **TestNet** RPC Urls. This way, our keys don't expose directly to the code. These environment variables are:
+
+* L1_TEST_NET_RPC_URL
+* L1_TEST_NET_RPC_WSS_URL
+* L2_TEST_NET_RPC_URL
+* L2_TEST_NET_RPC_WSS_URL
+
+In order to validate the code change, copy `.env.example` file change the name to `.env`. Then, update the values of variables. 
 
 ## Free advertising for integrated apps
 
