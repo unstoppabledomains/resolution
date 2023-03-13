@@ -57,16 +57,6 @@ npm update @unstoppabledomains/resolution --save
 
 ## Usage
 
-## Initialize with Default Ethereum Providers (deprecated)
-> NOTE: The default Infura key provided is rate limited and should only be used for testing. For production applications, please bring your own Infura or Alchemy RPC URL to prevent downtime.
-
-```javascript
-const {default: Resolution} = require('@unstoppabledomains/resolution');
-
-const resolution = new Resolution();
-
-```
-
 ## Initialize with Unstoppable Domains' Proxy Provider
 
 ```javascript

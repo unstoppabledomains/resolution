@@ -33,6 +33,37 @@ import UnsInternal from './UnsInternal';
 import Networking from './utils/Networking';
 import SupportedKeys from './config/resolver-keys.json';
 
+const ensureValidSourceConfig = (source: UnsSource): void => {
+  if (
+    !source.locations ||
+    !source.locations.Layer1 ||
+    !source.locations.Layer2
+  ) {
+    throw new ConfigurationError(ConfigurationErrorCode.NetworkConfigMissing, {
+      method: NamingServiceName.UNS,
+      config: !source.locations.Layer1 ? 'Layer1' : 'Layer2',
+    });
+  }
+
+  const layer1Config = source.locations.Layer1;
+  if (!layer1Config['url'] && !layer1Config['provider']) {
+    throw new ConfigurationError(ConfigurationErrorCode.NetworkConfigMissing, {
+      method: NamingServiceName.UNS,
+      config: 'Layer1.url',
+    });
+  }
+
+  const layer2Config = source.locations.Layer2;
+  if (!layer2Config['url'] && !layer2Config['provider']) {
+    throw new ConfigurationError(ConfigurationErrorCode.NetworkConfigMissing, {
+      method: NamingServiceName.UNS,
+      config: 'Layer2.url',
+    });
+  }
+
+  return;
+};
+
 /**
  * @internal
  */
@@ -43,33 +74,23 @@ export default class Uns extends NamingService {
 
   constructor(source?: UnsSource) {
     super();
-    if (
-      source &&
-      source.locations &&
-      (!source.locations.Layer1 || !source.locations.Layer2)
-    ) {
-      throw new ConfigurationError(
-        ConfigurationErrorCode.NetworkConfigMissing,
-        {
-          method: NamingServiceName.UNS,
-          config: !source.locations.Layer1 ? 'Layer1' : 'Layer2',
-        },
-      );
-    }
-    if (!source) {
+    if (source) {
+      ensureValidSourceConfig(source);
+    } else {
       source = {
         locations: {
           Layer1: {
-            url: UnsInternal.UrlMap['mainnet'],
+            url: '',
             network: 'mainnet',
           },
           Layer2: {
-            url: UnsInternal.UrlMap['polygon-mainnet'],
+            url: '',
             network: 'polygon-mainnet',
           },
         },
       };
     }
+
     this.unsl1 = new UnsInternal(
       UnsLocation.Layer1,
       source.locations.Layer1,

@@ -33,6 +33,11 @@ export const CryptoDomainWithoutGunDbRecords =
   'test-usdt-and-dns-records.crypto';
 export const SubdomainLayerTwo = 'subdomain.resolution-test.wallet';
 
+export enum ProviderProtocol {
+  'http' = 'http',
+  'wss' = 'wss',
+}
+
 try {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const dotenv = require('dotenv');
@@ -169,24 +174,35 @@ export function mockAPICalls(testName: string, url: string): void {
   });
 }
 
-function protocolLinkFromEnv(
+/**
+ * return URLs set in env vars if any
+ */
+export function getUnsProtocolLinkFromEnv(
   providerProtocol: ProviderProtocol,
   namingService: 'UNSL1' | 'UNSL2',
-): string | undefined {
+): string {
   if (
     namingService === 'UNSL1' &&
     providerProtocol === ProviderProtocol.http &&
     process.env.L1_TEST_NET_RPC_URL
   ) {
-    return process.env.L1_TEST_NET_RPC_URL;
+    if (process.env.L1_TEST_NET_RPC_URL) {
+      return process.env.L1_TEST_NET_RPC_URL;
+    }
+
+    throw new Error('missing env var L1_TEST_NET_RPC_URL');
   }
 
   if (
     namingService === 'UNSL1' &&
-    providerProtocol === ProviderProtocol.http &&
+    providerProtocol === ProviderProtocol.wss &&
     process.env.L1_TEST_NET_RPC_WSS_URL
   ) {
-    return process.env.L1_TEST_NET_RPC_WSS_URL;
+    if (process.env.L1_TEST_NET_RPC_WSS_URL) {
+      return process.env.L1_TEST_NET_RPC_WSS_URL;
+    }
+
+    throw new Error('missing env var L1_TEST_NET_RPC_WSS_URL');
   }
 
   if (
@@ -194,39 +210,26 @@ function protocolLinkFromEnv(
     providerProtocol === ProviderProtocol.http &&
     process.env.L2_TEST_NET_RPC_URL
   ) {
-    return process.env.L2_TEST_NET_RPC_URL;
+    if (process.env.L2_TEST_NET_RPC_URL) {
+      return process.env.L2_TEST_NET_RPC_URL;
+    }
+
+    throw new Error('missing env var L2_TEST_NET_RPC_URL');
   }
 
   if (
     namingService === 'UNSL2' &&
-    providerProtocol === ProviderProtocol.http &&
+    providerProtocol === ProviderProtocol.wss &&
     process.env.L2_TEST_NET_RPC_WSS_URL
   ) {
-    return process.env.L2_TEST_NET_RPC_WSS_URL;
-  }
-}
+    if (process.env.L2_TEST_NET_RPC_WSS_URL) {
+      return process.env.L2_TEST_NET_RPC_WSS_URL;
+    }
 
-/**
- * returns either a standard ethereum provider url
- * or the one with attached SECRET key from
- * UNSTOPPABLE_RESOLUTION_PROJECTID env variable if any
- */
-export function protocolLink(
-  providerProtocol: ProviderProtocol = ProviderProtocol.http,
-  namingService: 'UNSL1' | 'UNSL2' = 'UNSL1',
-): string {
-  const linkFromEnv = protocolLinkFromEnv(providerProtocol, namingService);
-
-  if (linkFromEnv) {
-    return linkFromEnv;
+    throw new Error('missing env var L2_TEST_NET_RPC_WSS_URL');
   }
 
-  return ethereumDefaultProviders[namingService][providerProtocol];
-}
-
-export enum ProviderProtocol {
-  'http' = 'http',
-  'wss' = 'wss',
+  throw new Error('Invalid test config');
 }
 
 export const caseMock = <T, U>(
@@ -240,15 +243,4 @@ export const caseMock = <T, U>(
   }
 
   throw new Error(`got unexpected params ${JSON.stringify(params)}`);
-};
-
-const ethereumDefaultProviders = {
-  UNSL1: {
-    http: 'https://goerli.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
-    wss: 'wss://goerli.infura.io/ws/v3/c4bb906ed6904c42b19c95825fe55f39',
-  },
-  UNSL2: {
-    http: 'https://polygon-mumbai.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
-    wss: 'wss://polygon-mumbai.g.alchemy.com/v2/c4bb906ed6904c42b19c95825fe55f39',
-  },
 };
