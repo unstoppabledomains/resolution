@@ -38,7 +38,8 @@ import {prepareAndValidateDomain} from './utils/prepareAndValidate';
 import {fromDecStringToHex} from './utils/namehash';
 import {UnsSupportedNetwork} from './types';
 
-const DEFAULT_UNS_PROXY_SERVICE_URL = 'https://resolve.unstoppabledomains.com';
+const DEFAULT_UNS_PROXY_SERVICE_URL =
+  'https://api.unstoppabledomains.com/resolve';
 
 /**
  * Blockchain domain Resolution library - Resolution.

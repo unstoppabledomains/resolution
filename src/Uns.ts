@@ -41,7 +41,7 @@ const ensureValidSourceConfig = (source: UnsSource): void => {
   ) {
     throw new ConfigurationError(ConfigurationErrorCode.NetworkConfigMissing, {
       method: NamingServiceName.UNS,
-      config: !source.locations.Layer1 ? 'Layer1' : 'Layer2',
+      config: !source?.locations?.Layer1 ? 'Layer1' : 'Layer2',
     });
   }
 

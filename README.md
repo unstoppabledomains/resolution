@@ -57,7 +57,7 @@ npm update @unstoppabledomains/resolution --save
 
 ## Using Resolution
 
-## Initialize with Unstoppable Domains' Proxy Provider
+## Initialize with Unstoppable Domains' UNS Proxy Provider
 
 ```javascript
 const {default: Resolution} = require('@unstoppabledomains/resolution');
@@ -66,7 +66,23 @@ const {default: Resolution} = require('@unstoppabledomains/resolution');
 const resolution = new Resolution({ apiKey: "<api_key>" });
 ```
 
-## Initialize with Custom Ethereum Provider Configuration
+> NOTE: The `apiKey` is only used resolve domains from Uns. Behind the scene, it still uses the default Zns (Zilliqa) RPC url. For additional control, please specify your Zns configuration.
+
+```javascript
+const {default: Resolution} = require('@unstoppabledomains/resolution');
+
+const resolution = new Resolution({ 
+  apiKey: "<api_key>",
+  sourceConfig: {
+    zns: {
+      url: 'https://api.zilliqa.com',
+      network: 'mainnet',
+    },
+  },
+});
+```
+
+## Initialize with Custom Provider Configuration
 
 You may want to specify a custom provider:
  - if you want to use a dedicated blockchain node
@@ -100,6 +116,10 @@ const resolution = new Resolution({
           network: 'polygon-mainnet',
         },
       },
+    },
+    zns: {
+      url: 'https://api.zilliqa.com',
+      network: 'mainnet',
     },
   },
 });

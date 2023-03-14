@@ -20,7 +20,7 @@ const ProviderURLMap: Record<Providers, NetworkSignedLinkURLs> = {
 };
 
 export function getLibAgent(): string {
-  let libAgent = 'resolution-js';
+  let libAgent = 'UnstoppableDomains/resolution-js';
   try {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const pjson = require('../../package.json');
