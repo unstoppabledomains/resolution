@@ -11,6 +11,7 @@ type NamingServiceSource = {url?: string} | {provider?: Provider};
 
 export type UnsLayerSource = NamingServiceSource & {
   network: string;
+  proxyServiceApiKey?: string;
   proxyReaderAddress?: string;
 };
 
@@ -26,6 +27,11 @@ export type ZnsSource = NamingServiceSource & {
 export type SourceConfig = {
   uns?: UnsSource | Api;
   zns?: ZnsSource | Api;
+};
+
+export type ResolutionConfig = {
+  sourceConfig?: SourceConfig;
+  apiKey?: string;
 };
 
 export enum UnsLocation {

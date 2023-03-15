@@ -7,12 +7,19 @@ export default class EthereumContract {
   readonly coder: Interface;
   readonly address: string;
   readonly provider: Provider;
+  readonly apiKey?: string;
 
-  constructor(abi: JsonFragment[], address: string, provider: Provider) {
+  constructor(
+    abi: JsonFragment[],
+    address: string,
+    provider: Provider,
+    apiKey?: string,
+  ) {
     this.abi = abi;
     this.address = address;
     this.provider = provider;
     this.coder = new Interface(this.abi);
+    this.apiKey = apiKey;
   }
 
   async call(
@@ -77,6 +84,7 @@ export default class EthereumContract {
     const request: RequestArguments = {
       method: 'eth_getLogs',
       params,
+      apiKey: this.apiKey,
     };
     return (await this.provider.request(request)) as Promise<EventData[]>;
   }
@@ -92,6 +100,7 @@ export default class EthereumContract {
     const request: RequestArguments = {
       method: 'eth_call',
       params,
+      apiKey: this.apiKey,
     };
     return await this.provider.request(request);
   }

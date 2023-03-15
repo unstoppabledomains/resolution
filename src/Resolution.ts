@@ -15,6 +15,7 @@ import {
   NamingServiceName,
   Provider,
   SourceConfig,
+  ResolutionConfig,
   TokenUriMetadata,
   Web3Version0Provider,
   Web3Version1Provider,
@@ -36,6 +37,9 @@ import Networking from './utils/Networking';
 import {prepareAndValidateDomain} from './utils/prepareAndValidate';
 import {fromDecStringToHex} from './utils/namehash';
 import {UnsSupportedNetwork} from './types';
+
+const DEFAULT_UNS_PROXY_SERVICE_URL =
+  'https://api.unstoppabledomains.com/resolve';
 
 /**
  * Blockchain domain Resolution library - Resolution.
@@ -61,13 +65,9 @@ export default class Resolution {
    */
   readonly serviceMap: Record<NamingServiceName, ServicesEntry>;
 
-  constructor({sourceConfig = undefined}: {sourceConfig?: SourceConfig} = {}) {
-    const uns = isApi(sourceConfig?.uns)
-      ? new UdApi(sourceConfig?.uns)
-      : new Uns(sourceConfig?.uns);
-    const zns = isApi(sourceConfig?.zns)
-      ? new UdApi(sourceConfig?.zns)
-      : new Zns(sourceConfig?.zns);
+  constructor(config: {sourceConfig?: SourceConfig; apiKey?: string} = {}) {
+    const uns = this.getUnsConfig(config);
+    const zns = this.getZnsConfig(config);
 
     // If both UNS and ZNS use the same UdApi providers, we don't want to call the API twice as it would return same
     // responses. It should be enough to compare just the URLs, as the network param isn't actually used in the calls.
@@ -79,11 +79,11 @@ export default class Resolution {
     this.serviceMap = {
       [NamingServiceName.UNS]: {
         usedServices: [uns],
-        native: isApi(sourceConfig?.uns) ? new Uns() : uns,
+        native: uns instanceof Uns ? uns : new Uns(),
       },
       [NamingServiceName.ZNS]: {
         usedServices: equalUdApiProviders ? [uns] : [uns, zns],
-        native: isApi(sourceConfig?.zns) ? new Zns() : zns,
+        native: zns instanceof Zns ? zns : new Zns(),
       },
     };
   }
@@ -977,6 +977,35 @@ export default class Resolution {
     const service = this.serviceMap['UNS'].native;
     const tokenId = await service.reverseOf(address, location);
     return tokenId as string;
+  }
+
+  private getUnsConfig(config: ResolutionConfig): Uns | UdApi {
+    if (config.apiKey) {
+      return new Uns({
+        locations: {
+          Layer1: {
+            url: `${DEFAULT_UNS_PROXY_SERVICE_URL}/chains/eth/rpc`,
+            network: 'mainnet',
+            proxyServiceApiKey: config.apiKey,
+          },
+          Layer2: {
+            url: `${DEFAULT_UNS_PROXY_SERVICE_URL}/chains/matic/rpc`,
+            network: 'polygon-mainnet',
+            proxyServiceApiKey: config.apiKey,
+          },
+        },
+      });
+    }
+
+    return isApi(config.sourceConfig?.uns)
+      ? new UdApi(config.sourceConfig?.uns)
+      : new Uns(config.sourceConfig?.uns);
+  }
+
+  getZnsConfig(config: ResolutionConfig): Zns | UdApi {
+    return isApi(config.sourceConfig?.zns)
+      ? new UdApi(config.sourceConfig?.zns)
+      : new Zns(config.sourceConfig?.zns);
   }
 }
 
