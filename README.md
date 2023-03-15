@@ -66,7 +66,7 @@ const {default: Resolution} = require('@unstoppabledomains/resolution');
 const resolution = new Resolution({ apiKey: "<api_key>" });
 ```
 
-> NOTE: The `apiKey` is only used resolve domains from Uns. Behind the scene, it still uses the default Zns (Zilliqa) RPC url. For additional control, please specify your Zns configuration.
+> NOTE: The `apiKey` is only used resolve domains from UNS. Behind the scene, it still uses the default ZNS (Zilliqa) RPC url. For additional control, please specify your ZNS configuration.
 
 ```javascript
 const {default: Resolution} = require('@unstoppabledomains/resolution');
