@@ -1,3 +1,8 @@
+## 9.0.0
+
+- Allow initialization with partner key
+- Remove default RPC urls
+
 ## 8.5.1
 
 - Update uns config dependency
