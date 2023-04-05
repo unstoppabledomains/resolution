@@ -3,7 +3,7 @@ import {NullAddress} from '../types';
 import {
   mockAsyncMethods,
   expectSpyToBeCalled,
-  protocolLink,
+  getUnsProtocolLinkFromEnv,
   CryptoDomainWithAllRecords,
   WalletDomainLayerTwoWithAllRecords,
   mockAPICalls,
@@ -18,6 +18,7 @@ import {
 } from '../errors/configurationError';
 import {ResolutionError, ResolutionErrorCode} from '../errors/resolutionError';
 import {eip137Namehash, fromHexStringToDecimals} from '../utils/namehash';
+import Networking from '../utils/Networking';
 
 let unsInternalL1: UnsInternal;
 let unsInternalL2: UnsInternal;
@@ -27,7 +28,7 @@ beforeEach(async () => {
   unsInternalL1 = new UnsInternal(
     UnsLocation.Layer1,
     {
-      url: protocolLink(ProviderProtocol.http, 'UNSL1'),
+      url: getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
       network: 'goerli',
     },
     BlockchainType.ETH,
@@ -35,7 +36,7 @@ beforeEach(async () => {
   unsInternalL2 = new UnsInternal(
     UnsLocation.Layer2,
     {
-      url: protocolLink(ProviderProtocol.http, 'UNSL2'),
+      url: getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
       network: 'polygon-mumbai',
     },
     BlockchainType.MATIC,
@@ -50,7 +51,7 @@ describe('UnsInternal', () => {
           new UnsInternal(
             UnsLocation.Layer1,
             {
-              url: protocolLink(ProviderProtocol.http, 'UNSL1'),
+              url: getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
             } as any,
             BlockchainType.ETH,
           ),
@@ -66,7 +67,7 @@ describe('UnsInternal', () => {
           new UnsInternal(
             UnsLocation.Layer1,
             {
-              url: protocolLink(ProviderProtocol.http, 'UNSL1'),
+              url: getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
               network: 'custom',
             },
             BlockchainType.ETH,
@@ -87,7 +88,7 @@ describe('UnsInternal', () => {
           new UnsInternal(
             UnsLocation.Layer1,
             {
-              url: protocolLink(ProviderProtocol.http, 'UNSL1'),
+              url: getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
               network: 'custom',
               proxyReaderAddress: '0xinvalid',
             },
@@ -123,6 +124,20 @@ describe('UnsInternal', () => {
           },
         ),
       );
+    });
+
+    it('should accept an api key', async () => {
+      unsInternalL1 = new UnsInternal(
+        UnsLocation.Layer1,
+        {
+          url: getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
+          network: 'goerli',
+          proxyServiceApiKey: 'some key',
+        },
+        BlockchainType.ETH,
+      );
+
+      expect(unsInternalL1.readerContract.apiKey).toEqual('some key');
     });
   });
   it('should return tokenURI for domain on L2', async () => {
@@ -296,21 +311,27 @@ describe('UnsInternal', () => {
   });
 
   it('should return true for tld exists', async () => {
-    mockAPICalls('uns_domain_exists_test', protocolLink());
+    mockAPICalls(
+      'uns_domain_exists_test',
+      getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
+    );
     const exists = await unsInternalL1.exists(
       CryptoDomainWithAllRecords.split('.')[1],
     );
     expect(exists).toBe(true);
   });
   it('should return true for domain exists', async () => {
-    mockAPICalls('uns_domain_exists_true_test', protocolLink());
+    mockAPICalls(
+      'uns_domain_exists_true_test',
+      getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
+    );
     const exists = await unsInternalL1.exists(CryptoDomainWithAllRecords);
     expect(exists).toBe(true);
   });
   it('should return true for tld exists on L2', async () => {
     mockAPICalls(
       'uns_l2_domain_exists_test',
-      protocolLink(ProviderProtocol.http, 'UNSL2'),
+      getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
     );
     const exists = await unsInternalL2.exists(
       WalletDomainLayerTwoWithAllRecords.split('.')[1],
@@ -320,7 +341,7 @@ describe('UnsInternal', () => {
   it('should return true for domain exists on L2', async () => {
     mockAPICalls(
       'uns_l2_domain_exists_test',
-      protocolLink(ProviderProtocol.http, 'UNSL2'),
+      getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
     );
     const exists = await unsInternalL2.exists(
       WalletDomainLayerTwoWithAllRecords,
@@ -331,7 +352,7 @@ describe('UnsInternal', () => {
   it('should return location for L1 domains', async () => {
     mockAPICalls(
       'uns_l1_location_test',
-      protocolLink(ProviderProtocol.http, 'UNSL1'),
+      getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
     );
     const location = await unsInternalL1.locations([
       'udtestdev-check.wallet',
@@ -344,7 +365,10 @@ describe('UnsInternal', () => {
       networkId: 5,
       blockchain: BlockchainType.ETH,
       ownerAddress: '0x0e43F36e4B986dfbE1a75cacfA60cA2bD44Ae962',
-      blockchainProviderUrl: protocolLink(ProviderProtocol.http, 'UNSL1'),
+      blockchainProviderUrl: getUnsProtocolLinkFromEnv(
+        ProviderProtocol.http,
+        'UNSL1',
+      ),
     });
     expect(location['brad.crypto']).toEqual({
       registryAddress: '0x801452cFAC27e79a11c6b185986fdE09e8637589',
@@ -352,7 +376,10 @@ describe('UnsInternal', () => {
       networkId: 5,
       blockchain: BlockchainType.ETH,
       ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
-      blockchainProviderUrl: protocolLink(ProviderProtocol.http, 'UNSL1'),
+      blockchainProviderUrl: getUnsProtocolLinkFromEnv(
+        ProviderProtocol.http,
+        'UNSL1',
+      ),
     });
     expect(
       location['testing-domain-doesnt-exist-12345abc.blockchain'],
@@ -362,7 +389,7 @@ describe('UnsInternal', () => {
   it('should return location for L2 domains', async () => {
     mockAPICalls(
       'uns_l2_location_test',
-      protocolLink(ProviderProtocol.http, 'UNSL2'),
+      getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
     );
     const location = await unsInternalL2.locations([
       'udtestdev-test-l2-domain-784391.wallet',
@@ -374,7 +401,10 @@ describe('UnsInternal', () => {
       networkId: 80001,
       blockchain: BlockchainType.MATIC,
       ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
-      blockchainProviderUrl: protocolLink(ProviderProtocol.http, 'UNSL2'),
+      blockchainProviderUrl: getUnsProtocolLinkFromEnv(
+        ProviderProtocol.http,
+        'UNSL2',
+      ),
     });
     expect(
       location['testing-domain-doesnt-exist-12345abc.blockchain'],
@@ -384,7 +414,7 @@ describe('UnsInternal', () => {
   it('should return location for domains starting with 0x', async () => {
     mockAPICalls(
       'uns_l2_0x_location_test',
-      protocolLink(ProviderProtocol.http, 'UNSL2'),
+      getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
     );
     const location = await unsInternalL2.locations([
       '0xtestdomain-dev-test.wallet',
@@ -395,7 +425,42 @@ describe('UnsInternal', () => {
       networkId: 80001,
       blockchain: BlockchainType.MATIC,
       ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
-      blockchainProviderUrl: protocolLink(ProviderProtocol.http, 'UNSL2'),
+      blockchainProviderUrl: getUnsProtocolLinkFromEnv(
+        ProviderProtocol.http,
+        'UNSL2',
+      ),
     });
+  });
+
+  it('should pass api key as header to the rpc provider', async () => {
+    const fetchSpy = jest.spyOn(Networking, 'fetch');
+
+    unsInternalL1 = new UnsInternal(
+      UnsLocation.Layer1,
+      {
+        url: getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
+        network: 'goerli',
+        proxyServiceApiKey: 'some key',
+      },
+      BlockchainType.ETH,
+    );
+
+    mockAPICalls(
+      'uns_domain_exists_true_test',
+      getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
+    );
+    const exists = await unsInternalL1.exists(CryptoDomainWithAllRecords);
+    expect(exists).toBe(true);
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    expect(fetchSpy).toHaveBeenLastCalledWith(
+      getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer some key',
+        }),
+      }),
+    );
   });
 });

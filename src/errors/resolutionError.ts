@@ -1,4 +1,8 @@
-import {ResolutionMethod, UnsLocation} from '../types/publicTypes';
+import {
+  ResolutionMethod,
+  UnsLocation,
+  ResolutionConfig,
+} from '../types/publicTypes';
 
 /**
  * Alias for Resolution error handler function
@@ -17,6 +21,7 @@ type ResolutionErrorOptions = {
   namingService?: string;
   location?: UnsLocation;
   tokenUri?: string;
+  config?: ResolutionConfig;
 };
 
 export enum ResolutionErrorCode {
@@ -34,6 +39,7 @@ export enum ResolutionErrorCode {
   InvalidTwitterVerification = 'InvalidTwitterVerification',
   InconsistentDomainArray = 'InconsistentDomainArray',
   InvalidDomainAddress = 'InvalidDomainAddress',
+  InvalidUnsResolutionConfiguration = 'InvalidResolutionConfiguration',
 }
 
 /**
@@ -96,6 +102,9 @@ const HandlersByCode = {
     `Naming service ${params.namingService} is not supported`,
   [ResolutionErrorCode.InvalidDomainAddress]: (params: {domain: string}) =>
     `Domain address ${params.domain} is invalid`,
+  [ResolutionErrorCode.InvalidUnsResolutionConfiguration]: (params: {
+    config: any;
+  }) => `Resolution `,
 };
 
 /**

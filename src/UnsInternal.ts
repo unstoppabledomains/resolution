@@ -1,9 +1,4 @@
-import {
-  BlockhainNetworkUrlMap,
-  UnsSupportedNetwork,
-  ProxyReaderMap,
-  NullAddress,
-} from './types';
+import {UnsSupportedNetwork, ProxyReaderMap, NullAddress} from './types';
 import {UnsLayerSource} from './types/publicTypes';
 import ConfigurationError from './errors/configurationError';
 import {ConfigurationErrorCode} from './errors/configurationError';
@@ -23,14 +18,6 @@ import {eip137Namehash} from './utils/namehash';
 
 export default class UnsInternal {
   static readonly ProxyReaderMap: ProxyReaderMap = getProxyReaderMap();
-  static readonly UrlMap: BlockhainNetworkUrlMap = {
-    mainnet: 'https://mainnet.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
-    goerli: 'https://goerli.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
-    'polygon-mainnet':
-      'https://polygon-mainnet.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
-    'polygon-mumbai':
-      'https://polygon-mumbai.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39',
-  };
 
   readonly network: string;
   readonly url: string;
@@ -48,7 +35,7 @@ export default class UnsInternal {
     this.checkNetworkConfig(unsLocation, source);
     this.network = source.network;
     this.blockchain = blockchain;
-    this.url = source['url'] || UnsInternal.UrlMap[this.network];
+    this.url = source['url'];
     this.provider =
       source['provider'] || new FetchProvider(this.unsLocation, this.url);
     this.readerContract = new EthereumContract(
@@ -56,6 +43,7 @@ export default class UnsInternal {
       source.proxyReaderAddress ||
         UnsInternal.ProxyReaderMap[EthereumNetworks[this.network]],
       this.provider,
+      source['proxyServiceApiKey'],
     );
   }
 

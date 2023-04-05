@@ -1,9 +1,6 @@
 import {Provider} from './publicTypes';
 
 export type Dictionary<T> = {[k: string]: T};
-export interface BlockhainNetworkUrlMap {
-  [key: string]: string | undefined;
-}
 export interface ProxyReaderMap {
   [key: string]: string;
 }
@@ -12,6 +9,7 @@ export type ProviderParams = unknown[] | object;
 export interface RequestArguments {
   method: string;
   params?: ProviderParams;
+  apiKey?: string;
 }
 export type TransactionRequest = {
   to?: unknown;

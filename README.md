@@ -10,8 +10,8 @@
 - [Installing Resolution](#installing-resolution)
 - [Updating Resolution](#updating-resolution)
 - [Using Resolution](#using-resolution)
-- [Default Ethereum Providers](#default-ethereum-providers)
 - [Error Handling](#error-handling)
+- [Development](#development)
 - [Free advertising for integrated apps](#free-advertising-for-integrated-apps)
 
 Resolution is a library for interacting with blockchain domain names. It can be
@@ -57,97 +57,32 @@ npm update @unstoppabledomains/resolution --save
 
 ## Using Resolution
 
-Create a new project.
-
-```shell
-mkdir resolution && cd $_
-yarn init -y
-yarn add @unstoppabledomains/resolution
-```
-
-### Look up a domain's crypto address
-
-Create a new file in your project, `address.js`.
+## Initialize with Unstoppable Domains' UNS Proxy Provider
 
 ```javascript
 const {default: Resolution} = require('@unstoppabledomains/resolution');
-const resolution = new Resolution();
 
-function resolve(domain, currency) {
-  resolution
-    .addr(domain, currency)
-    .then((address) => console.log(domain, 'resolves to', address))
-    .catch(console.error);
-}
-
-resolve('brad.crypto', 'ETH');
-resolve('brad.zil', 'ZIL');
+// obtain a key from https://unstoppabledomains.com/partner-api-dashboard if you are a partner
+const resolution = new Resolution({ apiKey: "<api_key>" });
 ```
 
-Execute the script.
-
-```shell
-$ node address.js
-brad.crypto resolves to 0x8aaD44321A86b170879d7A244c1e8d360c99DdA8
-brad.zil resolves to zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj
-```
-
-### Find the IPFS hash for a decentralized website
-
-Create a new file in your project, `ipfs_hash.js`.
+> NOTE: The `apiKey` is only used resolve domains from UNS. Behind the scene, it still uses the default ZNS (Zilliqa) RPC url. For additional control, please specify your ZNS configuration.
 
 ```javascript
 const {default: Resolution} = require('@unstoppabledomains/resolution');
-const resolution = new Resolution();
 
-function resolveIpfsHash(domain) {
-  resolution
-    .ipfsHash(domain)
-    .then((hash) =>
-      console.log(
-        `You can access this website via a public IPFS gateway: https://gateway.ipfs.io/ipfs/${hash}`,
-      ),
-    )
-    .catch(console.error);
-}
-
-resolveIpfsHash('homecakes.crypto');
+const resolution = new Resolution({ 
+  apiKey: "<api_key>",
+  sourceConfig: {
+    zns: {
+      url: 'https://api.zilliqa.com',
+      network: 'mainnet',
+    },
+  },
+});
 ```
 
-Execute the script.
-
-```shell
-$ node ipfs_hash.js
-You can access this website via a public IPFS gateway: https://gateway.ipfs.io/ipfs/QmVJ26hBrwwNAPVmLavEFXDUunNDXeFSeMPmHuPxKe6dJv
-```
-
-### Find a custom record
-
-Create a new file in your project, `custom-resolution.js`.
-
-```javascript
-const {default: Resolution} = require('@unstoppabledomains/resolution');
-const resolution = new Resolution();
-
-function resolveCustomRecord(domain, record) {
-  resolution
-    .records(domain, [record])
-    .then((value) => console.log(`Domain ${domain} ${record} is: ${value}`))
-    .catch(console.error);
-}
-
-resolveCustomRecord('homecakes.crypto', 'custom.record.value');
-```
-
-### Command Line Interface
-
-CLI support was removed from the Resolution library starting from version 6.0. Please use the [standalone CLI tool](https://github.com/unstoppabledomains/resolution-cli).
-
-## Default Ethereum Providers
-
-The default [Infura](https://www.infura.io/) key provided is rate limited and should only be used for testing. For production applications, please bring your own Infura or Alchemy RPC URL to prevent downtime.
-
-## Custom Ethereum Provider configuration
+## Initialize with Custom Provider Configuration
 
 You may want to specify a custom provider:
  - if you want to use a dedicated blockchain node
@@ -163,40 +98,38 @@ Default provider can be changed by changing constructor options
 - `Resolution.fromEthersProvider()`
 - etc.
 
-To see all constructor options and factory methods check
-[Unstoppable API reference](https://unstoppabledomains.github.io/resolution).
-
-
 ```javascript
+
 const {default: Resolution} = require('@unstoppabledomains/resolution');
 
-const ethereumProviderUrl = ALCHEMY_ETHEREUM_API;
-const polygonProviderUrl = ALCHEMY_POLYGON_API;
-
-// custom provider config using the `Resolution` constructor options
+// obtain a key from https://www.infura.io
 const resolution = new Resolution({
-    sourceConfig: {
-      uns: {
-        locations: {
-          Layer1: {
-            url: ethereumProviderUrl,
-            network: 'mainnet'
-          },
-          Layer2: {
-            url: polygonProviderUrl,
-            network: 'polygon-mainnet',
-          },
+  sourceConfig: {
+    uns: {
+      locations: {
+        Layer1: {
+          url: "https://mainnet.infura.io/v3/<infura_api_key>",
+          network: 'mainnet'
+        },
+        Layer2: {
+          url: "https://polygon-mainnet.infura.io/v3/<infura_api_key>",
+          network: 'polygon-mainnet',
         },
       },
     },
-  });
+    zns: {
+      url: 'https://api.zilliqa.com',
+      network: 'mainnet',
+    },
+  },
+});
 ```
 
-## Autoconfiguration of blockchain network
+## Initialize with Autoconfiguration of blockchain network
 
-In some scenarios system might not be flexible enough to easily distinguish
-between various Ethereum testnets on compile time. For this case Resolution
-library provides a special async constructor which should be waited for
+In some scenarios system might not be flexible enough to easy distinguish
+between various Ethereum testnets at compilation time. In this case, Resolution
+library provide a special async constructor
 `await Resolution.autonetwork(options)`. This method makes a JSON RPC
 "net_version" call to the provider to get the network id.
 
@@ -210,6 +143,64 @@ await Resolution.autoNetwork({
 });
 ```
 
+### Examples
+
+To see all constructor options and factory methods check
+[Unstoppable API reference](https://unstoppabledomains.github.io/resolution).
+
+#### Look up a domain's crypto address
+
+```javascript
+
+function resolve(domain, currency) {
+  resolution
+    .addr(domain, currency)
+    .then((address) => console.log(domain, 'resolves to', address))
+    .catch(console.error);
+}
+
+resolve('brad.crypto', 'ETH');
+resolve('brad.zil', 'ZIL');
+```
+
+### Find the IPFS hash for a decentralized website
+
+Create a new file in your project, `ipfs_hash.js`.
+
+```javascript
+function resolveIpfsHash(domain) {
+  resolution
+    .ipfsHash(domain)
+    .then((hash) =>
+      console.log(
+        `You can access this website via a public IPFS gateway: https://gateway.ipfs.io/ipfs/${hash}`,
+      ),
+    )
+    .catch(console.error);
+}
+
+resolveIpfsHash('homecakes.crypto');
+```
+
+### Find a custom record
+
+Create a new file in your project, `custom-resolution.js`.
+
+```javascript
+function resolveCustomRecord(domain, record) {
+  resolution
+    .records(domain, [record])
+    .then((value) => console.log(`Domain ${domain} ${record} is: ${value}`))
+    .catch(console.error);
+}
+
+resolveCustomRecord('homecakes.crypto', 'custom.record.value');
+```
+
+### Command Line Interface
+
+CLI support was removed from the Resolution library starting from version 6.0. Please use the [standalone CLI tool](https://github.com/unstoppabledomains/resolution-cli).
+
 ## Error Handling
 
 When resolution encounters an error it returns the error code instead of
@@ -220,33 +211,27 @@ stopping the process. Keep an eye out for return values like `RECORD_NOT_FOUND`.
 Use these commands to set up a local development environment (**macOS Terminal**
 or **Linux shell**).
 
-1. Install `nvm`
+1. Recommended NodeJs version
 
-   ```bash
-   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-   ```
+* Node v16
 
-2. Install concrete version of `node.js`
-
-   ```bash
-   nvm install 16.15.0
-   ```
-
-3. Install `yarn`
-   ```bash
-   npm install -g yarn
-   ```
-4. Clone the repository
+2. Clone the repository
 
    ```bash
    git clone https://github.com/unstoppabledomains/resolution.git
    cd resolution
    ```
 
-5. Install dependencies
-   ```bash
-   yarn install
-   ```
+3. Install dependencies
+
+    ```bash
+    yarn install
+    ```
+    or
+
+    ```bash
+    npm install
+    ```
 
 ### Internal config
 
@@ -255,6 +240,17 @@ or **Linux shell**).
 - Network config: `$ yarn network-config:pull`
 - Resolver keys: `$ yarn resolver-keys:pull`
 - Both configs: `$ yarn config:pull`
+
+#### Unit tests:
+
+Resolution library relies on environment variables to load **TestNet** RPC Urls. This way, our keys don't expose directly to the code. These environment variables are:
+
+* L1_TEST_NET_RPC_URL
+* L1_TEST_NET_RPC_WSS_URL
+* L2_TEST_NET_RPC_URL
+* L2_TEST_NET_RPC_WSS_URL
+
+In order to validate the code change, copy `.env.example` file change the name to `.env`. Then, update the values of variables. 
 
 ## Free advertising for integrated apps
 

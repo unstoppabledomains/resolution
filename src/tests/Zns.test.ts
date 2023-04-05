@@ -1,5 +1,7 @@
 import Resolution, {ResolutionErrorCode} from '../index';
 import {
+  getUnsProtocolLinkFromEnv,
+  ProviderProtocol,
   mockAsyncMethod,
   expectSpyToBeCalled,
   expectResolutionErrorCode,
@@ -22,6 +24,18 @@ describe('ZNS', () => {
     jest.restoreAllMocks();
     resolution = new Resolution({
       sourceConfig: {
+        uns: {
+          locations: {
+            Layer1: {
+              url: getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
+              network: 'goerli',
+            },
+            Layer2: {
+              url: getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
+              network: 'polygon-mumbai',
+            },
+          },
+        },
         zns: {
           network: 'testnet',
         },
@@ -45,6 +59,18 @@ describe('ZNS', () => {
     it('checks normalizeSource zns (object) #1', async () => {
       const resolution = new Resolution({
         sourceConfig: {
+          uns: {
+            locations: {
+              Layer1: {
+                url: getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
+                network: 'goerli',
+              },
+              Layer2: {
+                url: getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
+                network: 'polygon-mumbai',
+              },
+            },
+          },
           zns: {url: 'https://dev-api.zilliqa.com', network: 'testnet'},
         },
       });
@@ -56,6 +82,18 @@ describe('ZNS', () => {
     it('checks normalizeSource zns (object) #3', async () => {
       const resolution = new Resolution({
         sourceConfig: {
+          uns: {
+            locations: {
+              Layer1: {
+                url: getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
+                network: 'goerli',
+              },
+              Layer2: {
+                url: getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
+                network: 'polygon-mumbai',
+              },
+            },
+          },
           zns: {url: 'https://dev-api.zilliqa.com', network: 'testnet'},
         },
       });
@@ -67,6 +105,18 @@ describe('ZNS', () => {
     it('checks normalizeSource zns (object) #4', async () => {
       const resolution = new Resolution({
         sourceConfig: {
+          uns: {
+            locations: {
+              Layer1: {
+                url: getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
+                network: 'goerli',
+              },
+              Layer2: {
+                url: getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
+                network: 'polygon-mumbai',
+              },
+            },
+          },
           zns: {url: 'https://dev-api.zilliqa.com', network: 'testnet'},
         },
       });
@@ -79,7 +129,27 @@ describe('ZNS', () => {
       expect(
         () =>
           new Resolution({
-            sourceConfig: {zns: {network: '42'}},
+            sourceConfig: {
+              uns: {
+                locations: {
+                  Layer1: {
+                    url: getUnsProtocolLinkFromEnv(
+                      ProviderProtocol.http,
+                      'UNSL1',
+                    ),
+                    network: 'goerli',
+                  },
+                  Layer2: {
+                    url: getUnsProtocolLinkFromEnv(
+                      ProviderProtocol.http,
+                      'UNSL2',
+                    ),
+                    network: 'polygon-mumbai',
+                  },
+                },
+              },
+              zns: {network: '42'},
+            },
           }),
       ).toThrowError(
         'Missing configuration in Resolution ZNS. Please specify registryAddress when using a custom network',
@@ -91,6 +161,24 @@ describe('ZNS', () => {
         () =>
           new Resolution({
             sourceConfig: {
+              uns: {
+                locations: {
+                  Layer1: {
+                    url: getUnsProtocolLinkFromEnv(
+                      ProviderProtocol.http,
+                      'UNSL1',
+                    ),
+                    network: 'goerli',
+                  },
+                  Layer2: {
+                    url: getUnsProtocolLinkFromEnv(
+                      ProviderProtocol.http,
+                      'UNSL2',
+                    ),
+                    network: 'polygon-mumbai',
+                  },
+                },
+              },
               zns: {
                 network: 'random-network',
                 url: 'https://dev-api.zilliqa.com',
@@ -105,6 +193,18 @@ describe('ZNS', () => {
     it('checks normalizeSource zns (object) #7.1', async () => {
       const validResolution = new Resolution({
         sourceConfig: {
+          uns: {
+            locations: {
+              Layer1: {
+                url: getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
+                network: 'goerli',
+              },
+              Layer2: {
+                url: getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
+                network: 'polygon-mumbai',
+              },
+            },
+          },
           zns: {
             network: 'random-network',
             url: 'https://dev-api.zilliqa.com',
@@ -120,6 +220,24 @@ describe('ZNS', () => {
         () =>
           new Resolution({
             sourceConfig: {
+              uns: {
+                locations: {
+                  Layer1: {
+                    url: getUnsProtocolLinkFromEnv(
+                      ProviderProtocol.http,
+                      'UNSL1',
+                    ),
+                    network: 'goerli',
+                  },
+                  Layer2: {
+                    url: getUnsProtocolLinkFromEnv(
+                      ProviderProtocol.http,
+                      'UNSL2',
+                    ),
+                    network: 'polygon-mumbai',
+                  },
+                },
+              },
               zns: {
                 network: 'random-network',
                 registryAddress: '0x0123123',
@@ -135,6 +253,24 @@ describe('ZNS', () => {
         () =>
           new Resolution({
             sourceConfig: {
+              uns: {
+                locations: {
+                  Layer1: {
+                    url: getUnsProtocolLinkFromEnv(
+                      ProviderProtocol.http,
+                      'UNSL1',
+                    ),
+                    network: 'goerli',
+                  },
+                  Layer2: {
+                    url: getUnsProtocolLinkFromEnv(
+                      ProviderProtocol.http,
+                      'UNSL2',
+                    ),
+                    network: 'polygon-mumbai',
+                  },
+                },
+              },
               zns: {
                 network: 'random-network',
                 url: 'example.com',
@@ -148,7 +284,21 @@ describe('ZNS', () => {
 
     it('checks normalizeSource zns (object) #8', async () => {
       const resolution = new Resolution({
-        sourceConfig: {zns: {network: 'testnet'}},
+        sourceConfig: {
+          uns: {
+            locations: {
+              Layer1: {
+                url: getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
+                network: 'goerli',
+              },
+              Layer2: {
+                url: getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
+                network: 'polygon-mumbai',
+              },
+            },
+          },
+          zns: {network: 'testnet'},
+        },
       });
       zns = resolution.serviceMap[NamingServiceName.ZNS].native as Zns;
       expect(zns.network).toBe(333);
@@ -158,6 +308,18 @@ describe('ZNS', () => {
     it('checks normalizeSource zns (object) #10', async () => {
       const resolution = new Resolution({
         sourceConfig: {
+          uns: {
+            locations: {
+              Layer1: {
+                url: getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
+                network: 'goerli',
+              },
+              Layer2: {
+                url: getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
+                network: 'polygon-mumbai',
+              },
+            },
+          },
           zns: {
             registryAddress: 'zil1hyj6m5w4atcn7s806s69r0uh5g4t84e8gp6nps',
             network: 'testnet',
@@ -175,6 +337,18 @@ describe('ZNS', () => {
     it('checks normalizeSource zns (object) #11', async () => {
       const resolution = new Resolution({
         sourceConfig: {
+          uns: {
+            locations: {
+              Layer1: {
+                url: getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
+                network: 'goerli',
+              },
+              Layer2: {
+                url: getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
+                network: 'polygon-mumbai',
+              },
+            },
+          },
           zns: {
             registryAddress: '0xb925add1d5eaf13f40efd43451bf97a22ab3d727',
             network: 'testnet',
