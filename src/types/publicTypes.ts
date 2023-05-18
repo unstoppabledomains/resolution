@@ -250,8 +250,11 @@ export type TokenUriMetadataAttribute =
     };
 
 export interface TokenUriMetadata extends Erc721Metadata {
+  tokenId?: string;
+  namehash?: string;
   external_link?: string;
   image_data?: string;
+  image_url?: string;
   attributes?: Array<TokenUriMetadataAttribute>;
   background_color?: string;
   animation_url?: string;
