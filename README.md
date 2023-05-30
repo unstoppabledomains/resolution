@@ -62,7 +62,7 @@ npm update @unstoppabledomains/resolution --save
 ```javascript
 const {default: Resolution} = require('@unstoppabledomains/resolution');
 
-// obtain a key from https://unstoppabledomains.com/partner-api-dashboard if you are a partner
+// obtain a key by following this document https://docs.unstoppabledomains.com/domain-distribution-and-management/quickstart/retrieve-an-api-key/#api-key
 const resolution = new Resolution({ apiKey: "<api_key>" });
 ```
 
