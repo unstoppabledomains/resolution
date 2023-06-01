@@ -554,6 +554,23 @@ export default class Resolution {
 
   /**
    * @param domain - domain name
+   * @param network - network name
+   * @param token - token ticker
+   * @returns An owner address of the domain
+   */
+  async getAddress(
+    domain: string,
+    network: string,
+    token: string,
+  ): Promise<string | null> {
+    domain = prepareAndValidateDomain(domain);
+    return this.callServiceForDomain(domain, (service) =>
+      service.getAddress(domain, network, token),
+    );
+  }
+
+  /**
+   * @param domain - domain name
    * @param recordKey - a name of a record to be resolved
    * @returns A record value promise for a given record name
    */
@@ -702,19 +719,6 @@ export default class Resolution {
         throwIfUnsupportedDomain: false,
         expectedValue: true,
       },
-    );
-  }
-
-  /**
-   * Returns all record keys of the domain.
-   * This method is strongly unrecommended for production use due to lack of support for many ethereum service providers and low performance
-   * @param domain - domain name
-   * @deprecated
-   */
-  async allRecords(domain: string): Promise<CryptoRecords> {
-    domain = prepareAndValidateDomain(domain);
-    return this.callServiceForDomain(domain, (service) =>
-      service.allRecords(domain),
     );
   }
 

@@ -390,6 +390,47 @@ export default class Uns extends NamingService {
     return null;
   }
 
+  async getAddress(
+    domain: string,
+    network: string,
+    token: string,
+  ): Promise<string | null> {
+    const [resultOrErrorL1, resultOrErrorL2] = await Promise.all([
+      this.unsl1.getAddress(domain, network, token).catch((err) => err),
+      this.unsl2.getAddress(domain, network, token).catch((err) => err),
+    ]);
+
+    const addressL1 = () => {
+      validResultOrThrow(resultOrErrorL1);
+      if (resultOrErrorL1 !== '') {
+        return resultOrErrorL1;
+      } else {
+        return null;
+      }
+    };
+
+    const addressL2 = () => {
+      validResultOrThrow(resultOrErrorL2);
+      if (resultOrErrorL2 !== '') {
+        return resultOrErrorL2;
+      } else {
+        return null;
+      }
+    };
+
+    const reversedL1 = addressL1();
+    if (reversedL1) {
+      return reversedL1;
+    }
+
+    const reversedL2 = addressL2();
+    if (reversedL2) {
+      return reversedL2;
+    }
+
+    return null;
+  }
+
   async getDomainFromTokenId(tokenId: string): Promise<string> {
     const metadata = await this.getMetadata(tokenId);
     if (this.namehash(metadata.name) !== tokenId) {

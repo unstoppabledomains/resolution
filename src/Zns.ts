@@ -134,6 +134,16 @@ export default class Zns extends NamingService {
     return record;
   }
 
+  async getAddress(
+    _domain: string,
+    _network: string,
+    _token: string,
+  ): Promise<string | null> {
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+      methodName: 'isSupportedDomain',
+    });
+  }
+
   async records(domain: string, keys: string[]): Promise<CryptoRecords> {
     const records = await this.allRecords(domain);
     return constructRecords(keys, records);

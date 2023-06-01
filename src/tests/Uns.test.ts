@@ -1139,7 +1139,7 @@ describe('UNS', () => {
             properties: {records},
           }),
         });
-        const endpoint = 'https://resolve.unstoppabledomains.com/metadata/';
+        const endpoint = 'https://api.unstoppabledomains.com/metadata/';
 
         mockAsyncMethod(uns, 'getTokenUri', endpoint);
         const result = await uns.allRecords(CryptoDomainWithAllRecords);
@@ -1182,48 +1182,12 @@ describe('UNS', () => {
             properties: {records},
           }),
         });
-        const endpoint = 'https://resolve.unstoppabledomains.com/metadata/';
+        const endpoint = 'https://api.unstoppabledomains.com/metadata/';
 
         mockAsyncMethod(uns, 'getTokenUri', endpoint);
         const result = await uns.allRecords(CryptoDomainWithAllRecords);
         expect(result).toMatchObject(records);
       });
-
-      skipItInLive(
-        'should return all records for an L2 .zil domain',
-        async () => {
-          const records = {
-            'crypto.XRP.address': 'rMXToC1316oNyqwgQpWgSrzMUU9R6UDizW',
-            'crypto.ZIL.address': 'zil1xftz4cd425mer6jxmtl29l28xr0zu8s5hnp9he',
-            'dns.A': '["10.0.0.1","10.0.0.3"]',
-            'dns.A.ttl': '98',
-            'dns.AAAA': '[]',
-            'dns.ttl': '128',
-            'ipfs.html.value': 'QmQ38zzQHVfqMoLWq2VeiMLHHYki9XktzXxLYTWXt8cydu',
-            'ipfs.redirect_domain.value': 'google.com',
-            'whois.email.value': 'johnny@unstoppabledomains.com',
-          };
-          const unsSpy = mockAsyncMethod(uns, 'get', {
-            owner: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
-            resolver: '0x878bC2f3f717766ab69C0A5f9A6144931E61AEd3',
-            records: records,
-            location: UnsLocation.Layer1,
-          });
-          mockAsyncMethod(Networking, 'fetch', {
-            ok: true,
-            json: () => ({
-              name: ZilDomainWithAllRecords,
-              properties: {records},
-            }),
-          });
-          const endpoint = 'https://resolve.unstoppabledomains.com/metadata/';
-          mockAsyncMethod(uns, 'getTokenUri', endpoint);
-          const znsSpy = mockAsyncMethod(zns, 'getRecordsAddresses', undefined);
-          const result = await resolution.allRecords(ZilDomainWithAllRecords);
-          expect(result).toMatchObject(records);
-          expectSpyToBeCalled([unsSpy, znsSpy]);
-        },
-      );
     });
 
     describe('.registryAddress', () => {
@@ -1705,7 +1669,7 @@ describe('UNS', () => {
               name: testMeta.name,
             }),
           });
-          const endpoint = 'https://resolve.unstoppabledomains.com/metadata/';
+          const endpoint = 'https://api.unstoppabledomains.com/metadata/';
 
           mockAsyncMethod(uns, 'getTokenUri', endpoint);
           const domain = await resolution.unhash(
@@ -1722,7 +1686,7 @@ describe('UNS', () => {
               name: testMeta.name,
             }),
           });
-          const endpoint = 'https://resolve.unstoppabledomains.com/metadata/';
+          const endpoint = 'https://api.unstoppabledomains.com/metadata/';
 
           mockAsyncMethod(uns, 'getTokenUri', endpoint);
           const domain = await resolution.unhash(
@@ -1812,7 +1776,7 @@ describe('UNS', () => {
                 name: 'invalid-domain.crypto',
               }),
             });
-            const endpoint = 'https://resolve.unstoppabledomains.com/metadata/';
+            const endpoint = 'https://api.unstoppabledomains.com/metadata/';
 
             mockAsyncMethod(uns, 'getTokenUri', endpoint);
             await expect(
@@ -1844,6 +1808,60 @@ describe('UNS', () => {
             );
           },
         );
+      });
+    });
+
+    describe('.getAddress', () => {
+      it('should return null', async () => {
+        const spies = mockAsyncMethods(uns.unsl1.readerContract, {
+          call: [''],
+        });
+        const spies2 = mockAsyncMethods(uns.unsl2.readerContract, {
+          call: [''],
+        });
+        const address = await uns.getAddress('brad.crypto', 'ETH', 'ETH');
+        expectSpyToBeCalled(spies);
+        expectSpyToBeCalled(spies2);
+        expect(address).toBe(null);
+      });
+
+      it('should return an address from L1', async () => {
+        const spies = mockAsyncMethods(uns.unsl1.readerContract, {
+          call: ['0x8aaD44321A86b170879d7A244c1e8d360c99DdA8'],
+        });
+        const spies2 = mockAsyncMethods(uns.unsl2.readerContract, {
+          call: [''],
+        });
+        const address = await uns.getAddress('brad.crypto', 'ETH', 'ETH');
+        expectSpyToBeCalled(spies);
+        expectSpyToBeCalled(spies2);
+        expect(address).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
+      });
+
+      it('should return an address from L2', async () => {
+        const spies = mockAsyncMethods(uns.unsl1.readerContract, {
+          call: [''],
+        });
+        const spies2 = mockAsyncMethods(uns.unsl2.readerContract, {
+          call: ['0x8aaD44321A86b170879d7A244c1e8d360c99DdA8'],
+        });
+        const address = await uns.getAddress('brad.crypto', 'ETH', 'ETH');
+        expectSpyToBeCalled(spies);
+        expectSpyToBeCalled(spies2);
+        expect(address).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
+      });
+
+      it('should not throw error', async () => {
+        const spies = mockAsyncMethods(uns.unsl1.readerContract, {
+          call: [''],
+        });
+        const spies2 = mockAsyncMethods(uns.unsl2.readerContract, {
+          call: ['0x8aaD44321A86b170879d7A244c1e8d360c99DdA8'],
+        });
+        const address = await uns.getAddress('brad.crypto', 'ETH', 'ETH');
+        expectSpyToBeCalled(spies);
+        expectSpyToBeCalled(spies2);
+        expect(address).toBe('0x8aaD44321A86b170879d7A244c1e8d360c99DdA8');
       });
     });
   });

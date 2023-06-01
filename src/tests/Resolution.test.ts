@@ -1668,10 +1668,6 @@ describe('Resolution', () => {
         () => resolution.isSupportedDomain('hello#blockchain'),
         ResolutionErrorCode.InvalidDomainAddress,
       );
-      await expectResolutionErrorCode(
-        () => resolution.allRecords('hello#blockchain'),
-        ResolutionErrorCode.InvalidDomainAddress,
-      );
     });
   });
 

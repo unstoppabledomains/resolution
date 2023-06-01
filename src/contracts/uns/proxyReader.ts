@@ -1,19 +1,61 @@
 export default [
   {
+    anonymous: false,
     inputs: [
       {
-        internalType: 'contract IUNSRegistry',
-        name: 'unsRegistry',
+        indexed: false,
+        internalType: 'uint8',
+        name: 'version',
+        type: 'uint8',
+      },
+    ],
+    name: 'Initialized',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'previousOwner',
         type: 'address',
       },
       {
-        internalType: 'contract ICNSRegistry',
-        name: 'cnsRegistry',
+        indexed: true,
+        internalType: 'address',
+        name: 'newOwner',
         type: 'address',
       },
     ],
-    stateMutability: 'nonpayable',
-    type: 'constructor',
+    name: 'OwnershipTransferred',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'tokenKey',
+        type: 'string',
+      },
+    ],
+    name: 'SetLegacyRecords',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'network',
+        type: 'string',
+      },
+    ],
+    name: 'SetNetworkFamily',
+    type: 'event',
   },
   {
     inputs: [],
@@ -44,36 +86,66 @@ export default [
   {
     inputs: [
       {
+        internalType: 'string[]',
+        name: 'networks',
+        type: 'string[]',
+      },
+      {
+        internalType: 'string[]',
+        name: 'families',
+        type: 'string[]',
+      },
+    ],
+    name: 'addBlockchainNetworks',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'string[]',
+        name: 'networks',
+        type: 'string[]',
+      },
+      {
+        internalType: 'string',
+        name: 'family',
+        type: 'string',
+      },
+    ],
+    name: 'addBlockchainNetworks',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'string[]',
+        name: 'keys',
+        type: 'string[]',
+      },
+      {
+        internalType: 'string[][]',
+        name: 'legacyKeys',
+        type: 'string[][]',
+      },
+    ],
+    name: 'addLegacyRecords',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
         internalType: 'address',
         name: 'owner',
         type: 'address',
       },
     ],
     name: 'balanceOf',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: 'tokenId',
-        type: 'uint256',
-      },
-      {
-        internalType: 'string',
-        name: 'label',
-        type: 'string',
-      },
-    ],
-    name: 'childIdOf',
     outputs: [
       {
         internalType: 'uint256',
@@ -122,6 +194,88 @@ export default [
         internalType: 'string',
         name: 'value',
         type: 'string',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'string',
+        name: 'network',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: 'token',
+        type: 'string',
+      },
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    name: 'getAddress',
+    outputs: [
+      {
+        internalType: 'string',
+        name: 'addr',
+        type: 'string',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'string',
+        name: 'network',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: 'token',
+        type: 'string',
+      },
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    name: 'getAddressKey',
+    outputs: [
+      {
+        internalType: 'string',
+        name: 'key',
+        type: 'string',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'string',
+        name: 'network',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: 'token',
+        type: 'string',
+      },
+    ],
+    name: 'getAddressKeys',
+    outputs: [
+      {
+        internalType: 'string[]',
+        name: 'keys',
+        type: 'string[]',
       },
     ],
     stateMutability: 'view',
@@ -377,6 +531,24 @@ export default [
   {
     inputs: [
       {
+        internalType: 'contract IUNSRegistry',
+        name: 'unsRegistry',
+        type: 'address',
+      },
+      {
+        internalType: 'contract ICNSRegistry',
+        name: 'cnsRegistry',
+        type: 'address',
+      },
+    ],
+    name: 'initialize',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
         internalType: 'address',
         name: '',
         type: 'address',
@@ -444,6 +616,38 @@ export default [
   {
     inputs: [
       {
+        internalType: 'string[]',
+        name: 'labels',
+        type: 'string[]',
+      },
+    ],
+    name: 'namehash',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'owner',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
         internalType: 'uint256',
         name: 'tokenId',
         type: 'uint256',
@@ -499,6 +703,13 @@ export default [
     type: 'function',
   },
   {
+    inputs: [],
+    name: 'renounceOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
     inputs: [
       {
         internalType: 'uint256',
@@ -515,6 +726,57 @@ export default [
       },
     ],
     stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'addr',
+        type: 'address',
+      },
+    ],
+    name: 'reverseNameOf',
+    outputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'addr',
+        type: 'address',
+      },
+    ],
+    name: 'reverseOf',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'addr',
+        type: 'address',
+      },
+    ],
+    name: 'setOwner',
+    outputs: [],
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
@@ -555,12 +817,17 @@ export default [
     stateMutability: 'view',
     type: 'function',
   },
-
   {
-    inputs: [{internalType: 'address', name: 'addr', type: 'address'}],
-    name: 'reverseOf',
-    outputs: [{internalType: 'uint256', name: '', type: 'uint256'}],
-    stateMutability: 'view',
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'newOwner',
+        type: 'address',
+      },
+    ],
+    name: 'transferOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
     type: 'function',
   },
 ];

@@ -374,77 +374,6 @@ describe('ZNS', () => {
   });
 
   describe('.Resolve', () => {
-    it('resolves .zil name using ZNS', async () => {
-      const unsSpy = mockAsyncMethod(uns, 'allRecords', () => {
-        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
-      });
-      const znsEyes = mockAsyncMethods(zns, {
-        getRecordsAddresses: [
-          'zil1ye72zl5t8wl5n3f2fsa5w0x7hja0jqj7mhct23',
-          '0xb17c35e557a8c13a730696c92d716a58421e36ca',
-        ],
-        getResolverRecords: {
-          'crypto.BTC.address': '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB',
-          'crypto.ETH.address': '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
-        },
-      });
-      const result = await resolution.allRecords('testing.zil');
-      expectSpyToBeCalled([unsSpy, ...znsEyes]);
-      expect(result).toBeDefined();
-      expect(result['crypto.ETH.address']).toEqual(
-        '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
-      );
-      expect(result['crypto.BTC.address']).toEqual(
-        '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB',
-      );
-    });
-
-    it('resolves domain using ZNS #2', async () => {
-      const unsSpy = mockAsyncMethod(uns, 'allRecords', async () => {
-        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
-      });
-      const spies = mockAsyncMethods(zns, {
-        getRecordsAddresses: [
-          'zil1zzpjwyp2nu29pcv3sh04qxq9x5l45vke0hrwec',
-          '0x3f329078d95f043fd902d5c3ea2fbce0b3fca003',
-        ],
-        getResolverRecords: {
-          'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
-          'whois.email.value': 'derainberk@gmail.com',
-          'crypto.BCH.address': 'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6',
-          'crypto.BTC.address': '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB',
-          'crypto.ETH.address': '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
-          'crypto.LTC.address': 'LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL',
-          'crypto.XMR.address':
-            '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d',
-          'crypto.ZEC.address': 't1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV',
-          'crypto.ZIL.address': 'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
-          'crypto.DASH.address': 'XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j',
-          'ipfs.redirect_domain.value': 'www.unstoppabledomains.com',
-          'crypto.USDT.version.ERC20.address':
-            '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
-        },
-      });
-      const result = await resolution.allRecords('testing.zil');
-      expectSpyToBeCalled([unsSpy, ...spies]);
-      expect(result).toEqual({
-        'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
-        'whois.email.value': 'derainberk@gmail.com',
-        'crypto.BCH.address': 'qrq4sk49ayvepqz7j7ep8x4km2qp8lauvcnzhveyu6',
-        'crypto.BTC.address': '1EVt92qQnaLDcmVFtHivRJaunG2mf2C3mB',
-        'crypto.ETH.address': '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
-        'crypto.LTC.address': 'LetmswTW3b7dgJ46mXuiXMUY17XbK29UmL',
-        'crypto.XMR.address':
-          '447d7TVFkoQ57k3jm3wGKoEAkfEym59mK96Xw5yWamDNFGaLKW5wL2qK5RMTDKGSvYfQYVN7dLSrLdkwtKH3hwbSCQCu26d',
-        'crypto.ZEC.address': 't1h7ttmQvWCSH1wfrcmvT4mZJfGw2DgCSqV',
-        'crypto.ZIL.address': 'zil1yu5u4hegy9v3xgluweg4en54zm8f8auwxu0xxj',
-        'crypto.DASH.address': 'XnixreEBqFuSLnDSLNbfqMH1GsZk7cgW4j',
-        'ipfs.redirect_domain.value': 'www.unstoppabledomains.com',
-        'crypto.USDT.version.ERC20.address':
-          '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
-      });
-    });
-
     it('should return a valid resolver address', async () => {
       const unsSpy = mockAsyncMethod(uns, 'resolver', async () => {
         throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
@@ -651,32 +580,6 @@ describe('ZNS', () => {
       const httpUrl = await resolution.httpUrl('testing.zil');
       expectSpyToBeCalled([unsSpy, eye, secondEye]);
       expect(httpUrl).toBe('www.unstoppabledomains.com');
-    });
-
-    it('should return all records for zil domain', async () => {
-      const unsSpy = mockAsyncMethod(uns, 'allRecords', async () => {
-        throw new ResolutionError(ResolutionErrorCode.UnregisteredDomain);
-      });
-      const eye = mockAsyncMethod(zns, 'getContractMapValue', {
-        argtypes: [],
-        arguments: [
-          '0xcea21f5a6afc11b3a4ef82e986d63b8b050b6910',
-          '0x34bbdee3404138430c76c2d1b2d4a2d223a896df',
-        ],
-        constructor: 'Record',
-      });
-      const secondEye = mockAsyncMethod(zns, 'getResolverRecords', {
-        'crypto.ETH.address': '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
-        'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
-        'whois.email.value': 'derainberk@gmail.com',
-      });
-      const records = await resolution.allRecords('testing.zil');
-      expectSpyToBeCalled([unsSpy, eye, secondEye]);
-      expect(records).toMatchObject({
-        'crypto.ETH.address': '0x45b31e01AA6f42F0549aD482BE81635ED3149abb',
-        'ipfs.html.value': 'QmVaAtQbi3EtsfpKoLzALm6vXphdi2KjMgxEDKeGg6wHuK',
-        'whois.email.value': 'derainberk@gmail.com',
-      });
     });
   });
 

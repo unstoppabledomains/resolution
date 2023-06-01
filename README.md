@@ -23,7 +23,7 @@ and IPFS hashes for
 Resolution is primarily built and maintained by
 [Unstoppable Domains](https://unstoppabledomains.com/).
 
-Resolution supports different decentralized domains. Please, refer to the [Top Level Domains List](https://resolve.unstoppabledomains.com/supported_tlds)
+Resolution supports different decentralized domains. Please, refer to the [Top Level Domains List](https://api.unstoppabledomains.com/resolve/supported_tlds)
 
 For more information, see our detailed
 [API Reference](https://unstoppabledomains.github.io/resolution/).
