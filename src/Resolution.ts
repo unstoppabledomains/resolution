@@ -722,6 +722,19 @@ export default class Resolution {
     );
   }
 
+  /**
+   * Returns all record keys of the domain.
+   * This method is strongly unrecommended for production use due to lack of support for many ethereum service providers and low performance
+   * @param domain - domain name
+   * @deprecated
+   */
+  async allRecords(domain: string): Promise<CryptoRecords> {
+    domain = prepareAndValidateDomain(domain);
+    return this.callServiceForDomain(domain, (service) =>
+      service.allRecords(domain),
+    );
+  }
+
   async dns(domain: string, types: DnsRecordType[]): Promise<DnsRecord[]> {
     const dnsUtils = new DnsUtils();
     domain = prepareAndValidateDomain(domain);

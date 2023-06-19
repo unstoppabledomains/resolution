@@ -64,11 +64,11 @@ export default class UnsInternal {
     network: string,
     token: string,
   ): Promise<{string}> {
-    console.log('data', domain, network, token);
+    const tokenId = this.namehash(domain);
     const [addr] = await this.readerContract.call('getAddress', [
       network,
       token,
-      this.namehash(domain),
+      tokenId,
     ]);
 
     return addr;
