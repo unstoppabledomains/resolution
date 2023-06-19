@@ -395,6 +395,8 @@ export default class Uns extends NamingService {
     network: string,
     token: string,
   ): Promise<string | null> {
+    network = network.toUpperCase();
+    token = token.toUpperCase();
     const [resultOrErrorL1, resultOrErrorL2] = await Promise.all([
       this.unsl1.getAddress(domain, network, token).catch((err) => err),
       this.unsl2.getAddress(domain, network, token).catch((err) => err),
