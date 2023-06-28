@@ -220,6 +220,29 @@ getWalletAddr('homecakes.crypto', 'ETH');
 // Domain homecakes.crypto has address for ETH: 0xe7474D07fD2FA286e7e0aa23cd107F8379085037
 ```
 
+**Resolve multi-chain address format (similar to **`multiChainAddr`** API)**
+
+This API is used to retrieve wallet address for multi-chain address records.
+(See
+[multi-chain currency](https://docs.unstoppabledomains.com/resolution/guides/records-reference/#multi-chain-currencies))
+
+With `aaron.x` has `crypto.AAVE.version.ERC20.address` on-chain:
+
+```javascript
+function getMultiChainWalletAddr(domain, ticker, network) {
+  resolution
+    .multiChainAddr(domain, ticker, network)
+    .then((address) =>
+      console.log(
+        `Domain ${domain} has address for ${ticker} on network ${network}: ${address}`,
+      ),
+    )
+    .catch(console.error);
+}
+getMultiChainWalletAddr('aaron.x', 'AAVE', 'ETH');
+// Domain aaron.x has address for AAVE on network ETH: 0xCD0DAdAb45bAF9a06ce1279D1342EcC3F44845af
+```
+
 ### Resolve wallet address using `getAddress`
 
 This (beta) API can be used to resolve different formats
@@ -262,8 +285,8 @@ getWalletAddress('aaron.x', 'ETH', 'AAVE');
 family.**
 
 The API can also be used by crypto exchanges to infer wallet addresses. In
-centralized exchanges, users have same wallet addresses on different networks with same
-wallet family.
+centralized exchanges, users have same wallet addresses on different networks
+with same wallet family.
 
 With `blockchain-family-keys.x` only has `token.EVM.address` record on-chain.
 The API resolves to same wallet address for tokens live on EVM compatible
@@ -280,7 +303,7 @@ getWalletAddress('blockchain-family-keys.x', 'AVAX', 'USDT');
 // Domain blockchain-family-keys.x has address for USDT on AVAX: 0xCD0DAdAb45bAF9a06ce1279D1342EcC3F44845af
 ```
 
-with `uns-devtest-nickshatilo-withdraw-test2.x` only has `token.EVM.ETH.address`
+With `uns-devtest-nickshatilo-withdraw-test2.x` only has `token.EVM.ETH.address`
 record on chain. The API resolves to the same wallet address for tokens
 specifically on Ethereum network.
 
@@ -299,7 +322,7 @@ getWalletAddress('uns-devtest-nickshatilo-withdraw-test2.x', 'MATIC', 'USDT');
 ```
 
 The API is compatible with other address formats. If a domain has multiple
-address formats, it will follow the algorithm described as follow:
+address formats set, it will follow the algorithm described as follow:
 
 if a domain has following records set:
 
