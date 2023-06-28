@@ -205,21 +205,22 @@ This API is used to retrieve wallet address for single address record. (See
 [Cryptocurrency payment](https://docs.unstoppabledomains.com/resolution/guides/records-reference/#cryptocurrency-payments)
 section for the record format)
 
-```javascript
-// homecakes.crypto has `crypto.ETH.address` set to 0xe7474D07fD2FA286e7e0aa23cd107F8379085037
+With `homecakes.crypto` has `crypto.ETH.address` on-chain:
 
+```javascript
 function getWalletAddr(domain, ticker) {
   resolution
     .addr(domain, ticker)
     .then((address) =>
-      console.log(`Domain ${domain} has address for ${ticker} is: ${address}`),
+      console.log(`Domain ${domain} has address for ${ticker}: ${address}`),
     )
     .catch(console.error);
 }
 getWalletAddr('homecakes.crypto', 'ETH');
+// Domain homecakes.crypto has address for ETH: 0xe7474D07fD2FA286e7e0aa23cd107F8379085037
 ```
 
-### Resolve wallet address using `getAddr`
+### Resolve wallet address using `getAddress`
 
 This (beta) API can be used to resolve different formats
 
@@ -229,7 +230,7 @@ function getWalletAddress(domain, network, token) {
     .getAddress(domain, network, token)
     .then((address) =>
       console.log(
-        `Domain ${domain} has address for ${token} on ${network} is: ${address}`,
+        `Domain ${domain} has address for ${token} on ${network}: ${address}`,
       ),
     )
     .catch(console.error);
@@ -242,7 +243,7 @@ With `homecakes.crypto` has a `crypto.ETH.address` record set on-chain:
 
 ```javascript
 getWalletAddress('homecakes.crypto', 'ETH', 'ETH');
-// Domain homecakes.crypto has address for ETH on ETH is: 0xe7474D07fD2FA286e7e0aa23cd107F8379085037
+// Domain homecakes.crypto has address for ETH on ETH: 0xe7474D07fD2FA286e7e0aa23cd107F8379085037
 ```
 
 **Resolve multi-chain currency address format (See
@@ -254,29 +255,29 @@ on `ETH` network:
 
 ```javascript
 getWalletAddress('aaron.x', 'ETH', 'AAVE');
-// Domain aaron.x has address for AAVE on ETH is: 0xCD0DAdAb45bAF9a06ce1279D1342EcC3F44845af
+// Domain aaron.x has address for AAVE on ETH: 0xCD0DAdAb45bAF9a06ce1279D1342EcC3F44845af
 ```
 
 **Derive wallet addresses within the same blockchain network and blockchain
 family.**
 
-This can be used by crypto exchange (CEX) to infer wallet addresses. In
-centralized exchanges, users have same wallet addresses on blockchains with same
+The API can also be used by crypto exchanges to infer wallet addresses. In
+centralized exchanges, users have same wallet addresses on different networks with same
 wallet family.
 
-with `blockchain-family-keys.x` only has `token.EVM.address` record on-chain.
+With `blockchain-family-keys.x` only has `token.EVM.address` record on-chain.
 The API resolves to same wallet address for tokens live on EVM compatible
 networks.
 
 ```javascript
 getWalletAddress('blockchain-family-keys.x', 'ETH', 'AAVE');
-// Domain blockchain-family-keys.x has address for AAVE on ETH is: 0xCD0DAdAb45bAF9a06ce1279D1342EcC3F44845af
+// Domain blockchain-family-keys.x has address for AAVE on ETH: 0xCD0DAdAb45bAF9a06ce1279D1342EcC3F44845af
 
 getWalletAddress('blockchain-family-keys.x', 'ETH', 'ETH');
-// Domain blockchain-family-keys.x has address for ETH on ETH is: 0xCD0DAdAb45bAF9a06ce1279D1342EcC3F44845af
+// Domain blockchain-family-keys.x has address for ETH on ETH: 0xCD0DAdAb45bAF9a06ce1279D1342EcC3F44845af
 
 getWalletAddress('blockchain-family-keys.x', 'AVAX', 'USDT');
-// Domain blockchain-family-keys.x has address for USDT on AVAX is: 0xCD0DAdAb45bAF9a06ce1279D1342EcC3F44845af
+// Domain blockchain-family-keys.x has address for USDT on AVAX: 0xCD0DAdAb45bAF9a06ce1279D1342EcC3F44845af
 ```
 
 with `uns-devtest-nickshatilo-withdraw-test2.x` only has `token.EVM.ETH.address`
@@ -285,13 +286,13 @@ specifically on Ethereum network.
 
 ```javascript
 getWalletAddress('uns-devtest-nickshatilo-withdraw-test2.x', 'ETH', 'AAVE');
-// Domain blockchain-family-keys.x has address for AAVE on ETH is: 0xCD0DAdAb45bAF9a06ce1279D1342EcC3F44845af
+// Domain blockchain-family-keys.x has address for AAVE on ETH: 0xCD0DAdAb45bAF9a06ce1279D1342EcC3F44845af
 
 getWalletAddress('uns-devtest-nickshatilo-withdraw-test2.x', 'ETH', 'MATIC');
-// Domain blockchain-family-keys.x has address for ETH on ETH is: 0xCD0DAdAb45bAF9a06ce1279D1342EcC3F44845af
+// Domain blockchain-family-keys.x has address for ETH on ETH: 0xCD0DAdAb45bAF9a06ce1279D1342EcC3F44845af
 
 getWalletAddress('uns-devtest-nickshatilo-withdraw-test2.x', 'ETH', 'USDT');
-// Domain blockchain-family-keys.x has address for USDT on ETH is: 0xCD0DAdAb45bAF9a06ce1279D1342EcC3F44845af
+// Domain blockchain-family-keys.x has address for USDT on ETH: 0xCD0DAdAb45bAF9a06ce1279D1342EcC3F44845af
 
 getWalletAddress('uns-devtest-nickshatilo-withdraw-test2.x', 'MATIC', 'USDT');
 // won't work
