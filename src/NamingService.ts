@@ -26,9 +26,7 @@ export abstract class NamingService {
     network: string,
     token: string,
   ): Promise<string | null>;
-  // abstract allRecords(domain: string): Promise<Record<string, string>>;
   abstract isRegistered(domain: string): Promise<boolean>;
-
   abstract getTokenUri(tokenId: string): Promise<string>;
   abstract getDomainFromTokenId(tokenId: string): Promise<string>;
 

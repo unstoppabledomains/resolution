@@ -23,7 +23,8 @@ and IPFS hashes for
 Resolution is primarily built and maintained by
 [Unstoppable Domains](https://unstoppabledomains.com/).
 
-Resolution supports different decentralized domains. Please, refer to the [Top Level Domains List](https://api.unstoppabledomains.com/resolve/supported_tlds)
+Resolution supports different decentralized domains. Please, refer to the
+[Top Level Domains List](https://api.unstoppabledomains.com/resolve/supported_tlds)
 
 For more information, see our detailed
 [API Reference](https://unstoppabledomains.github.io/resolution/).
@@ -63,16 +64,18 @@ npm update @unstoppabledomains/resolution --save
 const {default: Resolution} = require('@unstoppabledomains/resolution');
 
 // obtain a key by following this document https://docs.unstoppabledomains.com/domain-distribution-and-management/quickstart/retrieve-an-api-key/#api-key
-const resolution = new Resolution({ apiKey: "<api_key>" });
+const resolution = new Resolution({apiKey: '<api_key>'});
 ```
 
-> NOTE: The `apiKey` is only used resolve domains from UNS. Behind the scene, it still uses the default ZNS (Zilliqa) RPC url. For additional control, please specify your ZNS configuration.
+> NOTE: The `apiKey` is only used resolve domains from UNS. Behind the scene, it
+> still uses the default ZNS (Zilliqa) RPC url. For additional control, please
+> specify your ZNS configuration.
 
 ```javascript
 const {default: Resolution} = require('@unstoppabledomains/resolution');
 
-const resolution = new Resolution({ 
-  apiKey: "<api_key>",
+const resolution = new Resolution({
+  apiKey: '<api_key>',
   sourceConfig: {
     zns: {
       url: 'https://api.zilliqa.com',
@@ -85,9 +88,10 @@ const resolution = new Resolution({
 ## Initialize with Custom Provider Configuration
 
 You may want to specify a custom provider:
- - if you want to use a dedicated blockchain node
- - if you want to monitor app usage
- - if you already have a provider in your app to re-use it for domain resolution
+
+- if you want to use a dedicated blockchain node
+- if you want to monitor app usage
+- if you already have a provider in your app to re-use it for domain resolution
 
 Default provider can be changed by changing constructor options
 `new Resolution(options)` or by using one of the factory methods:
@@ -99,7 +103,6 @@ Default provider can be changed by changing constructor options
 - etc.
 
 ```javascript
-
 const {default: Resolution} = require('@unstoppabledomains/resolution');
 
 // obtain a key from https://www.infura.io
@@ -108,11 +111,11 @@ const resolution = new Resolution({
     uns: {
       locations: {
         Layer1: {
-          url: "https://mainnet.infura.io/v3/<infura_api_key>",
-          network: 'mainnet'
+          url: 'https://mainnet.infura.io/v3/<infura_api_key>',
+          network: 'mainnet',
         },
         Layer2: {
-          url: "https://polygon-mainnet.infura.io/v3/<infura_api_key>",
+          url: 'https://polygon-mainnet.infura.io/v3/<infura_api_key>',
           network: 'polygon-mainnet',
         },
       },
@@ -151,7 +154,6 @@ To see all constructor options and factory methods check
 #### Look up a domain's crypto address
 
 ```javascript
-
 function resolve(domain, currency) {
   resolution
     .addr(domain, currency)
@@ -197,9 +199,135 @@ function resolveCustomRecord(domain, record) {
 resolveCustomRecord('homecakes.crypto', 'custom.record.value');
 ```
 
+### Resolve wallet address using `addr`
+
+This API is used to retrieve wallet address for single address record. (See
+[Cryptocurrency payment](https://docs.unstoppabledomains.com/resolution/guides/records-reference/#cryptocurrency-payments)
+section for the record format)
+
+```javascript
+// homecakes.crypto has `crypto.ETH.address` set to 0xe7474D07fD2FA286e7e0aa23cd107F8379085037
+
+function getWalletAddr(domain, ticker) {
+  resolution
+    .addr(domain, ticker)
+    .then((address) =>
+      console.log(`Domain ${domain} has address for ${ticker} is: ${address}`),
+    )
+    .catch(console.error);
+}
+getWalletAddr('homecakes.crypto', 'ETH');
+```
+
+### Resolve wallet address using `getAddr`
+
+This (beta) API can be used to resolve different formats
+
+```javascript
+function getWalletAddress(domain, network, token) {
+  resolution
+    .getAddress(domain, network, token)
+    .then((address) =>
+      console.log(
+        `Domain ${domain} has address for ${token} on ${network} is: ${address}`,
+      ),
+    )
+    .catch(console.error);
+}
+```
+
+**Resolve single address format (similar to **`addr`** API)**
+
+With `homecakes.crypto` has a `crypto.ETH.address` record set on-chain:
+
+```javascript
+getWalletAddress('homecakes.crypto', 'ETH', 'ETH');
+// Domain homecakes.crypto has address for ETH on ETH is: 0xe7474D07fD2FA286e7e0aa23cd107F8379085037
+```
+
+**Resolve multi-chain currency address format (See
+[multi-chain currency](https://docs.unstoppabledomains.com/resolution/guides/records-reference/#multi-chain-currencies))**
+
+With `aaron.x` has a `crypto.AAVE.version.ERC20.address` record set to
+`0xCD0DAdAb45bAF9a06ce1279D1342EcC3F44845af`. The `ERC20` indicates it's a token
+on `ETH` network:
+
+```javascript
+getWalletAddress('aaron.x', 'ETH', 'AAVE');
+// Domain aaron.x has address for AAVE on ETH is: 0xCD0DAdAb45bAF9a06ce1279D1342EcC3F44845af
+```
+
+**Derive wallet addresses within the same blockchain network and blockchain
+family.**
+
+This can be used by crypto exchange (CEX) to infer wallet addresses. In
+centralized exchanges, users have same wallet addresses on blockchains with same
+wallet family.
+
+with `blockchain-family-keys.x` only has `token.EVM.address` record on-chain.
+The API resolves to same wallet address for tokens live on EVM compatible
+networks.
+
+```javascript
+getWalletAddress('blockchain-family-keys.x', 'ETH', 'AAVE');
+// Domain blockchain-family-keys.x has address for AAVE on ETH is: 0xCD0DAdAb45bAF9a06ce1279D1342EcC3F44845af
+
+getWalletAddress('blockchain-family-keys.x', 'ETH', 'ETH');
+// Domain blockchain-family-keys.x has address for ETH on ETH is: 0xCD0DAdAb45bAF9a06ce1279D1342EcC3F44845af
+
+getWalletAddress('blockchain-family-keys.x', 'AVAX', 'USDT');
+// Domain blockchain-family-keys.x has address for USDT on AVAX is: 0xCD0DAdAb45bAF9a06ce1279D1342EcC3F44845af
+```
+
+with `uns-devtest-nickshatilo-withdraw-test2.x` only has `token.EVM.ETH.address`
+record on chain. The API resolves to the same wallet address for tokens
+specifically on Ethereum network.
+
+```javascript
+getWalletAddress('uns-devtest-nickshatilo-withdraw-test2.x', 'ETH', 'AAVE');
+// Domain blockchain-family-keys.x has address for AAVE on ETH is: 0xCD0DAdAb45bAF9a06ce1279D1342EcC3F44845af
+
+getWalletAddress('uns-devtest-nickshatilo-withdraw-test2.x', 'ETH', 'MATIC');
+// Domain blockchain-family-keys.x has address for ETH on ETH is: 0xCD0DAdAb45bAF9a06ce1279D1342EcC3F44845af
+
+getWalletAddress('uns-devtest-nickshatilo-withdraw-test2.x', 'ETH', 'USDT');
+// Domain blockchain-family-keys.x has address for USDT on ETH is: 0xCD0DAdAb45bAF9a06ce1279D1342EcC3F44845af
+
+getWalletAddress('uns-devtest-nickshatilo-withdraw-test2.x', 'MATIC', 'USDT');
+// won't work
+```
+
+The API is compatible with other address formats. If a domain has multiple
+address formats, it will follow the algorithm described as follow:
+
+if a domain has following records set:
+
+```
+token.EVM.address
+crypto.USDC.version.ERC20.address
+token.EVM.ETH.USDC.address
+crypto.USDC.address
+token.EVM.ETH.address
+```
+
+`getAddress(domain, 'ETH', 'USDC')` will lookup records in the following order:
+
+```
+1. token.EVM.ETH.USDC.address
+2. crypto.USDC.address
+3. crypto.USDC.version.ERC20.address
+4. token.EVM.ETH.address
+5. token.EVM.address
+```
+
+> **Warning** please use the API with caution as it's still in beta. Please
+> submit an issue if you find a bug.
+
 ### Command Line Interface
 
-CLI support was removed from the Resolution library starting from version 6.0. Please use the [standalone CLI tool](https://github.com/unstoppabledomains/resolution-cli).
+CLI support was removed from the Resolution library starting from version 6.0.
+Please use the
+[standalone CLI tool](https://github.com/unstoppabledomains/resolution-cli).
 
 ## Error Handling
 
@@ -213,7 +341,7 @@ or **Linux shell**).
 
 1. Recommended NodeJs version
 
-* Node v16
+- Node v16
 
 2. Clone the repository
 
@@ -224,14 +352,15 @@ or **Linux shell**).
 
 3. Install dependencies
 
-    ```bash
-    yarn install
-    ```
-    or
+   ```bash
+   yarn install
+   ```
 
-    ```bash
-    npm install
-    ```
+   or
+
+   ```bash
+   npm install
+   ```
 
 ### Internal config
 
@@ -243,14 +372,17 @@ or **Linux shell**).
 
 #### Unit tests:
 
-Resolution library relies on environment variables to load **TestNet** RPC Urls. This way, our keys don't expose directly to the code. These environment variables are:
+Resolution library relies on environment variables to load **TestNet** RPC Urls.
+This way, our keys don't expose directly to the code. These environment
+variables are:
 
-* L1_TEST_NET_RPC_URL
-* L1_TEST_NET_RPC_WSS_URL
-* L2_TEST_NET_RPC_URL
-* L2_TEST_NET_RPC_WSS_URL
+- L1_TEST_NET_RPC_URL
+- L1_TEST_NET_RPC_WSS_URL
+- L2_TEST_NET_RPC_URL
+- L2_TEST_NET_RPC_WSS_URL
 
-In order to validate the code change, copy `.env.example` file change the name to `.env`. Then, update the values of variables. 
+In order to validate the code change, copy `.env.example` file change the name
+to `.env`. Then, update the values of variables.
 
 ## Free advertising for integrated apps
 
@@ -268,8 +400,11 @@ business.
 
 ## Get help
 
-[Join our discord community](https://discord.gg/unstoppabledomains) and ask questions.
+[Join our discord community](https://discord.gg/unstoppabledomains) and ask
+questions.
 
 ## Help us improve
 
-We're always looking for ways to improve how developers use and integrate our products into their applications. We'd love to hear about your experience to help us improve by [taking our survey](https://form.typeform.com/to/uHPQyHO6).
+We're always looking for ways to improve how developers use and integrate our
+products into their applications. We'd love to hear about your experience to
+help us improve by [taking our survey](https://form.typeform.com/to/uHPQyHO6).
