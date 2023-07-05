@@ -420,14 +420,14 @@ export default class Uns extends NamingService {
       }
     };
 
-    const reversedL1 = addressL1();
-    if (reversedL1) {
-      return reversedL1;
-    }
-
     const reversedL2 = addressL2();
     if (reversedL2) {
       return reversedL2;
+    }
+
+    const reversedL1 = addressL1();
+    if (reversedL1) {
+      return reversedL1;
     }
 
     return null;
