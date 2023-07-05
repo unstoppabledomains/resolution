@@ -1,5 +1,5 @@
 {
-  "version": "0.8.2",
+  "version": "0.8.3",
   "networks": {
     "1": {
       "contracts": {
@@ -74,7 +74,7 @@
         },
         "ProxyReader": {
           "address": "0x578853aa776Eef10CeE6c4dd2B5862bdcE767A8B",
-          "implementation": "0x627eA00369922802A6206A0D709fe2dA0f6b369c",
+          "implementation": "0xF83b08F90C1d5eEf255E8DB50b3Ab158A37a9AD4",
           "legacyAddresses": [
             "0x6E68f3EaAD2CC946C6CC7f4859251d8D70Dd3EDB",
             "0x1BDc0fD4fbABeed3E611fd6195fCd5d41dcEF393",
@@ -291,7 +291,7 @@
         },
         "ProxyReader": {
           "address": "0x91EDd8708062bd4233f4Dd0FCE15A7cb4d500091",
-          "implementation": "0x627eA00369922802A6206A0D709fe2dA0f6b369c",
+          "implementation": "0x989730eAe394d0415eaB088e0C1d83aCD40A66A1",
           "legacyAddresses": [
             "0x68Af8fFFCdC6218836C62Bc2Fd2D35dA544471dD",
             "0x3E67b8c702a1292d1CEb025494C84367fcb12b45",
