@@ -220,7 +220,7 @@ getWalletAddr('homecakes.crypto', 'ETH');
 // Domain homecakes.crypto has address for ETH: 0xe7474D07fD2FA286e7e0aa23cd107F8379085037
 ```
 
-**Resolve multi-chain address format (similar to **`multiChainAddr`** API)**
+### Resolve multi-chain address format using `multiChainAddr`
 
 This API is used to retrieve wallet address for multi-chain address records.
 (See
