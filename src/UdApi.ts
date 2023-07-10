@@ -127,6 +127,16 @@ export default class UdApi extends NamingService {
     return twitterHandle;
   }
 
+  async getAddress(
+    _domain: string,
+    _network: string,
+    _token: string,
+  ): Promise<string | null> {
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+      methodName: 'isSupportedDomain',
+    });
+  }
+
   async allRecords(domain: string): Promise<CryptoRecords> {
     return (await this.resolve(domain)).records || {};
   }

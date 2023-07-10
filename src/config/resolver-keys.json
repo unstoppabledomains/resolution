@@ -1,5 +1,5 @@
 {
-  "version": "2.1.20",
+  "version": "2.1.27",
   "information": {
     "description": "This file describes all resolver keys with a defined meaning and related metadata used by Unstoppable Domains UNS Registry",
     "documentation": "https://docs.unstoppabledomains.com/developer-toolkit/records-reference/",
@@ -284,7 +284,7 @@
     "crypto.LSK.address": {
       "deprecatedKeyName": "LSK",
       "deprecated": false,
-      "validationRegex": "^\\d{1,21}[L]$|^[0-9a-z]{3}[23456789abcdefghjkmnopqrstuvwxyz]{38}$"
+      "validationRegex": "^[0-9a-z]{3}[23456789abcdefghjkmnopqrstuvwxyz]{38}$"
     },
     "crypto.ATOM.address": {
       "deprecatedKeyName": "ATOM",
@@ -2301,6 +2301,16 @@
       "validationRegex": "^0x[a-fA-F0-9]{40}$",
       "deprecated": false
     },
+    "crypto.MCONTENT.version.ERC20.address": {
+      "deprecatedKeyName": "MCONTENT_ERC20",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
+    "crypto.MCONTENT.version.BEP20.address": {
+      "deprecatedKeyName": "MCONTENT_BEP20",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
     "crypto.DODO.version.ERC20.address": {
       "deprecatedKeyName": "DODO_ERC20",
       "validationRegex": "^0x[a-fA-F0-9]{40}$",
@@ -2564,17 +2574,17 @@
     "crypto.0ZK.version.ERC20.address": {
       "deprecatedKeyName": "0ZK_ERC20",
       "validationRegex": "(^0zk1)([qpzry9x8gf2tvdw0s3jn54khce6mua7l]{52})([qzyxg2vwsj5kc6u7])(unpd9kxwatwq)([qpzry9x8])([qpzry9x8gf2tvdw0s3jn54khce6mua7l]{57})",
-      "deprecated": true
+      "deprecated": false
     },
     "crypto.0ZK.version.BEP20.address": {
       "deprecatedKeyName": "0ZK_BEP20",
       "validationRegex": "(^0zk1)([qpzry9x8gf2tvdw0s3jn54khce6mua7l]{52})([qzyxg2vwsj5kc6u7])(unpd9kxwatw8)([qpzry9x8])([qpzry9x8gf2tvdw0s3jn54khce6mua7l]{57})",
-      "deprecated": true
+      "deprecated": false
     },
     "crypto.0ZK.version.MATIC.address": {
       "deprecatedKeyName": "0ZK_MATIC",
       "validationRegex": "(^0zk1)([qpzry9x8gf2tvdw0s3jn54khce6mua7l]{52})([qzyxg2vwsj5kc6u7])(unpd9kxwatw3)([qpzry9x8])([qpzry9x8gf2tvdw0s3jn54khce6mua7l]{57})",
-      "deprecated": true
+      "deprecated": false
     },
     "crypto.0ZK.version.0ZK.address": {
       "deprecatedKeyName": "0ZK_0ZK",
@@ -2599,6 +2609,46 @@
     "crypto.SWEAT.version.NEP-141.address": {
       "deprecatedKeyName": "SWEAT_NEP-141",
       "validationRegex": "^([a-f0-9]{64})|([a-z\\d_-]{2,59}\\.near)$",
+      "deprecated": false
+    },
+    "crypto.POKT.address": {
+      "deprecatedKeyName": "POKT",
+      "validationRegex": "^[0-9a-fA-F]{40}$",
+      "deprecated": false
+    },
+    "crypto.KAI.address": {
+      "deprecatedKeyName": "KAI",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
+    "crypto.XLA.address": {
+      "deprecatedKeyName": "XLA",
+      "validationRegex": "^(S|Ss)+([1-9A-HJ-NP-Za-km-z]{96})$",
+      "deprecated": false
+    },
+    "crypto.APT.address": {
+      "deprecatedKeyName": "APT",
+      "validationRegex": "^0x[a-f0-9]{64}$",
+      "deprecated": false
+    },
+    "crypto.GTH.address": {
+      "deprecatedKeyName": "GTH",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
+    "crypto.HI.version.ERC20.address": {
+      "deprecatedKeyName": "HI_ERC20",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
+    "crypto.HI.version.BEP20.address": {
+      "deprecatedKeyName": "HI_BEP20",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
+      "deprecated": false
+    },
+    "crypto.VERSE.address": {
+      "deprecatedKeyName": "VERSE",
+      "validationRegex": "^0x[a-fA-F0-9]{40}$",
       "deprecated": false
     }
   }

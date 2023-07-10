@@ -21,8 +21,12 @@ export abstract class NamingService {
     location?: UnsLocation,
   ): Promise<string | null>;
   abstract allRecords(domain: string): Promise<Record<string, string>>;
+  abstract getAddress(
+    domain: string,
+    network: string,
+    token: string,
+  ): Promise<string | null>;
   abstract isRegistered(domain: string): Promise<boolean>;
-
   abstract getTokenUri(tokenId: string): Promise<string>;
   abstract getDomainFromTokenId(tokenId: string): Promise<string>;
 

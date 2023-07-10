@@ -59,6 +59,21 @@ export default class UnsInternal {
     return reverseHash;
   }
 
+  async getAddress(
+    domain: string,
+    network: string,
+    token: string,
+  ): Promise<{string}> {
+    const tokenId = this.namehash(domain);
+    const [addr] = await this.readerContract.call('getAddress', [
+      network,
+      token,
+      tokenId,
+    ]);
+
+    return addr;
+  }
+
   async getTokenUri(tokenId: string): Promise<string> {
     const [tokenURI] = await this.readerContract.call('tokenURI', [tokenId]);
     return tokenURI;
