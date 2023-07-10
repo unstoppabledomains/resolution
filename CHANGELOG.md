@@ -1,3 +1,7 @@
+## 9.1.0
+
+- Add new getAddress API
+
 ## 9.0.0
 
 - Allow initialization with partner key
