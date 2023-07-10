@@ -286,7 +286,7 @@ family.**
 
 The API can also be used by crypto exchanges to infer wallet addresses. In
 centralized exchanges, users have same wallet addresses on different networks
-with same wallet family.
+with same wallet family. (See [Blockchain Family, Network, Token Level Addresses](https://apidocs.unstoppabledomains.com/resolution/guides/records-reference/#blockchain-family-network-token-level-addresses) section for the record format)
 
 With `blockchain-family-keys.x` only has `token.EVM.address` record on-chain.
 The API resolves to same wallet address for tokens live on EVM compatible
