@@ -24,9 +24,15 @@ export type ZnsSource = NamingServiceSource & {
   registryAddress?: string;
 };
 
+export type RnsSource = NamingServiceSource & {
+  network: string;
+  registryAddress?: string;
+};
+
 export type SourceConfig = {
   uns?: UnsSource | Api;
   zns?: ZnsSource | Api;
+  rns?: RnsSource | Api;
 };
 
 export type ResolutionConfig = {
@@ -42,6 +48,7 @@ export enum UnsLocation {
 export enum NamingServiceName {
   UNS = 'UNS',
   ZNS = 'ZNS',
+  RNS = 'RNS',
 }
 
 export type ResolutionMethod = NamingServiceName | UnsLocation | 'UDAPI';
@@ -54,6 +61,7 @@ export type AutoNetworkConfigs = {
     };
   };
   zns?: {url: string} | {provider: Provider};
+  rns?: {url: string} | {provider: Provider};
 };
 
 /**
@@ -271,6 +279,7 @@ export enum BlockchainType {
   ETH = 'ETH',
   MATIC = 'MATIC',
   ZIL = 'ZIL',
+  RSK = 'RSK',
 }
 
 export type DomainLocation = {

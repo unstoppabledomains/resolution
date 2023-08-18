@@ -96,6 +96,8 @@ export const EthereumNetworks = {
   goerli: 5,
   'polygon-mainnet': 137,
   'polygon-mumbai': 80001,
+  'rsk-mainnet': 30,
+  'rsk-testnet': 31,
 } as const;
 
 export const EthereumNetworksInverted = {
@@ -103,6 +105,8 @@ export const EthereumNetworksInverted = {
   5: 'goerli',
   137: 'polygon-mainnet',
   80001: 'polygon-mumbai',
+  30: 'rsk-mainnet',
+  31: 'rsk-testnet',
 } as const;
 
 export const wrapResult = <T>(func: () => T): Promise<WrappedResult<T>> => {

@@ -37,6 +37,7 @@ import Networking from './utils/Networking';
 import {prepareAndValidateDomain} from './utils/prepareAndValidate';
 import {fromDecStringToHex} from './utils/namehash';
 import {UnsSupportedNetwork} from './types';
+import Rns from './Rns';
 
 const DEFAULT_UNS_PROXY_SERVICE_URL =
   'https://api.unstoppabledomains.com/resolve';
@@ -68,6 +69,7 @@ export default class Resolution {
   constructor(config: {sourceConfig?: SourceConfig; apiKey?: string} = {}) {
     const uns = this.getUnsConfig(config);
     const zns = this.getZnsConfig(config);
+    const rns = this.getRnsConfig(config);
 
     // If both UNS and ZNS use the same UdApi providers, we don't want to call the API twice as it would return same
     // responses. It should be enough to compare just the URLs, as the network param isn't actually used in the calls.
@@ -84,6 +86,10 @@ export default class Resolution {
       [NamingServiceName.ZNS]: {
         usedServices: equalUdApiProviders ? [uns] : [uns, zns],
         native: zns instanceof Zns ? zns : new Zns(),
+      },
+      [NamingServiceName.RNS]: {
+        usedServices: equalUdApiProviders ? [uns] : [uns, zns, rns],
+        native: rns instanceof Rns ? rns : new Rns(),
       },
     };
   }
@@ -218,6 +224,10 @@ export default class Resolution {
       provider: Provider;
       network: string;
     };
+    rsk?: {
+      provider: Provider;
+      network: string;
+    };
   }): Resolution {
     if (networks.uns) {
       return this.fromEthereumEip1193Provider({
@@ -227,8 +237,11 @@ export default class Resolution {
     if (networks.zns) {
       return this.fromZilliqaProvider(networks.zns.provider, networks);
     }
+    if (networks.rsk) {
+      return this.fromRskProvider(networks.rsk.provider, networks);
+    }
     throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
-      providerMessage: 'Must specify network for uns or zns',
+      providerMessage: 'Must specify network for uns or zns or rsk',
     });
   }
 
@@ -288,6 +301,27 @@ export default class Resolution {
     return new this({
       sourceConfig: {
         zns: {provider, network: networks?.zns?.network || 'mainnet'},
+      },
+    });
+  }
+
+  /**
+   * Creates a resolution instance with configured provider
+   * @param provider - any provider compatible with EIP-1193
+   * @param networks - an optional object that describes what network to use when connecting RNS default is mainnet
+   * @see https://eips.ethereum.org/EIPS/eip-1193
+   */
+  static fromRskProvider(
+    provider: Provider,
+    networks?: {
+      rsk?: {
+        network: string;
+      };
+    },
+  ): Resolution {
+    return new this({
+      sourceConfig: {
+        rns: {provider, network: networks?.rsk?.network || 'mainnet'},
       },
     });
   }
@@ -1023,6 +1057,12 @@ export default class Resolution {
     return isApi(config.sourceConfig?.zns)
       ? new UdApi(config.sourceConfig?.zns)
       : new Zns(config.sourceConfig?.zns);
+  }
+
+  getRnsConfig(config: ResolutionConfig): Rns | UdApi {
+    return isApi(config.sourceConfig?.rns)
+      ? new UdApi(config.sourceConfig?.rns)
+      : new Rns(config.sourceConfig?.rns);
   }
 }
 

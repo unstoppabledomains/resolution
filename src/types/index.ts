@@ -125,6 +125,8 @@ export type UnsSupportedNetwork = typeof UnsSupportedNetwork.type;
 
 export const ZnsSupportedNetwork = StringUnion('mainnet', 'testnet');
 
+export const RnsSupportedNetwork = StringUnion('mainnet', 'testnet');
+
 export function hasProvider(obj: any): obj is {provider: Provider} {
   return obj && !!obj.provider;
 }
