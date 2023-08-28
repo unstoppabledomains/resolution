@@ -422,7 +422,7 @@ describe('Resolution', () => {
 
     it('should throw on unspecified network', async () => {
       expect(() => Resolution.fromResolutionProvider({})).toThrowError(
-        '< Must specify network for uns or zns >',
+        '< Must specify network for uns or zns or rsk >',
       );
     });
 
