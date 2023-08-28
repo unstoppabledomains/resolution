@@ -75,6 +75,7 @@ export function constructRecords(
 export const domainExtensionToNamingServiceName = {
   crypto: NamingServiceName.UNS,
   zil: NamingServiceName.ZNS,
+  rsk: NamingServiceName.RNS,
 };
 
 export const findNamingServiceName = (

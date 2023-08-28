@@ -88,7 +88,7 @@ export default class Resolution {
         native: zns instanceof Zns ? zns : new Zns(),
       },
       [NamingServiceName.RNS]: {
-        usedServices: equalUdApiProviders ? [uns] : [uns, zns, rns],
+        usedServices: [rns],
         native: rns instanceof Rns ? rns : new Rns(),
       },
     };

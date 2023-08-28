@@ -4,7 +4,7 @@ import {
   toChecksumAddress,
 } from './utils/znsUtils';
 import {isNullAddress, constructRecords} from './utils';
-import {Dictionary, ZnsResolution, ZnsSupportedNetwork} from './types';
+import {Dictionary, RnsSupportedNetwork, ZnsResolution} from './types';
 import {ResolutionError, ResolutionErrorCode} from './errors/resolutionError';
 import {
   CryptoRecords,
@@ -18,7 +18,12 @@ import {
   RnsSource,
 } from './types/publicTypes';
 import FetchProvider from './FetchProvider';
-import {znsChildhash, znsNamehash} from './utils/namehash';
+import {
+  eip137Childhash,
+  eip137Namehash,
+  znsChildhash,
+  znsNamehash,
+} from './utils/namehash';
 import {NamingService} from './NamingService';
 import ConfigurationError, {
   ConfigurationErrorCode,
@@ -44,7 +49,7 @@ export default class Rns extends NamingService {
   };
 
   readonly network: number;
-  readonly name: NamingServiceName = NamingServiceName.ZNS;
+  readonly name: NamingServiceName = NamingServiceName.RNS;
   readonly url: string;
   readonly registryAddr: string;
   readonly provider: Provider;
@@ -64,9 +69,6 @@ export default class Rns extends NamingService {
     this.registryAddr =
       source['registryAddress'] || Rns.RegistryMap[this.network];
     this.checkRegistryAddress(this.registryAddr);
-    if (this.registryAddr.startsWith('0x')) {
-      this.registryAddr = toBech32Address(this.registryAddr);
-    }
   }
 
   async owner(domain: string): Promise<string> {
@@ -110,11 +112,11 @@ export default class Rns extends NamingService {
         domain,
       });
     }
-    return znsNamehash(domain);
+    return eip137Namehash(domain);
   }
 
   childhash(parentHash: string, label: string): string {
-    return znsChildhash(parentHash, label);
+    return eip137Childhash(parentHash, label);
   }
 
   async isSupportedDomain(domain: string): Promise<boolean> {
@@ -314,16 +316,14 @@ export default class Rns extends NamingService {
         method: NamingServiceName.RNS,
       });
     }
-    if (!ZnsSupportedNetwork.guard(source.network)) {
+    if (!RnsSupportedNetwork.guard(source.network)) {
       this.checkCustomNetworkConfig(source);
     }
   }
 
   private checkRegistryAddress(address: string): void {
-    // Represents both versions of Zilliqa addresses eth-like and bech32 zil-like
-    //TODO: Review this!
     const addressValidator = new RegExp(
-      '^0x[a-fA-F0-9]{40}$|^zil1[qpzry9x8gf2tvdw0s3jn54khce6mua7l]{38}$',
+      '^0x[a-fA-F0-9]{40}$|^(0x|0X)?[0-9a-f]{40}$|^(0x|0X)?[0-9A-F]{40}$',
     );
     if (!addressValidator.test(address)) {
       throw new ConfigurationError(
@@ -336,7 +336,7 @@ export default class Rns extends NamingService {
     }
   }
 
-  private checkCustomNetworkConfig(source: ZnsSource): void {
+  private checkCustomNetworkConfig(source: RnsSource): void {
     if (!source.registryAddress) {
       throw new ConfigurationError(
         ConfigurationErrorCode.CustomNetworkConfigMissing,
