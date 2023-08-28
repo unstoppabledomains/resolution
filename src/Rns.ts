@@ -9,7 +9,6 @@ import {ResolutionError, ResolutionErrorCode} from './errors/resolutionError';
 import {
   CryptoRecords,
   Provider,
-  ZnsSource,
   NamingServiceName,
   Locations,
   UnsLocation,
@@ -18,12 +17,7 @@ import {
   RnsSource,
 } from './types/publicTypes';
 import FetchProvider from './FetchProvider';
-import {
-  eip137Childhash,
-  eip137Namehash,
-  znsChildhash,
-  znsNamehash,
-} from './utils/namehash';
+import {eip137Childhash, eip137Namehash} from './utils/namehash';
 import {NamingService} from './NamingService';
 import ConfigurationError, {
   ConfigurationErrorCode,
