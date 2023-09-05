@@ -133,6 +133,10 @@ const resolution = new Resolution({
       url: 'https://api.zilliqa.com',
       network: 'mainnet',
     },
+    ens: {
+      url: 'https://mainnet.infura.io/v3/<infura_api_key>',
+      network: 'mainnet',
+    },
   },
 });
 ```

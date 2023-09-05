@@ -53,7 +53,7 @@ const DEFAULT_UNS_PROXY_SERVICE_URL =
  *
  * let resolution = new Resolution({ blockchain: {
  *        uns: {
- *           url: "https://mainnet.infura.io/v3/c4bb906ed6904c42b19c95825fe55f39",
+ *           url: "https://mainnet.infura.io/v3/<infura_api_key>",
  *           network: "mainnet"
  *        }
  *      }
@@ -72,9 +72,7 @@ export default class Resolution {
   constructor(config: {sourceConfig?: SourceConfig; apiKey?: string} = {}) {
     const uns = this.getUnsConfig(config);
     const zns = this.getZnsConfig(config);
-    const ens = isApi(config.sourceConfig?.ens)
-      ? new UdApi(config.sourceConfig?.ens)
-      : new Ens(config.sourceConfig?.ens);
+    const ens = this.getEnsConfig(config);
 
     // If both UNS and ZNS use the same UdApi providers, we don't want to call the API twice as it would return same
     // responses. It should be enough to compare just the URLs, as the network param isn't actually used in the calls.
@@ -94,7 +92,7 @@ export default class Resolution {
       },
       [NamingServiceName.ENS]: {
         usedServices: [ens],
-        native: isApi(config.sourceConfig?.ens) ? new Ens() : ens,
+        native: ens instanceof Ens ? ens : new Ens(),
       },
     };
   }
@@ -1105,6 +1103,10 @@ export default class Resolution {
     return isApi(config.sourceConfig?.zns)
       ? new UdApi(config.sourceConfig?.zns)
       : new Zns(config.sourceConfig?.zns);
+  }
+
+  getEnsConfig(config: ResolutionConfig): Ens {
+    return new Ens(config.sourceConfig?.ens);
   }
 }
 

@@ -4,9 +4,6 @@ export type Dictionary<T> = {[k: string]: T};
 export type EnsNetworkIdMap = {
   [key: number]: string;
 };
-export interface BlockhainNetworkUrlMap {
-  [key: string]: string | undefined;
-}
 export interface ProxyReaderMap {
   [key: string]: string;
 }
@@ -131,12 +128,7 @@ export const UnsSupportedNetwork = StringUnion(
 
 export type UnsSupportedNetwork = typeof UnsSupportedNetwork.type;
 
-export const EnsSupportedNetwork = StringUnion(
-  'mainnet',
-  'rinkeby',
-  'goerli',
-  'ropsten',
-);
+export const EnsSupportedNetwork = StringUnion('mainnet', 'goerli');
 
 export const ZnsSupportedNetwork = StringUnion('mainnet', 'testnet');
 

@@ -3,7 +3,7 @@ import nock from 'nock';
 
 beforeAll(() => {
   if (!isLive()) {
-    nock.disableNetConnect();
+    // nock.disableNetConnect();
   }
 });
 

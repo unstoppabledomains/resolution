@@ -1,11 +1,6 @@
 import {default as ensInterface} from './contracts/ens/ens';
 import {default as resolverInterface} from './contracts/ens/resolver';
-import {
-  BlockhainNetworkUrlMap,
-  EnsSupportedNetwork,
-  EthCoinIndex,
-  hasProvider,
-} from './types';
+import {EnsSupportedNetwork, EthCoinIndex, hasProvider} from './types';
 import {ResolutionError, ResolutionErrorCode} from './errors/resolutionError';
 import EthereumContract from './contracts/EthereumContract';
 import EnsNetworkMap from 'ethereum-ens-network-map';
@@ -34,32 +29,31 @@ import {requireOrFail} from './utils/requireOrFail';
  * @internal
  */
 export default class Ens extends NamingService {
-  static readonly UrlMap: BlockhainNetworkUrlMap = {
-    1: 'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
-    3: 'https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
-    4: 'https://rinkeby.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
-  };
-
   readonly name = NamingServiceName.ENS;
   readonly network: number;
-  readonly url: string | undefined;
+  readonly url: string;
   readonly provider: Provider;
   readonly readerContract: EthereumContract;
 
-  constructor(
-    source: EnsSource = {
-      url: Ens.UrlMap[1],
-      network: 'mainnet',
-    },
-  ) {
+  constructor(source?: EnsSource) {
     super();
-    this.checkNetworkConfig(source);
-    this.network = EthereumNetworks[source.network];
-    this.url = source['url'] || Ens.UrlMap[this.network];
+    let finalSource: EnsSource = {url: '', network: 'mainnet'};
+    if (source) {
+      finalSource = source;
+    }
+    finalSource = this.checkNetworkConfig(source);
+    this.network = EthereumNetworks[finalSource.network];
+    if (!finalSource['url']) {
+      throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedUrl, {
+        method: NamingServiceName.ENS,
+      });
+    }
+    this.url = finalSource['url'];
     this.provider =
-      source['provider'] || new FetchProvider(this.name, this.url!);
+      finalSource['provider'] ||
+      FetchProvider.factory(NamingServiceName.ENS, this.url);
     const registryAddress =
-      source['registryAddress'] || EnsNetworkMap[this.network];
+      finalSource['registryAddress'] || EnsNetworkMap[this.network];
     this.readerContract = new EthereumContract(
       ensInterface,
       registryAddress,
@@ -244,6 +238,15 @@ export default class Ens extends NamingService {
     });
   }
 
+  async getAddress(
+    domain: string,
+    network: string,
+    token: string,
+  ): Promise<string> {
+    // TODO: getAddress;
+    return '';
+  }
+
   /**
    * This was done to make automated tests more configurable
    */
@@ -407,8 +410,8 @@ export default class Ens extends NamingService {
     );
   }
 
-  private checkNetworkConfig(source: EnsSource): void {
-    if (!source.network) {
+  private checkNetworkConfig(source: EnsSource | undefined): EnsSource {
+    if (!source?.network) {
       throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork, {
         method: this.name,
       });
@@ -416,6 +419,8 @@ export default class Ens extends NamingService {
     if (!EnsSupportedNetwork.guard(source.network)) {
       this.checkCustomNetworkConfig(source);
     }
+
+    return source;
   }
 
   private checkCustomNetworkConfig(source: EnsSource): void {

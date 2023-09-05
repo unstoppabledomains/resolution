@@ -233,13 +233,13 @@ export function getProtocolLinkFromEnv(
   if (
     namingService === NamingServiceName.ENS &&
     providerProtocol === ProviderProtocol.http &&
-    process.env.ENS_TEST_NET_RPC_URL
+    process.env.L1_TEST_NET_RPC_URL
   ) {
-    if (process.env.ENS_TEST_NET_RPC_URL) {
-      return process.env.ENS_TEST_NET_RPC_URL;
+    if (process.env.L1_TEST_NET_RPC_URL) {
+      return process.env.L1_TEST_NET_RPC_URL;
     }
 
-    throw new Error('missing env var ENS_TEST_NET_RPC_URL');
+    throw new Error('missing env var L1_TEST_NET_RPC_URL');
   }
 
   if (
@@ -247,11 +247,11 @@ export function getProtocolLinkFromEnv(
     providerProtocol === ProviderProtocol.wss &&
     process.env.ENS_TEST_NET_RPC_WSS_URL
   ) {
-    if (process.env.ENS_TEST_NET_RPC_WSS_URL) {
-      return process.env.ENS_TEST_NET_RPC_WSS_URL;
+    if (process.env.L1_TEST_NET_RPC_WSS_URL) {
+      return process.env.L1_TEST_NET_RPC_WSS_URL;
     }
 
-    throw new Error('missing env var ENS_TEST_NET_RPC_WSS_URL');
+    throw new Error('missing env var L1_TEST_NET_RPC_WSS_URL');
   }
 
   throw new Error('Invalid test config');

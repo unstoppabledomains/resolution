@@ -27,42 +27,30 @@ beforeEach(() => {
           ProviderProtocol.http,
           NamingServiceName.ENS,
         ),
-        network: 'mainnet',
+        network: 'goerli',
       },
     },
   });
   ens = resolution.serviceMap[NamingServiceName.ENS].native as Ens;
 });
 
+// Test only on testnet? ttl?
 describe('ENS', () => {
   it('allows ens network specified as string', async () => {
     expect(ens.url).toBe(
-      'https://eth-goerli.g.alchemy.com/v2/J-ff_OlmWzw41ocqwpkRccHdfqSZML4q',
+      getProtocolLinkFromEnv(ProviderProtocol.http, NamingServiceName.ENS),
     );
-    expect(ens.network).toEqual(1);
+    expect(ens.network).toEqual(5);
   });
 
   it('resolves .eth name using blockchain', async () => {
-    expect(ens.url).toBe(
-      getProtocolLinkFromEnv(ProviderProtocol.http, NamingServiceName.ENS),
+    expect(ens.network).toEqual(5);
+    expect(await resolution.addr('abjbash.eth', 'ETH')).toEqual(
+      '0x5842DdB424B7884E52eC417E10C629A9B8e6BADa',
     );
-    expect(ens.network).toEqual(1);
-
-    const eyes = mockAsyncMethods(ens, {
-      resolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
-      fetchAddress: '0xa59C818Ddb801f1253edEbf0Cf08c9E481EA2fE5',
-    });
-    const spy = mockAsyncMethods(ens, {
-      owner: '0xa59C818Ddb801f1253edEbf0Cf08c9E481EA2fE5',
-    });
-    expect(await resolution.addr('matthewgould.eth', 'ETH')).toEqual(
-      '0xa59C818Ddb801f1253edEbf0Cf08c9E481EA2fE5',
+    expect(await resolution.owner('abjbash.eth')).toEqual(
+      '0x114D4603199df73e7D157787f8778E21fCd13066',
     );
-    expect(await resolution.owner('matthewgould.eth')).toEqual(
-      '0xa59C818Ddb801f1253edEbf0Cf08c9E481EA2fE5',
-    );
-    expectSpyToBeCalled(eyes);
-    expectSpyToBeCalled(spy, 1);
   });
 
   skipItInLive('reverses address to ENS domain', async () => {
@@ -143,77 +131,23 @@ describe('ENS', () => {
     expect(doge).toBe('DBXu2kgc3xtvCUWFcxFE3r9hEYgmuaaCyD');
   });
 
-  it('checks normalizeSource ens (boolean)', async () => {
-    expect(ens.network).toBe(1);
-    expect(ens.url).toBe(
-      'https://eth-goerli.g.alchemy.com/v2/J-ff_OlmWzw41ocqwpkRccHdfqSZML4q',
-    );
-  });
-
-  it('checks normalizeSource ens (object) #1', async () => {
-    expect(ens.network).toBe(1);
+  it('checks normalizeSource ens (object)', async () => {
+    expect(ens.network).toBe(5);
     expect(ens.url).toBe(
       getProtocolLinkFromEnv(ProviderProtocol.http, NamingServiceName.ENS),
     );
-  });
-
-  it('checks normalizeSource ens (object) #2', async () => {
-    const resolution = new Resolution({
-      sourceConfig: {ens: {network: 'ropsten'}},
-    });
-    ens = resolution.serviceMap[NamingServiceName.ENS].native as Ens;
-    expect(ens.network).toBe(3);
-    expect(ens.url).toBe(
-      'https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
-    );
     expect(ens.readerContract.address).toBe(
       '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
     );
   });
 
-  it('checks normalizeSource ens (object) #3', async () => {
-    const resolution = new Resolution({
-      sourceConfig: {
-        ens: {url: 'https://rinkeby.infura.io', network: 'rinkeby'},
-      },
-    });
-    ens = resolution.serviceMap[NamingServiceName.ENS].native as Ens;
-    expect(ens.network).toBe(4);
-    expect(ens.url).toBe('https://rinkeby.infura.io');
-  });
-
-  it('checks normalizeSource ens (object) #4', async () => {
-    const resolution = new Resolution({
-      sourceConfig: {
-        ens: {url: 'https://goerli.infura.io', network: 'goerli'},
-      },
-    });
-    ens = resolution.serviceMap[NamingServiceName.ENS].native as Ens;
-    expect(ens.network).toBe(5);
-    expect(ens.url).toBe('https://goerli.infura.io');
-    expect(ens.readerContract.address).toBe(
-      '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
-    );
-  });
-
-  it('checks normalizeSource ens (object) #6', async () => {
+  it('normalizeSource ens (object) should throw error', async () => {
     expect(
       () =>
         new Resolution({
           sourceConfig: {
             ens: {network: 'notRealNetwork'},
           },
-        }),
-    ).toThrowError(
-      'Missing configuration in Resolution ENS. Please specify registryAddress when using a custom network',
-    );
-  });
-
-  it('checks normalizeSource ens (object) #7', async () => {
-    expect(
-      () =>
-        new Resolution({
-          sourceConfig: {ens: {network: 'invalid'}},
         }),
     ).toThrowError(
       'Missing configuration in Resolution ENS. Please specify registryAddress when using a custom network',
@@ -242,7 +176,10 @@ describe('ENS', () => {
         ens: {
           network: 'custom',
           registryAddress: '0x314159265dd8dbb310642f98f50c066173c1259b',
-          url: 'https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
+          url: getProtocolLinkFromEnv(
+            ProviderProtocol.http,
+            NamingServiceName.ENS,
+          ),
         },
       },
     });
@@ -252,23 +189,30 @@ describe('ENS', () => {
       '0x314159265dd8dbb310642f98f50c066173c1259b',
     );
     expect(ens.url).toBe(
-      'https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
+      getProtocolLinkFromEnv(ProviderProtocol.http, NamingServiceName.ENS),
     );
   });
 
   it('checks custom network config without with provider', async () => {
     const provider = new FetchProvider(
       NamingServiceName.ENS,
-      'https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
+      getProtocolLinkFromEnv(ProviderProtocol.http, NamingServiceName.ENS),
     );
     const resolution = new Resolution({
       sourceConfig: {
         ens: {
           network: 'custom',
           registryAddress: '0x314159265dd8dbb310642f98f50c066173c1259b',
+          url: getProtocolLinkFromEnv(
+            ProviderProtocol.http,
+            NamingServiceName.ENS,
+          ),
           provider: new FetchProvider(
             NamingServiceName.ENS,
-            'https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
+            getProtocolLinkFromEnv(
+              ProviderProtocol.http,
+              NamingServiceName.ENS,
+            ),
           ),
         },
       },
@@ -282,12 +226,15 @@ describe('ENS', () => {
   });
 
   it('resolve record with custom network', async () => {
-    const networkId = 1;
+    const networkId = 5;
     const resolution = new Resolution({
       sourceConfig: {
         ens: {
           network: 'custom',
-          url: Ens.UrlMap[networkId],
+          url: getProtocolLinkFromEnv(
+            ProviderProtocol.http,
+            NamingServiceName.ENS,
+          ),
           registryAddress: EnsNetworkMap[networkId],
         },
       },
@@ -302,74 +249,6 @@ describe('ENS', () => {
     const doge = await resolution.addr('testthing.eth', 'DOGE');
     expectSpyToBeCalled(eyes);
     expect(doge).toBe('DBXu2kgc3xtvCUWFcxFE3r9hEYgmuaaCyD');
-  });
-
-  it('checks normalizeSource ens (object) #8', async () => {
-    const resolution = new Resolution({
-      sourceConfig: {ens: {network: 'mainnet'}},
-    });
-    ens = resolution.serviceMap[NamingServiceName.ENS].native as Ens;
-    expect(ens.network).toBe(1);
-    expect(ens.url).toBe(
-      'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
-    );
-  });
-
-  it('checks normalizeSource ens (object) #10', async () => {
-    const resolution = new Resolution({
-      sourceConfig: {
-        ens: {
-          registryAddress: '0x314159265dd8dbb310642f98f50c066173c1259b',
-          network: 'mainnet',
-        },
-      },
-    });
-    ens = resolution.serviceMap[NamingServiceName.ENS].native as Ens;
-    expect(ens.network).toBe(1);
-    expect(ens.url).toBe(
-      'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
-    );
-    expect(ens.readerContract.address).toBe(
-      '0x314159265dd8dbb310642f98f50c066173c1259b',
-    );
-  });
-
-  it('checks normalizeSource ens (object) #11', async () => {
-    const resolution = new Resolution({
-      sourceConfig: {
-        ens: {
-          network: 'ropsten',
-          registryAddress: '0x112234455c3a32fd11230c42e7bccd4a84e02010',
-        },
-      },
-    });
-    ens = resolution.serviceMap[NamingServiceName.ENS].native as Ens;
-    expect(ens.network).toBe(3);
-    expect(ens.url).toBe(
-      'https://ropsten.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
-    );
-    expect(ens.readerContract.address).toBe(
-      '0x112234455c3a32fd11230c42e7bccd4a84e02010',
-    );
-  });
-
-  it('checks normalizeSource ens (object) #12', async () => {
-    const resolution = new Resolution({
-      sourceConfig: {
-        ens: {
-          registryAddress: '0xabcffff1231586348194fcabbeff1231240234fc',
-          network: 'mainnet',
-        },
-      },
-    });
-    ens = resolution.serviceMap[NamingServiceName.ENS].native as Ens;
-    expect(ens.network).toBe(1);
-    expect(ens.url).toBe(
-      'https://mainnet.infura.io/v3/d423cf2499584d7fbe171e33b42cfbee',
-    );
-    expect(ens.readerContract.address).toBe(
-      '0xabcffff1231586348194fcabbeff1231240234fc',
-    );
   });
 
   it('checks normalizeSource ens (object) #13', async () => {

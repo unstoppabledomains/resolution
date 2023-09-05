@@ -77,7 +77,7 @@ beforeEach(() => {
           ProviderProtocol.http,
           NamingServiceName.ENS,
         ),
-        network: 'rinkeby',
+        network: 'goerli',
       },
       zns: {network: 'testnet'},
     },
@@ -1078,7 +1078,7 @@ describe('Resolution', () => {
             );
             const polygonProvider = new InfuraProvider(
               'maticmum',
-              'c4bb906ed6904c42b19c95825fe55f39',
+              'a32aa2ace9704ee9a1a9906418bcabe5',
             );
 
             const eye = mockAsyncMethod(provider, 'call', (params) =>
@@ -1769,7 +1769,7 @@ describe('Resolution', () => {
               blockchain: BlockchainType.ETH,
               ownerAddress: '0x0e43F36e4B986dfbE1a75cacfA60cA2bD44Ae962',
               blockchainProviderUrl:
-                'https://eth-rinkeby.alchemyapi.io/v2/ZDERxOLIj120dh2-Io2Q9RTh9RfWEssT',
+                'https://goerli.infura.io/v3/a32aa2ace9704ee9a1a9906418bcabe5',
             });
             expect(location['brad.crypto']).toEqual({
               registryAddress: '0xAad76bea7CFEc82927239415BB18D2e93518ecBB',
@@ -1778,7 +1778,7 @@ describe('Resolution', () => {
               blockchain: BlockchainType.ETH,
               ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
               blockchainProviderUrl:
-                'https://eth-rinkeby.alchemyapi.io/v2/ZDERxOLIj120dh2-Io2Q9RTh9RfWEssT',
+                'https://goerli.infura.io/v3/a32aa2ace9704ee9a1a9906418bcabe5',
             });
             expect(location['udtestdev-test-l2-domain-784391.wallet']).toEqual({
               registryAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
@@ -1787,7 +1787,7 @@ describe('Resolution', () => {
               blockchain: BlockchainType.MATIC,
               ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
               blockchainProviderUrl:
-                'https://polygon-mumbai.g.alchemy.com/v2/c4bb906ed6904c42b19c95825fe55f39',
+                'https://polygon-mumbai.g.alchemy.com/v2/a32aa2ace9704ee9a1a9906418bcabe5',
             });
             expect(
               location['udtestdev-test-l1-and-l2-ownership.wallet'],
@@ -1798,7 +1798,7 @@ describe('Resolution', () => {
               blockchain: BlockchainType.MATIC,
               ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
               blockchainProviderUrl:
-                'https://polygon-mumbai.g.alchemy.com/v2/c4bb906ed6904c42b19c95825fe55f39',
+                'https://polygon-mumbai.g.alchemy.com/v2/a32aa2ace9704ee9a1a9906418bcabe5',
             });
             expect(
               location['testing-domain-doesnt-exist-12345abc.blockchain'],
@@ -1811,7 +1811,7 @@ describe('Resolution', () => {
               blockchain: BlockchainType.MATIC,
               ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
               blockchainProviderUrl:
-                'https://polygon-mumbai.g.alchemy.com/v2/c4bb906ed6904c42b19c95825fe55f39',
+                'https://polygon-mumbai.g.alchemy.com/v2/a32aa2ace9704ee9a1a9906418bcabe5',
             });
             expect(location['zns-devtest-testnet-domain.zil']).toEqual({
               registryAddress: 'zil1hyj6m5w4atcn7s806s69r0uh5g4t84e8gp6nps',
