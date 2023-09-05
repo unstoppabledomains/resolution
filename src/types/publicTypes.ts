@@ -33,7 +33,7 @@ export type ZnsSource = NamingServiceSource & {
 export type SourceConfig = {
   uns?: UnsSource | Api;
   zns?: ZnsSource | Api;
-  ens?: EnsSource;
+  ens?: EnsSource | Api;
 };
 
 export type ResolutionConfig = {

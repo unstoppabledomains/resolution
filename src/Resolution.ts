@@ -1106,7 +1106,7 @@ export default class Resolution {
       : new Zns(config.sourceConfig?.zns);
   }
 
-  getEnsConfig(config: ResolutionConfig): Ens {
+  getEnsConfig(config: ResolutionConfig): Ens | UdApi {
     if (config.apiKey) {
       return new Ens({
         url: `${DEFAULT_UNS_PROXY_SERVICE_URL}/chains/eth/rpc`,
@@ -1114,7 +1114,9 @@ export default class Resolution {
         proxyServiceApiKey: config.apiKey,
       });
     }
-    return new Ens(config.sourceConfig?.ens);
+    return isApi(config.sourceConfig?.ens)
+      ? new UdApi(config.sourceConfig?.ens)
+      : new Ens(config.sourceConfig?.ens);
   }
 }
 
