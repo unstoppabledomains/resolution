@@ -22,6 +22,7 @@ export type UnsSource = {
 export type EnsSource = NamingServiceSource & {
   network: string;
   registryAddress?: string;
+  proxyServiceApiKey?: string;
 };
 
 export type ZnsSource = NamingServiceSource & {

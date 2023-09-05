@@ -106,6 +106,7 @@ export default class Resolution {
   static async autoNetwork(
     sourceConfig: AutoNetworkConfigs,
   ): Promise<Resolution> {
+    // BREAKS the ENS construction.
     const resolution = new this();
     if (!sourceConfig.uns && !sourceConfig.ens) {
       throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork);
@@ -1106,6 +1107,13 @@ export default class Resolution {
   }
 
   getEnsConfig(config: ResolutionConfig): Ens {
+    if (config.apiKey) {
+      return new Ens({
+        url: `${DEFAULT_UNS_PROXY_SERVICE_URL}/chains/eth/rpc`,
+        network: 'mainnet',
+        proxyServiceApiKey: config.apiKey,
+      });
+    }
     return new Ens(config.sourceConfig?.ens);
   }
 }

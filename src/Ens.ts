@@ -39,15 +39,14 @@ export default class Ens extends NamingService {
     super();
     let finalSource: EnsSource = {url: '', network: 'mainnet'};
     if (source) {
-      finalSource = source;
+      finalSource = this.checkNetworkConfig(source);
     }
-    finalSource = this.checkNetworkConfig(source);
     this.network = EthereumNetworks[finalSource.network];
-    if (!finalSource['url']) {
-      throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedUrl, {
-        method: NamingServiceName.ENS,
-      });
-    }
+    // if (!finalSource['url']) {
+    //   throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedUrl, {
+    //     method: NamingServiceName.ENS,
+    //   });
+    // }
     this.url = finalSource['url'];
     this.provider =
       finalSource['provider'] ||
@@ -58,6 +57,7 @@ export default class Ens extends NamingService {
       ensInterface,
       registryAddress,
       this.provider,
+      finalSource['proxyServiceApiKey'],
     );
   }
 
@@ -65,6 +65,7 @@ export default class Ens extends NamingService {
     config: {url: string} | {provider: Provider},
   ): Promise<Ens> {
     let provider: Provider;
+    // console.log("INSIDE AUTONETOWRK:", config);
 
     if (hasProvider(config)) {
       provider = config.provider;

@@ -124,6 +124,7 @@ describe('Resolution', () => {
         );
         Ens.autoNetwork = jest.fn().mockReturnValue(
           new Ens({
+            url: goerliUrl,
             network: 'goerli',
             provider: new FetchProvider(NamingServiceName.ENS, goerliUrl),
           }),
@@ -410,13 +411,13 @@ describe('Resolution', () => {
             Layer2: {network: 'polygon-mumbai'},
           },
         },
-        ens: {network: 'rinkeby'},
+        ens: {network: 'goerli'},
       });
       uns = resolution.serviceMap[NamingServiceName.UNS].native as Uns;
       ens = resolution.serviceMap[NamingServiceName.ENS].native as Ens;
       expect(uns.unsl1.url).toBe(`https://goerli.infura.io/v3/api-key`);
       expect(uns.unsl2.url).toBe(`https://polygon-mumbai.infura.io/v3/api-key`);
-      expect(ens.url).toBe(`https://rinkeby.infura.io/v3/api-key`);
+      expect(ens.url).toBe(`https://goerli.infura.io/v3/api-key`);
     });
 
     it('should get a valid resolution instance with .alchemy', async () => {
@@ -1332,20 +1333,20 @@ describe('Resolution', () => {
         it('should return uns mainnet registry address', async () => {
           const spies = mockAsyncMethods(uns, {
             registryAddress:
-              UnsConfig.networks[4].contracts.UNSRegistry.address,
+              UnsConfig.networks[5].contracts.UNSRegistry.address,
           });
           const registryAddress = await resolution.registryAddress(
             'udtestdev-check.wallet',
           );
           expectSpyToBeCalled(spies);
           expect(registryAddress).toBe(
-            UnsConfig.networks[4].contracts.UNSRegistry.address,
+            UnsConfig.networks[5].contracts.UNSRegistry.address,
           );
         });
         it('should return uns l2 mainnet registry address if domain exists on both', async () => {
           const spies = mockAsyncMethods(uns.unsl1, {
             registryAddress:
-              UnsConfig.networks[4].contracts.UNSRegistry.address,
+              UnsConfig.networks[5].contracts.UNSRegistry.address,
           });
           const spies2 = mockAsyncMethods(uns.unsl2, {
             registryAddress:
@@ -1765,20 +1766,24 @@ describe('Resolution', () => {
             expect(location['udtestdev-check.wallet']).toEqual({
               registryAddress: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
               resolverAddress: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
-              networkId: 4,
+              networkId: 5,
               blockchain: BlockchainType.ETH,
               ownerAddress: '0x0e43F36e4B986dfbE1a75cacfA60cA2bD44Ae962',
-              blockchainProviderUrl:
-                'https://goerli.infura.io/v3/a32aa2ace9704ee9a1a9906418bcabe5',
+              blockchainProviderUrl: getProtocolLinkFromEnv(
+                ProviderProtocol.http,
+                NamingServiceName.ENS,
+              ),
             });
             expect(location['brad.crypto']).toEqual({
               registryAddress: '0xAad76bea7CFEc82927239415BB18D2e93518ecBB',
               resolverAddress: '0x95AE1515367aa64C462c71e87157771165B1287A',
-              networkId: 4,
+              networkId: 5,
               blockchain: BlockchainType.ETH,
               ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
-              blockchainProviderUrl:
-                'https://goerli.infura.io/v3/a32aa2ace9704ee9a1a9906418bcabe5',
+              blockchainProviderUrl: getProtocolLinkFromEnv(
+                ProviderProtocol.http,
+                NamingServiceName.ENS,
+              ),
             });
             expect(location['udtestdev-test-l2-domain-784391.wallet']).toEqual({
               registryAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
@@ -1786,8 +1791,10 @@ describe('Resolution', () => {
               networkId: 80001,
               blockchain: BlockchainType.MATIC,
               ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
-              blockchainProviderUrl:
-                'https://polygon-mumbai.g.alchemy.com/v2/a32aa2ace9704ee9a1a9906418bcabe5',
+              blockchainProviderUrl: getProtocolLinkFromEnv(
+                ProviderProtocol.http,
+                'UNSL2',
+              ),
             });
             expect(
               location['udtestdev-test-l1-and-l2-ownership.wallet'],
@@ -1797,8 +1804,10 @@ describe('Resolution', () => {
               networkId: 80001,
               blockchain: BlockchainType.MATIC,
               ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
-              blockchainProviderUrl:
-                'https://polygon-mumbai.g.alchemy.com/v2/a32aa2ace9704ee9a1a9906418bcabe5',
+              blockchainProviderUrl: getProtocolLinkFromEnv(
+                ProviderProtocol.http,
+                'UNSL2',
+              ),
             });
             expect(
               location['testing-domain-doesnt-exist-12345abc.blockchain'],
@@ -1810,8 +1819,10 @@ describe('Resolution', () => {
               networkId: 80001,
               blockchain: BlockchainType.MATIC,
               ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
-              blockchainProviderUrl:
-                'https://polygon-mumbai.g.alchemy.com/v2/a32aa2ace9704ee9a1a9906418bcabe5',
+              blockchainProviderUrl: getProtocolLinkFromEnv(
+                ProviderProtocol.http,
+                'UNSL2',
+              ),
             });
             expect(location['zns-devtest-testnet-domain.zil']).toEqual({
               registryAddress: 'zil1hyj6m5w4atcn7s806s69r0uh5g4t84e8gp6nps',
