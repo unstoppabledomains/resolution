@@ -44,13 +44,26 @@ describe('ENS', () => {
   });
 
   it('resolves .eth name using blockchain', async () => {
+    expect(ens.url).toBe(
+      getProtocolLinkFromEnv(ProviderProtocol.http, NamingServiceName.ENS),
+    );
     expect(ens.network).toEqual(5);
-    expect(await resolution.addr('abjbash.eth', 'ETH')).toEqual(
-      '0x5842DdB424B7884E52eC417E10C629A9B8e6BADa',
+
+    const eyes = mockAsyncMethods(ens, {
+      resolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
+      fetchAddress: '0xa59C818Ddb801f1253edEbf0Cf08c9E481EA2fE5',
+    });
+    const spy = mockAsyncMethods(ens, {
+      owner: '0xa59C818Ddb801f1253edEbf0Cf08c9E481EA2fE5',
+    });
+    expect(await resolution.addr('matthewgould.eth', 'ETH')).toEqual(
+      '0xa59C818Ddb801f1253edEbf0Cf08c9E481EA2fE5',
     );
-    expect(await resolution.owner('abjbash.eth')).toEqual(
-      '0x114D4603199df73e7D157787f8778E21fCd13066',
+    expect(await resolution.owner('matthewgould.eth')).toEqual(
+      '0xa59C818Ddb801f1253edEbf0Cf08c9E481EA2fE5',
     );
+    expectSpyToBeCalled(eyes);
+    expectSpyToBeCalled(spy, 1);
   });
 
   skipItInLive('reverses address to ENS domain', async () => {

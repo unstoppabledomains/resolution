@@ -55,7 +55,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v1
         with:
-          node-version: 12
+          node-version: ${{ matrix.node }}
 
       - name: Install Dependencies
         run: yarn install

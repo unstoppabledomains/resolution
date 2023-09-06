@@ -42,11 +42,6 @@ export default class Ens extends NamingService {
       finalSource = this.checkNetworkConfig(source);
     }
     this.network = EthereumNetworks[finalSource.network];
-    // if (!finalSource['url']) {
-    //   throw new ConfigurationError(ConfigurationErrorCode.UnspecifiedUrl, {
-    //     method: NamingServiceName.ENS,
-    //   });
-    // }
     this.url = finalSource['url'];
     this.provider =
       finalSource['provider'] ||

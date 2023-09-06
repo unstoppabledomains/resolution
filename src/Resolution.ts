@@ -106,7 +106,6 @@ export default class Resolution {
   static async autoNetwork(
     sourceConfig: AutoNetworkConfigs,
   ): Promise<Resolution> {
-    // BREAKS the ENS construction.
     const resolution = new this();
     if (!sourceConfig.uns && !sourceConfig.ens) {
       throw new ConfigurationError(ConfigurationErrorCode.UnsupportedNetwork);
