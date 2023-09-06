@@ -244,8 +244,13 @@ export default class Ens extends NamingService {
     network: string,
     token: string,
   ): Promise<string> {
-    // TODO: getAddress;
-    return '';
+    let fetchedAddress = '';
+    const address = await this.addr(domain, token);
+    if (address) {
+      fetchedAddress = address;
+    }
+
+    return fetchedAddress;
   }
 
   /**
