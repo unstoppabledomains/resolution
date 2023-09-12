@@ -149,7 +149,7 @@ describe('ENS', () => {
     expect(ens.url).toBe(
       getProtocolLinkFromEnv(ProviderProtocol.http, NamingServiceName.ENS),
     );
-    expect(ens.readerContract.address).toBe(
+    expect(ens.registryContract.address).toBe(
       '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e',
     );
   });

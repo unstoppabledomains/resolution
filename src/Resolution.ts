@@ -642,9 +642,9 @@ export default class Resolution {
     token: string,
   ): Promise<string | null> {
     domain = prepareAndValidateDomain(domain);
-    return this.callServiceForDomain(domain, (service) =>
-      service.getAddress(domain, network, token),
-    );
+    return this.callServiceForDomain(domain, (service) => {
+      return service.getAddress(domain, network, token);
+    });
   }
 
   /**
@@ -831,12 +831,18 @@ export default class Resolution {
    * @param domain - domain name
    */
   async tokenURI(domain: string): Promise<string> {
-    // The `getTokenUri` method isn't supported in ZNS (it'll throw in the next call), so we just assume that we need
-    // to calculate a UNS namehash.
-    const namehash = this.namehash(domain, NamingServiceName.UNS);
-    return this.callServiceForDomain(domain, (service) =>
-      service.getTokenUri(namehash),
-    );
+    // The `getTokenUri` method isn't supported in ZNS (it'll throw in the next call)
+    return this.callServiceForDomain(domain, (service) => {
+      if (service.name === NamingServiceName.UNS) {
+        const namehash = this.namehash(domain, NamingServiceName.UNS);
+        return service.getTokenUri(namehash);
+      } else if (service.name === NamingServiceName.ENS) {
+        return service.getTokenUri(domain);
+      }
+
+      const namehash = this.namehash(domain, NamingServiceName.ZNS);
+      return service.getTokenUri(namehash);
+    });
   }
 
   /**

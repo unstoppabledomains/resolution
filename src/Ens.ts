@@ -1,5 +1,7 @@
 import {default as ensInterface} from './contracts/ens/ens';
 import {default as resolverInterface} from './contracts/ens/resolver';
+import {default as nameWrapperInterface} from './contracts/ens/nameWrapper';
+import {default as baseRegistrarInterface} from './contracts/ens/baseRegistrar';
 import {EnsSupportedNetwork, EthCoinIndex, hasProvider} from './types';
 import {ResolutionError, ResolutionErrorCode} from './errors/resolutionError';
 import EthereumContract from './contracts/EthereumContract';
@@ -10,6 +12,7 @@ import {
   UnsLocation,
   NamingServiceName,
   Provider,
+  TokenUriMetadata,
 } from './types/publicTypes';
 import {
   constructRecords,
@@ -17,13 +20,15 @@ import {
   isNullAddress,
 } from './utils';
 import FetchProvider from './FetchProvider';
-import {eip137Childhash, eip137Namehash} from './utils/namehash';
+import {eip137Childhash, eip137Namehash, labelNameHash} from './utils/namehash';
 import {NamingService} from './NamingService';
 import ConfigurationError, {
   ConfigurationErrorCode,
 } from './errors/configurationError';
 import {EthereumNetworks} from './utils';
 import {requireOrFail} from './utils/requireOrFail';
+import ensConfig from '../src/config/ens-config.json';
+import Networking from './utils/Networking';
 
 /**
  * @internal
@@ -31,9 +36,12 @@ import {requireOrFail} from './utils/requireOrFail';
 export default class Ens extends NamingService {
   readonly name = NamingServiceName.ENS;
   readonly network: number;
+  readonly networkName: string;
   readonly url: string;
   readonly provider: Provider;
-  readonly readerContract: EthereumContract;
+  readonly registryContract: EthereumContract;
+  readonly nameWrapperContract: EthereumContract;
+  readonly baseRegistrarContract: EthereumContract;
 
   constructor(source?: EnsSource) {
     super();
@@ -42,15 +50,35 @@ export default class Ens extends NamingService {
       finalSource = this.checkNetworkConfig(source);
     }
     this.network = EthereumNetworks[finalSource.network];
+    this.networkName = finalSource.network;
     this.url = finalSource['url'];
     this.provider =
       finalSource['provider'] ||
       FetchProvider.factory(NamingServiceName.ENS, this.url);
+
     const registryAddress =
       finalSource['registryAddress'] || EnsNetworkMap[this.network];
-    this.readerContract = new EthereumContract(
+    this.registryContract = new EthereumContract(
       ensInterface,
       registryAddress,
+      this.provider,
+      finalSource['proxyServiceApiKey'],
+    );
+
+    const nameWrapperAddress = this.determineNameWrapperAddress(this.network);
+    this.nameWrapperContract = new EthereumContract(
+      nameWrapperInterface,
+      nameWrapperAddress,
+      this.provider,
+      finalSource['proxyServiceApiKey'],
+    );
+
+    const baseRegistrarAddress = this.determineBaseRegistrarAddress(
+      this.network,
+    );
+    this.baseRegistrarContract = new EthereumContract(
+      baseRegistrarInterface,
+      baseRegistrarAddress,
       this.provider,
       finalSource['proxyServiceApiKey'],
     );
@@ -60,7 +88,6 @@ export default class Ens extends NamingService {
     config: {url: string} | {provider: Provider},
   ): Promise<Ens> {
     let provider: Provider;
-    // console.log("INSIDE AUTONETOWRK:", config);
 
     if (hasProvider(config)) {
       provider = config.provider;
@@ -108,13 +135,13 @@ export default class Ens extends NamingService {
 
   async owner(domain: string): Promise<string> {
     const namehash = this.namehash(domain);
-    return await this.callMethod(this.readerContract, 'owner', [namehash]);
+    return await this.callMethod(this.registryContract, 'owner', [namehash]);
   }
 
   async resolver(domain: string): Promise<string> {
     const nodeHash = this.namehash(domain);
     const resolverAddr = await this.callMethod(
-      this.readerContract,
+      this.registryContract,
       'resolver',
       [nodeHash],
     );
@@ -200,11 +227,15 @@ export default class Ens extends NamingService {
     });
   }
 
-  async getTokenUri(tokenId: string): Promise<string> {
-    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
-      method: NamingServiceName.ENS,
-      methodName: 'getTokenUri',
-    });
+  async getTokenUri(domain: string): Promise<string> {
+    const tokenId = this.namehash(domain);
+    const isWrappedDomain = await this.determineIsWrappedDomain(tokenId);
+    if (isWrappedDomain) {
+      return `https://metadata.ens.domains/${this.networkName}/${this.nameWrapperContract.address}/${tokenId}`;
+    }
+
+    const hashedLabel = labelNameHash(domain);
+    return `https://metadata.ens.domains/${this.networkName}/${this.baseRegistrarContract.address}/${hashedLabel}`;
   }
 
   async isAvailable(domain: string): Promise<boolean> {
@@ -212,7 +243,7 @@ export default class Ens extends NamingService {
   }
 
   async registryAddress(domain: string): Promise<string> {
-    return this.readerContract.address;
+    return this.registryContract.address;
   }
 
   async isRegistered(domain: string): Promise<boolean> {
@@ -316,6 +347,14 @@ export default class Ens extends NamingService {
         }
       },
     );
+
+    const isWrappedDomain = await this.determineIsWrappedDomain(
+      this.namehash(domain),
+    );
+    if (isWrappedDomain) {
+      return await this.getAddressForWrappedDomain(domain);
+    }
+
     if (!resolver) {
       const owner = await this.owner(domain);
       if (isNullAddress(owner)) {
@@ -328,8 +367,8 @@ export default class Ens extends NamingService {
       });
     }
 
-    const cointType = this.getCoinType(currencyTicker.toUpperCase());
-    return await this.fetchAddress(resolver, domain, cointType);
+    const coinType = this.getCoinType(currencyTicker.toUpperCase());
+    return await this.fetchAddress(resolver, domain, coinType);
   }
 
   private async fetchAddress(
@@ -404,11 +443,7 @@ export default class Ens extends NamingService {
   }
 
   private checkSupportedDomain(domain: string): boolean {
-    return (
-      domain === 'eth' ||
-      (/^[^-]*[^-]*\.(eth|luxe|xyz|kred|addr\.reverse)$/.test(domain) &&
-        domain.split('.').every((v) => !!v.length))
-    );
+    return domain === 'eth' || /^([^\s\\.]+\.)+([a-zA-Z])+$/.test(domain);
   }
 
   private checkNetworkConfig(source: EnsSource | undefined): EnsSource {
@@ -458,4 +493,65 @@ export default class Ens extends NamingService {
     const ethLikePattern = new RegExp('^0x[a-fA-F0-9]{40}$');
     return ethLikePattern.test(address);
   }
+
+  private async getAddressForWrappedDomain(
+    domain: string,
+  ): Promise<string | undefined> {
+    const addr1 = await this.getOwnerOfFromNameHashContract(domain);
+    const addr2 = await this.owner(domain);
+
+    if (addr1) {
+      return addr1;
+    }
+
+    if (addr2) {
+      return addr2;
+    }
+
+    return;
+  }
+
+  private determineNameWrapperAddress(network: number): string {
+    return ensConfig.networks[network].contracts.NameWrapper.address;
+  }
+
+  private determineBaseRegistrarAddress(network: number): string {
+    return ensConfig.networks[network].contracts.BaseRegistrarImplementation
+      .address;
+  }
+
+  private async determineIsWrappedDomain(
+    hashedDomain: string,
+  ): Promise<boolean> {
+    return await this.callMethod(this.nameWrapperContract, 'isWrapped', [
+      hashedDomain,
+    ]);
+  }
+
+  private async getOwnerOfFromNameHashContract(
+    domain: string,
+  ): Promise<string> {
+    return await this.callMethod(this.nameWrapperContract, 'ownerOf', [
+      this.namehash(domain),
+    ]);
+  }
+
+  private async getMetadataFromTokenURI(
+    tokenUri: string,
+  ): Promise<TokenUriMetadata> {
+    const resp = await Networking.fetch(tokenUri, {});
+    if (resp.ok) {
+      return resp.json();
+    }
+
+    throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
+      providerMessage: await resp.text(),
+      method: 'UDAPI',
+      methodName: 'tokenURIMetadata',
+    });
+  }
+
+  // private async unhashTokenId(tokenId: string): Promise<string> {
+
+  // }
 }

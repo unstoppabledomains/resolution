@@ -3,6 +3,7 @@ import sha3 from 'crypto-js/sha3';
 import hex from 'crypto-js/enc-hex';
 import WordArray from 'crypto-js/lib-typedarrays';
 import BN from 'bn.js';
+import {keccak256} from 'js-sha3';
 
 export function eip137Namehash(domain: string): string {
   const arr = hashArray(domain, 'sha3');
@@ -71,3 +72,26 @@ export function fromDecStringToHex(value: string): string {
 
   return value;
 }
+
+export const splitDomainName = (
+  domain: string,
+): {label: string; tld: string} => {
+  const splitDomain = domain.split('.');
+  let label = splitDomain[0];
+  let tld = splitDomain[1];
+  if (splitDomain.length - 1 < 2) {
+    return {label, tld};
+  }
+
+  tld = splitDomain[-1];
+  label = splitDomain.slice(0, -1).join('.');
+  return {label, tld};
+};
+
+// returns the tokenId of an ens domain name.
+// @see https://docs.ens.domains/dapp-developer-guide/ens-as-nft#deriving-tokenid-from-ens-name
+export const labelNameHash = (domain: string): string => {
+  const splitDomain = splitDomainName(domain);
+  const labelHash = keccak256(Buffer.from(splitDomain.label, 'utf8'));
+  return `0x${labelHash}`;
+};
