@@ -29,15 +29,6 @@ Resolution supports different decentralized domains. Please, refer to the
 For more information, see our detailed
 [API Reference](https://unstoppabledomains.github.io/resolution/).
 
-### ENS support
-**Note: Ethereum Name Service requires installing additional packages 
-otherwise library throws error when trying to resolve ENS domain.**
-
-#### Required packages
-- `"bip44-constants": "^8.0.103"`
-- `"@ensdomains/address-encoder": ">= 0.1.x <= 0.2.x"`
-- `"content-hash": "^2.5.2"`
-
 ## Installing Resolution
 
 Resolution can be installed with either `yarn` or `npm`.
