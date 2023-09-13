@@ -897,30 +897,33 @@ export default class Resolution {
     // migrated to UNS), the ZNS call result will be ignored and an error, if there's one, won't be thrown.
 
     const unsPromise = this.serviceMap.UNS.usedServices[0].locations(domains);
-    if (!zilDomains.length) {
-      return unsPromise;
-    }
-
-    const znsServices = this.serviceMap.ZNS.usedServices;
-    // The actual ZNS service is the last one in the array.
-    const znsService = znsServices[znsServices.length - 1];
-    // Start fetching ZNS locations before awaiting UNS ones for the concurrency sake, wrap errors to avoid unhandled
-    // exceptions in case we decide that we aren't interested in the result.
-    const znsPromise = wrapResult(() => znsService.locations(zilDomains));
-
     // Fetch UNS locations first. If we see that there are no .zil domains with absent locations, we can return early.
     const unsLocations = await unsPromise;
-    const emptyZilEntries = Object.entries(unsLocations).filter(
-      ([domain, location]) => domain.endsWith('.zil') && !location,
-    );
-    if (!emptyZilEntries.length) {
-      return unsLocations;
+    if (zilDomains.length) {
+      const znsServices = this.serviceMap.ZNS.usedServices;
+      // The actual ZNS service is the last one in the array.
+      const znsService = znsServices[znsServices.length - 1];
+      const znsPromise = wrapResult(() => znsService.locations(zilDomains));
+      const emptyZilEntries = Object.entries(unsLocations).filter(
+        ([domain, location]) => domain.endsWith('.zil') && !location,
+      );
+
+      // If we don't have locations for some .zil domains in UNS, we want to check whether they are present in ZNS and
+      // merge them if that's the case.
+      const znsLocations = await znsPromise.then(unwrapResult);
+      for (const [domain] of emptyZilEntries) {
+        unsLocations[domain] = znsLocations[domain];
+      }
     }
-    // If we don't have locations for some .zil domains in UNS, we want to check whether they are present in ZNS and
-    // merge them if that's the case.
-    const znsLocations = await znsPromise.then(unwrapResult);
-    for (const [domain] of emptyZilEntries) {
-      unsLocations[domain] = znsLocations[domain];
+
+    const ensDomains = domains.filter((domain) => domain.endsWith('.eth'));
+    if (ensDomains.length) {
+      const ensLocations = await this.serviceMap.ENS.usedServices[0].locations(
+        ensDomains,
+      );
+      for (const ensDomain in ensLocations) {
+        unsLocations[ensDomain] = ensLocations[ensDomain];
+      }
     }
 
     return unsLocations;

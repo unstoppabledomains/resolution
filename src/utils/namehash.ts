@@ -95,3 +95,8 @@ export const labelNameHash = (domain: string): string => {
   const labelHash = keccak256(Buffer.from(splitDomain.label, 'utf8'));
   return `0x${labelHash}`;
 };
+
+export const getParentDomain = (domain: string): string => {
+  const splitDomain = domain.split('.');
+  return `${splitDomain[-2]}.${splitDomain[-1]}`;
+};

@@ -13,6 +13,7 @@ import {
   NamingServiceName,
   Provider,
   TokenUriMetadata,
+  BlockchainType,
 } from './types/publicTypes';
 import {
   constructRecords,
@@ -20,7 +21,12 @@ import {
   isNullAddress,
 } from './utils';
 import FetchProvider from './FetchProvider';
-import {eip137Childhash, eip137Namehash, labelNameHash} from './utils/namehash';
+import {
+  eip137Childhash,
+  eip137Namehash,
+  labelNameHash,
+  getParentDomain,
+} from './utils/namehash';
 import {NamingService} from './NamingService';
 import ConfigurationError, {
   ConfigurationErrorCode,
@@ -278,11 +284,21 @@ export default class Ens extends NamingService {
     return domainName;
   }
 
-  locations(domains: string[]): Promise<Locations> {
-    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
-      method: NamingServiceName.ENS,
-      methodName: 'locations',
-    });
+  async locations(domains: string[]): Promise<Locations> {
+    console.log('HERERER');
+    const result: Locations = domains.reduce(async (locations, domain) => {
+      locations[domain] = {
+        resolverAddress: (await this.getResolverContract(domain)).address,
+        registryAddress: this.registryContract.address,
+        networkId: this.network,
+        blockchain: BlockchainType.ETH,
+        ownerAddress: (await this.addr(domain, BlockchainType.ETH)) || '',
+        blockchainProviderUrl: this.url,
+      };
+      return locations;
+    }, {});
+
+    return result;
   }
 
   async getAddress(
