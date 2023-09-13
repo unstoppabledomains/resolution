@@ -868,10 +868,10 @@ export default class Resolution {
 
   /**
    * Retrieves the domain name from tokenId by parsing registry smart contract event logs.
-   * @throws {ResolutionError} if returned domain name doesn't match the original namhash.
-   * @returns the domain name retrieved from token metadata
-   * @param hash - domain hash
-   * @param service - nameservice which is used for lookup
+   * @throws {ResolutionError} if returned domain name doesn't match the original namehash.
+   * @returns the domain name retrieved from token metadata.
+   * @param hash - domain name hash or label hash.
+   * @param service - name service which is used for lookup.
    */
   async unhash(hash: string, service: NamingServiceName): Promise<string> {
     hash = fromDecStringToHex(hash);

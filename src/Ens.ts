@@ -251,11 +251,31 @@ export default class Ens extends NamingService {
     return !isNullAddress(address);
   }
 
-  async getDomainFromTokenId(tokenId: string): Promise<string> {
-    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
-      method: NamingServiceName.ENS,
-      methodName: 'getDomainFromTokenId',
-    });
+  // Tries to fetch domain metadata from both NameWrapper & BaseRegistrar contract
+  // due to ENS having wrapped domains and not knowing which hash the user will input.
+  async getDomainFromTokenId(hash: string): Promise<string> {
+    let domainName = '';
+    const nameWrapperMetadataResponse = await Networking.fetch(
+      `https://metadata.ens.domains/${this.networkName}/${this.nameWrapperContract.address}/${hash}`,
+      {},
+    );
+    if (nameWrapperMetadataResponse.status === 200) {
+      const jsonResponse = await nameWrapperMetadataResponse.json();
+      domainName = jsonResponse.name;
+      return domainName;
+    }
+
+    const baseRegistrarMetadataResponse = await Networking.fetch(
+      `https://metadata.ens.domains/${this.networkName}/${this.baseRegistrarContract.address}/${hash}`,
+      {},
+    );
+
+    if (baseRegistrarMetadataResponse.status === 200) {
+      const jsonResponse = await baseRegistrarMetadataResponse.json();
+      domainName = jsonResponse.name;
+    }
+
+    return domainName;
   }
 
   locations(domains: string[]): Promise<Locations> {
