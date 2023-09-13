@@ -21,12 +21,7 @@ import {
   isNullAddress,
 } from './utils';
 import FetchProvider from './FetchProvider';
-import {
-  eip137Childhash,
-  eip137Namehash,
-  labelNameHash,
-  getParentDomain,
-} from './utils/namehash';
+import {eip137Childhash, eip137Namehash, labelNameHash} from './utils/namehash';
 import {NamingService} from './NamingService';
 import ConfigurationError, {
   ConfigurationErrorCode,
@@ -285,7 +280,6 @@ export default class Ens extends NamingService {
   }
 
   async locations(domains: string[]): Promise<Locations> {
-    console.log('HERERER');
     const result: Locations = domains.reduce(async (locations, domain) => {
       locations[domain] = {
         resolverAddress: (await this.getResolverContract(domain)).address,

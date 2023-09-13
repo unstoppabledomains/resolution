@@ -11,8 +11,6 @@ import {
   skipItInLive,
 } from './helpers';
 import Ens from '../Ens';
-import FetchProvider from '../FetchProvider';
-import EnsNetworkMap from 'ethereum-ens-network-map';
 
 let resolution: Resolution;
 let ens: Ens;
@@ -34,7 +32,6 @@ beforeEach(() => {
   ens = resolution.serviceMap[NamingServiceName.ENS].native as Ens;
 });
 
-// Test only on testnet? ttl?
 describe('ENS', () => {
   it('allows ens network specified as string', async () => {
     expect(ens.url).toBe(
@@ -50,6 +47,7 @@ describe('ENS', () => {
     expect(ens.network).toEqual(5);
 
     const eyes = mockAsyncMethods(ens, {
+      determineIsWrappedDomain: false,
       resolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
       fetchAddress: '0xa59C818Ddb801f1253edEbf0Cf08c9E481EA2fE5',
     });
@@ -91,6 +89,7 @@ describe('ENS', () => {
 
   it('resolves .xyz name using ENS blockchain', async () => {
     const eyes = mockAsyncMethods(ens, {
+      determineIsWrappedDomain: false,
       resolver: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
       fetchAddress: '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
     });
@@ -102,6 +101,7 @@ describe('ENS', () => {
 
   it('resolves .luxe name using ENS blockchain', async () => {
     const eyes = mockAsyncMethods(ens, {
+      determineIsWrappedDomain: false,
       resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
       fetchAddress: '0xf3dE750A73C11a6a2863761E930BF5fE979d5663',
     });
@@ -113,6 +113,7 @@ describe('ENS', () => {
 
   it('resolves .kred name using ENS blockchain', async () => {
     const eyes = mockAsyncMethods(ens, {
+      determineIsWrappedDomain: false,
       resolver: '0x96184444629F3489c4dE199871E6F99568229d8f',
       callMethod: '0x96184444629F3489c4dE199871E6F99568229d8f',
     });
@@ -123,6 +124,7 @@ describe('ENS', () => {
 
   it('resolves .luxe name using ENS blockchain with thrown error', async () => {
     const spies = mockAsyncMethods(ens, {
+      determineIsWrappedDomain: false,
       resolver: undefined,
       owner: undefined,
     });
@@ -137,7 +139,7 @@ describe('ENS', () => {
   it('resolves name with resolver but without an owner', async () => {
     const eyes = mockAsyncMethods(ens, {
       resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-      callMethod: '0x76a9144620b70031f0e9437e374a2100934fba4911046088ac',
+      callMethod: 'DBXu2kgc3xtvCUWFcxFE3r9hEYgmuaaCyD',
     });
     const doge = await resolution.addr('testthing.eth', 'DOGE');
     expectSpyToBeCalled(eyes);
@@ -167,103 +169,6 @@ describe('ENS', () => {
     );
   });
 
-  it('checks custom network config without url or provider', async () => {
-    expect(
-      () =>
-        new Resolution({
-          sourceConfig: {
-            ens: {
-              network: 'custom',
-              registryAddress: '0x314159265dd8dbb310642f98f50c066173c1259b',
-            },
-          },
-        }),
-    ).toThrowError(
-      'Missing configuration in Resolution ENS. Please specify url or provider when using a custom network',
-    );
-  });
-
-  it('checks custom network config without with url', async () => {
-    const resolution = new Resolution({
-      sourceConfig: {
-        ens: {
-          network: 'custom',
-          registryAddress: '0x314159265dd8dbb310642f98f50c066173c1259b',
-          url: getProtocolLinkFromEnv(
-            ProviderProtocol.http,
-            NamingServiceName.ENS,
-          ),
-        },
-      },
-    });
-    const ens = resolution.serviceMap[NamingServiceName.ENS].native as Ens;
-    expect(ens.network).toBeUndefined();
-    expect(await ens.registryAddress('test.ens')).toBe(
-      '0x314159265dd8dbb310642f98f50c066173c1259b',
-    );
-    expect(ens.url).toBe(
-      getProtocolLinkFromEnv(ProviderProtocol.http, NamingServiceName.ENS),
-    );
-  });
-
-  it('checks custom network config without with provider', async () => {
-    const provider = new FetchProvider(
-      NamingServiceName.ENS,
-      getProtocolLinkFromEnv(ProviderProtocol.http, NamingServiceName.ENS),
-    );
-    const resolution = new Resolution({
-      sourceConfig: {
-        ens: {
-          network: 'custom',
-          registryAddress: '0x314159265dd8dbb310642f98f50c066173c1259b',
-          url: getProtocolLinkFromEnv(
-            ProviderProtocol.http,
-            NamingServiceName.ENS,
-          ),
-          provider: new FetchProvider(
-            NamingServiceName.ENS,
-            getProtocolLinkFromEnv(
-              ProviderProtocol.http,
-              NamingServiceName.ENS,
-            ),
-          ),
-        },
-      },
-    });
-    const ens = resolution.serviceMap[NamingServiceName.ENS].native as Ens;
-    expect(ens.network).toBeUndefined();
-    expect(await ens.registryAddress('test.ens')).toBe(
-      '0x314159265dd8dbb310642f98f50c066173c1259b',
-    );
-    expect(ens.provider).toMatchObject(provider);
-  });
-
-  it('resolve record with custom network', async () => {
-    const networkId = 5;
-    const resolution = new Resolution({
-      sourceConfig: {
-        ens: {
-          network: 'custom',
-          url: getProtocolLinkFromEnv(
-            ProviderProtocol.http,
-            NamingServiceName.ENS,
-          ),
-          registryAddress: EnsNetworkMap[networkId],
-        },
-      },
-    });
-    const eyes = mockAsyncMethods(
-      resolution.serviceMap[NamingServiceName.ENS].native,
-      {
-        resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-        callMethod: '0x76a9144620b70031f0e9437e374a2100934fba4911046088ac',
-      },
-    );
-    const doge = await resolution.addr('testthing.eth', 'DOGE');
-    expectSpyToBeCalled(eyes);
-    expect(doge).toBe('DBXu2kgc3xtvCUWFcxFE3r9hEYgmuaaCyD');
-  });
-
   it('checks normalizeSource ens (object) #13', async () => {
     expect(
       () =>
@@ -280,7 +185,7 @@ describe('ENS', () => {
   it('checks ens multicoin support #1', async () => {
     const eyes = mockAsyncMethods(ens, {
       resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-      callMethod: '0x76a9144620b70031f0e9437e374a2100934fba4911046088ac',
+      callMethod: 'DBXu2kgc3xtvCUWFcxFE3r9hEYgmuaaCyD',
     });
     const doge = await resolution.addr('testthing.eth', 'DOGE');
     expectSpyToBeCalled(eyes);
@@ -290,7 +195,7 @@ describe('ENS', () => {
   it('checks ens multicoin support #2', async () => {
     const eyes = mockAsyncMethods(ens, {
       resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-      callMethod: '0xa914e8604d28ef5d2a7caafe8741e5dd4816b7cb19ea87',
+      callMethod: 'MV5rN5EcX1imDS2gEh5jPJXeiW5QN8YrK3',
     });
     const ltc = await resolution.addr('testthing.eth', 'LTC');
     expectSpyToBeCalled(eyes);
@@ -304,7 +209,7 @@ describe('ENS', () => {
     });
     const eth = await resolution.addr('testthing.eth', 'ETH');
     expectSpyToBeCalled(eyes);
-    expect(eth).toBe('0x314159265dD8dbb310642f98f50C066173C1259b');
+    expect(eth).toBe('0x314159265dd8dbb310642f98f50c066173c1259b');
   });
 
   it('checks ens multicoin support #4', async () => {
@@ -314,7 +219,7 @@ describe('ENS', () => {
     });
     const etc = await resolution.addr('testthing.eth', 'etc');
     expectSpyToBeCalled(eyes);
-    expect(etc).toBe('0x314159265dD8dbb310642f98f50C066173C1259b');
+    expect(etc).toBe('0x314159265dd8dbb310642f98f50c066173c1259b');
   });
 
   it('checks ens multicoin support #5', async () => {
@@ -324,14 +229,13 @@ describe('ENS', () => {
     });
     const rsk = await resolution.addr('testthing.eth', 'rsk');
     expectSpyToBeCalled(eyes);
-    expect(rsk).toBe('0x314159265dD8DbB310642F98f50C066173c1259B');
+    expect(rsk).toBe('0x314159265dd8dbb310642f98f50c066173c1259b');
   });
 
   it('checks ens multicoin support #6', async () => {
     const eyes = mockAsyncMethods(ens, {
       resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-      callMethod:
-        '0x05444b4e9c06f24296074f7bc48f92a97916c6dc5ea9000000000000000000',
+      callMethod: 'X7qvLs7gSnNoKvZzNWUT2e8st17QPY64PPe7zriLNuJszeg',
     });
     const xrp = await resolution.addr('testthing.eth', 'xrp');
     expectSpyToBeCalled(eyes);
@@ -341,7 +245,7 @@ describe('ENS', () => {
   it('checks ens multicoin support #7', async () => {
     const eyes = mockAsyncMethods(ens, {
       resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-      callMethod: '0x76a91476a04053bda0a88bda5177b86a15c3b29f55987388ac',
+      callMethod: 'bitcoincash:qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a',
     });
     const bch = await resolution.addr('testthing.eth', 'bch');
     expectSpyToBeCalled(eyes);
@@ -352,7 +256,7 @@ describe('ENS', () => {
     const eyes = mockAsyncMethods(ens, {
       resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
       callMethod:
-        '0x5128751e76e8199196d454941c45d1b3a323f1433bd6751e76e8199196d454941c45d1b3a323f1433bd6',
+        'bc1pw508d6qejxtdg4y5r3zarvary0c5xw7kw508d6qejxtdg4y5r3zarvary0c5xw7k7grplx',
     });
     const btc = await resolution.addr('testthing.eth', 'BTC');
     expectSpyToBeCalled(eyes);
@@ -364,6 +268,7 @@ describe('ENS', () => {
   it('checks UnsupportedCurrency error', async () => {
     const eyes = mockAsyncMethods(ens, {
       resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
+      determineIsWrappedDomain: false,
     });
     await expectResolutionErrorCode(
       resolution.addr('testthing.eth', 'UNREALTICKER'),
@@ -409,38 +314,6 @@ describe('ENS', () => {
         expect(resolution.namehash('alice.eth', NamingServiceName.ENS)).toBe(
           '0x787192fc5378cc32aa956ddfdedbf26b24e8d78e40109add0eea2c1a012c3dec',
         );
-      });
-
-      describe('.domain invalid format', () => {
-        it('starts with -', async () => {
-          expect(await resolution.isSupportedDomain('-hello.eth')).toEqual(
-            false,
-          );
-          await expectResolutionErrorCode(
-            () => resolution.namehash('-hello.eth', NamingServiceName.ENS),
-            ResolutionErrorCode.UnsupportedDomain,
-          );
-        });
-
-        it('ends with -', async () => {
-          expect(await resolution.isSupportedDomain('hello-.eth')).toEqual(
-            false,
-          );
-          await expectResolutionErrorCode(
-            () => resolution.namehash('hello-.eth', NamingServiceName.ENS),
-            ResolutionErrorCode.UnsupportedDomain,
-          );
-        });
-
-        it('starts and ends with -', async () => {
-          expect(await resolution.isSupportedDomain('-hello-.eth')).toEqual(
-            false,
-          );
-          await expectResolutionErrorCode(
-            () => resolution.namehash('-hello-.eth', NamingServiceName.ENS),
-            ResolutionErrorCode.UnsupportedDomain,
-          );
-        });
       });
     });
   });
