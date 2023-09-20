@@ -43,6 +43,7 @@ export default class Ens extends NamingService {
   readonly registryContract: EthereumContract;
   readonly nameWrapperContract: EthereumContract;
   readonly baseRegistrarContract: EthereumContract;
+  readonly proxyServiceApiKey: string | undefined;
 
   constructor(source?: EnsSource) {
     super();
@@ -56,6 +57,7 @@ export default class Ens extends NamingService {
     this.provider =
       finalSource['provider'] ||
       FetchProvider.factory(NamingServiceName.ENS, this.url);
+    this.proxyServiceApiKey = finalSource['proxyServiceApiKey'];
 
     const registryAddress =
       finalSource['registryAddress'] || EnsNetworkMap[this.network];
@@ -63,7 +65,7 @@ export default class Ens extends NamingService {
       ensInterface,
       registryAddress,
       this.provider,
-      finalSource['proxyServiceApiKey'],
+      this.proxyServiceApiKey,
     );
 
     const nameWrapperAddress = this.determineNameWrapperAddress(this.network);
@@ -71,7 +73,7 @@ export default class Ens extends NamingService {
       nameWrapperInterface,
       nameWrapperAddress,
       this.provider,
-      finalSource['proxyServiceApiKey'],
+      this.proxyServiceApiKey,
     );
 
     const baseRegistrarAddress = this.determineBaseRegistrarAddress(
@@ -81,7 +83,7 @@ export default class Ens extends NamingService {
       baseRegistrarInterface,
       baseRegistrarAddress,
       this.provider,
-      finalSource['proxyServiceApiKey'],
+      this.proxyServiceApiKey,
     );
   }
 
@@ -214,6 +216,7 @@ export default class Ens extends NamingService {
       resolverInterface(resolverAddress, EthCoinIndex),
       resolverAddress,
       this.provider,
+      this.proxyServiceApiKey,
     );
 
     return await this.resolverCallToName(resolverContract, nodeHash);
@@ -411,11 +414,14 @@ export default class Ens extends NamingService {
       '@ensdomains/address-encoder',
       '>= 0.1.x <= 0.2.x',
     ).formatsByCoinType;
+
     const resolverContract = new EthereumContract(
       resolverInterface(resolver, coinType),
       resolver,
       this.provider,
+      this.proxyServiceApiKey,
     );
+
     const nodeHash = this.namehash(domain);
     const addr: string =
       coinType !== EthCoinIndex
@@ -424,6 +430,7 @@ export default class Ens extends NamingService {
     if (isNullAddress(addr)) {
       return undefined;
     }
+
     // eslint-disable-next-line no-undef
     const data = Buffer.from(addr.replace('0x', ''), 'hex');
     return formatsByCoinType[coinType].encoder(data);
