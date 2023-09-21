@@ -37,6 +37,7 @@ import Networking from './utils/Networking';
 import {prepareAndValidateDomain} from './utils/prepareAndValidate';
 import {fromDecStringToHex} from './utils/namehash';
 import {UnsSupportedNetwork} from './types';
+import Rns from './Rns';
 
 const DEFAULT_UNS_PROXY_SERVICE_URL =
   'https://api.unstoppabledomains.com/resolve';
@@ -68,6 +69,9 @@ export default class Resolution {
   constructor(config: {sourceConfig?: SourceConfig; apiKey?: string} = {}) {
     const uns = this.getUnsConfig(config);
     const zns = this.getZnsConfig(config);
+    const rns = config.sourceConfig?.rns
+      ? new Rns(config.sourceConfig?.rns)
+      : undefined;
 
     // If both UNS and ZNS use the same UdApi providers, we don't want to call the API twice as it would return same
     // responses. It should be enough to compare just the URLs, as the network param isn't actually used in the calls.
@@ -84,6 +88,10 @@ export default class Resolution {
       [NamingServiceName.ZNS]: {
         usedServices: equalUdApiProviders ? [uns] : [uns, zns],
         native: zns instanceof Zns ? zns : new Zns(),
+      },
+      [NamingServiceName.RNS]: {
+        usedServices: [rns instanceof Rns ? rns : new Rns()],
+        native: rns instanceof Rns ? rns : new Rns(),
       },
     };
   }

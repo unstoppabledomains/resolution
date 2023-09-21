@@ -536,7 +536,7 @@ export default class Uns extends NamingService {
       !!tokens.length &&
       !(
         domain === 'eth' ||
-        /^[^-]*[^-]*\.(eth|luxe|xyz|kred|addr\.reverse)$/.test(domain)
+        /^[^-]*[^-]*\.(eth|luxe|xyz|kred|addr|rsk\.reverse)$/.test(domain)
       ) &&
       tokens.every((v) => !!v.length)
     );

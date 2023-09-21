@@ -47,10 +47,12 @@ import {Eip1993Factories as Eip1193Factories} from '../utils/Eip1993Factories';
 import UnsConfig from '../config/uns-config.json';
 import {NullAddress} from '../types';
 import Networking from '../utils/Networking';
+import Rns from '../Rns';
 
 let resolution: Resolution;
 let uns: Uns;
 let zns: Zns;
+let rns: Rns;
 
 beforeEach(() => {
   nock.cleanAll();
@@ -70,10 +72,12 @@ beforeEach(() => {
         },
       },
       zns: {network: 'testnet'},
+      rns: {network: 'mainnet'},
     },
   });
   uns = resolution.serviceMap[NamingServiceName.UNS].native as Uns;
   zns = resolution.serviceMap[NamingServiceName.ZNS].native as Zns;
+  rns = resolution.serviceMap[NamingServiceName.RNS].native as Rns;
 });
 
 describe('Resolution', () => {

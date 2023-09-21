@@ -5,6 +5,10 @@ export interface ProxyReaderMap {
   [key: string]: string;
 }
 
+export interface ContractMap {
+  [key: string]: string;
+}
+
 export type ProviderParams = unknown[] | object;
 export interface RequestArguments {
   method: string;
@@ -124,6 +128,8 @@ export const UnsSupportedNetwork = StringUnion(
 export type UnsSupportedNetwork = typeof UnsSupportedNetwork.type;
 
 export const ZnsSupportedNetwork = StringUnion('mainnet', 'testnet');
+
+export const RnsSupportedNetwork = StringUnion('mainnet', 'testnet');
 
 export function hasProvider(obj: any): obj is {provider: Provider} {
   return obj && !!obj.provider;

@@ -1,0 +1,22 @@
+{
+  "version": "0.8.3",
+  "networks": {
+    "30": {
+      "contracts": {
+        "Registry": {
+          "address": "0xcb868aeabd31e2b66f74e9a55cf064abb31a4ad5",
+          "implementation": "0xcb868aeabd31e2b66f74e9a55cf064abb31a4ad5",
+          "legacyAddresses": [],
+          "deploymentBlock": "0x5653412",
+          "forwarder": "0x0000000000000000000000000000000000000000"
+        },
+        "Resolver": {
+          "address": "0xd87f8121d44f3717d4badc50b24e50044f86d64b",
+          "legacyAddresses": [],
+          "deploymentBlock": "0x55F772",
+          "forwarder": "0x0000000000000000000000000000000000000000"
+        }
+      }
+    }
+  }
+}
