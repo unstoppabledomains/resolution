@@ -945,7 +945,7 @@ export default class Resolution {
   /**
    * Returns the domain that is the primary resolution of the provided address
    * @param address - owner's address
-   * @returns Promise<URL> - domain URL that is the primary resolution of the provided addresss
+   * @returns Promise<URL> - domain URL that is the primary resolution of the provided address
    */
   async reverse(
     address: string,
@@ -955,6 +955,12 @@ export default class Resolution {
 
     if (tokenId) {
       return this.unhash(tokenId as string, NamingServiceName.UNS);
+    }
+
+    const ensService = this.serviceMap['ENS'].native;
+    const ensDomainName = await ensService.reverseOf(address);
+    if (ensDomainName) {
+      return ensDomainName;
     }
 
     return null;

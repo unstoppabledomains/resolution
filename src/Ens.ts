@@ -2,6 +2,7 @@ import {default as ensInterface} from './contracts/ens/ens';
 import {default as resolverInterface} from './contracts/ens/resolver';
 import {default as nameWrapperInterface} from './contracts/ens/nameWrapper';
 import {default as baseRegistrarInterface} from './contracts/ens/baseRegistrar';
+import {default as reverseRegistrarInterface} from './contracts/ens/reverseRegistrar';
 import {EnsSupportedNetwork, EthCoinIndex, hasProvider} from './types';
 import {ResolutionError, ResolutionErrorCode} from './errors/resolutionError';
 import EthereumContract from './contracts/EthereumContract';
@@ -15,11 +16,7 @@ import {
   TokenUriMetadata,
   BlockchainType,
 } from './types/publicTypes';
-import {
-  constructRecords,
-  EthereumNetworksInverted,
-  isNullAddress,
-} from './utils';
+import {EthereumNetworksInverted, isNullAddress} from './utils';
 import FetchProvider from './FetchProvider';
 import {eip137Childhash, eip137Namehash, labelNameHash} from './utils/namehash';
 import {NamingService} from './NamingService';
@@ -138,6 +135,12 @@ export default class Ens extends NamingService {
 
   async owner(domain: string): Promise<string> {
     const namehash = this.namehash(domain);
+    const isWrapped = await this.determineIsWrappedDomain(namehash);
+    if (isWrapped) {
+      return await this.callMethod(this.nameWrapperContract, 'ownerOf', [
+        namehash,
+      ]);
+    }
     return await this.callMethod(this.registryContract, 'owner', [namehash]);
   }
 
@@ -155,13 +158,14 @@ export default class Ens extends NamingService {
   }
 
   async record(domain: string, key: string): Promise<string> {
-    const returnee = (await this.records(domain, [key]))[key];
+    const returnee = await this.getTextRecord(domain, key);
     if (!returnee) {
       throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
         domain,
-        recordName: key,
+        key,
       });
     }
+
     return returnee;
   }
 
@@ -169,43 +173,45 @@ export default class Ens extends NamingService {
     domain: string,
     keys: string[],
   ): Promise<Record<string, string>> {
-    const values = await Promise.all(
-      keys.map(async (key) => {
-        if (key.startsWith('crypto.')) {
-          const ticker = key.split('.')[1];
-          return await this.addr(domain, ticker);
-        }
-        if (key === 'ipfs.html.value' || key === 'dweb.ipfs.hash') {
-          return await this.getContentHash(domain);
-        }
-        const ensRecordName = this.fromUDRecordNameToENS(key);
-        return await this.getTextRecord(domain, ensRecordName);
-      }),
-    );
-    return constructRecords(keys, values);
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+      methodName: 'records',
+    });
   }
 
   async reverse(
     address: string,
     currencyTicker: string,
   ): Promise<string | null> {
-    if (currencyTicker != 'ETH') {
-      throw new Error(`Ens doesn't support any currency other than ETH`);
-    }
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+      methodName: 'reverse',
+    });
+  }
 
+  // TODO: Figure out why nameHash() does not work for reverse address.
+  // Current implementation uses reverseRegistrarContract to fetch the correct node hash.
+  // @see: https://eips.ethereum.org/EIPS/eip-181
+  async reverseOf(address: string): Promise<string | null> {
     if (address.startsWith('0x')) {
       address = address.substr(2);
     }
 
-    const reverseAddress = address + '.addr.reverse';
-    const nodeHash = this.namehash(reverseAddress);
-    const resolverAddress = await this.resolver(reverseAddress).catch(
-      (err: ResolutionError) => {
-        if (err.code === ResolutionErrorCode.UnspecifiedResolver) {
-          return null;
-        }
-        throw err;
-      },
+    const reverseRegistrarAddress = this.determineReverseRegistrarAddress(
+      this.network,
+    );
+    const reverseRegistrarContract = new EthereumContract(
+      reverseRegistrarInterface,
+      reverseRegistrarAddress,
+      this.provider,
+      this.proxyServiceApiKey,
+    );
+
+    const nodeHash = await this.callMethod(reverseRegistrarContract, 'node', [
+      address,
+    ]);
+    const resolverAddress = await this.callMethod(
+      this.registryContract,
+      'resolver',
+      [nodeHash],
     );
 
     if (isNullAddress(resolverAddress)) {
@@ -220,15 +226,6 @@ export default class Ens extends NamingService {
     );
 
     return await this.resolverCallToName(resolverContract, nodeHash);
-  }
-
-  async reverseOf(
-    address: string,
-    location?: UnsLocation,
-  ): Promise<string | null> {
-    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
-      methodName: 'reverseOf',
-    });
   }
 
   async getTokenUri(domain: string): Promise<string> {
@@ -303,13 +300,9 @@ export default class Ens extends NamingService {
     network: string,
     token: string,
   ): Promise<string> {
-    let fetchedAddress = '';
-    const address = await this.addr(domain, token);
-    if (address) {
-      fetchedAddress = address;
-    }
-
-    return fetchedAddress;
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+      methodName: 'getAddress',
+    });
   }
 
   /**
@@ -356,17 +349,6 @@ export default class Ens extends NamingService {
     }
 
     return coin.toString();
-  }
-
-  private fromUDRecordNameToENS(record: string): string {
-    const mapper = {
-      'ipfs.redirect_domain.value': 'url',
-      'browser.redirect_url': 'url',
-      'whois.email.value': 'email',
-      'gundb.username.value': 'gundb_username',
-      'gundb.public_key.value': 'gundb_public_key',
-    };
-    return mapper[record] || record;
   }
 
   private async addr(
@@ -439,7 +421,8 @@ export default class Ens extends NamingService {
   private async getTextRecord(domain, key): Promise<string | undefined> {
     const nodeHash = this.namehash(domain);
     const resolver = await this.getResolverContract(domain);
-    return await this.callMethod(resolver, 'text', [nodeHash, key]);
+    const textRecord = await this.callMethod(resolver, 'text', [nodeHash, key]);
+    return textRecord;
   }
 
   private async getContentHash(domain: string): Promise<string | undefined> {
@@ -479,8 +462,13 @@ export default class Ens extends NamingService {
     return result[0];
   }
 
+  // Checks if domain is an ENS domain with tlds, or a reverse address.
   private checkSupportedDomain(domain: string): boolean {
-    return domain === 'eth' || /^([^\s\\.]+\.)+([a-zA-Z])+$/.test(domain);
+    return (
+      domain === 'eth' ||
+      /^([^\s\\.]+\.)+(eth|luxe|xyz|kred)+$/.test(domain) ||
+      /^([^\s\\.]+\.)(addr\.)(reverse)$/.test(domain)
+    );
   }
 
   private checkNetworkConfig(source: EnsSource | undefined): EnsSource {
@@ -555,6 +543,10 @@ export default class Ens extends NamingService {
   private determineBaseRegistrarAddress(network: number): string {
     return ensConfig.networks[network].contracts.BaseRegistrarImplementation
       .address;
+  }
+
+  private determineReverseRegistrarAddress(network: number): string {
+    return ensConfig.networks[network].contracts.ReverseRegistrar.address;
   }
 
   private async determineIsWrappedDomain(
