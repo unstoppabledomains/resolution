@@ -66,24 +66,28 @@ describe('ENS', () => {
 
   skipItInLive('reverses address to ENS domain', async () => {
     const eyes = mockAsyncMethods(ens, {
+      reverseRegistrarCallToNode:
+        '0x4da70a332a7a98a58486f551a455b1398ce309d9bd3a4f0800da4eec299829a4',
+      callMethod: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
       resolverCallToName: 'adrian.argent.xyz',
-      resolver: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
     });
-    const result = await ens?.reverse(
+    const result = await ens?.reverseOf(
       '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
-      'ETH',
     );
     expectSpyToBeCalled(eyes);
     expect(result).toEqual('adrian.argent.xyz');
   });
 
   it('reverses address to ENS domain null', async () => {
-    const spy = mockAsyncMethod(ens, 'resolver', NullAddress);
-    const result = await ens?.reverse(
+    const spy = mockAsyncMethods(ens, {
+      reverseRegistrarCallToNode:
+        '0x4da70a332a7a98a58486f551a455b1398ce309d9bd3a4f0800da4eec299829a4',
+      callMethod: NullAddress,
+    });
+    const result = await ens?.reverseOf(
       '0x112234455c3a32fd11230c42e7bccd4a84e02010',
-      'ETH',
     );
-    expectSpyToBeCalled([spy]);
+    expectSpyToBeCalled(spy);
     expect(result).toEqual(null);
   });
 

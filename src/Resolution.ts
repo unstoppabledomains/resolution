@@ -582,11 +582,18 @@ export default class Resolution {
    */
   async ipfsHash(domain: string): Promise<string> {
     domain = prepareAndValidateDomain(domain);
-    return this.getPreferableNewRecord(
-      domain,
-      'dweb.ipfs.hash',
-      'ipfs.html.value',
-    );
+    return await this.callServiceForDomain(domain, async (service) => {
+      if (service instanceof Ens) {
+        // @see https://docs.ens.domains/ens-improvement-proposals/ensip-7-contenthash-field
+        return await service.record(domain, 'contenthash');
+      }
+
+      return await this.getPreferableNewRecord(
+        domain,
+        'dweb.ipfs.hash',
+        'ipfs.html.value',
+      );
+    });
   }
 
   /**
@@ -595,11 +602,17 @@ export default class Resolution {
    */
   async httpUrl(domain: string): Promise<string> {
     domain = prepareAndValidateDomain(domain);
-    return this.getPreferableNewRecord(
-      domain,
-      'browser.redirect_url',
-      'ipfs.redirect_domain.value',
-    );
+    return await this.callServiceForDomain(domain, async (service) => {
+      if (service instanceof Ens) {
+        return await service.record(domain, 'url');
+      }
+
+      return await this.getPreferableNewRecord(
+        domain,
+        'browser.redirect_url',
+        'ipfs.redirect_domain.value',
+      );
+    });
   }
 
   /**
@@ -609,7 +622,14 @@ export default class Resolution {
    * @returns A Promise that resolves in an email address configured for this domain whois
    */
   async email(domain: string): Promise<string> {
-    return this.record(domain, 'whois.email.value');
+    domain = prepareAndValidateDomain(domain);
+    let key = 'whois.email.value';
+    const serviceName = findNamingServiceName(domain);
+    if (serviceName === 'ENS') {
+      key = 'email';
+    }
+
+    return await this.record(domain, key);
   }
 
   /**

@@ -204,9 +204,10 @@ export default class Ens extends NamingService {
       this.proxyServiceApiKey,
     );
 
-    const nodeHash = await this.callMethod(reverseRegistrarContract, 'node', [
+    const nodeHash = await this.reverseRegistrarCallToNode(
+      reverseRegistrarContract,
       address,
-    ]);
+    );
     const resolverAddress = await this.callMethod(
       this.registryContract,
       'resolver',
@@ -312,6 +313,16 @@ export default class Ens extends NamingService {
     nodeHash: string,
   ) {
     return this.callMethod(resolverContract, 'name', [nodeHash]);
+  }
+
+  /**
+   * This was done to make automated tests more configurable
+   */
+  private async reverseRegistrarCallToNode(
+    reverseRegistrarContract: EthereumContract,
+    address: string,
+  ): Promise<string> {
+    return await this.callMethod(reverseRegistrarContract, 'node', [address]);
   }
 
   async twitter(domain: string): Promise<string> {
@@ -420,16 +431,21 @@ export default class Ens extends NamingService {
     return formatsByCoinType[coinType].encoder(data);
   }
 
+  // @see https://docs.ens.domains/ens-improvement-proposals/ensip-5-text-records
   private async getTextRecord(
     domain: string,
     key: string,
   ): Promise<string | undefined> {
+    if (key === 'contenthash') {
+      return await this.getContentHash(domain);
+    }
     const nodeHash = this.namehash(domain);
     const resolver = await this.getResolverContract(domain);
     const textRecord = await this.callMethod(resolver, 'text', [nodeHash, key]);
     return textRecord;
   }
 
+  // @see https://docs.ens.domains/ens-improvement-proposals/ensip-7-contenthash-field
   private async getContentHash(domain: string): Promise<string | undefined> {
     const contentHash = requireOrFail('content-hash', 'content-hash', '^2.5.2');
     const nodeHash = this.namehash(domain);
