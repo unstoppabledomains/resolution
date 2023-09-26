@@ -10,7 +10,6 @@ import EnsNetworkMap from 'ethereum-ens-network-map';
 import {
   EnsSource,
   Locations,
-  UnsLocation,
   NamingServiceName,
   Provider,
   TokenUriMetadata,
@@ -308,7 +307,10 @@ export default class Ens extends NamingService {
   /**
    * This was done to make automated tests more configurable
    */
-  private resolverCallToName(resolverContract: EthereumContract, nodeHash) {
+  private resolverCallToName(
+    resolverContract: EthereumContract,
+    nodeHash: string,
+  ) {
     return this.callMethod(resolverContract, 'name', [nodeHash]);
   }
 
@@ -351,7 +353,7 @@ export default class Ens extends NamingService {
     return coin.toString();
   }
 
-  private async addr(
+  async addr(
     domain: string,
     currencyTicker: string,
   ): Promise<string | undefined> {
@@ -418,7 +420,10 @@ export default class Ens extends NamingService {
     return formatsByCoinType[coinType].encoder(data);
   }
 
-  private async getTextRecord(domain, key): Promise<string | undefined> {
+  private async getTextRecord(
+    domain: string,
+    key: string,
+  ): Promise<string | undefined> {
     const nodeHash = this.namehash(domain);
     const resolver = await this.getResolverContract(domain);
     const textRecord = await this.callMethod(resolver, 'text', [nodeHash, key]);
@@ -450,6 +455,7 @@ export default class Ens extends NamingService {
       resolverInterface(resolverAddress, coinType),
       resolverAddress,
       this.provider,
+      this.proxyServiceApiKey,
     );
   }
 
@@ -579,8 +585,4 @@ export default class Ens extends NamingService {
       methodName: 'tokenURIMetadata',
     });
   }
-
-  // private async unhashTokenId(tokenId: string): Promise<string> {
-
-  // }
 }

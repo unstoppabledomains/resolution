@@ -22,6 +22,7 @@ type ResolutionErrorOptions = {
   location?: UnsLocation;
   tokenUri?: string;
   config?: ResolutionConfig;
+  key?: string;
 };
 
 export enum ResolutionErrorCode {

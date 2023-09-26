@@ -506,8 +506,18 @@ export default class Resolution {
    * @throws [[ResolutionError]] if address is not found
    * @returns A promise that resolves in an address
    */
-  async addr(domain: string, ticker: string): Promise<string> {
-    return this.record(domain, `crypto.${ticker.toUpperCase()}.address`);
+  async addr(domain: string, ticker: string): Promise<string | undefined> {
+    domain = prepareAndValidateDomain(domain);
+    return await this.callServiceForDomain(domain, async (service) => {
+      if (service instanceof Ens) {
+        return await service.addr(domain, ticker);
+      }
+
+      return await this.record(
+        domain,
+        `crypto.${ticker.toUpperCase()}.address`,
+      );
+    });
   }
 
   /**
