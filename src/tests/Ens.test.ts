@@ -4,7 +4,6 @@ import {NullAddress} from '../types';
 import {
   expectResolutionErrorCode,
   expectSpyToBeCalled,
-  mockAsyncMethod,
   mockAsyncMethods,
   getProtocolLinkFromEnv,
   ProviderProtocol,
@@ -69,6 +68,7 @@ describe('ENS', () => {
       reverseRegistrarCallToNode:
         '0x4da70a332a7a98a58486f551a455b1398ce309d9bd3a4f0800da4eec299829a4',
       callMethod: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
+      addr: '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
       resolverCallToName: 'adrian.argent.xyz',
     });
     const result = await ens?.reverseOf(

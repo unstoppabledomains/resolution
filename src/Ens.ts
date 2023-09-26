@@ -190,6 +190,7 @@ export default class Ens extends NamingService {
   // Current implementation uses reverseRegistrarContract to fetch the correct node hash.
   // @see: https://eips.ethereum.org/EIPS/eip-181
   async reverseOf(address: string): Promise<string | null> {
+    const originalAddress = address;
     if (address.startsWith('0x')) {
       address = address.substr(2);
     }
@@ -225,7 +226,16 @@ export default class Ens extends NamingService {
       this.proxyServiceApiKey,
     );
 
-    return await this.resolverCallToName(resolverContract, nodeHash);
+    const domainName = await this.resolverCallToName(
+      resolverContract,
+      nodeHash,
+    );
+    const fetchedAddress = await this.addr(domainName, BlockchainType.ETH);
+    if (fetchedAddress?.toLowerCase() !== originalAddress.toLowerCase()) {
+      return null;
+    }
+
+    return domainName;
   }
 
   async getTokenUri(domain: string): Promise<string> {
