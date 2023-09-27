@@ -32,6 +32,7 @@ export const WalletDomainOnBothLayers =
 export const CryptoDomainWithoutGunDbRecords =
   'test-usdt-and-dns-records.crypto';
 export const SubdomainLayerTwo = 'subdomain.resolution-test.wallet';
+export const RnsDomainWithAllRecords = 'test-usdt-and-dns-records.rsk';
 
 export enum ProviderProtocol {
   'http' = 'http',

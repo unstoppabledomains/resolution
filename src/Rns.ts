@@ -32,7 +32,7 @@ export default class Rns extends NamingService {
 
   static readonly UrlMap = {
     30: 'https://public-node.rsk.co',
-    31: 'https://public-node.rsk.co',
+    31: 'https://public-node.testnet.rsk.co',
   };
 
   static readonly NetworkNameMap = {
@@ -205,7 +205,7 @@ export default class Rns extends NamingService {
 
   async locations(domains: string[]): Promise<Locations> {
     const recordsAddresses = await Promise.all(
-      domains.map((domain) => this.callRegistryResolver(domain)),
+      domains.map((domain) => this.callRegistryResolver(this.namehash(domain))),
     );
 
     return domains.reduce((locations, domain, i) => {
@@ -255,6 +255,15 @@ export default class Rns extends NamingService {
         {
           method: NamingServiceName.RNS,
           config: 'resolverAddress',
+        },
+      );
+    }
+    if (!source.registryAddress) {
+      throw new ConfigurationError(
+        ConfigurationErrorCode.CustomNetworkConfigMissing,
+        {
+          method: NamingServiceName.RNS,
+          config: 'registryAddress',
         },
       );
     }
