@@ -533,12 +533,16 @@ export default class Resolution {
     domain: string,
     ticker: string,
     chain: string,
-  ): Promise<string> {
+  ): Promise<string | undefined> {
     domain = prepareAndValidateDomain(domain);
     const recordKey = `crypto.${ticker.toUpperCase()}.version.${chain.toUpperCase()}.address`;
-    return this.callServiceForDomain(domain, (service) =>
-      service.record(domain, recordKey),
-    );
+    return this.callServiceForDomain(domain, async (service) => {
+      if (service instanceof Ens) {
+        return await service.addr(domain, ticker);
+      }
+
+      return await service.record(domain, recordKey);
+    });
   }
 
   /**
@@ -603,7 +607,8 @@ export default class Resolution {
     return await this.callServiceForDomain(domain, async (service) => {
       if (service instanceof Ens) {
         // @see https://docs.ens.domains/ens-improvement-proposals/ensip-7-contenthash-field
-        return await service.record(domain, 'contenthash');
+        const contentHash = await service.record(domain, 'contenthash');
+        return `ipfs://${contentHash}`;
       }
 
       return await this.getPreferableNewRecord(
@@ -647,7 +652,16 @@ export default class Resolution {
       key = 'email';
     }
 
-    return await this.record(domain, key);
+    try {
+      return await this.record(domain, key);
+    } catch (err) {
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+        domain,
+        method: err.method,
+        methodName: 'email',
+        recordName: err.recordName,
+      });
+    }
   }
 
   /**
@@ -992,9 +1006,20 @@ export default class Resolution {
   async reverseTokenId(
     address: string,
     options?: ReverseResolutionOptions,
-  ): Promise<string> {
-    const tokenId = this.reverseGetTokenId(address, options?.location);
-    return tokenId;
+  ): Promise<string | null> {
+    const tokenId = await this.reverseGetTokenId(address, options?.location);
+    if (tokenId) {
+      return tokenId;
+    }
+
+    const ensService = this.serviceMap['ENS'].native;
+    const ensDomainName = await ensService.reverseOf(address);
+    if (ensDomainName) {
+      const ensNameHash = ensService.namehash(ensDomainName);
+      return `${BigInt(ensNameHash)}`;
+    }
+
+    return null;
   }
 
   /**
