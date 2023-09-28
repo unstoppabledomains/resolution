@@ -562,7 +562,16 @@ export default class Resolution {
    * @returns A promise that resolves in chatId
    */
   async chatId(domain: string): Promise<string> {
-    return this.record(domain, 'gundb.username.value');
+    try {
+      return await this.record(domain, 'gundb.username.value');
+    } catch (err) {
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+        domain,
+        method: err.method,
+        methodName: 'chatId',
+        recordName: err.recordName,
+      });
+    }
   }
 
   /**
@@ -572,7 +581,16 @@ export default class Resolution {
    * @returns a promise that resolves in gundb public key
    */
   async chatPk(domain: string): Promise<string> {
-    return this.record(domain, 'gundb.public_key.value');
+    try {
+      return await this.record(domain, 'gundb.public_key.value');
+    } catch (err) {
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+        domain,
+        method: err.method,
+        methodName: 'chatPk',
+        recordName: err.recordName,
+      });
+    }
   }
 
   /**
@@ -919,14 +937,22 @@ export default class Resolution {
    */
   async locations(domains: string[]): Promise<Locations> {
     const zilDomains = domains.filter((domain) => domain.endsWith('.zil'));
-
+    const ensDomains = domains.filter((domain) =>
+      domain.match(/^([^\s\\.]+\.)+(eth|luxe|xyz|kred)+$/),
+    );
+    const unsDomains = domains.filter(
+      (domain) =>
+        !domain.endsWith('.zil') &&
+        !domain.match(/^([^\s\\.]+\.)+(eth|luxe|xyz|kred)+$/),
+    );
     // Here, we call both UNS and ZNS methods and merge the results.
     // If any of the calls fails, this method will fail as well as we aren't interested in partial results.
     // For example, if one of the providers is configured as `UdApi`, it'll fail as the method is unsupported.
     // But if there are no .zil domains with absent UNS locations (i.e. all the requested .zil domains have been
     // migrated to UNS), the ZNS call result will be ignored and an error, if there's one, won't be thrown.
 
-    const unsPromise = this.serviceMap.UNS.usedServices[0].locations(domains);
+    const unsPromise =
+      this.serviceMap.UNS.usedServices[0].locations(unsDomains);
     // Fetch UNS locations first. If we see that there are no .zil domains with absent locations, we can return early.
     const unsLocations = await unsPromise;
     if (zilDomains.length) {
@@ -946,7 +972,6 @@ export default class Resolution {
       }
     }
 
-    const ensDomains = domains.filter((domain) => domain.endsWith('.eth'));
     if (ensDomains.length) {
       const ensLocations = await this.serviceMap.ENS.usedServices[0].locations(
         ensDomains,

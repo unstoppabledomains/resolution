@@ -161,7 +161,9 @@ export default class Ens extends NamingService {
     if (!returnee) {
       throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
         domain,
-        key,
+        recordName: key,
+        method: this.name,
+        methodName: 'record',
       });
     }
 
@@ -290,8 +292,9 @@ export default class Ens extends NamingService {
   }
 
   async locations(domains: string[]): Promise<Locations> {
-    const result: Locations = domains.reduce(async (locations, domain) => {
-      locations[domain] = {
+    const result: Locations = {};
+    for (const domain of domains) {
+      result[domain] = {
         resolverAddress: (await this.getResolverContract(domain)).address,
         registryAddress: this.registryContract.address,
         networkId: this.network,
@@ -299,8 +302,7 @@ export default class Ens extends NamingService {
         ownerAddress: (await this.addr(domain, BlockchainType.ETH)) || '',
         blockchainProviderUrl: this.url,
       };
-      return locations;
-    }, {});
+    }
 
     return result;
   }
@@ -335,11 +337,18 @@ export default class Ens extends NamingService {
     return await this.callMethod(reverseRegistrarContract, 'node', [address]);
   }
 
+  // @see: https://docs.ens.domains/ens-improvement-proposals/ensip-5-text-records#service-keys
   async twitter(domain: string): Promise<string> {
-    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
-      domain,
-      methodName: 'twitter',
-    });
+    try {
+      return await this.record(domain, 'com.twitter');
+    } catch (err) {
+      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+        domain,
+        method: this.name,
+        methodName: 'twitter',
+        recordName: err.recordName,
+      });
+    }
   }
 
   async allRecords(domain: string): Promise<Record<string, string>> {
