@@ -178,6 +178,8 @@ export default class Ens extends NamingService {
   ): Promise<Record<string, string>> {
     throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
       methodName: 'records',
+      domain,
+      method: this.serviceName(),
     });
   }
 
@@ -185,6 +187,8 @@ export default class Ens extends NamingService {
   async dns(domain: string, types: DnsRecordType[]): Promise<DnsRecord[]> {
     throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
       methodName: 'dns',
+      method: this.serviceName(),
+      domain,
     });
   }
 
@@ -323,6 +327,8 @@ export default class Ens extends NamingService {
   ): Promise<string> {
     throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
       methodName: 'getAddress',
+      domain,
+      method: this.serviceName(),
     });
   }
 

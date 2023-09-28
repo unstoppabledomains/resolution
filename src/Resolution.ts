@@ -569,12 +569,15 @@ export default class Resolution {
     try {
       return await this.record(domain, 'gundb.username.value');
     } catch (err) {
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-        domain,
-        method: err.method,
-        methodName: 'chatId',
-        recordName: err.recordName,
-      });
+      if (err.code === ResolutionErrorCode.RecordNotFound) {
+        throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+          domain,
+          method: err.method,
+          methodName: 'chatId',
+          recordName: err.recordName,
+        });
+      }
+      throw err;
     }
   }
 
@@ -588,12 +591,15 @@ export default class Resolution {
     try {
       return await this.record(domain, 'gundb.public_key.value');
     } catch (err) {
-      throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
-        domain,
-        method: err.method,
-        methodName: 'chatPk',
-        recordName: err.recordName,
-      });
+      if (err.code === ResolutionErrorCode.RecordNotFound) {
+        throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
+          domain,
+          method: err.method,
+          methodName: 'chatPk',
+          recordName: err.recordName,
+        });
+      }
+      throw err;
     }
   }
 
@@ -954,10 +960,8 @@ export default class Resolution {
     const ensDomains = domains.filter((domain) =>
       domain.match(/^([^\s\\.]+\.)+(eth|luxe|xyz|kred)+$/),
     );
-    const unsDomains = domains.filter(
-      (domain) =>
-        !domain.endsWith('.zil') &&
-        !domain.match(/^([^\s\\.]+\.)+(eth|luxe|xyz|kred)+$/),
+    const nonEnsDomains = domains.filter(
+      (domain) => !domain.match(/^([^\s\\.]+\.)+(eth|luxe|xyz|kred)+$/),
     );
     // Here, we call both UNS and ZNS methods and merge the results.
     // If any of the calls fails, this method will fail as well as we aren't interested in partial results.
@@ -966,7 +970,7 @@ export default class Resolution {
     // migrated to UNS), the ZNS call result will be ignored and an error, if there's one, won't be thrown.
 
     const unsPromise =
-      this.serviceMap.UNS.usedServices[0].locations(unsDomains);
+      this.serviceMap.UNS.usedServices[0].locations(nonEnsDomains);
     // Fetch UNS locations first. If we see that there are no .zil domains with absent locations, we can return early.
     const unsLocations = await unsPromise;
     if (zilDomains.length) {

@@ -331,7 +331,9 @@ describe('ENS', () => {
       });
       const ipfsHash = await resolution.ipfsHash('monkybrain.eth');
       expectSpyToBeCalled(eyes);
-      expect(ipfsHash).toBe('QmXSBLw6VMegqkCHSDBPg7xzfLhUyuRBzTb927KVzKC1vq');
+      expect(ipfsHash).toBe(
+        'ipfs://QmXSBLw6VMegqkCHSDBPg7xzfLhUyuRBzTb927KVzKC1vq',
+      );
     });
 
     // todo(johny) find some domains with url property set
