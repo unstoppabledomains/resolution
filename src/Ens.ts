@@ -14,6 +14,8 @@ import {
   Provider,
   TokenUriMetadata,
   BlockchainType,
+  DnsRecordType,
+  DnsRecord,
 } from './types/publicTypes';
 import {EthereumNetworksInverted, isNullAddress} from './utils';
 import FetchProvider from './FetchProvider';
@@ -176,6 +178,13 @@ export default class Ens extends NamingService {
   ): Promise<Record<string, string>> {
     throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
       methodName: 'records',
+    });
+  }
+
+  // TODO: Need to understand how ENS supports DNS @see https://docs.ens.domains/contract-api-reference/dns-registrar#retrieving-the-dns-text-record
+  async dns(domain: string, types: DnsRecordType[]): Promise<DnsRecord[]> {
+    throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+      methodName: 'dns',
     });
   }
 
