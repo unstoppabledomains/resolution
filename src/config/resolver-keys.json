@@ -2650,6 +2650,16 @@
       "deprecatedKeyName": "VERSE",
       "validationRegex": "^0x[a-fA-F0-9]{40}$",
       "deprecated": false
+    },
+    "crypto.RBTC.address": {
+      "deprecatedKeyName": "RBTC",
+      "deprecated": false,
+      "validationRegex": "^0x[a-fA-F0-9]{40}$"
+    },
+    "crypto.TRBTC.address": {
+      "deprecatedKeyName": "TRBTC",
+      "deprecated": false,
+      "validationRegex": "^0x[a-fA-F0-9]{40}$"
     }
   }
 }

@@ -75,6 +75,7 @@ export function constructRecords(
 export const domainExtensionToNamingServiceName = {
   crypto: NamingServiceName.UNS,
   zil: NamingServiceName.ZNS,
+  rsk: NamingServiceName.RNS,
 };
 
 export const findNamingServiceName = (
@@ -96,6 +97,11 @@ export const EthereumNetworks = {
   goerli: 5,
   'polygon-mainnet': 137,
   'polygon-mumbai': 80001,
+} as const;
+
+export const RskNetworks = {
+  mainnet: 30,
+  testnet: 31,
 } as const;
 
 export const EthereumNetworksInverted = {
