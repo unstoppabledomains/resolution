@@ -538,7 +538,11 @@ export default class Resolution {
     const recordKey = `crypto.${ticker.toUpperCase()}.version.${chain.toUpperCase()}.address`;
     return this.callServiceForDomain(domain, async (service) => {
       if (service instanceof Ens) {
-        return await service.addr(domain, ticker);
+        throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
+          methodName: 'multiChainAddr',
+          domain,
+          method: service.name,
+        });
       }
 
       return await service.record(domain, recordKey);
