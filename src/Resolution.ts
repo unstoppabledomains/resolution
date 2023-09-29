@@ -595,7 +595,7 @@ export default class Resolution {
         throw new ResolutionError(ResolutionErrorCode.RecordNotFound, {
           domain,
           method: err.method,
-          methodName: 'chatPk',
+          methodName: 'chatId',
           recordName: err.recordName,
         });
       }

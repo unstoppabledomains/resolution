@@ -46,7 +46,6 @@ describe('ENS', () => {
     expect(ens.network).toEqual(5);
 
     const eyes = mockAsyncMethods(ens, {
-      determineIsWrappedDomain: false,
       resolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
       fetchAddress: '0xa59C818Ddb801f1253edEbf0Cf08c9E481EA2fE5',
     });
@@ -68,7 +67,7 @@ describe('ENS', () => {
       reverseRegistrarCallToNode:
         '0x4da70a332a7a98a58486f551a455b1398ce309d9bd3a4f0800da4eec299829a4',
       callMethod: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
-      addr: '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
+      resolverCallToAddr: '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
       resolverCallToName: 'adrian.argent.xyz',
     });
     const result = await ens?.reverseOf(
@@ -93,7 +92,6 @@ describe('ENS', () => {
 
   it('resolves .xyz name using ENS blockchain', async () => {
     const eyes = mockAsyncMethods(ens, {
-      determineIsWrappedDomain: false,
       resolver: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
       fetchAddress: '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
     });
@@ -105,7 +103,6 @@ describe('ENS', () => {
 
   it('resolves .luxe name using ENS blockchain', async () => {
     const eyes = mockAsyncMethods(ens, {
-      determineIsWrappedDomain: false,
       resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
       fetchAddress: '0xf3dE750A73C11a6a2863761E930BF5fE979d5663',
     });
@@ -117,9 +114,8 @@ describe('ENS', () => {
 
   it('resolves .kred name using ENS blockchain', async () => {
     const eyes = mockAsyncMethods(ens, {
-      determineIsWrappedDomain: false,
       resolver: '0x96184444629F3489c4dE199871E6F99568229d8f',
-      callMethod: '0x96184444629F3489c4dE199871E6F99568229d8f',
+      fetchAddress: '0x96184444629F3489c4dE199871E6F99568229d8f',
     });
     const result = await resolution.addr('brantly.kred', 'ETH');
     expectSpyToBeCalled(eyes);
@@ -128,7 +124,6 @@ describe('ENS', () => {
 
   it('resolves .luxe name using ENS blockchain with thrown error', async () => {
     const spies = mockAsyncMethods(ens, {
-      determineIsWrappedDomain: false,
       resolver: undefined,
       owner: undefined,
     });
@@ -143,7 +138,7 @@ describe('ENS', () => {
   it('resolves name with resolver but without an owner', async () => {
     const eyes = mockAsyncMethods(ens, {
       resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-      callMethod: 'DBXu2kgc3xtvCUWFcxFE3r9hEYgmuaaCyD',
+      fetchAddress: 'DBXu2kgc3xtvCUWFcxFE3r9hEYgmuaaCyD',
     });
     const doge = await resolution.addr('testthing.eth', 'DOGE');
     expectSpyToBeCalled(eyes);
@@ -189,7 +184,7 @@ describe('ENS', () => {
   it('checks ens multicoin support #1', async () => {
     const eyes = mockAsyncMethods(ens, {
       resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-      callMethod: 'DBXu2kgc3xtvCUWFcxFE3r9hEYgmuaaCyD',
+      fetchAddress: 'DBXu2kgc3xtvCUWFcxFE3r9hEYgmuaaCyD',
     });
     const doge = await resolution.addr('testthing.eth', 'DOGE');
     expectSpyToBeCalled(eyes);
@@ -199,7 +194,7 @@ describe('ENS', () => {
   it('checks ens multicoin support #2', async () => {
     const eyes = mockAsyncMethods(ens, {
       resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-      callMethod: 'MV5rN5EcX1imDS2gEh5jPJXeiW5QN8YrK3',
+      fetchAddress: 'MV5rN5EcX1imDS2gEh5jPJXeiW5QN8YrK3',
     });
     const ltc = await resolution.addr('testthing.eth', 'LTC');
     expectSpyToBeCalled(eyes);
@@ -209,37 +204,37 @@ describe('ENS', () => {
   it('checks ens multicoin support #3', async () => {
     const eyes = mockAsyncMethods(ens, {
       resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-      callMethod: '0x314159265dd8dbb310642f98f50c066173c1259b',
+      fetchAddress: '0x314159265dD8dbb310642f98f50C066173C1259b',
     });
     const eth = await resolution.addr('testthing.eth', 'ETH');
     expectSpyToBeCalled(eyes);
-    expect(eth).toBe('0x314159265dd8dbb310642f98f50c066173c1259b');
+    expect(eth).toBe('0x314159265dD8dbb310642f98f50C066173C1259b');
   });
 
   it('checks ens multicoin support #4', async () => {
     const eyes = mockAsyncMethods(ens, {
       resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-      callMethod: '0x314159265dd8dbb310642f98f50c066173c1259b',
+      fetchAddress: '0x314159265dD8dbb310642f98f50C066173C1259b',
     });
     const etc = await resolution.addr('testthing.eth', 'etc');
     expectSpyToBeCalled(eyes);
-    expect(etc).toBe('0x314159265dd8dbb310642f98f50c066173c1259b');
+    expect(etc).toBe('0x314159265dD8dbb310642f98f50C066173C1259b');
   });
 
   it('checks ens multicoin support #5', async () => {
     const eyes = mockAsyncMethods(ens, {
       resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-      callMethod: '0x314159265dd8dbb310642f98f50c066173c1259b',
+      fetchAddress: '0x314159265dD8DbB310642F98f50C066173c1259B',
     });
     const rsk = await resolution.addr('testthing.eth', 'rsk');
     expectSpyToBeCalled(eyes);
-    expect(rsk).toBe('0x314159265dd8dbb310642f98f50c066173c1259b');
+    expect(rsk).toBe('0x314159265dD8DbB310642F98f50C066173c1259B');
   });
 
   it('checks ens multicoin support #6', async () => {
     const eyes = mockAsyncMethods(ens, {
       resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-      callMethod: 'X7qvLs7gSnNoKvZzNWUT2e8st17QPY64PPe7zriLNuJszeg',
+      fetchAddress: 'X7qvLs7gSnNoKvZzNWUT2e8st17QPY64PPe7zriLNuJszeg',
     });
     const xrp = await resolution.addr('testthing.eth', 'xrp');
     expectSpyToBeCalled(eyes);
@@ -249,7 +244,7 @@ describe('ENS', () => {
   it('checks ens multicoin support #7', async () => {
     const eyes = mockAsyncMethods(ens, {
       resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-      callMethod: 'bitcoincash:qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a',
+      fetchAddress: 'bitcoincash:qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a',
     });
     const bch = await resolution.addr('testthing.eth', 'bch');
     expectSpyToBeCalled(eyes);
@@ -259,7 +254,7 @@ describe('ENS', () => {
   it('checks ens multicoin support #8', async () => {
     const eyes = mockAsyncMethods(ens, {
       resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-      callMethod:
+      fetchAddress:
         'bc1pw508d6qejxtdg4y5r3zarvary0c5xw7kw508d6qejxtdg4y5r3zarvary0c5xw7k7grplx',
     });
     const btc = await resolution.addr('testthing.eth', 'BTC');
@@ -272,7 +267,6 @@ describe('ENS', () => {
   it('checks UnsupportedCurrency error', async () => {
     const eyes = mockAsyncMethods(ens, {
       resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',
-      determineIsWrappedDomain: false,
     });
     await expectResolutionErrorCode(
       resolution.addr('testthing.eth', 'UNREALTICKER'),

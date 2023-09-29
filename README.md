@@ -337,6 +337,18 @@ token.EVM.ETH.USDC.address
 crypto.USDC.address
 token.EVM.ETH.address
 ```
+
+`getAddress(domain, 'ETH', 'USDC')` will lookup records in the following order:
+// Not supported with ENS
+
+```
+1. token.EVM.ETH.USDC.address
+2. crypto.USDC.address
+3. crypto.USDC.version.ERC20.address
+4. token.EVM.ETH.address
+5. token.EVM.address
+```
+
 ## Error Handling
 
 When resolution encounters an error it returns the error code instead of

@@ -245,7 +245,11 @@ export default class Ens extends NamingService {
       resolverContract,
       nodeHash,
     );
-    const fetchedAddress = await this.addr(domainName, BlockchainType.ETH);
+
+    const fetchedAddress = await this.resolverCallToAddr(
+      resolverContract,
+      domainName,
+    );
     if (fetchedAddress?.toLowerCase() !== originalAddress.toLowerCase()) {
       return null;
     }
@@ -352,6 +356,18 @@ export default class Ens extends NamingService {
     return await this.callMethod(reverseRegistrarContract, 'node', [address]);
   }
 
+  /**
+   * This was done to make automated tests more configurable
+   */
+  private async resolverCallToAddr(
+    resolverContract: EthereumContract,
+    domainName: string,
+  ): Promise<string> {
+    return await this.callMethod(resolverContract, 'addr', [
+      this.namehash(domainName),
+    ]);
+  }
+
   // @see: https://docs.ens.domains/ens-improvement-proposals/ensip-5-text-records#service-keys
   async twitter(domain: string): Promise<string> {
     try {
@@ -409,13 +425,6 @@ export default class Ens extends NamingService {
         }
       },
     );
-
-    const isWrappedDomain = await this.determineIsWrappedDomain(
-      this.namehash(domain),
-    );
-    if (isWrappedDomain) {
-      return await this.getAddressForWrappedDomain(domain);
-    }
 
     if (!resolver) {
       const owner = await this.owner(domain);
