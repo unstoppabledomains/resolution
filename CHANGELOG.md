@@ -1,3 +1,7 @@
+## 9.2.2
+
+- Changed devDependencies to dependencies
+
 ## 9.2.1
 
 - Fix ens-config.json path error
