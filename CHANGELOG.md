@@ -1,4 +1,8 @@
-## 9.2.0 
+## 9.2.1
+
+- Fix ens-config.json path error
+
+## 9.2.0
 
 - Add ENS support
 
