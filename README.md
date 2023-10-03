@@ -167,6 +167,7 @@ function resolve(domain, currency) {
 
 resolve('brad.crypto', 'ETH');
 resolve('brad.zil', 'ZIL');
+resolve('vitalik.eth', 'ETH');
 ```
 
 ### Find the IPFS hash for a decentralized website
@@ -186,6 +187,7 @@ function resolveIpfsHash(domain) {
 }
 
 resolveIpfsHash('homecakes.crypto');
+resolveIpfsHash('vitalik.eth');
 ```
 
 ### Find a custom record
@@ -193,6 +195,8 @@ resolveIpfsHash('homecakes.crypto');
 Create a new file in your project, `custom-resolution.js`.
 
 ```javascript
+// Does not support ENS
+
 function resolveCustomRecord(domain, record) {
   resolution
     .records(domain, [record])
@@ -222,6 +226,8 @@ function getWalletAddr(domain, ticker) {
 }
 getWalletAddr('homecakes.crypto', 'ETH');
 // Domain homecakes.crypto has address for ETH: 0xe7474D07fD2FA286e7e0aa23cd107F8379085037
+getWalletAddr('vitalik.eth', 'ETH');
+// Domain homecakes.crypto has address for ETH: 0xe7474D07fD2FA286e7e0aa23cd107F8379085037
 ```
 
 ### Resolve multi-chain address format using `multiChainAddr`
@@ -233,6 +239,8 @@ This API is used to retrieve wallet address for multi-chain address records.
 With `aaron.x` has `crypto.AAVE.version.ERC20.address` on-chain:
 
 ```javascript
+// Does not support ENS
+
 function getMultiChainWalletAddr(domain, ticker, network) {
   resolution
     .multiChainAddr(domain, ticker, network)
