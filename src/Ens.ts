@@ -26,7 +26,7 @@ import ConfigurationError, {
 } from './errors/configurationError';
 import {EthereumNetworks} from './utils';
 import {requireOrFail} from './utils/requireOrFail';
-import ensConfig from '../src/config/ens-config.json';
+import ensConfig from './config/ens-config.json';
 import Networking from './utils/Networking';
 
 /**
