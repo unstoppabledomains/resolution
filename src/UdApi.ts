@@ -23,6 +23,7 @@ import {NamingService} from './NamingService';
  * @internal
  */
 export default class UdApi extends NamingService {
+  readonly name?: string | undefined;
   public readonly url: string;
   private readonly headers: {
     [key: string]: string;

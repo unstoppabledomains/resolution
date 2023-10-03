@@ -124,11 +124,13 @@ export class ResolutionError extends Error {
   readonly code: ResolutionErrorCode;
   readonly domain?: string;
   readonly method?: string;
+  readonly methodName?: string;
+  readonly recordName?: string;
   readonly currencyTicker?: string;
 
   constructor(code: ResolutionErrorCode, options: ResolutionErrorOptions = {}) {
     const resolutionErrorHandler: ResolutionErrorHandler = HandlersByCode[code];
-    const {domain, method, currencyTicker} = options;
+    const {domain, method, currencyTicker, methodName, recordName} = options;
     const message = resolutionErrorHandler(options);
 
     super(message);
@@ -137,6 +139,8 @@ export class ResolutionError extends Error {
     this.method = method;
     this.currencyTicker = currencyTicker;
     this.name = 'ResolutionError';
+    this.methodName = methodName;
+    this.recordName = recordName;
     Object.setPrototypeOf(this, ResolutionError.prototype);
   }
 }

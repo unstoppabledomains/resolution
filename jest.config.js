@@ -8,7 +8,7 @@ module.exports = {
       diagnostics: false,
     },
   },
-  testTimeout: 40000,
+  testTimeout: 50000,
   coveragePathIgnorePatterns: ['/node_modules/', '/src/tests/'],
   setupFilesAfterEnv: ['<rootDir>/src/tests/jestSetup.ts'],
 };

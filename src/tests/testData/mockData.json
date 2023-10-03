@@ -596,5 +596,41 @@
         "transactionIndex": "0x9"
       }
     ]
-  }
+  },
+  "ens_setup_call": [
+    {
+      "METHOD": "POST",
+      "REQUEST": {
+        "method": "POST",
+        "url": "https://goerli.infura.io/v3/a32aa2ace9704ee9a1a9906418bcabe5",
+        "headers": {
+          "content-type": ["application/json"],
+          "accept": ["*/*"],
+          "content-length": ["202"],
+          "user-agent": [
+            "node-fetch/1.0 (+https://github.com/bitinn/node-fetch)"
+          ],
+          "accept-encoding": ["gzip,deflate"],
+          "connection": ["close"]
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "1",
+          "method": "eth_call",
+          "params": [
+            {
+              "data": "0xfd0cd0d9d83b9ecd0138440a533df2ae4ef7e2b1467caa9bf9b00b9f6a680c9321ceae1e",
+              "to": "0x114D4603199df73e7D157787f8778E21fCd13066"
+            },
+            "latest"
+          ]
+        }
+      },
+      "RESPONSE": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": "0x0000000000000000000000000000000000000000000000000000000000000001"
+      }
+    }
+  ]
 }

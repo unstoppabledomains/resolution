@@ -64,7 +64,7 @@ function fromWeb3Version0Provider(provider: Web3Version0Provider): Provider {
  * @see https://github.com/ethereum/web3.js/blob/1.x/packages/web3-providers-http/src/index.js#L95
  */
 function fromWeb3Version1Provider(provider: Web3Version1Provider): Provider {
-  if (provider.send === undefined) {
+  if (provider && provider.send === undefined) {
     throw new ConfigurationError(ConfigurationErrorCode.IncorrectProvider);
   }
   return {

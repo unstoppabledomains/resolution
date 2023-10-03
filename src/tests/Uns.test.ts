@@ -7,7 +7,7 @@ import {
   mockAsyncMethods,
   expectSpyToBeCalled,
   expectResolutionErrorCode,
-  getUnsProtocolLinkFromEnv,
+  getProtocolLinkFromEnv,
   expectConfigurationErrorCode,
   CryptoDomainWithoutGunDbRecords,
   CryptoDomainWithAllRecords,
@@ -36,11 +36,11 @@ describe('UNS', () => {
       const uns = new Uns({
         locations: {
           Layer1: {
-            url: getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
+            url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
             network: 'goerli',
           },
           Layer2: {
-            url: getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
+            url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
             network: 'polygon-mumbai',
           },
         },
@@ -48,11 +48,11 @@ describe('UNS', () => {
       expect(uns).toBeDefined();
       expect(uns.unsl1.network).toBe('goerli');
       expect(uns.unsl1.url).toBe(
-        getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
+        getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
       );
       expect(uns.unsl2.network).toBe('polygon-mumbai');
       expect(uns.unsl2.url).toBe(
-        getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
+        getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
       );
     });
 
@@ -145,11 +145,11 @@ describe('UNS', () => {
           uns: {
             locations: {
               Layer1: {
-                url: getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
+                url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
                 network: 'goerli',
               },
               Layer2: {
-                url: getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
+                url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
                 network: 'polygon-mumbai',
               },
             },
@@ -326,7 +326,7 @@ describe('UNS', () => {
     it('should return true for supported domain', async () => {
       mockAPICalls(
         'uns_domain_exists_test_true',
-        getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
+        getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
       );
       const uns = resolution.serviceMap[NamingServiceName.UNS].native as Uns;
       mockAsyncMethods(uns.unsl2.readerContract, {
@@ -343,7 +343,7 @@ describe('UNS', () => {
     it('should return false for unsupported domain', async () => {
       mockAPICalls(
         'uns_domain_exists_test',
-        getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
+        getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
       );
       const uns = resolution.serviceMap[NamingServiceName.UNS].native as Uns;
       mockAsyncMethods(uns.unsl2.readerContract, {
@@ -1198,7 +1198,7 @@ describe('UNS', () => {
         );
         mockAPICalls(
           'uns_registry_address_tests',
-          getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
+          getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
         );
         const registryAddress = await uns.registryAddress(
           'udtestdev-265f8f.crypto',
@@ -1216,7 +1216,7 @@ describe('UNS', () => {
         );
         mockAPICalls(
           'uns_registry_address_tests',
-          getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
+          getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
         );
         const registryAddress = await uns.registryAddress('some-domain.888');
         expect(registryAddress).toBe(
@@ -1265,7 +1265,7 @@ describe('UNS', () => {
       it('should throw error if tld is not supported', async () => {
         mockAPICalls(
           'uns_registry_address_tests',
-          getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
+          getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
         );
         const unsl2 = uns.unsl2;
         mockAsyncMethod(unsl2.readerContract, 'call', (params) =>
@@ -1284,7 +1284,7 @@ describe('UNS', () => {
         );
         mockAPICalls(
           'uns_registry_address_tests',
-          getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
+          getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
         );
         await expectResolutionErrorCode(
           () => uns.registryAddress('some-domain.unknown'),
@@ -1524,11 +1524,11 @@ describe('UNS', () => {
       skipItInLive(
         'should throw error when FetchProvider throws Error',
         async () => {
-          const url = getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1');
+          const url = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1');
           const provider = new FetchProvider(NamingServiceName.UNS, url);
           const polygonProvider = new FetchProvider(
             NamingServiceName.UNS,
-            getUnsProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
+            getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
           );
           resolution = new Resolution({
             sourceConfig: {

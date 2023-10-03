@@ -1,6 +1,7 @@
 import {Locations, UnsLocation} from './types/publicTypes';
 
 export abstract class NamingService {
+  abstract name?: string;
   abstract owner(domain: string): Promise<string>;
   abstract resolver(domain: string): Promise<string>;
   abstract namehash(domain: string): string;

@@ -124,6 +124,10 @@ const resolution = new Resolution({
       url: 'https://api.zilliqa.com',
       network: 'mainnet',
     },
+    ens: {
+      url: 'https://mainnet.infura.io/v3/<infura_api_key>',
+      network: 'mainnet',
+    },
   },
 });
 ```
@@ -163,6 +167,7 @@ function resolve(domain, currency) {
 
 resolve('brad.crypto', 'ETH');
 resolve('brad.zil', 'ZIL');
+resolve('vitalik.eth', 'ETH');
 ```
 
 ### Find the IPFS hash for a decentralized website
@@ -182,6 +187,7 @@ function resolveIpfsHash(domain) {
 }
 
 resolveIpfsHash('homecakes.crypto');
+resolveIpfsHash('vitalik.eth');
 ```
 
 ### Find a custom record
@@ -189,6 +195,8 @@ resolveIpfsHash('homecakes.crypto');
 Create a new file in your project, `custom-resolution.js`.
 
 ```javascript
+// Does not support ENS
+
 function resolveCustomRecord(domain, record) {
   resolution
     .records(domain, [record])
@@ -218,6 +226,8 @@ function getWalletAddr(domain, ticker) {
 }
 getWalletAddr('homecakes.crypto', 'ETH');
 // Domain homecakes.crypto has address for ETH: 0xe7474D07fD2FA286e7e0aa23cd107F8379085037
+getWalletAddr('vitalik.eth', 'ETH');
+// Domain homecakes.crypto has address for ETH: 0xe7474D07fD2FA286e7e0aa23cd107F8379085037
 ```
 
 ### Resolve multi-chain address format using `multiChainAddr`
@@ -229,6 +239,8 @@ This API is used to retrieve wallet address for multi-chain address records.
 With `aaron.x` has `crypto.AAVE.version.ERC20.address` on-chain:
 
 ```javascript
+// Does not support ENS
+
 function getMultiChainWalletAddr(domain, ticker, network) {
   resolution
     .multiChainAddr(domain, ticker, network)
@@ -335,6 +347,7 @@ token.EVM.ETH.address
 ```
 
 `getAddress(domain, 'ETH', 'USDC')` will lookup records in the following order:
+// Not supported with ENS
 
 ```
 1. token.EVM.ETH.USDC.address
@@ -343,15 +356,6 @@ token.EVM.ETH.address
 4. token.EVM.ETH.address
 5. token.EVM.address
 ```
-
-> **Warning** please use the API with caution as it's still in beta. Please
-> submit an issue if you find a bug.
-
-### Command Line Interface
-
-CLI support was removed from the Resolution library starting from version 6.0.
-Please use the
-[standalone CLI tool](https://github.com/unstoppabledomains/resolution-cli).
 
 ## Error Handling
 
@@ -389,7 +393,6 @@ or **Linux shell**).
 ### Internal config
 
 #### To update:
-
 - Network config: `$ yarn network-config:pull`
 - Resolver keys: `$ yarn resolver-keys:pull`
 - Both configs: `$ yarn config:pull`

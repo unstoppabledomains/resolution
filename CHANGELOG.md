@@ -1,3 +1,7 @@
+## 9.2.0 
+
+- Add ENS support
+
 ## 9.1.0
 
 - Add new getAddress API
