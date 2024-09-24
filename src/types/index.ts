@@ -121,9 +121,11 @@ const StringUnion = <UnionType extends string>(...values: UnionType[]) => {
 
 export const UnsSupportedNetwork = StringUnion(
   'mainnet',
-  'goerli',
+  'sepolia',
   'polygon-mainnet',
-  'polygon-mumbai',
+  'polygon-amoy',
+  'base-mainnet',
+  'base-sepolia',
 );
 
 export type UnsSupportedNetwork = typeof UnsSupportedNetwork.type;

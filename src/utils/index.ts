@@ -7,15 +7,19 @@ type NetworkSignedLinkURLs = Record<UnsSupportedNetwork, string>;
 const ProviderURLMap: Record<Providers, NetworkSignedLinkURLs> = {
   infura: {
     mainnet: 'https://mainnet.infura.io/v3/',
-    goerli: 'https://goerli.infura.io/v3/',
+    sepolia: 'https://sepolia.infura.io/v3/',
     'polygon-mainnet': 'https://polygon-mainnet.infura.io/v3/',
-    'polygon-mumbai': 'https://polygon-mumbai.infura.io/v3/',
+    'polygon-amoy': 'https://polygon-amoy.infura.io/v3/',
+    'base-mainnet': 'https://base-mainnet.infura.io/v3/',
+    'base-sepolia': 'https://base-sepolia.infura.io/v3/',
   },
   alchemy: {
     mainnet: 'https://eth-mainnet.alchemyapi.io/v2/',
-    goerli: 'https://eth-goerli.alchemyapi.io/v2/',
+    sepolia: 'https://eth-sepolia.alchemyapi.io/v2/',
     'polygon-mainnet': 'https://polygon-mainnet.g.alchemy.com/v2/',
-    'polygon-mumbai': 'https://polygon-mumbai.g.alchemy.com/v2/',
+    'polygon-amoy': 'https://polygon-amoy.g.alchemy.com/v2/',
+    'base-mainnet': 'https://base-mainnet.g.alchemy.com/v2/',
+    'base-sepolia': 'https://base-sepolia.g.alchemy.com/v2/',
   },
 };
 
@@ -76,6 +80,7 @@ export function constructRecords(
   return records;
 }
 
+// TODO: Replace this with supported_tlds calls
 export const domainExtensionToNamingServiceName = {
   crypto: NamingServiceName.UNS,
   zil: NamingServiceName.ZNS,
@@ -84,6 +89,7 @@ export const domainExtensionToNamingServiceName = {
   xyz: NamingServiceName.ENS,
   kred: NamingServiceName.ENS,
   reverse: NamingServiceName.ENS,
+  udtest: NamingServiceName.UNS_BASE,
 };
 
 export const findNamingServiceName = (
@@ -102,17 +108,22 @@ export const findNamingServiceName = (
 
 export const EthereumNetworks = {
   mainnet: 1,
-  goerli: 5,
+  sepolia: 11155111,
   'polygon-mainnet': 137,
-  'polygon-mumbai': 80001,
+  'polygon-amoy': 80002,
+  'base-mainnet': 8453,
+  'base-sepolia': 84532,
 } as const;
 
-export const EthereumNetworksInverted = {
-  1: 'mainnet',
-  5: 'goerli',
-  137: 'polygon-mainnet',
-  80001: 'polygon-mumbai',
-} as const;
+export const EthereumNetworksInverted = Object.entries(EthereumNetworks).reduce<
+  Record<number, string>
+>(
+  (acc, [originalKey, originalValue]) => ({
+    ...acc,
+    [originalValue]: originalKey,
+  }),
+  {},
+);
 
 export const wrapResult = <T>(func: () => T): Promise<WrappedResult<T>> => {
   let callResult;

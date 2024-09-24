@@ -48,6 +48,7 @@ export enum UnsLocation {
 
 export enum NamingServiceName {
   UNS = 'UNS',
+  UNS_BASE = 'UNS_BASE',
   ENS = 'ENS',
   ZNS = 'ZNS',
 }
@@ -280,6 +281,7 @@ export enum BlockchainType {
   ETH = 'ETH',
   MATIC = 'MATIC',
   ZIL = 'ZIL',
+  BASE = 'BASE',
 }
 
 export type DomainLocation = {
