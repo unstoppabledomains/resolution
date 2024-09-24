@@ -1178,10 +1178,18 @@ export default class Resolution {
   private async reverseGetTokenId(
     address: string,
     location?: UnsLocation,
-  ): Promise<string> {
-    const service = this.serviceMap['UNS'].native;
-    const tokenId = await service.reverseOf(address, location);
-    return tokenId as string;
+  ): Promise<string | null> {
+    let tokenId: string | null = null;
+
+    const unsService = this.serviceMap['UNS'].native;
+    tokenId = await unsService.reverseOf(address, location);
+
+    if (!tokenId) {
+      const baseUnsService = this.serviceMap['UNS_BASE'].native;
+      tokenId = await baseUnsService.reverseOf(address, location);
+    }
+
+    return tokenId;
   }
 
   private getUnsConfig(config: ResolutionConfig): Uns | UdApi {
