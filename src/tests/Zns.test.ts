@@ -15,6 +15,9 @@ import {ConfigurationErrorCode} from '../errors/configurationError';
 import Uns from '../Uns';
 import ResolutionError from '../errors/resolutionError';
 
+const ETH_L1_TESTNET_NAME = 'sepolia';
+const POL_L2_TESTNET_NAME = 'polygon-amoy';
+
 let resolution: Resolution;
 let zns: Zns;
 let uns: Uns;
@@ -28,11 +31,11 @@ describe('ZNS', () => {
           locations: {
             Layer1: {
               url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
-              network: 'goerli',
+              network: ETH_L1_TESTNET_NAME,
             },
             Layer2: {
               url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
-              network: 'polygon-mumbai',
+              network: POL_L2_TESTNET_NAME,
             },
           },
         },
@@ -63,11 +66,11 @@ describe('ZNS', () => {
             locations: {
               Layer1: {
                 url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
-                network: 'goerli',
+                network: ETH_L1_TESTNET_NAME,
               },
               Layer2: {
                 url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
-                network: 'polygon-mumbai',
+                network: POL_L2_TESTNET_NAME,
               },
             },
           },
@@ -86,11 +89,11 @@ describe('ZNS', () => {
             locations: {
               Layer1: {
                 url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
-                network: 'goerli',
+                network: ETH_L1_TESTNET_NAME,
               },
               Layer2: {
                 url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
-                network: 'polygon-mumbai',
+                network: POL_L2_TESTNET_NAME,
               },
             },
           },
@@ -109,11 +112,11 @@ describe('ZNS', () => {
             locations: {
               Layer1: {
                 url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
-                network: 'goerli',
+                network: ETH_L1_TESTNET_NAME,
               },
               Layer2: {
                 url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
-                network: 'polygon-mumbai',
+                network: POL_L2_TESTNET_NAME,
               },
             },
           },
@@ -134,11 +137,11 @@ describe('ZNS', () => {
                 locations: {
                   Layer1: {
                     url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
-                    network: 'goerli',
+                    network: ETH_L1_TESTNET_NAME,
                   },
                   Layer2: {
                     url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
-                    network: 'polygon-mumbai',
+                    network: POL_L2_TESTNET_NAME,
                   },
                 },
               },
@@ -159,11 +162,11 @@ describe('ZNS', () => {
                 locations: {
                   Layer1: {
                     url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
-                    network: 'goerli',
+                    network: ETH_L1_TESTNET_NAME,
                   },
                   Layer2: {
                     url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
-                    network: 'polygon-mumbai',
+                    network: POL_L2_TESTNET_NAME,
                   },
                 },
               },
@@ -185,11 +188,11 @@ describe('ZNS', () => {
             locations: {
               Layer1: {
                 url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
-                network: 'goerli',
+                network: ETH_L1_TESTNET_NAME,
               },
               Layer2: {
                 url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
-                network: 'polygon-mumbai',
+                network: POL_L2_TESTNET_NAME,
               },
             },
           },
@@ -212,11 +215,11 @@ describe('ZNS', () => {
                 locations: {
                   Layer1: {
                     url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
-                    network: 'goerli',
+                    network: ETH_L1_TESTNET_NAME,
                   },
                   Layer2: {
                     url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
-                    network: 'polygon-mumbai',
+                    network: POL_L2_TESTNET_NAME,
                   },
                 },
               },
@@ -239,11 +242,11 @@ describe('ZNS', () => {
                 locations: {
                   Layer1: {
                     url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
-                    network: 'goerli',
+                    network: ETH_L1_TESTNET_NAME,
                   },
                   Layer2: {
                     url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
-                    network: 'polygon-mumbai',
+                    network: POL_L2_TESTNET_NAME,
                   },
                 },
               },
@@ -265,11 +268,11 @@ describe('ZNS', () => {
             locations: {
               Layer1: {
                 url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
-                network: 'goerli',
+                network: ETH_L1_TESTNET_NAME,
               },
               Layer2: {
                 url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
-                network: 'polygon-mumbai',
+                network: POL_L2_TESTNET_NAME,
               },
             },
           },
@@ -288,11 +291,11 @@ describe('ZNS', () => {
             locations: {
               Layer1: {
                 url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
-                network: 'goerli',
+                network: ETH_L1_TESTNET_NAME,
               },
               Layer2: {
                 url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
-                network: 'polygon-mumbai',
+                network: POL_L2_TESTNET_NAME,
               },
             },
           },
@@ -317,11 +320,11 @@ describe('ZNS', () => {
             locations: {
               Layer1: {
                 url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
-                network: 'goerli',
+                network: ETH_L1_TESTNET_NAME,
               },
               Layer2: {
                 url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
-                network: 'polygon-mumbai',
+                network: POL_L2_TESTNET_NAME,
               },
             },
           },

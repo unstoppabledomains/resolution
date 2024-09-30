@@ -130,7 +130,7 @@ export const UnsSupportedNetwork = StringUnion(
 
 export type UnsSupportedNetwork = typeof UnsSupportedNetwork.type;
 
-export const EnsSupportedNetwork = StringUnion('mainnet', 'goerli');
+export const EnsSupportedNetwork = StringUnion('mainnet', 'sepolia');
 
 export const ZnsSupportedNetwork = StringUnion('mainnet', 'testnet');
 

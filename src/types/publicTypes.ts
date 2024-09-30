@@ -156,7 +156,6 @@ export interface EthersProvider {
   getLogs(filter: EventFilter): Promise<RpcProviderLogEntry[]>;
 }
 
-export const UDApiDefaultUrl = 'https://unstoppabledomains.com/api/v1';
 export type NamehashOptions = {
   readonly format?: 'dec' | 'hex';
   readonly prefix?: boolean;
@@ -279,7 +278,7 @@ export interface DomainMetadata extends Erc721Metadata {
 
 export enum BlockchainType {
   ETH = 'ETH',
-  MATIC = 'MATIC',
+  POL = 'POL',
   ZIL = 'ZIL',
   BASE = 'BASE',
 }

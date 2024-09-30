@@ -30,6 +30,9 @@ import UnsConfig from '../config/uns-config.json';
 import {eip137Namehash, fromHexStringToDecimals} from '../utils/namehash';
 import Zns from '../Zns';
 
+const ETH_L1_TESTNET_NAME = 'sepolia';
+const POL_L2_TESTNET_NAME = 'polygon-amoy';
+
 describe('UNS', () => {
   describe('constructor', () => {
     it('should define the default uns contract', () => {
@@ -37,20 +40,20 @@ describe('UNS', () => {
         locations: {
           Layer1: {
             url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
-            network: 'goerli',
+            network: ETH_L1_TESTNET_NAME,
           },
           Layer2: {
             url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
-            network: 'polygon-mumbai',
+            network: POL_L2_TESTNET_NAME,
           },
         },
       });
       expect(uns).toBeDefined();
-      expect(uns.unsl1.network).toBe('goerli');
+      expect(uns.unsl1.network).toBe(ETH_L1_TESTNET_NAME);
       expect(uns.unsl1.url).toBe(
         getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
       );
-      expect(uns.unsl2.network).toBe('polygon-mumbai');
+      expect(uns.unsl2.network).toBe(POL_L2_TESTNET_NAME);
       expect(uns.unsl2.url).toBe(
         getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
       );
@@ -101,9 +104,9 @@ describe('UNS', () => {
             sourceConfig: {
               uns: {
                 locations: {
-                  Layer1: {network: 'goerli'},
+                  Layer1: {network: ETH_L1_TESTNET_NAME},
                   Layer2: {
-                    network: 'polygon-mumbai',
+                    network: POL_L2_TESTNET_NAME,
                     url: 'https://someurl.com',
                   },
                 },
@@ -121,9 +124,12 @@ describe('UNS', () => {
             sourceConfig: {
               uns: {
                 locations: {
-                  Layer1: {network: 'goerli', url: 'https://someurl.com'},
+                  Layer1: {
+                    network: ETH_L1_TESTNET_NAME,
+                    url: 'https://someurl.com',
+                  },
                   Layer2: {
-                    network: 'polygon-mumbai',
+                    network: POL_L2_TESTNET_NAME,
                   },
                 },
               },
@@ -146,11 +152,11 @@ describe('UNS', () => {
             locations: {
               Layer1: {
                 url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
-                network: 'goerli',
+                network: ETH_L1_TESTNET_NAME,
               },
               Layer2: {
                 url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
-                network: 'polygon-mumbai',
+                network: POL_L2_TESTNET_NAME,
               },
             },
           },
@@ -1534,9 +1540,9 @@ describe('UNS', () => {
             sourceConfig: {
               uns: {
                 locations: {
-                  Layer1: {url, provider, network: 'goerli'},
+                  Layer1: {url, provider, network: ETH_L1_TESTNET_NAME},
                   Layer2: {
-                    network: 'polygon-mumbai',
+                    network: POL_L2_TESTNET_NAME,
                     provider: polygonProvider,
                   },
                 },

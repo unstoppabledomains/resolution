@@ -31,9 +31,9 @@ export default class UdApi extends NamingService {
 
   constructor(api?: Api) {
     super();
-    this.url = api?.url || 'https://unstoppabledomains.com/api/v1';
+    this.url = api?.url || 'https://unstoppabledomains.com/api/v1'; // TODO: this is about to be deprecated
     const DefaultUserAgent =
-      'cross-fetch/3.1.4 (+https://github.com/lquixada/cross-fetch)';
+      'cross-fetch/4.0.0 (+https://github.com/lquixada/cross-fetch)';
     const CustomUserAgent = `${DefaultUserAgent} Resolution`;
     this.headers = {'X-user-agent': CustomUserAgent};
   }
@@ -77,7 +77,7 @@ export default class UdApi extends NamingService {
   }
 
   async twitter(domain: string): Promise<string> {
-    const serviceName = findNamingServiceName(domain);
+    const serviceName = await findNamingServiceName(domain);
     if (serviceName !== NamingServiceName.UNS) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedMethod, {
         domain,
@@ -150,7 +150,7 @@ export default class UdApi extends NamingService {
 
   private async getMetadata(tokenId: string): Promise<ResolutionResponse> {
     const tokenUri = `${this.url}/${tokenId}`;
-    const resp = await Networking.fetch(tokenUri, {}).catch((err) => {
+    const resp = await Networking.fetch(tokenUri).catch((err) => {
       throw new ResolutionError(ResolutionErrorCode.MetadataEndpointError, {
         tokenUri: tokenUri || 'undefined',
         errorMessage: err.message,

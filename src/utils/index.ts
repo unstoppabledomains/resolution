@@ -1,6 +1,12 @@
-import {CryptoRecords, NamingServiceName} from '../types/publicTypes';
+import {
+  BlockchainType,
+  CryptoRecords,
+  NamingServiceName,
+} from '../types/publicTypes';
 import {NullAddresses} from '../types';
 import {UnsSupportedNetwork} from '../types';
+import Tlds from './Tlds';
+import ResolutionError, {ResolutionErrorCode} from '../errors/resolutionError';
 
 type Providers = 'infura' | 'alchemy';
 type NetworkSignedLinkURLs = Record<UnsSupportedNetwork, string>;
@@ -14,8 +20,8 @@ const ProviderURLMap: Record<Providers, NetworkSignedLinkURLs> = {
     'base-sepolia': 'https://base-sepolia.infura.io/v3/',
   },
   alchemy: {
-    mainnet: 'https://eth-mainnet.alchemyapi.io/v2/',
-    sepolia: 'https://eth-sepolia.alchemyapi.io/v2/',
+    mainnet: 'https://eth-mainnet.g.alchemy.com/v2/',
+    sepolia: 'https://eth-sepolia.g.alchemy.com/v2/',
     'polygon-mainnet': 'https://polygon-mainnet.g.alchemy.com/v2/',
     'polygon-amoy': 'https://polygon-amoy.g.alchemy.com/v2/',
     'base-mainnet': 'https://base-mainnet.g.alchemy.com/v2/',
@@ -80,30 +86,49 @@ export function constructRecords(
   return records;
 }
 
-// TODO: Replace this with supported_tlds calls
-export const domainExtensionToNamingServiceName = {
-  crypto: NamingServiceName.UNS,
-  zil: NamingServiceName.ZNS,
-  eth: NamingServiceName.ENS,
-  luxe: NamingServiceName.ENS,
-  xyz: NamingServiceName.ENS,
-  kred: NamingServiceName.ENS,
-  reverse: NamingServiceName.ENS,
-  udtest: NamingServiceName.UNS_BASE,
-};
+const EnsTlds = ['eth', 'luxe', 'xyz', 'kred', 'reverse'];
 
-export const findNamingServiceName = (
+export const findNamingServiceName = async (
   domain: string,
-): NamingServiceName | '' => {
-  const extension = domain.split('.').pop();
+): Promise<NamingServiceName | null> => {
+  const tld = domain.split('.').pop();
 
-  if (!extension) {
-    return '';
-  } else if (extension in domainExtensionToNamingServiceName) {
-    return domainExtensionToNamingServiceName[extension];
-  } else {
-    return domainExtensionToNamingServiceName.crypto;
+  if (!tld) {
+    return null;
   }
+
+  if (EnsTlds.includes(tld)) {
+    return NamingServiceName.ENS;
+  }
+
+  const tldsMeta = await Tlds.getTldsMeta();
+
+  if (!tldsMeta) {
+    throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
+      providerMessage:
+        'TLD meta is not available. Possibly failed to load supported TLDs data',
+    });
+  }
+
+  if (tld in tldsMeta) {
+    const {namingService, registrationBlockchain} = tldsMeta[tld];
+    switch (namingService) {
+      case 'UNS': {
+        switch (registrationBlockchain) {
+          case BlockchainType.BASE:
+            return NamingServiceName.UNS_BASE;
+          default:
+            return NamingServiceName.UNS;
+        }
+      }
+      case 'ENS':
+        return NamingServiceName.ENS;
+      case 'ZNS':
+        return NamingServiceName.ZNS;
+    }
+  }
+
+  return null;
 };
 
 export const EthereumNetworks = {

@@ -11,6 +11,8 @@ import {
 } from './helpers';
 import Ens from '../Ens';
 
+const ETH_L1_TESTNET_NAME = 'sepolia';
+
 let resolution: Resolution;
 let ens: Ens;
 
@@ -24,7 +26,7 @@ beforeEach(() => {
           ProviderProtocol.http,
           NamingServiceName.ENS,
         ),
-        network: 'goerli',
+        network: ETH_L1_TESTNET_NAME,
       },
     },
   });

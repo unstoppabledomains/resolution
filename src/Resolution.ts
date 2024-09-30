@@ -662,7 +662,7 @@ export default class Resolution {
   async email(domain: string): Promise<string> {
     domain = prepareAndValidateDomain(domain);
     let key = 'whois.email.value';
-    const serviceName = findNamingServiceName(domain);
+    const serviceName = await findNamingServiceName(domain);
     if (serviceName === 'ENS') {
       key = 'email';
     }
@@ -1062,7 +1062,7 @@ export default class Resolution {
   private async getMetadataFromTokenURI(
     tokenUri: string,
   ): Promise<TokenUriMetadata> {
-    const resp = await Networking.fetch(tokenUri, {});
+    const resp = await Networking.fetch(tokenUri);
     if (resp.ok) {
       return resp.json();
     }
@@ -1102,7 +1102,7 @@ export default class Resolution {
     domain: string,
     func: (service: NamingService) => T,
   ): Promise<UnwrapPromise<T>> {
-    const serviceName = findNamingServiceName(domain);
+    const serviceName = await findNamingServiceName(domain);
     if (!serviceName) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
         domain,
@@ -1141,7 +1141,7 @@ export default class Resolution {
     func: (service: NamingService) => Promise<boolean>,
     options: {throwIfUnsupportedDomain: boolean; expectedValue: boolean},
   ): Promise<boolean> {
-    const serviceName = findNamingServiceName(domain);
+    const serviceName = await findNamingServiceName(domain);
     if (!serviceName) {
       if (!options.throwIfUnsupportedDomain) {
         return !options.expectedValue;

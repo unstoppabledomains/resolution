@@ -15,7 +15,6 @@ import {
   Locations,
   NamingServiceName,
   Provider,
-  TokenUriMetadata,
   BlockchainType,
   DnsRecordType,
   DnsRecord,
@@ -289,7 +288,6 @@ export default class Ens extends NamingService {
     let domainName = '';
     const nameWrapperMetadataResponse = await Networking.fetch(
       `https://metadata.ens.domains/${this.networkName}/${this.nameWrapperContract.address}/${hash}`,
-      {},
     );
     if (nameWrapperMetadataResponse.status === 200) {
       const jsonResponse = await nameWrapperMetadataResponse.json();
@@ -299,7 +297,6 @@ export default class Ens extends NamingService {
 
     const baseRegistrarMetadataResponse = await Networking.fetch(
       `https://metadata.ens.domains/${this.networkName}/${this.baseRegistrarContract.address}/${hash}`,
-      {},
     );
 
     if (baseRegistrarMetadataResponse.status === 200) {
@@ -613,20 +610,5 @@ export default class Ens extends NamingService {
     return await this.callMethod(this.nameWrapperContract, 'ownerOf', [
       this.namehash(domain),
     ]);
-  }
-
-  private async getMetadataFromTokenURI(
-    tokenUri: string,
-  ): Promise<TokenUriMetadata> {
-    const resp = await Networking.fetch(tokenUri, {});
-    if (resp.ok) {
-      return resp.json();
-    }
-
-    throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
-      providerMessage: await resp.text(),
-      method: 'UDAPI',
-      methodName: 'tokenURIMetadata',
-    });
   }
 }

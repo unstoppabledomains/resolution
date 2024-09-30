@@ -602,7 +602,7 @@
       "METHOD": "POST",
       "REQUEST": {
         "method": "POST",
-        "url": "https://goerli.infura.io/v3/a32aa2ace9704ee9a1a9906418bcabe5",
+        "url": "https://sepolia.infura.io/v3/a32aa2ace9704ee9a1a9906418bcabe5",
         "headers": {
           "content-type": ["application/json"],
           "accept": ["*/*"],

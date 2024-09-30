@@ -55,6 +55,9 @@ let uns: Uns;
 let zns: Zns;
 let ens: Ens;
 
+const ETH_L1_TESTNET_NAME = 'sepolia';
+const POL_L2_TESTNET_NAME = 'polygon-amoy';
+
 beforeEach(() => {
   nock.cleanAll();
   jest.restoreAllMocks();
@@ -64,11 +67,11 @@ beforeEach(() => {
         locations: {
           Layer1: {
             url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
-            network: 'goerli',
+            network: ETH_L1_TESTNET_NAME,
           },
           Layer2: {
             url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
-            network: 'polygon-mumbai',
+            network: POL_L2_TESTNET_NAME,
           },
         },
       },
@@ -77,7 +80,7 @@ beforeEach(() => {
           ProviderProtocol.http,
           NamingServiceName.ENS,
         ),
-        network: 'goerli',
+        network: ETH_L1_TESTNET_NAME,
       },
       zns: {network: 'testnet'},
     },
@@ -102,8 +105,8 @@ describe('Resolution', () => {
 
   describe('.Basic setup', () => {
     it('should work with autonetwork url configuration', async () => {
-      const polygonUrl = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2');
-      const goerliUrl = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1');
+      const l2Url = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2');
+      const l1Url = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1');
       // mocking getNetworkConfigs because no access to inner provider.request
       const UnsGetNetworkOriginal = Uns.autoNetwork;
       const EnsGetNetworkOriginal = Ens.autoNetwork;
@@ -112,29 +115,29 @@ describe('Resolution', () => {
           new Uns({
             locations: {
               Layer1: {
-                network: 'goerli',
-                provider: new FetchProvider(UnsLocation.Layer1, goerliUrl),
+                network: ETH_L1_TESTNET_NAME,
+                provider: new FetchProvider(UnsLocation.Layer1, l1Url),
               },
               Layer2: {
-                network: 'polygon-mumbai',
-                provider: new FetchProvider(UnsLocation.Layer2, polygonUrl),
+                network: POL_L2_TESTNET_NAME,
+                provider: new FetchProvider(UnsLocation.Layer2, l2Url),
               },
             },
           }),
         );
         Ens.autoNetwork = jest.fn().mockReturnValue(
           new Ens({
-            url: goerliUrl,
-            network: 'goerli',
-            provider: new FetchProvider(NamingServiceName.ENS, goerliUrl),
+            url: l1Url,
+            network: ETH_L1_TESTNET_NAME,
+            provider: new FetchProvider(NamingServiceName.ENS, l1Url),
           }),
         );
       }
       const resolution = await Resolution.autoNetwork({
         uns: {
-          locations: {Layer1: {url: goerliUrl}, Layer2: {url: polygonUrl}},
+          locations: {Layer1: {url: l1Url}, Layer2: {url: l2Url}},
         },
-        ens: {url: goerliUrl},
+        ens: {url: l1Url},
       });
       // We need to manually restore the function as jest.restoreAllMocks and simillar works only with spyOn
       Uns.autoNetwork = UnsGetNetworkOriginal;
@@ -142,52 +145,53 @@ describe('Resolution', () => {
       expect(
         (resolution.serviceMap[NamingServiceName.UNS].native as Uns).unsl1
           .network,
-      ).toBe('goerli');
+      ).toBe(ETH_L1_TESTNET_NAME);
       expect(
         (resolution.serviceMap[NamingServiceName.UNS].native as Uns).unsl2
           .network,
-      ).toBe('polygon-mumbai');
+      ).toBe(POL_L2_TESTNET_NAME);
       expect(
         (resolution.serviceMap[NamingServiceName.ENS].native as Ens).network,
       ).toBe(5);
     });
 
     it('should not work with invalid proxyReader configuration #1', async () => {
-      const goerliUrl = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1');
-      const customNetwork = 'goerli';
-      const polygonUrl = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2');
+      const l1Url = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1');
+      const l2Url = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2');
+
       await expectConfigurationErrorCode(() => {
         new Uns({
           locations: {
             Layer1: {
-              network: customNetwork,
-              url: goerliUrl,
+              network: ETH_L1_TESTNET_NAME,
+              url: l1Url,
               proxyReaderAddress: '0x012312931293',
             },
             Layer2: {
-              network: 'polygon-mumbai',
-              url: polygonUrl,
+              network: POL_L2_TESTNET_NAME,
+              url: l2Url,
               proxyReaderAddress: '0x012312931293',
             },
           },
         });
       }, ConfigurationErrorCode.InvalidConfigurationField);
     });
+
     it('should not work with invalid proxyReader configuration #2', async () => {
-      const goerliUrl = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1');
-      const customNetwork = 'goerli';
-      const polygonUrl = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2');
+      const l1Url = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1');
+      const l2Url = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2');
+
       await expect(() => {
         new Uns({
           locations: {
             Layer1: {
-              network: customNetwork,
-              url: goerliUrl,
+              network: ETH_L1_TESTNET_NAME,
+              url: l1Url,
               proxyReaderAddress: '0xe7474D07fD2FA286e7e0aa23cd107F8379025037',
             },
             Layer2: {
-              network: 'polygon-mumbai',
-              url: polygonUrl,
+              network: POL_L2_TESTNET_NAME,
+              url: l2Url,
               proxyReaderAddress: '0x012312931293',
             },
           },
@@ -204,22 +208,22 @@ describe('Resolution', () => {
     });
 
     it('should not work with invalid proxyReader configuration #3', async () => {
-      const goerliUrl = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1');
-      const provider = new FetchProvider(NamingServiceName.UNS, goerliUrl);
-      const polygonUrl = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2');
-      const polygonProvider = new FetchProvider(UnsLocation.Layer2, polygonUrl);
-      const customNetwork = 'goerli';
+      const l1Url = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1');
+      const l1Provider = new FetchProvider(NamingServiceName.UNS, l1Url);
+      const l2Url = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2');
+      const l2Provider = new FetchProvider(UnsLocation.Layer2, l2Url);
+
       await expectConfigurationErrorCode(() => {
         new Uns({
           locations: {
             Layer1: {
-              network: customNetwork,
-              provider,
+              network: ETH_L1_TESTNET_NAME,
+              provider: l1Provider,
               proxyReaderAddress: '0xe7474D07fD2FA286e7e0aa23cd107F8379025037',
             },
             Layer2: {
-              network: 'polygon-mumbai',
-              provider: polygonProvider,
+              network: POL_L2_TESTNET_NAME,
+              provider: l2Provider,
               proxyReaderAddress: '0x332a8191905fa8e6eea7350b5799f225b8ed',
             },
           },
@@ -228,20 +232,19 @@ describe('Resolution', () => {
     });
 
     it('should work with proxyReader configuration', async () => {
-      const goerliUrl = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1');
-      const polygonUrl = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2');
-      const customNetwork = 'goerli';
+      const l1Url = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1');
+      const l2Url = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2');
 
       const uns = new Uns({
         locations: {
           Layer1: {
-            network: customNetwork,
-            url: goerliUrl,
+            network: ETH_L1_TESTNET_NAME,
+            url: l1Url,
             proxyReaderAddress: '0xe7474D07fD2FA286e7e0aa23cd107F8379025037',
           },
           Layer2: {
-            network: 'polygon-mumbai',
-            url: polygonUrl,
+            network: POL_L2_TESTNET_NAME,
+            url: l2Url,
             proxyReaderAddress: '0x332a8191905fa8e6eea7350b5799f225b8ed30a9',
           },
         },
@@ -250,21 +253,21 @@ describe('Resolution', () => {
     });
 
     it('should work with custom network configuration with provider', async () => {
-      const goerliUrl = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1');
-      const provider = new FetchProvider(NamingServiceName.UNS, goerliUrl);
-      const polygonUrl = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2');
-      const polygonProvider = new FetchProvider(UnsLocation.Layer2, polygonUrl);
-      const customNetwork = 'goerli';
+      const l1Url = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1');
+      const l1Provider = new FetchProvider(NamingServiceName.UNS, l1Url);
+      const l2Url = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2');
+      const l2Provider = new FetchProvider(UnsLocation.Layer2, l2Url);
+
       const uns = new Uns({
         locations: {
           Layer1: {
-            network: customNetwork,
-            provider,
+            network: ETH_L1_TESTNET_NAME,
+            provider: l1Provider,
             proxyReaderAddress: '0xe7447Fdd52FA286e7e0aa23cd107F83790250897',
           },
           Layer2: {
-            network: 'polygon-mumbai',
-            provider: polygonProvider,
+            network: POL_L2_TESTNET_NAME,
+            provider: l2Provider,
             proxyReaderAddress: '0x332a8191905fa8e6eea7350b5799f225b8ed30a9',
           },
         },
@@ -278,13 +281,13 @@ describe('Resolution', () => {
         getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
       );
 
-      const polygonUrl = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2');
-      const polygonProvider = new FetchProvider(UnsLocation.Layer2, polygonUrl);
+      const l2Url = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2');
+      const l2Provider = new FetchProvider(UnsLocation.Layer2, l2Url);
       const spy = mockAsyncMethod(provider, 'request', '1');
-      const spyTwo = mockAsyncMethod(polygonProvider, 'request', '80001');
+      const spyTwo = mockAsyncMethod(l2Provider, 'request', '80001');
       const resolution = await Resolution.autoNetwork({
         uns: {
-          locations: {Layer1: {provider}, Layer2: {provider: polygonProvider}},
+          locations: {Layer1: {provider}, Layer2: {provider: l2Provider}},
         },
         ens: {provider},
       });
@@ -297,7 +300,7 @@ describe('Resolution', () => {
       expect(
         (resolution.serviceMap[NamingServiceName.UNS].native as Uns).unsl2
           .network,
-      ).toBe('polygon-mumbai');
+      ).toBe(POL_L2_TESTNET_NAME);
       expect(
         (resolution.serviceMap[NamingServiceName.ENS].native as Ens).network,
       ).toBe(1);
@@ -367,15 +370,9 @@ describe('Resolution', () => {
     });
 
     it('should fail because of unsupported test network for uns', async () => {
-      const blockchainUrl = getProtocolLinkFromEnv(
-        ProviderProtocol.http,
-        'UNSL1',
-      );
-      const polygonUrl = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2');
-      const mockedProvider = new FetchProvider(
-        NamingServiceName.UNS,
-        blockchainUrl,
-      );
+      const l1Url = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1');
+      const l2Url = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2');
+      const mockedProvider = new FetchProvider(NamingServiceName.UNS, l1Url);
       mockAsyncMethod(mockedProvider, 'request', () => '3');
       mockAsyncMethod(FetchProvider, 'factory', () => mockedProvider);
 
@@ -383,8 +380,8 @@ describe('Resolution', () => {
         Resolution.autoNetwork({
           uns: {
             locations: {
-              Layer1: {url: blockchainUrl},
-              Layer2: {url: polygonUrl},
+              Layer1: {url: l1Url},
+              Layer2: {url: l2Url},
             },
           },
         }),
@@ -407,32 +404,40 @@ describe('Resolution', () => {
       const resolution = Resolution.infura('api-key', {
         uns: {
           locations: {
-            Layer1: {network: 'goerli'},
-            Layer2: {network: 'polygon-mumbai'},
+            Layer1: {network: ETH_L1_TESTNET_NAME},
+            Layer2: {network: POL_L2_TESTNET_NAME},
           },
         },
-        ens: {network: 'goerli'},
+        ens: {network: ETH_L1_TESTNET_NAME},
       });
       uns = resolution.serviceMap[NamingServiceName.UNS].native as Uns;
       ens = resolution.serviceMap[NamingServiceName.ENS].native as Ens;
-      expect(uns.unsl1.url).toBe(`https://goerli.infura.io/v3/api-key`);
-      expect(uns.unsl2.url).toBe(`https://polygon-mumbai.infura.io/v3/api-key`);
-      expect(ens.url).toBe(`https://goerli.infura.io/v3/api-key`);
+      expect(uns.unsl1.url).toBe(
+        `https://${ETH_L1_TESTNET_NAME}.infura.io/v3/api-key`,
+      );
+      expect(uns.unsl2.url).toBe(
+        `https://${POL_L2_TESTNET_NAME}.infura.io/v3/api-key`,
+      );
+      expect(ens.url).toBe(
+        `https://${ETH_L1_TESTNET_NAME}.infura.io/v3/api-key`,
+      );
     });
 
     it('should get a valid resolution instance with .alchemy', async () => {
       const resolution = Resolution.alchemy('api-key', {
         uns: {
           locations: {
-            Layer1: {network: 'goerli'},
-            Layer2: {network: 'polygon-mumbai'},
+            Layer1: {network: ETH_L1_TESTNET_NAME},
+            Layer2: {network: POL_L2_TESTNET_NAME},
           },
         },
       });
       uns = resolution.serviceMap[NamingServiceName.UNS].native as Uns;
-      expect(uns.unsl1.url).toBe(`https://eth-goerli.alchemyapi.io/v2/api-key`);
+      expect(uns.unsl1.url).toBe(
+        `https://eth-${ETH_L1_TESTNET_NAME}.g.alchemy.com/v2/api-key`,
+      );
       expect(uns.unsl2.url).toBe(
-        `https://polygon-mumbai.g.alchemy.com/v2/api-key`,
+        `https://${POL_L2_TESTNET_NAME}.g.alchemy.com/v2/api-key`,
       );
     });
 
@@ -615,6 +620,7 @@ describe('Resolution', () => {
           );
           expectSpyToBeCalled([unsSpy, znsSpy]);
         });
+
         it('checks Resolution#addr error #2', async () => {
           const resolution = new Resolution({
             sourceConfig: {
@@ -622,11 +628,11 @@ describe('Resolution', () => {
                 locations: {
                   Layer1: {
                     url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
-                    network: 'goerli',
+                    network: ETH_L1_TESTNET_NAME,
                   },
                   Layer2: {
                     url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
-                    network: 'polygon-mumbai',
+                    network: POL_L2_TESTNET_NAME,
                   },
                 },
               },
@@ -775,6 +781,7 @@ describe('Resolution', () => {
             expectSpyToBeCalled(eyes, 2);
             expect(capital).toStrictEqual(lower);
           });
+
           describe('.multichain', () => {
             it('should work with usdt on different erc20', async () => {
               const erc20Spy = mockAsyncMethod(uns, 'get', {
@@ -852,15 +859,15 @@ describe('Resolution', () => {
         describe('.Providers', () => {
           it('should work with web3HttpProvider', async () => {
             // web3-providers-http has problems with type definitions
-            const provider = new (Web3HttpProvider as any)(
+            const l1Provider = new (Web3HttpProvider as any)(
               getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
             );
-            const polygonProvider = new (Web3HttpProvider as any)(
+            const l2Provider = new (Web3HttpProvider as any)(
               getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
             );
             // mock the send function with different implementations (each should call callback right away with different answers)
             const eye = mockAsyncMethod(
-              provider,
+              l1Provider,
               'send',
               (payload: JsonRpcPayload, callback) => {
                 const result = caseMock(
@@ -879,13 +886,12 @@ describe('Resolution', () => {
               uns: {
                 locations: {
                   Layer1: {
-                    network: 'goerli',
-                    provider: provider as unknown as Web3Version1Provider,
+                    network: ETH_L1_TESTNET_NAME,
+                    provider: l1Provider as Web3Version1Provider,
                   },
                   Layer2: {
-                    network: 'polygon-mumbai',
-                    provider:
-                      polygonProvider as unknown as Web3Version1Provider,
+                    network: POL_L2_TESTNET_NAME,
+                    provider: l2Provider as Web3Version1Provider,
                   },
                 },
               },
@@ -905,14 +911,14 @@ describe('Resolution', () => {
 
           it('should work with webSocketProvider', async () => {
             // web3-providers-ws has problems with type definitions
-            const provider = new (Web3WsProvider as any)(
+            const l1Provider = new (Web3WsProvider as any)(
               getProtocolLinkFromEnv(ProviderProtocol.wss, 'UNSL1'),
             );
-            const polygonProvider = new (Web3WsProvider as any)(
+            const l2Provider = new (Web3WsProvider as any)(
               getProtocolLinkFromEnv(ProviderProtocol.wss, 'UNSL2'),
             );
             const eye = mockAsyncMethod(
-              provider,
+              l1Provider,
               'send',
               (payload, callback) => {
                 const result = caseMock(
@@ -930,13 +936,12 @@ describe('Resolution', () => {
               uns: {
                 locations: {
                   Layer1: {
-                    network: 'goerli',
-                    provider: provider as unknown as Web3Version1Provider,
+                    network: ETH_L1_TESTNET_NAME,
+                    provider: l1Provider as Web3Version1Provider,
                   },
                   Layer2: {
-                    network: 'polygon-mumbai',
-                    provider:
-                      polygonProvider as unknown as Web3Version1Provider,
+                    network: POL_L2_TESTNET_NAME,
+                    provider: l2Provider as Web3Version1Provider,
                   },
                 },
               },
@@ -946,7 +951,7 @@ describe('Resolution', () => {
               Promise.resolve([NullAddress, NullAddress, {}]),
             );
             const ethAddress = await resolution.addr('brad.crypto', 'ETH');
-            provider.disconnect(1000, 'end of test');
+            l1Provider.disconnect(1000, 'end of test');
             expectSpyToBeCalled([eye]);
             expect(ethAddress).toBe(
               '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
@@ -954,21 +959,21 @@ describe('Resolution', () => {
           });
 
           it('should work for ethers jsonrpc provider', async () => {
-            const provider = new JsonRpcProvider(
+            const l1Provider = new JsonRpcProvider(
               getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
-              'goerli',
+              ETH_L1_TESTNET_NAME,
             );
-            const polygonProvider = new JsonRpcProvider(
+            const l2Provider = new JsonRpcProvider(
               getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
-              'maticmum',
+              POL_L2_TESTNET_NAME,
             );
             const resolution = Resolution.fromEthersProvider({
               uns: {
                 locations: {
-                  Layer1: {network: 'goerli', provider},
+                  Layer1: {network: ETH_L1_TESTNET_NAME, provider: l1Provider},
                   Layer2: {
-                    network: 'polygon-mumbai',
-                    provider: polygonProvider,
+                    network: POL_L2_TESTNET_NAME,
+                    provider: l2Provider,
                   },
                 },
               },
@@ -977,7 +982,7 @@ describe('Resolution', () => {
             mockAsyncMethod(uns.unsl2.readerContract, 'call', (params) =>
               Promise.resolve([NullAddress, NullAddress, {}]),
             );
-            const eye = mockAsyncMethod(provider, 'call', (params) =>
+            const eye = mockAsyncMethod(l1Provider, 'call', (params) =>
               Promise.resolve(caseMock(params, RpcProviderTestCases)),
             );
             const ethAddress = await resolution.addr('brad.crypto', 'ETH');
@@ -989,14 +994,14 @@ describe('Resolution', () => {
 
           it('should work with webSocketProvider', async () => {
             // web3-providers-ws has problems with type definitions
-            const provider = new (Web3WsProvider as any)(
+            const l1Provider = new (Web3WsProvider as any)(
               getProtocolLinkFromEnv(ProviderProtocol.wss, 'UNSL1'),
             );
-            const polygonProvider = new (Web3WsProvider as any)(
+            const l2Provider = new (Web3WsProvider as any)(
               getProtocolLinkFromEnv(ProviderProtocol.wss, 'UNSL2'),
             );
             const eye = mockAsyncMethod(
-              provider,
+              l1Provider,
               'send',
               (payload, callback) => {
                 const result = caseMock(
@@ -1015,13 +1020,12 @@ describe('Resolution', () => {
               uns: {
                 locations: {
                   Layer1: {
-                    network: 'goerli',
-                    provider: provider as unknown as Web3Version1Provider,
+                    network: ETH_L1_TESTNET_NAME,
+                    provider: l1Provider as Web3Version1Provider,
                   },
                   Layer2: {
-                    network: 'polygon-mumbai',
-                    provider:
-                      polygonProvider as unknown as Web3Version1Provider,
+                    network: POL_L2_TESTNET_NAME,
+                    provider: l2Provider as Web3Version1Provider,
                   },
                 },
               },
@@ -1031,7 +1035,7 @@ describe('Resolution', () => {
               Promise.resolve([NullAddress, NullAddress, {}]),
             );
             const ethAddress = await resolution.addr('brad.crypto', 'ETH');
-            provider.disconnect(1000, 'end of test');
+            l1Provider.disconnect(1000, 'end of test');
             expectSpyToBeCalled([eye]);
             expect(ethAddress).toBe(
               '0x8aaD44321A86b170879d7A244c1e8d360c99DdA8',
@@ -1039,21 +1043,21 @@ describe('Resolution', () => {
           });
 
           it('should work for ethers jsonrpc provider', async () => {
-            const provider = new JsonRpcProvider(
+            const l1Provider = new JsonRpcProvider(
               getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
-              'goerli',
+              ETH_L1_TESTNET_NAME,
             );
-            const polygonProvider = new JsonRpcProvider(
+            const l2Provider = new JsonRpcProvider(
               getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
-              'maticmum',
+              POL_L2_TESTNET_NAME,
             );
             const resolution = Resolution.fromEthersProvider({
               uns: {
                 locations: {
-                  Layer1: {network: 'goerli', provider},
+                  Layer1: {network: ETH_L1_TESTNET_NAME, provider: l1Provider},
                   Layer2: {
-                    network: 'polygon-mumbai',
-                    provider: polygonProvider,
+                    network: POL_L2_TESTNET_NAME,
+                    provider: l2Provider,
                   },
                 },
               },
@@ -1062,7 +1066,7 @@ describe('Resolution', () => {
             mockAsyncMethod(uns.unsl2.readerContract, 'call', (params) =>
               Promise.resolve([NullAddress, NullAddress, {}]),
             );
-            const eye = mockAsyncMethod(provider, 'call', (params) =>
+            const eye = mockAsyncMethod(l1Provider, 'call', (params) =>
               Promise.resolve(caseMock(params, RpcProviderTestCases)),
             );
             const ethAddress = await resolution.addr('brad.crypto', 'ETH');
@@ -1073,25 +1077,25 @@ describe('Resolution', () => {
           });
 
           it('should work with ethers default provider', async () => {
-            const provider = new InfuraProvider(
-              'goerli',
+            const l1Provider = new InfuraProvider(
+              ETH_L1_TESTNET_NAME,
               '213fff28936343858ca9c5115eff1419',
             );
-            const polygonProvider = new InfuraProvider(
-              'maticmum',
+            const l2Provider = new InfuraProvider(
+              POL_L2_TESTNET_NAME,
               'a32aa2ace9704ee9a1a9906418bcabe5',
             );
 
-            const eye = mockAsyncMethod(provider, 'call', (params) =>
+            const eye = mockAsyncMethod(l1Provider, 'call', (params) =>
               Promise.resolve(caseMock(params, RpcProviderTestCases)),
             );
             const resolution = Resolution.fromEthersProvider({
               uns: {
                 locations: {
-                  Layer1: {network: 'goerli', provider},
+                  Layer1: {network: ETH_L1_TESTNET_NAME, provider: l1Provider},
                   Layer2: {
-                    network: 'polygon-mumbai',
-                    provider: polygonProvider,
+                    network: POL_L2_TESTNET_NAME,
+                    provider: l2Provider,
                   },
                 },
               },
@@ -1789,7 +1793,7 @@ describe('Resolution', () => {
               registryAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
               resolverAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
               networkId: 80001,
-              blockchain: BlockchainType.MATIC,
+              blockchain: BlockchainType.POL,
               ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
               blockchainProviderUrl: getProtocolLinkFromEnv(
                 ProviderProtocol.http,
@@ -1802,7 +1806,7 @@ describe('Resolution', () => {
               registryAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
               resolverAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
               networkId: 80001,
-              blockchain: BlockchainType.MATIC,
+              blockchain: BlockchainType.POL,
               ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
               blockchainProviderUrl: getProtocolLinkFromEnv(
                 ProviderProtocol.http,
@@ -1817,7 +1821,7 @@ describe('Resolution', () => {
               registryAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
               resolverAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
               networkId: 80001,
-              blockchain: BlockchainType.MATIC,
+              blockchain: BlockchainType.POL,
               ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
               blockchainProviderUrl: getProtocolLinkFromEnv(
                 ProviderProtocol.http,
