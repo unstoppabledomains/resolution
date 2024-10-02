@@ -8,10 +8,10 @@ import {
   getProtocolLinkFromEnv,
   ProviderProtocol,
   skipItInLive,
+  ETH_L1_TESTNET_NAME,
 } from './helpers';
 import Ens from '../Ens';
-
-const ETH_L1_TESTNET_NAME = 'sepolia';
+import {EthereumNetworks} from '../utils';
 
 let resolution: Resolution;
 let ens: Ens;
@@ -38,14 +38,14 @@ describe('ENS', () => {
     expect(ens.url).toBe(
       getProtocolLinkFromEnv(ProviderProtocol.http, NamingServiceName.ENS),
     );
-    expect(ens.network).toEqual(5);
+    expect(ens.network).toEqual(EthereumNetworks[ETH_L1_TESTNET_NAME]);
   });
 
   it('resolves .eth name using blockchain', async () => {
     expect(ens.url).toBe(
       getProtocolLinkFromEnv(ProviderProtocol.http, NamingServiceName.ENS),
     );
-    expect(ens.network).toEqual(5);
+    expect(ens.network).toEqual(EthereumNetworks[ETH_L1_TESTNET_NAME]);
 
     const eyes = mockAsyncMethods(ens, {
       resolver: '0x5FfC014343cd971B7eb70732021E26C35B744cc4',
@@ -148,7 +148,7 @@ describe('ENS', () => {
   });
 
   it('checks normalizeSource ens (object)', async () => {
-    expect(ens.network).toBe(5);
+    expect(ens.network).toBe(EthereumNetworks[ETH_L1_TESTNET_NAME]);
     expect(ens.url).toBe(
       getProtocolLinkFromEnv(ProviderProtocol.http, NamingServiceName.ENS),
     );

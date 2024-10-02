@@ -10,6 +10,8 @@ import {
   ProviderProtocol,
   WalletDomainOnBothLayers,
   skipItInLive,
+  ETH_L1_TESTNET_NAME,
+  POL_L2_TESTNET_NAME,
 } from './helpers';
 import {BlockchainType, UnsLocation} from '../types/publicTypes';
 import {
@@ -19,9 +21,6 @@ import {
 import {ResolutionError, ResolutionErrorCode} from '../errors/resolutionError';
 import {eip137Namehash, fromHexStringToDecimals} from '../utils/namehash';
 import Networking from '../utils/Networking';
-
-const ETH_L1_TESTNET_NAME = 'sepolia';
-const POL_L2_TESTNET_NAME = 'polygon-amoy';
 
 let unsInternalL1: UnsInternal;
 let unsInternalL2: UnsInternal;
@@ -314,6 +313,10 @@ describe('UnsInternal', () => {
   });
 
   it('should return true for tld exists', async () => {
+    console.log(
+      'heyhey',
+      getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
+    );
     mockAPICalls(
       'uns_domain_exists_test',
       getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),

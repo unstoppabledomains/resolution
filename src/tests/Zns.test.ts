@@ -7,6 +7,10 @@ import {
   expectResolutionErrorCode,
   mockAsyncMethods,
   expectConfigurationErrorCode,
+  mockAPICalls,
+  RESOLUTION_SERVICE_BASE_URL,
+  ETH_L1_TESTNET_NAME,
+  POL_L2_TESTNET_NAME,
 } from './helpers';
 import {NullAddress} from '../types';
 import {NamingServiceName} from '../types/publicTypes';
@@ -14,9 +18,6 @@ import Zns from '../Zns';
 import {ConfigurationErrorCode} from '../errors/configurationError';
 import Uns from '../Uns';
 import ResolutionError from '../errors/resolutionError';
-
-const ETH_L1_TESTNET_NAME = 'sepolia';
-const POL_L2_TESTNET_NAME = 'polygon-amoy';
 
 let resolution: Resolution;
 let zns: Zns;
@@ -46,6 +47,10 @@ describe('ZNS', () => {
     });
     zns = resolution.serviceMap[NamingServiceName.ZNS].native as Zns;
     uns = resolution.serviceMap[NamingServiceName.UNS].native as Uns;
+    mockAPICalls(
+      'resolution_service_supported_tlds',
+      RESOLUTION_SERVICE_BASE_URL,
+    );
   });
 
   describe('.NormalizeSource', () => {

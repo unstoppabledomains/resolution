@@ -18,6 +18,9 @@ import {
   mockAsyncMethod,
   ZilDomainWithAllRecords,
   ZilDomainWithNoResolver,
+  RESOLUTION_SERVICE_BASE_URL,
+  ETH_L1_TESTNET_NAME,
+  POL_L2_TESTNET_NAME,
 } from './helpers';
 import FetchProvider from '../FetchProvider';
 import {NamingServiceName, UnsLocation} from '../types/publicTypes';
@@ -29,9 +32,7 @@ import liveData from './testData/liveData.json';
 import UnsConfig from '../config/uns-config.json';
 import {eip137Namehash, fromHexStringToDecimals} from '../utils/namehash';
 import Zns from '../Zns';
-
-const ETH_L1_TESTNET_NAME = 'sepolia';
-const POL_L2_TESTNET_NAME = 'polygon-amoy';
+import {EthereumNetworks} from '../utils';
 
 describe('UNS', () => {
   describe('constructor', () => {
@@ -164,6 +165,10 @@ describe('UNS', () => {
       });
       uns = resolution.serviceMap[NamingServiceName.UNS].native as Uns;
       zns = resolution.serviceMap[NamingServiceName.ZNS].native as Zns;
+      mockAPICalls(
+        'resolution_service_supported_tlds',
+        RESOLUTION_SERVICE_BASE_URL,
+      );
     });
 
     afterEach(() => {
@@ -1231,38 +1236,40 @@ describe('UNS', () => {
       });
 
       it('should return uns l2 registry address', async () => {
-        mockAsyncMethod(uns.unsl1.readerContract, 'call', (params) =>
+        const networkId = EthereumNetworks[POL_L2_TESTNET_NAME];
+        mockAsyncMethod(uns.unsl1.readerContract, 'call', () =>
           Promise.resolve(),
         );
-        mockAsyncMethod(uns.unsl2.readerContract, 'call', (params) =>
+        mockAsyncMethod(uns.unsl2.readerContract, 'call', () =>
           Promise.resolve([
-            UnsConfig.networks[80001].contracts.UNSRegistry.address,
+            UnsConfig.networks[networkId].contracts.UNSRegistry.address,
           ]),
         );
         const registryAddress = await uns.registryAddress(
           WalletDomainLayerTwoWithAllRecords,
         );
         expect(registryAddress).toBe(
-          UnsConfig.networks[80001].contracts.UNSRegistry.address,
+          UnsConfig.networks[networkId].contracts.UNSRegistry.address,
         );
       });
 
       skipItInLive(
         'should return uns l2 registry address for a .zil domain',
         async () => {
+          const networkId = EthereumNetworks[POL_L2_TESTNET_NAME];
           const l1Spy = mockAsyncMethod(
             uns.unsl1.readerContract,
             'call',
             undefined,
           );
           const l2Spy = mockAsyncMethod(uns.unsl2.readerContract, 'call', [
-            UnsConfig.networks[80001].contracts.UNSRegistry.address,
+            UnsConfig.networks[networkId].contracts.UNSRegistry.address,
           ]);
           const registryAddress = await resolution.registryAddress(
             WalletDomainLayerTwoWithAllRecords,
           );
           expect(registryAddress).toBe(
-            UnsConfig.networks[80001].contracts.UNSRegistry.address,
+            UnsConfig.networks[networkId].contracts.UNSRegistry.address,
           );
           expectSpyToBeCalled([l1Spy, l2Spy]);
         },

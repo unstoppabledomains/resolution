@@ -32,6 +32,10 @@ import {
   WalletDomainLayerTwoWithAllRecords,
   WalletDomainOnBothLayers,
   SubdomainLayerTwo,
+  ETH_L1_TESTNET_NAME,
+  POL_L2_TESTNET_NAME,
+  mockAPICalls,
+  RESOLUTION_SERVICE_BASE_URL,
 } from './helpers';
 import {RpcProviderTestCases} from './providerMockData';
 import fetch, {FetchError} from 'node-fetch';
@@ -48,49 +52,51 @@ import {Eip1993Factories as Eip1193Factories} from '../utils/Eip1993Factories';
 import UnsConfig from '../config/uns-config.json';
 import {NullAddress} from '../types';
 import Networking from '../utils/Networking';
-import {findNamingServiceName} from '../utils';
+import {EthereumNetworks, findNamingServiceName} from '../utils';
 
 let resolution: Resolution;
 let uns: Uns;
 let zns: Zns;
 let ens: Ens;
 
-const ETH_L1_TESTNET_NAME = 'sepolia';
-const POL_L2_TESTNET_NAME = 'polygon-amoy';
-
-beforeEach(() => {
-  nock.cleanAll();
-  jest.restoreAllMocks();
-  resolution = new Resolution({
-    sourceConfig: {
-      uns: {
-        locations: {
-          Layer1: {
-            url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
-            network: ETH_L1_TESTNET_NAME,
-          },
-          Layer2: {
-            url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
-            network: POL_L2_TESTNET_NAME,
+describe('Resolution', () => {
+  beforeEach(() => {
+    nock.cleanAll();
+    jest.restoreAllMocks();
+    resolution = new Resolution({
+      sourceConfig: {
+        uns: {
+          locations: {
+            Layer1: {
+              url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
+              network: ETH_L1_TESTNET_NAME,
+            },
+            Layer2: {
+              url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
+              network: POL_L2_TESTNET_NAME,
+            },
           },
         },
+        ens: {
+          url: getProtocolLinkFromEnv(
+            ProviderProtocol.http,
+            NamingServiceName.ENS,
+          ),
+          network: ETH_L1_TESTNET_NAME,
+        },
+        zns: {network: 'testnet'},
       },
-      ens: {
-        url: getProtocolLinkFromEnv(
-          ProviderProtocol.http,
-          NamingServiceName.ENS,
-        ),
-        network: ETH_L1_TESTNET_NAME,
-      },
-      zns: {network: 'testnet'},
-    },
-  });
-  uns = resolution.serviceMap[NamingServiceName.UNS].native as Uns;
-  zns = resolution.serviceMap[NamingServiceName.ZNS].native as Zns;
-  ens = resolution.serviceMap[NamingServiceName.ENS].native as Ens;
-});
+    });
+    uns = resolution.serviceMap[NamingServiceName.UNS].native as Uns;
+    zns = resolution.serviceMap[NamingServiceName.ZNS].native as Zns;
+    ens = resolution.serviceMap[NamingServiceName.ENS].native as Ens;
 
-describe('Resolution', () => {
+    mockAPICalls(
+      'resolution_service_supported_tlds',
+      RESOLUTION_SERVICE_BASE_URL,
+    );
+  });
+
   describe('constructor', () => {
     it(`should allow to configure with api key`, () => {
       const resolution = new Resolution({
@@ -105,6 +111,7 @@ describe('Resolution', () => {
 
   describe('.Basic setup', () => {
     it('should work with autonetwork url configuration', async () => {
+      const l1NetworkId = EthereumNetworks[ETH_L1_TESTNET_NAME];
       const l2Url = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2');
       const l1Url = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1');
       // mocking getNetworkConfigs because no access to inner provider.request
@@ -152,7 +159,7 @@ describe('Resolution', () => {
       ).toBe(POL_L2_TESTNET_NAME);
       expect(
         (resolution.serviceMap[NamingServiceName.ENS].native as Ens).network,
-      ).toBe(5);
+      ).toBe(l1NetworkId);
     });
 
     it('should not work with invalid proxyReader configuration #1', async () => {
@@ -1251,40 +1258,44 @@ describe('Resolution', () => {
         });
 
         it('should return cns mainnet registry address #1', async () => {
+          const l1NetworkId = EthereumNetworks[ETH_L1_TESTNET_NAME];
           const spies = mockAsyncMethods(uns, {
             registryAddress:
-              UnsConfig.networks[5].contracts.CNSRegistry.address,
+              UnsConfig.networks[l1NetworkId].contracts.CNSRegistry.address,
           });
           const registryAddress = await resolution.registryAddress(
             'udtestdev-crewe.crypto',
           );
           expectSpyToBeCalled(spies);
           expect(registryAddress).toBe(
-            UnsConfig.networks[5].contracts.CNSRegistry.address,
+            UnsConfig.networks[l1NetworkId].contracts.CNSRegistry.address,
           );
         });
 
         it('should return uns mainnet registry address', async () => {
+          const l1NetworkId = EthereumNetworks[ETH_L1_TESTNET_NAME];
           const spies = mockAsyncMethods(uns, {
             registryAddress:
-              UnsConfig.networks[5].contracts.UNSRegistry.address,
+              UnsConfig.networks[l1NetworkId].contracts.UNSRegistry.address,
           });
           const registryAddress = await resolution.registryAddress(
             'udtestdev-check.wallet',
           );
           expectSpyToBeCalled(spies);
           expect(registryAddress).toBe(
-            UnsConfig.networks[5].contracts.UNSRegistry.address,
+            UnsConfig.networks[l1NetworkId].contracts.UNSRegistry.address,
           );
         });
         it('should return uns l2 mainnet registry address if domain exists on both', async () => {
+          const l1NetworkId = EthereumNetworks[ETH_L1_TESTNET_NAME];
+          const l2NetworkId = EthereumNetworks[POL_L2_TESTNET_NAME];
           const spies = mockAsyncMethods(uns.unsl1, {
             registryAddress:
-              UnsConfig.networks[5].contracts.UNSRegistry.address,
+              UnsConfig.networks[l1NetworkId].contracts.UNSRegistry.address,
           });
           const spies2 = mockAsyncMethods(uns.unsl2, {
             registryAddress:
-              UnsConfig.networks[80001].contracts.UNSRegistry.address,
+              UnsConfig.networks[l2NetworkId].contracts.UNSRegistry.address,
           });
           const registryAddress = await resolution.registryAddress(
             WalletDomainOnBothLayers,
@@ -1292,7 +1303,7 @@ describe('Resolution', () => {
           expectSpyToBeCalled(spies);
           expectSpyToBeCalled(spies2);
           expect(registryAddress).toBe(
-            UnsConfig.networks[80001].contracts.UNSRegistry.address,
+            UnsConfig.networks[l2NetworkId].contracts.UNSRegistry.address,
           );
         });
       });
@@ -1335,26 +1346,29 @@ describe('Resolution', () => {
         });
 
         it('should return uns mainnet registry address', async () => {
+          const l1NetworkId = EthereumNetworks[ETH_L1_TESTNET_NAME];
           const spies = mockAsyncMethods(uns, {
             registryAddress:
-              UnsConfig.networks[5].contracts.UNSRegistry.address,
+              UnsConfig.networks[l1NetworkId].contracts.UNSRegistry.address,
           });
           const registryAddress = await resolution.registryAddress(
             'udtestdev-check.wallet',
           );
           expectSpyToBeCalled(spies);
           expect(registryAddress).toBe(
-            UnsConfig.networks[5].contracts.UNSRegistry.address,
+            UnsConfig.networks[l1NetworkId].contracts.UNSRegistry.address,
           );
         });
         it('should return uns l2 mainnet registry address if domain exists on both', async () => {
+          const l1NetworkId = EthereumNetworks[ETH_L1_TESTNET_NAME];
+          const l2NetworkId = EthereumNetworks[POL_L2_TESTNET_NAME];
           const spies = mockAsyncMethods(uns.unsl1, {
             registryAddress:
-              UnsConfig.networks[5].contracts.UNSRegistry.address,
+              UnsConfig.networks[l1NetworkId].contracts.UNSRegistry.address,
           });
           const spies2 = mockAsyncMethods(uns.unsl2, {
             registryAddress:
-              UnsConfig.networks[80001].contracts.UNSRegistry.address,
+              UnsConfig.networks[l2NetworkId].contracts.UNSRegistry.address,
           });
           const registryAddress = await resolution.registryAddress(
             WalletDomainOnBothLayers,
@@ -1362,7 +1376,7 @@ describe('Resolution', () => {
           expectSpyToBeCalled(spies);
           expectSpyToBeCalled(spies2);
           expect(registryAddress).toBe(
-            UnsConfig.networks[80001].contracts.UNSRegistry.address,
+            UnsConfig.networks[l2NetworkId].contracts.UNSRegistry.address,
           );
         });
       });
@@ -1770,7 +1784,7 @@ describe('Resolution', () => {
             expect(location['udtestdev-check.wallet']).toEqual({
               registryAddress: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
               resolverAddress: '0x7fb83000B8eD59D3eAD22f0D584Df3a85fBC0086',
-              networkId: 5,
+              networkId: EthereumNetworks[ETH_L1_TESTNET_NAME],
               blockchain: BlockchainType.ETH,
               ownerAddress: '0x0e43F36e4B986dfbE1a75cacfA60cA2bD44Ae962',
               blockchainProviderUrl: getProtocolLinkFromEnv(
@@ -1781,7 +1795,7 @@ describe('Resolution', () => {
             expect(location['brad.crypto']).toEqual({
               registryAddress: '0xAad76bea7CFEc82927239415BB18D2e93518ecBB',
               resolverAddress: '0x95AE1515367aa64C462c71e87157771165B1287A',
-              networkId: 5,
+              networkId: EthereumNetworks[ETH_L1_TESTNET_NAME],
               blockchain: BlockchainType.ETH,
               ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
               blockchainProviderUrl: getProtocolLinkFromEnv(
@@ -1792,7 +1806,7 @@ describe('Resolution', () => {
             expect(location['udtestdev-test-l2-domain-784391.wallet']).toEqual({
               registryAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
               resolverAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
-              networkId: 80001,
+              networkId: EthereumNetworks[POL_L2_TESTNET_NAME],
               blockchain: BlockchainType.POL,
               ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
               blockchainProviderUrl: getProtocolLinkFromEnv(
@@ -1805,7 +1819,7 @@ describe('Resolution', () => {
             ).toEqual({
               registryAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
               resolverAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
-              networkId: 80001,
+              networkId: EthereumNetworks[POL_L2_TESTNET_NAME],
               blockchain: BlockchainType.POL,
               ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
               blockchainProviderUrl: getProtocolLinkFromEnv(
@@ -1820,7 +1834,7 @@ describe('Resolution', () => {
             expect(location['uns-devtest-testnet-domain.zil']).toEqual({
               registryAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
               resolverAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
-              networkId: 80001,
+              networkId: EthereumNetworks[POL_L2_TESTNET_NAME],
               blockchain: BlockchainType.POL,
               ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
               blockchainProviderUrl: getProtocolLinkFromEnv(

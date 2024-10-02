@@ -632,5 +632,237 @@
         "result": "0x0000000000000000000000000000000000000000000000000000000000000001"
       }
     }
+  ],
+  "resolution_service_supported_tlds": [
+    {
+      "METHOD": "GET",
+      "REQUEST": "/supported_tlds",
+      "RESPONSE": {
+        "tlds": [
+          "888",
+          "altimist",
+          "anime",
+          "austin",
+          "benji",
+          "binanceus",
+          "bitcoin",
+          "bitget",
+          "blockchain",
+          "ca",
+          "clay",
+          "com",
+          "crypto",
+          "dao",
+          "dfz",
+          "dream",
+          "eth",
+          "farms",
+          "go",
+          "hi",
+          "klever",
+          "kresus",
+          "kryptic",
+          "lfg",
+          "manga",
+          "metropolis",
+          "mumu",
+          "nft",
+          "pog",
+          "polygon",
+          "pudgy",
+          "pw",
+          "raiin",
+          "secret",
+          "smobler",
+          "stepn",
+          "tball",
+          "ubu",
+          "unstoppable",
+          "wallet",
+          "witg",
+          "wrkx",
+          "x",
+          "zil"
+        ],
+        "meta": {
+          "888": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "altimist": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "anime": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "austin": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "binanceus": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "bitcoin": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "bitget": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "blockchain": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "clay": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "crypto": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "dao": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "dfz": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "dream": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "farms": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "go": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "hi": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "klever": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "kresus": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "kryptic": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "lfg": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "manga": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "metropolis": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "mumu": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "nft": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "pog": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "polygon": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "pudgy": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "raiin": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "secret": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "stepn": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "tball": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "ubu": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "unstoppable": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "wallet": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "witg": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "wrkx": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "x": {
+            "namingService": "UNS",
+            "registrationBlockchain": "POL"
+          },
+          "benji": {
+            "namingService": "UNS",
+            "registrationBlockchain": "BASE"
+          },
+          "smobler": {
+            "namingService": "UNS",
+            "registrationBlockchain": "BASE"
+          },
+          "zil": {
+            "namingService": "ZNS",
+            "registrationBlockchain": "POL"
+          },
+          "ca": {
+            "namingService": "DNS",
+            "registrationBlockchain": "POL"
+          },
+          "com": {
+            "namingService": "DNS",
+            "registrationBlockchain": "POL"
+          },
+          "pw": {
+            "namingService": "DNS",
+            "registrationBlockchain": "POL"
+          },
+          "eth": {
+            "namingService": "ENS",
+            "registrationBlockchain": "ETH"
+          }
+        }
+      }
+    }
   ]
 }
