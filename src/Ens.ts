@@ -1,7 +1,6 @@
 import * as contentHash from 'content-hash';
 import bip44Constants from 'bip44-constants';
 import {formatsByCoinType} from '@ensdomains/address-encoder';
-import EnsNetworkMap from 'ethereum-ens-network-map';
 import {default as ensInterface} from './contracts/ens/ens';
 import {default as resolverInterface} from './contracts/ens/resolver';
 import {default as nameWrapperInterface} from './contracts/ens/nameWrapper';
@@ -59,7 +58,8 @@ export default class Ens extends NamingService {
     this.proxyServiceApiKey = finalSource['proxyServiceApiKey'];
 
     const registryAddress =
-      finalSource['registryAddress'] || EnsNetworkMap[this.network];
+      finalSource['registryAddress'] ||
+      ensConfig.networks[this.network].contracts.ENSRegistry.address;
     this.registryContract = new EthereumContract(
       ensInterface,
       registryAddress,

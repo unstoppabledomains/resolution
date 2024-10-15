@@ -13,27 +13,28 @@ import {
 import Ens from '../Ens';
 import {EthereumNetworks} from '../utils';
 
-let resolution: Resolution;
-let ens: Ens;
-
-beforeEach(() => {
-  nock.cleanAll();
-  jest.restoreAllMocks();
-  resolution = new Resolution({
-    sourceConfig: {
-      ens: {
-        url: getProtocolLinkFromEnv(
-          ProviderProtocol.http,
-          NamingServiceName.ENS,
-        ),
-        network: ETH_L1_TESTNET_NAME,
-      },
-    },
-  });
-  ens = resolution.serviceMap[NamingServiceName.ENS].native as Ens;
-});
-
 describe('ENS', () => {
+  let resolution: Resolution;
+  let ens: Ens;
+
+  beforeEach(() => {
+    nock.cleanAll();
+    jest.restoreAllMocks();
+
+    resolution = new Resolution({
+      sourceConfig: {
+        ens: {
+          url: getProtocolLinkFromEnv(
+            ProviderProtocol.http,
+            NamingServiceName.ENS,
+          ),
+          network: ETH_L1_TESTNET_NAME,
+        },
+      },
+    });
+    ens = resolution.serviceMap[NamingServiceName.ENS].native as Ens;
+  });
+
   it('allows ens network specified as string', async () => {
     expect(ens.url).toBe(
       getProtocolLinkFromEnv(ProviderProtocol.http, NamingServiceName.ENS),

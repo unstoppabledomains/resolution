@@ -313,10 +313,6 @@ describe('UnsInternal', () => {
   });
 
   it('should return true for tld exists', async () => {
-    console.log(
-      'heyhey',
-      getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
-    );
     mockAPICalls(
       'uns_domain_exists_test',
       getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),

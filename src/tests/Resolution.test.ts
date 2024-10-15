@@ -12,7 +12,7 @@ import {
   NamingServiceName,
   Web3Version1Provider,
 } from '../types/publicTypes';
-import {JsonRpcProvider, InfuraProvider} from '@ethersproject/providers';
+import {ethers} from 'ethers';
 import Web3HttpProvider from 'web3-providers-http';
 import Web3WsProvider from 'web3-providers-ws';
 import {
@@ -291,7 +291,11 @@ describe('Resolution', () => {
       const l2Url = getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2');
       const l2Provider = new FetchProvider(UnsLocation.Layer2, l2Url);
       const spy = mockAsyncMethod(provider, 'request', '1');
-      const spyTwo = mockAsyncMethod(l2Provider, 'request', '80001');
+      const spyTwo = mockAsyncMethod(
+        l2Provider,
+        'request',
+        EthereumNetworks[POL_L2_TESTNET_NAME],
+      );
       const resolution = await Resolution.autoNetwork({
         uns: {
           locations: {Layer1: {provider}, Layer2: {provider: l2Provider}},
@@ -533,9 +537,9 @@ describe('Resolution', () => {
     });
 
     describe('.ServiceName', () => {
-      it('checks ens service name', () => {
-        const serviceName = findNamingServiceName('domain.eth');
-        expect(serviceName).toBe('ENS');
+      it('checks ens service name', async () => {
+        const serviceName = await findNamingServiceName('domain.eth');
+        expect(serviceName).toBe(NamingServiceName.ENS);
       });
 
       it('should resolve gundb chat id', async () => {
@@ -966,21 +970,24 @@ describe('Resolution', () => {
           });
 
           it('should work for ethers jsonrpc provider', async () => {
-            const l1Provider = new JsonRpcProvider(
+            const l1Provider = new ethers.JsonRpcProvider(
               getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
               ETH_L1_TESTNET_NAME,
             );
-            const l2Provider = new JsonRpcProvider(
+            const l2Provider = new ethers.JsonRpcProvider(
               getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
-              POL_L2_TESTNET_NAME,
+              'matic-amoy',
             );
             const resolution = Resolution.fromEthersProvider({
               uns: {
                 locations: {
-                  Layer1: {network: ETH_L1_TESTNET_NAME, provider: l1Provider},
+                  Layer1: {
+                    network: ETH_L1_TESTNET_NAME,
+                    provider: l1Provider as any,
+                  },
                   Layer2: {
                     network: POL_L2_TESTNET_NAME,
-                    provider: l2Provider,
+                    provider: l2Provider as any,
                   },
                 },
               },
@@ -1050,21 +1057,24 @@ describe('Resolution', () => {
           });
 
           it('should work for ethers jsonrpc provider', async () => {
-            const l1Provider = new JsonRpcProvider(
+            const l1Provider = new ethers.JsonRpcProvider(
               getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
               ETH_L1_TESTNET_NAME,
             );
-            const l2Provider = new JsonRpcProvider(
+            const l2Provider = new ethers.JsonRpcProvider(
               getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
-              POL_L2_TESTNET_NAME,
+              'matic-amoy',
             );
             const resolution = Resolution.fromEthersProvider({
               uns: {
                 locations: {
-                  Layer1: {network: ETH_L1_TESTNET_NAME, provider: l1Provider},
+                  Layer1: {
+                    network: ETH_L1_TESTNET_NAME,
+                    provider: l1Provider as any,
+                  },
                   Layer2: {
                     network: POL_L2_TESTNET_NAME,
-                    provider: l2Provider,
+                    provider: l2Provider as any,
                   },
                 },
               },
@@ -1084,12 +1094,12 @@ describe('Resolution', () => {
           });
 
           it('should work with ethers default provider', async () => {
-            const l1Provider = new InfuraProvider(
-              ETH_L1_TESTNET_NAME,
+            const l1Provider = new ethers.InfuraProvider(
+              'matic-amoy',
               '213fff28936343858ca9c5115eff1419',
             );
-            const l2Provider = new InfuraProvider(
-              POL_L2_TESTNET_NAME,
+            const l2Provider = new ethers.InfuraProvider(
+              'matic-amoy',
               'a32aa2ace9704ee9a1a9906418bcabe5',
             );
 
@@ -1099,10 +1109,13 @@ describe('Resolution', () => {
             const resolution = Resolution.fromEthersProvider({
               uns: {
                 locations: {
-                  Layer1: {network: ETH_L1_TESTNET_NAME, provider: l1Provider},
+                  Layer1: {
+                    network: ETH_L1_TESTNET_NAME,
+                    provider: l1Provider as any,
+                  },
                   Layer2: {
                     network: POL_L2_TESTNET_NAME,
-                    provider: l2Provider,
+                    provider: l2Provider as any,
                   },
                 },
               },
