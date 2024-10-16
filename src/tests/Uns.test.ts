@@ -1,3 +1,4 @@
+import nock from 'nock';
 import Resolution from '../index';
 import ResolutionError, {ResolutionErrorCode} from '../errors/resolutionError';
 import {NullAddress} from '../types';
@@ -35,6 +36,11 @@ import Zns from '../Zns';
 import {EthereumNetworks} from '../utils';
 
 describe('UNS', () => {
+  beforeEach(() => {
+    nock.cleanAll();
+    jest.restoreAllMocks();
+  });
+
   describe('constructor', () => {
     it('should define the default uns contract', () => {
       const uns = new Uns({
@@ -1215,7 +1221,8 @@ describe('UNS', () => {
           'udtestdev-265f8f.crypto',
         );
         expect(registryAddress).toBe(
-          UnsConfig.networks[5].contracts.CNSRegistry.address,
+          UnsConfig.networks[EthereumNetworks[ETH_L1_TESTNET_NAME]].contracts
+            .CNSRegistry.address,
         );
       });
 
@@ -1231,7 +1238,8 @@ describe('UNS', () => {
         );
         const registryAddress = await uns.registryAddress('some-domain.888');
         expect(registryAddress).toBe(
-          UnsConfig.networks[5].contracts.UNSRegistry.address,
+          UnsConfig.networks[EthereumNetworks[ETH_L1_TESTNET_NAME]].contracts
+            .UNSRegistry.address,
         );
       });
 

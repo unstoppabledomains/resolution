@@ -21,6 +21,7 @@ import {
 import {ResolutionError, ResolutionErrorCode} from '../errors/resolutionError';
 import {eip137Namehash, fromHexStringToDecimals} from '../utils/namehash';
 import Networking from '../utils/Networking';
+import {EthereumNetworks} from '../utils';
 
 let unsInternalL1: UnsInternal;
 let unsInternalL2: UnsInternal;
@@ -364,7 +365,7 @@ describe('UnsInternal', () => {
     expect(location['udtestdev-check.wallet']).toEqual({
       registryAddress: '0x070e83FCed225184E67c86302493ffFCDB953f71',
       resolverAddress: '0x070e83FCed225184E67c86302493ffFCDB953f71',
-      networkId: 5,
+      networkId: EthereumNetworks[ETH_L1_TESTNET_NAME],
       blockchain: BlockchainType.ETH,
       ownerAddress: '0x0e43F36e4B986dfbE1a75cacfA60cA2bD44Ae962',
       blockchainProviderUrl: getProtocolLinkFromEnv(
@@ -375,7 +376,7 @@ describe('UnsInternal', () => {
     expect(location['brad.crypto']).toEqual({
       registryAddress: '0x801452cFAC27e79a11c6b185986fdE09e8637589',
       resolverAddress: '0x95AE1515367aa64C462c71e87157771165B1287A',
-      networkId: 5,
+      networkId: EthereumNetworks[ETH_L1_TESTNET_NAME],
       blockchain: BlockchainType.ETH,
       ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
       blockchainProviderUrl: getProtocolLinkFromEnv(
@@ -400,7 +401,7 @@ describe('UnsInternal', () => {
     expect(location['udtestdev-test-l2-domain-784391.wallet']).toEqual({
       registryAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
       resolverAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
-      networkId: 80001,
+      networkId: EthereumNetworks[POL_L2_TESTNET_NAME],
       blockchain: BlockchainType.POL,
       ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
       blockchainProviderUrl: getProtocolLinkFromEnv(
@@ -424,7 +425,7 @@ describe('UnsInternal', () => {
     expect(location['0xtestdomain-dev-test.wallet']).toEqual({
       registryAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
       resolverAddress: '0x2a93C52E7B6E7054870758e15A1446E769EdfB93',
-      networkId: 80001,
+      networkId: EthereumNetworks[POL_L2_TESTNET_NAME],
       blockchain: BlockchainType.POL,
       ownerAddress: '0x499dD6D875787869670900a2130223D85d4F6Aa7',
       blockchainProviderUrl: getProtocolLinkFromEnv(
