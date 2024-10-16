@@ -99,7 +99,7 @@ export default class Uns extends NamingService {
     this.unsl2 = new UnsInternal(
       UnsLocation.Layer2,
       source.locations.Layer2,
-      BlockchainType.MATIC,
+      BlockchainType.POL,
     );
   }
 
@@ -447,7 +447,7 @@ export default class Uns extends NamingService {
 
   private async getMetadata(tokenId: string): Promise<DomainMetadata> {
     const tokenUri = await this.getTokenUri(tokenId);
-    const resp = await Networking.fetch(tokenUri, {}).catch((err) => {
+    const resp = await Networking.fetch(tokenUri).catch((err) => {
       throw new ResolutionError(ResolutionErrorCode.MetadataEndpointError, {
         tokenUri: tokenUri || 'undefined',
         errorMessage: err.message,

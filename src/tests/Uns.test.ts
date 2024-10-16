@@ -1,3 +1,4 @@
+import nock from 'nock';
 import Resolution from '../index';
 import ResolutionError, {ResolutionErrorCode} from '../errors/resolutionError';
 import {NullAddress} from '../types';
@@ -18,6 +19,9 @@ import {
   mockAsyncMethod,
   ZilDomainWithAllRecords,
   ZilDomainWithNoResolver,
+  RESOLUTION_SERVICE_BASE_URL,
+  ETH_L1_TESTNET_NAME,
+  POL_L2_TESTNET_NAME,
 } from './helpers';
 import FetchProvider from '../FetchProvider';
 import {NamingServiceName, UnsLocation} from '../types/publicTypes';
@@ -29,28 +33,34 @@ import liveData from './testData/liveData.json';
 import UnsConfig from '../config/uns-config.json';
 import {eip137Namehash, fromHexStringToDecimals} from '../utils/namehash';
 import Zns from '../Zns';
+import {EthereumNetworks} from '../utils';
 
 describe('UNS', () => {
+  beforeEach(() => {
+    nock.cleanAll();
+    jest.restoreAllMocks();
+  });
+
   describe('constructor', () => {
     it('should define the default uns contract', () => {
       const uns = new Uns({
         locations: {
           Layer1: {
             url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
-            network: 'goerli',
+            network: ETH_L1_TESTNET_NAME,
           },
           Layer2: {
             url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
-            network: 'polygon-mumbai',
+            network: POL_L2_TESTNET_NAME,
           },
         },
       });
       expect(uns).toBeDefined();
-      expect(uns.unsl1.network).toBe('goerli');
+      expect(uns.unsl1.network).toBe(ETH_L1_TESTNET_NAME);
       expect(uns.unsl1.url).toBe(
         getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
       );
-      expect(uns.unsl2.network).toBe('polygon-mumbai');
+      expect(uns.unsl2.network).toBe(POL_L2_TESTNET_NAME);
       expect(uns.unsl2.url).toBe(
         getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
       );
@@ -101,9 +111,9 @@ describe('UNS', () => {
             sourceConfig: {
               uns: {
                 locations: {
-                  Layer1: {network: 'goerli'},
+                  Layer1: {network: ETH_L1_TESTNET_NAME},
                   Layer2: {
-                    network: 'polygon-mumbai',
+                    network: POL_L2_TESTNET_NAME,
                     url: 'https://someurl.com',
                   },
                 },
@@ -121,9 +131,12 @@ describe('UNS', () => {
             sourceConfig: {
               uns: {
                 locations: {
-                  Layer1: {network: 'goerli', url: 'https://someurl.com'},
+                  Layer1: {
+                    network: ETH_L1_TESTNET_NAME,
+                    url: 'https://someurl.com',
+                  },
                   Layer2: {
-                    network: 'polygon-mumbai',
+                    network: POL_L2_TESTNET_NAME,
                   },
                 },
               },
@@ -146,11 +159,11 @@ describe('UNS', () => {
             locations: {
               Layer1: {
                 url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL1'),
-                network: 'goerli',
+                network: ETH_L1_TESTNET_NAME,
               },
               Layer2: {
                 url: getProtocolLinkFromEnv(ProviderProtocol.http, 'UNSL2'),
-                network: 'polygon-mumbai',
+                network: POL_L2_TESTNET_NAME,
               },
             },
           },
@@ -158,6 +171,10 @@ describe('UNS', () => {
       });
       uns = resolution.serviceMap[NamingServiceName.UNS].native as Uns;
       zns = resolution.serviceMap[NamingServiceName.ZNS].native as Zns;
+      mockAPICalls(
+        'resolution_service_supported_tlds',
+        RESOLUTION_SERVICE_BASE_URL,
+      );
     });
 
     afterEach(() => {
@@ -1204,7 +1221,8 @@ describe('UNS', () => {
           'udtestdev-265f8f.crypto',
         );
         expect(registryAddress).toBe(
-          UnsConfig.networks[5].contracts.CNSRegistry.address,
+          UnsConfig.networks[EthereumNetworks[ETH_L1_TESTNET_NAME]].contracts
+            .CNSRegistry.address,
         );
       });
 
@@ -1220,43 +1238,46 @@ describe('UNS', () => {
         );
         const registryAddress = await uns.registryAddress('some-domain.888');
         expect(registryAddress).toBe(
-          UnsConfig.networks[5].contracts.UNSRegistry.address,
+          UnsConfig.networks[EthereumNetworks[ETH_L1_TESTNET_NAME]].contracts
+            .UNSRegistry.address,
         );
       });
 
       it('should return uns l2 registry address', async () => {
-        mockAsyncMethod(uns.unsl1.readerContract, 'call', (params) =>
+        const networkId = EthereumNetworks[POL_L2_TESTNET_NAME];
+        mockAsyncMethod(uns.unsl1.readerContract, 'call', () =>
           Promise.resolve(),
         );
-        mockAsyncMethod(uns.unsl2.readerContract, 'call', (params) =>
+        mockAsyncMethod(uns.unsl2.readerContract, 'call', () =>
           Promise.resolve([
-            UnsConfig.networks[80001].contracts.UNSRegistry.address,
+            UnsConfig.networks[networkId].contracts.UNSRegistry.address,
           ]),
         );
         const registryAddress = await uns.registryAddress(
           WalletDomainLayerTwoWithAllRecords,
         );
         expect(registryAddress).toBe(
-          UnsConfig.networks[80001].contracts.UNSRegistry.address,
+          UnsConfig.networks[networkId].contracts.UNSRegistry.address,
         );
       });
 
       skipItInLive(
         'should return uns l2 registry address for a .zil domain',
         async () => {
+          const networkId = EthereumNetworks[POL_L2_TESTNET_NAME];
           const l1Spy = mockAsyncMethod(
             uns.unsl1.readerContract,
             'call',
             undefined,
           );
           const l2Spy = mockAsyncMethod(uns.unsl2.readerContract, 'call', [
-            UnsConfig.networks[80001].contracts.UNSRegistry.address,
+            UnsConfig.networks[networkId].contracts.UNSRegistry.address,
           ]);
           const registryAddress = await resolution.registryAddress(
             WalletDomainLayerTwoWithAllRecords,
           );
           expect(registryAddress).toBe(
-            UnsConfig.networks[80001].contracts.UNSRegistry.address,
+            UnsConfig.networks[networkId].contracts.UNSRegistry.address,
           );
           expectSpyToBeCalled([l1Spy, l2Spy]);
         },
@@ -1534,9 +1555,9 @@ describe('UNS', () => {
             sourceConfig: {
               uns: {
                 locations: {
-                  Layer1: {url, provider, network: 'goerli'},
+                  Layer1: {url, provider, network: ETH_L1_TESTNET_NAME},
                   Layer2: {
-                    network: 'polygon-mumbai',
+                    network: POL_L2_TESTNET_NAME,
                     provider: polygonProvider,
                   },
                 },

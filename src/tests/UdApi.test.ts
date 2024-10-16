@@ -9,6 +9,7 @@ import {
   expectSpyToBeCalled,
   CryptoDomainWithTwitterVerification,
   expectResolutionErrorCode,
+  RESOLUTION_SERVICE_BASE_URL,
 } from './helpers';
 import {NamingServiceName} from '../types/publicTypes';
 import {ResolutionErrorCode} from '../errors/resolutionError';
@@ -16,20 +17,25 @@ import {ResolutionErrorCode} from '../errors/resolutionError';
 let resolution: Resolution;
 let udApi: UdApi;
 
-beforeEach(() => {
-  nock.cleanAll();
-  jest.restoreAllMocks();
-  resolution = new Resolution({
-    sourceConfig: {
-      zns: {api: true},
-      uns: {api: true},
-      ens: {api: true},
-    },
-  });
-  udApi = resolution.serviceMap[NamingServiceName.UNS].usedServices[0] as UdApi;
-});
-
 describe('Unstoppable API', () => {
+  beforeEach(() => {
+    nock.cleanAll();
+    jest.restoreAllMocks();
+    resolution = new Resolution({
+      sourceConfig: {
+        zns: {api: true},
+        uns: {api: true},
+        ens: {api: true},
+      },
+    });
+    udApi = resolution.serviceMap[NamingServiceName.UNS]
+      .usedServices[0] as UdApi;
+    mockAPICalls(
+      'resolution_service_supported_tlds',
+      RESOLUTION_SERVICE_BASE_URL,
+    );
+  });
+
   it('should throw error for registryAddress', async () => {
     await expectResolutionErrorCode(
       () => resolution.registryAddress('test.crypto'),

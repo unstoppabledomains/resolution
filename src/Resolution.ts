@@ -71,6 +71,7 @@ export default class Resolution {
 
   constructor(config: {sourceConfig?: SourceConfig; apiKey?: string} = {}) {
     const uns = this.getUnsConfig(config);
+    const unsBase = this.getUnsBaseConfig(config);
     const zns = this.getZnsConfig(config);
     const ens = this.getEnsConfig(config);
 
@@ -85,6 +86,10 @@ export default class Resolution {
       [NamingServiceName.UNS]: {
         usedServices: [uns],
         native: uns instanceof Uns ? uns : new Uns(),
+      },
+      [NamingServiceName.UNS_BASE]: {
+        usedServices: [unsBase],
+        native: unsBase instanceof Uns ? unsBase : new Uns(),
       },
       [NamingServiceName.ZNS]: {
         usedServices: equalUdApiProviders ? [uns] : [uns, zns],
@@ -657,7 +662,7 @@ export default class Resolution {
   async email(domain: string): Promise<string> {
     domain = prepareAndValidateDomain(domain);
     let key = 'whois.email.value';
-    const serviceName = findNamingServiceName(domain);
+    const serviceName = await findNamingServiceName(domain);
     if (serviceName === 'ENS') {
       key = 'email';
     }
@@ -1057,7 +1062,7 @@ export default class Resolution {
   private async getMetadataFromTokenURI(
     tokenUri: string,
   ): Promise<TokenUriMetadata> {
-    const resp = await Networking.fetch(tokenUri, {});
+    const resp = await Networking.fetch(tokenUri);
     if (resp.ok) {
       return resp.json();
     }
@@ -1097,7 +1102,7 @@ export default class Resolution {
     domain: string,
     func: (service: NamingService) => T,
   ): Promise<UnwrapPromise<T>> {
-    const serviceName = findNamingServiceName(domain);
+    const serviceName = await findNamingServiceName(domain);
     if (!serviceName) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedDomain, {
         domain,
@@ -1136,7 +1141,7 @@ export default class Resolution {
     func: (service: NamingService) => Promise<boolean>,
     options: {throwIfUnsupportedDomain: boolean; expectedValue: boolean},
   ): Promise<boolean> {
-    const serviceName = findNamingServiceName(domain);
+    const serviceName = await findNamingServiceName(domain);
     if (!serviceName) {
       if (!options.throwIfUnsupportedDomain) {
         return !options.expectedValue;
@@ -1173,10 +1178,18 @@ export default class Resolution {
   private async reverseGetTokenId(
     address: string,
     location?: UnsLocation,
-  ): Promise<string> {
-    const service = this.serviceMap['UNS'].native;
-    const tokenId = await service.reverseOf(address, location);
-    return tokenId as string;
+  ): Promise<string | null> {
+    let tokenId: string | null = null;
+
+    const unsService = this.serviceMap['UNS'].native;
+    tokenId = await unsService.reverseOf(address, location);
+
+    if (!tokenId) {
+      const baseUnsService = this.serviceMap['UNS_BASE'].native;
+      tokenId = await baseUnsService.reverseOf(address, location);
+    }
+
+    return tokenId;
   }
 
   private getUnsConfig(config: ResolutionConfig): Uns | UdApi {
@@ -1202,13 +1215,36 @@ export default class Resolution {
       : new Uns(config.sourceConfig?.uns);
   }
 
-  getZnsConfig(config: ResolutionConfig): Zns | UdApi {
+  private getUnsBaseConfig(config: ResolutionConfig): Uns | UdApi {
+    if (config.apiKey) {
+      return new Uns({
+        locations: {
+          Layer1: {
+            url: `${DEFAULT_UNS_PROXY_SERVICE_URL}/chains/eth/rpc`,
+            network: 'mainnet',
+            proxyServiceApiKey: config.apiKey,
+          },
+          Layer2: {
+            url: `${DEFAULT_UNS_PROXY_SERVICE_URL}/chains/base/rpc`,
+            network: 'base-mainnet',
+            proxyServiceApiKey: config.apiKey,
+          },
+        },
+      });
+    }
+
+    return isApi(config.sourceConfig?.uns)
+      ? new UdApi(config.sourceConfig?.uns)
+      : new Uns(config.sourceConfig?.uns);
+  }
+
+  private getZnsConfig(config: ResolutionConfig): Zns | UdApi {
     return isApi(config.sourceConfig?.zns)
       ? new UdApi(config.sourceConfig?.zns)
       : new Zns(config.sourceConfig?.zns);
   }
 
-  getEnsConfig(config: ResolutionConfig): Ens | UdApi {
+  private getEnsConfig(config: ResolutionConfig): Ens | UdApi {
     if (config.apiKey) {
       return new Ens({
         url: `${DEFAULT_UNS_PROXY_SERVICE_URL}/chains/eth/rpc`,
@@ -1231,5 +1267,10 @@ type ServicesEntry = {
 };
 
 function isApi(obj: any): obj is Api {
-  return obj && obj.api;
+  return (
+    typeof obj === 'object' &&
+    obj !== null &&
+    'api' in obj &&
+    typeof obj.api === 'boolean'
+  );
 }

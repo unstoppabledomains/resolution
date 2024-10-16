@@ -1,21 +1,31 @@
-import {CryptoRecords, NamingServiceName} from '../types/publicTypes';
+import {
+  BlockchainType,
+  CryptoRecords,
+  NamingServiceName,
+} from '../types/publicTypes';
 import {NullAddresses} from '../types';
 import {UnsSupportedNetwork} from '../types';
+import Tlds from './Tlds';
+import ResolutionError, {ResolutionErrorCode} from '../errors/resolutionError';
 
 type Providers = 'infura' | 'alchemy';
 type NetworkSignedLinkURLs = Record<UnsSupportedNetwork, string>;
 const ProviderURLMap: Record<Providers, NetworkSignedLinkURLs> = {
   infura: {
     mainnet: 'https://mainnet.infura.io/v3/',
-    goerli: 'https://goerli.infura.io/v3/',
+    sepolia: 'https://sepolia.infura.io/v3/',
     'polygon-mainnet': 'https://polygon-mainnet.infura.io/v3/',
-    'polygon-mumbai': 'https://polygon-mumbai.infura.io/v3/',
+    'polygon-amoy': 'https://polygon-amoy.infura.io/v3/',
+    'base-mainnet': 'https://base-mainnet.infura.io/v3/',
+    'base-sepolia': 'https://base-sepolia.infura.io/v3/',
   },
   alchemy: {
-    mainnet: 'https://eth-mainnet.alchemyapi.io/v2/',
-    goerli: 'https://eth-goerli.alchemyapi.io/v2/',
+    mainnet: 'https://eth-mainnet.g.alchemy.com/v2/',
+    sepolia: 'https://eth-sepolia.g.alchemy.com/v2/',
     'polygon-mainnet': 'https://polygon-mainnet.g.alchemy.com/v2/',
-    'polygon-mumbai': 'https://polygon-mumbai.g.alchemy.com/v2/',
+    'polygon-amoy': 'https://polygon-amoy.g.alchemy.com/v2/',
+    'base-mainnet': 'https://base-mainnet.g.alchemy.com/v2/',
+    'base-sepolia': 'https://base-sepolia.g.alchemy.com/v2/',
   },
 };
 
@@ -76,43 +86,69 @@ export function constructRecords(
   return records;
 }
 
-export const domainExtensionToNamingServiceName = {
-  crypto: NamingServiceName.UNS,
-  zil: NamingServiceName.ZNS,
-  eth: NamingServiceName.ENS,
-  luxe: NamingServiceName.ENS,
-  xyz: NamingServiceName.ENS,
-  kred: NamingServiceName.ENS,
-  reverse: NamingServiceName.ENS,
-};
+const EnsTlds = ['eth', 'luxe', 'xyz', 'kred', 'reverse'];
 
-export const findNamingServiceName = (
+export const findNamingServiceName = async (
   domain: string,
-): NamingServiceName | '' => {
-  const extension = domain.split('.').pop();
+): Promise<NamingServiceName | null> => {
+  const tld = domain.split('.').pop();
 
-  if (!extension) {
-    return '';
-  } else if (extension in domainExtensionToNamingServiceName) {
-    return domainExtensionToNamingServiceName[extension];
-  } else {
-    return domainExtensionToNamingServiceName.crypto;
+  if (!tld) {
+    return null;
   }
+
+  if (EnsTlds.includes(tld)) {
+    return NamingServiceName.ENS;
+  }
+
+  const tldsMeta = await Tlds.getTldsMeta();
+
+  if (!tldsMeta) {
+    throw new ResolutionError(ResolutionErrorCode.ServiceProviderError, {
+      providerMessage:
+        'TLD meta is not available. Possibly failed to load supported TLDs data',
+    });
+  }
+
+  if (tld in tldsMeta) {
+    const {namingService, registrationBlockchain} = tldsMeta[tld];
+    switch (namingService) {
+      case 'UNS': {
+        switch (registrationBlockchain) {
+          case BlockchainType.BASE:
+            return NamingServiceName.UNS_BASE;
+          default:
+            return NamingServiceName.UNS;
+        }
+      }
+      case 'ENS':
+        return NamingServiceName.ENS;
+      case 'ZNS':
+        return NamingServiceName.ZNS;
+    }
+  }
+
+  return null;
 };
 
 export const EthereumNetworks = {
   mainnet: 1,
-  goerli: 5,
+  sepolia: 11155111,
   'polygon-mainnet': 137,
-  'polygon-mumbai': 80001,
+  'polygon-amoy': 80002,
+  'base-mainnet': 8453,
+  'base-sepolia': 84532,
 } as const;
 
-export const EthereumNetworksInverted = {
-  1: 'mainnet',
-  5: 'goerli',
-  137: 'polygon-mainnet',
-  80001: 'polygon-mumbai',
-} as const;
+export const EthereumNetworksInverted = Object.entries(EthereumNetworks).reduce<
+  Record<number, string>
+>(
+  (acc, [originalKey, originalValue]) => ({
+    ...acc,
+    [originalValue]: originalKey,
+  }),
+  {},
+);
 
 export const wrapResult = <T>(func: () => T): Promise<WrappedResult<T>> => {
   let callResult;
