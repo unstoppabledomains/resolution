@@ -1,8 +1,14 @@
 import {RpcProviderTestCase} from '../types';
 import UnsConfig from '../config/uns-config.json';
+import {EthereumNetworks} from '../utils';
+import {ETH_L1_TESTNET_NAME} from './helpers';
+
+const networkId = EthereumNetworks[ETH_L1_TESTNET_NAME];
+
 const ProxyReaderAddress =
-  UnsConfig.networks[5].contracts.ProxyReader.address.toLowerCase();
-const ResolverAddress = UnsConfig.networks[5].contracts.Resolver.address;
+  UnsConfig.networks[networkId].contracts.ProxyReader.address.toLowerCase();
+const ResolverAddress =
+  UnsConfig.networks[networkId].contracts.Resolver.address;
 
 export const RpcProviderTestCases: RpcProviderTestCase = [
   {

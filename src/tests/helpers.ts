@@ -11,6 +11,11 @@ import {NamingServiceName} from '../types/publicTypes';
 
 export const ZilliqaUrl = 'https://api.zilliqa.com';
 export const DefaultUrl = 'https://unstoppabledomains.com/api/v1';
+export const RESOLUTION_SERVICE_BASE_URL =
+  'https://api.unstoppabledomains.com/resolve';
+
+export const ETH_L1_TESTNET_NAME = 'sepolia';
+export const POL_L2_TESTNET_NAME = 'polygon-amoy';
 
 export const CryptoDomainWithTwitterVerification =
   'reseller-test-udtesting-052523593694.crypto';

@@ -1,3 +1,7 @@
+## 9.3.0
+
+- Support Base blockchain UNS domains resolution
+
 ## 9.2.2
 
 - Changed devDependencies to dependencies
