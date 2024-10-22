@@ -13,6 +13,7 @@ export type UnsLayerSource = NamingServiceSource & {
   network: string;
   proxyServiceApiKey?: string;
   proxyReaderAddress?: string;
+  blockchain?: BlockchainType;
 };
 
 export type UnsSource = {

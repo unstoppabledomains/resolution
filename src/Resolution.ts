@@ -22,6 +22,7 @@ import {
   Web3Version1Provider,
   ReverseResolutionOptions,
   UnsLocation,
+  BlockchainType,
 } from './types/publicTypes';
 import ResolutionError, {ResolutionErrorCode} from './errors/resolutionError';
 import DnsUtils from './utils/DnsUtils';
@@ -1200,11 +1201,13 @@ export default class Resolution {
             url: `${DEFAULT_UNS_PROXY_SERVICE_URL}/chains/eth/rpc`,
             network: 'mainnet',
             proxyServiceApiKey: config.apiKey,
+            blockchain: BlockchainType.ETH,
           },
           Layer2: {
             url: `${DEFAULT_UNS_PROXY_SERVICE_URL}/chains/matic/rpc`,
             network: 'polygon-mainnet',
             proxyServiceApiKey: config.apiKey,
+            blockchain: BlockchainType.POL,
           },
         },
       });
@@ -1223,11 +1226,13 @@ export default class Resolution {
             url: `${DEFAULT_UNS_PROXY_SERVICE_URL}/chains/eth/rpc`,
             network: 'mainnet',
             proxyServiceApiKey: config.apiKey,
+            blockchain: BlockchainType.ETH,
           },
           Layer2: {
             url: `${DEFAULT_UNS_PROXY_SERVICE_URL}/chains/base/rpc`,
             network: 'base-mainnet',
             proxyServiceApiKey: config.apiKey,
+            blockchain: BlockchainType.BASE,
           },
         },
       });

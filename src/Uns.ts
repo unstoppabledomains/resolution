@@ -94,12 +94,12 @@ export default class Uns extends NamingService {
     this.unsl1 = new UnsInternal(
       UnsLocation.Layer1,
       source.locations.Layer1,
-      BlockchainType.ETH,
+      source.locations.Layer1.blockchain ?? BlockchainType.ETH,
     );
     this.unsl2 = new UnsInternal(
       UnsLocation.Layer2,
       source.locations.Layer2,
-      BlockchainType.POL,
+      source.locations.Layer2.blockchain ?? BlockchainType.POL,
     );
   }
 
