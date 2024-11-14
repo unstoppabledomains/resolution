@@ -1,6 +1,7 @@
 ## 9.3.1
 
 - Resolve .xyz TLD as UNS domains
+- Remove .kred and .luxe from ENS resolution
 
 ## 9.3.0
 

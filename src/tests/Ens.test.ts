@@ -93,40 +93,6 @@ describe('ENS', () => {
     expect(result).toEqual(null);
   });
 
-  it('resolves .luxe name using ENS blockchain', async () => {
-    const eyes = mockAsyncMethods(ens, {
-      resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
-      fetchAddress: '0xf3dE750A73C11a6a2863761E930BF5fE979d5663',
-    });
-
-    const result = await resolution.addr('john.luxe', 'ETH');
-    expectSpyToBeCalled(eyes);
-    expect(result).toEqual('0xf3dE750A73C11a6a2863761E930BF5fE979d5663');
-  });
-
-  it('resolves .kred name using ENS blockchain', async () => {
-    const eyes = mockAsyncMethods(ens, {
-      resolver: '0x96184444629F3489c4dE199871E6F99568229d8f',
-      fetchAddress: '0x96184444629F3489c4dE199871E6F99568229d8f',
-    });
-    const result = await resolution.addr('brantly.kred', 'ETH');
-    expectSpyToBeCalled(eyes);
-    expect(result).toEqual('0x96184444629F3489c4dE199871E6F99568229d8f');
-  });
-
-  it('resolves .luxe name using ENS blockchain with thrown error', async () => {
-    const spies = mockAsyncMethods(ens, {
-      resolver: undefined,
-      owner: undefined,
-    });
-
-    await expectResolutionErrorCode(
-      resolution.addr('something.luxe', 'ETH'),
-      ResolutionErrorCode.UnregisteredDomain,
-    );
-    expectSpyToBeCalled(spies);
-  });
-
   it('resolves name with resolver but without an owner', async () => {
     const eyes = mockAsyncMethods(ens, {
       resolver: '0x226159d592E2b063810a10Ebf6dcbADA94Ed68b8',

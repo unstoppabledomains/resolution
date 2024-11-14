@@ -163,10 +163,7 @@ export default class UnsInternal {
     const tokens = domain.split('.');
     return (
       !!tokens.length &&
-      !(
-        domain === 'eth' ||
-        /^[^-]*[^-]*\.(eth|luxe|kred|addr\.reverse)$/.test(domain)
-      ) &&
+      !(domain === 'eth' || /^[^-]*[^-]*\.(eth|addr\.reverse)$/.test(domain)) &&
       tokens.every((v) => !!v.length)
     );
   }

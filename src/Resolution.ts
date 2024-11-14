@@ -968,10 +968,10 @@ export default class Resolution {
   async locations(domains: string[]): Promise<Locations> {
     const zilDomains = domains.filter((domain) => domain.endsWith('.zil'));
     const ensDomains = domains.filter((domain) =>
-      domain.match(/^([^\s\\.]+\.)+(eth|luxe|kred)+$/),
+      domain.match(/^([^\s\\.]+\.)+(eth)+$/),
     );
     const nonEnsDomains = domains.filter(
-      (domain) => !domain.match(/^([^\s\\.]+\.)+(eth|luxe|kred)+$/),
+      (domain) => !domain.match(/^([^\s\\.]+\.)+(eth)+$/),
     );
     // Here, we call both UNS and ZNS methods and merge the results.
     // If any of the calls fails, this method will fail as well as we aren't interested in partial results.
