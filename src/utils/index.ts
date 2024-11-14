@@ -86,7 +86,7 @@ export function constructRecords(
   return records;
 }
 
-const EnsTlds = ['eth', 'luxe', 'xyz', 'kred', 'reverse'];
+const EnsTlds = ['eth', 'reverse'];
 
 export const findNamingServiceName = async (
   domain: string,

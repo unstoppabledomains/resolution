@@ -534,10 +534,7 @@ export default class Uns extends NamingService {
     const tokens = domain.split('.');
     return (
       !!tokens.length &&
-      !(
-        domain === 'eth' ||
-        /^[^-]*[^-]*\.(eth|luxe|xyz|kred|addr\.reverse)$/.test(domain)
-      ) &&
+      !(domain === 'eth' || /^[^-]*[^-]*\.(eth|addr\.reverse)$/.test(domain)) &&
       tokens.every((v) => !!v.length)
     );
   }

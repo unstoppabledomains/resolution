@@ -71,13 +71,13 @@ describe('ENS', () => {
         '0x4da70a332a7a98a58486f551a455b1398ce309d9bd3a4f0800da4eec299829a4',
       callMethod: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
       resolverCallToAddr: '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
-      resolverCallToName: 'adrian.argent.xyz',
+      resolverCallToName: 'adrian.argent.eth',
     });
     const result = await ens?.reverseOf(
       '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
     );
     expectSpyToBeCalled(eyes);
-    expect(result).toEqual('adrian.argent.xyz');
+    expect(result).toEqual('adrian.argent.eth');
   });
 
   it('reverses address to ENS domain null', async () => {
@@ -91,51 +91,6 @@ describe('ENS', () => {
     );
     expectSpyToBeCalled(spy);
     expect(result).toEqual(null);
-  });
-
-  it('resolves .xyz name using ENS blockchain', async () => {
-    const eyes = mockAsyncMethods(ens, {
-      resolver: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
-      fetchAddress: '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
-    });
-
-    const result = await resolution.addr('adrian.argent.xyz', 'ETH');
-    expectSpyToBeCalled(eyes);
-    expect(result).toEqual('0xb0E7a465D255aE83eb7F8a50504F3867B945164C');
-  });
-
-  it('resolves .luxe name using ENS blockchain', async () => {
-    const eyes = mockAsyncMethods(ens, {
-      resolver: '0xBD5F5ec7ed5f19b53726344540296C02584A5237',
-      fetchAddress: '0xf3dE750A73C11a6a2863761E930BF5fE979d5663',
-    });
-
-    const result = await resolution.addr('john.luxe', 'ETH');
-    expectSpyToBeCalled(eyes);
-    expect(result).toEqual('0xf3dE750A73C11a6a2863761E930BF5fE979d5663');
-  });
-
-  it('resolves .kred name using ENS blockchain', async () => {
-    const eyes = mockAsyncMethods(ens, {
-      resolver: '0x96184444629F3489c4dE199871E6F99568229d8f',
-      fetchAddress: '0x96184444629F3489c4dE199871E6F99568229d8f',
-    });
-    const result = await resolution.addr('brantly.kred', 'ETH');
-    expectSpyToBeCalled(eyes);
-    expect(result).toEqual('0x96184444629F3489c4dE199871E6F99568229d8f');
-  });
-
-  it('resolves .luxe name using ENS blockchain with thrown error', async () => {
-    const spies = mockAsyncMethods(ens, {
-      resolver: undefined,
-      owner: undefined,
-    });
-
-    await expectResolutionErrorCode(
-      resolution.addr('something.luxe', 'ETH'),
-      ResolutionErrorCode.UnregisteredDomain,
-    );
-    expectSpyToBeCalled(spies);
   });
 
   it('resolves name with resolver but without an owner', async () => {
