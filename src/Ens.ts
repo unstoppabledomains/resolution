@@ -513,7 +513,7 @@ export default class Ens extends NamingService {
   private checkSupportedDomain(domain: string): boolean {
     return (
       domain === 'eth' ||
-      /^([^\s\\.]+\.)+(eth|luxe|xyz|kred)+$/.test(domain) ||
+      /^([^\s\\.]+\.)+(eth|luxe|kred)+$/.test(domain) ||
       /^([^\s\\.]+\.)(addr\.)(reverse)$/.test(domain)
     );
   }

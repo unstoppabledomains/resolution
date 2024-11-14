@@ -165,7 +165,7 @@ export default class UnsInternal {
       !!tokens.length &&
       !(
         domain === 'eth' ||
-        /^[^-]*[^-]*\.(eth|luxe|xyz|kred|addr\.reverse)$/.test(domain)
+        /^[^-]*[^-]*\.(eth|luxe|kred|addr\.reverse)$/.test(domain)
       ) &&
       tokens.every((v) => !!v.length)
     );

@@ -1,3 +1,7 @@
+## 9.3.1
+
+- Resolve .xyz TLD as UNS domains
+
 ## 9.3.0
 
 - Support Base blockchain UNS domains resolution

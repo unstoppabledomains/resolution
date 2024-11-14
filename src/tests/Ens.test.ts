@@ -71,13 +71,13 @@ describe('ENS', () => {
         '0x4da70a332a7a98a58486f551a455b1398ce309d9bd3a4f0800da4eec299829a4',
       callMethod: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
       resolverCallToAddr: '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
-      resolverCallToName: 'adrian.argent.xyz',
+      resolverCallToName: 'adrian.argent.luxy',
     });
     const result = await ens?.reverseOf(
       '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
     );
     expectSpyToBeCalled(eyes);
-    expect(result).toEqual('adrian.argent.xyz');
+    expect(result).toEqual('adrian.argent.luxy');
   });
 
   it('reverses address to ENS domain null', async () => {
@@ -91,17 +91,6 @@ describe('ENS', () => {
     );
     expectSpyToBeCalled(spy);
     expect(result).toEqual(null);
-  });
-
-  it('resolves .xyz name using ENS blockchain', async () => {
-    const eyes = mockAsyncMethods(ens, {
-      resolver: '0xDa1756Bb923Af5d1a05E277CB1E54f1D0A127890',
-      fetchAddress: '0xb0E7a465D255aE83eb7F8a50504F3867B945164C',
-    });
-
-    const result = await resolution.addr('adrian.argent.xyz', 'ETH');
-    expectSpyToBeCalled(eyes);
-    expect(result).toEqual('0xb0E7a465D255aE83eb7F8a50504F3867B945164C');
   });
 
   it('resolves .luxe name using ENS blockchain', async () => {
