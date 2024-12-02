@@ -146,7 +146,7 @@ describe('Resolution', () => {
         },
         ens: {url: l1Url},
       });
-      // We need to manually restore the function as jest.restoreAllMocks and simillar works only with spyOn
+      // We need to manually restore the function as jest.restoreAllMocks and similar works only with spyOn
       Uns.autoNetwork = UnsGetNetworkOriginal;
       Ens.autoNetwork = EnsGetNetworkOriginal;
       expect(
@@ -317,7 +317,7 @@ describe('Resolution', () => {
       ).toBe(1);
     });
 
-    it('should fail because provided url failled net_version call', async () => {
+    it('should fail because provided url failed net_version call', async () => {
       const mockedProvider = new FetchProvider(
         NamingServiceName.UNS,
         'https://google.com',
@@ -578,7 +578,7 @@ describe('Resolution', () => {
 
       describe('.ipfsHash', () => {
         skipItInLive(
-          'should prioritize new keys over depricated ones',
+          'should prioritize new keys over deprecated ones',
           async () => {
             const spies = mockAsyncMethods(uns, {
               get: {
