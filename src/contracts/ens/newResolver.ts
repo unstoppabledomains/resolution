@@ -73,7 +73,7 @@ export default [
     stateMutability: 'nonpayable',
     type: 'function',
   },
-  // This funciton is defined, however there is other version with 2 arguments
+  // This function is defined, however there is other version with 2 arguments
   // that we prefer to use all the time to be consistent
   // {
   // constant: true,
