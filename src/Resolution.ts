@@ -23,6 +23,7 @@ import {
   ReverseResolutionOptions,
   UnsLocation,
   BlockchainType,
+  UnsBlockchainsSource,
 } from './types/publicTypes';
 import ResolutionError, {ResolutionErrorCode} from './errors/resolutionError';
 import DnsUtils from './utils/DnsUtils';
@@ -1213,6 +1214,15 @@ export default class Resolution {
       });
     }
 
+    if (isBlockchainsConfig(config.sourceConfig?.uns)) {
+      return new Uns({
+        locations: {
+          Layer1: config.sourceConfig?.uns.blockchains.eth,
+          Layer2: config.sourceConfig?.uns.blockchains.pol,
+        },
+      });
+    }
+
     return isApi(config.sourceConfig?.uns)
       ? new UdApi(config.sourceConfig?.uns)
       : new Uns(config.sourceConfig?.uns);
@@ -1234,6 +1244,15 @@ export default class Resolution {
             proxyServiceApiKey: config.apiKey,
             blockchain: BlockchainType.BASE,
           },
+        },
+      });
+    }
+
+    if (isBlockchainsConfig(config.sourceConfig?.uns)) {
+      return new Uns({
+        locations: {
+          Layer1: config.sourceConfig?.uns.blockchains.eth,
+          Layer2: config.sourceConfig?.uns.blockchains.base,
         },
       });
     }
@@ -1278,4 +1297,8 @@ function isApi(obj: any): obj is Api {
     'api' in obj &&
     typeof obj.api === 'boolean'
   );
+}
+
+function isBlockchainsConfig(obj: any): obj is UnsBlockchainsSource {
+  return typeof obj === 'object' && obj !== null && 'blockchains' in obj;
 }

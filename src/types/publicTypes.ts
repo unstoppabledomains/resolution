@@ -20,6 +20,10 @@ export type UnsSource = {
   locations: {Layer1: UnsLayerSource; Layer2: UnsLayerSource};
 };
 
+export type UnsBlockchainsSource = {
+  blockchains: {eth: UnsLayerSource; pol: UnsLayerSource; base: UnsLayerSource};
+};
+
 export type EnsSource = NamingServiceSource & {
   network: string;
   registryAddress?: string;
@@ -32,7 +36,7 @@ export type ZnsSource = NamingServiceSource & {
 };
 
 export type SourceConfig = {
-  uns?: UnsSource | Api;
+  uns?: UnsSource | UnsBlockchainsSource | Api;
   zns?: ZnsSource | Api;
   ens?: EnsSource | Api;
 };
