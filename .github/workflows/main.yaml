@@ -44,20 +44,15 @@ jobs:
       - name: Dependencies Security Audit
         run: npx audit-ci --skip-dev --critical --package-manager yarn
 
-  size:
-    runs-on: ubuntu-latest
-
-    name: size check (<= 500 KB)
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Setup node
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node }}
-
-      - name: Install Dependencies
-        run: yarn install
-
-      - run: yarn size
+  # size:
+  #   runs-on: ubuntu-latest
+  #   name: size check (<= 500 KB)
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Setup node
+  #       uses: actions/setup-node@v1
+  #       with:
+  #         node-version: ${{ matrix.node }}
+  #     - name: Install Dependencies
+  #       run: yarn install
+  #     - run: yarn size

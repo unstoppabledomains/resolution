@@ -1214,18 +1214,17 @@ export default class Resolution {
       });
     }
 
-    if (isBlockchainsConfig(config.sourceConfig?.uns)) {
+    const unsSource = config.sourceConfig?.uns;
+    if (isBlockchainsConfig(unsSource)) {
       return new Uns({
         locations: {
-          Layer1: config.sourceConfig?.uns.blockchains.eth,
-          Layer2: config.sourceConfig?.uns.blockchains.pol,
+          Layer1: unsSource.blockchains.eth,
+          Layer2: unsSource.blockchains.pol,
         },
       });
     }
 
-    return isApi(config.sourceConfig?.uns)
-      ? new UdApi(config.sourceConfig?.uns)
-      : new Uns(config.sourceConfig?.uns);
+    return isApi(unsSource) ? new UdApi(unsSource) : new Uns(unsSource);
   }
 
   private getUnsBaseConfig(config: ResolutionConfig): Uns | UdApi {
@@ -1248,18 +1247,17 @@ export default class Resolution {
       });
     }
 
-    if (isBlockchainsConfig(config.sourceConfig?.uns)) {
+    const unsSource = config.sourceConfig?.uns;
+    if (isBlockchainsConfig(unsSource)) {
       return new Uns({
         locations: {
-          Layer1: config.sourceConfig?.uns.blockchains.eth,
-          Layer2: config.sourceConfig?.uns.blockchains.base,
+          Layer1: unsSource.blockchains.eth,
+          Layer2: unsSource.blockchains.base,
         },
       });
     }
 
-    return isApi(config.sourceConfig?.uns)
-      ? new UdApi(config.sourceConfig?.uns)
-      : new Uns(config.sourceConfig?.uns);
+    return isApi(unsSource) ? new UdApi(unsSource) : new Uns(unsSource);
   }
 
   private getZnsConfig(config: ResolutionConfig): Zns | UdApi {
