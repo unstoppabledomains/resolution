@@ -23,7 +23,7 @@ import {
   ReverseResolutionOptions,
   UnsLocation,
   BlockchainType,
-  UnsBlockchainsSource,
+  UnsLayerSource,
 } from './types/publicTypes';
 import ResolutionError, {ResolutionErrorCode} from './errors/resolutionError';
 import DnsUtils from './utils/DnsUtils';
@@ -69,7 +69,29 @@ export default class Resolution {
   /**
    * @internal
    */
-  readonly serviceMap: Record<NamingServiceName, ServicesEntry>;
+  readonly serviceMap: {
+    [NamingServiceName.UNS]: ServicesEntry;
+    [NamingServiceName.ZNS]: ServicesEntry;
+    [NamingServiceName.ENS]: ServicesEntry;
+    [NamingServiceName.UNS_BASE]?: ServicesEntry;
+  };
+
+  private getService(serviceName: NamingServiceName): ServicesEntry {
+    const entry = this.serviceMap[serviceName];
+    if (!entry) {
+      throw new ConfigurationError(
+        ConfigurationErrorCode.NetworkConfigMissing,
+        {
+          method: serviceName,
+          config:
+            serviceName === NamingServiceName.UNS_BASE
+              ? `sourceConfig.uns.base`
+              : `sourceConfig.${serviceName.toLowerCase()}`,
+        },
+      );
+    }
+    return entry;
+  }
 
   constructor(config: {sourceConfig?: SourceConfig; apiKey?: string} = {}) {
     const uns = this.getUnsConfig(config);
@@ -89,10 +111,6 @@ export default class Resolution {
         usedServices: [uns],
         native: uns instanceof Uns ? uns : new Uns(),
       },
-      [NamingServiceName.UNS_BASE]: {
-        usedServices: [unsBase],
-        native: unsBase instanceof Uns ? unsBase : new Uns(),
-      },
       [NamingServiceName.ZNS]: {
         usedServices: equalUdApiProviders ? [uns] : [uns, zns],
         native: zns instanceof Zns ? zns : new Zns(),
@@ -102,6 +120,13 @@ export default class Resolution {
         native: ens instanceof Ens ? ens : new Ens(),
       },
     };
+
+    if (unsBase) {
+      this.serviceMap[NamingServiceName.UNS_BASE] = {
+        usedServices: [unsBase],
+        native: unsBase instanceof Uns ? unsBase : new Uns(),
+      };
+    }
   }
 
   /**
@@ -795,7 +820,7 @@ export default class Resolution {
     namingService: NamingServiceName,
     options: NamehashOptions = NamehashOptionsDefault,
   ): string {
-    const service = this.serviceMap[namingService];
+    const service = this.getService(namingService);
     if (!service) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedService, {
         namingService,
@@ -819,16 +844,23 @@ export default class Resolution {
     namingService: NamingServiceName,
     options: NamehashOptions = NamehashOptionsDefault,
   ): string {
-    const service = this.serviceMap[namingService];
-    if (!service) {
-      throw new ResolutionError(ResolutionErrorCode.UnsupportedService, {
-        namingService,
-      });
+    try {
+      const service = this.getService(namingService);
+      return this.formatNamehash(
+        service.native.childhash(parent, label),
+        options,
+      );
+    } catch (error) {
+      if (
+        error instanceof ConfigurationError &&
+        error.code === ConfigurationErrorCode.NetworkConfigMissing
+      ) {
+        throw new ResolutionError(ResolutionErrorCode.UnsupportedService, {
+          namingService,
+        });
+      }
+      throw error;
     }
-    return this.formatNamehash(
-      service.native.childhash(parent, label),
-      options,
-    );
   }
 
   private formatNamehash(hash, options: NamehashOptions) {
@@ -851,7 +883,7 @@ export default class Resolution {
     hash: string,
     namingService: NamingServiceName,
   ): boolean {
-    const service = this.serviceMap[namingService];
+    const service = this.getService(namingService);
     if (!service) {
       throw new ResolutionError(ResolutionErrorCode.UnsupportedService, {
         namingService,
@@ -954,7 +986,7 @@ export default class Resolution {
    */
   async unhash(hash: string, service: NamingServiceName): Promise<string> {
     hash = fromDecStringToHex(hash);
-    const services = this.serviceMap[service].usedServices;
+    const services = this.getService(service).usedServices;
     // UNS is the only service and ZNS is the one with the lowest priority.
     // We don't want to access the `native` service, as a user may want to call `UdApi`.
     const method = services[services.length - 1];
@@ -980,12 +1012,13 @@ export default class Resolution {
     // But if there are no .zil domains with absent UNS locations (i.e. all the requested .zil domains have been
     // migrated to UNS), the ZNS call result will be ignored and an error, if there's one, won't be thrown.
 
-    const unsPromise =
-      this.serviceMap.UNS.usedServices[0].locations(nonEnsDomains);
+    const unsPromise = this.getService(
+      NamingServiceName.UNS,
+    ).usedServices[0].locations(nonEnsDomains);
     // Fetch UNS locations first. If we see that there are no .zil domains with absent locations, we can return early.
     const unsLocations = await unsPromise;
     if (zilDomains.length) {
-      const znsServices = this.serviceMap.ZNS.usedServices;
+      const znsServices = this.getService(NamingServiceName.ZNS).usedServices;
       // The actual ZNS service is the last one in the array.
       const znsService = znsServices[znsServices.length - 1];
       const znsPromise = wrapResult(() => znsService.locations(zilDomains));
@@ -1002,9 +1035,9 @@ export default class Resolution {
     }
 
     if (ensDomains.length) {
-      const ensLocations = await this.serviceMap.ENS.usedServices[0].locations(
-        ensDomains,
-      );
+      const ensLocations = await this.getService(
+        NamingServiceName.ENS,
+      ).usedServices[0].locations(ensDomains);
       for (const ensDomain in ensLocations) {
         unsLocations[ensDomain] = ensLocations[ensDomain];
       }
@@ -1027,7 +1060,7 @@ export default class Resolution {
       return tokenId;
     }
 
-    const ensService = this.serviceMap['ENS'].native;
+    const ensService = this.getService(NamingServiceName.ENS).native;
     const ensDomainName = await ensService.reverseOf(address);
     if (ensDomainName) {
       const ensNameHash = ensService.namehash(ensDomainName);
@@ -1052,7 +1085,7 @@ export default class Resolution {
       return this.unhash(tokenId as string, NamingServiceName.UNS);
     }
 
-    const ensService = this.serviceMap['ENS'].native;
+    const ensService = this.getService(NamingServiceName.ENS).native;
     const ensDomainName = await ensService.reverseOf(address);
     if (ensDomainName) {
       return ensDomainName;
@@ -1111,7 +1144,7 @@ export default class Resolution {
       });
     }
 
-    const servicePromises = this.serviceMap[serviceName].usedServices.map(
+    const servicePromises = this.getService(serviceName).usedServices.map(
       (service) => wrapResult(() => func(service)),
     );
 
@@ -1153,7 +1186,7 @@ export default class Resolution {
       });
     }
 
-    const servicePromises = this.serviceMap[serviceName].usedServices.map(
+    const servicePromises = this.getService(serviceName).usedServices.map(
       (service) => wrapResult(() => func(service)),
     );
 
@@ -1183,11 +1216,11 @@ export default class Resolution {
   ): Promise<string | null> {
     let tokenId: string | null = null;
 
-    const unsService = this.serviceMap['UNS'].native;
+    const unsService = this.getService(NamingServiceName.UNS).native;
     tokenId = await unsService.reverseOf(address, location);
 
     if (!tokenId) {
-      const baseUnsService = this.serviceMap['UNS_BASE'].native;
+      const baseUnsService = this.getService(NamingServiceName.UNS_BASE).native;
       tokenId = await baseUnsService.reverseOf(address, location);
     }
 
@@ -1214,20 +1247,27 @@ export default class Resolution {
       });
     }
 
-    const unsSource = config.sourceConfig?.uns;
-    if (isBlockchainsConfig(unsSource)) {
-      return new Uns({
-        locations: {
-          Layer1: unsSource.blockchains.eth,
-          Layer2: unsSource.blockchains.pol,
-        },
-      });
+    if (isApi(config.sourceConfig?.uns)) {
+      return new UdApi(config.sourceConfig?.uns);
     }
 
-    return isApi(unsSource) ? new UdApi(unsSource) : new Uns(unsSource);
+    const layer1 =
+      config.sourceConfig?.uns?.locations.Layer1 ||
+      config.sourceConfig?.uns?.locations.eth;
+    const layer2 =
+      config.sourceConfig?.uns?.locations.Layer2 ||
+      config.sourceConfig?.uns?.locations.pol;
+    return layer1 || layer2
+      ? new Uns({
+          locations: {
+            Layer1: layer1 as UnsLayerSource,
+            Layer2: layer2 as UnsLayerSource,
+          },
+        })
+      : new Uns();
   }
 
-  private getUnsBaseConfig(config: ResolutionConfig): Uns | UdApi {
+  private getUnsBaseConfig(config: ResolutionConfig): Uns | UdApi | undefined {
     if (config.apiKey) {
       return new Uns({
         locations: {
@@ -1247,17 +1287,22 @@ export default class Resolution {
       });
     }
 
-    const unsSource = config.sourceConfig?.uns;
-    if (isBlockchainsConfig(unsSource)) {
-      return new Uns({
-        locations: {
-          Layer1: unsSource.blockchains.eth,
-          Layer2: unsSource.blockchains.base,
-        },
-      });
+    if (isApi(config.sourceConfig?.uns)) {
+      return new UdApi(config.sourceConfig?.uns);
     }
 
-    return isApi(unsSource) ? new UdApi(unsSource) : new Uns(unsSource);
+    const layer1 =
+      config.sourceConfig?.uns?.locations.Layer1 ||
+      config.sourceConfig?.uns?.locations.eth;
+    const layer2 = config.sourceConfig?.uns?.locations.base;
+    return layer1 && layer2
+      ? new Uns({
+          locations: {
+            Layer1: layer1 as UnsLayerSource,
+            Layer2: layer2 as UnsLayerSource,
+          },
+        })
+      : undefined;
   }
 
   private getZnsConfig(config: ResolutionConfig): Zns | UdApi {
@@ -1295,8 +1340,4 @@ function isApi(obj: any): obj is Api {
     'api' in obj &&
     typeof obj.api === 'boolean'
   );
-}
-
-function isBlockchainsConfig(obj: any): obj is UnsBlockchainsSource {
-  return typeof obj === 'object' && obj !== null && 'blockchains' in obj;
 }

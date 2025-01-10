@@ -8,7 +8,6 @@ import {
   unwrapResult,
 } from './utils';
 import {
-  UnsSource,
   CryptoRecords,
   DomainData,
   NamingServiceName,
@@ -17,6 +16,7 @@ import {
   Locations,
   BlockchainType,
   DomainMetadata,
+  UnsInternalSource,
 } from './types/publicTypes';
 import {isValidTwitterSignature} from './utils/TwitterSignatureValidator';
 import FetchProvider from './FetchProvider';
@@ -33,7 +33,7 @@ import UnsInternal from './UnsInternal';
 import Networking from './utils/Networking';
 import SupportedKeys from './config/resolver-keys.json';
 
-const ensureValidSourceConfig = (source: UnsSource): void => {
+const ensureValidSourceConfig = (source: UnsInternalSource): void => {
   if (
     !source.locations ||
     !source.locations.Layer1 ||
@@ -72,7 +72,7 @@ export default class Uns extends NamingService {
   public unsl2: UnsInternal;
   readonly name: NamingServiceName = NamingServiceName.UNS;
 
-  constructor(source?: UnsSource) {
+  constructor(source?: UnsInternalSource) {
     super();
     if (source) {
       ensureValidSourceConfig(source);
