@@ -16,8 +16,21 @@ export type UnsLayerSource = NamingServiceSource & {
   blockchain?: BlockchainType;
 };
 
+export type UnsInternalSource = {
+  locations: {
+    Layer1: UnsLayerSource;
+    Layer2: UnsLayerSource;
+  };
+};
+
 export type UnsSource = {
-  locations: {Layer1: UnsLayerSource; Layer2: UnsLayerSource};
+  locations: {
+    Layer1?: UnsLayerSource;
+    Layer2?: UnsLayerSource;
+    eth?: UnsLayerSource;
+    pol?: UnsLayerSource;
+    base?: UnsLayerSource;
+  };
 };
 
 export type EnsSource = NamingServiceSource & {
