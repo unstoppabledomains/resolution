@@ -414,7 +414,7 @@
 
 ## 1.1.0
 
-- Using flexible dependacies instead of locked versions
+- Using flexible dependencies instead of locked versions
 - Moved sizecheck to a separate dev dependacy
 - Added web3Provider Support [#57]
 - Added factories Resolution.infura, Resolution.provider,
