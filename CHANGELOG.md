@@ -313,7 +313,7 @@
 - Add DnsUtils as a helper class to convert from CryptoRecord type to DnsRecord
   and vice-versa #99
 - Plug-in network config from dot-crypto library #101
-- Removed elliptic from dependacy list. (when needed user should install it
+- Removed elliptic from dependency list. (when needed user should install it
   separately)
 
 ## 1.8.3
@@ -415,7 +415,7 @@
 ## 1.1.0
 
 - Using flexible dependacies instead of locked versions
-- Moved sizecheck to a separate dev dependacy
+- Moved sizecheck to a separate dev dependency
 - Added web3Provider Support [#57]
 - Added factories Resolution.infura, Resolution.provider,
   Resolution.jsonRPCprovider
