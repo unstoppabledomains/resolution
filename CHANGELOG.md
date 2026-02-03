@@ -554,7 +554,7 @@
 - Resolution#owner method - returns an owner address of the domain
 - Fixed issue with user agent on browsers instances for Resolution
 - Added docs generation scripts
-- Unstoppable API is not initilized when blockchain param is true inside the
+- Unstoppable API is not initialized when blockchain param is true inside the
   Resolution configuration
 
 ## 0.3.0
