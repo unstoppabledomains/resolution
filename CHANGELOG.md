@@ -193,7 +193,7 @@
 - Introduced new method
   `Resolution#tokenURI -> Retrieves the tokenURI from the registry smart contract`
 - Introduced new method
-  `Resolution#tokenURIMetadata -> etrieves the data from the endpoint provided by tokenURI from the registry smart contract`
+  `Resolution#tokenURIMetadata -> Retrieves the data from the endpoint provided by tokenURI from the registry smart contract`
 - Introduced new factory method
   `Resolution#fromZilliqaProvider -> Creates a resolution instance with configured provider from Zilliqa provider`
 - Introduced new factory method
@@ -278,12 +278,12 @@
 
 - Introduced Resolution#usdt(domain: string, version: TickerVersion) which
   resolves in various USDT records from different chains
-- Introduced TickerVersion enum which holds all values for version parametr ar
+- Introduced TickerVersion enum which holds all values for version parameter at
   Resolution#usdt
 
 ## 1.10.4-1.11.1
 
-- updated resolution cli, config option is depricated
+- updated resolution cli, config option is deprecated
 - introduced --ethereum-url option to provide a non default blockchain provider
 
 ## 1.10.3
@@ -292,11 +292,11 @@
 
 ## 1.10.2
 
-- hotfix regarding incompatable types with Ethers InfuraProvider
+- hotfix regarding incompatible types with Ethers InfuraProvider
 
 ## 1.10.1
 
-- Fixed bug regarding incompatable types with Ethers InfuraProvider
+- Fixed bug regarding incompatible types with Ethers InfuraProvider
 - Remove ability to read from registry directly. `ProxyReader` address is now
   required. #105.
 
