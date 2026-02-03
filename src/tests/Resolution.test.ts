@@ -578,7 +578,7 @@ describe('Resolution', () => {
 
       describe('.ipfsHash', () => {
         skipItInLive(
-          'should prioritize new keys over depricated ones',
+          'should prioritize new keys over deprecated ones',
           async () => {
             const spies = mockAsyncMethods(uns, {
               get: {
