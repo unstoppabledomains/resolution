@@ -115,7 +115,7 @@ const HandlersByCode = {
  * - UnspecifiedResolver - domain has no resolver specified
  * - UnspecifiedCurrency - domain resolver doesn't have any address of specified currency
  * - UnsupportedCurrency - currency is not supported
- * - IncorrectResolverInterface - ResolverInterface is incorrected
+ * - IncorrectResolverInterface - ResolverInterface is incorrect
  * - RecordNotFound - No record was found
  * @param domain - Domain name that was being used
  * @param method

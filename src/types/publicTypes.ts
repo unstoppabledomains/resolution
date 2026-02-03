@@ -81,7 +81,7 @@ export type AutoNetworkConfigs = {
 };
 
 /**
- * ResolutionResulution
+ * ResolutionResponse
  * @typedef ResolutionResponse
  * @property {Object} addresses - Resolution addresses for various currency addresses attached to the domain
  * @property {Object} meta - meta information about the owner of the domain

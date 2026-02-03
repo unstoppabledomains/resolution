@@ -559,7 +559,7 @@ export default class Resolution {
    * @param ticker - currency ticker (USDT, FTM, etc.)
    * @param chain - chain version, usually means blockchain ( ERC20, BEP2, OMNI, etc. )
    * @throws [[ResolutionError]] if address is not found
-   * @returns A promise that resolves in an adress
+   * @returns A promise that resolves in an address
    */
   async multiChainAddr(
     domain: string,
@@ -873,7 +873,7 @@ export default class Resolution {
   }
 
   /**
-   * Checks weather the domain name matches the hash
+   * Checks whether the domain name matches the hash
    * @param domain - domain name to check against
    * @param hash - hash obtained from the blockchain
    * @param namingService - "UNS" or "ZNS" (uses keccak256 or sha256 algorithm respectively)
