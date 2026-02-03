@@ -137,10 +137,10 @@
 
 - 🎉 🎉 🎉 Add Polygon Layer 2 support!
 - Add `Resolution#locations` method which will help to determine domains
-  location (blockhain, networkId) and useful metadata like owner, resolver,
+  location (blockchain, networkId) and useful metadata like owner, resolver,
   registry addresses, provider url if possible.
   - Method returns:
-    - Domain blockhain (ETH or MATIC)
+    - Domain blockchain (ETH or MATIC)
     - Blockchain network id (numeric)
     - Owner address
     - Resolver address
