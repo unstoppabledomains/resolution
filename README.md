@@ -67,7 +67,7 @@ const {default: Resolution} = require('@unstoppabledomains/resolution');
 const resolution = new Resolution({apiKey: '<api_key>'});
 ```
 
-> NOTE: The `apiKey` is only used resolve domains from UNS. Behind the scene, it
+> NOTE: The `apiKey` is only used to resolve domains from UNS. Behind the scene, it
 > still uses the default ZNS (Zilliqa) RPC url. For additional control, please
 > specify your ZNS configuration.
 
@@ -134,14 +134,14 @@ const resolution = new Resolution({
 
 ## Initialize with Autoconfiguration of blockchain network
 
-In some scenarios system might not be flexible enough to easy distinguish
+In some scenarios system might not be flexible enough to easily distinguish
 between various Ethereum testnets at compilation time. In this case, Resolution
-library provide a special async constructor
+library provides a special async constructor
 `await Resolution.autonetwork(options)`. This method makes a JSON RPC
 "net_version" call to the provider to get the network id.
 
 This method configures only Uns. Zns is supported only on Zilliqa mainnet which
-is going to be used in any cases. You can provide a configured provider or a
+is going to be used in any case. You can provide a configured provider or a
 blockchain url as in the following example:
 
 ```
