@@ -197,9 +197,9 @@
 - Introduced new factory method
   `Resolution#fromZilliqaProvider -> Creates a resolution instance with configured provider from Zilliqa provider`
 - Introduced new factory method
-  `Resolution#fromResolutionProvider -> Creates a resolution from Resolution compatitable provider`
+  `Resolution#fromResolutionProvider -> Creates a resolution from Resolution compatible provider`
 - Introduced new factory method
-  `Resolution#fromEthereumEip1193Provider -> Creates a resolution from EIP-1193 compatitable provider`
+  `Resolution#fromEthereumEip1193Provider -> Creates a resolution from EIP-1193 compatible provider`
 - Return ENS support
 - Add custom network support for ENS
 
