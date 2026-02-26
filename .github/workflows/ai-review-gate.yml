@@ -1,0 +1,26 @@
+name: AI Review Gate
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
+      - unlabeled
+  pull_request_review:
+    types:
+      - submitted
+      - dismissed
+
+# Permissions ceiling for the reusable workflow's jobs
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  ai-review-gate:
+    # Centralized gate logic from agent-plugins.
+    uses: unstoppabledomains/agent-plugins/.github/workflows/ai-review-gate-reusable.yml@main
+    secrets: inherit
