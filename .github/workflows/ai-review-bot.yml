@@ -1,0 +1,17 @@
+name: AI Review Bot
+
+on:
+  pull_request:
+    types: [labeled, unlabeled, review_requested]
+
+# Permissions ceiling for the reusable workflow's jobs
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  ai-review-bot:
+    # Centralized review logic from agent-plugins; uses main for stable tooling.
+    uses: unstoppabledomains/agent-plugins/.github/workflows/ai-review-bot-reusable.yml@main
+    secrets: inherit
